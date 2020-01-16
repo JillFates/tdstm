@@ -1,11 +1,11 @@
 <!-- Main content -->
-<div class="content tag-list body tds-kendo-grid without-selectabe-rows">
+<div class="content tag-list body tds-kendo-grid">
 	<section>
 		<div class="box-body box-with-empty-header">
 			<form novalidate #myForm="ngForm">
 				<kendo-grid
-					class="page-height"
-					[ngClass]="{'row-actions-3-children': gridSettings.canSupportColumnMenuDynamic(7), 'hide-filter': !showFilters}"
+					class="page-height row-actions-3-children fixed-context-menu"
+					[ngClass]="{'hide-filter': !showFilters}"
 					*ngIf="gridSettings"
 					[data]="gridSettings.gridData"
 					[filter]="gridSettings.state.filter"
@@ -30,41 +30,26 @@
 				>
 					<!-- Toolbar Template -->
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<div class="button-bar text-right">
-							<div>
-								<!-- Refresh button -->
-								<tds-button-custom
-									[flat]="true"
-									[icon]="'repeat'"
-									[tooltip]="'Refresh View'"
-									(click)="reloadTagList()"
-								>
-								</tds-button-custom>
-							</div>
-						</div>
-						<div class="button-bar">
-							<div class="inline float-right">
-								<tds-button-create
-									[displayLabel]="false"
-									(click)="clickAddButton()"
-									title="{{ 'GLOBAL.CREATE' | translate }}"
-									[type]="button"
-									*ngIf="canCreate()"
-								>
-								</tds-button-create>
+						<div class="clr-row">
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadTagList()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
 								<!-- Use a hidden button so that we don't have to override kendo's button styles -->
-								<button
-									id="addButton"
-									kendoGridAddCommand
-									*ngIf="canCreate()"
-									style="display: none;"
-									type="button"
-								></button>
+								<button id="addButton"
+										kendoGridAddCommand
+										*ngIf="canCreate()"
+										style="display: none;"
+										type="button">
+								</button>
 							</div>
 						</div>
-					</ng-template>
+                    </ng-template>
 
-					<!-- Action -->
+                    <!-- Action -->
 					<kendo-grid-column
 						[width]="60"
 						[class]="{ 'k-custom-command-column': true }"
@@ -95,8 +80,6 @@
 							kendoGridCellTemplate
 							let-dataItem
 							let-rowIndex="rowIndex"
-							let-isComment="dataItem.taskAndCommentFlags.comment"
-							let-isIssue="dataItem.taskAndCommentFlags.issue"
 						>
 							<div class="action-button btn-link">
 								<clr-dropdown>
@@ -274,65 +257,17 @@
 
 						<!-- Filter Template -->
 						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div
-								class="has-feedback"
-								*ngIf="
-									column.property &&
-									column.type !== 'action' &&
-									column.type !== 'number' &&
-									column.property !== 'color'
-								"
-							>
-								<div
-									*ngIf="
-										column.type === 'date';
-										then dateFilter;
-										else stringFilter
-									"
-								></div>
-								<ng-template #dateFilter>
-									<kendo-datepicker
-										[format]="dateFormat"
-										[(ngModel)]="column.filter"
-										[ngModelOptions]="{ standalone: true }"
-										(valueChange)="
-											gridSettings.onFilter(column)
-										"
-										style="width: 100%;"
-									></kendo-datepicker>
-									<span
-										*ngIf="column.filter"
-										(click)="
-											gridSettings.clearFilter(column)
-										"
-										style="margin-right: 25px"
-										class="fa fa-times form-control-feedback"
-									></span>
-									<!--<kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"-->
-									<!--[ngModelOptions]="{standalone: true}"></kendo-datepicker>-->
-									<!--<span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"-->
-									<!--class="fa fa-times form-control-feedback"></span>-->
-								</ng-template>
-								<ng-template #stringFilter>
-									<input
-										clrInput
-										[(ngModel)]="column.filter"
-										(keyup)="gridSettings.onFilter(column)"
-										[ngModelOptions]="{ standalone: true }"
-										type="text"
-										name="{{ column.property }}"
-										placeholder="Filter"
-									/>
-									<span
-										*ngIf="column.filter"
-										(click)="
-											gridSettings.clearValue(column)
-										"
-										class="fa fa-times form-control-feedback"
-									></span>
-								</ng-template>
+							<div class="filter-input" *ngIf="column.property !== 'color'">
+								<tds-filter-input
+										[name]="column.property"
+										[value]="column.filter || ''"
+										[columnType]="column.type"
+										placeholder="{{'GLOBAL.FILTER' | translate}}"
+										(filter)="gridSettings.onFilterWithValue($event, column)">
+								</tds-filter-input>
 							</div>
 						</ng-template>
+
 					</kendo-grid-column>
 
 					<ng-template

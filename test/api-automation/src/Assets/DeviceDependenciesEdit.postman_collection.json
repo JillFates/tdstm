@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0dcee02c-7aff-4b7a-8abd-d6e10dc4222c",
+		"_postman_id": "2596d21d-24ca-45e0-a30c-015538cb4628",
 		"name": "DeviceDependencyEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -95,7 +102,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
+					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1\n\n",
 					"host": [
 						"{{host}}"
 					],
@@ -272,6 +279,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -325,6 +337,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -389,6 +406,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -440,5 +462,6 @@
 			"value": "999999999999999999999",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

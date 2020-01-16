@@ -1,7 +1,7 @@
 import {
 	AfterContentInit,
 	Component,
-	ElementRef,
+	ElementRef, OnDestroy,
 	OnInit,
 	Renderer2,
 } from '@angular/core';
@@ -23,9 +23,11 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PreferenceService } from '../../../../shared/services/preference.service';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {
 	ActivatedRoute,
-	Event,
 	Params,
 	Router,
 	NavigationEnd,
@@ -39,6 +41,7 @@ import {
 import { ProjectCreateComponent } from '../create/project-create.component';
 import { ProjectViewEditComponent } from '../view-edit/project-view-edit.component';
 import { NotifierService } from '../../../../shared/services/notifier.service';
+import {Permission} from '../../../../shared/model/permission.model';
 
 declare var jQuery: any;
 
@@ -46,7 +49,9 @@ declare var jQuery: any;
 	selector: `project-list`,
 	templateUrl: 'project-list.component.html',
 })
-export class ProjectListComponent implements OnInit, AfterContentInit {
+export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected state: State = {
 		sort: [
 			{
@@ -67,15 +72,16 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: ProjectModel[];
+	protected navigationSubscription;
 	public canEditProject;
 	public dateFormat = '';
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	public showActive: boolean;
-	private projectToOpen: number;
-	private pageURL: string;
+	private projectToOpen: string;
 	private projectOpen = false;
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -87,7 +93,8 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		private router: Router,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
-		private renderer: Renderer2
+		private renderer: Renderer2,
+		private translateService: TranslatePipe,
 	) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
@@ -97,10 +104,25 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 			? this.route.snapshot.data['projects'].activeProjects
 			: this.route.snapshot.data['projects'].completedProjects;
 		this.gridData = process(this.resultSet, this.state);
+
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
 	}
 
 	ngOnInit() {
-		this.pageURL = this.router.url;
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('PROJECT.CREATE_PROJECT'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.openCreateProject.bind(this),
+			},
+		];
+
 		this.preferenceService
 			.getUserDatePreferenceAsKendoFormat()
 			.subscribe(dateFormat => {
@@ -116,26 +138,22 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngAfterContentInit() {
-		this.projectToOpen = +this.route.snapshot.queryParams['show'];
-
-		this.router.events.subscribe(e => {
-			if (this.pageURL === this.router.url) {
-				if (
-					e instanceof NavigationEnd &&
-					this.projectToOpen &&
-					!this.projectOpen
-				) {
-					this.projectToOpen = this.projectToOpen;
-					this.showProject(this.projectToOpen);
-				}
-			} else {
-				this.pageURL = '';
+		this.projectToOpen = this.route.snapshot.queryParams['show'];
+		// The following code Listen to any change made on the route to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event && event.state && event.state && event.state.url.indexOf('/project/list') !== -1) {
+				this.projectToOpen = event.state.root.queryParams.show;
+			}
+			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length && !this.projectOpen) {
+				this.showProject(this.projectToOpen);
 			}
 		});
 
 		this.route.queryParams.subscribe(params => {
 			if (this.projectToOpen && !this.projectOpen) {
-				this.showProject(this.projectToOpen);
+				setTimeout(() => {
+					this.showProject(this.projectToOpen);
+				});
 			}
 		});
 	}
@@ -266,15 +284,56 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.projectColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Determines if user has the permission to create projects
+	 */
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProjectCreate);
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 }

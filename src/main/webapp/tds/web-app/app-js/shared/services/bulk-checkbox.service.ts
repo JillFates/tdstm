@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
-import {CheckboxState, CheckboxStates} from '../components/tds-checkbox/model/tds-checkbox.model';
+import {CheckboxState, CheckboxStates} from '../components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 
 @Injectable()
 export class BulkCheckboxService {

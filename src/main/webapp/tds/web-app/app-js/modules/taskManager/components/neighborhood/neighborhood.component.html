@@ -1,7 +1,6 @@
 <div class="neighborhood-container content body">
   <div class="row task-manager-header">
     <div class="col-md-4 k-align-self-center">
-      <p class="task-graph-title">Task Graph</p>
     </div>
     <div class="col-md-4 text-center k-align-self-center">
       <tds-task-view-toggle></tds-task-view-toggle>
@@ -36,13 +35,13 @@
       </kendo-dropdownlist>
     </div>
     <div class="col-md-2  k-align-self-center">
-      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Teams:</label>
+      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Team:</label>
       <kendo-dropdownlist
         id="neighborhood-teams-dropdown"
         textField="label"
         valueField="label"
         [ngClass]="'neighborhood-custom-dropdown'"
-        [value]="selectedEvent"
+        [value]="selectedTeam"
         [data]="teamHighlights$ | async"
         (selectionChange)="highlightByTeam($event)"
         [(ngModel)]="selectedTeam"
@@ -89,6 +88,16 @@
         <span class="checkmark"></span>
         View Unpublished
       </label>
+
+      <label class="task-chk-container" [ngClass]="{'disabled': !hasCycles}">
+        <input
+                type="checkbox"
+                [(ngModel)]="showCycles"
+                (ngModelChange)="highlightCycles()"
+                [disabled]="!hasCycles"/>
+        <span class="checkmark"></span>
+        Cycles
+      </label>
     </div>
 
   </div>
@@ -100,6 +109,7 @@
     (nodeClicked)="onNeighborhood($event)"
     (backTofullGraph)="viewFullGraphFromCache()"
     (nodeUpdated)="updateGraphCache($event)"
+    (diagramClicked)="diagramClicked()"
     #graph></tds-diagram-layout>
   </div>
 </div>

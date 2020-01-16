@@ -8,12 +8,14 @@ import {
 	Renderer2,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
 // Services
 import { ProviderService } from '../../service/provider.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { DateUtils } from '../../../../shared/utils/date.utils';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 // Components
 import { ProviderViewEditComponent } from '../view-edit/provider-view-edit.component';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
@@ -32,59 +34,38 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 import { ProviderAssociatedModel } from '../../model/provider-associated.model';
 import { Permission } from '../../../../shared/model/permission.model';
 // Kendo
-import {
-	CompositeFilterDescriptor,
-	State,
-	process,
-} from '@progress/kendo-data-query';
-import {
-	CellClickEvent,
-	GridDataResult,
-	PageChangeEvent,
-} from '@progress/kendo-angular-grid';
+import { SelectableSettings } from '@progress/kendo-angular-grid';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-declare var jQuery: any;
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'provider-list',
-	templateUrl: 'provider-list.component.html',
-	styles: [
-		`
-			#btnCreateProvider {
-				margin-left: 16px;
-			}
-		`,
-	],
+	templateUrl: 'provider-list.component.html'
 })
 export class ProviderListComponent implements OnInit, OnDestroy {
-	protected gridColumns: any[];
+	public headerActionButtons: HeaderActionButtonData[];
 
-	protected state: State = {
-		sort: [
-			{
-				dir: 'asc',
-				field: 'name',
-			},
-		],
-		filter: {
-			filters: [],
-			logic: 'and',
-		},
-	};
-	public skip = 0;
+	protected gridColumns: any[];
+	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: true};
+	public dataGridOperationsHelper: DataGridOperationsHelper;
+	private initialSort: any = [{
+		dir: 'asc',
+		field: 'name'
+	}];
+	private checkboxSelectionConfig = null;
+
 	public pageSize = GRID_DEFAULT_PAGE_SIZE;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public providerColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
-	public gridData: GridDataResult;
-	public resultSet: ProviderModel[];
 	public selectedRows = [];
 	public dateFormat = '';
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	protected showFilters = false;
+	public disabledClearFilters: any;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -94,15 +75,32 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
 		private renderer: Renderer2,
-		private userContext: UserContextService
+		private userContext: UserContextService,
+		private translateService: TranslatePipe
 	) {
-		this.state.take = this.pageSize;
-		this.state.skip = this.skip;
-		this.resultSet = this.route.snapshot.data['providers'];
-		this.gridData = process(this.resultSet, this.state);
+
+		this.dataGridOperationsHelper = new DataGridOperationsHelper(
+			this.route.snapshot.data['providers'],
+			this.initialSort,
+			this.selectableSettings,
+			this.checkboxSelectionConfig,
+			this.pageSize);
 	}
 
 	ngOnInit() {
+		this.disabledClearFilters = this.onDisableClearFilter.bind(this);
+
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('PROVIDER.CREATE_PROVIDER'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateProvider.bind(this),
+			},
+		];
+
 		this.userContext
 			.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
@@ -117,25 +115,6 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 					column => column.type !== 'action'
 				);
 			});
-	}
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected onFilter(column: any): void {
-		const root = this.providerService.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
-
-	protected clearValue(column: any): void {
-		this.providerService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
 	}
 
 	protected onCreateProvider(): void {
@@ -194,13 +173,11 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * @param {any} dataItem
 	 */
-	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			this.openProviderDialogViewEdit(event['dataItem'], ActionType.VIEW);
-		}
+	protected cellClick(dataItem: any): void {
+		this.selectRow(dataItem.id);
+		this.openProviderDialogViewEdit(dataItem, ActionType.VIEW);
 	}
 
 	protected reloadData(): void {
@@ -209,8 +186,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
 				result => {
-					this.resultSet = result;
-					this.gridData = process(this.resultSet, this.state);
+					this.dataGridOperationsHelper.reloadData(result);
 					setTimeout(
 						() => this.forceDisplayLastRowAddedToGrid(),
 						100
@@ -225,7 +201,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
 	 */
 	private forceDisplayLastRowAddedToGrid(): void {
-		const lastIndex = this.gridData.data.length - 1;
+		const lastIndex = this.dataGridOperationsHelper.gridData.data.length - 1;
 		let target = this.elementRef.nativeElement.querySelector(
 			`tr[data-kendo-grid-item-index="${lastIndex}"]`
 		);
@@ -271,20 +247,6 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
-	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
-		// Adjusting the locked column(s) height to prevent cut-off issues.
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-	}
-
-	/**
 	 * unsubscribe from all subscriptions on destroy hook.
 	 * @HostListener decorator ensures the OnDestroy hook is called on events like
 	 * Page refresh, Tab close, Browser close, navigation to another view.
@@ -311,11 +273,26 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of current selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter();
 	}
 
-	protected hasFilterApplied(): boolean {
-		return this.state.filter.filters.length > 0;
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.gridColumns);
 	}
+
+	/**
+	 * Disable clear filters
+	 */
+	protected onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
 }

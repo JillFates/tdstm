@@ -7,6 +7,7 @@ import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
+import { pathOr, uniq } from 'ramda';
 import {
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS,
@@ -114,8 +115,8 @@ export class DataGridOperationsHelper {
 			if (filter) {
 				this.state.filter.filters = this.getFiltersExcluding(column.property);
 			}
-			root.filters.push({ field: column.property, operator: 'gte', value: init, });
-			root.filters.push({ field: column.property, operator: 'lte', value: end });
+			root.filters.push({ field: column.property, operator: 'gte', value: init || '', });
+			root.filters.push({ field: column.property, operator: 'lte', value: end || '' });
 		}
 		if (column.type === 'boolean') {
 			if (!filter) {
@@ -144,21 +145,25 @@ export class DataGridOperationsHelper {
 	 * @param {any} state: Current filters state
 	 * @returns void
 	 */
-	public clearFilter(column: any): void {
+	public clearFilter(column: any, state: State = null): void {
+		const currentState: State = state || this.state;
+
 		column.filter = '';
-		this.state.filter.filters = this.getFiltersExcluding(column.property);
-		this.filterChange(this.state.filter);
+		currentState.filter.filters = this.getFiltersExcluding(
+			column.customPropertyName ? column.customPropertyName : column.property);
+		this.filterChange(currentState.filter);
 	}
 
 	/**
 	 * Clears all filters of all filterable columns.
 	 * @param columns
+	 * @param state: Optional Current filters state
 	 */
-	public clearAllFilters(columns: Array<GridColumnModel>): void {
+	public clearAllFilters(columns: Array<GridColumnModel>, state: State = null): void {
 		columns
 			.filter(column => column.filterable)
 			.forEach(column => {
-				this.clearFilter(column);
+				this.clearFilter(column, state);
 			});
 	}
 
@@ -174,7 +179,7 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * On Clear Value for filter event.
+	 * On Clear Value for filter event (Remove the column filter of the current selected filters).
 	 * @param column
 	 */
 	public clearValue(column: GridColumnModel): void {
@@ -190,8 +195,9 @@ export class DataGridOperationsHelper {
 	 * On Filter Change.
 	 * @param {CompositeFilterDescriptor} filter
 	 */
-	public filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
+	public filterChange(filter: CompositeFilterDescriptor, state: State = null): void {
+		const currentState = state || this.state;
+		currentState.filter = filter;
 		this.loadPageData();
 	}
 
@@ -372,5 +378,43 @@ export class DataGridOperationsHelper {
 	public canSupportColumnMenuDynamic(minRows = 0): boolean {
 		const minimum = minRows || MINIMUM_ROWS_TO_MAKE_MENU_COLUMN_POSITIONED_DYNAMIC;
 		return (this.gridData && this.gridData.total) >= minimum;
+	}
+
+	/**
+	 * Set the value of the filter and call the filtering process
+	 * @param value Value to be sent to the filter, could be boolean, date, string, etc...
+	 * @param column Column to filtering
+	 * @param operator Type of filter operation
+	 */
+	public onFilterWithValue(value: any, column: GridColumnModel, operator?: string): void {
+		column.filter = value;
+		let root = this.getFilter(column, operator);
+		root = this.removeEmptyFilters(root, column) ;
+		this.filterChange(root);
+	}
+
+	/**
+	 * Remove any empty filters who remains over the currenc selected filters collection
+	 * @param root Collection containing all filters
+	 * @param column column of the current filter selected
+	 */
+	public removeEmptyFilters(root: CompositeFilterDescriptor, column: GridColumnModel): CompositeFilterDescriptor {
+		// clear (string/date) values
+		root.filters = (root.filters || []).filter((filter: any) => filter.value !== '');
+		// clear boolean filter value
+		if (column.filter === '' && column.type === 'boolean') {
+			root.filters = root.filters.filter((filter: any) => filter.field !== column.property);
+		}
+
+		return root;
+	}
+
+	/**
+	 * Returns the number of distinct currently selected filters
+	 * @param state optionally pass the state otherwise use the current state
+	 */
+	public getFilterCounter(state: State = null): number {
+		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
+		return uniq(filters.map((filter: any) => filter.field)).length;
 	}
 }

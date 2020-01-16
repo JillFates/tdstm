@@ -51,7 +51,7 @@
 								/>
 								<label>Completed</label>
 							</clr-radio-wrapper>
-							<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchEventsForGrid()" class="flat"></tds-button-custom>
+							<tds-button-custom icon="sync" [displayLabel]="false" tooltip="Refresh" (click)="fetchEventsForGrid()"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -97,7 +97,7 @@
 							<label class="description">Active news for your events</label>
 						</div>
 						<div class="grid-actions clr-col-4">
-							<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="fetchEventNewsForGrid()" class="flat" tooltip="Refresh"></tds-button-custom>
+							<tds-button-custom icon="sync" [displayLabel]="false" (click)="fetchEventNewsForGrid()" tooltip="Refresh"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -147,7 +147,7 @@
 								<span> - Your applications as an SME or Owner</span>
 							</div>
 							<div class="grid-actions clr-col-4">
-								<tds-button-custom  icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchApplicationsForGrid()" class="flat"></tds-button-custom>
+								<tds-button-custom  icon="sync" [displayLabel]="false" tooltip="Refresh" (click)="fetchApplicationsForGrid()"></tds-button-custom>
 							</div>
 						</div>
 					</ng-template>
@@ -178,7 +178,7 @@
 								<label class="description">Currently active people on this project</label>
 							</div>
 							<div class="grid-actions clr-col-4">
-								<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchPeopleForGrid()" class="flat"></tds-button-custom>
+								<tds-button-custom icon="sync" [displayLabel]="false" tooltip="Refresh" (click)="fetchPeopleForGrid()"></tds-button-custom>
 							</div>
 						</div>
 					</ng-template>
@@ -218,7 +218,7 @@
 								<label class="description">Active tasks assigned to you</label>
 							</div>
 							<div class="grid-actions clr-col-6">
-								<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchTasksForGrid()" class="flat"></tds-button-custom>
+								<tds-button-custom icon="sync" [displayLabel]="false" tooltip="Refresh" (click)="fetchTasksForGrid()"></tds-button-custom>
 							</div>
 						</div>
 					</ng-template>

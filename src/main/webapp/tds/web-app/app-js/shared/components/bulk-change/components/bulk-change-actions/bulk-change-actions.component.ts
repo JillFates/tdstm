@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UIExtraDialog} from '../../../../services/ui-dialog.service';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
@@ -10,13 +10,20 @@ import {BulkChangeService} from '../../../../services/bulk-change.service';
 import {Permission} from '../../../../model/permission.model';
 import {PermissionService} from '../../../../services/permission.service';
 import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.component';
-
+import { APIActionService } from '../../../../../modules/apiAction/service/api-action.service';
+import { NotifierService } from '../../../../services/notifier.service';
+import {AlertType} from '../../../../model/alert.model';
 @Component({
 	selector: 'tds-bulk-change-actions',
 	templateUrl: 'bulk-change-actions.component.html',
-	providers: [TranslatePipe]
+	providers: [TranslatePipe, APIActionService]
 })
-export class BulkChangeActionsComponent extends UIExtraDialog {
+export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit {
+	private readonly SELECT_DATA_MODEL = {
+		id: -1,
+		name: 'GLOBAL.PLEASE_SELECT',
+		isAutoProcess: false
+	};
 	protected bulkChangeType: BulkChangeType;
 	protected selectedItems: number[] = [];
 	protected selectedAction: BulkActions;
@@ -26,6 +33,10 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	protected itemType: string;
 	public showEdit: boolean;
 	public showDelete: boolean;
+	public showRun = false;
+	public sendEmailNotification = false;
+	public dataScriptOptions: Array<any> = [this.SELECT_DATA_MODEL];
+	public selectedScriptOption = this.dataScriptOptions[0];
 
 	constructor(
 		private bulkChangeModel: BulkChangeModel,
@@ -33,6 +44,8 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		private bulkChangeService: BulkChangeService,
 		private permissionService: PermissionService,
 		private dialogService: UIDialogService,
+		private apiActionService: APIActionService,
+		private notifier: NotifierService,
 		private translatePipe: TranslatePipe) {
 			super('#bulk-change-action-component');
 			this.selectedItems = this.bulkChangeModel.selectedItems || [];
@@ -45,6 +58,17 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 				this.getSinglePluralAssetName() : this.getSinglePluralDependenceName()
 	}
 
+	ngOnInit() {
+		this.apiActionService.getDataScripts({useWithAssetActions: true, isAutoProcess: true}).subscribe(result => {
+			if (Array.isArray(result) && result.length > 0) {
+				this.showRun = true;
+				this.dataScriptOptions = [this.SELECT_DATA_MODEL, ...result];
+			} else {
+				this.showRun = false;
+			}
+		});
+	}
+
 	public cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
 		this.dismiss(bulkOperationResult || {action: null, success: false});
 	}
@@ -54,7 +78,17 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 	}
 
 	onNext(): void {
-		(this.selectedAction === this.ACTION.Delete) ? this.deleteAction() : this.editAction();
+		switch (this.selectedAction) {
+			case this.ACTION.Edit:
+				this.editAction();
+				break;
+			case this.ACTION.Delete:
+				this.deleteAction();
+				break;
+			case this.ACTION.Run:
+				this.runAction();
+				break;
+		}
 	}
 
 	private editAction(): void {
@@ -81,6 +115,13 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 			.catch((result) => this.cancelCloseDialog(result))
 	}
 
+	private runAction(): void  {
+		this.confirmRun()
+			.then(this.runBulk.bind(this))
+			.then(this.closeDialog.bind(this))
+			.catch((result) => this.cancelCloseDialog(result))
+	}
+
 	private confirmDelete(): Promise<boolean> {
 		const translationKey = this.bulkChangeType === BulkChangeType.Assets
 			? 'ASSET_EXPLORER.BULK_CHANGE.DELETE.CONFIRM_DELETE_ASSETS'
@@ -101,6 +142,88 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		})
 	}
 
+	private confirmRun(): Promise<boolean> {
+		const translationKey =
+		this.bulkChangeType === BulkChangeType.Assets
+			? 'ASSET_EXPLORER.BULK_CHANGE.RUN.CONFIRM_RUN_ASSETS'
+			: 'ASSET_EXPLORER.BULK_CHANGE.RUN.CONFIRM_RUN_DEPENDENCIES';
+		const singleOrPluralName =
+		this.bulkChangeType === BulkChangeType.Assets
+			? this.getSinglePluralAssetName()
+			: this.getSinglePluralDependenceName();
+		const message = this.translatePipe.transform(translationKey, [
+			this.affected,
+			singleOrPluralName,
+			singleOrPluralName
+		]);
+		return new Promise((resolve, reject) => {
+			this.promptService
+				.open(
+					this.translatePipe.transform(
+						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+					),
+					message,
+					this.translatePipe.transform('GLOBAL.CONFIRM'),
+					this.translatePipe.transform('GLOBAL.CANCEL')
+					)
+				.then(result =>
+					result
+						? resolve()
+						: reject({
+							action: BulkActions.Run,
+							success: false,
+							message: 'canceled'
+						})
+				);
+			});
+	}
+
+	private runBulk(): Promise<BulkActionResult> {
+		return new Promise((resolve, reject) => {
+			if (this.hasAssetRunPermission()) {
+				const userParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}};
+				const payload = {
+					userParams,
+					dataViewId: this.bulkChangeModel.viewId,
+					ids: this.bulkChangeModel.selectedItems,
+					dataScriptId: this.selectedScriptOption.id
+				};
+				this.bulkChangeService.bulkRun(payload).subscribe(
+					result => {
+						this.notifier.broadcast({
+							name: AlertType.SUCCESS,
+							message: 'The ETL import process was succesfully initiated'
+						});
+
+						return resolve({
+							action: BulkActions.Run,
+							success: true,
+							message: result.message || result.resp
+						})
+					}
+					,
+					err => {
+						this.notifier.broadcast({
+							name: AlertType.DANGER,
+							message: err.message || err
+						});
+						return reject({
+							action: BulkActions.Run,
+							success: false,
+							message: err.message || err
+						})
+					}
+					);
+				} else {
+					reject({
+						action: BulkActions.Run,
+						success: false,
+						message: 'Forbidden operation'
+					});
+				}
+			});
+	}
+
 	private deleteBulk(): Promise<BulkActionResult> {
 		const items = this.selectedItems.map((value: number) => value.toString());
 		return new Promise((resolve, reject) =>  {
@@ -113,13 +236,15 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 			} else {
 				reject({action: BulkActions.Delete, success: false, message: 'Forbidden operation' });
 			}
-
 		});
-
 	}
 
 	private hasAssetDeletePermission(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetDelete);
+	}
+
+	private hasAssetRunPermission(): boolean {
+		return true;
 	}
 
 	/*

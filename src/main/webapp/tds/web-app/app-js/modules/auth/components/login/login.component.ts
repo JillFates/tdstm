@@ -96,13 +96,13 @@ export class LoginComponent implements OnInit {
 	 */
 	ngOnInit(): void {
 		let loginRequests = [
-			this.pageService.updateLastPage(),
+			this.pageService.updateLastPage().catch(e => Observable.of({successful: false})),
 			this.loginService.getLoginInfo()
 		];
 		Observable.forkJoin(loginRequests).pipe(
 			map(([successToSaveLastPage, loginInfo]) => {
 				// If session is still active, redirect user to his last page saved
-				if (successToSaveLastPage) {
+				if (successToSaveLastPage.successful) {
 					this.getCurrentUserSnapshot();
 				} else {
 					// If not, we ensure the session start from scratch
@@ -202,21 +202,8 @@ export class LoginComponent implements OnInit {
 					}
 				});
 			});
-		} else if (
-			this.userContextModel &&
-			this.userContextModel.notices &&
-			this.userContextModel.notices.redirectUrl
-		) {
-			if (
-				this.userContextModel.postNotices && this.userContextModel.postNotices.notices &&
-				this.userContextModel.postNotices.notices.length > 0
-			) {
-				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map(
-					(notice: NoticeModel) => {
-						notice.sequence = notice.sequence || 0;
-						return notice;
-					}
-				);
+		} else if (this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
+			if (this.userContextModel.postNotices && this.userContextModel.postNotices.length > 0) {
 				this.showNotices();
 			} else {
 				this.navigateTo();
@@ -244,16 +231,22 @@ export class LoginComponent implements OnInit {
 					setTimeout(() => {
 						this.showStandardNotices()
 							.then(() => {
-								this.postNoticesManager
-									.notifyContinue()
-									.subscribe(() => this.navigateTo());
+								this.postNoticesManager.notifyContinue()
+									.subscribe(
+										() => this.navigateTo(),
+										() => {
+											this.navigateTo();
+										});
 							})
-							.catch(error => this.navigateTo());
+							.catch((error) => this.navigateTo());
 					}, 600);
 				} else {
-					this.postNoticesManager
-						.notifyContinue()
-						.subscribe(() => this.navigateTo());
+					this.postNoticesManager.notifyContinue()
+						.subscribe(
+							() => this.navigateTo(),
+							() => {
+								this.navigateTo();
+							});
 				}
 			})
 			.catch(() => {
@@ -267,14 +260,10 @@ export class LoginComponent implements OnInit {
 	private showStandardNotices() {
 		const notices = this.filterPostNotices(false);
 
-		return notices.length
-			? this.dialogService.open(StandardNoticesComponent, [
-				{
-					provide: Notices,
-					useValue: {notices: notices},
-				},
-			])
-			: Promise.resolve(true);
+		return notices.length ? this.dialogService.open(StandardNoticesComponent, [{
+			provide: Notices,
+			useValue: {notices: notices}
+		}]) : Promise.resolve(true);
 	}
 
 	/**
@@ -283,11 +272,10 @@ export class LoginComponent implements OnInit {
 	private showMandatoryNotices() {
 		const notices = this.filterPostNotices(true);
 
-		return notices.length
-			? this.dialogService.open(MandatoryNoticesComponent, [
-				{provide: Notices, useValue: {notices: notices}},
-			])
-			: Promise.resolve(true);
+		return notices.length ? this.dialogService
+				.open(MandatoryNoticesComponent, [{provide: Notices, useValue: {notices: notices}}])
+			:
+			Promise.resolve(true);
 	}
 
 	/**
@@ -295,7 +283,7 @@ export class LoginComponent implements OnInit {
 	 * @param {Boolean} mandatory True for get mandatory, False for get Standard
 	 */
 	private filterPostNotices(mandatory: boolean): any[] {
-		return this.userContextModel.postNotices.notices
+		return this.userContextModel.postNotices
 			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
 			.map((notice: NoticeModel) => {
 				return {...notice, notShowAgain: false};

@@ -4,10 +4,15 @@
   height: 100%;
 }
 
+.neighborhood-container.content {
+  padding-top: 5px !important;
+}
+
 .diagram-container {
   width: 100%;
   height: 100%;
   margin-left: 0;
+  z-index: 70;
 }
 
 .task-manager-header {
@@ -20,6 +25,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  z-index: 79;
 }
 
 .task-graph-title {
@@ -98,6 +104,15 @@
   width: 0;
 }
 
+.task-chk-container.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-chk-container input:disabled {
+  cursor: not-allowed;
+}
+
 /* Create a custom checkbox */
 .checkmark {
   position: absolute;
@@ -171,6 +186,7 @@
 
 .neighborhood-custom-dropdown {
   width: 70% !important;
+  display: inline-block !important;
 }
 
 .disp-inline-block {
@@ -184,4 +200,8 @@
 .clear-icon-button {
   float: right;
   cursor: pointer;
+}
+
+.k-icon {
+  font-family: "WebComponentsIcons", serif !important;
 }

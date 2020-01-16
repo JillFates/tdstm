@@ -26,22 +26,33 @@
 				>
 					<ng-template kendoGridToolbarTemplate position="top">
 						<div class="clr-row">
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
+							</div>
+						</div>
+                        <!--
+						<div class="clr-row">
 							<div class="clr-col-4 grid-label">
-								<!-- <strong>Bundle List</strong> -->
 							</div>
 							<div class="clr-col-8 grid-actions">
 								<div *ngIf="canEditBundle">
 									<tds-button
-										icon="sync"
-										(click)="reloadData()"
-									></tds-button>
-									<tds-button
 										icon="plus"
 										(click)="openCreateBundle()"
+									></tds-button>
+									<tds-button
+											icon="sync"
+											(click)="reloadData()"
 									></tds-button>
 								</div>
 							</div>
 						</div>
+						-->
 					</ng-template>
 
 					<!-- Show Filters / Actions column -->
@@ -112,12 +123,10 @@
 							*ngIf="column.type === 'boolean'"
 							let-dataItem
 						>
-							<input
-								type="checkbox"
-								[(ngModel)]="dataItem[column.property]"
-								style="margin-left: 35%;"
-								disabled
-							/>
+							<div class="checkbox-container">
+								<tds-checkbox [(inputModel)]="dataItem[column.property]" [disabled]="true"> 															 >
+								</tds-checkbox>
+							</div>
 						</ng-template>
 						<ng-template kendoGridFilterCellTemplate let-filter>
 							<div

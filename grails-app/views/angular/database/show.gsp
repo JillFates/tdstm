@@ -101,7 +101,7 @@
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>
 				<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-					<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
+					<tbody [ngClass]="{'one-column':!showDetails, 'three-column':showDetails}">
 						<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" />
 						<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
 						<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
@@ -204,19 +204,17 @@
 		</div>
 				
 		<div tdsScrollSection class="clr-row">
-			<div  class="clr-col-12">
-				<g:render 
-					template="/angular/common/commentList" 
-					model="[
-						asset:asset, 
-						prefValue: prefValue, 
-						viewUnpublishedValue: viewUnpublishedValue, 
-						currentUserId: currentUserId,
-						showTask:false,
-						showComment:true,
-					]" >
-				</g:render>
-			</div>
+			<g:render
+				template="/angular/common/commentList"
+				model="[
+					asset:asset,
+					prefValue: prefValue,
+					viewUnpublishedValue: viewUnpublishedValue,
+					currentUserId: currentUserId,
+					showTask:false,
+					showComment:true,
+				]" >
+			</g:render>
 		</div>
     </div>
 

@@ -1,28 +1,22 @@
 .task-list
   font-family: Roboto
-  padding-top: 10px
+  .header-controls
+    display: flex
+    height: 100%
+    justify-content: center
+    align-items: flex-end
+    padding-top: 2px
+    &.counter-down
+      align-items: baseline
+    clr-select-container
+      margin-top: unset
+  .row-controls
+    .header-controls
+      align-items: center
   form
     height: 12%
-    padding-top: 0
     input[type=checkbox][disabled] + label
       cursor: not-allowed
-  $secondary-fore-color: #18394B
-  .btn-link
-    .contextual-menu
-  .refresh-container
-    display: flex
-  .page-header
-    display: flex
-    justify-content: space-between
-    border-bottom-width: 0
-    margin-bottom: 0
-    padding-bottom: 0
-    h1
-      font-weight: bold
-      font-size: 18px
-      line-height: 24px
-      color: #18394B
-      margin-top: 5px
   .badge
     padding: 0
   .task-action-buttons
@@ -39,47 +33,20 @@
       height: 100%
       max-height: 100%
       display: -webkit-box
+      .k-grid-toolbar
+        padding-top: 0
   .label-event-list
     font-style: normal
     font-weight: 500
     font-size: 14px
     line-height: 24px
     margin: unset
+  .task-updated-cell
+    padding: 2px 6px
   .select-event-list
-    //width: 176px
     width: 150px
     max-width: 150px
     font-style: normal
     font-weight: 500
     font-size: 13px
     line-height: 18px
-  .checkboxes-container
-    display: flex
-    align-items: flex-end
-    justify-content: space-around
-  .actions-primary-page-container
-    display: flex
-    justify-content: space-between
-    align-items: flex-end
-    clr-select-container
-      margin-top: unset
-    tds-button
-      button
-        color: unset
-        border-color: unset
-    //.left-container
-    //  display: flex
-    //  clr-select-container
-    //    margin-top: 10px
-    .check-container
-      display: flex
-      clr-checkbox-wrapper
-        margin-right: 15px
-  .actions-secondary-page-container
-    display: flex
-    justify-content: flex-end
-    padding-top: 4px
-  .buttons-container
-    display: flex
-    align-items: flex-end
-    justify-content: flex-end

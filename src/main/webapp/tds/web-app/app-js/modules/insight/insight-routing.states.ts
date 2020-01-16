@@ -3,7 +3,6 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-// import {EventsResolveService} from './resolve/events-resolve.service';
 // Services
 import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
@@ -17,7 +16,6 @@ export class InsightStates {
 }
 
 const TOP_MENU_PARENT_SECTION = 'menu-parent-dashboard';
-const TOP_MENU_PARENT_PLANNING_SECTION = 'menu-parent-planning';
 
 export const InsightRoute: Routes = [
 
@@ -34,7 +32,7 @@ export const InsightRoute: Routes = [
 			requiresLicense: true
 		},
 		component: InsightDashboardComponent,
-		// canActivate: [AuthGuardService, ModuleResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 

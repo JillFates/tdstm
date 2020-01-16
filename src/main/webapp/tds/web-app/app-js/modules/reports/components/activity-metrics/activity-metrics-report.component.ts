@@ -72,7 +72,6 @@ import {ReportComponent} from '../report.component';
 									<div class="form-group row ">
 										<div class="col-sm-2 col-sm-offset-2 buttons">
 											<tds-button-export
-												class="btn-primary"
 												[disabled]="loadingLists"
 												(click)="onGenerateReport()"
 												title="Export to Excel"

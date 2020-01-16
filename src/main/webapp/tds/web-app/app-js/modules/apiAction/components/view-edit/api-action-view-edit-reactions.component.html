@@ -1,815 +1,413 @@
-<form
-	name="apiActionReactionForm"
-	role="form"
-	data-toggle="validator"
-	#apiActionReactionForm="ngForm"
-	class="form-horizontal left-alignment"
->
+<form name="apiActionReactionForm" role="form" data-toggle="validator"
+			#apiActionReactionForm='ngForm'
+			class="form-horizontal left-alignment">
 	<div class="box-body">
 		<div class="row">
 			<div class="col-md-12 event-wrapper">
 				<div class="row">
-					<div class="col-md-1 event-title">
-						<label>Events:</label>
+					<div class="col-md-1 event-title"><label>Events:</label></div>
+					<div class="col-md-1 hide-if-remote-section">
+						<tds-checkbox [name]="'apiActionStatusDetermination'"
+							[(inputModel)]="eventReactions[EventReactions.Status].selected"
+							[disabled]="eventReactions[EventReactions.Status].value.length > 0 || modalType === actionTypes.VIEW"
+							[title]="'Status'">
+						</tds-checkbox>
 					</div>
-					<div class="col-md-10" style="margin-top: 6px;">
-						<clr-checkbox-container clrInline>
-							<clr-checkbox-wrapper
-								class="hide-if-remote-section"
-							>
-								<input
-									type="checkbox"
-									clrCheckbox
-									name="apiActionStatusDetermination"
-									[(ngModel)]="eventReactions[0].selected"
-									[disabled]="
-										eventReactions[0].value.length > 0 ||
-										modalType === actionTypes.VIEW
-									"
-								/>
-								<label>Status</label>
-							</clr-checkbox-wrapper>
-							<clr-checkbox-wrapper>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionSuccess"
-									[(ngModel)]="eventReactions[1].selected"
-									[disabled]="true"
-								/>
-								<label>Success</label>
-							</clr-checkbox-wrapper>
-							<clr-checkbox-wrapper
-								class="hide-if-remote-section"
-							>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionDefault"
-									[(ngModel)]="eventReactions[2].selected"
-									[disabled]="
-										eventReactions[2].value.length > 0 ||
-										modalType === actionTypes.VIEW
-									"
-								/>
-								<label>Default</label>
-							</clr-checkbox-wrapper>
-							<clr-checkbox-wrapper>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionError"
-									(change)="
-										onErrorReactionCheckboxChangeHandler(
-											eventReactions[3]
-										)
-									"
-									[(ngModel)]="eventReactions[3].selected"
-									[disabled]="
-										isRemote ||
-										modalType === actionTypes.VIEW
-									"
-								/>
-								<label>Error</label>
-							</clr-checkbox-wrapper>
-							<clr-checkbox-wrapper>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionFailed"
-									[(ngModel)]="eventReactions[4].selected"
-									[disabled]="
-										eventReactions[4].value.length > 0 ||
-										modalType === actionTypes.VIEW
-									"
-								/>
-								<label>Failed</label>
-							</clr-checkbox-wrapper>
-							<clr-checkbox-wrapper
-								*ngIf="isPolling"
-								class=" hide-if-remote-section"
-							>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionLapsed"
-									[(ngModel)]="eventReactions[5].selected"
-									[disabled]="
-										eventReactions[5].value.length > 0 ||
-										modalType === actionTypes.VIEW
-									"
-								/>
-								<label>Lapsed</label>
-							</clr-checkbox-wrapper>
-							<clr-checkbox-wrapper
-								*ngIf="isPolling"
-								class="hide-if-remote-section"
-							>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionStalled"
-									[(ngModel)]="eventReactions[6].selected"
-									[disabled]="
-										eventReactions[6].value.length > 0 ||
-										modalType === actionTypes.VIEW
-									"
-								/>
-								<label>Stalled</label>
-							</clr-checkbox-wrapper>
-						</clr-checkbox-container>
+					<div class="col-md-1">
+						<tds-checkbox [name]="'apiActionSuccess'"
+									  [(inputModel)]="eventReactions[EventReactions.Success].selected"
+									  [disabled]="true"
+									  [title]="'Sucess'">
+						</tds-checkbox>
 					</div>
-				</div>
-				<div class="row">
-					<div
-						class="col-md-2 customize event-title hide-if-remote-section"
-					>
-						<label>Customize:</label>
+					<div class="col-md-1 hide-if-remote-section">
+						<tds-checkbox [name]="'apiActionDefault'"
+									  [(inputModel)]="eventReactions[EventReactions.Default].selected"
+									  [disabled]="eventReactions[EventReactions.Default].value.length > 0 || modalType === actionTypes.VIEW"
+									  [title]="'Default'">
+						</tds-checkbox>
 					</div>
-					<div class="col-md-10" style="margin-top: 6px;">
-						<clr-checkbox-container clrInline>
-							<clr-checkbox-wrapper
-								class="hide-if-remote-section"
-							>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionBeforeCall"
-									(change)="
-										onEventReactionSelect(eventReactions[7])
-									"
-									[(ngModel)]="eventReactions[7].selected"
-									[disabled]="disableApiActionBeforeCall()"
-								/>
-								<label>Before Invocation</label>
-							</clr-checkbox-wrapper>
-							<clr-checkbox-wrapper
-								class="hide-if-remote-section"
-							>
-								<input
-									clrCheckbox
-									type="checkbox"
-									name="apiActionAfterCall"
-									[(ngModel)]="eventReactions[8].selected"
-									[disabled]="
-										eventReactions[8].value.length > 0 ||
-										modalType === actionTypes.VIEW
-									"
-								/>
-								<label>Post Invocation</label>
-							</clr-checkbox-wrapper>
-						</clr-checkbox-container>
+					<div class="col-md-1">
+						<tds-checkbox [name]="'apiActionError'"
+									  [(inputModel)]="eventReactions[EventReactions.Error].selected"
+									  (change)="onErrorReactionCheckboxChangeHandler(eventReactions[EventReactions.Error])"
+									  [disabled]="isRemote || modalType === actionTypes.VIEW"
+									  [title]="'Error'">
+						</tds-checkbox>
+					</div>
+					<div class="col-md-1  hide-if-remote-section">
+						<tds-checkbox [name]="'apiActionFailed'"
+									  [(inputModel)]="eventReactions[EventReactions.Failed].value.length > 0 || modalType === actionTypes.VIEW"
+									  [disabled]="eventReactions[EventReactions.Failed].value.length > 0 || modalType === actionTypes.VIEW"
+									  [title]="'Failed'">
+						</tds-checkbox>
+					</div>
+					<div *ngIf="isPolling">
+						<div class="col-md-1 hide-if-remote-section">
+							<tds-checkbox [name]="'apiActionLapsed'"
+										  [(inputModel)]="eventReactions[EventReactions.Lapsed].selected"
+										  [disabled]="eventReactions[EventReactions.Lapsed].value.length > 0 || modalType === actionTypes.VIEW"
+										  [title]="'Lapsed'">
+							</tds-checkbox>
+						</div>
+						<div class="col-md-1  hide-if-remote-section">
+							<tds-checkbox [name]="'apiActionStalled'"
+										  [(inputModel)]="eventReactions[EventReactions.Stalled].selected"
+										  [disabled]="eventReactions[EventReactions.Stalled].value.length > 0 || modalType === actionTypes.VIEW"
+										  [title]="'Stalled'">
+							</tds-checkbox>
+						</div>
+					</div>
+					<div class="col-md-1 customize event-title hide-if-remote-section"><label>Customize:</label></div>
+					<div class="col-md-2  hide-if-remote-section">
+						<tds-checkbox [name]="'apiActionBeforeCall'"
+									  [(inputModel)]="eventReactions[EventReactions.BeforeInvocation].selected"
+									  (change)="onEventReactionSelect(eventReactions[EventReactions.BeforeInvocation])"
+									  [disabled]="disableApiActionBeforeCall()"
+									  [title]="'Before Invocation'">
+						</tds-checkbox>
+					</div>
+					<div class="col-md-2  hide-if-remote-section">
+						<tds-checkbox [name]="'apiActionAfterCall'"
+									  [(inputModel)]="eventReactions[EventReactions.PostInvocation].selected"
+									  [disabled]="eventReactions[EventReactions.PostInvocation].value.length > 0 || modalType === actionTypes.VIEW"
+									  [title]="'Post Invocation'">
+						</tds-checkbox>
 					</div>
 				</div>
 			</div>
 			<div class="all-codemirrors">
-				<div
-					class="col-md-12 codemirror-wrapper hide-if-remote-section"
-					*ngIf="eventReactions[0].selected"
-				>
+				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[0].selected">
 					<div class="form-group">
-						<label
-							for="apiActionStatusDetermination"
-							class="col-sm-8 control-label"
-							style="text-align: unset;"
-							>Status Determination
-							<span class="font-normal"
-								>- logic to determine the Success or other
-								status based on API response.</span
-							>
+						<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination
+							<span class="font-normal">- logic to determine the Success or other status based on API response.</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(0)"
-								[(model)]="eventReactions[0]"
-								(onClick)="verifyCode(eventReactions[0])"
-							></tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[0])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[0].open,
-										'fa-angle-double-up': !eventReactions[0]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+											  [disabled]="isCheckSyntaxSectionDisabled(EventReactions.Status)"
+											  [(model)]="eventReactions[EventReactions.Status]"
+												(onClick)="verifyCode(eventReactions[EventReactions.Status])">
+							</tds-check-action>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.Status].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Status])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.Status].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.Status])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[0].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.Status].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionStatusDetermination"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[0].value"
-							>
+							<code-mirror #reactionCodeMirror
+													 id="apiActionStatusDetermination"
+													 [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.Status].value">
 							</code-mirror>
-							<div
-								*ngIf="
-									eventReactions[0].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[0].error"
-									readonly
-								></textarea>
+							<div *ngIf="eventReactions[0].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													[ngModel]="eventReactions[EventReactions.Status].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<label
-					class="col-md-12 reaction-section-event"
-					*ngIf="showsEventLabel()"
-					>Events:</label
-				>
-				<div
-					class="col-md-12 codemirror-wrapper"
-					*ngIf="eventReactions[1].selected"
-				>
+				<label class="col-md-12 reaction-section-event" *ngIf="showsEventLabel()">Events:</label>
+				<div class="col-md-12 codemirror-wrapper" *ngIf="eventReactions[EventReactions.Success].selected">
 					<div class="form-group">
-						<label
-							for="apiActionSuccess"
-							class="col-sm-8 control-label"
-							style="text-align: unset;"
-							>Success
-							<span class="font-normal"
-								>- logic to be performed upon the API call being
-								successful.</span
-							>
+						<label for="apiActionSuccess" class="col-sm-8 control-label">Success
+							<span class="font-normal">- logic to be performed upon the API call being successful.</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(1)"
-								[(model)]="eventReactions[1]"
-								(onClick)="verifyCode(eventReactions[1])"
-							>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW" 
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Success)"
+																[(model)]="eventReactions[EventReactions.Success]" (onClick)="verifyCode(eventReactions[EventReactions.Success])">
 							</tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[1])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[1].open,
-										'fa-angle-double-up': !eventReactions[1]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.Success].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Success])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.Success].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.Success])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[1].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.Success].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionSuccess"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[1].value"
-							></code-mirror>
-							<div
-								*ngIf="
-									eventReactions[1].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[1].error"
-									readonly
-								></textarea>
+							<code-mirror #reactionCodeMirror id="apiActionSuccess" [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.Success].value"></code-mirror>
+							<div *ngIf="eventReactions[EventReactions.Success].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													[ngModel]="eventReactions[EventReactions.Success].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div
-					class="col-md-12 codemirror-wrapper hide-if-remote-section"
-					*ngIf="eventReactions[2].selected"
-				>
+				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.Default].selected">
 					<div class="form-group">
-						<label
-							for="apiActionDefault"
-							class="col-sm-8 control-label"
-							style="text-align: unset;"
-							>Default
-							<span class="font-normal"
-								>- logic to be performed for events not
-								explicitly defined.</span
-							>
+						<label for="apiActionDefault" class="col-sm-8 control-label">Default 
+							<span class="font-normal">- logic to be performed for events not explicitly defined.</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(2)"
-								[(model)]="eventReactions[2]"
-								(onClick)="verifyCode(eventReactions[2])"
-							>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Default)"
+																[(model)]="eventReactions[EventReactions.Default]"
+																(onClick)="verifyCode(eventReactions[EventReactions.Default])">
 							</tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[2])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[2].open,
-										'fa-angle-double-up': !eventReactions[2]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.Default].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Default])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.Default].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.Default])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[2].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.Default].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionDefault"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[2].value"
-							></code-mirror>
-							<div
-								*ngIf="
-									eventReactions[2].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[2].error"
-									readonly
-								></textarea>
+							<code-mirror #reactionCodeMirror id="apiActionDefault" [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.Default].value"></code-mirror>
+							<div *ngIf="eventReactions[EventReactions.Default].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													 [ngModel]="eventReactions[EventReactions.Default].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
 				<!-- Error Reaction Event -->
-				<div
-					class="col-md-12 codemirror-wrapper"
-					*ngIf="eventReactions[3].selected"
-				>
+				<div class="col-md-12 codemirror-wrapper" *ngIf="eventReactions[EventReactions.Error].selected">
 					<div class="form-group">
-						<label
-							for="apiActionError"
-							style="text-align: unset;"
-							class="col-sm-8 control-label"
-							>Error
-							<span class="font-normal"
-								>- logic to perform when the API call fails for
-								any cause.</span
-							>
+						<label for="apiActionError" class="col-sm-8 control-label">Error 
+							<span class="font-normal">- logic to perform when the API call fails for any cause.</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(3)"
-								[(model)]="eventReactions[3]"
-								(onClick)="verifyCode(eventReactions[3])"
-							>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Error)"
+																[(model)]="eventReactions[EventReactions.Error]"
+																(onClick)="verifyCode(eventReactions[EventReactions.Error])">
 							</tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[3])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[3].open,
-										'fa-angle-double-up': !eventReactions[3]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.Error].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Error])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.Error].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.Error])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[3].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.Error].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionError"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[3].value"
-							></code-mirror>
-							<div
-								*ngIf="
-									eventReactions[3].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[3].error"
-									readonly
-								></textarea>
+							<code-mirror #reactionCodeMirror id="apiActionError" [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.Error].value"></code-mirror>
+							<div *ngIf="eventReactions[EventReactions.Error].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													 [ngModel]="eventReactions[EventReactions.Error].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div
-					class="col-md-12 codemirror-wrapper hide-if-remote-section"
-					*ngIf="eventReactions[4].selected"
-				>
+				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.Failed].selected">
 					<div class="form-group">
-						<label
-							for="apiActionFailed"
-							style="text-align: unset;"
-							class="col-sm-8 control-label"
-							>Failed
-							<span class="font-normal"
-								>-logic to perform when API call receives 400 or
-								500 series HTTP error code.</span
-							>
+						<label for="apiActionFailed" class="col-sm-8 control-label">Failed 
+							<span class="font-normal">-logic to perform when API call receives 400 or 500 series HTTP error code.</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(4)"
-								[(model)]="eventReactions[4]"
-								(onClick)="verifyCode(eventReactions[4])"
-							>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Failed)"
+																[(model)]="eventReactions[EventReactions.Failed]"
+																(onClick)="verifyCode(eventReactions[EventReactions.Failed])">
 							</tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[4])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[4].open,
-										'fa-angle-double-up': !eventReactions[4]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.Failed].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Failed])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.Failed].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.Failed])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[4].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.Failed].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionFailed"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[4].value"
-							>
+							<code-mirror #reactionCodeMirror id="apiActionFailed" [mode]="codeMirrorMode" [(model)]="eventReactions[EventReactions.Failed].value">
 							</code-mirror>
-							<div
-								*ngIf="
-									eventReactions[4].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[4].error"
-									readonly
-								></textarea>
+							<div *ngIf="eventReactions[EventReactions.Failed].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													 [ngModel]="eventReactions[EventReactions.Failed].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div
-					class="col-md-12 codemirror-wrapper hide-if-remote-section"
-					*ngIf="eventReactions[5].selected && isPolling"
-				>
+				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.Lapsed].selected && isPolling">
 					<div class="form-group">
-						<label
-							for="apiActionLapsed"
-							style="text-align: unset;"
-							class="col-sm-8 control-label"
-							>Lapsed
-							<span class="font-normal"
-								>-logic to perform if a polling action did not
-								complete in anticipated time.</span
-							>
+						<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed
+							<span class="font-normal">-logic to perform if a polling action did not complete in anticipated time.</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(5)"
-								[(model)]="eventReactions[5]"
-								(onClick)="verifyCode(eventReactions[5])"
-							>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Lapsed)"
+																[(model)]="eventReactions[EventReactions.Lapsed]" (onClick)="verifyCode(eventReactions[EventReactions.Lapsed])">
 							</tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[5])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[5].open,
-										'fa-angle-double-up': !eventReactions[5]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.Lapsed].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Lapsed])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.Lapsed].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.Lapsed])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[5].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.Lapsed].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionLapsed"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[5].value"
-							></code-mirror>
-							<div
-								*ngIf="
-									eventReactions[5].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[5].error"
-									readonly
-								></textarea>
+							<code-mirror #reactionCodeMirror id="apiActionLapsed" [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.Lapsed].value"></code-mirror>
+							<div *ngIf="eventReactions[EventReactions.Lapsed].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													[ngModel]="eventReactions[EventReactions.Lapsed].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div
-					class="col-md-12 codemirror-wrapper hide-if-remote-section"
-					*ngIf="eventReactions[6].selected && isPolling"
-				>
+				<div class="col-md-12 codemirror-wrapper hide-if-remote-section"
+						 *ngIf="eventReactions[EventReactions.Stalled].selected && isPolling">
 					<div class="form-group">
-						<label
-							for="apiActionStalled"
-							style="text-align: unset;"
-							class="col-sm-8 control-label"
-							>Stalled
+						<label for="apiActionStalled" class="col-sm-8 control-label">Stalled
 							<span class="font-normal">
-								-logic to perform if a polling action has not
-								detected any progress for a period of time.
+								-logic to perform if a polling action has not detected any progress for a period of time.
 							</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(6)"
-								[(model)]="eventReactions[6]"
-								(onClick)="verifyCode(eventReactions[6])"
-							>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Stalled)"
+																[(model)]="eventReactions[EventReactions.Stalled]" (onClick)="verifyCode(eventReactions[EventReactions.Stalled])">
+
 							</tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[6])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[6].open,
-										'fa-angle-double-up': !eventReactions[6]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.Stalled].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Stalled])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.Stalled].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.Stalled])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[6].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.Stalled].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionStalled"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[6].value"
-							></code-mirror>
-							<div
-								*ngIf="
-									eventReactions[6].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[6].error"
-									readonly
-								></textarea>
+							<code-mirror #reactionCodeMirror id="apiActionStalled" [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.Stalled].value"></code-mirror>
+							<div *ngIf="eventReactions[EventReactions.Stalled].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													[ngModel]="eventReactions[EventReactions.Stalled].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<label
-					class="col-md-12 reaction-section-event hide-if-remote-section"
-					*ngIf="showsCustomizeLabel()"
-					>Customize:
+				<label class="col-md-12 reaction-section-event hide-if-remote-section"
+							 *ngIf="showsCustomizeLabel()">Customize:
 				</label>
-				<div
-					class="col-md-12 codemirror-wrapper hide-if-remote-section"
-					*ngIf="eventReactions[7].selected"
-				>
+				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.BeforeInvocation].selected">
 					<div class="form-group">
-						<label
-							for="apiActionBeforeCall"
-							style="text-align: unset;"
-							class="col-sm-8 control-label"
-							>Before Invocation
+						<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before Invocation
 							<span class="font-normal">
-								-logic to perform before the API call is invoked
-								to customize the request.
+								-logic to perform before the API call is invoked to customize the request.
 							</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(7)"
-								[(model)]="eventReactions[7]"
-								(onClick)="verifyCode(eventReactions[7])"
-							>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.BeforeInvocation)"
+																[(model)]="eventReactions[EventReactions.BeforeInvocation]" (onClick)="verifyCode(eventReactions[EventReactions.BeforeInvocation])">
 							</tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[7])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[7].open,
-										'fa-angle-double-up': !eventReactions[7]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.BeforeInvocation].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.BeforeInvocation])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.BeforeInvocation].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.BeforeInvocation])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[7].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.BeforeInvocation].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionBeforeCall"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[7].value"
-							></code-mirror>
-							<div
-								*ngIf="
-									eventReactions[7].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[7].error"
-									readonly
-								></textarea>
+							<code-mirror #reactionCodeMirror id="apiActionBeforeCall" [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.BeforeInvocation].value"></code-mirror>
+							<div *ngIf="eventReactions[EventReactions.BeforeInvocation].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													[ngModel]="eventReactions[EventReactions.BeforeInvocation].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div
-					class="col-md-12 codemirror-wrapper hide-if-remote-section"
-					*ngIf="eventReactions[8].selected"
-				>
+				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.PostInvocation].selected">
 					<div class="form-group">
-						<label
-							for="apiActionAfterCall"
-							style="text-align: unset;"
-							class="col-sm-8 control-label"
-							>Post Invocation
+						<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Invocation
 							<span class="font-normal">
-								-logic to perform after API call completes or
-								erred and the appropriate event has been
-								processed.
+								-logic to perform after API call completes or erred and the appropriate event has been processed.
 							</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action
-								*ngIf="modalType !== actionTypes.VIEW"
-								[disabled]="isCheckSyntaxSectionDisabled(8)"
-								[(model)]="eventReactions[8]"
-								(onClick)="verifyCode(eventReactions[8])"
-							></tds-check-action>
-							<button
-								type="button"
-								class="btn btn-icon"
-								(click)="openCloseCodeMirror(eventReactions[8])"
-							>
-								<i
-									style="font-size: 18px; color: #0092d1; padding: unset;"
-									[ngClass]="{
-										'fa-angle-double-down':
-											eventReactions[8].open,
-										'fa-angle-double-up': !eventReactions[8]
-											.open
-									}"
-									class="fa"
-								></i>
-							</button>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.PostInvocation)"
+																[(model)]="eventReactions[EventReactions.PostInvocation]"
+																(onClick)="verifyCode(eventReactions[EventReactions.PostInvocation])"></tds-check-action>
+
+							<tds-button-collapse *ngIf="eventReactions[EventReactions.PostInvocation].open"
+												 (click)="openCloseCodeMirror(eventReactions[EventReactions.PostInvocation])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[EventReactions.PostInvocation].open"
+											   (click)="openCloseCodeMirror(eventReactions[EventReactions.PostInvocation])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
-					<div class="form-group" *ngIf="eventReactions[8].open">
+					<div class="form-group" *ngIf="eventReactions[EventReactions.PostInvocation].open">
 						<div class="col-sm-12">
-							<code-mirror
-								#reactionCodeMirror
-								id="apiActionAfterCall"
-								[mode]="codeMirrorMode"
-								[(model)]="eventReactions[8].value"
-							></code-mirror>
-							<div
-								*ngIf="
-									eventReactions[8].state ===
-									CHECK_ACTION.INVALID
-								"
-								style="margin-left: 50px;"
-							>
-								<label
-									class="control-label"
-									style="color:darkred; text-align: unset;"
-									>Syntax Error</label
-								>
-								<textarea
-									class="form-control script-error"
-									name="apiActionSyntaxStatusDetermination"
-									[ngModel]="eventReactions[8].error"
-									readonly
-								></textarea>
+							<code-mirror #reactionCodeMirror id="apiActionAfterCall" [mode]="codeMirrorMode"
+													 [(model)]="eventReactions[EventReactions.PostInvocation].value"></code-mirror>
+							<div *ngIf="eventReactions[EventReactions.PostInvocation].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
+								<label class="control-label" style="color:darkred;">Syntax Error</label>
+								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+													[ngModel]="eventReactions[EventReactions.PostInvocation].error" readonly></textarea>
 							</div>
 						</div>
 					</div>

@@ -17,6 +17,10 @@ import {BundleColumnModel, BundleModel} from '../../model/bundle.model';
 import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
 import {BundleCreateComponent} from '../create/bundle-create.component';
 import {BundleViewEditComponent} from '../view-edit/bundle-view-edit.component';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { Permission } from '../../../../shared/model/permission.model';
 
 declare var jQuery: any;
 
@@ -25,6 +29,8 @@ declare var jQuery: any;
 	templateUrl: 'bundle-list.component.html',
 })
 export class BundleListComponent implements OnInit, AfterContentInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected state: State = {
 		sort: [{
 			dir: 'asc',
@@ -48,6 +54,7 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	public showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -58,7 +65,12 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
 		private store: Store,
-		private renderer: Renderer2) {
+		private renderer: Renderer2,
+		private translateService: TranslatePipe) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['bundles'];
@@ -66,6 +78,18 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('PLANNING.BUNDLES.CREATE_BUNDLE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.openCreateBundle.bind(this),
+			},
+		];
+
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
@@ -134,14 +158,23 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 			(err) => console.log(err));
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}
@@ -178,5 +211,28 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		this.gridData = process(this.resultSet, this.state);
 		// Adjusting the locked column(s) height to prevent cut-off issues.
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.bundleColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Determines if user has the permission to create projects
+	 */
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProjectCreate);
 	}
 }

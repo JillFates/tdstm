@@ -1,6 +1,7 @@
 package net.transitionmanager.imports
 
 import com.tdsops.etl.DomainClassQueryHelper
+import com.tdsops.etl.TagResults
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
@@ -327,6 +328,16 @@ class ImportBatchRecord {
 		this.tags = JsonUtil.toJson(tags)
 	}
 
+	/**
+	 * Saves {@code ImportBatchRecord#tags}
+	 * previously transforming it to a JSON.
+	 * @param tags a Map with tags structure.
+	 * @see ImportBatchRecord#tags
+	 */
+	void saveTagsAsMap(TagResults tags) {
+		this.tags = JsonUtil.toJson(tags)
+	}
+
 	// TODO : JPM 2/2018 : When using these setters the assignments were NOT working correctly
 	//
 	// Setter functions to deal with the JSON properties
@@ -367,6 +378,6 @@ class ImportBatchRecord {
 	 * @return true if tags contains any value or false if tags is null
 	 */
 	boolean hasTags() {
-		return tags != null
+		return tags != null && tags.trim() != '{"add":[],"remove":[],"replace":{}}'
 	}
 }

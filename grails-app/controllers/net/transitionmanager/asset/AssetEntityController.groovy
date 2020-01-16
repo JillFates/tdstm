@@ -2837,7 +2837,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			assetTypes: AssetEntityService.ASSET_TYPE_NAME_MAP,
 			defaultPrefs:defaultPrefs as JSON,
 			graphPrefs:prefsObject,
-			assetClassesForSelect2: AssetClass.classOptionsDefinition
+			assetClassesForSelect2: AssetClass.classOptionsDefinitionsLegacy
 		]
 		render(view: 'architectureGraph', model: model, assetId: params.assetId)
 	}
@@ -2867,7 +2867,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 
 		if (context.mode == "assetId") {
-			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsDown + 1, assetsList, dependencyList)
+			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsDown, assetsList, dependencyList)
 			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsUp, assetsList, dependencyList, false)
 		}
 

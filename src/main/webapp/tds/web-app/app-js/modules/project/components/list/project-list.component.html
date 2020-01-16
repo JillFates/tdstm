@@ -26,7 +26,7 @@
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
-							<div class="clr-col-12 grid-actions">
+							<div class="clr-col-4 grid-actions project-active-completed-options">
 								<clr-radio-wrapper>
 									<input
 										type="radio"
@@ -49,17 +49,14 @@
 									/>
 									<label>Show Completed Projects</label>
 								</clr-radio-wrapper>
-
-								<tds-button
-									icon="sync"
-									(click)="reloadData()"
-								></tds-button>
-
-								<tds-button-create
-									[displayLabel]="'false'"
-									*ngIf="canEditProject"
-									(click)="openCreateProject()"
-								></tds-button-create>
+							</div>
+							<div class="clr-col-8 grid-actions">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons"
+                                        (clearFilters)="clearAllFilters()"
+                                        [disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
 							</div>
 						</div>
 					</ng-template>
@@ -157,7 +154,7 @@
 									<span
 										*ngIf="column.filter"
 										(click)="clearValue(column)"
-										style="right:15%;cursor:pointer;color:#656565;pointer-events:all"
+										style="cursor:pointer;color:#656565;pointer-events:all; margin-right: 22px; line-height: 25px;"
 										class="fa fa-times form-control-feedback"
 										aria-hidden="true"
 									></span>
@@ -184,40 +181,6 @@
 										[flat]="true"
 									>
 									</tds-button>
-								</div>
-								<div *ngIf="column.type === 'number'">
-									<kendo-numerictextbox
-										(valueChange)="onFilter(column)"
-										[decimals]="0"
-										style="width:100%"
-										format="\#"
-										placeholder="Filter {{ column.label }}"
-										name="{{ column.property }}"
-										[(ngModel)]="column.filter"
-									>
-									</kendo-numerictextbox>
-									<span
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										style="cursor:pointer;color:#656565;pointer-events:all;width:80%;top:-2px"
-										class="fa fa-times form-control-feedback"
-										aria-hidden="true"
-									></span>
-								</div>
-								<div *ngIf="column.type === 'boolean'">
-									<kendo-dropdownlist
-										[data]="booleanFilterData"
-										[(ngModel)]="column.filter"
-										(valueChange)="onFilter(column)"
-										[style.width.%]="100"
-									></kendo-dropdownlist>
-									<span
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										style="cursor:pointer;color:#656565;pointer-events:all; margin-right: 10px; line-height: 30px;"
-										class="fa fa-times form-control-feedback"
-										aria-hidden="true"
-									></span>
 								</div>
 							</div>
 						</ng-template>

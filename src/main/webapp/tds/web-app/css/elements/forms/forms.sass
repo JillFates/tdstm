@@ -1,6 +1,8 @@
 // Some elements are not always inside a form, this allow to workaround some scenarios
 
 /* Applicable to All Forms */
+@import "invalid-input"
+
 form
   .form-horizontal
     &.left-alignment
@@ -192,11 +194,6 @@ div.error, span.error
   padding: 6px 12px
   font-size: 12px
   align-items: flex-start
-
-kendo-dropdownlist
-  &.form-control
-    &.error, &.has-error
-      border: 1px #f00 solid
 
 // invisible button style for exit on esc key help.
 button.invisible-button

@@ -1,6 +1,6 @@
-<header class="main-header header-component" *ngIf="!pageMetaData.hideTopNav || !userContext">
-	<nav class="navbar navbar-static-top">
-		<div class="container menu-top-container" [ngClass]="{ 'menu-top-container-full-menu': userContext?.licenseInfo && !userContext.licenseInfo?.license?.isManager}">
+<header class="main-header header-component" *ngIf="(!pageMetaData.hideTopNav || !userContext) && userContext.logged">
+    <nav class="navbar navbar-static-top">
+        <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': userContext.license && !userContext.license.isManager}">
 			<div class="navbar-header branding">
 				<img [src]="userContext.project.logoUrl" alt="Transition Manager Logo" />
 			</div>
@@ -21,14 +21,14 @@
 								<span *ngIf="userContext.bundle"> : {{ userContext.bundle.name }}</span>
 							</span>
 						</li>
-						<li *ngIf="userContext.licenseInfo && !userContext.licenseInfo.license.isManager && !userContext.licenseInfo.license.isValid">
+						<li *ngIf="userContext.license && !userContext.license.isManager && !userContext.license.isValid">
 							<tds-license-warning></tds-license-warning>
 						</li>
 						<!-- User Account Menu -->
 						<li class="dropdown user user-menu">
 							<!-- Menu Toggle Button -->
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" [title]="userContext.person.fullName">
-								<span class="user-name">{{getUserIconText()}}</span>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" [title]="fullName | async">
+								<span class="user-name">{{iconText | async}}</span>
 								<span class="user-menu-text">Account Options</span>
 							</a>
 							<ul class="dropdown-menu">

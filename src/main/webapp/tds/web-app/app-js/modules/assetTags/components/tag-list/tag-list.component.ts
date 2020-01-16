@@ -7,6 +7,8 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 // Components
 import { TagMergeDialogComponent } from '../tag-merge/tag-merge-dialog.component';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { HeaderActionButtonData } from 'tds-component-library';
+
 // Models
 import { TagModel } from '../../model/tag.model';
 import { TagListColumnsModel } from '../../model/tag-list-columns.model';
@@ -33,6 +35,8 @@ import { ReplaySubject } from 'rxjs';
 	providers: [TranslatePipe],
 })
 export class TagListComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	public gridSettings: DataGridOperationsHelper;
 	protected gridColumns: TagListColumnsModel;
 	protected colorList: Array<string>;
@@ -56,6 +60,17 @@ export class TagListComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translatePipe.transform('ASSET_TAGS.CREATE_TAG'),
+				disabled: !this.canCreate(),
+				show: true,
+				onClick: this.onAddButton.bind(this),
+			},
+		];
 		this.userContext
 			.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
@@ -353,6 +368,22 @@ export class TagListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.gridSettings.clearAllFilters(this.gridColumns.columns);
+		this.reloadTagList();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
 	 * Filter Assets Toggle
 	 */
 	public toggleFilters(): void {
@@ -363,14 +394,14 @@ export class TagListComponent implements OnInit, OnDestroy {
 		return this.gridSettings.state.filter.filters.length > 0;
 	}
 
-	protected clickAddButton() {
+	protected onAddButton() {
 		document.getElementById('addButton').click();
 	}
 	/**
 	 * Returns the number of current filters applied.
 	 */
 	public filterCount(): number {
-		return this.gridSettings.state.filter.filters.length;
+		return this.gridSettings.getFilterCounter();
 	}
 
 	protected canCreate(): boolean {

@@ -142,14 +142,21 @@ class RoomController implements ControllerMethods {
 			moveBundleList = [id: 'all']
 		} else if (userPreferenceService.getPreference(PREF.HIGHLIGHT_TASKS) || moveBundleId?.contains("taskReady")) {
 			def roomAssets = room.sourceAssets + room.targetAssets
-			Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,
-																						[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
-			racks = assetsByStatus.rackSource + assetsByStatus.rackTarget
-			racks.removeAll([null])
-			racks.each {
-				def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status
-				statusList[it.id] = statuses.contains("Hold") ? "task_hold" : statuses.contains("Started") ? "task_started" : "task_ready"
+			Set assetsByStatus
+
+			if (roomAssets) {
+				assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets, [
+					AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD
+				]).assetEntity
+
+				racks = assetsByStatus?.rackSource + assetsByStatus?.rackTarget
+				racks.removeAll([null])
+				racks.each {
+					def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status
+					statusList[it.id] = statuses.contains("Hold") ? "task_hold" : statuses.contains("Started") ? "task_started" : "task_ready"
+				}
 			}
+
 			userPreferenceService.setPreference(PREF.HIGHLIGHT_TASKS, moveBundleId)
 			moveBundleId = 'taskReady'
 		}
@@ -157,10 +164,23 @@ class RoomController implements ControllerMethods {
 		def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad") ?:
 		                      request.getHeader("User-Agent").toLowerCase().contains("mobile")
 
-		[roomInstance: room, roomInstanceList: rooms, moveBundleList: moveBundleList, project: project,
-		 racksList: racksList, source: params.source, target: params.target, projectId: project.id,
-		 capacityView: params.capView, capacityType: params.capType ?: 'Remaining', auditPref: auditView,
-		 browserTestiPad: browserTestiPad, statusList: statusList, bundleList: bundleLists, moveBundleId: moveBundleId]
+		[
+			roomInstance    : room,
+			roomInstanceList: rooms,
+			moveBundleList  : moveBundleList,
+			project         : project,
+			racksList       : racksList,
+			source          : params.source,
+			target          : params.target,
+			projectId       : project.id,
+			capacityView    : params.capView,
+			capacityType    : params.capType ?: 'Remaining',
+			auditPref       : auditView,
+			browserTestiPad : browserTestiPad,
+			statusList      : statusList,
+			bundleList      : bundleLists,
+			moveBundleId    : moveBundleId
+		]
 	}
 
 	@HasPermission(Permission.RoomEdit)
@@ -323,7 +343,7 @@ class RoomController implements ControllerMethods {
 			assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
 				spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 				def powerConnectors = AssetCableMap.executeQuery(
-					'FROM AssetCableMap WHERE assetFromPort.type=? AND assetFrom=?0', ["Power", assetEntity])
+					'FROM AssetCableMap WHERE assetFromPort.type=:type AND assetFrom=:asset', [type: "Power", asset: assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
 				def rackPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 				if (powerConnectorsAssigned) {

@@ -19,6 +19,11 @@ export class ButtonsFactoryService {
 			},
 			['tds-button-clone']: {icon: 'clone', title: translate('GLOBAL.CLONE'), tooltip: translate('GLOBAL.CLONE')},
 			['tds-button-close']: {icon: 'ban', title: translate('GLOBAL.CLOSE'), tooltip: translate('GLOBAL.CLOSE')},
+			['tds-button-check-syntax']: {
+				icon: 'thumbs-up',
+				title: translate('GLOBAL.CHECK_SYNTAX'),
+				tooltip: translate('GLOBAL.CHECK_SYNTAX')
+			},
 			['tds-button-create']: {
 				icon: 'plus',
 				title: translate('GLOBAL.CREATE'),
@@ -47,6 +52,7 @@ export class ButtonsFactoryService {
 				tooltip: translate('GLOBAL.FILTER')
 			},
 			['tds-button-save']: {icon: 'floppy', title: translate('GLOBAL.SAVE'), tooltip: translate('GLOBAL.SAVE')},
+			['tds-button-sync']: {icon: 'sync', title: translate('GLOBAL.REFRESH'), tooltip: translate('GLOBAL.REFRESH')},
 			['tds-button-undo']: {icon: 'undo', title: translate('GLOBAL.UNDO'), tooltip: translate('GLOBAL.UNDO')},
 			['tds-button-script']: {icon: 'file-code-o', title: translate('GLOBAL.SCRIPT'), tooltip: translate('GLOBAL.SCRIPT')},
 			['tds-button-collapse']: {icon: 'collapse-card', title: translate('GLOBAL.COLLAPSE'), tooltip: translate('GLOBAL.COLLAPSE')},

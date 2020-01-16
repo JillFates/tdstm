@@ -20,13 +20,13 @@ import {AssetGlobalFiltersService} from '../../service/asset-global-filters.serv
 import {AssetViewSelectorComponent} from '../asset-view-selector/asset-view-selector.component';
 import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
 import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+import { HeaderActionButtonData } from 'tds-component-library';
+
 // Other
 import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
-import { BulkActionResult, BulkChangeType } from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { ASSET_ENTITY_DIALOG_TYPES } from '../../../assetExplorer/model/asset-entity.model';
 import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
 import { takeUntil } from 'rxjs/operators';
@@ -39,6 +39,8 @@ declare var jQuery: any;
 	templateUrl: 'asset-view-show.component.html'
 })
 export class AssetViewShowComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 
 	private currentId;
 	private dataSignature: string;
@@ -60,11 +62,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
 	public hiddenFilters = false;
-	bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 	private unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
-	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -86,6 +86,22 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'download-cloud',
+				title: this.translateService.transform('ASSET_EXPORT.VIEW'),
+				show: true,
+				onClick: this.onExport.bind(this),
+			},
+			{
+				icon: 'cog',
+				title: this.translateService.transform('ASSET_EXPLORER.CONFIGURE_VIEW'),
+				show: true,
+				onClick: this.onEdit.bind(this),
+			},
+		];
+
 		// Get all Query Params
 		this.route.queryParams.subscribe(map => map);
 		this.globalQueryParams = this.route.snapshot.queryParams;
@@ -184,7 +200,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				this.data = result;
 				jQuery('[data-toggle="popover"]').popover();
 			}, err => console.log(err));
-		});
+		}, 2000);
 	}
 
 	public onEdit(): void {
@@ -233,6 +249,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			queryId: this.model.id,
 			viewName: this.model.name
 		};
+
+		if (this.hiddenFilters) {
+			this.assetGlobalFiltersService.prepareFilters(assetExportModel.assetQueryParams, this.globalQueryParams);
+		}
 
 		this.dialogService.open(AssetViewExportComponent, [
 			{ provide: AssetExportModel, useValue: assetExportModel }
@@ -285,6 +305,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				columns: model.schema.columns
 			}
 		};
+
 		if (justPlanning) {
 			assetQueryParams['justPlanning'] = justPlanning;
 		}
@@ -397,20 +418,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * On bulk edit call grid bulk edit action
-	 */
-	onClickBulkButton(): void {
-		this.assetExplorerViewGrid.onClickBulkButton(this.tdsBulkChangeButton);
-	}
-
-	/**
-	 * Handle Bulk edit result.
-	 */
-	onBulkOperationResult(operationResult: BulkActionResult): void {
-		this.assetExplorerViewGrid.onBulkOperationResult(operationResult);
-	}
-
-	/**
 	 * Returns the grid configuration.
 	 */
 	getGridConfig(): any {
@@ -458,5 +465,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	private getPreferences(): Observable<any> {
 		return this.preferenceService.getPreferences(PREFERENCES_LIST.ASSET_JUST_PLANNING);
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
 	}
 }

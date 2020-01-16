@@ -22,17 +22,15 @@
 				(cellClick)="cellClick($event)"
 				[selectable]="true"
 				[ngClass]="{ 'hide-filter': !showFilters }"
-				class="page-height row-actions-1-children"
+				class="page-height row-actions-2-children fixed-context-menu"
 			>
 				<ng-template kendoGridToolbarTemplate [position]="'top'">
-					<div class="clr-row">
-						<div class="clr-col-12 grid-actions">
-							<tds-button
-								icon="sync"
-								(click)="reloadData()"
-							></tds-button>
-						</div>
-					</div>
+					<tds-grid-header-action-buttons
+							(refresh)="reloadData()"
+							[actionButtons]="headerActionButtons"
+							(clearFilters)="onClearFilters()"
+							[disableClearFilters]="disableClearFilters">
+					</tds-grid-header-action-buttons>
 				</ng-template>
 
 				<!-- Show Filters / Actions column -->
@@ -66,7 +64,7 @@
 						let-dataItem
 						let-rowIndex="rowIndex"
 					>
-						<div class="action-button btn-group btn-link">
+						<div class="action-button btn-link">
 							<clr-dropdown>
 								<tds-button
 									icon="ellipsis-vertical"
@@ -84,13 +82,6 @@
 									>
 										Edit
 									</a>
-									<!-- <a
-											clrDropdownItem
-											(click)="onDelete(dataItem)"
-											[disabled]="!isDeleteAvailable()"
-										>
-											Delete
-										</a> -->
 								</clr-dropdown-menu>
 							</clr-dropdown>
 						</div>
@@ -120,14 +111,14 @@
 						>
 							<label> {{ column.label }}</label>
 						</div>
-                    </ng-template>
+					</ng-template>
 
 					<ng-template kendoGridFilterCellTemplate let-filter>
 						<div
 							class="has-feedback"
 							*ngIf="column.property && column.type !== 'action'"
 							style="margin-bottom:0px;"
-                        >
+						>
 							<div *ngIf="column.type === 'date'">
 								<kendo-datepicker
 									[format]="dateFormat"

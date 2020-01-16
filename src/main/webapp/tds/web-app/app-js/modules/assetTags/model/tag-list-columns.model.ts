@@ -8,6 +8,7 @@ export class TagListColumnsModel {
 		this.columns = [
 			{
 				label: 'Name',
+				filterable: true,
 				property: 'name',
 				type: 'text',
 				width: 170,
@@ -15,6 +16,7 @@ export class TagListColumnsModel {
 			},
 			{
 				label: 'Description',
+				filterable: true,
 				property: 'description',
 				type: 'text',
 				width: 380,
@@ -22,6 +24,7 @@ export class TagListColumnsModel {
 			},
 			{
 				label: 'Color',
+				filterable: false,
 				property: 'color',
 				type: 'text',
 				width: 100,
@@ -29,6 +32,7 @@ export class TagListColumnsModel {
 			},
 			{
 				label: 'Assets',
+				filterable: true,
 				property: 'assets',
 				type: 'number',
 				width: 120,
@@ -52,6 +56,7 @@ export class TagListColumnsModel {
 			},*/
 			{
 				label: 'Date Created',
+				filterable: true,
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
@@ -60,6 +65,7 @@ export class TagListColumnsModel {
 			},
 			{
 				label: 'Last Modified',
+				filterable: true,
 				property: 'lastModified',
 				type: 'date',
 				format: dateFormat,

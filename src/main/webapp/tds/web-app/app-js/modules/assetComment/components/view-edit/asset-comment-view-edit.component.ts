@@ -66,7 +66,8 @@ export class AssetCommentViewEditComponent extends UIExtraDialog
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.getModelFields());
+		return this.assetCommentModel.modal.type === ModalType.VIEW ?
+			false : this.dataSignature !== JSON.stringify(this.getModelFields());
 	}
 
 	/**
@@ -108,7 +109,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog
 		this.promptService
 			.open(
 				'Confirmation Required',
-				'Confirm deletion of this record. There is no undo for this action?',
+				'Confirm deletion of this record. There is no undo for this action.',
 				'Confirm',
 				'Cancel'
 			)
@@ -127,30 +128,6 @@ export class AssetCommentViewEditComponent extends UIExtraDialog
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	public cancelEditDialog(): void {
-		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
-				)
-				.then(confirm => {
-					if (confirm) {
-						this.assetCommentModel.modal.type = ModalType.VIEW;
-					}
-				})
-				.catch(error => console.log(error));
-		} else {
-			this.assetCommentModel.modal.type = ModalType.VIEW;
-		}
-	}
-
 	public closeDialog(): void {
 		if (this.isDirty()) {
 			this.promptService

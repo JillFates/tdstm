@@ -1,46 +1,36 @@
 <!-- Main content -->
-<div class="content body tds-kendo-grid">
+<div class="content body tds-kendo-grid provider-list-component">
 	<section>
 		<div *ngIf="providerColumnModel">
 			<div class="box-body box-with-empty-header">
 				<kendo-grid
-					[data]="gridData"
-					[filter]="state.filter"
+					*ngIf="dataGridOperationsHelper"
+					[data]="dataGridOperationsHelper.gridData"
+					[filter]="dataGridOperationsHelper.state.filter"
 					[filterable]="true"
-					(filterChange)="filterChange($event)"
-					[sort]="state.sort"
-					[skip]="skip"
-					[sortable]="{ mode: 'single' }"
-					[pageSize]="pageSize"
+					(filterChange)="dataGridOperationsHelper.filterChange($event)"
+					[sort]="dataGridOperationsHelper.state.sort"
+					[sortable]="{mode:'single', allowUnsort: false}"
 					[resizable]="true"
-					(sortChange)="sortChange($event)"
-					[pageable]="{
-						pageSizes: defaultPageOptions,
-						pageSize: pageSize,
-						info: true
-					}"
-					(pageChange)="pageChange($event)"
-					(cellClick)="cellClick($event)"
-					[selectable]="true"
+					(sortChange)="dataGridOperationsHelper.sortChange($event)"
+					[pageSize]="dataGridOperationsHelper.state.take"
+					[skip]="dataGridOperationsHelper.state.skip"
+					[pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
+					[selectable]="selectableSettings"
 					[ngClass]="{ 'hide-filter': !showFilters }"
-					class="page-height row-actions-2-children"
+					class="page-height row-actions-2-children fixed-context-menu"
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
-							<div class="clr-col-12 grid-actions">
-								<tds-button
-									icon="sync"
-									(click)="reloadData()"
-								></tds-button>
-								<tds-button
-									icon="plus"
-									[disabled]="!isCreateAvailable()"
-									[title]="
-										'PROVIDER.CREATE_PROVIDER' | translate
-									"
-									(click)="onCreateProvider()"
-									[id]="'btnCreateProvider'"
-								></tds-button>
+							<div class="clr-col-12">
+								<div class="pull-right">
+									<tds-grid-header-action-buttons
+											[actionButtons]="headerActionButtons"
+											(clearFilters)="clearAllFilters()"
+											[disableClearFilters]="disabledClearFilters"
+											(refresh)="reloadData()">
+									</tds-grid-header-action-buttons>
+								</div>
 							</div>
 						</div>
 					</ng-template>
@@ -62,10 +52,10 @@
 									class="grid-filter-button is-solid"
 								>
 									<span
-										*ngIf="hasFilterApplied()"
+										*ngIf="filterCount(); let filterCounter"
 										class="badge badge-warning"
 									>
-										{{ filterCount() }}
+										{{ filterCounter }}
 									</span>
 								</clr-icon>
 							</tds-button>
@@ -75,8 +65,6 @@
 							kendoGridCellTemplate
 							let-dataItem
 							let-rowIndex="rowIndex"
-							let-isComment="dataItem.taskAndCommentFlags.comment"
-							let-isIssue="dataItem.taskAndCommentFlags.issue"
 						>
 							<div class="action-button btn-link">
 								<clr-dropdown>
@@ -121,59 +109,30 @@
 					>
 						<ng-template kendoGridHeaderTemplate>
 							<div
-								class="sortable-column"
-								(click)="onClickTemplate($event)"
-							>
+								class="sortable-column">
 								<label> {{ column.label }}</label>
 							</div>
 						</ng-template>
 
+						<ng-template kendoGridCellTemplate *ngIf="column.isActionable" let-dataItem>
+								<span class="is-grid-link" (click)="cellClick(dataItem)">
+									{{dataItem[column.property]}}
+								</span>
+						</ng-template>
+
 						<ng-template kendoGridFilterCellTemplate let-filter>
 							<div
-								class="has-feedback"
-								*ngIf="
-									column.property && column.type !== 'action'
-								"
+								class="filter-input"
+								*ngIf="column.property && column.type !== 'action'"
 								style="margin-bottom:0px;"
 							>
-								<div *ngIf="column.type === 'date'">
-									<kendo-datepicker
-										[format]="dateFormat"
-										[(ngModel)]="column.filter"
-										(valueChange)="onFilter(column)"
-										[style.width.%]="100"
-									></kendo-datepicker>
-									<span
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										style="right:15%;cursor:pointer;color:#656565;pointer-events:all"
-										class="fa fa-times form-control-feedback"
-										aria-hidden="true"
-									></span>
-								</div>
-								<div
-									*ngIf="column.type === 'text'"
-									class="filter-input"
-								>
-									<input
-										clrInput
-										type="text"
-										(keyup)="onFilter(column)"
-										name="{{ column.property }}"
-										[(ngModel)]="column.filter"
-										placeholder="Filter {{ column.label }}"
-										value=""
-									/>
-									<tds-button
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										[title]="'Clear Filter'"
-										icon="times-circle"
-										[small]="true"
-										[flat]="true"
-									>
-									</tds-button>
-								</div>
+								<tds-filter-input
+										name="{{column.property}}"
+										[value]="column.filter || ''"
+                                        [columnType]="column.type"
+										placeholder="{{'GLOBAL.FILTER' | translate}}"
+										(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
+								</tds-filter-input>
 							</div>
 						</ng-template>
 					</kendo-grid-column>
@@ -190,8 +149,9 @@
 								[total]="total"
 								[totalPages]="totalPages"
 								[currentPage]="currentPage"
+								[pageSize]="pageSize"
 								[pageSizes]="defaultPageOptions"
-								(pageChange)="pageChange($event)"
+								(pageChange)="dataGridOperationsHelper.pageChange($event)"
 							>
 							</tds-grid-pager>
 						</div>

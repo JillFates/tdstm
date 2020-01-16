@@ -132,10 +132,10 @@
                         </td>
                     </tr>
                     <tr *ngIf="planningDashboardModel.analysis.overdueTasks > 0">
-                        <td>
+                        <td class="planning-dashboard-overdue-tasks">
                             <a [routerLink]="['/taskManager', 'list']"
                                [queryParams]="{filter: 'generalOverDue', moveEvent:0,  justRemaining:1, viewUnpublished: 0}">
-                                {{planningDashboardModel.analysis.overdueTasks}}
+                                <span>{{planningDashboardModel.analysis.overdueTasks}}</span>
                             </a>
                         </td>
                         <td>
@@ -190,7 +190,7 @@
                 <div class="row-fluid">
                     <div class="execution-table">
                         <table class="dashboard-right-table dashboard-stat-table">
-                                <thead *ngIf="planningDashboardModel.execution.moveEventList.length > 0">
+                                <thead>
                                 <tr>
                                     <th></th>
                                     <th></th>
@@ -321,9 +321,9 @@
                             </tr>
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/other_menu.svg"/></td>
-                                <td><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'other', _ufp: 'true'}">Other</a>
+                                <td><a [routerLink]="['/asset','views',3,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Unassigned', _ufp: 'true'}">Other</a>
                                 </td>
-                                <td class="execution-data-column"><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Unassigned', _ufp: 'true'}">{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedOtherPerc}}%)</a></td>
+                                <td class="execution-data-column"><a [routerLink]="['/asset','views',3,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Unassigned', _ufp: 'true'}">{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedOtherPerc}}%)</a></td>
                                 <td *ngFor="let other of planningDashboardModel.execution.otherList" class="execution-data-column">
                                     <span *ngIf="other.count==0" class='colorGrey'>0</span>
                                     <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_event: other.moveEvent, _ufp: 'true'}" *ngIf="other.count!=0">

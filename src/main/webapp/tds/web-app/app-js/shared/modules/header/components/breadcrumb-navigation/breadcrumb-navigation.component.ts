@@ -20,29 +20,41 @@ declare var jQuery: any;
 	selector: 'tds-breadcrumb-navigation',
 	template: `
 		<!-- Content Header (Page header) -->
-		<section class="content-header" *ngIf="!pageMetaData.hideTopNav && !pageMetaData.hideBreadcrumb">
+		<section class="content-header" *ngIf="!pageMetaData.hideTopNav">
 			<ng-container *ngIf="pageMetaData">
-				<h1>
-					{{ pageMetaData.title | translate }}
-					<small *ngIf="pageMetaData.instruction">{{pageMetaData.instruction | translate}}</small>
-				</h1>
-				<div
-					class="breadcrumb licensing-banner-message"
-					*ngIf="userContext.licenseInfo && userContext.licenseInfo.license && userContext.licenseInfo.license.banner">
-					<div class="callout">
-						{{ userContext.licenseInfo?.license.banner }}
-					</div>
+				<div class="clr-row">
+            <div class="clr-col-4 clr-align-content-center">
+              <div class="content-middle">
+                  <h2 [style.color]="pageMetaData?.titleColor" [style.fontWeight]="pageMetaData?.titleFontWeight">
+                      {{ pageMetaData.title | translate }}
+                      <small *ngIf="pageMetaData.instruction">{{pageMetaData.instruction | translate}}</small>
+                  </h2>
+              </div>
+            </div>
+						<div class="clr-col-4 clr-align-self-center">
+                <div
+                    class="breadcrumb-container licensing-banner-message"
+                    *ngIf="userContext.license && userContext.license.banner">
+                    <div class="callout">
+                        {{ userContext.license?.banner }}
+                    </div>
+                </div>
+						</div>
+						<div class="clr-col-4">
+              <div class="content-middle element-height-100-per clr-float-md-right">
+                  <ol class="breadcrumb-container">
+                      <li *ngFor="let menu of pageMetaData.menu; let last = last" [ngClass]="{ active: last }">
+                          <a *ngIf="!last && menu.navigateTo"
+                             [routerLink]="menu.navigateTo">{{ menu.text || menu | translate }}</a>
+                          <span *ngIf="!last && !menu.navigateTo">{{menu.text || menu | translate}}</span>
+                          <ng-container *ngIf="last">
+                              {{ menu.text || menu | translate }}
+                          </ng-container>
+                      </li>
+                  </ol>
+              </div>
+						</div>
 				</div>
-				<ol class="breadcrumb">
-					<li *ngFor="let menu of pageMetaData.menu; let last = last" [ngClass]="{ active: last }">
-						<a *ngIf="!last && menu.navigateTo"
-							[routerLink]="menu.navigateTo">{{ menu.text || menu | translate }}</a>
-						<span *ngIf="!last && !menu.navigateTo">{{menu.text || menu | translate}}</span>
-						<ng-container *ngIf="last">
-							{{ menu.text || menu | translate }}
-						</ng-container>
-					</li>
-				</ol>
 			</ng-container>
 		</section>
 		<tds-ui-dialog></tds-ui-dialog>
@@ -120,12 +132,11 @@ export class BreadcrumbNavigationComponent {
 			if (event.event.url.indexOf('/auth/') >= 0) {
 				this.pageMetaData.hideTopNav = true;
 			}
-			this.pageMetaData.hideBreadcrumb = event.event.url.indexOf('/taskManager/') >= 0;
 		});
 
 		this.notifierService.on('notificationRouteNavigationEnd', event => {
 			if (event.route.snapshot.data && event.route.snapshot.data.page) {
-				this.pageMetaData = {...event.route.snapshot.data.page, hideBreadcrumb: this.pageMetaData.hideBreadcrumb};
+				this.pageMetaData = event.route.snapshot.data.page;
 				const { report } = event.route.snapshot.data;
 				this.pageMetaData.id = report && report.id;
 				// Set Title

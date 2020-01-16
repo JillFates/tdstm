@@ -224,8 +224,8 @@ export class DateUtils {
 	 * @returns {init, end}
 	 */
 	public static getInitEndFromDate(date: Date): {init: Date, end: Date} {
-		const init = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-		const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+		const init = date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : null;
+		const end = date ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59) : null;
 
 		return {init, end};
 	}

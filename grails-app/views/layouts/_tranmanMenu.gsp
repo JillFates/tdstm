@@ -155,9 +155,6 @@
                                 <g:link class="mmlink" controller="module" action="asset" id="views">Manage Views</g:link>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">All Assets</g:link>
-                            </li>
                             <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="7" elementId="7">Applications</g:link>
                             </li>
@@ -172,6 +169,9 @@
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">Logical Storage</g:link>
+                            </li>
+                            <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
+                                <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">All Assets</g:link>
                             </li>
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-dependencies-list">
@@ -193,6 +193,11 @@
                                     <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
                                         Architecture Graph
                                     </g:link>
+                                </li>
+                            </tds:hasPermission>
+                            <tds:hasPermission permission="${Permission.ArchitectureView}">
+                                <li class="menu-child-item menu-parent-assets-architecture-graph">
+                                    <g:link controller="module" action="architecture-graph">GoJS Architecture Graph</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.DataTransferBatchView}">
@@ -277,7 +282,7 @@
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.TaskGraphView}">
                                 <li class="menu-child-item menu-parent-tasks-gojs-graph">
-                                    <g:link controller="module" action="taskManager/task-graph">GoJS Task Graph</g:link>
+                                    <g:link controller="module" action="task-graph">GoJS Task Graph</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.TaskTimelineView}">

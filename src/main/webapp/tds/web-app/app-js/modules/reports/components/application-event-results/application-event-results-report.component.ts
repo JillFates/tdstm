@@ -49,7 +49,7 @@ import {ReportComponent} from '../report.component';
 										</div>
 									</div>
 									<div class="form-group row input">
-										<label class="col-sm-2 control-label" for="starstWithList">Start of with</label>
+										<label class="col-sm-2 control-label" for="starstWithList">Begins with</label>
 										<div class="col-sm-3">
 											<kendo-dropdownlist
 												name="startsWithList"
@@ -92,12 +92,12 @@ import {ReportComponent} from '../report.component';
 									</div>
 									<div class="form-group row ">
 										<div class="col-sm-2 col-sm-offset-2 buttons">
-											<tds-button-custom class="btn-primary"
-																				 [disabled]="loadingSmeList || loadingLists"
-																				 (click)="onGenerateReport()"
-																				 title="Generate"
-																				 tooltip="Generate"
-																				 icon="table">
+											<tds-button-custom
+													[disabled]="loadingSmeList || loadingLists"
+													(click)="onGenerateReport()"
+													title="Generate"
+													tooltip="Generate"
+													icon="table">
 											</tds-button-custom>
 										</div>
 									</div>
