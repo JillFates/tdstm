@@ -5989,7 +5989,7 @@ class TaskService implements ServiceMethods {
 			note.save(flush: true)
 		}
 
-		if (task.assignedTo && commentService.shouldSendNotification(task, task.assignedTo, addingNote)) {
+		if (task.assignedTo && commentService.shouldSendNotification(task, task.assignedTo, !taskCommand.id, addingNote)) {
 			String tzId = userPreferenceService.timeZone
 			String userDTFormat = userPreferenceService.dateFormat
 			commentService.dispatchTaskEmail([taskId: task.id, tzId: tzId, isNew: !taskCommand.id , userDTFormat: userDTFormat])

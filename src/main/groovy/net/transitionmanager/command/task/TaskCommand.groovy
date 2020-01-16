@@ -1,5 +1,7 @@
 package net.transitionmanager.command.task
 
+import com.tdssrc.grails.TimeUtil
+import grails.databinding.BindUsing
 import net.transitionmanager.command.CommandObject
 
 class TaskCommand implements CommandObject {
@@ -15,7 +17,13 @@ class TaskCommand implements CommandObject {
     Long duration
     Integer durationLocked
     String durationScale
+    @BindUsing({ obj, source ->
+        return TimeUtil.parseDateTime(source['estFinish'])
+    })
     Date estFinish
+    @BindUsing({ obj, source ->
+        return TimeUtil.parseDateTime(source['estStart'])
+    })
     Date estStart
     Integer hardAssigned
     Long id
@@ -28,7 +36,7 @@ class TaskCommand implements CommandObject {
     Integer override
     Integer percentageComplete
     Integer prevAsset
-    String priority
+    Integer priority
     String resolution
     String role
     String status
