@@ -3125,7 +3125,7 @@ class ImportService implements ServiceMethods {
 		}.get()
 
 		if (!dataScript) {
-			throw new InvalidParamException('No DataScript identified')
+			throw new InvalidParamException('Specified DataView was not found')
 		}
 
 		return dataImportService.scheduleETLTransformDataJob(
