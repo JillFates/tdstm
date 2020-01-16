@@ -13,6 +13,9 @@ class TaskCommand implements CommandObject {
     String comment
     List deletedPreds
     String displayOption
+    @BindUsing({ obj, source ->
+        return TimeUtil.parseDateTime(source['dueDate'])
+    })
     Date dueDate
     Long duration
     Integer durationLocked
