@@ -87,6 +87,7 @@ export class TaskListComponent implements OnInit {
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
 	public hasViewUnpublishedPermission = false;
 	public isFiltering  = false;
+	public allTasksPermission: boolean;
 
 	constructor(
 		private taskService: TaskService,
@@ -94,12 +95,14 @@ export class TaskListComponent implements OnInit {
 		private userPreferenceService: PreferenceService,
 		private loaderService: UILoaderService,
 		private store: Store,
+		private permissionService: PermissionService,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
-		private activatedRoute: ActivatedRoute, private permissionService: PermissionService, private el: ElementRef, private renderer: Renderer2) {
+		private activatedRoute: ActivatedRoute) {
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
-		this.justMyTasks = false;
+		this.allTasksPermission = this.permissionService.hasPermission(Permission.TaskManagerAllTasks);
+		this.justMyTasks = !this.allTasksPermission;
 		this.loading = true;
 		this.hideGrid = true;
 		this.rowsExpanded = false;

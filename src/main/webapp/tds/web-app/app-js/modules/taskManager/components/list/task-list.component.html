@@ -70,6 +70,7 @@
 								clrCheckbox
 								type="checkbox"
 								name="justMine"
+								[disabled]="!allTasksPermission"
 								id="justMine"
 								[(ngModel)]="justMyTasks"
 								(ngModelChange)="onFiltersChange()"
