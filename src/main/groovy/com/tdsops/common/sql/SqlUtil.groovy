@@ -1,6 +1,6 @@
 package com.tdsops.common.sql
 
-
+import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.DateTimeFilterUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -346,29 +346,25 @@ class SqlUtil {
 				break
 
 			/* Scenario 1: Starts with '=' */
-			case ~ /^=.*/:
-				if (originalFilter.size() == 1) {
-					// TODO handle =empty
-				} else {
-					fieldSearchData.filter = originalFilter.substring(1)
-					buildSingleValueParameter(fieldSearchData, originalFilter[0])
-				}
+			case ~ /^=.+?/:
+				fieldSearchData.filter = originalFilter.substring(1)
+				buildSingleValueParameter(fieldSearchData, originalFilter[0])
 				break
 
 			/* Scenario 2: Starts with '<=' or '>=' */
-			case ~ /^(<=|>=).*/:
+			case ~ /^(<=|>=).+?/:
 				fieldSearchData.filter = originalFilter.substring(2)
 				buildSingleValueParameter(fieldSearchData, originalFilter.substring(0, 2))
 				break
 
 			/* Scenario 3: Starts with '<>' */
-			case ~ /^<>.*/:
+			case ~ /^<>.+?/:
 				fieldSearchData.filter = originalFilter.substring(2)
 				buildDistinctParameter(fieldSearchData)
 				break
 
 			/* Scenario 4: Starts with '<' or '>' and any literal follows. */
-			case ~ /^(<|>).*/:
+			case ~ /^(<|>).+?/:
 				fieldSearchData.filter = originalFilter.substring(1)
 				buildSingleValueParameter(fieldSearchData, originalFilter[0])
 				break
@@ -386,29 +382,29 @@ class SqlUtil {
 				break
 
 			/* Scenario 7: Starts with '-' and it isn't a list. */
-			case ~ /^-.*/:
+			case ~ /^-.+?/:
 				fieldSearchData.filter = originalFilter.substring(1)
 				buildDistinctParameter(fieldSearchData)
 				break
 
 			/* Scenario 8: Starts with '!' and it isn't a list. */
-			case ~ /^!.*/:
+			case ~ /^!.+?/:
 				fieldSearchData.filter = originalFilter.substring(1)
 				buildSingleValueParameter(fieldSearchData, '<>')
 				break
 
 			/* Scenario 9: It's a list of '&' separated values. */
-			case ~ /.*&.*/:
+			case ~ /.+?&.+?/:
 				buildLikeList(fieldSearchData, 'LIKE', 'AND', '&')
 				break
 
 			/* Scenario 10: It's a list of '|' separated values. */
-			case ~ /.*\|.*/:
+			case ~ /.+?\|.+?/:
 				buildInList(fieldSearchData, 'IN')
 				break
 
 			/* Scenario 11: It's a list of ':' separated values. */
-			case ~ /.*:.*/:
+			case ~ /.+?:..+?/:
 				buildLikeList(fieldSearchData, 'LIKE', 'OR', ':')
 				break
 
@@ -644,7 +640,9 @@ class SqlUtil {
 		String expression
 		if (operator == 'LIKE' && isNumber) {
 			expression =  column + " LIKE CONCAT(:$fieldSearchData.columnAlias, '%')"
-		} else {
+		} else if(operator == '=' && isNumber){
+			expression =  column + " = :$fieldSearchData.columnAlias"
+		}else {
 			expression = getSingleValueExpression(column, fieldSearchData.columnAlias, operator)
 		}
 		fieldSearchData.sqlSearchExpression = expression
@@ -838,6 +836,10 @@ class SqlUtil {
 		boolean isNumeric = false
 
 		FieldSpec fieldSpec = fsd.searchInfo?.fieldSpec
+
+		if(fieldSpec.control == ControlType.NUMBER.value()){
+			return true
+		}
 
 		if(fieldSpec?.isCustom()){
 			isNumeric = fieldSpec.isNumeric()

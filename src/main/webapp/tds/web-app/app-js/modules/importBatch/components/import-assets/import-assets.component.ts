@@ -41,6 +41,7 @@ export class ImportAssetsComponent implements OnInit {
 	public importInProcess = false;
 	public fetchFileContent: any;
 	public transformFileContent: any;
+
 	private viewDataType: string;
 	protected transformProgress = {
 		progressKey: null,
@@ -416,7 +417,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.uiConfig = {
 			...this.uiConfig,
 			showAutoProcessElements: true,
-			showManualProcesslElements: false,
+			showManualProcessElements: false,
 			sendNotification: true,
 			transformBtnLabel: 'IMPORT_ASSETS.AUTO_IMPORT.INITIATE_IMPORT'
 		}
@@ -426,7 +427,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.uiConfig = {
 			...this.uiConfig,
 			showAutoProcessElements: false,
-			showManualProcesslElements: true,
+			showManualProcessElements: true,
 			sendNotification: false,
 			transformBtnLabel: 'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM'
 		};

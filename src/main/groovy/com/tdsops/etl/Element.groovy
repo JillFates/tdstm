@@ -910,8 +910,10 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
 	 * <code>
-	 *  extract 1 load 'description' when { it > 1000 }*     ...
-	 * 	load 'description' with myVar when { it > 1000 }* </code>
+	 *  extract 1 load 'description' when { it > 1000 } //
+	 *  ...
+	 * 	load 'description' with myVar when { it > 1000 } //
+	 * 	</code>
 	 * @param closure Closure to determine if it is necessary
 	 * 			to remove current {@code Element} instance from {@code ETLProcessorResult}
 	 * @return current{@code Element} instance
@@ -1110,7 +1112,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * Perform {@code StringUtils#prependIfMissing} over {@code Element#value}
 	 * <code>
-	 * extract 'url' transform with appendIfMissing('com')
+	 * extract 'url' transform with prependIfMissing('com')
 	 * </code>
 	 *
 	 * @param otherValue a {@code String} value
@@ -1128,7 +1130,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * Perform {@code StringUtils#prependIfMissingIgnoreCase} over {@code Element#value}
 	 * <code>
-	 * extract 'url' transform with appendIfMissing('com')
+	 * extract 'url' transform with prependIfMissingIgnoreCase('com')
 	 * </code>
 	 *
 	 * @param otherValue a {@code String} value

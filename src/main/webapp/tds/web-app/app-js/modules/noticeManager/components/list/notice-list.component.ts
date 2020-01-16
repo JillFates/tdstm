@@ -9,6 +9,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { NoticeService } from '../../service/notice.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 import { PreferenceService } from '../../../../shared/services/preference.service';
 // Model
@@ -61,7 +62,8 @@ export class NoticeListComponent implements OnInit {
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private noticeService: NoticeService,
-		private prompt: UIPromptService
+		private prompt: UIPromptService,
+		private translateService: TranslatePipe
 	) {
 		this.noticeTypes = [...NoticeTypes];
 	}
@@ -87,8 +89,9 @@ export class NoticeListComponent implements OnInit {
 
 		this.headerActions = [
 			{
-				icon: 'plus',
-				title: '"NOTICE.CREATE_NOTICE" | translate',
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('NOTICE.CREATE_NOTICE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateNotice,
@@ -100,7 +103,7 @@ export class NoticeListComponent implements OnInit {
 			gridRowActions: this.gridRowActions,
 			gridSettings: this.gridSettings,
 			headerActionButtons: this.headerActions,
-			showDataReloadButton: true,
+			showDataReloadButton: false,
 			loadData: this.loadData,
 		};
 

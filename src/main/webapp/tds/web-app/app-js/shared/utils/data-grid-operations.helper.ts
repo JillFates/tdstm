@@ -145,21 +145,25 @@ export class DataGridOperationsHelper {
 	 * @param {any} state: Current filters state
 	 * @returns void
 	 */
-	public clearFilter(column: any): void {
+	public clearFilter(column: any, state: State = null): void {
+		const currentState: State = state || this.state;
+
 		column.filter = '';
-		this.state.filter.filters = this.getFiltersExcluding(column.property);
-		this.filterChange(this.state.filter);
+		currentState.filter.filters = this.getFiltersExcluding(
+			column.customPropertyName ? column.customPropertyName : column.property);
+		this.filterChange(currentState.filter);
 	}
 
 	/**
 	 * Clears all filters of all filterable columns.
 	 * @param columns
+	 * @param state: Optional Current filters state
 	 */
-	public clearAllFilters(columns: Array<GridColumnModel>): void {
+	public clearAllFilters(columns: Array<GridColumnModel>, state: State = null): void {
 		columns
 			.filter(column => column.filterable)
 			.forEach(column => {
-				this.clearFilter(column);
+				this.clearFilter(column, state);
 			});
 	}
 
@@ -191,8 +195,9 @@ export class DataGridOperationsHelper {
 	 * On Filter Change.
 	 * @param {CompositeFilterDescriptor} filter
 	 */
-	public filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
+	public filterChange(filter: CompositeFilterDescriptor, state: State = null): void {
+		const currentState = state || this.state;
+		currentState.filter = filter;
 		this.loadPageData();
 	}
 

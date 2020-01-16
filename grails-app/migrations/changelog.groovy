@@ -86,4 +86,7 @@ databaseChangeLog = {
 	include file: 'version/v4_7_2/20191119-add-use_with_asset_actions.groovy'
 	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 	include file: 'version/v5_0_0/20190925-updating-password-hashing.groovy'
+	include file: 'version/v4_7_2/20200103-making-from-address-nullable.groovy'
+	include file: 'version/v5_0_0/20200110-add-tbd-conflict-depdency-group-columns-to-common-columns-view.groovy'
+	include file: 'version/v5_0_0/20200114-drop-depdencyBundle-column.groovy'
 }

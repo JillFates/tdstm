@@ -116,6 +116,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATABASE': 'Create DB',
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
+		'CONFIGURE_VIEW': 'Configure View',
 		'SHOW_COMMENTS': 'Show Comments',
 		'SHOW_TASKS': 'Show Tasks',
 		'GRID': {
@@ -176,7 +177,8 @@ export const en_DICTIONARY: Object = {
 		'RACK': 'Rack',
 		'DEPENDENCY': 'Dependency',
 		'CABLING': 'Cabling',
-		'COMMENT': 'Comment'
+		'COMMENT': 'Comment',
+		'VIEW': 'Export View'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
@@ -242,6 +244,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project'
 	},
 	'DEPENDENCIES': {
+		'CREATE_DEPENDENCY': 'Create Dependency',
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
@@ -287,10 +290,12 @@ export const en_DICTIONARY: Object = {
 		'BUNDLES': {
 			'BUNDLES': 'Bundles',
 			'LIST': 'Bundle List',
+			'CREATE_BUNDLE': 'Create Bundle',
 		}
 	},
 	'PROJECT': {
 		'PROJECTS': 'Projects',
+		'CREATE_PROJECT': 'Create Projects',
 		'SELECT_PROJECT': 'Select a Project',
 		'MISSING_PROJECT': 'Your account is missing an active project. Please select one in order to proceed.',
 		'NO_ACTIVE_PROJECTS': 'There are currently no active projects to choose from.  Please contact your administrator for assistance.'
@@ -479,6 +484,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'DELETE_MODEL' : 'Are you sure you want to delete this model? There is no undo for this action',
 	},
 	'TASK_MANAGER': {
+		'BULK_ACTION': 'Bulk Action',
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',
 		'CREATE_TASK': 'Create Task',

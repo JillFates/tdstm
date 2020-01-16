@@ -751,7 +751,9 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			{provide: TaskDetailModel, useValue: taskDetailModel}
 		], false, false)
 			.then(result => {
-				this.updateGraphNode(result.assetComment);
+				if (result && result.shouldEdit) {
+					this.editTask({task: {id: result.id && result.id.id}});
+				}
 			}).catch(result => {
 			if (result) {
 				console.error('catch: ', result);

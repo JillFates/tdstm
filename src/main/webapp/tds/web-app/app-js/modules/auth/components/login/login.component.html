@@ -12,6 +12,7 @@
 						<select clrSelect
 								name="authority"
 								[(ngModel)]="loginModel.authority"
+								(keydown.enter)="$event.stopImmediatePropagation(); onLogin();"
 								required>
 							<option value="Select {{ loginInfo.config?.authorityLabel }}" disabled>Select {{ loginInfo.config?.authorityLabel }}</option>
 							<option *ngFor=" let authority of loginInfo.config.authorityList"

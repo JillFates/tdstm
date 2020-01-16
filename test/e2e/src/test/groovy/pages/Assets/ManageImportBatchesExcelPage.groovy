@@ -7,7 +7,7 @@ import modules.AssetsMenuModule
 class ManageImportBatchesExcelPage extends Page {
 
     static at = {
-        manageImportBatchPageTitle.text().trim()  == "Manage Import Batches (Excel)"
+        manageImportBatchPageTitle.text().trim()  == "Manage Import Batches (TM Excel)"
         manageImportBatchBreadcrumbs[0].text()   == "Assets"
 
     }

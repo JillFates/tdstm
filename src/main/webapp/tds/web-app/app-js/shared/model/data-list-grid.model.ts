@@ -26,6 +26,7 @@ export enum ActionType {
 export class GridColumnModel {
 	label: string;
 	property: string;
+	customPropertyName?: string; // To keep the custome name and dont loose the property name original
 	properties ?: Array<string>; // use this when it's a multi-level object accessor. i.e. [dataItem.currentValues.name]
 	type: string;
 	format?: string;

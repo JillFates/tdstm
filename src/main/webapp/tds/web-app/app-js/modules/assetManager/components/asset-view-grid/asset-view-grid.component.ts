@@ -255,6 +255,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			this.tagSelector.reset();
 		}
 		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		this.showAssetsFilter = false;
 	}
 
 	/**
@@ -849,4 +850,17 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		resizable: true,
 		columnMenu: true,
 	};
+
+	/**
+	 * Get the current status of certain properties, like the property that indicates if grid has filters applied
+	 * or the current filter, in order that don't repeat functions calls
+	 * (add more properties on demand)
+	 */
+	public getCurrentStatus(): {isFiltering: boolean, filterCounter: number, showAssetsFilter: boolean} {
+		return {
+			isFiltering: this.hasFilterApplied(),
+			showAssetsFilter: this.showAssetsFilter,
+			filterCounter: this.filterCount()
+		}
+	}
 }
