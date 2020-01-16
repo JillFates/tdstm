@@ -93,7 +93,7 @@
             <div>
                 <table class="dashboard-stat-table">
                     <tr>
-                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated|PlanReady', _ufp: 'true'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.validated}}</td><td>Validated</td></a>
+                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated', _ufp: 'true'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.validated}}</td><td>Validated</td></a>
                     </tr>
                     <tr>
                         <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'PlanReady', _ufp: 'true'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.planReady}}</td><td>Plan Ready</td></a>
