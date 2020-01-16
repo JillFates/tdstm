@@ -283,4 +283,73 @@ class CSVDatasetSpec extends ETLBaseSpec {
             }
     }
 
+    @See('TM-16814')
+    void 'test can load field with commas in String literals'() {
+
+        given:
+            String fileName = createCSVFIle("""
+				id,name,description,owner
+				123,Foo,"This, That, and the other","Jim Beam"
+				456,Bar,"What out for that owner","Sparrow, Jack"
+			""")
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(
+                    GMDEMO,
+                    new CSVDataset(fileName),
+                    debugConsole,
+                    validator
+            )
+
+        when: 'The ETL script is evaluated'
+            etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'id' load 'id'
+					extract 'name' load 'assetName'
+					extract 'description' load 'description'
+					extract 'owner' load 'sme'
+				}
+			""".stripIndent())
+
+        then: 'Results should contain domain results associated'
+            assertWith(etlProcessor.finalResult()) {
+                domains.size() == 1
+                assertWith(domains[0], DomainResult) {
+                    domain == ETLDomain.Application.name()
+                    fieldNames == ['id', 'assetName', 'description', 'sme'] as Set
+
+                    data.size() == 2
+                    assertWith(data[0], RowResult) {
+                        op == ImportOperationEnum.INSERT.toString()
+                        rowNum == 1
+                        fields.keySet().size() == 2
+                        assertWith(fields.id, FieldResult) {
+                            value == '123'
+                            originalValue == '123'
+                            init == null
+                        }
+                        assertWith(fields.assetName, FieldResult) {
+                            value == 'Foo'
+                            originalValue == 'Foo'
+                            init == null
+                        }
+                        assertWith(fields.description, FieldResult) {
+                            value == 'This, That, and the other'
+                            originalValue == 'This, That, and the other'
+                            init == null
+                        }
+                        assertWith(fields.sme, FieldResult) {
+                            value == 'Jim Beam'
+                            originalValue == 'Jim Beam'
+                            init == null
+                        }
+                    }
+
+
+                }
+            }
+    }
+
 }
