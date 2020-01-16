@@ -1,0 +1,13 @@
+
+
+model {
+    Map<String, ?> timelineResponse
+}
+
+json {
+    sinks timelineResponse.sinks
+    starts timelineResponse.starts
+    startDate timelineResponse.startDate
+    cycles timelineResponse.cycles
+    tasks timelineResponse.tasks
+}
