@@ -426,7 +426,7 @@ class TaskService implements ServiceMethods {
 				throw new EmptyResultException('Task was not found')
 			}
 
-			if (! AssetCommentStatus.CanInvokeActionStatusCodes.contains(taskWithLock.status)) {
+			if (! ACS.CanInvokeActionStatusCodes.contains(taskWithLock.status)) {
 				throwException(InvalidRequestException, 'apiAction.task.message.taskNotInActionableState', 'Task status must be in the Ready or Started state in order to invoke an action')
 			}
 
@@ -472,8 +472,8 @@ class TaskService implements ServiceMethods {
 			taskWithLock.actStart = taskWithLock.apiActionInvokedAt
 
 			// Make sure that the status is STARTED instead
-			if (taskWithLock.status != AssetCommentStatus.STARTED) {
-				setTaskStatus(taskWithLock, AssetCommentStatus.STARTED, whom)
+			if (taskWithLock.status != ACS.STARTED) {
+				setTaskStatus(taskWithLock, ACS.STARTED, whom)
 			}
 			taskWithLock.save(flush: true, failOnError: true)
 
@@ -505,7 +505,7 @@ class TaskService implements ServiceMethods {
 
 			if (taskWithLock) {
 				addNote(taskWithLock, whom, "Invoke action ${taskWithLock.apiAction.name} failed : $errMsg")
-				setTaskStatus(taskWithLock, AssetCommentStatus.HOLD, whom)
+				setTaskStatus(taskWithLock, ACS.HOLD, whom)
 			}
 
 			// TODO : JPM 6/2019 : We should have a general TM exception that we know the message can displayed to the user
@@ -587,7 +587,7 @@ class TaskService implements ServiceMethods {
 		// Trigger the action if it is automatic and the action is local
 		// and task already exist (it fails with task not found when task has not been saved yet)
 		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally() && task.id) {
-			if (AssetCommentStatus.CanInvokeActionStatusCodes.contains(status) ) {
+			if (ACS.CanInvokeActionStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
@@ -5684,13 +5684,13 @@ class TaskService implements ServiceMethods {
 	String getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
 
 		String updatedClass = ''
-		if (task.status == AssetCommentStatus.READY) {
+		if (task.status == ACS.READY) {
 			if (elapsedSec >= MINUTES_CONSIDERED_LATE) {   // 10 minutes
 				updatedClass = 'task_late'
 			} else if (elapsedSec >= MINUTES_CONSIDERED_TARDY) {  // 5 minutes
 				updatedClass = 'task_tardy'
 			}
-		} else if (task.status == AssetCommentStatus.STARTED) {
+		} else if (task.status == ACS.STARTED) {
 			def dueInSecs = elapsedSec - (task.duration ?: 0) * 60
 			if (dueInSecs >= MINUTES_CONSIDERED_LATE) {
 				updatedClass='task_late'
@@ -5774,7 +5774,7 @@ class TaskService implements ServiceMethods {
 		boolean taskIsActionable = task.isActionable()
 
 		// Determine the Estimated Start CSS
-		if (estStartInMin && (task.status in [ AssetCommentStatus.PENDING, AssetCommentStatus.READY ]) )  {
+		if (estStartInMin && (task.status in [ ACS.PENDING, ACS.READY ]) )  {
 			// Note that in the future when we have have slack calculations in the tasks, we can
 			// flag tasks that started late and won't finished by critical path finish times but for
 			// now we will just flag tasks that didn't start by their est start.
