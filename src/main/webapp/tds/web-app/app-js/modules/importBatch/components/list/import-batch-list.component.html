@@ -6,17 +6,14 @@
 				class="page-height narrow-rows clickable-rows"
 				[ngClass]="{ 'hide-filter': !showFilters }"
 				[data]="dataGridOperationsHelper.gridData"
-				[filter]="dataGridOperationsHelper.state.filter"
 				[filterable]="true"
-				(filterChange)="dataGridOperationsHelper.filterChange($event)"
 				[sort]="dataGridOperationsHelper.state.sort"
 				[sortable]="{mode:'single'}"
-				[pageSize]="dataGridOperationsHelper.state.take"
+				(sortChange)="dataGridOperationsHelper.sortChange($event)"
 				[skip]="dataGridOperationsHelper.state.skip"
 				[pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
-				(pageChange)="onPageChange($event)"
+				[pageSize]="dataGridOperationsHelper.state.take"
 				[resizable]="true"
-				(sortChange)="dataGridOperationsHelper.sortChange($event)"
 				[selectable]="selectableSettings"
 				[rowSelected]="dataGridOperationsHelper.isRowSelected"
 				(cellClick)="openBatchDetail($event)">
@@ -181,6 +178,21 @@
 					</ng-template>
 
 				</kendo-grid-column>
+
+				<!-- Pagination Footer -->
+				<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+					<div class="clr-col-4"></div>
+					<div class="clr-col-8">
+						<tds-grid-pager
+							[total]="total"
+							[totalPages]="totalPages"
+							[currentPage]="currentPage"
+							[pageSize]="dataGridOperationsHelper.state.take"
+							[pageSizes]="dataGridOperationsHelper.defaultPageOptions"
+							(pageChange)="onPageChange($event)">
+						</tds-grid-pager>
+					</div>
+				</ng-template>
 			</kendo-grid>
 		</div>
 	</section>
