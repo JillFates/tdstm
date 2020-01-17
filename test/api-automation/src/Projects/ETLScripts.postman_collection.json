@@ -520,13 +520,11 @@
 							"*/",
 							"var counter = 0;",
 							"pm.test(\"Check the status of the progress key until it's completed\", function () {",
-							"    if (jsonObject.data.status != \"COMPLETED\" && counter!=20){",
+							"    ",
+							"    while(jsonObject.data.status != \"COMPLETED\" && counter!=20)",
+							"    {",
 							"        postman.setNextRequest(\"Check Progress Completed\");",
 							"        counter++;",
-							"    } ",
-							"        ",
-							"    else {",
-							"        pm.expect(jsonObject.data.status).eql('COMPLETED') ;",
 							"    }",
 							"    ",
 							"    ",
@@ -700,7 +698,9 @@
 							"pm.environment.unset(\"fileName\");",
 							"pm.environment.unset(\"progressKey\");",
 							"pm.environment.unset(\"etlOutputName\");",
-							""
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
