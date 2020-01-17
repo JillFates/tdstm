@@ -949,7 +949,7 @@ digraph runbook {
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
 		Map preferencesMap = [:]
-		SetLabelQuantityPrefCommand commandObject = populateCommandObject(SetLabelQuantityPrefCommand)
+		SetLabelQuantityPrefCommand commandObject = populateCommandObject(SetLabelQuantityPrefCommand, false)
 		if (commandObject.hasErrors()) {
 			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(commandObject) ) )
 			return

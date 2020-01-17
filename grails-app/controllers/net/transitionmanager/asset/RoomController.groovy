@@ -82,7 +82,7 @@ class RoomController implements ControllerMethods {
 
 	@HasPermission(Permission.RoomCreate)
 	def save() {
-		RoomCommand roomCommand = populateCommandObject(RoomCommand)
+		RoomCommand roomCommand = populateCommandObject(RoomCommand, false)
 		flash.message = roomService.save(roomCommand)
 		redirect(action: "list", params: [viewType: "list"])
 	}

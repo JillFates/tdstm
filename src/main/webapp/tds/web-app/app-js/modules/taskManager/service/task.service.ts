@@ -266,7 +266,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	updateTask(payload: any): Observable<any> {
-		const url = `${ this.baseURL }/assetEntity/updateComment`;
+		const url = `${ this.baseURL }/ws/task/saveTask`;
 		return this.http.post(url, JSON.stringify(payload))
 			.map((response: any) => response)
 			.catch((error: any) => error);
@@ -298,7 +298,8 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	createTask(payload: any): Observable<any> {
-		const url = `${ this.baseURL }/assetEntity/saveComment`;
+		const url = `${ this.baseURL }/ws/task/saveTask`;
+
 		return this.http.post(url, JSON.stringify(payload))
 			.map((response: any) => response)
 			.catch((error: any) => error);

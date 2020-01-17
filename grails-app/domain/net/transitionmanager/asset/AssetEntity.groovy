@@ -211,7 +211,6 @@ class AssetEntity {
 
 	String externalRefId
 
-	Integer    dependencyBundle = 0
 	Integer    size
 	SizeScale  scale
 	Integer    rateOfChange
@@ -284,7 +283,6 @@ class AssetEntity {
 
 		// MoveBundleAsset fields
 		validation size: 0..20, inList: ValidationType.list
-		dependencyBundle nullable: true
 		externalRefId nullable: true, size: 0..255
 
 		size nullable: true

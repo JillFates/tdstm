@@ -168,8 +168,6 @@ class WsProjectController implements ControllerMethods {
 	def saveProject(String projectId) {
 		ProjectCommand projectCommand = populateCommandObject(ProjectCommand)
 
-		validateCommandObject(projectCommand)
-
 		if (projectId) {
 			projectCommand.id = projectId.toLong()
 		}

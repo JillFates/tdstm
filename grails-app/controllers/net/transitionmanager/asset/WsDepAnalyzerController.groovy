@@ -4,10 +4,10 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.NumberUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.asset.DependencyAnalyzerService
 import net.transitionmanager.command.dependency.analyzer.FilteredAssetsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.asset.DependencyAnalyzerService
 import org.springframework.jdbc.core.JdbcTemplate
 /**
  * Controller used primarily for the Dependency Analyzer
@@ -64,7 +64,6 @@ class WsDepAnalyzerController implements ControllerMethods {
 	@HasPermission(Permission.DepAnalyzerView)
 	def filteredAssetList () {
 		FilteredAssetsCommand filter = populateCommandObject(FilteredAssetsCommand)
-		validateCommandObject(filter)
 
 		String projectId = securityService.getUserCurrentProjectId()
 

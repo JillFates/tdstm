@@ -31,6 +31,12 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
     &:not(.actions-column)
       overflow: hidden !important
 
+  kendo-grid
+    .action-button.btn-link
+      display: flex
+      justify-content: center
+      align-items: center
+
   $grid-font-icon-size: 20px
 
   .k-grid-pager
@@ -105,6 +111,18 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
             margin-top: 3px
       input.form-control[name="common.assetName"]
         width: 98%
+
+    // Hide the vertical column line separator for the first header column
+    // and center the filter column of all assets view (TM-16757)
+    th[aria-colindex="1"]
+      position: unset
+      .tds-indeterminate-checkbox
+        position: absolute
+        top: 10px
+    th[aria-colindex="2"]
+      display: flex
+      justify-content: center
+      align-items: center
 
   .kendo-grid-toolbar__refresh-btn
     margin-top: unset!important
