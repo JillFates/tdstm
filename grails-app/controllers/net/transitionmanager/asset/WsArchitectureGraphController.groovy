@@ -32,7 +32,6 @@ class WsArchitectureGraphController implements ControllerMethods, PaginationMeth
 	def preferences() {
 		licenseAdminService.checkValidForLicenseOrThrowException()
 		ArchitectureGraphCommand context = populateCommandObject(ArchitectureGraphCommand)
-		validateCommandObject(context)
 		Project project = securityService.userCurrentProject
 
 		render view: "/common/mapAsJson", model: [data: architectureGraphService.getPreferences(context.assetId, context.levelsUp, context.levelsDown, project)]
@@ -47,7 +46,6 @@ class WsArchitectureGraphController implements ControllerMethods, PaginationMeth
 		Project project = securityService.userCurrentProject
 
 		ArchitectureGraphCommand context = populateCommandObject(ArchitectureGraphCommand)
-		validateCommandObject(context)
 
 		AssetEntity rootAsset = AssetEntity.get(context.assetId)
 

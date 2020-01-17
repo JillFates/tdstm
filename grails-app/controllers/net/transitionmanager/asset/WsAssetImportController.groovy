@@ -154,7 +154,6 @@ class WsAssetImportController implements ControllerMethods {
 		def stopwatch = new StopWatch()
 		stopwatch.start()
 		InitiateTransformDataActionCommand actionCommand  = populateCommandObject(InitiateTransformDataActionCommand)
-		validateCommandObject(actionCommand)
 
 		Project project = getProjectForWs()
 		Map result = dataImportService.scheduleETLTransformDataJob(
