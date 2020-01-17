@@ -31,7 +31,7 @@ export class CredentialColumnModel {
 				filterable: true,
 				property: 'environment',
 				type: 'text',
-				width: 200
+				width: 130
 			}, {
 				label: 'Status',
 				filterable: true,
@@ -43,14 +43,14 @@ export class CredentialColumnModel {
 				filterable: true,
 				property: 'authMethod',
 				type: 'text',
-				width: 200
+				width: 130
 			}, {
 				label: 'Created',
 				filterable: true,
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 150
 			}
 		];
 	}
