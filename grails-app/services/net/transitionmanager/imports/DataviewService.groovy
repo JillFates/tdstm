@@ -1226,9 +1226,14 @@ class DataviewService implements ServiceMethods {
 		],
 		'tbd'            : [
 			property      : """
-				(SELECT COUNT(*)
-				FROM AssetDependency AD
-				WHERE status IN ('${UNKNOWN}','${QUESTIONED}') AND (AD.asset=AE OR AD.dependent=AE))
+				((SELECT COUNT(*)
+						FROM AssetDependency AD
+						WHERE status IN ('${UNKNOWN}','${QUESTIONED}') AND AD.asset=AE)
+					+
+					(SELECT COUNT(*)
+						FROM AssetDependency AD
+						WHERE status IN ('${UNKNOWN}','${QUESTIONED}') AND AD.dependent=AE)
+				)
 			""",
 			type          : Integer,
 			namedParameter: 'tbd',
