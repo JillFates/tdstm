@@ -64,10 +64,6 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				this.reject();
 			}
 		});
-		jQuery(this.el.nativeElement).draggable({
-			handle: '.modal-header',
-			containment: 'window'
-		});
 	}
 
 	/**
