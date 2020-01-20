@@ -63,6 +63,22 @@ kendo-numerictextbox {
 }
 
 kendo-grid.k-grid {
+  // wrap overflow text in ellipsis mode.
+  &.narrow-rows {
+    td {
+      padding: 0px 8px;
+      line-height: 10px;
+      word-break: normal;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      &:not(.actions-column) {
+        overflow: hidden !important
+      }
+    }
+   .filter-input {
+      margin-bottom: 5px;
+    }
+  }
   &.clickable-rows {
     tr {
       cursor: pointer;

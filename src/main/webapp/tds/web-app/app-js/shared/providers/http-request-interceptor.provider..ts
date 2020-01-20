@@ -36,7 +36,7 @@ import {map, catchError, finalize} from 'rxjs/operators';
 
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
 export const APPLICATION_JSON = 'application/json';
-export const TOKEN_GUARD = ['POST', 'PUT', 'DELETE'];
+export const TOKEN_GUARD = ['POST', 'PUT', 'DELETE', 'PATCH'];
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {

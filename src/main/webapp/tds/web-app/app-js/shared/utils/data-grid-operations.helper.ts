@@ -40,6 +40,7 @@ export class DataGridOperationsHelper {
 	private checkboxSelectionConfig: any;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private notifier: NotifierService;
+	public showFilters;
 
 	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
 		// to notify grid height changes
@@ -416,5 +417,12 @@ export class DataGridOperationsHelper {
 	public getFilterCounter(state: State = null): number {
 		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
 		return uniq(filters.map((filter: any) => filter.field)).length;
+	}
+
+	/**
+	 * Show/Hide filters
+	 */
+	toggleFilters(): void {
+		this.showFilters = !this.showFilters;
 	}
 }

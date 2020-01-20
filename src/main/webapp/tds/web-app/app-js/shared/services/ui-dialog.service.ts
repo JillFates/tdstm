@@ -180,7 +180,9 @@ export class UIExtraDialog implements OnDestroy {
 		for (let div of divs) {
 			if (!closingDialog) {
 				this.currentActiveModalDivIndex = index;
-				jQuery(div).addClass('no-background');
+				if (!jQuery(div).hasClass('allow-modal-background')) {
+					jQuery(div).addClass('no-background');
+				}
 				if (index === divs.length) {
 					jQuery(div).removeClass('no-background');
 				}
