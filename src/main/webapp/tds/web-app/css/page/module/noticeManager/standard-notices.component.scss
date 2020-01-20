@@ -1,3 +1,11 @@
-.notices-container {
-  height: 500px;
+.tds-modal-content {
+  max-height: 100vh;
+
+  .modal-body {
+    max-height: none !important;
+  }
+
+  .notices-container {
+    height: 500px;
+  }
 }

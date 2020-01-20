@@ -198,6 +198,14 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/task/saveTask" {
+			controller = "wsTask"
+			action = [
+			        PUT: 'saveTask',
+					POST: 'saveTask'
+			]
+		}
+
 
 		'/ws/bulkChange' {
 			controller = 'wsBulkAssetChange'
@@ -1604,6 +1612,17 @@ class UrlMappings {
 
 		"/ws/architectureGraph/$action" {
 			controller = "wsArchitectureGraph"
+		}
+
+		"/ws/dependencyConsole/" {
+			controller = "wsDependencyConsole"
+			action = [
+				GET: "dependencyConsole"
+			]
+		}
+
+		"/ws/dependencyConsole/$action" {
+			controller = "wsDependencyConsole"
 		}
 
 		// Angular

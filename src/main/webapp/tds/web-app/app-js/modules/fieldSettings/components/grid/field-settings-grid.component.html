@@ -101,9 +101,9 @@
 
 	<!-- Show Actions column -->
 	<kendo-grid-column
-		[width]="60"
+		[width]="80"
 		[class]="{ 'k-custom-command-column': true }"
-		[minResizableWidth]="60"
+		[minResizableWidth]="80"
 		title="Action"
 		*ngIf="isEditing"
 	>
@@ -111,8 +111,6 @@
 			kendoGridCellTemplate
 			let-dataItem
 			let-rowIndex="rowIndex"
-			let-isComment="dataItem.taskAndCommentFlags.comment"
-			let-isIssue="dataItem.taskAndCommentFlags.issue"
 		>
 			<div class="action-button btn-link" *ngIf="dataItem.udf">
 				<clr-dropdown>

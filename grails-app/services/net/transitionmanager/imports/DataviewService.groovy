@@ -6,6 +6,7 @@ package net.transitionmanager.imports
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.JsonUtil
@@ -18,6 +19,7 @@ import net.transitionmanager.command.dataview.DataviewApiParamsCommand
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -36,10 +38,11 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.service.dataview.DataviewSpec
 import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
 import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
-import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 
-import java.sql.Timestamp
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.UNKNOWN
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.VALIDATED
 
 /**
  * Service class with main database operations for Dataview.
@@ -456,56 +459,6 @@ class DataviewService implements ServiceMethods {
 				}
 			}
 		}
-
-		// Add the flags signaling whether or not each asset has comments and/or tasks associated.
-		appendTasksAndComments(queryResults)
-
-	}
-
-	/**
-	 * After querying for the assets we need to determine if the returned assets
-	 * have comments and/or tasks associated.
-	 *
-	 * @param queryResults - the result of the assets query.
-	 */
-	private void appendTasksAndComments(Map queryResults) {
-		// Build a list with the asset ids and initialize tasks and comments flags.
-		List<Long> assetIds = []
-		// List with the assets found by the preview method.
-		List<Map> assetResults = queryResults['assets']
-		// This map will contain, for each asset, the flags for each comment type.
-		Map<Long, Map<String, Boolean>> commentsAndTasksMap = [:]
-		// Iterate over the assets keeping their id and initializing the map for its flags.
-		assetResults.each { Map assetMap ->
-			Long assetId = NumberUtil.toLong(assetMap['common_id'])
-			assetIds << assetId
-			commentsAndTasksMap[assetId] = [issue: false, comment: false]
-		}
-
-		if (assetIds) {
-			// Query for assets and the comment types associated with them.
-			String tasksAndCommentsQuery = """
-				SELECT assetEntity.id, commentType FROM AssetComment 
-				WHERE assetEntity.id IN (:assetIds) AND isPublished = true
-				GROUP BY assetEntity.id, commentType
-			"""
-
-			// Execute the query.
-			List tasksAndComments = AssetComment.executeQuery(tasksAndCommentsQuery, [assetIds: assetIds])
-
-			// Iterate over the results from the database updating the flags map.
-			for (taskOrComment in tasksAndComments) {
-				Long assetId = taskOrComment[0]
-				String commentType = taskOrComment[1]
-				commentsAndTasksMap[assetId][commentType] = true
-			}
-
-			// Iterate over the preview assets setting the flags map as an attribute.
-			assetResults.each { Map assetMap ->
-				Long assetId = NumberUtil.toLong(assetMap['common_id'])
-				assetMap['taskAndCommentFlags'] = commentsAndTasksMap[assetId]
-			}
-		}
 	}
 
 	/**
@@ -653,10 +606,50 @@ class DataviewService implements ServiceMethods {
 	 * @param dataviewSpec an instance of {@code DataviewSpec}
 	 * @return
 	 */
-	private String hqlColumns(DataviewSpec dataviewSpec){
-		return dataviewSpec.columns.collect { Map column ->
+	private String hqlColumns(DataviewSpec dataviewSpec) {
+		String columns = dataviewSpec.columns.collect { Map column ->
 			"${projectionPropertyFor(column)}"
 		}.join(", ")
+
+		//Add comment and task counts
+		columns += getCountOfQuery('commentCount', 'Comment Count', dataviewSpec)
+		columns += getCountOfQuery('taskCount', 'Task Count', dataviewSpec)
+
+		return columns
+
+	}
+
+	/**
+	 * Used for getting the comment/task count sub-queries. These fields do not slow up in the field spec and won't be displayed in the grids
+	 * as a column, however they maybe used to display the counts for comments/tasks.
+	 *
+	 * @param property The property to get the sub-query for.
+	 * @param label the label to get the sub-query for.
+	 * @param dataViewSpec The data view spec to add the column for the sub-query to.
+	 *
+	 * @return The string of the sub-query that does the count for a property
+	 */
+	private String getCountOfQuery(String property, String label, DataviewSpec dataViewSpec) {
+		Map countMap =  [
+			domain   : 'common',
+			label    : label,
+			property : property,
+			fieldSpec: new FieldSpec([
+				control           : 'Number',
+				field             : property,
+				label             : label,
+				isUserDefinedField: false,
+				required          : 1,
+				shared            : false,
+				constraints       : [
+					required: 1
+				]
+			])
+		]
+
+		dataViewSpec.addColumn('common', property)
+
+		return ",${projectionPropertyFor(countMap)}"
 	}
 
     /**
@@ -1224,6 +1217,67 @@ class DataviewService implements ServiceMethods {
 				}
 			]
 		],
+		'dependencyGroup': [
+			property      : 'ABD.dependencyBundle',
+			type          : Integer,
+			namedParameter: 'dependencyGroup',
+			alias         : 'dependencyGroup',
+			join          : "left outer join AssetDependencyBundle ABD on AE.id = ABD.asset.id AND ABD.dependencySource = 'Dependency'"
+		],
+		'tbd'            : [
+			property      : """
+				((SELECT COUNT(*)
+						FROM AssetDependency AD
+						WHERE status IN ('${UNKNOWN}','${QUESTIONED}') AND AD.asset=AE)
+					+
+					(SELECT COUNT(*)
+						FROM AssetDependency AD
+						WHERE status IN ('${UNKNOWN}','${QUESTIONED}') AND AD.dependent=AE)
+				)
+			""",
+			type          : Integer,
+			namedParameter: 'tbd',
+			alias         : 'tbd',
+			join          : ''
+		],
+		'conflict'       : [
+			property      : """
+				(SELECT COUNT(*)
+				FROM AssetDependency AD
+				WHERE status IN ('${VALIDATED}','${UNKNOWN}','${QUESTIONED}')
+				  AND asset=AE
+				  AND AD.dependent.moveBundle != AE.moveBundle)
+			""",
+			type          : Integer,
+			namedParameter: 'conflict',
+			alias         : 'conflict',
+			join          : ''
+		],
+		commentCount: [
+			property      : """
+				(SELECT COUNT(*) FROM AssetComment AC
+				WHERE AC.assetEntity =AE AND
+				AC.isPublished = true AND
+				AC.commentType = '${AssetCommentType.COMMENT}')
+			""",
+			type          : Integer,
+			namedParameter: 'commentCount',
+			alias         : 'commentCount',
+			join          : ''
+		],
+		taskCount: [
+			property      : """
+				(SELECT COUNT(*) FROM AssetComment AC
+				WHERE AC.assetEntity =AE AND
+				AC.isPublished = true AND
+				AC.commentType = '${AssetCommentType.ISSUE}')
+
+			""",
+			type          : Integer,
+			namedParameter: 'taskCount',
+			alias         : 'taskCount',
+			join          : ''
+		]
 
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where", domainAlias: "AE"]

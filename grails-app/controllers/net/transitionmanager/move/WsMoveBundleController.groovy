@@ -96,7 +96,7 @@ class WsMoveBundleController implements ControllerMethods {
 	@HasPermission(Permission.BundleCreate)
 	def save(Long moveBundleId) {
 		Project project = getProjectForWs()
-		MoveBundleCommand moveBundleCommand = populateCommandObject(MoveBundleCommand)
+		MoveBundleCommand moveBundleCommand = populateCommandObject(MoveBundleCommand, false)
 		MoveBundle moveBundle = moveBundleService.saveOrUpdate(moveBundleCommand, project, moveBundleId)
 		renderSuccessJson(moveBundle.toMap())
 	}

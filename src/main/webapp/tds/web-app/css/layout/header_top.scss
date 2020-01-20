@@ -46,6 +46,11 @@
 				word-break: break-all;
 			}
 		}
+      .alert-dismissable {
+        .close:focus {
+          box-shadow: none;
+        }
+      }
 	}
 }
 

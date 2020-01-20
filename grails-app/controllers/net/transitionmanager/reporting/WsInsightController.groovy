@@ -18,7 +18,6 @@ class WsInsightController implements ControllerMethods {
 	 */
 	def provider() {
 		InsightDataCommand context = populateCommandObject(InsightDataCommand)
-		validateCommandObject(context)
 
 		Project project = securityService.userCurrentProject
 
@@ -32,7 +31,6 @@ class WsInsightController implements ControllerMethods {
 	 */
 	def topTags() {
 		InsightDataCommand context = populateCommandObject(InsightDataCommand)
-		validateCommandObject(context)
 
 		Project project = securityService.userCurrentProject
 
@@ -57,7 +55,6 @@ class WsInsightController implements ControllerMethods {
 	 */
 	def devicesByEvent() {
 		InsightDataCommand context = populateCommandObject(InsightDataCommand)
-		validateCommandObject(context)
 
 		Project project = securityService.userCurrentProject
 
@@ -82,7 +79,6 @@ class WsInsightController implements ControllerMethods {
 	 */
 	def applicationsBlastRadius() {
 		InsightDataCommand context = populateCommandObject(InsightDataCommand)
-		validateCommandObject(context)
 
 		Project project = securityService.userCurrentProject
 

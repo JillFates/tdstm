@@ -25,7 +25,7 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-asset-tag-selector',
 	template: `
-		<div class="asset-tag-selector-component">
+		<div class="{{classComponent}}">
 		    <kendo-switch *ngIf="showSwitch && switchVisible"
 		            class=""
 		            [(ngModel)]="assetSelectorModel.switch"
@@ -77,18 +77,20 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	// Optional Place holder
 	@Input('placeholder') placeholder = '';
 
+	@Input('class') classList;
+
 	// Use to control if the Switch becomes visible
 	public switchVisible = false;
 	public tagList: Array<TagModel> = [];
-
 	public assetSelectorModel = {
 		switch: false,
 		tags: []
 	};
+	public classComponent = '';
 
 	ngOnInit(): void {
 		this.tagList = this.sourceTagList.slice();
-
+		this.classComponent = `asset-tag-selector-component ${this.classList}`;
 		if (this.model) {
 			this.assetSelectorModel.tags = this.model.tags;
 			this.assetSelectorModel.switch = this.model.operator === 'ALL' ? true : false;

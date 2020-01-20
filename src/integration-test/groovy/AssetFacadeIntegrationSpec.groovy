@@ -45,9 +45,9 @@ class AssetFacadeIntegrationSpec extends Specification {
 		setup: 'giving an asset with basic properties'
 			AssetFacade assetFacade = new AssetFacade(assetEntity, null, false)
 		when: 'setting asset property value'
-			assetFacade.dependencyBundle = Integer.valueOf('1')
+			assetFacade.targetBladePosition = Integer.valueOf('1')
 		then: 'the value should be able to be read'
-			assetFacade.dependencyBundle instanceof Integer
+			assetFacade.targetBladePosition instanceof Integer
 	}
 
 	void "test setting an asset date property should be able to set new value and read it"() {
