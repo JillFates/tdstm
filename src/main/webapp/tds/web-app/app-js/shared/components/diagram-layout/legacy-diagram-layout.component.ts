@@ -29,14 +29,14 @@ import {
 import {ITaskGraphIcon} from '../../../modules/taskManager/model/task-graph-icon.model';
 import {FA_ICONS} from '../../constants/fontawesome-icons';
 import {of, ReplaySubject} from 'rxjs';
-import {DiagramContextMenuComponent} from './context-menu/diagram-context-menu.component';
-import {IDiagramContextMenuModel, IDiagramContextMenuOption} from './model/diagram-context-menu.model';
+import {LegacyDiagramContextMenuComponent} from './context-menu/legacy-diagram-context-menu.component';
+import {IDiagramContextMenuModel, IDiagramContextMenuOption} from './model/legacy-diagram-context-menu.model';
 import {IGraphTask} from '../../../modules/taskManager/model/graph-task.model';
 import {NotifierService} from '../../services/notifier.service';
 import {TaskTeam} from '../../../modules/taskManager/components/common/constants/task-team.constant';
-import {DiagramEvent, DiagramEventAction} from './model/diagram-event.constant';
+import {DiagramEvent, DiagramEventAction} from './model/legacy-diagram-event.constant';
 import {DiagramLayoutService} from '../../services/diagram-layout.service';
-import {ILinkPath} from './model/diagram-layout.model';
+import {ILinkPath} from './model/legacy-diagram-layout.model';
 import {GOJS_LICENSE_KEY} from './gojs-license';
 
 const enum NodeTemplateEnum {
@@ -102,7 +102,7 @@ const enum NodeTemplateEnum {
 			<button id="show-full-graph" *ngIf="showFullGraphBtn" (click)="showFullGraph()">Back to Full Graph</button>
 		</div>`,
 })
-export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class LegacyDiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestroy {
 	@Input() nodeData: any = {};
 	@Input() nodeTemplateOpts: go.Node;
 	@Input() linkTemplateOpts: go.Link;
@@ -117,7 +117,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	@Output() diagramClicked: EventEmitter<void> = new EventEmitter<void>();
 	@ViewChild('diagramLayout', {static: false}) diagramLayout: ElementRef;
 	@ViewChild('overviewContainer', {static: false}) overviewContainer: ElementRef;
-	@ViewChild('taskCtxMenu', {static: false}) taskCtxMenu: DiagramContextMenuComponent;
+	@ViewChild('taskCtxMenu', {static: false}) taskCtxMenu: LegacyDiagramContextMenuComponent;
 	@ViewChild('nodeTooltip', {static: false}) nodeTooltip: ElementRef;
 	stateIcons = STATE_ICONS_PATH;
 	assetIcons = ASSET_ICONS_PATH;
@@ -821,6 +821,29 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
+	 * highlight nodes on the diagram based on passed filter
+	 **/
+	highlightNodes(filter?: (x: go.Node) => boolean, highlightLinks?: boolean): void {
+		this.diagram.commit(d => {
+			const highlightCollection = d.nodes.filter(filter);
+			if (highlightCollection) {
+				d.selectCollection(highlightCollection);
+				if (highlightLinks) {
+					highlightCollection.each(n => n.linksConnected.each(l => {
+						l.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
+						l.isSelected = true;
+					}));
+				}
+				if (highlightCollection.count > 0 && highlightCollection.first()) {
+					d.centerRect(highlightCollection.first().actualBounds);
+				} else {
+					d.clearSelection();
+				}
+			}
+		})
+	}
+
+	/**
 	 * highlight all nodes on the diagram
 	 **/
 	highlightAllNodes(): void {
@@ -1193,7 +1216,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * handler to show the tooltip on low or medium scale nodes
 	 * @param {GraphObject} obj
 	 * @param {Diagram} diagram
-	 * @param {Tool} tool
+	 * @param {go.Tool} tool
 	 **/
 	showTooltip(obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool): void {
 		if (this.nodeTooltip.nativeElement) {
@@ -1205,6 +1228,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		}
 	}
 
+	/**
+	 * Remove the tooltip from DOM
+	 */
 	hideToolTip(): void {
 		this.renderer.setStyle(this.nodeTooltip.nativeElement, 'display', 'none')
 	}
@@ -1220,7 +1246,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			node.updateAdornments();
 			d.select(node.part);
 			d.centerRect(node.actualBounds);
-		})
+		});
 	}
 
 	/**

@@ -1,5 +1,5 @@
 import {IGraphTask} from '../../../../modules/taskManager/model/graph-task.model';
-import {IDiagramContextMenuOption} from './diagram-context-menu.model';
+import {IDiagramContextMenuOption} from './legacy-diagram-context-menu.model';
 
 export interface IDiagramLayoutModel {
 	nodeDataArray: IGraphTask[];

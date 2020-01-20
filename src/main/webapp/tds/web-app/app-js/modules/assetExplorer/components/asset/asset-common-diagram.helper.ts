@@ -43,7 +43,7 @@ export class AssetCommonDiagramHelper {
 			lowScaleTemplate: this.lowScaleNodeTemplate(),
 			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
-			rootAsset: params.rootAsset,
+			rootNode: params.rootNode,
 			// extras: params.extras && params.extras
 		};
 	}
@@ -132,7 +132,6 @@ export class AssetCommonDiagramHelper {
 			const expandButton = GraphObject.make('TreeExpanderButton');
 			node.add(expandButton);
 		}
-		node.click = (i, o) => console.log('click');
 
 		return node;
 	}
@@ -159,7 +158,6 @@ export class AssetCommonDiagramHelper {
 			const expandButton = GraphObject.make('TreeExpanderButton');
 			node.add(expandButton);
 		}
-		node.click = (i, o) => console.log('click');
 
 		return node;
 	}
@@ -204,20 +202,12 @@ export class AssetCommonDiagramHelper {
 		shape.desiredSize = new Size(25, 35);
 		shape.fill = '#ddd';
 		node.add(shape);
-
-		// if onNodeClick function is assigned directly to click handler
-		// 'this' loses the binding to the component with onNodeClicked function
-		node.click = (i, o) => console.log('click');
 		return node;
 	}
 
 	mediumScaleNodeTemplate(): Node {
 
 		const node = new Node(Panel.Horizontal);
-
-		// if onNodeClick function is assigned directly to click handler
-		// 'this' loses the binding to the component with onNodeClicked function
-		node.click = (i, o) => console.log('click');
 		return node;
 	}
 
