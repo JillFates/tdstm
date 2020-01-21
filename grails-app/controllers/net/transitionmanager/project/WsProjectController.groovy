@@ -150,7 +150,7 @@ class WsProjectController implements ControllerMethods {
 				  projectInstance      : project,
 				  timezone             : project.timezone?.label ?: '',
 				  client               : project.client,
-				  defaultBundle        : project.defaultBundle,
+				  defaultBundle        : project.defaultBundle.toMap(),
 				  availableBundles     : availableBundles,
 				  possiblePartners     : projectDetails.partners,
 				  possibleManagers     : projectDetails.managers,
