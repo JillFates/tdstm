@@ -107,7 +107,7 @@ export class SingleNoteComponent extends UIExtraDialog implements OnInit {
 	 * Change to Edit view
 	 */
 	protected onEdit(): void {
-		this.singleNoteModel.modal.title = 'Edit Comment';
+		this.singleNoteModel.modal.title = 'Note Edit';
 		this.singleNoteModel.modal.type = ModalType.EDIT;
 	}
 
