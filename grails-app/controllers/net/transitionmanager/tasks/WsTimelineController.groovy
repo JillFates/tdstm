@@ -21,7 +21,6 @@ import net.transitionmanager.task.timeline.TimelineDependency
 import net.transitionmanager.task.timeline.TimelineService
 import net.transitionmanager.task.timeline.TimelineSummary
 import net.transitionmanager.task.timeline.TimelineTask
-import net.transitionmanager.util.JsonViewRenderService
 
 import java.text.DateFormat
 
@@ -29,7 +28,6 @@ import java.text.DateFormat
 class WsTimelineController implements ControllerMethods {
 
     TimelineService timelineService
-    JsonViewRenderService jsonViewRenderService
 
     @HasPermission(Permission.TaskViewCriticalPath)
     def timeline() {

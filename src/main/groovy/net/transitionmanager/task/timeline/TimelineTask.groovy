@@ -5,6 +5,22 @@ import com.tdsops.tm.enums.domain.TimeScale
 import net.transitionmanager.person.Person
 import net.transitionmanager.security.SecurityService
 
+/**
+ * DTO class for {@code Task} results in database. It's a preview with an small amount of fields used in CPA calculation.
+ * <pre>
+ *  tasks = Task.withCriteria { //
+ *      resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP) // Creates a Map with columns
+ *      ...
+ *      projections { //
+ *          property('id', 'id')
+ *          property('taskNumber', 'taskNumber')
+ *          ...
+ *
+ *      resultTransformer org.hibernate.transform.Transformers.aliasToBean(TimelineTask.class)
+ *
+ * </pre>
+ * @see TimelineService#getEventTasks(net.transitionmanager.project.MoveEvent)
+ */
 class TimelineTask {
 
     Long id
