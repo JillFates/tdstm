@@ -31,54 +31,70 @@
 			</ng-template>
 		</kendo-combobox>
 
-		<p>Filter: All classes</p>
+		<p>Filter Labels</p>
 		<kendo-dropdownlist
-			[defaultItem]="'All Classes'"
+			[defaultItem]="'Filter: All Classes'"
 			[data]="dataForSelect"
 			[textField]="'value'"
 			[valueField]="'id'"
+			(valueChange)="onAssetFilterChange($event)"
+			style="width: 100%;"
 		>
 		</kendo-dropdownlist>
 		<div class="tiers-above">
 			<tds-button icon="minus-circle" (click)="extractLevelsUp()"></tds-button>
 			<label>{{levelsUp}}</label>
-			<tds-button icon="plus-circle" (click)="addLevelsUp()"></tds-button>
+			<tds-button icon="plus-circle" (click)="addLevelsUp()" class="add-level-up-graph"></tds-button>
 			<label>Tiers Above</label>
 		</div>
 		<div class="tiers-below">
 			<tds-button icon="minus-circle" (click)="extractLevelsDown()"></tds-button>
 			<label>{{levelsDown}}</label>
-			<tds-button icon="plus-circle" (click)="addLevelsDown()"></tds-button>
+			<tds-button icon="plus-circle" (click)="addLevelsDown()" class="add-level-up-graph"></tds-button>
 			<label>Tiers Below</label>
 		</div>
 		<div class="graph-checkbox">
-			<input type="checkbox" class="k-checkbox" [checked]="showCycles" (change)="toggleShowCycles()">
-			<label class="k-checkbox-label" for="auth-2fa">Show Cyclical References</label>
+			<clr-checkbox-wrapper>
+				<input
+					clrCheckbox
+					type="checkbox"
+					name="showCyclesOnGraph"
+					id="showCyclesOnGraph"
+					class="k-checkbox"
+					[checked]="showCycles"
+					(change)="toggleShowCycles()">
+				<label for="showCyclesOnGraph" class="k-checkbox-label">Show Cyclical References</label>
+			</clr-checkbox-wrapper>
 		</div>
-<!--		<div class="graph-checkbox">-->
-<!--			<input type="checkbox" class="k-checkbox" checked="checked">-->
-<!--			<label class="k-checkbox-label" for="auth-2fa">Black Background</label>-->
-<!--		</div>-->
+
 		<div class="labels">
-			<label>Show Labels: </label> <tds-button icon="{{showLabels ? 'minus' : 'plus'}}" title="{{showLabels ? 'Show Labels' : 'Hide Labels'}}" (click)="toggleShowLabels()"></tds-button>
+			<label>Show Labels: </label>
+			<tds-button icon="{{showLabels ? 'minus' : 'plus'}}" title="{{showLabels ? 'Hide Labels' : 'Show Labels'}}" (click)="toggleShowLabels()" class="add-level-up-graph"></tds-button>
 			<div class="label-items" *ngIf="showLabels">
-<!--				Add all options here via ng for and add icon-->
-				<div class="graph-checkbox" *ngFor="let label of graphLabels">
-					<input type="checkbox" class="k-checkbox" name="{{label.value}}" [checked]="label.checked">
-					<label class="k-checkbox-label" for="{{label.value}}">
-<!--						<svg id="{{label.icon}}ShapeLeftPanel">-->
-<!--							<use [attr.xlink:href]="'#'+ label.icon + 'ShapeId'" class="node" x="15" y="15" style="fill: #1f77b4;">-->
-<!--							</use>-->
-<!--						</svg>-->
-						{{label.label}}
-					</label>
+				<div class="graph-checkbox" *ngFor="let label of graphLabels; let i = index">
+					<clr-checkbox-wrapper>
+						<input
+							clrCheckbox
+							type="checkbox"
+							class="k-checkbox"
+							[id]="label.value"
+							[name]="label.value"
+							[checked]="label.checked"
+							(change)="updateGraphLabels(i)"
+						>
+						<label class="k-checkbox-label" [for]="label.value">
+				<!--		TODO: add icons here-->
+<!--							<fa-icon icon="{{assetIconsPath[label.icon]}}" size="lg"></fa-icon>-->
+							{{label.label}}
+						</label>
+					</clr-checkbox-wrapper>
 				</div>
 			</div>
 		</div>
 		<div class="graph-spacing">
-			<tds-button icon="shrink" title="Zoom Out" (click)="zoomGraphOut()"></tds-button>
-			<tds-button icon="resize-up" title="Zoom In" (click)="zoomGraphIn()"></tds-button>
 			<label>Spacing</label>
+			<tds-button icon="zoom-out" title="Zoom Out" (click)="zoomGraphOut()" class="add-level-up-graph"></tds-button>
+			<tds-button icon="zoom-in" title="Zoom In" (click)="zoomGraphIn()"></tds-button>
 		</div>
 		<div class="graph-commands">
 			<div class="graph-command">
@@ -98,7 +114,7 @@
 			[data]="data$ | async"
 			[layout]="diagramLayout$ | async"
 			[contextMenuOptions]="ctxOpts"
-			[hideExpand]="true"
+			[hideExpand]="false"
             #graph
 		></tds-lib-diagram-layout>
 	</div>

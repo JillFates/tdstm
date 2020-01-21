@@ -336,149 +336,154 @@ div.graphContainer
 
   button.baseline-btn
     margin: 0 10px
+  .add-level-up-graph
+    margin-left: 12px
+  .graph-commands
+    button
+      width: 100%
+    //height: 30px
 
-
-div.graphContainer
-  &:not(.fullscreen)
-    div#toolsContainerId
-      div.graphPanel
-        &:not(.depAnalyzer)
-          @media screen and (min-height: 601px)
-            height: 400px !important
-          @media screen and (max-height: 600px)
-            height: 250px !important
-          @media screen and (max-height: 445px)
-            height: 142px !important
-          @media screen and (max-height: 344px)
-            height: 90px !important
-      div.graphPanel
-        &.depAnalyzer
-          @media screen and (min-height: 825px)
-            height: 385px !important
-          @media screen and (max-height: 824px)
-            height: 300px !important
-          @media screen and (max-height: 731px)
-            height: 200px !important
-          @media screen and (max-height: 640px)
-            height: 150px !important
-          @media screen and (max-height: 590px)
-            height: 100px !important
-
-div.content-wrapper
-  z-index: 70 !important
-  overflow: auto
-  div.container
-    z-index: 75 !important
-div.main-footer
-  position: relative
-
-// fullscreen specific styles
-div.graphContainer.fullscreen
-  background-color: #ffffff
-  width: 0px
-  padding: 0px
-  z-index: 95
-  div#toolsContainerId
-    position: fixed
-    top: 5px
-    left: 5px
-    z-index: 96
-    div#graphToolbarId
-      top: 0px
-      left: 0px
-      & > div, & > span
-        vertical-align: top
-      .btn
-        margin-top: 0px
-      div.graphPanelTab
-        border-top-width: 0px
-        &:not(.activeTab)
-          border-bottom: 1px solid #0077b8
-      & > *:not(.graphPanelTab)
-        opacity: 0.8
-      .graphTabButton
-        border-top-width: 0px !important
-    div.graphPanel
-      margin-top: -1px
-      top: 50px
-      left: 0px
-      height: 400px
-      @media screen and (max-width: 440px)
-        height: 280px !important
-    div#controlPanelId
-      .controlPanelLabel
-        padding: 0px
-        text-align: right
-        white-space: nowrap
-      .controlPanelControl
-        padding-left: 0px
-        padding-right: 0px
-    div#legendDivId
-  div#svgContainerId
-    border: none !important
-    position: fixed
-    left: 0px
-    top: 0px
-    svg
-      border-width: 0px
-
-#scriptDivId
-  padding: 0px
-
-// loading spinner styles
-#spinnerDivId
-  width: 800px
-  height: 300px
-  border: 1px solid #0077b8
-  padding: 5px
-  margin: 5px
-  &.graph
-    padding: 0px
-    margin: 0px
-
-.loading
-  opacity: 1
-  background-image: url(../images/spinner.gif)
-  background-position: center
-  background-repeat: no-repeat
-  background-size: 32px 32px
-  & > g
-    opacity: 0.5
-
-// custom right click context menu for graphs
-.customMenu
-  display: none
-  z-index: 75
-  position: fixed
-  overflow: hidden
-  border: 1px solid #CCC
-  white-space: nowrap
-  font-family: sans-serif
-  background: #FFF
-  color: #333
-  border-radius: 1px
-  padding: 0
-  li
-    padding: 4px 24px !important
-    height: 27px
-    width: 128px
-    font-size: 12px
-    cursor: pointer
-    list-style-type: none
-    background-repeat: no-repeat !important
-    background-position: 4px 2px !important
-    float: none !important
-    border: none !important
-    margin-right: 0px !important
-    &:hover
-      background-color: #DEF
-    &.show
-      background: url(../../../../icons/database_table.png)
-    &.edit
-      background: url(../../../../icons/database_edit.png)
-    &.console
-      background: url(../../../../icons/script_add.png)
-    &.graph
-      background: url(../../../../icons/chart_organisation.png)
-    &.refresh
-      background: url(../../../../icons/arrow_refresh.png)
+//div.graphContainer
+//  &:not(.fullscreen)
+//    div#toolsContainerId
+//      div.graphPanel
+//        &:not(.depAnalyzer)
+//          @media screen and (min-height: 601px)
+//            height: 400px !important
+//          @media screen and (max-height: 600px)
+//            height: 250px !important
+//          @media screen and (max-height: 445px)
+//            height: 142px !important
+//          @media screen and (max-height: 344px)
+//            height: 90px !important
+//      div.graphPanel
+//        &.depAnalyzer
+//          @media screen and (min-height: 825px)
+//            height: 385px !important
+//          @media screen and (max-height: 824px)
+//            height: 300px !important
+//          @media screen and (max-height: 731px)
+//            height: 200px !important
+//          @media screen and (max-height: 640px)
+//            height: 150px !important
+//          @media screen and (max-height: 590px)
+//            height: 100px !important
+//
+//div.content-wrapper
+//  z-index: 70 !important
+//  overflow: auto
+//  div.container
+//    z-index: 75 !important
+//div.main-footer
+//  position: relative
+//
+//// fullscreen specific styles
+//div.graphContainer.fullscreen
+//  background-color: #ffffff
+//  width: 0px
+//  padding: 0px
+//  z-index: 95
+//  div#toolsContainerId
+//    position: fixed
+//    top: 5px
+//    left: 5px
+//    z-index: 96
+//    div#graphToolbarId
+//      top: 0px
+//      left: 0px
+//      & > div, & > span
+//        vertical-align: top
+//      .btn
+//        margin-top: 0px
+//      div.graphPanelTab
+//        border-top-width: 0px
+//        &:not(.activeTab)
+//          border-bottom: 1px solid #0077b8
+//      & > *:not(.graphPanelTab)
+//        opacity: 0.8
+//      .graphTabButton
+//        border-top-width: 0px !important
+//    div.graphPanel
+//      margin-top: -1px
+//      top: 50px
+//      left: 0px
+//      height: 400px
+//      @media screen and (max-width: 440px)
+//        height: 280px !important
+//    div#controlPanelId
+//      .controlPanelLabel
+//        padding: 0px
+//        text-align: right
+//        white-space: nowrap
+//      .controlPanelControl
+//        padding-left: 0px
+//        padding-right: 0px
+//    div#legendDivId
+//  div#svgContainerId
+//    border: none !important
+//    position: fixed
+//    left: 0px
+//    top: 0px
+//    svg
+//      border-width: 0px
+//
+//#scriptDivId
+//  padding: 0px
+//
+//// loading spinner styles
+//#spinnerDivId
+//  width: 800px
+//  height: 300px
+//  border: 1px solid #0077b8
+//  padding: 5px
+//  margin: 5px
+//  &.graph
+//    padding: 0px
+//    margin: 0px
+//
+//.loading
+//  opacity: 1
+//  background-image: url(../images/spinner.gif)
+//  background-position: center
+//  background-repeat: no-repeat
+//  background-size: 32px 32px
+//  & > g
+//    opacity: 0.5
+//
+//// custom right click context menu for graphs
+//.customMenu
+//  display: none
+//  z-index: 75
+//  position: fixed
+//  overflow: hidden
+//  border: 1px solid #CCC
+//  white-space: nowrap
+//  font-family: sans-serif
+//  background: #FFF
+//  color: #333
+//  border-radius: 1px
+//  padding: 0
+//  li
+//    padding: 4px 24px !important
+//    height: 27px
+//    width: 128px
+//    font-size: 12px
+//    cursor: pointer
+//    list-style-type: none
+//    background-repeat: no-repeat !important
+//    background-position: 4px 2px !important
+//    float: none !important
+//    border: none !important
+//    margin-right: 0px !important
+//    &:hover
+//      background-color: #DEF
+//    &.show
+//      background: url(../../../../icons/database_table.png)
+//    &.edit
+//      background: url(../../../../icons/database_edit.png)
+//    &.console
+//      background: url(../../../../icons/script_add.png)
+//    &.graph
+//      background: url(../../../../icons/chart_organisation.png)
+//    &.refresh
+//      background: url(../../../../icons/arrow_refresh.png)

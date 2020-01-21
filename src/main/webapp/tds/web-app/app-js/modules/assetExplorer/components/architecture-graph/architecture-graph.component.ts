@@ -17,6 +17,7 @@ import {
 	ComboBoxSearchResultModel,
 	RESULT_PER_PAGE
 } from '../../../../shared/components/combo-box/model/combobox-search-result.model';
+import {ASSET_ICONS} from '../../model/asset-icon.constant';
 
 declare var jQuery: any;
 
@@ -58,6 +59,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	public dataForGraph;
 	public showLabels = false;
 	public showLegend = false;
+	public assetIconsPath = ASSET_ICONS;
 
 	public assetItem;
 
@@ -66,7 +68,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			icon: 'application',
 			label: 'Application',
 			value: 'application',
-			checked: true
+			checked: false
 		},
 		{
 			icon: 'database',
@@ -81,31 +83,31 @@ export class ArchitectureGraphComponent implements OnInit {
 			checked: false
 		},
 		{
-			icon: 'serverVirtual',
+			icon: 'virtualServer',
 			label: 'Virtual Server',
 			value: 'virtual_server',
 			checked: false
 		},
 		{
-			icon: 'storageLogical',
+			icon: 'logicalStorage',
 			label: 'Logical Storage',
 			value: 'Logical Storage',
 			checked: false
 		},
 		{
-			icon: 'storagePhysical',
+			icon: 'storage',
 			label: 'Storage Device',
 			value: 'Storage Device',
 			checked: false
 		},
 		{
-			icon: 'networkLogical',
+			icon: 'device',
 			label: 'Network Device',
 			value: 'Network Device',
 			checked: false
 		},
 		{
-			icon: 'other',
+			icon: 'device',
 			label: 'Other Device',
 			value: 'Other Device',
 			checked: false
@@ -173,12 +175,13 @@ export class ArchitectureGraphComponent implements OnInit {
 	loadData() {
 		this.architectureGraphService.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 			.subscribe( (res: any) => {
+				console.log('response from arch data:', res);
 				const diagramHelper = new AssetCommonDiagramHelper();
 				this.data$.next(diagramHelper.diagramData({
 					rootAsset: this.assetId,
 					currentUserId: 1,
 					data: res,
-					iconsOnly: true,
+					iconsOnly: false,
 					extras: {
 						diagramOpts: {
 							autoScale: Diagram.Uniform,
@@ -187,7 +190,7 @@ export class ArchitectureGraphComponent implements OnInit {
 						isExpandable: false
 					}
 				}));
-				this.graph.showFullGraphBtn = true;
+				this.graph.showFullGraphBtn = false;
 			});
 	}
 
@@ -244,6 +247,13 @@ export class ArchitectureGraphComponent implements OnInit {
 	toggleShowCycles() {
 		this.showCycles = !this.showCycles;
 		console.log('this.showCycles', this.showCycles);
+		const cycles = [];
+		// TODO: get cycle references from BE
+		// this.data$.subscribe( res => {
+		// 	console.log('subscribed to data', res);
+		// });
+		// this.data$.forEach(arr => cycles.push(...arr));
+		// this.graph.highlightNodesByCycle(cycles);
 	}
 
 	toggleShowLabels() {
@@ -401,5 +411,21 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.showLegend = !this.showLegend;
 	}
 
+	onAssetFilterChange(event) {
+		console.log('asset type filter change', event);
+		// do crazy logic here
+	}
 
+	updateGraphLabels(index) {
+		this.graphLabels[index].checked = !this.graphLabels[index].checked;
+		// TODO: filter nodes for removing labels on graph
+		let categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
+		console.log(categories);
+		if (categories.length > 0) {
+			this.graph.diagram.commit(d => d.nodes.filter(node => categories.includes(node.data.assetClass)).map(n => n.data.name = ''));
+		} else {
+			// TODO: add all labels back
+			console.log('put back all labels');
+		}
+	}
 }
