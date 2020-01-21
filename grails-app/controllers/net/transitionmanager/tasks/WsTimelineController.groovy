@@ -2,7 +2,6 @@ package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
@@ -18,8 +17,10 @@ import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.CriticalPathRoute
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
 import net.transitionmanager.task.timeline.TaskVertex
+import net.transitionmanager.task.timeline.TimelineDependency
 import net.transitionmanager.task.timeline.TimelineService
 import net.transitionmanager.task.timeline.TimelineSummary
+import net.transitionmanager.task.timeline.TimelineTask
 import net.transitionmanager.util.JsonViewRenderService
 
 import java.text.DateFormat
@@ -44,7 +45,8 @@ class WsTimelineController implements ControllerMethods {
 
         TaskTimeLineGraph graph = cpaResults.graph
         TimelineSummary summary = cpaResults.summary
-        List<Task> tasks = cpaResults.tasks
+        List<TimelineTask> tasks = cpaResults.tasks
+        List<TimelineDependency> dependencies = cpaResults.taskDependencies
 
         Date startDate
         Date endDate
@@ -52,8 +54,8 @@ class WsTimelineController implements ControllerMethods {
             startDate = findEarliestStartVertex(graph.getStarts())?.earliestStartDate
             endDate = findLatestFinishVertex(graph.getSinks())?.latestFinishDate
         } else {
-            List<Task> startTasks = tasks.findAll { it.taskNumber in graph.getStarts()*.taskNumber }
-            List<Task> sinkTasks = tasks.findAll { it.taskNumber in graph.getSinks()*.taskNumber }
+            List<TimelineTask> startTasks = tasks.findAll { it.taskNumber in graph.getStarts()*.taskNumber }
+            List<TimelineTask> sinkTasks = tasks.findAll { it.taskNumber in graph.getSinks()*.taskNumber }
             startDate = findEarliestTaskStartTime(startTasks)
             endDate = findLatestTaskFinishTime(sinkTasks)
         }
@@ -68,7 +70,7 @@ class WsTimelineController implements ControllerMethods {
                 tasks    : []
         ]
 
-        for (Task task in tasks) {
+        for (TimelineTask task in tasks) {
 
             TaskVertex taskVertex = graph.getVertex(task.taskNumber)
             // When a task duration is zero, UI needs a different solution:
@@ -91,7 +93,12 @@ class WsTimelineController implements ControllerMethods {
             Map<String, ?> taskMap = [
                     id            : task.id,
                     number        : task.taskNumber,
-                    asset         : GormUtil.domainObjectToMap(task.assetEntity, ['id', 'assetName', 'assetType', 'assetClass']),
+                    asset         : [
+                            id        : task.assetEntityId,
+                            assetName : task.assetName,
+                            assetType : task.assetType,
+                            assetClass: task.assetClass?.name(),
+                    ],
                     name          : task.comment,
                     criticalPath  : recalculate ? taskVertex.isCriticalPath() : task.isCriticalPath,
                     duration      : task.duration,
@@ -104,12 +111,12 @@ class WsTimelineController implements ControllerMethods {
                     actFinish     : task.actFinish,
                     estStart      : estimatedStart,
                     estFinish     : estimatedFinish,
-                    assignedTo    : task.assignedTo?.toString(),
-                    team          : task.role,
+                    assignedTo    : task.firstName ?: '' + ' ' + task.lastName ?: '',
+                    team          : task.team,
                     isAutomatic   : task.isAutomatic(),
                     hasAction     : task.hasAction(),
-                    predecessorIds: task.taskDependencies?.findAll { it.successor.id == task.id }.collect {
-                        it.predecessor.id
+                    predecessorIds: dependencies?.findAll { it.successorId == task.id }.collect {
+                        it.predecessorId
                     }
             ]
 
@@ -360,11 +367,11 @@ class WsTimelineController implements ControllerMethods {
     /**
      * Given a list of {@code Task} it calculate the lowest estStart
      *
-     * @param taskList list of {@code Task}
-     * @return lowest estStart from a list of {@code Task}
+     * @param taskList list of {@code TimelineTask}
+     * @return lowest estStart from a list of {@code TimelineTask}
      */
-    private Date findEarliestTaskStartTime(List<Task> taskList) {
-        return taskList.collect { Task task ->
+    private Date findEarliestTaskStartTime(List<TimelineTask> taskList) {
+        return taskList.collect { TimelineTask task ->
             [task.actStart, task.estStart, task.actFinish].min()
         }.min()
     }
@@ -372,11 +379,11 @@ class WsTimelineController implements ControllerMethods {
     /**
      * Given a list of {@code Task} it calculate the latest estFinish
      *
-     * @param taskList list of {@code Task}
-     * @return latest estFinish from a list of {@code Task}
+     * @param taskList list of {@code TimelineTask}
+     * @return latest estFinish from a list of {@code TimelineTask}
      */
-    private Date findLatestTaskFinishTime(List<Task> taskList) {
-        return taskList.collect { Task task ->
+    private Date findLatestTaskFinishTime(List<TimelineTask> taskList) {
+        return taskList.collect { TimelineTask task ->
             [task.actStart, task.actFinish, task.latestFinish].max()
         }.max()
     }
