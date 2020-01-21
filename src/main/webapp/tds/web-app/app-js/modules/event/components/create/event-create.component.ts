@@ -15,6 +15,7 @@ export class EventCreateComponent implements OnInit {
 	public bundles: any[] = [];
 	public runbookStatuses: string[] = [];
 	public assetTags: any[] = [];
+	public showSwitch: boolean = false;
 	public eventModel: EventModel = null;
 	private defaultModel = null;
 	private requiredFields = ['name'];
