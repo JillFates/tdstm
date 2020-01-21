@@ -198,6 +198,14 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/task/saveTask" {
+			controller = "wsTask"
+			action = [
+			        PUT: 'saveTask',
+					POST: 'saveTask'
+			]
+		}
+
 
 		'/ws/bulkChange' {
 			controller = 'wsBulkAssetChange'

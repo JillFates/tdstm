@@ -283,7 +283,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 */
 	@Secured('isAuthenticated()')
 	def validateUniqueName () {
-		DataviewNameValidationCommand cmd = populateCommandObject(DataviewNameValidationCommand)
+		DataviewNameValidationCommand cmd = populateCommandObject(DataviewNameValidationCommand, false)
 		boolean isUnique = dataviewService.validateUniqueName(cmd)
 		renderSuccessJson([isUnique: isUnique])
 	}

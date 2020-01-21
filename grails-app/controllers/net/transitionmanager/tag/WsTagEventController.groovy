@@ -19,7 +19,6 @@ class WsTagEventController implements ControllerMethods {
 	@HasPermission(Permission.TagCreate)
 	def create() {
 		CreateTagEventCommand newEventTag = populateCommandObject(CreateTagEventCommand)
-		validateCommandObject(newEventTag)
 		List<TagAsset> tagEvents = tagEventService.applyTags(projectForWs,newEventTag.tagIds, newEventTag?.eventId)
 
 		renderSuccessJson(tagEvents*.toMap())
@@ -29,7 +28,6 @@ class WsTagEventController implements ControllerMethods {
 	@HasPermission(Permission.TagDelete)
 	def delete() {
 		IdsCommand delete = populateCommandObject(IdsCommand)
-		validateCommandObject(delete)
 		tagEventService.removeTags(projectForWs, delete.ids)
 		return renderSuccessJson()
 	}

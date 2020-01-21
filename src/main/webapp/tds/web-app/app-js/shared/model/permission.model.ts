@@ -176,6 +176,7 @@ export class Permission {
 	static TaskEdit = 'TaskEdit';
 	static TaskExport = 'TaskExport';
 	static TaskGraphView = 'TaskGraphView';
+	static TaskManagerAllTasks = 'TaskManagerAllTasks';
 	static TaskManagerView = 'TaskManagerView';
 	static TaskPublish = 'TaskPublish';
 	static TaskSignMessage = 'TaskSignMessage';

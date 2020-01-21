@@ -300,7 +300,6 @@ class WsUserController implements ControllerMethods {
 	@HasPermission(Permission.UserGeneralAccess)
 	def savePreference() {
     	SavePreferenceCommand savePreference = populateCommandObject(SavePreferenceCommand)
-		validateCommandObject(savePreference)
 		userPreferenceService.setPreference(savePreference.code, savePreference.value)
     	renderSuccessJson()
 	}
@@ -403,7 +402,7 @@ class WsUserController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserResetOwnPassword)
 	def updatePassword() {
-		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand)
+		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand, false)
 		securityService.updatePassword(securityService.userLogin, command)
 		renderSuccessJson("Your password has been updated successfully.")
 	}

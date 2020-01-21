@@ -1,7 +1,6 @@
 package net.transitionmanager.tag
 
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.tag.CreateCommand
 import net.transitionmanager.command.tag.ListCommand
@@ -17,11 +16,6 @@ class WsTagController implements ControllerMethods {
 	@HasPermission(Permission.TagView)
 	def list() {
 		ListCommand filter = populateCommandObject(ListCommand)
-
-		if (filter.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(filter)))
-			return
-		}
 
 		List<Map> tags = tagService.list(
 			projectForWs,
@@ -40,11 +34,6 @@ class WsTagController implements ControllerMethods {
 	def search() {
 		SearchCommand filter = populateCommandObject(SearchCommand)
 
-		if (filter.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(filter)))
-			return
-		}
-
 		List<Map> tags = tagService.list(
 			projectForWs,
 			filter.name,
@@ -62,11 +51,6 @@ class WsTagController implements ControllerMethods {
 	def create() {
 		CreateCommand newTag = populateCommandObject(CreateCommand)
 
-		if (newTag.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(newTag)))
-			return
-		}
-
 		Tag tag = tagService.create(projectForWs, newTag.name, newTag.description, newTag.color)
 
 		renderSuccessJson(tag.toMap())
@@ -76,11 +60,6 @@ class WsTagController implements ControllerMethods {
 	@HasPermission(Permission.TagEdit)
 	def update(Long id) {
 		UpdateCommand updatedTag = populateCommandObject(UpdateCommand)
-
-		if (updatedTag.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(updatedTag)))
-			return
-		}
 
 		Tag tag = tagService.update(id, projectForWs, updatedTag.name, updatedTag.description, updatedTag.color)
 

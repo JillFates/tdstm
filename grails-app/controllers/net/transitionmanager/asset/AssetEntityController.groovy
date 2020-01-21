@@ -450,7 +450,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderAsJson assetCommentsList
 	}
 
-	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
+	@HasPermission(Permission.TaskView)
 	def showComment() {
 		def commentList = []
 		def personResolvedObj
@@ -668,7 +668,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 	}
 
-	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
+	@HasPermission(Permission.TaskEdit)
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
@@ -2850,7 +2850,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def applicationArchitectureGraph() {
 		Project project = securityService.userCurrentProject
 		ArchitectureGraphCommand context = populateCommandObject(ArchitectureGraphCommand)
-		validateCommandObject(context)
 		AssetEntity rootAsset = AssetEntity.get(context.assetId)
 
 		if (rootAsset && rootAsset.project != project) {
