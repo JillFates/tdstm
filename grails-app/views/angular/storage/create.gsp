@@ -45,7 +45,7 @@
                 <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance.supportType}"  ngmodel="model.asset.supportType" tabindex="5"/>
 
                 <div class="clr-form-control">
-                    <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.dependencyBundle?.value}"/>
+                    <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.moveBundle?.id}"/>
                     <kendo-dropdownlist
                         [tabIndex]="6"
                         class="tm-input-control"
