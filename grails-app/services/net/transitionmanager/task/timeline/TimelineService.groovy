@@ -1,6 +1,5 @@
 package net.transitionmanager.task.timeline
 
-
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -52,47 +51,45 @@ class TimelineService implements ServiceMethods {
      *
      * @param moveEvent the event to retrieve tasks for
      * @param viewUnpublished show only published tasks or all tasks
-     * @return List<Task>           a list of tasks
+     * @return List<Task>               a list of tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineTask> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
         List<TimelineTask> tasks
 
         if (event) {
-            tasks = Task.withCriteria {
-                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-                createAlias('assignedTo', 'whom', CriteriaSpecification.LEFT_JOIN)
-                createAlias('assetEntity', 'asset', CriteriaSpecification.LEFT_JOIN)
-                createAlias('apiAction', 'action', CriteriaSpecification.LEFT_JOIN)
-                eq('moveEvent', event)
-                projections {
-                    property('id', 'id')
-                    property('taskNumber', 'taskNumber')
-                    property('comment', 'comment')
-                    property('duration', 'duration')
-                    property('isCriticalPath', 'isCriticalPath')
-                    property('status', 'status')
-                    property('actStart', 'actStart')
-                    property('statusUpdated', 'statusUpdated')
-                    property('durationScale', 'durationScale')
-                    property('estStart', 'estStart')
-                    property('estFinish', 'estFinish')
-                    property('dateResolved', 'actFinish')
-                    property('latestFinish', 'latestFinish')
-                    property('slack', 'slack')
-                    property('role', 'team')
-                    property('action.id', 'apiActionId')
-                    property('action.name', 'apiActionName')
-                    property('whom.id', 'whomId')
-                    property('whom.firstName', 'firstName')
-                    property('whom.lastName', 'lastName')
-                    property('asset.id', 'assetEntityId')
-                    property('asset.assetName', 'assetName')
-                    property('asset.assetType', 'assetType')
-                    property('asset.assetClass', 'assetClass')
-                }
-                resultTransformer org.hibernate.transform.Transformers.aliasToBean(TimelineTask.class)
-            }
+            tasks = Task.executeQuery(""" 
+                    SELECT t.id,
+                           t.taskNumber,
+                           t.comment,
+                           t.duration,
+                           t.isCriticalPath,
+                           t.status,
+                           t.actStart,
+                           t.statusUpdated,
+                           t.durationScale,
+                           t.estStart,
+                           t.estFinish,
+                           t.latestFinish,
+                           t.slack,
+                           t.role,
+                           t.apiAction.id,
+                           t.apiAction.name,
+                           t.assignedTo.id,
+                           t.assignedTo.firstName,
+                           t.assignedTo.lastName,
+                           t.assetEntity.id,
+                           t.assetEntity.assetName,
+                           t.assetEntity.assetType,
+                           t.assetEntity.assetClass
+                                   
+                    from Task t
+                    left outer join t.apiAction
+                    left outer join t.assignedTo
+                    left outer join t.assetEntity
+                   where t.moveEvent.id = :eventId	
+                """, [eventId: event.id]).collect { new TimelineTask(it) }
+
         } else {
             tasks = []
         }
@@ -104,7 +101,7 @@ class TimelineService implements ServiceMethods {
      * Used to get the list of task dependencies for a given list of tasks
      *
      * @param List <AssetComment> a list of tasks
-     * @return List<TimelineDependency>           a list of the dependencies associated to the tasks
+     * @return List<TimelineDependency>               a list of the dependencies associated to the tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineDependency> getTaskDependencies(List<TimelineTask> tasks) {
@@ -112,21 +109,21 @@ class TimelineService implements ServiceMethods {
 
         if (tasks) {
             List<Long> ids = tasks*.id
-            dependencies = TaskDependency.withCriteria {
-                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-                createAlias('assetComment', 'suc', CriteriaSpecification.LEFT_JOIN)
-                createAlias('predecessor', 'pre', CriteriaSpecification.LEFT_JOIN)
-                'in'('suc.id', ids)
-                'in'('pre.id', ids)
-                projections {
-                    property('id', 'taskDependencyId')
-                    property('suc.id', 'successorId')
-                    property('suc.taskNumber', 'successorTaskNumber')
-                    property('pre.id', 'predecessorId')
-                    property('pre.taskNumber', 'predecessorTaskNumber')
-                }
-                resultTransformer org.hibernate.transform.Transformers.aliasToBean(TimelineDependency.class)
-            }
+
+            dependencies = TaskDependency.executeQuery("""
+                    SELECT t.id,
+                           t.assetComment.id,
+                           t.assetComment.taskNumber,
+                           t.predecessor.id,
+                           t.predecessor.taskNumber
+                    from TaskDependency t
+                    left outer join t.assetComment
+                    left outer join t.predecessor
+                    where t.assetComment.id in :ids
+                      and t.predecessor.id in :ids
+                      
+            """, [ids: ids]).collect { new TimelineDependency(it) }
+
         } else {
             dependencies = []
         }

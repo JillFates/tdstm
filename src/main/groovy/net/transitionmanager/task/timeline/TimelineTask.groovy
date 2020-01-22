@@ -50,6 +50,32 @@ class TimelineTask {
 
     List<TimelineDependency> taskDependencies = []
 
+    TimelineTask(Object values) {
+        this.id = values[0]
+        this.taskNumber = values[1]
+        this.comment = values[2]
+        this.duration = values[3]
+        this.isCriticalPath = values[4]
+        this.status = values[5]
+        this.actStart = values[6]
+        this.statusUpdated = values[7]
+        this.durationScale = values[8]
+        this.estStart = values[9]
+        this.estFinish = values[10]
+        this.latestFinish = values[11]
+        this.slack = values[12]
+        this.team = values[13]
+        this.apiActionId = values[14]
+        this.apiActionName = values[15]
+        this.whomId = values[16]
+        this.firstName = values[17]
+        this.lastName = values[18]
+        this.assetEntityId = values[19]
+        this.assetName = values[20]
+        this.assetType = values[21]
+        this.assetClass = values[22]
+    }
+
     /**
      * Determines if the task is Automatic processed
      * @return

@@ -11,4 +11,12 @@ class TimelineDependency {
     Integer successorTaskNumber
     Long predecessorId
     Integer predecessorTaskNumber
+
+    TimelineDependency(Object values) {
+        this.taskDependencyId = values[0]
+        this.successorId = values[1]
+        this.successorTaskNumber = values[2]
+        this.predecessorId = values[3]
+        this.predecessorTaskNumber = values[4]
+    }
 }

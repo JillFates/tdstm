@@ -113,9 +113,7 @@ class WsTimelineController implements ControllerMethods {
                     team          : task.team,
                     isAutomatic   : task.isAutomatic(),
                     hasAction     : task.hasAction(),
-                    predecessorIds: dependencies?.findAll { it.successorId == task.id }.collect {
-                        it.predecessorId
-                    }
+                    predecessorIds: taskVertex.predecessors*.taskId
             ]
 
             timelineResponse.tasks.add(taskMap)
