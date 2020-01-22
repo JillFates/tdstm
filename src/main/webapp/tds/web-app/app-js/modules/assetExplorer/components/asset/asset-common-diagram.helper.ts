@@ -16,7 +16,6 @@ import {
 	ITdsContextMenuOption
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {IconModel, IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-// import {ILinkPath} from '../../../taskManager/components/neighborhood/neighborhood.component';
 import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/architecture-graph-asset.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 
