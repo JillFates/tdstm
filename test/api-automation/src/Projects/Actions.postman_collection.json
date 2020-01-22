@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a44c66cb-5448-4a0e-9c22-4c3ec310168b",
+		"_postman_id": "0859a1ee-5284-45a8-9e5b-947aa6b8bb8e",
 		"name": "Actions Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -277,6 +284,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -334,6 +346,11 @@
 						"key": "Accept",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -386,7 +403,10 @@
 							"pm.environment.unset(\"dictionaryDocUrl\");",
 							"pm.environment.unset(\"apiActionName\");",
 							"pm.environment.unset(\"providerId\");",
-							"pm.environment.unset(\"apiID\");"
+							"pm.environment.unset(\"apiID\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -394,7 +414,13 @@
 			],
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": ""
@@ -414,5 +440,6 @@
 			},
 			"response": []
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

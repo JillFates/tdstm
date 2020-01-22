@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a4dcc8a4-e299-493b-a790-022f4fb3db0f",
+		"_postman_id": "b218045b-dab5-4cf4-bc30-f6503db2e79d",
 		"name": "Cookbook-Recipe Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -206,6 +213,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -319,7 +331,10 @@
 							"pm.environment.unset(\"versionNumber\");",
 							"pm.environment.unset(\"recipeID\");",
 							"pm.environment.unset(\"recipeName\");",
-							"pm.environment.unset(\"newRecipeID\");"
+							"pm.environment.unset(\"newRecipeID\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -327,7 +342,13 @@
 			],
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "formdata",
 					"formdata": [
@@ -392,5 +413,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
