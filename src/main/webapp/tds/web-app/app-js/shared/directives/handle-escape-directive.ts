@@ -36,7 +36,7 @@ export class UIHandleEscapeDirective implements OnInit, AfterViewInit {
 		setTimeout(() => {
 			const modalBody = this.el.nativeElement.querySelector('.modal-body');
 			if (modalBody) {
-				this.renderer.removeAttribute(modalBody,'tabindex');
+				this.renderer.removeAttribute(modalBody, 'tabindex');
 			}
 		}, 1000);
 	}
