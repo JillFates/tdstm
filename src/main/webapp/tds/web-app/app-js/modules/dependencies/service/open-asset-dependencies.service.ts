@@ -56,7 +56,7 @@ export class OpenAssetDependenciesService {
 					{ provide: 'ID', useValue: assetDependency.id },
 					{ provide: 'ASSET', useValue: assetDependency.class }
 				]),
-				extraParams: [DIALOG_SIZE.LG],
+				extraParams: [DIALOG_SIZE.XXL],
 				open
 			},
 			[dependentName]: {

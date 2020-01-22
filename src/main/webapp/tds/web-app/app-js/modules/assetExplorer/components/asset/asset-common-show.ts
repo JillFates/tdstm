@@ -151,13 +151,14 @@ export class AssetCommonShow implements OnInit {
 					iconsOnly: true,
 					extras: {
 						diagramOpts: {
+							initialAutoScale: Diagram.Uniform,
 							autoScale: Diagram.Uniform,
 							allowZoom: false
 						},
 						isExpandable: false
 					}
 				}));
-			})
+			});
 	}
 
 	/**
