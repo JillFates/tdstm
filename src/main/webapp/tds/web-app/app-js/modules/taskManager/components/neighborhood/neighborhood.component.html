@@ -101,15 +101,27 @@
     </div>
 
   </div>
-  <div class="row diagram-container">
-    <tds-diagram-layout
-		[nodeData]="nodeData$ | async"
-    [currentUser]="currentUser$ | async"
-    [contextMenuOptions]="ctxMenuOpts$ | async"
-    (nodeClicked)="onNeighborhood($event)"
-    (backTofullGraph)="viewFullGraphFromCache()"
-    (nodeUpdated)="updateGraphCache($event)"
-    (diagramClicked)="diagramClicked()"
-    #graph></tds-diagram-layout>
+  <div class="clr-row task-graph-diagram-container">
+    <tds-lib-diagram-layout
+          [style.width]="'100%'"
+          [data]="diagramData$ | async"
+          (nodeClicked)="onNeighborhood($event)"
+          (backToFullGraph)="viewFullGraphFromCache()"
+          (diagramAnimationFinished)="onDiagramAnimationFinished()"
+          (ctxMenuActionDispatched)="onActionDispatched($event)"
+          (nodeUpdated)="updateGraphCache($event)"
+          (diagramClicked)="diagramClicked()"
+          #graph
+    ></tds-lib-diagram-layout>
+<!--    <tds-diagram-layout-->
+<!--		[nodeData]="nodeData$ | async"-->
+<!--    [currentUser]="currentUser$ | async"-->
+<!--    [contextMenuOptions]="ctxMenuOpts$ | async"-->
+<!--    (nodeClicked)="onNeighborhood($event)"-->
+<!--    (backTofullGraph)="viewFullGraphFromCache()"-->
+<!--    (nodeUpdated)="updateGraphCache($event)"-->
+<!--    (diagramClicked)="diagramClicked()"-->
+<!--    #graph></tds-diagram-layout>-->
   </div>
+
 </div>

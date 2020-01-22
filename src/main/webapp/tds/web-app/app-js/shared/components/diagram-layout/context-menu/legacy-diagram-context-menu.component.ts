@@ -14,11 +14,11 @@ import {
 	IHideBtn,
 	IDiagramContextMenuModel,
 	IDiagramContextMenuField
-} from '../model/diagram-context-menu.model';
+} from '../model/legacy-diagram-context-menu.model';
 import {NotifierService} from '../../../services/notifier.service';
 import {PermissionService} from '../../../services/permission.service';
 import {IGraphTask} from '../../../../modules/taskManager/model/graph-task.model';
-import {DiagramContextMenuHelper} from './diagram-context-menu.helper';
+import {LegacyDiagramContextMenuHelper} from './legacy-diagram-context-menu.helper';
 
 @Component({
 	selector: 'tds-task-context-menu',
@@ -46,7 +46,7 @@ import {DiagramContextMenuHelper} from './diagram-context-menu.helper';
 			</ul>
 		</div>`
 })
-export class DiagramContextMenuComponent implements OnInit {
+export class LegacyDiagramContextMenuComponent implements OnInit {
 	@Input() data: IDiagramContextMenuModel;
 	@ViewChild('ctxMenu', {static: false}) ctxMenu: ElementRef;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
@@ -88,7 +88,7 @@ export class DiagramContextMenuComponent implements OnInit {
 	 * @param {IDiagramContextMenuField} option => option to run validations on
 	 **/
 	componentSpecificValidations(option: IDiagramContextMenuField): boolean {
-		return DiagramContextMenuHelper.validate(this.data.options.containerComp,
+		return LegacyDiagramContextMenuHelper.validate(this.data.options.containerComp,
 			option,
 			this.data.selectedNode,
 			this.data.currentUser);
