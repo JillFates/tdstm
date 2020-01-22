@@ -7,7 +7,6 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
-import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.jdbc.core.BatchPreparedStatementSetter
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -51,7 +50,7 @@ class TimelineService implements ServiceMethods {
      *
      * @param moveEvent the event to retrieve tasks for
      * @param viewUnpublished show only published tasks or all tasks
-     * @return List<Task>               a list of tasks
+     * @return List<Task>                a list of tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineTask> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
@@ -88,7 +87,7 @@ class TimelineService implements ServiceMethods {
                     left outer join t.assignedTo
                     left outer join t.assetEntity
                    where t.moveEvent.id = :eventId	
-                """, [eventId: event.id]).collect { new TimelineTask(it) }
+                """, [eventId: event.id]).collect { TimelineTask.fromResultSet(it) }
 
         } else {
             tasks = []
@@ -101,7 +100,7 @@ class TimelineService implements ServiceMethods {
      * Used to get the list of task dependencies for a given list of tasks
      *
      * @param List <AssetComment> a list of tasks
-     * @return List<TimelineDependency>               a list of the dependencies associated to the tasks
+     * @return List<TimelineDependency>                a list of the dependencies associated to the tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineDependency> getTaskDependencies(List<TimelineTask> tasks) {
@@ -122,7 +121,7 @@ class TimelineService implements ServiceMethods {
                     where t.assetComment.id in :ids
                       and t.predecessor.id in :ids
                       
-            """, [ids: ids]).collect { new TimelineDependency(it) }
+            """, [ids: ids]).collect { TimelineDependency.fromResultSet(it) }
 
         } else {
             dependencies = []

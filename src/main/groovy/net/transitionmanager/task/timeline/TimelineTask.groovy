@@ -50,32 +50,6 @@ class TimelineTask {
 
     List<TimelineDependency> taskDependencies = []
 
-    TimelineTask(Object values) {
-        this.id = values[0]
-        this.taskNumber = values[1]
-        this.comment = values[2]
-        this.duration = values[3]
-        this.isCriticalPath = values[4]
-        this.status = values[5]
-        this.actStart = values[6]
-        this.statusUpdated = values[7]
-        this.durationScale = values[8]
-        this.estStart = values[9]
-        this.estFinish = values[10]
-        this.latestFinish = values[11]
-        this.slack = values[12]
-        this.team = values[13]
-        this.apiActionId = values[14]
-        this.apiActionName = values[15]
-        this.whomId = values[16]
-        this.firstName = values[17]
-        this.lastName = values[18]
-        this.assetEntityId = values[19]
-        this.assetName = values[20]
-        this.assetType = values[21]
-        this.assetClass = values[22]
-    }
-
     /**
      * Determines if the task is Automatic processed
      * @return
@@ -91,5 +65,33 @@ class TimelineTask {
      */
     boolean hasAction() {
         return apiActionId != null
+    }
+
+    static TimelineTask fromResultSet(Object values) {
+        return new TimelineTask(
+                id: values[0],
+                taskNumber: values[1],
+                comment: values[2],
+                duration: values[3],
+                isCriticalPath: values[4],
+                status: values[5],
+                actStart: values[6],
+                statusUpdated: values[7],
+                durationScale: values[8],
+                estStart: values[9],
+                estFinish: values[10],
+                latestFinish: values[11],
+                slack: values[12],
+                team: values[13],
+                apiActionId: values[14],
+                apiActionName: values[15],
+                whomId: values[16],
+                firstName: values[17],
+                lastName: values[18],
+                assetEntityId: values[19],
+                assetName: values[20],
+                assetType: values[21],
+                assetClass: values[22]
+        )
     }
 }
