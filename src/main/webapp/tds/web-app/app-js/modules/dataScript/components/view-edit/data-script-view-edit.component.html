@@ -151,35 +151,30 @@
 				</div>
 				<div>
 					<div class="form-group">
-						<div class="col-sm-2">
-							<div></div>
-						</div>
-						<div class="col-sm-9" >
+						<div class="col-sm-offset-3 col-sm-8">
 							<span class="checkbox">
-								<label for="isAutoProcess">
+								<clr-checkbox-wrapper>
 									<input
-										id="isAutoProcess"
+										clrCheckbox
+										type="checkbox"
 										name="isAutoProcess"
-										type="checkbox"
+										id="isAutoProcess"
 										[disabled]="modalType === actionTypes.VIEW"
-										[(ngModel)]="dataScriptModel.isAutoProcess" />
-										<span class="checkbox-label">
-											Used to automatically transform, import and post data into TM
-										</span>
-								</label>
+										[(ngModel)]="dataScriptModel.isAutoProcess"/>
+									<label>Used to automatically transform, import and post data into TM</label>
+								</clr-checkbox-wrapper>
 							</span>
-							<span class="checkbox" >
-								<label for="useWithAssetActions">
+							<span class="checkbox">
+								<clr-checkbox-wrapper>
 									<input
-										id="useWithAssetActions"
-										name="useWithAssetActions"
+										clrCheckbox
 										type="checkbox"
+										name="useWithAssetActions"
+										id="useWithAssetActions"
 										[disabled]="modalType === actionTypes.VIEW"
-										[(ngModel)]="dataScriptModel.useWithAssetActions" />
-										<span class="checkbox-label">
-											Use with asset actions
-										</span>
-								</label>
+										[(ngModel)]="dataScriptModel.useWithAssetActions"/>
+									<label>Use with asset actions</label>
+								</clr-checkbox-wrapper>
 							</span>
 						</div>
 					</div>
