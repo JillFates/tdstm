@@ -1,10 +1,12 @@
 package net.transitionmanager.strategy.asset
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
 
 class ApplicationSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 
@@ -43,11 +45,20 @@ class ApplicationSaveUpdateStrategy extends AssetSaveUpdateStrategy{
 	protected void populateAsset(AssetEntity assetEntity) {
 		super.populateAsset(assetEntity)
 		Application application = (Application) assetEntity
-		application.sme = Person.get((Long)command.asset.sme.id)
-		application.appOwner = Person.get((Long)command.asset.appOwner.id)
-		application.sme2 = Person.get((Long)command.asset.sme2.id)
+		application.sme = personService.getPerson(project, command.asset.sme?.id)
+		application.appOwner = personService.getPerson(project, command.asset.appOwner?.id)
+		application.sme2 = personService.getPerson(project, command.asset.sme2?.id)
 		application.shutdownFixed = command.asset.shutdownFixed ?  1 : 0
 		application.startupFixed = command.asset.startupFixed ?  1 : 0
 		application.testingFixed = command.asset.testingFixed ?  1 : 0
+	}
+
+
+	/**
+	 * Return the person service instance in the container.
+	 * @return
+	 */
+	static PersonService getPersonService() {
+		return ApplicationContextHolder.getBean('personService')
 	}
 }
