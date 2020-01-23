@@ -50,7 +50,7 @@ class TimelineService implements ServiceMethods {
      *
      * @param moveEvent the event to retrieve tasks for
      * @param viewUnpublished show only published tasks or all tasks
-     * @return List<Task>                a list of tasks
+     * @return List<Task>                  a list of tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineTask> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
@@ -100,7 +100,7 @@ class TimelineService implements ServiceMethods {
      * Used to get the list of task dependencies for a given list of tasks
      *
      * @param List <AssetComment> a list of tasks
-     * @return List<TimelineDependency>                a list of the dependencies associated to the tasks
+     * @return List<TimelineDependency>                  a list of the dependencies associated to the tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineDependency> getTaskDependencies(List<TimelineTask> tasks) {
@@ -110,17 +110,25 @@ class TimelineService implements ServiceMethods {
             List<Long> ids = tasks*.id
 
             dependencies = TaskDependency.executeQuery("""
-                    SELECT t.id,
-                           t.assetComment.id,
-                           t.assetComment.taskNumber,
-                           t.predecessor.id,
-                           t.predecessor.taskNumber
-                    from TaskDependency t
-                    left outer join t.assetComment
-                    left outer join t.predecessor
-                    where t.assetComment.id in :ids
-                      and t.predecessor.id in :ids
-                      
+                SELECT t.id,
+                       t.assetComment.id,
+                       t.assetComment.taskNumber,
+                       t.predecessor.id,
+                       t.predecessor.taskNumber
+                from TaskDependency t
+                         left outer join t.assetComment
+                         left outer join t.predecessor
+                where t.assetComment.id in :ids)
+                UNION
+                SELECT t.id,
+                       t.assetComment.id,
+                       t.assetComment.taskNumber,
+                       t.predecessor.id,
+                       t.predecessor.taskNumber
+                from TaskDependency t
+                         left outer join t.assetComment
+                         left outer join t.predecessor
+                where t.predecessor.id in :ids)
             """, [ids: ids]).collect { TimelineDependency.fromResultSet(it) }
 
         } else {
