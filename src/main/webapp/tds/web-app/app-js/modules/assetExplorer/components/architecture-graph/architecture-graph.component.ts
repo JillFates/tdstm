@@ -18,6 +18,7 @@ import {
 	RESULT_PER_PAGE
 } from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 declare var jQuery: any;
 
@@ -43,6 +44,8 @@ export class ArchitectureGraphComponent implements OnInit {
 	public linkTemplate$: ReplaySubject<Link> = new ReplaySubject(1);
 	public userContext: UserContextModel;
 	public urlParams: IArchitectureGraphParams;
+	private currentNodesData;
+	public categories;
 
 	public assetList;
 	public graphPreferences;
@@ -67,49 +70,49 @@ export class ArchitectureGraphComponent implements OnInit {
 		{
 			icon: 'application',
 			label: 'Application',
-			value: 'application',
+			value: 'APPLICATION',
 			checked: false
 		},
 		{
 			icon: 'database',
 			label: 'Database',
-			value: 'database',
+			value: 'DATABASE',
 			checked: false
 		},
 		{
-			icon: 'server',
+			icon: 'serverPhysical',
 			label: 'Physical Server',
-			value: 'physical_server',
+			value: 'physical server',
 			checked: false
 		},
 		{
-			icon: 'virtualServer',
+			icon: 'serverVirtual',
 			label: 'Virtual Server',
-			value: 'virtual_server',
+			value: 'virtual server',
 			checked: false
 		},
 		{
-			icon: 'logicalStorage',
+			icon: 'storageLogical',
 			label: 'Logical Storage',
 			value: 'Logical Storage',
 			checked: false
 		},
 		{
-			icon: 'storage',
+			icon: 'storagePhysical',
 			label: 'Storage Device',
 			value: 'Storage Device',
 			checked: false
 		},
 		{
-			icon: 'device',
+			icon: 'networkLogical',
 			label: 'Network Device',
 			value: 'Network Device',
 			checked: false
 		},
 		{
-			icon: 'device',
+			icon: 'other',
 			label: 'Other Device',
-			value: 'Other Device',
+			value: 'Device',
 			checked: false
 		}
 	];
@@ -118,7 +121,8 @@ export class ArchitectureGraphComponent implements OnInit {
 		private userContextService: UserContextService,
 		private activatedRoute: ActivatedRoute,
 		private architectureGraphService: ArchitectureGraphService,
-		private sanitized: DomSanitizer
+		private sanitized: DomSanitizer,
+		private preferenceService: PreferenceService
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
@@ -127,8 +131,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	ngOnInit(): void {
 		// If it comes from asset explorer
 		if (this.urlParams && this.urlParams.assetId) {
-			console.log('params', this.urlParams);
-			this.loadDiagramData(this.urlParams);
+			this.assetId = this.urlParams.assetId;
+			this.loadData();
+			this.showControlPanel = false;
 		}
 		this.getArchitectureGraphPreferences();
 		this.initSearchModel();
@@ -137,9 +142,7 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	getArchitectureGraphPreferences() {
 		this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
-			console.log('res call 2', res);
 			this.dataForSelect = res.assetClassesForSelect;
-			this.assetId = res.assetId;
 			this.levelsUp = +res.graphPrefs.levelsUp;
 			this.levelsDown = +res.graphPrefs.levelsDown;
 			this.showCycles = res.graphPrefs.showCycles;
@@ -151,7 +154,6 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	loadAssetsForDropDown() {
 		this.architectureGraphService.getAssetsForArchitectureGraph(this.comboBoxSearchModel.query, this.comboBoxSearchModel.value, this.comboBoxSearchModel.maxPage, this.comboBoxSearchModel.currentPage, 'ALL').subscribe((res: any) => {
-			console.log('data for asset select', res);
 			this.comboBoxSearchResultModel = res;
 			const result = (this.comboBoxSearchResultModel.results || []);
 			result.forEach((item: any) => this.addToDataSource(item));
@@ -162,8 +164,11 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	onAssetSelected(event) {
-		console.log('asset selected', event);
 		if (event) {
+			this.graphLabels.forEach(item => {
+				item.checked = false;
+			});
+			this.showLabels = false;
 			this.assetId = event.id;
 			this.loadData();
 		}
@@ -175,48 +180,15 @@ export class ArchitectureGraphComponent implements OnInit {
 	loadData() {
 		this.architectureGraphService.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 			.subscribe( (res: any) => {
-				console.log('response from arch data:', res);
-				const diagramHelper = new AssetCommonDiagramHelper();
-				this.data$.next(diagramHelper.diagramData({
-					rootAsset: this.assetId,
-					currentUserId: 1,
-					data: res,
-					iconsOnly: false,
-					extras: {
-						diagramOpts: {
-							autoScale: Diagram.Uniform,
-							allowZoom: false
-						},
-						isExpandable: false
-					}
-				}));
-				this.graph.showFullGraphBtn = false;
-			});
-	}
-
-	loadDiagramData(params?: IArchitectureGraphParams): void {
-		this.architectureGraphService.getAssetDetails(params.assetId, this.levelsUp, this.levelsDown)
-			.subscribe(res => {
-				console.log('response assets details', res);
-				const diagramHelper = new AssetCommonDiagramHelper();
-				this.data$.next(diagramHelper.diagramData({
-					rootAsset: this.assetId,
-					currentUserId: 1,
-					data: res,
-					iconsOnly: true,
-					extras: {
-						diagramOpts: {
-							autoScale: Diagram.Uniform,
-							allowZoom: false
-						},
-						isExpandable: false,
-						initialExpandLevel: 2
-					}
-				}));
+				this.currentNodesData = res;
+				this.updateNodeData(this.currentNodesData, true);
 			});
 	}
 
 	toggleControlPanel() {
+		if (this.showLegend) {
+			this.showLegend = !this.showLegend;
+		}
 		this.showControlPanel = !this.showControlPanel;
 	}
 
@@ -246,7 +218,6 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	toggleShowCycles() {
 		this.showCycles = !this.showCycles;
-		console.log('this.showCycles', this.showCycles);
 		const cycles = [];
 		// TODO: get cycle references from BE
 		// this.data$.subscribe( res => {
@@ -279,7 +250,6 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	public onSelectionChange(value: any): void {
 		console.log('selection changed: ', value);
-		// this.selectionChangeonAssetSelected.emit(value);
 	}
 
 	/**
@@ -287,15 +257,12 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param filter
 	 */
 	public onFilterChange(filter: any): void {
-		console.log('on filter change', filter);
-		// load more with search of terms for assets
 		if (filter !== '') {
 			this.initSearchModel();
 			this.comboBoxSearchModel.currentPage = 1;
 			this.comboBoxSearchModel.query = filter;
 			this.getNewResultSet();
 		} else if (!filter) {
-			// reload initial data
 			this.initSearchModel();
 			this.loadAssetsForDropDown();
 		}
@@ -341,7 +308,6 @@ export class ArchitectureGraphComponent implements OnInit {
 			if ((RESULT_PER_PAGE * this.comboBoxSearchResultModel.page) <= this.comboBoxSearchResultModel.total) {
 				this.comboBoxSearchModel.currentPage++;
 				console.log('this.comboBoxSearchModel', this.comboBoxSearchModel);
-				// this.getResultSet();
 				this.loadAssetsForDropDown();
 			}
 		}
@@ -408,6 +374,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	toggleLegend() {
+		if (this.showControlPanel) {
+			this.showControlPanel = !this.showControlPanel;
+		}
 		this.showLegend = !this.showLegend;
 	}
 
@@ -419,13 +388,66 @@ export class ArchitectureGraphComponent implements OnInit {
 	updateGraphLabels(index) {
 		this.graphLabels[index].checked = !this.graphLabels[index].checked;
 		// TODO: filter nodes for removing labels on graph
-		let categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
-		console.log(categories);
-		if (categories.length > 0) {
-			this.graph.diagram.commit(d => d.nodes.filter(node => categories.includes(node.data.assetClass)).map(n => n.data.name = ''));
+		this.categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
+		console.log(this.categories);
+		if (this.categories.length > 0 && this.assetId) {
+			let tempNodesData = Object.assign({}, this.currentNodesData);
+			tempNodesData.nodes.forEach( node => {
+				if (!this.categories.includes(node.assetClass)) {
+					node.name = '';
+				}
+			});
+			this.updateNodeData(tempNodesData, false);
 		} else {
-			// TODO: add all labels back
-			console.log('put back all labels');
+			this.categories = [];
+			// TODO: remove all labels
+			console.log('remove back all labels');
+			this.updateNodeData(this.currentNodesData, true);
 		}
 	}
+
+	updateNodeData(data, iconsOnly) {
+		const diagramHelper = new AssetCommonDiagramHelper();
+		this.data$.next(diagramHelper.diagramData({
+			rootAsset: this.assetId,
+			currentUserId: 1,
+			data: data,
+			iconsOnly: iconsOnly,
+			extras: {
+				diagramOpts: {
+					autoScale: Diagram.Uniform,
+					allowZoom: false
+				},
+				isExpandable: false
+			}
+		}));
+	}
+
+	regenerateGraph() {
+		this.loadData();
+	}
+
+	savePreferences() {
+		const valueData = {
+			assetClass: 'ALL',
+			levelsUp: this.levelsUp,
+			levelsDown: this.levelsDown,
+			showCycles: this.showCycles,
+			appLbl: this.categories.length > 0
+		};
+		this.preferenceService.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
+			if (res.status === 'success') {
+				console.log('Preferences saved correctly');
+			}
+		})
+	}
+
+	resetDefaults() {
+		this.getArchitectureGraphPreferences();
+	}
+
+	goBackToNormalGraph() {
+		console.log('go back to normal');
+	}
+
 }
