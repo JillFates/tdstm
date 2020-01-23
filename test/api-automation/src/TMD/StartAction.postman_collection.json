@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a2da9901-403f-40d1-b88f-2315aa81a3ff",
+		"_postman_id": "4007d51e-fcfd-4274-b244-ee7858232969",
 		"name": "StartAction",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -16,7 +16,14 @@
 							"",
 							"pm.test(\"JSESSIONID present\", function () {",
 							"    pm.expect(pm.cookies.has('JSESSIONID')).to.be.true;",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -216,6 +223,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -334,6 +346,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -391,7 +408,9 @@
 							"pm.environment.unset(\"apiActionId\");",
 							"pm.environment.unset(\"taskName\");",
 							"pm.environment.unset(\"taskID\");",
-							""
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -410,6 +429,11 @@
 						"key": "Accept",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
