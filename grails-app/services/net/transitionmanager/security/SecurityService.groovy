@@ -35,6 +35,7 @@ import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ProjectRequiredException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.PartyRelationship
@@ -63,7 +64,7 @@ import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
-class SecurityService implements ServiceMethods, InitializingBean {
+class SecurityService implements InitializingBean {
 	private static final int ONE_HOUR = 60 * 60 * 1000
 	private static final Collection<String> SECURITY_ROLES = ['USER', 'EDITOR', 'SUPERVISOR']
 
@@ -238,7 +239,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Project project = getUserCurrentProject()
 
 		if(project == null){
-			throw new EmptyResultException('No project selected')
+			throw new ProjectRequiredException('No project selected')
 		}
 
 		return project

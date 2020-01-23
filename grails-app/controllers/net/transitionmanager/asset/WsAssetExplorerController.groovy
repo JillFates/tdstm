@@ -1,4 +1,7 @@
 package net.transitionmanager.asset
+
+import com.tdsops.common.security.spring.HasPermission
+
 /**
  * Created by David Ontiveros
  */
@@ -9,6 +12,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewCrudCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.imports.Dataview
@@ -16,6 +20,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.Permission
 import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.BooleanUtils
 import org.grails.web.json.JSONObject
@@ -33,7 +38,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 
 	DataviewService dataviewService
 	UserPreferenceService userPreferenceService
-	SecurityService securityService
+//	SecurityService securityService
 
 	// TODO: JPM 11/2017 - Need to add Permissions on ALL methods
 	// TODO: JPM 11/2017 - Methods do NOT need try/catches
@@ -79,12 +84,11 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * appropriately.
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.AssetExplorerEdit)
 	def updateDataview(Integer id) {
-		Person currentPerson = securityService.loadCurrentPerson()
-		Project currentProject = securityService.userCurrentProject
-
-		Map dataviewMap = dataviewService.update(currentPerson, currentProject, id, request.JSON).toMap(securityService.currentPersonId)
+		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
+		Person whom = currentPerson()
+		Map dataviewMap = dataviewService.update(whom, projectForWs, id, command).toMap(whom.id)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -94,13 +98,17 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * appropriately.
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.AssetExplorerCreate)
 	def createDataview() {
-		JSONObject dataviewJson = request.JSON
-		Person person = securityService.loadCurrentPerson()
-		Project project = dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
+		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
+		validateCommandObject(command)
+		Person person = currentPerson()
 
-		Map dataviewMap = dataviewService.create(person, project, dataviewJson).toMap(securityService.currentPersonId)
+		// TODO : JPM 1/2020 - Should we trust the parameter for a system view???
+		Project project = projectForWs
+				//dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
+
+		Map dataviewMap = dataviewService.create(project, person, command).toMap(person.id)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -110,7 +118,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * appropriately.
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.AssetExplorerDelete)
 	def deleteDataview(Integer id) {
 		dataviewService.delete(id)
 		renderSuccessJson([status: DELETE_OK_STATUS] )

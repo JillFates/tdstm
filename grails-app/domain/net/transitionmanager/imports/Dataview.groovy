@@ -16,8 +16,8 @@ class Dataview {
 	Project project
 	Person  person
 	String  name
-	Boolean isSystem
-	Boolean isShared
+	Boolean isSystem = false
+	Boolean isShared = false
 	String  reportSchema
 	Date    dateCreated
 	Date    lastModified

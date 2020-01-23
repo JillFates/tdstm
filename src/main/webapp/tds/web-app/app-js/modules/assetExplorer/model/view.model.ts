@@ -8,7 +8,7 @@ export class ViewModel {
 	isShared: boolean;
 	isFavorite?: boolean;
 	isOverride?: boolean;
-	saveOptionAs?: string;
+	saveAsOption?: string;
 	schema?: ViewSpec;
 	overridesView?: number;
 	constructor() {

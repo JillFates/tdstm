@@ -12,110 +12,110 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
 @Component({
 	selector: 'asset-explorer-view-save',
 	template: `
-		<div class="modal-content asset-explorer-view-save-component">
-			<div class="modal-header">
-				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-					<span aria-hidden="true">×</span>
-				</button>
-				<h4 class="modal-title">Save List View</h4>
-			</div>
-			<div class="modal-body">
-				<form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
-					  #noticeForm='ngForm'>
-					<div class="box-body">
-						<div>
-							<label for="name" class="col-sm-3 control-label">
-								{{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}:
-							</label>
-						</div>
-						<div class="form-group" style="padding-left:160px;">
-							<div *ngIf="hasMaintainAssetList()">
-								<div class="radio">
-									<div *ngIf="!isThereOnlyAssetViewOption()">
-										<label>
-											<input type="radio"
-												   name="radio-mode"
-												   [value]="saveAsOptions.MY_VIEW.value"
-												   [attr.disabled]="saveAsOptions.MY_VIEW.disabled || null"
-												   [(ngModel)]="model.saveOptionAs"
-												   checked>
-											<span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
-										</label>
-									</div>
-									<div class="col-sm-9" [attr.class]="">
-										<label for="name" style="padding: 0;font-weight: bold">
-											{{ 'GLOBAL.VIEW_NAME' | translate }}:*
-										</label>
-										<input type="text"
-											   name="name"
-											   id="name"
-											   class="form-control"
-											   placeholder="View Name"
-											   [disabled]="!isSaveInMyViewMode()"
-											   (keyup)="onNameChanged()"
-											   [(ngModel)]="model.name"
-											   required>
-										<span *ngIf="!isUnique"
-											  class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
+        <div class="modal-content asset-explorer-view-save-component">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Save List View</h4>
+            </div>
+            <div class="modal-body">
+                <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
+                      #noticeForm='ngForm'>
+                    <div class="box-body">
+                        <div>
+                            <label for="name" class="col-sm-3 control-label">
+                                {{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}:
+                            </label>
+                        </div>
+                        <div class="form-group" style="padding-left:160px;">
+                            <div *ngIf="hasMaintainAssetList()">
+                                <div class="radio">
+                                    <div *ngIf="!isThereOnlyAssetViewOption()">
+                                        <label>
+                                            <input type="radio"
+                                                   name="radio-mode"
+                                                   [value]="saveAsOptions.MY_VIEW.value"
+                                                   [attr.disabled]="saveAsOptions.MY_VIEW.disabled || null"
+                                                   [(ngModel)]="model.saveAsOption"
+                                                   checked>
+                                            <span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-9" [attr.class]="">
+                                        <label for="name" style="padding: 0;font-weight: bold">
+                                            {{ 'GLOBAL.VIEW_NAME' | translate }}:*
+                                        </label>
+                                        <input type="text"
+                                               name="name"
+                                               id="name"
+                                               class="form-control"
+                                               placeholder="View Name"
+                                               [disabled]="!isSaveInMyViewMode()"
+                                               (keyup)="onNameChanged()"
+                                               [(ngModel)]="model.name"
+                                               required>
+                                        <span *ngIf="!isUnique"
+                                              class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
 
-										<div class="checkbox">
-											<label>
-												<input type="checkbox" name="shared" [disabled]="!isSaveInMyViewMode()"
-													   [(ngModel)]="model.isShared">
-												<span>{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}</span>
-											</label>
-										</div>
-										<div class="checkbox" (click)="onFavorite()" disabled>
-											<i class="fa fa-star-o text-yellow"
-											   style="margin-left: -43px;padding:0 10px 10px 10px;font-size: 20px;top:2px;left:30px;position: relative"
-											   [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite,'disabled':!isSaveInMyViewMode()} "></i>
-											<label style="margin-left:5px">
-												<input type="checkbox" name="favorite"
-													   [disabled]="!isSaveInMyViewMode()"
-													   style="visibility:hidden"> {{ 'GLOBAL.ADD_FAVORITES' | translate }}
-											</label>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div *ngIf="hasMaintainAssetList() && !isThereOnlyAssetViewOption()">
-								<div class="radio" style="position:inherit">
-									<label for="overrideMe">
-										<input id="overrideMe" type="radio" name="radio-mode"
-											   [value]="saveAsOptions.OVERRIDE_FOR_ME.value"
-											   [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ME.disabled || null"
-											   [(ngModel)]="model.saveOptionAs">
-										<span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}</span>
-									</label>
-								</div>
-							</div>
-							<div *ngIf="hasMaintainSystemList() && !isThereOnlyAssetViewOption()">
-								<div class="radio">
-									<label for="overrideAll">
-										<input id="overrideAll" type="radio" name="radio-mode"
-											   [value]="saveAsOptions.OVERRIDE_FOR_ALL.value"
-											   [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ALL.disabled || null"
-											   [(ngModel)]="model.saveOptionAs">
-										<span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}</span>
-									</label>
-								</div>
-							</div>
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer form-group-center">
-				<tds-button-save
-					class="btn-primary pull-left"
-					(click)="confirmCloseDialog()"
-					[disabled]="!isValid()">
-				</tds-button-save>
-				<tds-button-cancel
-					(click)="cancelCloseDialog()"
-					class="pull-right">
-				</tds-button-cancel>
-			</div>
-		</div>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="shared" [disabled]="!isSaveInMyViewMode()"
+                                                       [(ngModel)]="model.isShared">
+                                                <span>{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}</span>
+                                            </label>
+                                        </div>
+                                        <div class="checkbox" (click)="onFavorite()" disabled>
+                                            <i class="fa fa-star-o text-yellow"
+                                               style="margin-left: -43px;padding:0 10px 10px 10px;font-size: 20px;top:2px;left:30px;position: relative"
+                                               [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite,'disabled':!isSaveInMyViewMode()} "></i>
+                                            <label style="margin-left:5px">
+                                                <input type="checkbox" name="favorite"
+                                                       [disabled]="!isSaveInMyViewMode()"
+                                                       style="visibility:hidden"> {{ 'GLOBAL.ADD_FAVORITES' | translate }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="hasMaintainAssetList() && !isThereOnlyAssetViewOption()">
+                                <div class="radio" style="position:inherit">
+                                    <label for="overrideMe">
+                                        <input id="overrideMe" type="radio" name="radio-mode"
+                                               [value]="saveAsOptions.OVERRIDE_FOR_ME.value"
+                                               [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ME.disabled || null"
+                                               [(ngModel)]="model.saveAsOption">
+                                        <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div *ngIf="hasMaintainSystemList() && !isThereOnlyAssetViewOption()">
+                                <div class="radio">
+                                    <label for="overrideAll">
+                                        <input id="overrideAll" type="radio" name="radio-mode"
+                                               [value]="saveAsOptions.OVERRIDE_FOR_ALL.value"
+                                               [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ALL.disabled || null"
+                                               [(ngModel)]="model.saveAsOption">
+                                        <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer form-group-center">
+                <tds-button-save
+                        class="btn-primary pull-left"
+                        (click)="confirmCloseDialog()"
+                        [disabled]="!isValid()">
+                </tds-button-save>
+                <tds-button-cancel
+                        (click)="cancelCloseDialog()"
+                        class="pull-right">
+                </tds-button-cancel>
+            </div>
+        </div>
 	`
 })
 export class AssetViewSaveComponent implements AfterViewInit {
@@ -166,15 +166,15 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public isSaveInMyViewMode(): boolean {
-		return this.model.saveOptionAs === this.saveAsOptions.MY_VIEW.value;
+		return this.model.saveAsOption === this.saveAsOptions.MY_VIEW.value;
 	}
 
 	public isOverrideForMeMode(): boolean {
-		return this.model.saveOptionAs === this.saveAsOptions.OVERRIDE_FOR_ME.value;
+		return this.model.saveAsOption === this.saveAsOptions.OVERRIDE_FOR_ME.value;
 	}
 
 	public isOverrideAllUsersMode(): boolean {
-		return this.model.saveOptionAs === this.saveAsOptions.OVERRIDE_FOR_ALL.value;
+		return this.model.saveAsOption === this.saveAsOptions.OVERRIDE_FOR_ALL.value;
 	}
 
 	public isValid(): boolean {
@@ -185,9 +185,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		const changes = { name: `Copy of ${this.preModel.name}`};
 		this.model = {...this.preModel, ...changes};
 		if (this.saveOptions) {
-			this.model.saveOptionAs = this.saveOptions.saveAsOptions[0];
+			this.model.saveAsOption = this.saveOptions.saveAsOptions[0];
 		} else {
-			this.model.saveOptionAs = this.saveAsOptions.MY_VIEW.value;
+			this.model.saveAsOption = this.saveAsOptions.MY_VIEW.value;
 		}
 	}
 
@@ -274,7 +274,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 
 	private extractModel(model: ViewModel) {
 		const tmpModel = Object.assign({}, model);
-		const saveOption = this.saveAsOptions[this.model.saveOptionAs];
+		const saveOption = this.saveAsOptions[this.model.saveAsOption];
 		if (saveOption && saveOption.isOverride) {
 			tmpModel.id = null
 			tmpModel.overridesView = model.id;

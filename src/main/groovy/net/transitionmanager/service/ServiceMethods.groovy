@@ -10,6 +10,7 @@ import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
 import grails.core.GrailsApplication
+import net.transitionmanager.security.Permission
 import net.transitionmanager.security.SecurityService
 import  org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
@@ -269,5 +270,23 @@ trait ServiceMethods {
 			}
 		}
 		return instance
+	}
+
+	/**
+	 * Used to validate if the current user has a given permission
+	 * @parameter permission - the permission to check for
+	 * @return true if the user has the specified permission
+	 */
+	Boolean hasPermission(String permission) {
+		securityService.hasPermission(permission)
+	}
+
+	/**
+	 * Used to validate if the current user does NOT have a given permission
+	 * @parameter permission - the permission to check for
+	 * @return true if the user does NOT has the specified permission
+	 */
+	Boolean notPermitted(String permission) {
+		! securityService.hasPermission(permission)
 	}
 }
