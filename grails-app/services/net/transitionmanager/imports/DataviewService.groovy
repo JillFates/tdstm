@@ -231,9 +231,10 @@ class DataviewService implements ServiceMethods {
 	Dataview update(Person person, Project project, Long id, DataviewCrudCommand dataviewCommand) {
 		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(id, dataviewCommand, dataview)
+		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
 
 		dataview.with {
-			reportSchema = dataviewCommand.schema
+			reportSchema = schema
 			isShared = dataviewCommand.isShared
 		}
 
