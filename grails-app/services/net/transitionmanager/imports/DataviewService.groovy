@@ -14,6 +14,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
+import grails.plugin.json.view.JsonViewTemplateEngine
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.dataview.DataviewApiFilterParam
 import net.transitionmanager.command.dataview.DataviewApiParamsCommand
@@ -40,6 +41,7 @@ import net.transitionmanager.service.dataview.DataviewSpec
 import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
 import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.util.JsonViewRenderService
 import org.grails.web.json.JSONObject
 
 import java.security.InvalidParameterException
@@ -51,6 +53,8 @@ class DataviewService implements ServiceMethods {
 
 	static         ProjectService        projectService
 				   UserPreferenceService userPreferenceService
+	JsonViewRenderService jsonViewRenderService
+
 	@Lazy
 	private static CustomDomainService   customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
 
@@ -223,6 +227,7 @@ class DataviewService implements ServiceMethods {
 	 * @throws net.transitionmanager.exception.DomainUpdateException, UnauthorizedException
 	 */
 	@Transactional
+
 	Dataview update(Person person, Project project, Long id, DataviewCrudCommand dataviewCommand) {
 		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(id, dataviewCommand, dataview)
@@ -267,13 +272,15 @@ class DataviewService implements ServiceMethods {
 		validateDataviewCreateAccessOrException(dataviewCommand, currentProject, currentPerson)
 
 		Dataview dataview = new Dataview()
+		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
+
 		dataview.with {
 			person = currentPerson
             project = currentProject
 			isShared = dataviewCommand.isShared
 
 			// TODO : Diego -- Convert the schema Command to JSON with JSON Views
-			reportSchema = dataviewCommand.schema
+			reportSchema = schema
 
 			if (dataviewCommand.overridesView) {
 				overridesView = dataviewCommand.overridesView
