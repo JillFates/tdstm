@@ -64,6 +64,8 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {NavigationEnd, Router} from '@angular/router';
+import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
+import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -501,7 +503,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	protected createComment(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
-		let singleCommentModel: SingleCommentModel = {
+		let assetCommentModel: AssetCommentModel = {
 			modal: {
 				title: 'Create Comment',
 				type: ModalType.CREATE
@@ -518,8 +520,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
-		this.dialog.extra(SingleCommentComponent, [
-			{provide: SingleCommentModel, useValue: singleCommentModel}
+		this.dialog.extra(AssetCommentViewEditComponent, [
+			{provide: AssetCommentModel, useValue: assetCommentModel}
 		], false, false).then(result => {
 			console.log('RESULT SINGLE COMMENT', result);
 			this.onReload();

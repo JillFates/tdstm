@@ -53,6 +53,7 @@ import {TaskService} from '../taskManager/service/task.service';
 	],
 	exports: [
 		AssetCommentListComponent,
+		AssetCommentViewEditComponent,
 	],
 	entryComponents: [
 		AssetCommentViewEditComponent
