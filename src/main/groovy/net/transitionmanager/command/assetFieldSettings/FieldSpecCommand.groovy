@@ -1,13 +1,13 @@
-package net.transitionmanager.command.dataview
+package net.transitionmanager.command.assetFieldSettings
 
 import com.tdsops.tm.enums.ControlType
 import net.transitionmanager.command.CommandObject
 
 /**
- * The command object that represents top level of the Dataview Schema
+ * The command object that represents all of the properties of an individual field in the asset field specs
  */
 
-class DataviewSchemaColumnCommand implements CommandObject {
+class FieldSpecCommand implements CommandObject {
 	/*
 	 * property constraints is mapped to columnConstraints because of the 'static constraints' name conflict
 	 */
@@ -47,7 +47,7 @@ class DataviewSchemaColumnCommand implements CommandObject {
 		columnConstraints = constraints
 	}
 
-	static constraints = {
+ 	static constraints = {
 		defaultValue nullable: true
 
 		bulkChangeActions validator: { value, object ->
@@ -55,7 +55,7 @@ class DataviewSchemaColumnCommand implements CommandObject {
 			if ( (value - validActions).size() == 0) {
 				return true
 			}
-			return ['dataview.validate.schemaBulkChangeActions', validActions]
+			return ['assetFieldSpec.validate.schemaBulkChangeActions', validActions]
 		}
 	}
 }

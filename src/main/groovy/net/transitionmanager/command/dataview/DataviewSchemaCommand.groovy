@@ -2,6 +2,7 @@ package net.transitionmanager.command.dataview
 
 
 import net.transitionmanager.command.CommandObject
+import net.transitionmanager.command.assetFieldSettings.DataviewSchemaColumnCommand
 
 /**
  * The command object that represents top level of the Dataview Schema
