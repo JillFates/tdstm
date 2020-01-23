@@ -9,7 +9,8 @@ import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {IArchitectureGraphParams} from '../../model/url-params.model';
 import {AssetCommonDiagramHelper} from '../asset/asset-common-diagram.helper';
-import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layout/diagram-layout.component';
+import {LegacyDiagramLayoutComponent} from '../../../../shared/components/diagram-layout/legacy-diagram-layout.component';
+// import {TaskGraphDiagramHelper} from './task-graph-diagram.helper';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
@@ -30,7 +31,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	// References
 	@ViewChild('dropdownFooter', {static: false}) dropdownFooter: ElementRef;
 	@ViewChild('innerComboBox', {static: false}) innerComboBox: ComboBoxComponent;
-	@ViewChild('graph', {static: false}) graph: DiagramLayoutComponent;
+	@ViewChild('graph', {static: false}) graph: LegacyDiagramLayoutComponent;
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 	private searchOnScroll = true;
