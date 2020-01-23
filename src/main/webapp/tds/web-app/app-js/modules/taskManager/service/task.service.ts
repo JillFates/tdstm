@@ -88,13 +88,13 @@ export class TaskService {
 
 	/**
 	 * Get the Current Team Assigned for the Comment
-	 * @returns {Observable<any>}
+	 * @param commentId: any
+	 * @param forTaskCreate: boolean, if true it will send the request even if commentId is null or empty.
 	 */
-	getAssignedTeam(commentId: any): Observable<any> {
-		if ( !commentId || commentId === null ) {
+	getAssignedTeam(commentId: any, forTaskCreate = false): Observable<any> {
+		if ( (!commentId || commentId === null) && !forTaskCreate) {
 			return Observable.of([]);
 		}
-
 		return this.http.post(`${ this.baseURL }/assetEntity/updateAssignedToSelect?format=json&forView=&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;

@@ -145,19 +145,20 @@ export class AssetCommonShow implements OnInit {
 			.subscribe(res => {
 				const diagramHelper = new AssetCommonDiagramHelper();
 				this.data$.next(diagramHelper.diagramData({
-					rootAsset: assetId,
-					currentUserId: 1,
+					rootNode: assetId,
+					currentUserId: this.currentUser.id,
 					data: res,
 					iconsOnly: true,
 					extras: {
 						diagramOpts: {
+							initialAutoScale: Diagram.Uniform,
 							autoScale: Diagram.Uniform,
 							allowZoom: false
 						},
 						isExpandable: false
 					}
 				}));
-			})
+			});
 	}
 
 	/**
