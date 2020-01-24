@@ -1844,11 +1844,12 @@ class PersonService implements ServiceMethods {
 		}
 		if (personId) {
 			person = get(Person, personId, project)
-			if (!hasAccessToProject(person, project)) {
+			if (!isAssignedToProject(project, person)) {
 				if (reportViolation) {
 					String errorMsg = "Attempted to assign person $personId to a project they don't have access to."
 					securityService.reportViolation(errorMsg, securityService.userLogin.username)
-					throw new InvalidParamException(errorMsg)
+					List msgArgs = [person.id, project.id]
+					throwException(InvalidParamException, 'person.project.noPermission', errorMsg, msgArgs)
 				} else {
 					person = null
 				}
