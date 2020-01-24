@@ -2,15 +2,18 @@ package net.transitionmanager.asset
 
 
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.DataViewMap
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 
 class StorageService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
+	DataviewService    dataviewService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a Storage asset
@@ -20,7 +23,13 @@ class StorageService implements ServiceMethods {
 	 */
 	Map getModelForShow(Project project, Files storage, Map params) {
 		Map commonModel = assetEntityService.getCommonModel(false, project, storage, 'Files', params)
-		[filesInstance: storage, currentUserId: securityService.currentPersonId] + commonModel
+		List fields =  dataviewService.fetch(DataViewMap.SERVERS.id).toMap(securityService.currentPersonId).schema.columns.collect{it.label}
+
+		return [
+				   filesInstance: storage,
+				   currentUserId: securityService.currentPersonId,
+				   fields       : fields
+			   ] + commonModel
 	}
 
 	/**

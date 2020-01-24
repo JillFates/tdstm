@@ -7,6 +7,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.command.dataview.DataviewManageImportBatchesExcel
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.DomainUpdateException
@@ -140,12 +141,15 @@ class DataTransferBatchController implements ControllerMethods {
 			flash.message = "Please select project to view Manage Batches"
 		}
 
-		if (!params.max) {
-			params.max = 25
+		DataviewManageImportBatchesExcel dataviewParams = populateCommandObject(DataviewManageImportBatchesExcel)
+
+		Map findAllParams = [sort: "dateCreated", order: "desc"]
+		if(dataviewParams.max > 0) {
+			findAllParams << [ max: dataviewParams.max, offset: dataviewParams.offset]
 		}
 
-		List<DataTransferBatch> dataTransferBatchList = DataTransferBatch.findAllByProjectAndTransferMode(project, "I",
-			[sort: "dateCreated", order: "desc", max: params.max, offset: params.offset ?: 0])
+		List<DataTransferBatch> dataTransferBatchList = DataTransferBatch.
+			findAllByProjectAndTransferMode(project, "I", findAllParams)
 
 		def result = []
 		for (DataTransferBatch entry in dataTransferBatchList) {

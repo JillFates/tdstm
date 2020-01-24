@@ -11,39 +11,46 @@ export class CredentialColumnModel {
 				locked: true
 			}, {
 				label: 'Name',
+				filterable: true,
 				property: 'name',
 				type: 'text',
 				locked: true
 			}, {
 				label: 'Description',
+				filterable: true,
 				property: 'description',
 				type: 'text'
 			}, {
 				label: 'Provider',
+				filterable: true,
 				property: 'provider.name',
 				type: 'text',
 				width: 200
 			}, {
 				label: 'Environment',
+				filterable: true,
 				property: 'environment',
 				type: 'text',
-				width: 200
+				width: 130
 			}, {
 				label: 'Status',
+				filterable: true,
 				property: 'status',
 				type: 'text',
 				width: 100
 			}, {
 				label: 'Auth Method',
+				filterable: true,
 				property: 'authMethod',
 				type: 'text',
-				width: 200
+				width: 130
 			}, {
 				label: 'Created',
+				filterable: true,
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 150
 			}
 		];
 	}

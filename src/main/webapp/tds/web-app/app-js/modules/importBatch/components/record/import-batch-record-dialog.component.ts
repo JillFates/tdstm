@@ -14,7 +14,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 })
 export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 
-	@ViewChild('detailFieldsComponent') detailFieldsComponent: ImportBatchRecordFieldsComponent;
+	@ViewChild('detailFieldsComponent', {static: false}) detailFieldsComponent: ImportBatchRecordFieldsComponent;
 	private batchRecordUpdatedFlag = false;
 	public modalOptions: DecoratorOptions;
 	public isWindowMaximized;
@@ -26,7 +26,7 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 		private translatePipe: TranslatePipe) {
 			super('#import-batch-record-dialog');
 			this.isWindowMaximized = false;
-			this.modalOptions = { isFullScreen: true, isResizable: true, isDraggable: true };
+			this.modalOptions = { isFullScreen: false, isResizable: true, isDraggable: true };
 	}
 
 	/**

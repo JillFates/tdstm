@@ -10,6 +10,8 @@ import net.transitionmanager.command.task.CalculateTimelineCommandObject
 import net.transitionmanager.command.task.ExportTimelineCommand
 import net.transitionmanager.command.task.ReadTimelineCommandObject
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.Task
@@ -26,13 +28,13 @@ import java.text.DateFormat
 @Secured('isAuthenticated()')
 class WsTimelineController implements ControllerMethods {
 
+	PersonService personService
 	TimelineService timelineService
 
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def timeline() {
 
 		CalculateTimelineCommandObject commandObject = populateCommandObject(CalculateTimelineCommandObject)
-		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		userPreferenceService.setPreference(UserPreferenceEnum.MOVE_EVENT, moveEvent.id)
@@ -83,6 +85,9 @@ class WsTimelineController implements ControllerMethods {
 						}
 					}
 
+					Person currentPerson = securityService.userLoginPerson
+					List<String> assignedTeams = personService.getPersonTeamCodes(currentPerson)
+
 					[
 						id            : task.id,
 						number        : task.taskNumber,
@@ -102,6 +107,7 @@ class WsTimelineController implements ControllerMethods {
 						assignedTo    : task.assignedTo?.toString(),
 						team          : task.role,
 						isAutomatic   : task.isAutomatic(),
+						myTask		  : task.assignedTo?.id == currentPerson.id || (task.assignedTo == null && task.role in assignedTeams),
 						hasAction     : task.hasAction(),
 						predecessorIds: task.taskDependencies?.findAll { it.successor.id == task.id }.collect {
 							it.predecessor.id
@@ -117,7 +123,6 @@ class WsTimelineController implements ControllerMethods {
 	def calculateCPA() {
 
 		ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
-		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
@@ -133,7 +138,6 @@ class WsTimelineController implements ControllerMethods {
 	def baseline() {
 
 		ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
-		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.updateTaskFromCPA(moveEvent, commandObject.viewUnpublished)
@@ -151,7 +155,6 @@ class WsTimelineController implements ControllerMethods {
 	def exportCPA() {
 
 		ExportTimelineCommand commandObject = populateCommandObject(ExportTimelineCommand)
-		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.showAll)

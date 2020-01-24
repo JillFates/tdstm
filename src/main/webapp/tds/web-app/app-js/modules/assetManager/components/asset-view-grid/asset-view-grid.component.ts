@@ -15,7 +15,7 @@ import {takeUntil} from 'rxjs/operators';
 import {State} from '@progress/kendo-data-query';
 import {
 	DataStateChangeEvent,
-	GridDataResult,
+	GridDataResult, PageChangeEvent,
 	RowClassArgs
 } from '@progress/kendo-angular-grid';
 
@@ -27,9 +27,7 @@ import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS,
-	KEYSTROKE,
 	ModalType,
-	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {
@@ -41,7 +39,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {BulkActionResult, BulkChangeType} from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -55,7 +53,7 @@ import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-
 import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';
 import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
-import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 import {UserService} from '../../../auth/service/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
@@ -83,20 +81,17 @@ declare var jQuery: any;
 export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() data: any;
 	@Input() model: ViewSpec;
+	@Input() justPlanning: boolean;
 	@Input() gridState: State;
 	@Output() modelChange = new EventEmitter<void>();
-	@Output() justPlanningChange = new EventEmitter<boolean>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Output() hiddenFiltersChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 	@Input() metadata: any;
 	@Input() fields: any;
 	@Input() hiddenFilters = false;
-
-	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
-	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
-	private displayCreateButton: boolean;
-	private showFullTags = false;
+	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
+	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
@@ -107,9 +102,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.gridStateChange.emit({...this.gridState, skip: 0});
 		this.modelChange.emit();
 	}
-
 	public currentFields = [];
-	public justPlanning = false;
 	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
@@ -120,6 +113,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 	protected userTimeZone: string;
 	protected userDateFormat: string;
+	protected showAssetsFilter = false;
+	private displayCreateButton: boolean;
+	private showFullTags = false;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -180,10 +176,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe((preferences: any) => {
 				this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
 				this.bulkCheckboxService.setPageSize(this.gridState.take);
-				this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
 				this.toggleTagsColumn = (preferences[PREFERENCE_WRAP_TAGS_COLUMN]) ? preferences[PREFERENCE_WRAP_TAGS_COLUMN].toString() === 'true' : false;
 				this.showFullTags = this.toggleTagsColumn;
-				this.justPlanningChange.emit(this.justPlanning);
 				this.onReload();
 		});
 
@@ -220,7 +214,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private getPreferences(): Observable<any> {
-		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING, PREFERENCE_WRAP_TAGS_COLUMN);
+		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_WRAP_TAGS_COLUMN);
 	}
 
 	/**
@@ -261,6 +255,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			this.tagSelector.reset();
 		}
 		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		this.showAssetsFilter = false;
 	}
 
 	/**
@@ -268,8 +263,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 */
 	public onClearHiddenFilters(): void {
 		this.hiddenFilters = false;
-		this.justPlanning = false;
-		this.justPlanningChange.emit(this.justPlanning);
 		this.hiddenFiltersChange.emit(this.hiddenFilters);
 		this.onClearFilters();
 	}
@@ -358,7 +351,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			this.dialog.open(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.LG).then(x => {
+				DIALOG_SIZE.XXL).then(x => {
 					this.createDependencyPromise(x.assetClass, x.id);
 				}).catch(x => {
 					console.log(x);
@@ -374,7 +367,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.LG, false)
+			DIALOG_SIZE.XXL, false)
 			.then(asset => {
 				if (asset) {
 					this.createDependencyPromise(asset.assetClass, asset.id);
@@ -389,13 +382,13 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	/**
 	 * display the create asset modal
 	 */
-	protected onCreateAsset(assetEntityType: string): void {
+	public onCreateAsset(assetEntityType: string): void {
 		if (!assetEntityType) {
 			return;
 		}
 		this.dialog.open(AssetCreateComponent, [
 				{provide: 'ASSET', useValue: assetEntityType}],
-			DIALOG_SIZE.LG, false).then(x => {
+			DIALOG_SIZE.XXL, false).then(x => {
 			if (x) {
 				this.createDependencyPromise(x.assetClass, 0);
 			}
@@ -440,7 +433,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel},
 			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.LG, true).then(result => {
+		], DIALOG_SIZE.XXL, true).then(result => {
 			if (result) {
 				console.log('Show Task Result',  result);
 			}
@@ -470,7 +463,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
-		this.dialog.extra(TaskCreateComponent, [
+		this.dialog.extra(TaskEditCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}
 		], false, false)
 			.then(result => {
@@ -497,7 +490,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel},
 			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.LG, true).then(result => {
+		], DIALOG_SIZE.XXL, true).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
@@ -542,7 +535,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL)
 			.then(() => {
 				this.onReload();
 				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
@@ -570,7 +563,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 					{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 				];
 
-				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 			} else if (!result.clonedAsset && result.showView) {
 				const data: any = {
 					common_id: result.assetId,
@@ -582,7 +575,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		}).catch( error => console.log('error', error));
 	}
 
-	protected setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
+	public setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
 		if (this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS) {
 			this.createButtonState = state;
 		}
@@ -681,16 +674,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			return classColumn;
 		}
 		return '';
-	}
-
-	onChangeJustPlanning(isChecked = false): void {
-		this.justPlanningChange.emit(isChecked);
-
-		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(() => {
-			this.onReload();
-		});
 	}
 
 	/**
@@ -825,5 +808,59 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	protected isAssetCloneAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetCreate);
+	}
+	/**
+	 * Filter Assets Toggle
+	 */
+	public toggleAssetsFilter(): void {
+		this.showAssetsFilter = !this.showAssetsFilter;
+	}
+
+	/**
+	 * Returns the number of current filters applied.
+	 */
+	public filterCount(): number {
+		return this.model.columns.filter((c: ViewColumn) => c.filter).length
+	}
+
+	/**
+	 * On Page Change, update grid state & handle pagination on server side.
+	 */
+	onPageChangeHandler({ skip, take }: PageChangeEvent): void {
+		this.gridState.skip = skip;
+		this.gridState.take = take;
+		this.updateGridState(this.gridState);
+		this.modelChange.emit();
+	}
+
+	/**
+	 * ==============
+	 * GRID TEST STUFF
+	 * ===============
+	 * TODO: delete this stuff below
+	 */
+	public assetsGrid: any = {
+		pageable: {
+			pageSizes: [5, 10, 25, 50, 100],
+			info: true,
+			type: 'input',
+		},
+		filterable: true,
+		sortable: true,
+		resizable: true,
+		columnMenu: true,
+	};
+
+	/**
+	 * Get the current status of certain properties, like the property that indicates if grid has filters applied
+	 * or the current filter, in order that don't repeat functions calls
+	 * (add more properties on demand)
+	 */
+	public getCurrentStatus(): {isFiltering: boolean, filterCounter: number, showAssetsFilter: boolean} {
+		return {
+			isFiltering: this.hasFilterApplied(),
+			showAssetsFilter: this.showAssetsFilter,
+			filterCounter: this.filterCount()
+		}
 	}
 }

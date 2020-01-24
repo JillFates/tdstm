@@ -1,12 +1,27 @@
 import-batch-detail-dialog
-
-  .toolbar-button
-    padding-left: 0px
-    padding-right: 0px
-    width: 85px
-
+  kendo-grid
+    .k-grid-header
+      .k-header
+        padding: 0
+        .k-link
+          margin: unset
   .toolbar-dropdown
-    padding-left: 0px
+    width: 120px
+    display: inline-block !important
+    margin-right: 10px
 
   .has-init
     font-style: italic
+
+  .select-all-header
+    padding-left: 15px
+    > label
+        padding-top: 5px
+        clr-checkbox-wrapper
+            margin: 0
+    tds-button
+      padding-top: 5px
+      position: absolute
+      .tds-button
+        padding-left: 0
+        padding-top: 3px

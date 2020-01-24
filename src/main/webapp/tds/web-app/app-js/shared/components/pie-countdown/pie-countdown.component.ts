@@ -1,7 +1,10 @@
-import {Component, Input, OnInit, EventEmitter, Output} from '@angular/core';
-import {CountDownItem} from './model/pie-countdown.model';
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
+import { CountDownItem } from './model/pie-countdown.model';
 
-import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.service';
+import {
+	PreferenceService,
+	PREFERENCES_LIST,
+} from '../../services/preference.service';
 
 /**
  * Also known as timer component.
@@ -11,23 +14,29 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 	template: `
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
-				<span *ngIf="!hideRefresh"
-							class="glyphicon glyphicon-refresh refresh"
-							aria-hidden="true"
-							(click)="onManualUpdate()"></span>
+                <tds-button-custom icon="sync"
+                                   *ngIf="!hideRefresh"
+                                   [displayLabel]="false" tooltip="Refresh"
+                                   (click)="onManualUpdate()">
+                </tds-button-custom>
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"
 					[data]="timerOptions"
 					[valueField]="'seconds'"
 					(valueChange)="onSelectedTimerOption($event)"
-					[textField]="'description'">
+					[textField]="'description'"
+				>
 				</kendo-dropdownlist>
-				<div *ngIf="selectedTimerOption && selectedTimerOption.seconds > 0"
-						 class="pie-countdown-timer"
-						 [ngClass]="getTimerClass()"></div>
+				<div
+					*ngIf="
+						selectedTimerOption && selectedTimerOption.seconds > 0
+					"
+					class="pie-countdown-timer"
+					[ngClass]="getTimerClass()"
+				></div>
 			</div>
 		</div>
-	`
+	`,
 })
 export class PieCountdownComponent implements OnInit {
 	@Output() timeout: EventEmitter<void> = new EventEmitter<void>();
@@ -39,16 +48,15 @@ export class PieCountdownComponent implements OnInit {
 	public selectedTimerOption: CountDownItem = null;
 	private interval: any;
 	public timerOptions: Array<CountDownItem> = [
-		{seconds: 0, description: 'Manual'},
-		{seconds: 30, description: '30 Sec'},
-		{seconds: 60, description: '1 Min'},
-		{seconds: 120, description: '2 Min'},
-		{seconds: 300, description: '5 Min'},
-		{seconds: 600, description: '10 Min'}
+		{ seconds: 0, description: 'Manual' },
+		{ seconds: 30, description: '30 Sec' },
+		{ seconds: 60, description: '1 Min' },
+		{ seconds: 120, description: '2 Min' },
+		{ seconds: 300, description: '5 Min' },
+		{ seconds: 600, description: '10 Min' },
 	];
 
-	constructor(private preferenceService: PreferenceService) {
-	}
+	constructor(private preferenceService: PreferenceService) {}
 
 	/**
 	 * On input changes set the corresponding refresh event parameter
@@ -61,11 +69,12 @@ export class PieCountdownComponent implements OnInit {
 		if (this.refreshPreference) {
 			refreshPref = this.refreshPreference;
 		}
-		this.preferenceService.getPreferences(refreshPref)
+		this.preferenceService
+			.getPreferences(refreshPref)
 			.subscribe((preferences: any[]) => {
-				this.selectedTimerOption =  {
+				this.selectedTimerOption = {
 					seconds: parseInt(preferences[refreshPref] || '0', 10),
-					description: ''
+					description: '',
 				};
 				this.setCurrentInterval(this.selectedTimerOption.seconds);
 				this.valueChange.emit(this.selectedTimerOption);
@@ -74,29 +83,35 @@ export class PieCountdownComponent implements OnInit {
 
 	/**
 	 * Set the current interval function based on the current selected unit time
- 	 * @param {number} seconds Seconds value
-	*/
+	 * @param {number} seconds Seconds value
+	 */
 	private setCurrentInterval(seconds: number): void {
 		if (this.interval) {
 			clearInterval(this.interval);
 		}
 		if (seconds) {
-			this.interval =  setInterval(() => this.notifyTimeout(), seconds * 1000);
+			this.interval = setInterval(
+				() => this.notifyTimeout(),
+				seconds * 1000
+			);
 		}
 	}
 
 	/**
 	 * selecting a timer clear the previous interval and set the new one
- 	 * @param {any} timerOption current timer option selected
-	*/
+	 * @param {any} timerOption current timer option selected
+	 */
 	onSelectedTimerOption(timerOption: any): void {
 		let refreshPref = PREFERENCES_LIST.EVENTDB_REFRESH;
 		if (this.refreshPreference) {
 			refreshPref = this.refreshPreference;
 		}
-		this.preferenceService.setPreference(refreshPref, timerOption.seconds)
-			.subscribe(() => {/* saved preference */});
-		this.selectedTimerOption = {seconds : 0, description: ''};
+		this.preferenceService
+			.setPreference(refreshPref, timerOption.seconds)
+			.subscribe(() => {
+				/* saved preference */
+			});
+		this.selectedTimerOption = { seconds: 0, description: '' };
 		setTimeout(() => {
 			this.selectedTimerOption = timerOption;
 			this.setCurrentInterval(this.selectedTimerOption.seconds);
@@ -107,15 +122,17 @@ export class PieCountdownComponent implements OnInit {
 	/**
 	 * Based on the current timer option selected, get the css corresponding class
 	 * @returns {string} Corresponding css class
-	*/
+	 */
 	getTimerClass(): string {
-		const seconds = this.selectedTimerOption && this.selectedTimerOption.seconds || '';
+		const seconds =
+			(this.selectedTimerOption && this.selectedTimerOption.seconds) ||
+			'';
 		return seconds ? `timer-${seconds}-seconds` : '';
 	}
 
 	/**
 	 * Notify to the host component about a countdown timeout event
-	*/
+	 */
 	notifyTimeout(): void {
 		this.timeout.emit();
 	}
@@ -123,7 +140,7 @@ export class PieCountdownComponent implements OnInit {
 	/**
 	 * Handle update started by the user
 	 * Grab the reference to the current refresh setting, reset it and restore the reference
-	*/
+	 */
 	onManualUpdate() {
 		const currentSelected = this.selectedTimerOption;
 		this.onSelectedTimerOption(this.timerOptions[0]);

@@ -95,7 +95,7 @@ class TeamController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RoleTypeEdit)
 	def update() {
-		TeamCommand command = populateCommandObject(TeamCommand.class)
+		TeamCommand command = populateCommandObject(TeamCommand.class, false)
 
 		try {
 			RoleType roleTypeInstance = roleTypeService.update(command)
@@ -127,7 +127,7 @@ class TeamController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RoleTypeCreate)
 	def save() {
-		TeamCommand command = populateCommandObject(TeamCommand.class)
+		TeamCommand command = populateCommandObject(TeamCommand.class, false)
 
 		if (roleTypeService.roleTypeExists(command.id)) {
 			flash.message = "Team $command.id already exists"

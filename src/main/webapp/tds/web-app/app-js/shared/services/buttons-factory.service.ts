@@ -11,7 +11,7 @@ export class ButtonsFactoryService {
 		const translate = this.translateService.transform.bind(this.translateService);
 
 		this.registeredButtons = {
-			['tds-button-add']: {icon: 'plus', title: translate('GLOBAL.ADD'), tooltip: translate('GLOBAL.ADD')},
+			['tds-button-add']: {icon: 'plus-circle', title: translate('GLOBAL.ADD'), tooltip: translate('GLOBAL.ADD')},
 			['tds-button-cancel']: {
 				icon: 'ban',
 				title: translate('GLOBAL.CANCEL'),
@@ -19,10 +19,20 @@ export class ButtonsFactoryService {
 			},
 			['tds-button-clone']: {icon: 'clone', title: translate('GLOBAL.CLONE'), tooltip: translate('GLOBAL.CLONE')},
 			['tds-button-close']: {icon: 'ban', title: translate('GLOBAL.CLOSE'), tooltip: translate('GLOBAL.CLOSE')},
+			['tds-button-check-syntax']: {
+				icon: 'thumbs-up',
+				title: translate('GLOBAL.CHECK_SYNTAX'),
+				tooltip: translate('GLOBAL.CHECK_SYNTAX')
+			},
 			['tds-button-create']: {
 				icon: 'plus',
 				title: translate('GLOBAL.CREATE'),
 				tooltip: translate('GLOBAL.CREATE')
+			},
+			['tds-button-confirm']: {
+				icon: 'check',
+				title: translate('GLOBAL.CONFIRM'),
+				tooltip: translate('GLOBAL.CONFIRM')
 			},
 			['tds-button-custom']: {icon: '', title: '', tooltip: ''},
 			['tds-button-delete']: {
@@ -41,9 +51,12 @@ export class ButtonsFactoryService {
 				title: translate('GLOBAL.FILTER'),
 				tooltip: translate('GLOBAL.FILTER')
 			},
-			['tds-button-save']: {icon: 'floppy-o', title: translate('GLOBAL.SAVE'), tooltip: translate('GLOBAL.SAVE')},
+			['tds-button-save']: {icon: 'floppy', title: translate('GLOBAL.SAVE'), tooltip: translate('GLOBAL.SAVE')},
+			['tds-button-sync']: {icon: 'sync', title: translate('GLOBAL.REFRESH'), tooltip: translate('GLOBAL.REFRESH')},
 			['tds-button-undo']: {icon: 'undo', title: translate('GLOBAL.UNDO'), tooltip: translate('GLOBAL.UNDO')},
-			['tds-button-script']: {icon: 'file-code-o', title: translate('GLOBAL.SCRIPT'), tooltip: translate('GLOBAL.SCRIPT')}
+			['tds-button-script']: {icon: 'file-code-o', title: translate('GLOBAL.SCRIPT'), tooltip: translate('GLOBAL.SCRIPT')},
+			['tds-button-collapse']: {icon: 'collapse-card', title: translate('GLOBAL.COLLAPSE'), tooltip: translate('GLOBAL.COLLAPSE')},
+			['tds-button-expand']: {icon: 'expand-card', title: translate('GLOBAL.EXPAND'), tooltip: translate('GLOBAL.EXPAND')}
 		};
 	}
 

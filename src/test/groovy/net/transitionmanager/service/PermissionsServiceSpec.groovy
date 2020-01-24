@@ -8,28 +8,10 @@ import net.transitionmanager.security.RolePermissions
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
 
-class PermissionsServiceSpec extends Specification implements DataTest, ServiceUnitTest<PermissionsService>{
+class PermissionsServiceSpec extends Specification implements DataTest, ServiceUnitTest<PermissionsService> {
 
 	void setupSpec() {
 		mockDomains Permissions, RolePermissions
-	}
-
-	@ConfineMetaClassChanges([RolePermissions])
-	void 'test can findAll permissions saved in database'() {
-
-		given:
-			RolePermissions.metaClass.static.executeUpdate = {String query -> RolePermissions.deleteAll()}
-			new Permissions(permissionItem: 'AssetExplorerView', description: 'AssetExplorerView UNIT TEST').save(flush: true)
-			new Permissions(permissionItem: 'AssetExplorerShow', description: 'AssetExplorerShow UNIT TEST').save(flush: true)
-			new Permissions(permissionItem: 'AssetExplorerUpdate', description: 'AssetExplorerUpdate UNIT TEST').save(flush: true)
-			new Permissions(permissionItem: 'AssetExplorerDelete', description: 'AssetExplorerDelete UNIT TEST').save(flush: true)
-
-		when:
-			List<Permissions> permissions = service.findAll()
-
-		then:
-			permissions.size() == 4
-
 	}
 
 	@ConfineMetaClassChanges([RolePermissions])

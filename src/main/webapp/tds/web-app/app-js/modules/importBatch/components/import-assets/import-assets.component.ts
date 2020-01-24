@@ -26,7 +26,7 @@ declare var jQuery: any;
 })
 export class ImportAssetsComponent implements OnInit {
 
-	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
+	@ViewChild('kendoUploadInstance', {static: false}) kendoUploadInstance: UploadComponent;
 
 	private readonly dataScriptOptionsInitial = {
 		id: -1,
@@ -41,6 +41,7 @@ export class ImportAssetsComponent implements OnInit {
 	public importInProcess = false;
 	public fetchFileContent: any;
 	public transformFileContent: any;
+
 	private viewDataType: string;
 	protected transformProgress = {
 		progressKey: null,
@@ -61,7 +62,7 @@ export class ImportAssetsComponent implements OnInit {
 		urlColSize: 2,
 		showTransformButton: false,
 		showAutoProcessElements: false,
-		showManuaProcesslElements: false,
+		showManualProcesslElements: false,
 		hasFinishedManualImport: false,
 		transformBtnLabel: '',
 		sendNotification: false

@@ -1,24 +1,36 @@
 tds-datetime-control
   .tds-datetime-control-component
     border-collapse: collapse !important
-    border-width: 1px
-    border-style: solid
-    border-color: #ededed
-    background-color: #ededed
-    width: 184px
+    display: flex
+    width: 220px
+    border: none
   kendo-datepicker
-    width: 155px !important
+    height: 100% !important
+    width: 200px !important
     float: left
+    border-radius: 0 !important
+    box-shadow: none !important
+    border-bottom: 1px solid #999 !important
     .k-picker-wrap
       border: 0 !important
+      .k-select
+        background-color: #ffffff
+        position: unset
+        bottom: 0
   kendo-timepicker
     width: 0px !important
     .k-picker-wrap
       border: 0 !important
       width: 0px !important
       .k-select
-        height: 30px
+        padding-top: 3px
+        padding-bottom: 5px
+        background: #ffffff
+        border-bottom: 1px solid #999 !important
       .k-dateinput
         visibility: hidden !important
         width: 0 !important
         height: 0 !important
+  .k-picker-wrap
+    .k-i-clock
+      margin-top: 6px

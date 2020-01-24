@@ -34,6 +34,7 @@ import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.math.NumberUtils
@@ -456,16 +457,17 @@ class TaskController implements ControllerMethods {
 
 			def dotText = new StringBuilder()
 
-			dotText << """#
-# TDS Runbook for Project $project, Task ${rootTask.toString().replaceAll(/[\n\r]/,'')}
-# Exported on $now
-# This is  .DOT file format of the project tasks
-#
-digraph runbook {
-	graph [rankdir=LR, margin=0.001]
-	node [ fontsize=10, fontname="Helvetica", shape="rect" style="$styleDef" ]
-
-"""
+			dotText << """
+				#
+				# TDS Runbook for Project $project, Task ${rootTask.toString().replaceAll(/[\n\r]/,'')}
+				# Exported on $now
+				# This is  .DOT file format of the project tasks
+				#
+				digraph runbook {
+					graph [rankdir=LR, margin=0.001]
+					node [ fontsize=10, fontname="Helvetica", shape="rect" style="$styleDef" ]
+				
+			""".stripIndent()
 
 			def style = ''
 			def fontcolor = ''
@@ -565,18 +567,6 @@ digraph runbook {
 			dotText << "}\n"
 
 			try {
-//				def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString())
-//
-//				// convert the URI to a web safe format
-//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-//				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
-//
-//				def svgText = svgFile.text
-//				def data = [svgText:svgText, roles:roles, tasks:taskList]
-//				render data as JSON
-//
-//				return false
-
 				String svgText = graphvizService.generateSVGFromDOT("neighborhood-${taskId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:taskList, automatedTasks: automatedTasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
@@ -602,6 +592,88 @@ digraph runbook {
 	}
 
 	/**
+	 * Generates JSON object of the tasks in the neighborhood around a given task
+	 * @param taskId
+	 */
+	@HasPermission(Permission.TaskGraphView)
+	def neighborhood() {
+
+		String currentProjectId = userPreferenceService.getCurrentProjectId()
+		Person currentPerson = securityService.loadCurrentPerson()
+
+		List<String> teams = partyRelationshipService.getProjectStaffFunctions(currentProjectId, currentPerson.id)?.id
+
+		def taskId = params.id
+		if (! taskId || ! taskId.isNumber()) {
+			renderErrorJson("An invalid task id was supplied. Please contact support if this problem persists.")
+			return
+		}
+
+		Project project = securityService.userCurrentProject
+		if (! project) {
+			renderErrorJson('You must first select a project before view graphs')
+			return
+		}
+
+		def rootTask = Task.read(taskId)
+		if (!rootTask || rootTask.project.id != project.id) {
+			if (rootTask) {
+				log.warn "SECURITY : User $securityService.currentUsername attempted to access graph for task ($taskId) not associated to current project ($project)"
+			}
+			renderErrorJson("Unable to find the specified task")
+			return
+		}
+
+		boolean viewUnpublished = params.viewUnpublished && params.viewUnpublished == "1"
+
+		userPreferenceService.setPreference(
+				  PREF.VIEW_UNPUBLISHED,
+				  securityService.hasPermission(Permission.TaskPublish) && viewUnpublished
+		)
+
+		// check if the specified task is unpubublished and the user shouldn't see it
+		if (!viewUnpublished && !rootTask.isPublished) {
+			renderErrorJson("Unable to find the specified task")
+			return
+		}
+
+		def depList = taskService.getNeighborhood(taskId, 2, 5, viewUnpublished)
+		if (depList.size() == 0) {
+			renderErrorJson("The task has no interdependencies with other tasks so a map wasn't generated.")
+			return
+		}
+
+		Map<String, Map> nodesMap = [:]
+		def tasks = []
+
+		// helper closure that creates the definition of a node
+		def outputTaskNode = { AssetComment task, rootId ->
+			if (! tasks.contains(task.id) && (viewUnpublished || task.isPublished)) {
+				tasks << task.id
+
+				Map taskMap = task.mapForGraphs()
+				taskMap.isMyTask = task.isMyTask(currentPerson, teams)
+
+				nodesMap[task.taskNumber] = [
+						  task: taskMap,
+						  successors: []
+				]
+			}
+		}
+
+		// Iterate over the task dependency list outputting the two nodes in the relationship. If it is an outer node
+		depList.each { d ->
+			outputTaskNode(d.successor, taskId)
+			outputTaskNode(d.predecessor, taskId)
+
+			nodesMap[d.predecessor.taskNumber].successors << d.assetComment.taskNumber
+		}
+
+		List<Map> nodes = nodesMap.collect { key, value -> value }
+		renderSuccessJson(nodes)
+	}
+
+	/**
 	 * Generates a graph of the Event Tasks
 	 * @param moveEventId
 	 * @param mode - flag as to what mode to display the graph as (s=status, ?=default)
@@ -609,7 +681,7 @@ digraph runbook {
 	 */
 	@HasPermission(Permission.TaskGraphView)
 	def moveEventTaskGraphSvg() {
-		def errorMessage = ''
+		def errorMessage
 
 		// Create a loop that we can break out of as we need to
 		while (true) {
@@ -877,7 +949,7 @@ digraph runbook {
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
 		Map preferencesMap = [:]
-		SetLabelQuantityPrefCommand commandObject = populateCommandObject(SetLabelQuantityPrefCommand)
+		SetLabelQuantityPrefCommand commandObject = populateCommandObject(SetLabelQuantityPrefCommand, false)
 		if (commandObject.hasErrors()) {
 			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(commandObject) ) )
 			return

@@ -19,7 +19,6 @@ class WsTagAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetEdit)
 	def create() {
 		CreateTagAssetCommand newAssetTag = populateCommandObject(CreateTagAssetCommand)
-		validateCommandObject(newAssetTag)
 		List<TagAsset> tagAssets = tagAssetService.applyTags(projectForWs,newAssetTag.tagIds, newAssetTag?.assetId)
 
 		renderSuccessJson(tagAssets*.toMap())
@@ -36,7 +35,6 @@ class WsTagAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetDelete)
 	def delete() {
 		IdsCommand delete = populateCommandObject(IdsCommand)
-		validateCommandObject(delete)
 		tagAssetService.removeTags(projectForWs, delete.ids)
 		return renderSuccessJson()
 	}

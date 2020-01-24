@@ -1,12 +1,44 @@
-.asset-explorer-view-grid-component
-  $grid-font-icon-size: 20px
+@mixin asset-tag-style
+  border-radius: 2px
+  border: 0
+  height: 100% !important
+  padding: 5px 7px
+  margin-bottom: 7px !important
+
+@mixin asset-tag-font-style
+  font-size: 11px
+  text-align: center
+  font-weight: 500
+  color: black
+
+asset-explorer-view-grid, .asset-explorer-view-grid-component
+  clr-checkbox-wrapper
+    margin: 0
+
   kendo-grid-list
-    .k-grid-content
-      .k-grid-table
-        tbody
-          tr
-            td
-              text-overflow: ellipsis !important
+    height: 70vh
+
+  .label.tag
+    @include asset-tag-style
+
+  // wrap overflow text in ellipsis mode.
+  kendo-grid.k-grid td
+    padding: 0px 8px
+    line-height: 10px
+    word-break: normal
+    text-overflow: ellipsis
+    white-space: nowrap
+    &:not(.actions-column)
+      overflow: hidden !important
+
+  kendo-grid
+    .action-button.btn-link
+      display: flex
+      justify-content: center
+      align-items: center
+
+  $grid-font-icon-size: 20px
+
   .k-grid-pager
     .k-icon
       font-size: $grid-font-icon-size
@@ -18,14 +50,56 @@
     .k-icon
       font-size: $grid-font-icon-size
     tr
-      //height: unset!important
       td
         .asset-tag-selector-component
           .k-multiselect
             padding: 0
             top: 0
             .k-multiselect-wrap
-              min-height: unset
+              border: 1px solid #ccc
+              border-radius: 3px
+              font-size: 13px
+              min-height: 26px
+              font-weight: 500
+              kendo-searchbar
+                width: 100%
+                input
+                  height: 100%
+                  width: 100%
+              div[class^="tag"]
+                @include asset-tag-font-style
+                @include asset-tag-style
+                padding-right: 28px
+                margin-bottom: 0 !important
+                max-width: 143px
+          kendo-switch
+            float: right
+            z-index: 2
+            width: 55px
+            top: 4px
+            height: 24px
+            position: relative
+            .k-switch-container
+              border-width: .1em
+              border-color: rgba(0, 0, 0, 0.17)
+              color: inherit !important
+              margin-right: 4px
+              background-color: transparent !important
+            .k-switch-handle
+              width: 2.3em
+              height: 2.2em
+              background-color: #5f9fcf !important
+            .k-switch-label-on, .k-switch-label-off
+              right: 6px
+              font-size: 10px
+              width: 100%
+              font-weight: 600
+            &.k-switch-on
+              .k-switch-label-on
+                right: -6px
+              .k-switch-handle
+                left: calc(100% - 2.3em)
+
         .has-feedback
           input.form-control
             padding: 2px 27px 2px 12px
@@ -38,9 +112,23 @@
       input.form-control[name="common.assetName"]
         width: 98%
 
+    // Hide the vertical column line separator for the first header column
+    // and center the filter column of all assets view (TM-16757)
+    th[aria-colindex="1"]
+      position: unset
+      .tds-indeterminate-checkbox
+        position: absolute
+        top: 10px
+    th[aria-colindex="2"]
+      display: flex
+      justify-content: center
+      align-items: center
+
   .kendo-grid-toolbar__refresh-btn
     margin-top: unset!important
 
+  .single-line-tags
+    white-space: normal
   .asset-detail-link
     font-weight: bold
     cursor: pointer
@@ -82,13 +170,9 @@
 
   .k-grid-header .k-header
     top: 3px
-    padding: 0 12px
     .k-link
       margin: unset
       padding: unset
-
-  .sortable-column
-    width: 85%
 
   .text-delimited
     white-space: nowrap
@@ -135,3 +219,42 @@
       .glyphicon.glyphicon-eye-close
         font-size: 13px
         padding-right: 5px
+
+  .assetsSelector
+    .tds-indeterminate-checkbox
+      label
+        margin-left: 4px
+  .selectall-checkbox-column
+    label
+      margin-bottom: 0
+  .selected-assets-counter
+    .icon
+      position: relative
+      bottom: 2px
+    h6
+      margin-top: 0
+      margin-left: 5px
+    tds-bulk-change-button
+      margin-left: 10px
+      .tds-button
+        margin-bottom: 0
+        margin-top: 0
+        clr-icon
+          width: 33px
+          margin-top: 4px
+
+kendo-popup.assets-view-grid
+  kendo-list
+    .k-list-scroller .k-list
+      overflow: auto
+      .k-item
+        padding: 0px 4px
+        &:last-child
+          margin-bottom: 10px
+    .asset-tag-selector-single-container
+      margin-left: 0
+      margin-top: 0
+    .asset-tag-selector-single-item
+      @include asset-tag-font-style
+      @include asset-tag-style
+      margin-bottom: 2px !important

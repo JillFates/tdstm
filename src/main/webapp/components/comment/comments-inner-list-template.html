@@ -1,35 +1,98 @@
-<input type="checkbox" id="showAll" name="showAll" value="1" ng-model="showAll" ng-true-value="1" ng-false-value="0" ng-change="updatePreference()" />
+<input
+  type="checkbox"
+  id="showAll"
+  name="showAll"
+  value="1"
+  ng-model="showAll"
+  ng-true-value="1"
+  ng-false-value="0"
+  ng-change="updatePreference()"
+/>
 <label for="showAll">&nbsp;View All Tasks&nbsp;&nbsp;</label>
-<span id="viewUnpublishedContainerId" style="display:{{hasPublishPermission == 'true' ? 'inline' : 'none'}};">
-	<input type="checkbox" id="viewUnpublishedCheckboxId" name="viewUnpublished" value="{{viewUnpublishedValue}}" ng-model="viewUnpublishedValue" ng-true-value="true" ng-false-value="false" ng-selected="{{viewUnpublishedValue}}" ng-change="updateViewUnpublished()" />
-	<label for="viewUnpublishedCheckboxId">&nbsp;View Unpublished Tasks</label>
+<span
+  id="viewUnpublishedContainerId"
+  style="display:{{hasPublishPermission == 'true' ? 'inline' : 'none'}};"
+>
+  <input
+    type="checkbox"
+    id="viewUnpublishedCheckboxId"
+    name="viewUnpublished"
+    value="{{viewUnpublishedValue}}"
+    ng-model="viewUnpublishedValue"
+    ng-true-value="true"
+    ng-false-value="false"
+    ng-selected="{{viewUnpublishedValue}}"
+    ng-change="updateViewUnpublished()"
+  />
+  <label for="viewUnpublishedCheckboxId">&nbsp;View Unpublished Tasks</label>
 </span>
 <div class="list" style="position: relative; margin-top: 4px;">
-<loading-indicator></loading-indicator>
-<table id="listCommentsTables">
-<thead>
-<tr>
-	<th nowrap class="headerwidth3">Edit</th>
-	<th nowrap class="headerwidth3">Task&nbsp;#</th>
-	<th nowrap>Task/Comment</th>
-	<th nowrap class="headerwidth12">Status</th>
-	<th nowrap class="headerwidth6">Category</th>
-	<th nowrap class="headerwidth20">Assigned To</th>
-</tr>
-</thead>
-<tbody id="listCommentsTbodyIds">
-<tr style="cursor: pointer;" ng-repeat="comment in comments | filter:commentFilter">
-	<td>
-		<a ng-if="comment.commentInstance.commentType == 'comment'" href="#" ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)" ng-show="canEditComments"><img ng-src="{{applyRootPath('/icons/comment_edit.png')}}" border="0px"/></a>
+  <loading-indicator></loading-indicator>
+  <table id="listCommentsTables">
+    <thead>
+      <tr>
+        <th nowrap class="headerwidth3">Edit</th>
+        <th nowrap class="headerwidth3">Task&nbsp;#</th>
+        <th nowrap>Task/Comment</th>
+        <th nowrap class="headerwidth12">Status</th>
+        <th nowrap class="headerwidth6">Category</th>
+        <th nowrap class="headerwidth20">Assigned To</th>
+      </tr>
+    </thead>
+    <tbody id="listCommentsTbodyIds">
+      <tr
+        style="cursor: pointer;"
+        ng-repeat="comment in comments | filter:commentFilter"
+      >
+        <td>
+          <a
+            ng-if="comment.commentInstance.commentType === 'comment'"
+            href="#"
+            ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)"
+            ng-show="canEditComments"
+            style="font-size:16px; color: #0092d1"
+          >
+            <i class="fas fa-edit"></i>
+          </a>
 
-		<a ng-if="comment.commentInstance.commentType != 'comment'" href="#" ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)" ng-show="canEditTasks"><img ng-src="{{applyRootPath('/icons/table_edit.png')}}" border="0px"/></a>
-	</td>
-	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)" style="text-align: center;">{{comment.commentInstance.taskNumber?comment.commentInstance.taskNumber:''}}</td>
-	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)">{{comment.commentInstance.comment}}</td>
-	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)">{{(comment.commentInstance.commentType == 'issue')?comment.commentInstance.status:((comment.commentInstance.isResolved?'Archived':''))}}</td>
-	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)">{{comment.commentInstance.category}}</td>
-	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)">{{comment.assignedTo + "/" + comment.role}}</td>
-</tr>
-</tbody>
-</table>
+          <a
+            ng-if="comment.commentInstance.commentType !== 'comment'"
+            href="#"
+            ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)"
+            ng-show="canEditTasks"
+            style="font-size:16px; color: #0092d1"
+          >
+            <i class="fas fa-edit"></i>
+          </a>
+        </td>
+        <td
+          ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)"
+          style="text-align: center;"
+        >
+          {{comment.commentInstance.taskNumber?comment.commentInstance.taskNumber:''}}
+        </td>
+        <td
+          ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)"
+        >
+          {{comment.commentInstance.comment}}
+        </td>
+        <td
+          ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)"
+        >
+          {{(comment.commentInstance.commentType ==
+          'issue')?comment.commentInstance.status:((comment.commentInstance.isResolved?'Archived':''))}}
+        </td>
+        <td
+          ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)"
+        >
+          {{comment.commentInstance.category}}
+        </td>
+        <td
+          ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)"
+        >
+          {{comment.assignedTo + "/" + comment.role}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

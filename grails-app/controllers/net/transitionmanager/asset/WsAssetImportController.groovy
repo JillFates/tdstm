@@ -78,7 +78,7 @@ class WsAssetImportController implements ControllerMethods {
 		ApiAction action = fetchDomain(ApiAction, params)
 
 		// Invoke action and eval the result
-		ApiActionResponse actionInvocationResult = apiActionService.invoke(action, currentPerson())
+		ApiActionResponse actionInvocationResult = apiActionService.invoke(action)
 
 		if (actionInvocationResult.successful) {
 			renderSuccessJson( [ filename: actionInvocationResult.filename ] )
@@ -153,7 +153,6 @@ class WsAssetImportController implements ControllerMethods {
 		def stopwatch = new StopWatch()
 		stopwatch.start()
 		InitiateTransformDataActionCommand actionCommand  = populateCommandObject(InitiateTransformDataActionCommand)
-		validateCommandObject(actionCommand)
 
 		Project project = getProjectForWs()
 		Map result = dataImportService.scheduleETLTransformDataJob(

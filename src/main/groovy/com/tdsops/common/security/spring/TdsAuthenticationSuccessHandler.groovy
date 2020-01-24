@@ -9,38 +9,41 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.JsonUtil
 import grails.core.GrailsApplication
-import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import groovy.transform.CompileStatic
-import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.security.Permission
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.AuditService
 import net.transitionmanager.notice.NoticeService
-import net.transitionmanager.security.SecurityService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.session.SessionContext
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
+import org.springframework.security.web.csrf.CsrfToken
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
 import org.springframework.util.Assert
+
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 
-
 @CompileStatic
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
 
-	AuditService auditService
-	GrailsApplication grailsApplication
-	SecurityService securityService
-	UserPreferenceService userPreferenceService
-	UserService userService
-	NoticeService noticeService
+	AuditService                   auditService
+	GrailsApplication              grailsApplication
+	SecurityService                securityService
+	UserPreferenceService          userPreferenceService
+	UserService                    userService
+	NoticeService                  noticeService
+	HttpSessionCsrfTokenRepository csrfTokenRepository
 
 	// This is a list of the legacy pages that we can allow the user to redirect to after login. Spring Security
 	// records all page requests when the user is not logged in, including Ajax calls. Therefore we need this list
@@ -83,6 +86,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				'This workflow expects an UsernamePasswordAuthorityAuthenticationToken instance here')
 
 		try {
+			CsrfToken token = csrfTokenRepository.generateToken(request)
+			csrfTokenRepository.saveToken(token, request, response)
 
 			response.setHeader('content-type', 'application/json')
 			PrintWriter responseWriter = response.getWriter()
@@ -119,7 +124,11 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			// This map will contain all the user-related data that needs to be sent in the response's payload.
 			Map signInInfoMap = [
 				userContext: userService.getUserContext(alternativeProjects).toMap(),
-				notices: [:]
+				csrf       : [
+					tokenHeaderName: token.headerName,
+					token          : token.token
+				],
+				notices    : [:]
 			]
 
 			if (securityService.shouldLockoutAccount(userLogin)) {

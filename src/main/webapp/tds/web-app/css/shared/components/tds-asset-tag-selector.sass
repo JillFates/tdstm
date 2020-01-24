@@ -1,6 +1,8 @@
 /* Exclusive for Angular*/
 .asset-tag-selector-component
   $asset-tag-placeholder: #999
+  kendo-multiselect
+    width: 100%
   .k-widget
     div.k-multiselect-wrap
       min-height: 30px
@@ -15,6 +17,7 @@
             margin-right: -8px
             span
               div
+                border-radius: 2px
                 height: 26px
                 padding-left: 7px
                 padding-right: 28px
@@ -139,6 +142,8 @@ $asset-tag-selector-default-label-color: #656565
   padding-top: 8px
   font-size: 11px
   color: $asset-tag-selector-default-label-color!important
+  border: unset
+  border-radius: 2px
 .tag-black
   background-color: black !important
 .tag-grey
@@ -164,18 +169,6 @@ $asset-tag-selector-default-label-color: #656565
 .tag-unselected
   background-color: unset !important
 
-.tds-angular-component-content, asset-explorer-view-grid
-  .label.tag, .dots-for-tags
-    display: inline-block
-    margin: 2px
-    vertical-align: baseline
-    text-align: center
-    width: auto
-    height: 28px
-    font-weight: 600
-    font-size: 11px
-  .dots-for-tags
-    padding-right: 200px
 .single-line-tags
   margin-top: 5px
 .single-line-tags:hover, .show-full-tags
@@ -195,3 +188,29 @@ $asset-tag-selector-default-label-color: #656565
 
 .tag-arrows-icon
   content: "\e010"
+
+.tds-angular-component-content, asset-explorer-view-grid
+  .single-line-tags
+    overflow-y: hidden
+    max-height: 30px
+    .label.tag, .dots-for-tags
+      display: inline-block
+      margin: 2px
+      vertical-align: baseline
+      text-align: center
+      width: auto
+      height: 15px
+      font-weight: 600
+      font-size: 11px
+    .dots-for-tags
+      padding-right: 200px
+    &:hover
+      max-height: unset
+      overflow-y: auto
+      .label.tag
+        height: 15px
+      .dots-for-tags
+        visibility: hidden
+
+kendo-popup .k-popup
+  border-color: #ccc !important

@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, Output, ViewChild, OnInit} from '@angular/core';
-import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
+import { Component, EventEmitter, Input, Output, ViewChild, OnInit } from '@angular/core';
+import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
 
 @Component({
 	selector: 'tds-combobox-group',
@@ -30,13 +30,18 @@ import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
                         <div class="combo-group-item">{{dataItem.text}}</div>
                     </div>
                 </ng-template>
-            </kendo-combobox>
-            <label class="fixed"><input type="checkbox" [checked]="!!isFixed" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />Fixed</label>
+			</kendo-combobox>
+			<div class="clr-control-container">
+				<div class="clr-checkbox-wrapper" style="display: flex">
+					<input clrcheckbox="" type="checkbox" clrCheckbox [checked]="!!isFixed" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />
+					<label class="clr-control-label">Fixed</label>
+				</div>
+			</div>
         </div>
 	`
 })
 export class TDSComboBoxGroupComponent implements OnInit {
-	@ViewChild('innerComboBoxGroup') innerComboBoxGroup: ComboBoxComponent;
+	@ViewChild('innerComboBoxGroup', { static: false }) innerComboBoxGroup: ComboBoxComponent;
 	@Output() modelChange = new EventEmitter<string>();
 	@Output() isFixedChange = new EventEmitter<number>();
 	@Input() tabIndex = 0;
@@ -48,23 +53,23 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	readonly CATEGORY_BY_REFERENCE = 'By Reference';
 	readonly CATEGORY_BY_TEAM = 'Team';
 	readonly CATEGORY_BY_NAMED_STAFF = 'Named Staff';
-	protected source: any[] ;
+	protected source: any[];
 	public data: any;
 
 	ngOnInit() {
 		this.source = [];
 		const sme = [
-				{ id: '#SME1',   text: 'SME 1' },
-				{ id: '#SME2',   text: 'SME 2' },
-				{ id: '#Owner', text: 'Owner' }
-			];
-		const namedStaff = this.namedStaff.map( (item) => ({ id: item.personId.toString(), text: item.fullName }));
-		const team = this.team.map( (item) => ({ id: `@${item.id}`, text: item.description }));
+			{ id: '#SME1', text: 'SME 1' },
+			{ id: '#SME2', text: 'SME 2' },
+			{ id: '#Owner', text: 'Owner' }
+		];
+		const namedStaff = this.namedStaff.map((item) => ({ id: item.personId.toString(), text: item.fullName }));
+		const team = this.team.map((item) => ({ id: `@${item.id}`, text: item.description }));
 
 		// concat the array categories to build the final data set
-		this.source = this.source.concat( this.addCategoryToArray(sme, this.CATEGORY_BY_REFERENCE) );
-		this.source = this.source.concat( this.addCategoryToArray(team, this.CATEGORY_BY_TEAM) );
-		this.source = this.source.concat( this.addCategoryToArray(namedStaff, this.CATEGORY_BY_NAMED_STAFF) );
+		this.source = this.source.concat(this.addCategoryToArray(sme, this.CATEGORY_BY_REFERENCE));
+		this.source = this.source.concat(this.addCategoryToArray(team, this.CATEGORY_BY_TEAM));
+		this.source = this.source.concat(this.addCategoryToArray(namedStaff, this.CATEGORY_BY_NAMED_STAFF));
 		this.data = [...this.source];
 	}
 
@@ -74,7 +79,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	 * @param {string} category name to add to the array
 	 */
 	private addCategoryToArray(items: any[], category: string): any[] {
-		return items.map((item, index) => Object.assign({},  item, { category, index } ))
+		return items.map((item, index) => Object.assign({}, item, { category, index }))
 	}
 
 	/**
@@ -121,7 +126,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	 */
 	private setIndex(data: any[], key: string): any[] {
 		return data.filter((item) => item.category === key)
-			.map((item, index) => ({...item, index}) );
+			.map((item, index) => ({ ...item, index }));
 	}
 
 	/**

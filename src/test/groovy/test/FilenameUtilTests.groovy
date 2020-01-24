@@ -3,19 +3,15 @@ package test
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.TimeUtil
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import spock.lang.See
 import spock.lang.Shared
-
 /**
  * Created by ecantu on 12/11/2017.
  */
-@TestMixin(ControllerUnitTestMixin)
 class FilenameUtilTests extends AbstractUnitSpec {
 
 		@Shared

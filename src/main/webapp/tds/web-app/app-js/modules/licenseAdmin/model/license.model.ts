@@ -11,53 +11,63 @@ export class LicenseColumnModel {
 				locked: true
 			}, {
 				label: 'Client',
+				filterable: true,
 				property: 'client.name',
 				type: 'text',
 				width: 160,
 			}, {
 				label: 'Project',
+				filterable: true,
 				property: 'project.name',
 				type: 'text',
 				width: 160,
 			}, {
 				label: 'Contact Email',
+				filterable: true,
 				property: 'email',
 				type: 'text',
 				width: 160,
 			}, {
 				label: 'Status',
+				filterable: true,
 				property: 'status',
 				type: 'text',
 				width: 160,
 			}, {
 				label: 'Type',
+				filterable: true,
 				property: 'type',
 				type: 'text',
 				width: 160,
 			}, {
 				label: 'Method',
+				filterable: true,
 				property: 'method.name',
 				type: 'text',
 				width: 160,
 			}, {
 				label: 'Server/Tokens',
+				filterable: true,
 				property: 'method.max',
 				type: 'text',
 				width: 160,
 			}, {
 				label: 'Inception',
+				filterable: true,
 				property: 'activationDate',
 				type: 'date',
 				format: dateFormat,
 				width: 170
 			}, {
 				label: 'Expiration',
+				filterable: true,
 				property: 'expirationDate',
 				type: 'date',
 				format: dateFormat,
 				width: 170
 			}, {
 				label: 'Environment',
+				filterable: true,
 				property: 'environment',
 				type: 'text',
 				width: 160,

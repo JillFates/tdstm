@@ -13,7 +13,6 @@ export class ImportBatchRecordSummaryComponent {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
-
 	public importBatchPreferences = {};
 	public importBatchPrefEnum = IMPORT_BATCH_PREFERENCES;
 	public userTimeZone: string;

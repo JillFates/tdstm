@@ -1,7 +1,6 @@
 // Common columns that should be shrunk to allow more space for primary info
 export const COMMON_SHRUNK_COLUMNS = [
 	'Asset Class',
-	'Environment',
 	'Archived',
 	'External Ref Id',
 	'Validation',
@@ -11,7 +10,6 @@ export const COMMON_SHRUNK_COLUMNS = [
 	'Created By',
 	'Updated',
 	'Category',
-	'Auth Method',
 	'Status',
 	'Last Modified',
 	'Date Create',

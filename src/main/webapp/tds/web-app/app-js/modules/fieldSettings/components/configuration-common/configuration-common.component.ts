@@ -6,7 +6,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {FieldSettingsModel} from '../../model/field-settings.model';
 
 export abstract class ConfigurationCommonComponent {
-	@ViewChild('templateForm') protected templateForm: NgForm;
+	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
 
 	constructor(
 		public field: FieldSettingsModel,

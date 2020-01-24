@@ -15,7 +15,7 @@ if type is blank, the extra underscore(_) will be avoided --%>
 <g:if test="${ forWhom == 'edit' }" >
 	<a title="${ dependency.comment?.toString() }"
 	 	id="commLink_${suffix}" href="#" onclick="javascript:EntityCrud.openDepCommentDialog('${suffix}')">
-   		<asset:image src="icons/comment_${ iconMode }.png" border="0px" />
+   		<%-- <asset:image src="icons/comment_${ iconMode }.png" border="0px" /> --%>
 	</a>
 
  	<input type="hidden" name="comment_${suffix}" id="comment_${suffix}" value="${dependency.comment}">
@@ -24,7 +24,7 @@ if type is blank, the extra underscore(_) will be avoided --%>
 <g:else>
  	<g:if test="${ dependency.comment }" >
  		<a title="" data-toggle="popover" data-trigger="hover" data-content="${ dependency.comment }">
-			<img id="comment_${dependency.id}" src="/tdstm/assets/icons/comment.png" style="height: 19px" border="0px" />
+			<%-- <img id="comment_${dependency.id}" src="/tdstm/assets/icons/comment.png" style="height: 19px" border="0px" /> --%>
 		</a>
    	</g:if>
 </g:else>

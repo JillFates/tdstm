@@ -1,16 +1,15 @@
 package net.transitionmanager.integration
 
-import net.transitionmanager.exception.ApiActionException
-import net.transitionmanager.task.AssetComment
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.asset.AssetEntity
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.person.Person
-import net.transitionmanager.i18n.Message
 import net.transitionmanager.common.MessageSourceService
-import net.transitionmanager.task.TaskService
+import net.transitionmanager.exception.ApiActionException
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.person.Person
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
+import net.transitionmanager.task.TaskService
 import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -20,10 +19,9 @@ import static ReactionHttpStatus.OK
 import static net.transitionmanager.integration.ReactionScriptCode.ERROR
 import static net.transitionmanager.integration.ReactionScriptCode.SUCCESS
 
-@TestMixin(GrailsUnitTestMixin)
-class ApiActionScriptSpec extends Specification {
+class ApiActionScriptSpec extends Specification implements ServiceUnitTest<MessageSourceService>{
 
-	static doWithSpring = {
+	Closure doWithSpring() {{ ->
 		messageSourceService(MessageSourceService) { bean ->
 			messageSource = ref('messageSource')
 		}
@@ -35,7 +33,7 @@ class ApiActionScriptSpec extends Specification {
 		taskFacade(TaskFacade) { bean ->
 			bean.scope = 'prototype'
 		}
-	}
+	}}
 
 	@Unroll
 	void 'test can create a script binding context based on a ReactionScriptCode.#reactionScriptCode'() {

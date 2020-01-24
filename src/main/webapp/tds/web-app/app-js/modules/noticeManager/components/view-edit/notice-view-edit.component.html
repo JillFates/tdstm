@@ -1,201 +1,401 @@
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content notice-edit-content">
-  <div class="modal-header">
-    <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-    <h4 class="modal-title">{{ getModalTitle(action) }}</h4>
-  </div>
-  <div class="modal-body">
-    <form novalidate role="form" class="form-horizontal left-alignment"  #form='ngForm' name="form">
-      <div class="box-body">
-        <div class="form-group">
-          <label for="inputTitle" class="col-sm-3 control-label required-field">Title:</label>
-          <div class="col-sm-9">
-            <input *ngIf="action !== EnumActionType.View; else noticeTitleView"
-                   type="text" name="title" id="inputTitle" class="form-control"
-                   title="{{'NOTICE.TOOLTIP_TITLE' | translate}}"
-                   [(ngModel)]="model.title" required>
-            <ng-template #noticeTitleView>
-              <label class="control-label label-detail">{{model.title}}</label>
-            </ng-template>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="selectType" class="col-sm-3 control-label required-field">Type:</label>
-          <div class="col-sm-9">
-            <kendo-dropdownlist
-              *ngIf="action !== EnumActionType.View; else noticeTypeView"
-              name="noticeType"
-              title="{{'NOTICE.TOOLTIP_NOTICE_TYPES' | translate}}"
-              #typeIdField="kendoDropDownList"
-              [defaultItem]="defaultItem"
-              [data]="typeDataSource"
-              [textField]="'name'"
-              [valueField]="'typeId'"
-              id="selectType"
-              class="form-control"
-              [(ngModel)]="noticeType"
-              (valueChange)="onChangeNoticeType($event)"
-              requiredComplexValue propertyName="typeId" required>
-            </kendo-dropdownlist>
+<div
+	tds-autofocus
+	tds-handle-escape
+	(escPressed)="closeDialog()"
+	class="tds-modal-content has-side-nav notice-edit-content"
+>
+	<div class="modal-header">
+		<button
+			(click)="closeDialog()"
+			type="button"
+			class="close"
+			aria-label="Close"
+		>
+			<clr-icon aria-hidden="true" shape="close"></clr-icon>
+		</button>
+		<div class="modal-title-container">
+			<div class="modal-title">
+				{{ getModalTitle(action) }}
+			</div>
+		</div>
+	</div>
+	<div class="modal-body">
+		<form
+			novalidate
+			role="form"
+			class="form-horizontal left-alignment"
+			#form="ngForm"
+			name="form"
+		>
+			<div class="box-body">
+				<!-- Title -->
+				<div class="clr-row">
+					<label for="inputTitle" class="clr-col-3 required-field"
+						>Title:</label
+					>
+					<div class="clr-col-9">
+						<input
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeTitleView
+							"
+							type="text"
+							name="title"
+							id="inputTitle"
+							class="clr-input form-control"
+							title="{{ 'NOTICE.TOOLTIP_TITLE' | translate }}"
+							[(ngModel)]="model.title"
+							required
+						/>
+						<ng-template #noticeTitleView>
+							<label class=" label-detail">{{
+								model.title
+							}}</label>
+						</ng-template>
+					</div>
+				</div>
+				<!-- Type -->
+				<div class="clr-row">
+					<label for="selectType" class="clr-col-3 required-field"
+						>Type:</label
+					>
+					<div class="clr-col-9">
+						<kendo-dropdownlist
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeTypeView
+							"
+							name="noticeType"
+							title="{{
+								'NOTICE.TOOLTIP_NOTICE_TYPES' | translate
+							}}"
+							#typeIdField="kendoDropDownList"
+							[defaultItem]="defaultItem"
+							[data]="typeDataSource"
+							[textField]="'name'"
+							[valueField]="'typeId'"
+							id="selectType"
+							class="form-control"
+							[(ngModel)]="noticeType"
+							(valueChange)="onChangeNoticeType($event)"
+							requiredComplexValue
+							propertyName="typeId"
+							required
+						>
+						</kendo-dropdownlist>
 
-            <ng-template #noticeTypeView>
-              <label class="control-label label-detail">{{typeName}}</label>
-            </ng-template>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="checkActive" class="col-sm-3 control-label">Active:</label>
-          <div class="col-sm-9">
-            <label  *ngIf="action !== EnumActionType.View; else noticeActiveView">
-              <input class="checkbox" title="{{'NOTICE.TOOLTIP_ACTIVE' | translate}}"
-                     id="checkActive" name="active" type="checkbox" [(ngModel)]="model.active">
-            </label>
+						<ng-template #noticeTypeView>
+							<label class=" label-detail">{{ typeName }}</label>
+						</ng-template>
+					</div>
+				</div>
+				<!-- Active -->
+				<div class="clr-row">
+					<label for="checkActive" class="clr-col-3 ">Active:</label>
+					<div class="clr-col-9">
+						<label
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeActiveView
+							"
+						>
+							<input
+								clrCheckbox
+								class="checkbox"
+								title="{{
+									'NOTICE.TOOLTIP_ACTIVE' | translate
+								}}"
+								id="checkActive"
+								name="active"
+								type="checkbox"
+								[(ngModel)]="model.active"
+							/>
+						</label>
 
-            <ng-template #noticeActiveView>
-              <label class="control-label label-detail">{{model.active | tdsUIBoolean}}</label>
-            </ng-template>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="activationDate" class="col-sm-3 control-label">Activation Date:</label>
-          <div class="col-sm-9">
-            <div *ngIf="action !== EnumActionType.View; else noticeActivationDateView">
-              <tds-date-control
-                title="{{'NOTICE.TOOLTIP_ACTIVATION_DATE' | translate}}"
-                id="activationDate"
-                name="activationDate"
-                #activationDate="ngModel"
-                [maximum]="maxDate"
-                (blur)="setMinDate($event)"
-                [value]="model.activationDate"
-                [(ngModel)]="model.activationDate">
-              </tds-date-control>
-              <tds-custom-validation-errors
-                *ngIf="getFormField(form,'activationDate'); let field"
-                [userDateFormat]="userDateFormat"
-                [errors]="field.errors"
-                [valid]="field.valid"
-                [touched]="field.touched"
-                [dirty]="field.dirty">
-              </tds-custom-validation-errors>
-            </div>
-            <ng-template #noticeActivationDateView>
-              <label class="control-label label-detail" *ngIf="model.activationDate">{{model.activationDate | tdsDate : userDateFormat}}</label>
-            </ng-template>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="expirationDate" class="col-sm-3 control-label">Expiration Date:</label>
-          <div class="col-sm-9">
-            <div *ngIf="action !== EnumActionType.View; else noticeExpirationDateView">
-              <tds-date-control
-                title="{{'NOTICE.TOOLTIP_EXPIRATION_DATE' | translate}}"
-                id="expirationDate"
-                name="expirationDate"
-                #expirationDate="ngModel"
-                [minimum]="minDate"
-                (blur)="setMaxDate($event)"
-                [value]="model.expirationDate"
-                [(ngModel)]="model.expirationDate">
-              </tds-date-control>
-              <tds-custom-validation-errors
-                *ngIf="getFormField(form,'expirationDate'); let field"
-                [userDateFormat]="userDateFormat"
-                [errors]="field.errors"
-                [valid]="field.valid"
-                [touched]="field.touched"
-                [dirty]="field.dirty">
-              </tds-custom-validation-errors>
-            </div>
+						<ng-template #noticeActiveView>
+							<label class=" label-detail">{{
+								model.active | tdsUIBoolean
+							}}</label>
+						</ng-template>
+					</div>
+				</div>
+				<!-- Activation Date -->
+				<div class="clr-row">
+					<label for="activationDate" class="clr-col-3"
+						>Activation Date:</label
+					>
+					<div class="clr-col-9">
+						<div
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeActivationDateView
+							"
+						>
+							<tds-date-control
+								title="{{
+									'NOTICE.TOOLTIP_ACTIVATION_DATE' | translate
+								}}"
+								id="activationDate"
+								name="activationDate"
+								#activationDate="ngModel"
+								[maximum]="maxDate"
+								(blur)="setMinDate($event)"
+								[value]="model.activationDate"
+								[(ngModel)]="model.activationDate"
+							>
+							</tds-date-control>
+							<tds-custom-validation-errors
+								*ngIf="
+									getFormField(form, 'activationDate');
+									let field
+								"
+								[userDateFormat]="userDateFormat"
+								[errors]="field.errors"
+								[valid]="field.valid"
+								[touched]="field.touched"
+								[dirty]="field.dirty"
+							>
+							</tds-custom-validation-errors>
+						</div>
+						<ng-template #noticeActivationDateView>
+							<label
+								class=" label-detail"
+								*ngIf="model.activationDate"
+								>{{
+									model.activationDate
+										| tdsDate: userDateFormat
+								}}</label
+							>
+						</ng-template>
+					</div>
+				</div>
+				<!-- Expiration Date -->
+				<div class="clr-row">
+					<label for="expirationDate" class="clr-col-3"
+						>Expiration Date:</label
+					>
+					<div class="clr-col-9">
+						<div
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeExpirationDateView
+							"
+						>
+							<tds-date-control
+								title="{{
+									'NOTICE.TOOLTIP_EXPIRATION_DATE' | translate
+								}}"
+								id="expirationDate"
+								name="expirationDate"
+								#expirationDate="ngModel"
+								[minimum]="minDate"
+								(blur)="setMaxDate($event)"
+								[value]="model.expirationDate"
+								[(ngModel)]="model.expirationDate"
+							>
+							</tds-date-control>
+							<tds-custom-validation-errors
+								*ngIf="
+									getFormField(form, 'expirationDate');
+									let field
+								"
+								[userDateFormat]="userDateFormat"
+								[errors]="field.errors"
+								[valid]="field.valid"
+								[touched]="field.touched"
+								[dirty]="field.dirty"
+							>
+							</tds-custom-validation-errors>
+						</div>
 
-            <ng-template #noticeExpirationDateView>
-              <label class="control-label label-detail" *ngIf="model.expirationDate">{{model.expirationDate | tdsDate : userDateFormat}}</label>
-            </ng-template>
-          </div>
-        </div>
+						<ng-template #noticeExpirationDateView>
+							<label
+								class=" label-detail"
+								*ngIf="model.expirationDate"
+								>{{
+									model.expirationDate
+										| tdsDate: userDateFormat
+								}}</label
+							>
+						</ng-template>
+					</div>
+				</div>
+				<!-- Sequence -->
+				<div class="clr-row">
+					<label for="sequence" class="clr-col-3">Sequence:</label>
+					<div class="col-sm-1">
+						<kendo-numerictextbox
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeSequenceView
+							"
+							title="{{ 'NOTICE.TOOLTIP_SEQUENCE' | translate }}"
+							[spinners]="false"
+							name="sequence"
+							[(ngModel)]="model.sequence"
+							[format]="'n0'"
+							[min]="0"
+							[max]="127"
+							[autoCorrect]="true"
+						>
+						</kendo-numerictextbox>
+						<ng-template #noticeSequenceView>
+							<label class=" label-detail">{{
+								model.sequence
+							}}</label>
+						</ng-template>
+					</div>
+					<div class="col-sm-2"></div>
+				</div>
+				<!-- Locked -->
+				<div class="clr-row">
+					<label for="locked" class="clr-col-3">Locked:</label>
+					<div class="clr-col-9">
+						<label
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeLockedView
+							"
+						>
+							<input
+								clrCheckbox
+								class="checkbox"
+								[disabled]="noticeIsLocked"
+								[ngClass]="{ 'is-disabled': noticeIsLocked }"
+								title="{{
+									'NOTICE.TOOLTIP_LOCKED' | translate
+								}}"
+								id="locked"
+								name="locked"
+								type="checkbox"
+								[(ngModel)]="model.locked"
+							/>
+						</label>
+						<ng-template #noticeLockedView>
+							<label class=" label-detail">{{
+								model.locked | tdsUIBoolean
+							}}</label>
+						</ng-template>
+					</div>
+				</div>
+				<!-- Message -->
+				<div class="clr-row">
+					<label class="clr-col-12 required-field vertical-label"
+						>Message:</label
+					>
+					<div
+						class="clr-col-12"
+						[ngClass]="{ 'readonly-control': noticeIsLocked }"
+					>
+						<rich-text-editor
+							[readonly]="
+								noticeIsLocked || action === EnumActionType.View
+							"
+							#htmlTextField
+							[elementId]="'htmlText'"
+							[required]="true"
+							[name]="'htmlText'"
+							(valueChange)="onValueChange($event)"
+							(rawValueChange)="onRawValueChange($event)"
+							(escHandler)="cancelDialog()"
+							[rawValue]="model.rawText"
+							[value]="model.htmlText"
+						>
+						</rich-text-editor>
+					</div>
+				</div>
+				<!-- Post Message Text -->
+				<div
+					class="clr-row"
+					*ngIf="noticeType && noticeType.typeId === MANDATORY"
+				>
+					<label
+						for="acknowledgeLabel"
+						class="clr-col-12  required-field vertical-label"
+						>Post Message Text:</label
+					>
+					<div class="clr-col-12">
+						<input
+							type="text"
+							*ngIf="
+								action !== EnumActionType.View;
+								else noticeAcknowledgeView
+							"
+							[readonly]="noticeIsLocked"
+							class="form-control"
+							name="acknowledgeLabel"
+							id="acknowledgeLabel"
+							[(ngModel)]="model.acknowledgeLabel"
+						/>
 
-        <div class="form-group">
-          <label for="sequence" class="col-sm-3 control-label">Sequence:</label>
-          <div class="col-sm-1">
-            <kendo-numerictextbox
-              *ngIf="action !== EnumActionType.View; else noticeSequenceView"
-              title="{{'NOTICE.TOOLTIP_SEQUENCE' | translate}}"
-              [spinners]="false"
-              name="sequence"
-              [(ngModel)]="model.sequence"
-              [format]="'n0'"
-              [min]="0"
-              [max]="127"
-              [autoCorrect]="true">
-            </kendo-numerictextbox>
-            <ng-template #noticeSequenceView>
-              <label class="control-label label-detail">{{model.sequence}}</label>
-            </ng-template>
-          </div>
-          <div class="col-sm-2">
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="locked" class="col-sm-3 control-label">Locked:</label>
-          <div class="col-sm-9">
-            <label *ngIf="action !== EnumActionType.View; else noticeLockedView">
-              <input
-                class="checkbox"
-                [disabled]="noticeIsLocked"
-                [ngClass]="{'is-disabled': noticeIsLocked}"
-                title="{{'NOTICE.TOOLTIP_LOCKED' | translate}}"
-                id="locked"
-                name="locked"
-                type="checkbox"
-                [(ngModel)]="model.locked">
-            </label>
-            <ng-template #noticeLockedView>
-              <label class="control-label label-detail">{{model.locked | tdsUIBoolean }}</label>
-            </ng-template>
-          </div>
-        </div>
+						<ng-template #noticeAcknowledgeView>
+							<label class=" label-detail">{{
+								model.acknowledgeLabel
+							}}</label>
+						</ng-template>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer content-end">
+		<tds-button
+			id="viewHTMLBtn"
+			icon="code"
+			(click)="viewHTML()"
+			[type]="'button'"
+			theme="primary"
+		>
+			{{ 'NOTICE.VIEW_HTML' | translate }}
+		</tds-button>
+	</div>
 
-        <div class="form-group">
-          <label class="col-sm-12 control-label required-field vertical-label">Message:</label>
-          <div class="col-sm-12" [ngClass]="{'readonly-control': noticeIsLocked}">
-            <rich-text-editor
-              [readonly]="noticeIsLocked || action === EnumActionType.View"
-              #htmlTextField
-              [elementId]="'htmlText'"
-              [required]="true"
-              [name]="'htmlText'"
-              (valueChange)="onValueChange($event)"
-              (rawValueChange)="onRawValueChange($event)"
-              (escHandler)="cancelCloseDialog()"
-              [rawValue]="model.rawText"
-              [value]="model.htmlText">
-            </rich-text-editor>
-          </div>
-        </div>
-        <div class="form-group"
-             *ngIf="noticeType && noticeType.typeId === MANDATORY">
-          <label for="acknowledgeLabel" class="col-sm-12 control-label required-field vertical-label">Post Message Text:</label>
-          <div class="col-sm-12">
-            <input type="text"
-                   *ngIf="action !== EnumActionType.View; else noticeAcknowledgeView"
-                   [readonly]="noticeIsLocked"
-                   class="form-control"
-                   name="acknowledgeLabel" id="acknowledgeLabel"
-                   [(ngModel)]="model.acknowledgeLabel">
+	<nav class="modal-sidenav btn-link">
+		<tds-button-edit
+			(click)="editNotice()"
+			icon="pencil"
+			*ngIf="action === EnumActionType.View"
+			[type]="'button'"
+		></tds-button-edit>
 
-            <ng-template #noticeAcknowledgeView>
-              <label class="control-label label-detail">{{model.acknowledgeLabel}}</label>
-            </ng-template>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer form-group-center">
-    <button (click)="editNotice()" *ngIf="action === EnumActionType.View" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-pencil"></span>{{ 'GLOBAL.EDIT' | translate }}</button>
-    <button (click)="saveNotice()" *ngIf="action !== EnumActionType.View" [disabled]="!formValid(form) || !isCreateEditAvailable() || !isDirty()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-floppy-o"></span>{{ 'GLOBAL.SAVE' | translate }}</button>
-    <button (click)="viewHTML()" type="button" class="btn btn-primary pull-left"><span class="fa fa-fw fa-code"></span>{{ 'NOTICE.VIEW_HTML' | translate }}</button>
-    <button (click)="deleteNotice()" [disabled]="!isDeleteAvailable()" *ngIf="action !== EnumActionType.Create" type="button" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> {{ 'GLOBAL.DELETE' | translate }}</button>
-    <button (click)="cancelCloseDialog()" *ngIf="action === EnumActionType.Edit || action === EnumActionType.Create" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
-    <button (click)="cancelCloseDialog()" *ngIf="action === EnumActionType.View" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
-  </div>
+		<tds-button-edit
+			icon="pencil"
+			*ngIf="action !== EnumActionType.View"
+			[type]="'button'"
+			class="selected-button"
+		></tds-button-edit>
+
+		<tds-button-save
+			*ngIf="action !== EnumActionType.View"
+			[disabled]="
+				!formValid(form) || !isCreateEditAvailable() || !isDirty()
+			"
+			(click)="saveNotice()"
+			[type]="'button'"
+		></tds-button-save>
+
+		<tds-button-delete
+			*ngIf="action !== EnumActionType.Create"
+			tooltip="Delete"
+			(click)="deleteNotice()"
+			[disabled]="!isDeleteAvailable()"
+			[type]="'button'"
+		></tds-button-delete>
+
+		<tds-button-close
+			*ngIf="
+				action === EnumActionType.View ||
+				action === EnumActionType.Create
+			"
+			[type]="'button'"
+			(click)="closeDialog()"
+		></tds-button-close>
+
+		<tds-button-cancel
+			*ngIf="action === EnumActionType.Edit"
+			tooltip="Cancel"
+			[type]="'button'"
+			(click)="cancelDialog()"
+		></tds-button-cancel>
+	</nav>
 </div>

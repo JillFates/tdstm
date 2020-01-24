@@ -78,7 +78,6 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 	@HasPermission(Permission.DataTransferBatchProcess)
 	def patchActionOnBatches() {
 		PatchActionCommand actionCmd = populateCommandObject(PatchActionCommand) as PatchActionCommand
-		validateCommandObject(actionCmd)
 
 		Project project = getProjectForWs()
 
@@ -124,8 +123,7 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 	def patchActionOnBatchRecords(Long id) {
 		Project project = getProjectForWs()
 
-		PatchActionCommand actionCmd = populateCommandObject(PatchActionCommand) as PatchActionCommand
-		validateCommandObject(actionCmd)
+		PatchActionCommand actionCmd = populateCommandObject(PatchActionCommand, false) as PatchActionCommand
 
 		ImportBatch importBatch = fetchDomain(ImportBatch, [id:id]) as ImportBatch
 		Integer affected
@@ -179,7 +177,6 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 		//Delete with a body doesn't get bound to command objects in Grails 3. In general from a REST perspective
 		// Delete methods shouldn't have a body, because they are usually deleting a resource by id.
 		IdsCommand idsCmd = populateCommandObject(IdsCommand)
-		validateCommandObject(idsCmd)
 		Project project = getProjectForWs()
 		importBatchService.deleteImportBatch(project, idsCmd.ids)
 		renderSuccessJson( [deleted: true] )
@@ -194,7 +191,7 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 	@HasPermission(Permission.DataTransferBatchProcess)
 	def updateImportBatchRecord(Long id, Long recordId) {
 		Project project = getProjectForWs()
-		ImportBatchRecordUpdateCommand command = populateCommandObject(ImportBatchRecordUpdateCommand)
+		ImportBatchRecordUpdateCommand command = populateCommandObject(ImportBatchRecordUpdateCommand, false)
 		ImportBatchRecord record = importBatchService.updateBatchRecord(project, id, recordId, command)
 		renderSuccessJson(record.toMap())
 	}

@@ -399,8 +399,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 				storage: [0, 0]
 			]
 
-			dependencyConsole.dependencyBundleCount == 4
-
 	}
 
 
@@ -423,8 +421,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '08. Test Dependency Console Map Filtered by tags ALL tag1'() {
@@ -446,8 +442,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '09. Test Dependency Console Map Filtered by tags ANY tag1 + tag2'() {
@@ -469,8 +463,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '10. Test Dependency Console Map Filtered by tags ALL tag1 + tag2'() {
@@ -492,8 +484,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '11. Create move bundle'() {

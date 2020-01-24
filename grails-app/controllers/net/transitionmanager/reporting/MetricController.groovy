@@ -26,7 +26,7 @@ class MetricController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def index() {
-		GetMetricsCommand commandObj = populateCommandObject(GetMetricsCommand)
+		GetMetricsCommand commandObj = populateCommandObject(GetMetricsCommand, false)
 		if (commandObj.hasErrors()) {
 			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(commandObj) ) )
 			return
