@@ -63,7 +63,6 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
-import org.apache.tools.ant.taskdefs.Move
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
