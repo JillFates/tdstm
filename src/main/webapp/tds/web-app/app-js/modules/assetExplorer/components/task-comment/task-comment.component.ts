@@ -27,6 +27,8 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { Permission } from '../../../../shared/model/permission.model';
+import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
+import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
 
 @Component({
 	selector: `task-comment`,
@@ -183,7 +185,7 @@ export class TaskCommentComponent implements OnInit {
 	 * @param comment
 	 */
 	public createComment(comment: any): void {
-		let singleCommentModel: SingleCommentModel = {
+		let assetCommentModel: AssetCommentModel = {
 			modal: {
 				title: 'Comment Create',
 				type: ModalType.CREATE,
@@ -202,8 +204,8 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService
 			.extra(
-				SingleCommentComponent,
-				[{ provide: SingleCommentModel, useValue: singleCommentModel }],
+				AssetCommentViewEditComponent,
+				[{ provide: AssetCommentModel, useValue: assetCommentModel }],
 				false,
 				false
 			)
@@ -237,7 +239,7 @@ export class TaskCommentComponent implements OnInit {
 	 * @param comment
 	 */
 	public openCommentDetail(comment: any, modalType: ModalType): void {
-		let singleCommentModel: SingleCommentModel = {
+		let assetCommentModel: AssetCommentModel = {
 			id: comment.commentInstance.id,
 			modal: {
 				title:
@@ -262,8 +264,8 @@ export class TaskCommentComponent implements OnInit {
 
 		this.dialogService
 			.extra(
-				SingleCommentComponent,
-				[{ provide: SingleCommentModel, useValue: singleCommentModel }],
+				AssetCommentViewEditComponent,
+				[{ provide: AssetCommentModel, useValue: assetCommentModel }],
 				false,
 				false
 			)
