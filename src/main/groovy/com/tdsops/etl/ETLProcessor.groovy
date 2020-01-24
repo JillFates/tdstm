@@ -135,7 +135,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     Map<String, Tuple2<String, String>> columnNamePartsCache = [:]
     /**
      * ETLMap definitions used by defineETLMap command
-     * @see ETLProcessor#defineETLMap(java.lang.String, groovy.lang.Closure)
+     * @see ETLProcessor#defineMap(java.lang.String, groovy.lang.Closure)
      */
     Map<String, ETLMap> etlMaps = [:]
 
@@ -1376,7 +1376,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return current instance of {@code ETLProcessor}
      */
     @CompileStatic
-    ETLProcessor defineETLMap(String mapName, Closure closure) {
+    ETLProcessor defineMap(String mapName, Closure closure) {
         etlMaps[mapName] = new ETLMapBuilder(this.selectedDomain.domain, this).build(closure)
         return this
     }
@@ -1391,7 +1391,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return
      */
     @CompileStatic
-    ETLProcessor loadETLMap(String mapName) {
+    ETLProcessor loadMap(String mapName) {
         ETLMap etlMap = etlMaps[mapName]
         if (!etlMaps) {
             throw ETLProcessorException.unknownETLMapDefinition(mapName)
