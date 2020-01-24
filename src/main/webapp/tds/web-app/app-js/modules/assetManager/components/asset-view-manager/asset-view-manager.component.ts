@@ -11,13 +11,14 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {DictionaryService} from '../../../../shared/services/dictionary.service';
-import {LAST_SELECTED_FOLDER} from '../../../../shared/model/constants';
+import { GRID_DEFAULT_PAGE_SIZE, LAST_SELECTED_FOLDER } from '../../../../shared/model/constants';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {AssetViewManagerColumnsHelper} from './asset-view-manager-columns.helper';
 import { HeaderActionButtonData } from 'tds-component-library';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
 	selector: 'tds-asset-view-manager',
@@ -34,6 +35,13 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	private report;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	showAssetsFilter: boolean;
+	gridHelper: DataGridOperationsHelper;
+	private initialSort: any = [{
+		dir: 'desc',
+		field: 'name'
+	}];
+	showFilters: boolean;
+	userDateFormat: string;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -48,6 +56,13 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		this.report = this.route.snapshot.data['reports'] as Observable<ViewGroupModel[]>;
 	}
 	ngOnInit() {
+		// remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
+		if (contentWrapper) {
+			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
+			// 45px is the header height, 31px is the footer height
+			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
+		}
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
@@ -70,13 +85,19 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	}
 
 	private setupDefaultSettings(preferences: any[]) {
-		const userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-		this.gridColumns =  AssetViewManagerColumnsHelper.setFormatToDateColumns(userDateFormat);
+		this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		this.gridColumns =  AssetViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
 		this.reportGroupModels = this.report;
 		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
 		this.gridColumns =  AssetViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT]);
-		this.selectedFolder.views = SortUtils.sort(this.selectedFolder.views, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
+		// this.selectedFolder.views = SortUtils.sort(this.selectedFolder.views, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
+		this.gridHelper = new DataGridOperationsHelper(
+			this.selectedFolder.views,
+			this.initialSort,
+			null,
+			null,
+			GRID_DEFAULT_PAGE_SIZE);
 	}
 
 	protected selectFolder(folderOpen: ViewGroupModel, $event: MouseEvent = null): void {

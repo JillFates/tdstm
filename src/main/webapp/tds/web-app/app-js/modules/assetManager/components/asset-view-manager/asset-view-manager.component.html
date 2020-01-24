@@ -29,10 +29,10 @@
 						<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
 						<div class="pull-right">
 							<tds-grid-header-action-buttons
-									(refresh)="loadData()"
-									[actionButtons]="headerActionButtons"
-									(clearFilters)="onClearAllFilters()"
-									[disableClearFilters]="disableClearFilters">
+								(refresh)="loadData()"
+								[actionButtons]="headerActionButtons"
+								(clearFilters)="onClearAllFilters()"
+								[disableClearFilters]="disableClearFilters">
 							</tds-grid-header-action-buttons>
 						</div>
 						<!-- /.box-tools -->
@@ -40,6 +40,130 @@
 					<!-- /.box-header -->
 					<div class="box-body">
 						<div class="table-responsive">
+							<!-- Grid -->
+							<kendo-grid
+								*ngIf="gridHelper"
+								class="page-height narrow-rows clickable-rows row-actions-2-children"
+								[ngClass]="{ 'hide-filter': !showFilters }"
+								[data]="gridHelper.gridData"
+								[filterable]="true"
+								[sort]="gridHelper.state.sort"
+								[sortable]="{mode:'single'}"
+								(sortChange)="gridHelper.sortChange($event)"
+								[skip]="gridHelper.state.skip"
+								[resizable]="true">
+
+								<!-- Toolbar Template -->
+								<ng-template kendoGridToolbarTemplate [position]="'top'">
+									<div class="clr-row">
+										<div class="clr-col-12">
+											<div class="pull-right">
+												<tds-grid-header-action-buttons
+													(refresh)="loadData()"
+													[actionButtons]="headerActionButtons"
+													(clearFilters)="onClearAllFilters()"
+													[disableClearFilters]="disableClearFilters">
+												</tds-grid-header-action-buttons>
+											</div>
+										</div>
+									</div>
+								</ng-template>
+
+								<!-- Show Filters / Actions column -->
+								<kendo-grid-column [width]="60"
+																	 [class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+																	 [minResizableWidth]="60">
+									<ng-template kendoGridHeaderTemplate>
+										<tds-button [flat]="true" (click)="toggleFilter()">
+											<clr-icon shape="filter" class="grid-filter-button is-solid">
+												<span
+													*ngIf="gridHelper.getFilterCounter()"
+													class="badge badge-warning">
+													{{ gridHelper.getFilterCounter() }}
+												</span>
+											</clr-icon>
+										</tds-button>
+									</ng-template>
+									<ng-template kendoGridCellTemplate let-dataItem>
+										<div class="action-button btn-link">
+											<clr-dropdown>
+												<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+												<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+													<a clrDropdownItem *ngIf="isEditAvailable(report)"
+														 title="Edit View"
+														 (click)="onEditReport(report)">
+														Edit
+													</a>
+													<a clrDropdownItem *ngIf="isDeleteAvailable(report) && !report.isSystem"
+														 title="Delete View"
+														 (click)="onDeleteReport(report)">
+														Delete
+													</a>
+												</clr-dropdown-menu>
+											</clr-dropdown>
+										</div>
+									</ng-template>
+								</kendo-grid-column>
+
+								<!-- Columns -->
+								<kendo-grid-column
+									*ngFor="let column of gridColumns"
+									[resizable]="column.resizable"
+									field="{{ column.property }}"
+									[locked]="column.locked"
+									format="{{ column.format }}"
+									[headerClass]="column.headerClass ? column.headerClass : ''"
+									[headerStyle]="column.headerStyle ? column.headerStyle : ''"
+									[class]="column.cellClass ? column.cellClass : ''"
+									[style]="column.cellStyle ? column.cellStyle : ''"
+									[width]="!column.width ? 100 : column.width"
+									[columnMenu]="column.columnMenu">
+
+									<!-- Header Template -->
+									<ng-template kendoGridHeaderTemplate>
+										<div class="sortable-column">
+											<label>{{ column.label | translate }}</label>
+										</div>
+									</ng-template>
+
+									<!-- Cell Templates -->
+									<ng-template kendoGridCellTemplate *ngIf="column.type === 'datetime'" let-dataItem>
+										{{dataItem[column.property] | tdsDateTime: userDateFormat }}
+									</ng-template>
+
+									<!-- Filter Template -->
+									<ng-template kendoGridFilterCellTemplate let-filter>
+										<div class="filter-input"
+												 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )">
+											<tds-filter-input
+												name="{{column.property}}"
+												[value]="column.filter || ''"
+												[columnType]="column.type"
+												placeholder="{{'GLOBAL.FILTER' | translate}}"
+												(filter)="gridHelper.onFilterWithValue($event, column)">
+											</tds-filter-input>
+										</div>
+									</ng-template>
+
+									<!-- Pagination Footer -->
+									<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+										<div class="clr-col-4"></div>
+										<div class="clr-col-8">
+											<tds-grid-pager
+												[total]="total"
+												[totalPages]="totalPages"
+												[currentPage]="currentPage"
+												[pageSize]="gridHelper.state.take"
+												[pageSizes]="gridHelper.defaultPageOptions"
+												(pageChange)="gridHelper.pageChange($event)">
+											</tds-grid-pager>
+										</div>
+									</ng-template>
+
+								</kendo-grid-column>
+							</kendo-grid>
+
+							<!-- old table -->
 							<table class="table clarity-table-grid fixed-header row-actions-2-children">
 								<thead>
 								<tr>
@@ -60,12 +184,12 @@
 										</div>
 										<div *ngIf="column.filterable && showAssetsFilter">
 											<div class="filter-input">
-<!--												(filter)="searchText = $event;"-->
+												<!--												(filter)="searchText = $event;"-->
 												<tds-filter-input
-                                                        [columnType]="column.type"
-														[value]="searchText || ''"
-														(filter)="onFilter($event, column)"
-														placeholder="{{'GLOBAL.FILTER' | translate}}">
+													[columnType]="column.type"
+													[value]="searchText || ''"
+													(filter)="onFilter($event, column)"
+													placeholder="{{'GLOBAL.FILTER' | translate}}">
 												</tds-filter-input>
 											</div>
 										</div>
