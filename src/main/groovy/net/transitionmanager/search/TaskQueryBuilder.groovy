@@ -212,6 +212,15 @@ class TaskQueryBuilder {
 	}
 
 	/**
+	 * Process the special case is the role field is of type 'NO_ROLE'.
+	 * @param fieldMap - the map with the info for constructing the clause for the field being handled.
+	 */
+	private void processNoRoleField(Map fieldMap) {
+		String property = fieldMap['property']
+		whereClauses << "(${property} LIKE '' OR ${property} is null)"
+	}
+
+	/**
 	 * Construct an expression 'field like %someValue%. This closure handles all sorts of data types
 	 * that cannot be handled with criteria (dates, numbers, etc).
 	 */
@@ -253,12 +262,12 @@ class TaskQueryBuilder {
 	Closure roleLikeBuilder = { String field, Map fieldMap ->
 		String value
 		if (requestParams[field] == "NO_ROLE") {
-			value = "" // special case where we want to show all tasks without a role
+		 // special case where we want to show all tasks without a role (ac.role is null or blank)
+			processNoRoleField(fieldMap)
 		} else {
 			value = "%${requestParams[field]}%"
+			processField(field, fieldMap, 'LIKE', ":${field}",  value)
 		}
-		processField(field, fieldMap, 'LIKE', ":${field}",  value)
-
 	}
 
 	/**

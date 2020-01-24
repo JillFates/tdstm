@@ -97,13 +97,14 @@ class TimelineService implements ServiceMethods {
 	 * It throws an Exception if {@code TimelineSummary#cycles} is not empty.
 	 *
 	 * @param event an instance of {@code MoveEvent}
-	 *
+	 * @param viewUnpublished show only published tasks or all tasks
+	 * 
 	 * @return CPA calculation results in an instance of {@code TimelineSummary} and
 	 * 			and instance of {@code TaskTimeLineGraph}
 	 */
-	CPAResults updateTaskFromCPA(MoveEvent event) {
+	CPAResults updateTaskFromCPA(MoveEvent event, Boolean viewUnpublished) {
 
-		List<Task> tasks = getEventTasks(event)
+		List<Task> tasks = getEventTasks(event, viewUnpublished)
 		List<TaskDependency> taskDependencies = getTaskDependencies(tasks)
 
 		TaskTimeLineGraph graph = createTaskTimeLineGraph(tasks, taskDependencies)

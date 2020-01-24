@@ -282,7 +282,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	def listTasks(ListTaskCommand params) {
 		validateCommandObject(params)
 		Map<String, String> definedSortableFields = [
-				'actFinish'         : 'actFinish',
+				'actFinish'         : 'dateResolved',
 				'actStart'          : 'actStart',
 				'apiAction'         : 'apiAction',
 				'assetName'         : 'assetName',
