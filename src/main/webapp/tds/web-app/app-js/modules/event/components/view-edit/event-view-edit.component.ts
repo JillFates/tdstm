@@ -18,6 +18,8 @@ import {SetEvent} from '../../action/event.actions';
 export class EventViewEditComponent implements OnInit {
 	public eventModel: EventModel = null;
 	public savedModel: EventModel = null;
+	public showSwitch = false;
+	public showClearButton = false;
 	public availableBundles: any[] = [];
 	public runbookStatuses: string[] = [];
 	public availableTags: any[] = [];
@@ -143,6 +145,10 @@ export class EventViewEditComponent implements OnInit {
 
 	public onAssetTagChange(event) {
 		this.eventModel.tagIds = event.tags;
+	}
+
+	public clearButtonBundleChange(event) {
+		this.showClearButton =  event && event.length > 1;
 	}
 
 	public saveForm() {
