@@ -67,14 +67,16 @@ export class ImportBatchColumnsModel {
 				property: 'status.label',
 				type: 'text',
 				width: 130,
-				locked: false
+				locked: false,
+				filterable: true
 			},
 			{
 				label: 'Domain',
 				property: 'domainClassName',
 				type: 'text',
 				width: 120,
-				locked: false
+				locked: false,
+				filterable: true
 			},
 			{
 				label: 'Records',
@@ -122,7 +124,8 @@ export class ImportBatchColumnsModel {
 				type: 'datetime',
 				format: 'yyyy-MM-dd HH:mm:ss',
 				width: 170,
-				locked: false
+				locked: false,
+				filterable: true
 			},
 			{
 				label: 'Last Updated',
@@ -130,35 +133,40 @@ export class ImportBatchColumnsModel {
 				type: 'datetime',
 				format: 'yyyy-MM-dd HH:mm:ss',
 				width: 170,
-				locked: false
+				locked: false,
+				filterable: true
 			},
 			{
 				label: 'Imported By',
 				property: 'createdBy',
 				type: 'text',
 				width: 120,
-				locked: false
+				locked: false,
+				filterable: true
 			},
 			{
 				label: 'Provider',
 				property: 'provider.name',
 				type: 'text',
 				width: 130,
-				locked: false
+				locked: false,
+				filterable: true
 			},
 			{
 				label: 'ETL Script',
 				property: 'dataScript.name',
 				type: 'text',
 				width: 160,
-				locked: false
+				locked: false,
+				filterable: true
 			},
 			{
 				label: 'File Name',
 				property: 'originalFilename',
 				type: 'text',
 				width: 150,
-				locked: false
+				locked: false,
+				filterable: true
 			}
 		];
 	}

@@ -63,6 +63,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	private runningBatches: Array<ImportBatchModel> = [];
 	private queuedBatches: Array<ImportBatchModel> = [];
 	showFilters: boolean;
+	disableClearFilters: () => {};
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -74,7 +75,6 @@ export class ImportBatchListComponent implements OnDestroy {
 		private userPreferenceService: PreferenceService,
 		private userContextService: UserContextService,
 		private route: ActivatedRoute) {
-
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
 				this.userTimeZone = userContext.timezone;
@@ -101,11 +101,19 @@ export class ImportBatchListComponent implements OnDestroy {
 					pageSize = GRID_DEFAULT_PAGE_SIZE;
 				}
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig, pageSize);
+				this.disableClearFilters = this.noFilterApplied.bind(this);
 				this.preSelectBatch();
 				this.setRunningLoop();
 				this.setQueuedLoop();
 			});
 		});
+	}
+
+	/**
+	 * Check if no filter has been applied.
+	 */
+	noFilterApplied(): boolean {
+		return !this.dataGridOperationsHelper.hasFilterApplied();
 	}
 
 	/**

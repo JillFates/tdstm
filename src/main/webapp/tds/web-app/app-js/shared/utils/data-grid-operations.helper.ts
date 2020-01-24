@@ -111,7 +111,7 @@ export class DataGridOperationsHelper {
 				filter.value = column.filter;
 			}
 		}
-		if (column.type === 'date') {
+		if (column.type === 'date' || column.type === 'datetime') {
 			const { init, end } = DateUtils.getInitEndFromDate(column.filter);
 			if (filter) {
 				this.state.filter.filters = this.getFiltersExcluding(column.property);
@@ -411,18 +411,25 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
+	 * Returns true if grid has filters applied
+	 */
+	public hasFilterApplied(): boolean {
+		return this.state && this.state.filter && this.state.filter.filters.length > 0;
+	}
+
+	/**
+	 * Show/Hide filters
+	 */
+	public toggleFilters(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	/**
 	 * Returns the number of distinct currently selected filters
 	 * @param state optionally pass the state otherwise use the current state
 	 */
 	public getFilterCounter(state: State = null): number {
 		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
 		return uniq(filters.map((filter: any) => filter.field)).length;
-	}
-
-	/**
-	 * Show/Hide filters
-	 */
-	toggleFilters(): void {
-		this.showFilters = !this.showFilters;
 	}
 }

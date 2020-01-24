@@ -53,7 +53,7 @@
 								<tds-grid-header-action-buttons
 									[actionButtons]="[]"
 									(clearFilters)="dataGridOperationsHelper.clearAllFilters(columnsModel.columns)"
-									[disableClearFilters]="dataGridOperationsHelper.getFilterCounter() === 0"
+									[disableClearFilters]="disableClearFilters"
 									(refresh)="onToggleViewArchived()">
 								</tds-grid-header-action-buttons>
 							</div>
