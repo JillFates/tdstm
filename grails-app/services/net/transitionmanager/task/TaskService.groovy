@@ -63,6 +63,7 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
+import org.apache.tools.ant.taskdefs.Move
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -70,9 +71,11 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
 import java.sql.Timestamp
 import java.text.DateFormat
+import net.transitionmanager.task.timeline.TimelineService
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
+import net.transitionmanager.task.timeline.CPAResults
 
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
@@ -105,6 +108,7 @@ class TaskService implements ServiceMethods {
 	LinkGenerator              grailsLinkGenerator
 	CoreService                coreService
 	CredentialService          credentialService
+	TimelineService            timelineService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -1076,28 +1080,44 @@ class TaskService implements ServiceMethods {
 	 */
 	def resetTaskDataForTaskBatch(TaskBatch taskBatch) {
 		try {
-			def tasksMap = getTaskBatchTaskLists(taskBatch.id)
-			return resetTaskDataForTasks(tasksMap)
+			if (taskBatch.eventId) {
+				return resetTaskDataForTasks(taskBatch.eventId)
+			} else {
+				def tasksMap = getTaskBatchTaskLists(taskBatch.id)
+				return resetTaskDataForTasks(tasksMap)
+			}
 		} catch(e) {
 			log.error "An error occurred while trying to Reset tasks for taskBatch $taskBatch on project $taskBatch.project\n$e"
-			throw new RuntimeException("An unexpected error occured")
+			throw new RuntimeException("An unexpected error occurred")
 		}
 	}
 
+	/**
+	 * Given a map of task ids, reset all tasks
+	 * and delete any audit comments related.
+	 *
+	 * Get a list of {@code AssetComment} ids from taskMap
+	 * Resets the {@code AssetComment#status} of all the tasks with no predecessors to {AssetCommentStatus#READY}
+	 * Resets the {@code AssetComment#status} of all the remaining tasks to {AssetCommentStatus#PENDING}
+	 * Delete all instances of {@code CommentNote} associated to any of this tasks
+	 *
+	 * @param tasksMap  map of tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
+	 * @return A confirmation message
+	 */
 	def resetTaskDataForTasks(def tasksMap) {
-		// We want to find all AssetComment records that are associate with assets that are
+		// We want to find all AssetComment records that are associated with assets that are
 		// with bundles that are part of the event. With that list, we will reset the
 		// AssetComment status to PENDING by default or READY if there are no predecessors and clear several other properties.
 		// We will also delete Task notes that are auto generated during the runbook execution.
 		def msg
-		log.info("resetTaskData() was called")
+		log.info("resetTaskDataForTasks() was called")
 		try {
 			int taskResetCnt = 0
 			int notesDeleted = 0
 
 			String updateHql = '''
 				UPDATE AssetComment
-				SET status = :status, actStart = null, actStart = null, dateResolved = null,
+				SET status = :status, actStart = null, dateResolved = null,
 				    resolvedBy = null, statusUpdated = null
 				WHERE id in (:ids)'''
 
@@ -1112,6 +1132,67 @@ class TaskService implements ServiceMethods {
 				notesDeleted = CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1",
 					[ids: tasksMap.tasksWithNotes])
 			}
+
+
+			msg = "$taskResetCnt tasks reset and $notesDeleted audit notes were deleted"
+		} catch(e) {
+			log.error "An error occurred while trying to Reset tasks\n$e"
+			throw new RuntimeException("An unexpected error occurred")
+		}
+		return msg
+	}
+
+	/**
+	 * Given an Event, reset all tasks associated to that event,
+	 * and delete any audit comments related.
+	 *
+	 * Get a list of {@code AssetComment} ids associated to the event
+	 * Resets the {@code AssetComment#status} of all the tasks with no predecessors to {AssetCommentStatus#READY}
+	 * Resets the {@code AssetComment#status} of all the remaining tasks to {AssetCommentStatus#PENDING}
+	 * Delete all instances of {@code CommentNote} associated to any of this tasks
+	 *
+	 * @param eventId  The id of the event to which all tasks are associated
+	 * @return A confirmation message
+	 */
+	def resetTaskDataForTasks(Long eventId) {
+		// We want to find all AssetComment records that are associated with assets that are
+		// with bundles that are part of the event. With that list, we will reset the
+		// AssetComment status to PENDING by default or READY if there are no predecessors and clear several other properties.
+		// We will also delete Task notes that are auto generated during the runbook execution.
+		def msg
+		log.info("resetTaskDataForTasks() was called")
+
+		if (!eventId) {
+			throw new IllegalArgumentException('eventId was not found')
+		}
+		MoveEvent event = MoveEvent.get(eventId)
+
+		// use the event to run the CPA
+		CPAResults cpaResults = timelineService.updateTaskFromCPA(event, true)
+		TaskTimeLineGraph graph = cpaResults.graph
+
+		List<Long> allTasks = graph.getVertices()*.taskId ?: 0
+		List<Long> tasksNoPred = graph.getStarts()*.taskId ?:0
+
+		// now update the tasks status with the CPA results
+		try {
+			int taskResetCnt = 0
+			int notesDeleted = 0
+
+			String updateHql = '''
+				UPDATE AssetComment
+				SET status = :status, actStart = null, dateResolved = null,
+				    resolvedBy = null, statusUpdated = null
+				WHERE id in (:ids)'''
+
+			if (allTasks) {
+				taskResetCnt = AssetComment.executeUpdate(updateHql, [status: ACS.PENDING, ids: allTasks - tasksNoPred])
+			}
+			if (tasksNoPred) {
+				taskResetCnt += AssetComment.executeUpdate(updateHql, [status: ACS.READY, ids: tasksNoPred])
+			}
+			// Delete any of the audit comments that are created during the event
+			notesDeleted = CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1", [ids: allTasks])
 
 			msg = "$taskResetCnt tasks reset and $notesDeleted audit notes were deleted"
 		} catch(e) {

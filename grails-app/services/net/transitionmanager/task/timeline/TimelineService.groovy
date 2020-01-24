@@ -88,6 +88,7 @@ class TimelineService implements ServiceMethods {
 
 		return dependencies
 	}
+
 	/**
 	 * Execute critical path analysis using an instance of {@code TaskTimeLineGraph}
 	 * and returning an instance of {@code TimelineSummary} with results
