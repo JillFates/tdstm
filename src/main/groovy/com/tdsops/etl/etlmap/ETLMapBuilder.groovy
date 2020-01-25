@@ -78,7 +78,6 @@ class ETLMapBuilder {
      * @see ETLMapBuilder#methodMissing(java.lang.String, java.lang.Object)
      */
     ETLMap build(Closure closure) {
-
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = this
         closure()

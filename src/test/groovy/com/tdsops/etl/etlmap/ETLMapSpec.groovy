@@ -71,8 +71,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'device-name', 'Name'
 				}
 				
@@ -120,8 +119,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'Name'
 				}
 				
@@ -169,8 +167,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 1, 'Name'
 				}
 				
@@ -218,8 +215,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'device-name', 'Name', uppercase()
 				}
 				
@@ -273,8 +269,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'device-name', 'Name', left(4)
 				}
 				
@@ -328,8 +323,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'Name', uppercase()
 				}
 				
@@ -379,8 +373,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'environment', 'Environment', substitute(['PROD':'Production', 'DEV': 'Development'])
 				}
 				
@@ -438,8 +431,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'device-name', 'Unknown'
 				}
 				
@@ -448,9 +440,9 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'Unknown').message + ' at line 5'
-				startLine == 5
-				endLine == 5
+				message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'Unknown').message + ' at line 4'
+				startLine == 4
+				endLine == 4
 				startColumn == null
 				endColumn == null
 				fatal == true
@@ -478,8 +470,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'Unknown', 'assetName'
 				}
 				
@@ -488,9 +479,9 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == ETLProcessorException.extractMissingColumn( 'Unknown').message + ' at line 5'
-				startLine == 5
-				endLine == 5
+				message == ETLProcessorException.extractMissingColumn( 'Unknown').message + ' at line 4'
+				startLine == 4
+				endLine == 4
 				startColumn == null
 				endColumn == null
 				fatal == true
@@ -518,8 +509,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 4, 'assetName'
 				}
 			""".stripIndent())
@@ -527,12 +517,76 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == 'Invalid index = 4 at line 5'
-				startLine == 5
-				endLine == 5
+				message == 'Invalid index = 4 at line 4'
+				startLine == 4
+				endLine == 4
 				startColumn == null
 				endColumn == null
 				fatal == true
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
+	void 'test can throw an exception when a defined ETL map receives incorrect ammount of arguments'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				device-name
+				acmevmprod01
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				defineMap Device 'verni-devices' 'Unknown', {
+				    map 4, 'assetName'
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == ETLProcessorException.invalidAmountOfArguments().message + ' at line 3'
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
+	void 'test can throw an exception when a defined ETL map does not receive a Closure as argument'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				device-name
+				acmevmprod01
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				defineMap Device 'verni-devices' 'Unknown'
+			""".stripIndent())
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == ETLProcessorException.invalidArgument().message + ' at line 3'
 			}
 
 		cleanup:
@@ -563,8 +617,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'device-name', 'Name'
 				}
 				
@@ -609,8 +662,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'device-name', 'Name', uppercase()
 				}
 				
@@ -655,8 +707,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'device-name', 'Name', left(4)
 				}
 				
@@ -701,8 +752,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'environment', 'Environment', substitute(['PROD':'Production', 'DEV': 'Development'])
 				}
 				
@@ -747,8 +797,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Device
-				defineMap 'verni-devices', {
+				defineMap Device 'verni-devices' {
 				    map 'environment', 'Environment', uppercase(), substitute(['PROD':'Production', 'DEV': 'Development'])
 				}
 				
