@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "fbad4e46-1201-447a-9132-cffcb829f605",
+		"_postman_id": "973a1711-8f9f-41e6-b22c-0683c302150b",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1826,6 +1826,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -4043,7 +4048,7 @@
 			"response": []
 		},
 		{
-			"name": "Bulk change replace PlanStatus Reset Copy",
+			"name": "Bulk change replace PlanStatus Reset",
 			"event": [
 				{
 					"listen": "test",
