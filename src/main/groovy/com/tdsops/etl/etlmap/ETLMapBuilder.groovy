@@ -19,7 +19,7 @@ import com.tdsops.etl.ETLProcessor
  * <p>An instance of {@code ETLMapBuilder} can build an instance of {@code ETLMap},
  * reflecting all the configurations defined in 'defineETLMap' command</p>
  *
- * @see ETLProcessor#defineETLMap(java.lang.String, groovy.lang.Closure)
+ * @see ETLProcessor#defineMap(java.lang.String, groovy.lang.Closure)
  * @see ETLMapBuilder#build(groovy.lang.Closure)
  */
 class ETLMapBuilder {
@@ -78,7 +78,6 @@ class ETLMapBuilder {
      * @see ETLMapBuilder#methodMissing(java.lang.String, java.lang.Object)
      */
     ETLMap build(Closure closure) {
-
         closure.resolveStrategy = Closure.DELEGATE_FIRST
         closure.delegate = this
         closure()

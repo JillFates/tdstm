@@ -4,8 +4,8 @@ import com.tdsops.AssetDependencyTypesCache
 import com.tdsops.ETLTagValidator
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.etl.dataset.ETLIterator
+import com.tdsops.etl.etlmap.DefineETLMapCommand
 import com.tdsops.etl.etlmap.ETLMap
-import com.tdsops.etl.etlmap.ETLMapBuilder
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -135,7 +135,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     Map<String, Tuple2<String, String>> columnNamePartsCache = [:]
     /**
      * ETLMap definitions used by defineETLMap command
-     * @see ETLProcessor#defineETLMap(java.lang.String, groovy.lang.Closure)
+     * @see ETLProcessor#defineMap(java.lang.String, groovy.lang.Closure)
      */
     Map<String, ETLMap> etlMaps = [:]
 
@@ -1363,7 +1363,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * saved in {@code ETLProceesor#etlMaps} field,
      * associated with {@code mapName} param.
      * <pre>
-     *  defineETLMap 'verni-devices', { //
+     *  defineMap Device 'verni-devices' { //
      *      add 'device-name', 'Name'
      *      add 'description'
      *      add 'environment', 'Environment', substitute(['PROD':'Production', 'DEV', 'Development'])
@@ -1376,22 +1376,24 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return current instance of {@code ETLProcessor}
      */
     @CompileStatic
-    ETLProcessor defineETLMap(String mapName, Closure closure) {
-        etlMaps[mapName] = new ETLMapBuilder(this.selectedDomain.domain, this).build(closure)
-        return this
+    DefineETLMapCommand defineMap(ETLDomain domain) {
+        return new DefineETLMapCommand(domain, this)
     }
 
     /**
-     * Define
+     * Uses an instance of {@code ETLMap} previously defined
+     * by {@code ETLProcessor#defineMap} command.
      * <pre>
-     *
+     *  iterate { //
+     *      loadMap 'verni-devices'
+     *      ...
      * </pre>
      * @param mapName
      * @param closure
-     * @return
+     * @return current instance of {@code ETLProcessor}
      */
     @CompileStatic
-    ETLProcessor loadETLMap(String mapName) {
+    ETLProcessor loadMap(String mapName) {
         ETLMap etlMap = etlMaps[mapName]
         if (!etlMaps) {
             throw ETLProcessorException.unknownETLMapDefinition(mapName)
@@ -1402,6 +1404,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         return this
     }
 
+    void addETLMap(String name, ETLMap etlMap) {
+        // Validates map name previously defined
+        this.etlMaps[name] = etlMap
+    }
     /**
      * <b>Cache ETL command.</b><br>
      * ETL Script evaluation is using internally a findCache of find command results.
