@@ -61,6 +61,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Output('blur') blur: EventEmitter<any> = new EventEmitter();
 	// Model
 	@Output() modelChange = new EventEmitter<string>();
+	@Input('allowEmptyValue') allowEmptyValue = false;
 	@Input('model') model: any;
 	@Input('metaParam') metaParam: any;
 	@Input('tabindex') tabindex: any;
@@ -108,7 +109,14 @@ export class TDSComboBoxComponent implements OnChanges {
 	 * @param model Item to add
 	 */
 	addToDataSource(model: any): void {
-		if (model && model.id && !this.datasource.find((item) => item.id === model.id)) {
+		// if is a valid model
+		if (model && model.id) {
+			// and doesn't exists in the collection
+			if (!this.datasource.find((item) => item.id === model.id)) {
+				this.datasource.push(model);
+			}
+		} else if (this.allowEmptyValue) {
+			// if is a new empty value and the control allows empty values
 			this.datasource.push(model);
 		}
 	}
