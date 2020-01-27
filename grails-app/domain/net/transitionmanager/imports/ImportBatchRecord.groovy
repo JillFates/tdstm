@@ -203,7 +203,7 @@ class ImportBatchRecord {
 					initVal = record.init
 				}
 
-				currentValues[fieldName] = value
+				currentValues[fieldName] = value ? value : ' '
 
 				if ( initVal ) {
 					initValues[fieldName] = initVal

@@ -106,6 +106,6 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 	 * Determine if the form has a dirty state
 	 */
 	isDirty(): boolean {
-		return this.templateForm.dirty;
+		return Boolean(this.templateForm && this.templateForm.dirty);
 	}
 }

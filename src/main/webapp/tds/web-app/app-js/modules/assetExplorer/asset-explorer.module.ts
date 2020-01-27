@@ -26,7 +26,6 @@ import {TaskCommentComponent} from './components/task-comment/task-comment.compo
 import {AssetDependencyComponent} from './components/asset-dependency/asset-dependency.component';
 import {AssetDependencyShowComponent} from './components/asset-dependency/show/asset-dependency-show.component';
 import {AssetDependencyEditComponent} from './components/asset-dependency/edit/asset-dependency-edit.component';
-import {SingleCommentComponent} from './components/single-comment/single-comment.component';
 import {SingleNoteComponent} from './components/single-note/single-note.component';
 import {TaskDetailComponent} from '../taskManager/components/detail/task-detail.component';
 import {ManufacturerShowComponent} from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
@@ -68,7 +67,6 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		AssetDependencyComponent,
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
-		SingleCommentComponent,
 		SingleNoteComponent,
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
@@ -118,7 +116,6 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		TaskCommentComponent,
 		TaskDetailComponent,
 		TaskEditCreateComponent,
-		SingleCommentComponent,
 		SingleNoteComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
