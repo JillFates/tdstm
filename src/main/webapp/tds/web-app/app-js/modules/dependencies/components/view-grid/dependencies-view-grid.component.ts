@@ -402,7 +402,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			this.state
 		).filter((item: any) => item.field !== column.property);
 
-		if (column.filter !== '') {
+		if (column.filter) {
 			filters.push({
 				field: column.property,
 				operator: 'contains',
