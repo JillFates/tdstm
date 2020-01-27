@@ -505,7 +505,6 @@ export class SupportsDependsComponent implements OnInit {
 	 * And update the Object Model
 	 */
 	private onChangeInternalModel(): void {
-		console.log('on change internal model');
 		let validForm = true;
 		// Validate the Supports Table
 		this.dataGridSupportsOnHelper.gridData.data.forEach((dataItem: any) => {
