@@ -8,9 +8,7 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {IArchitectureGraphParams} from '../../model/url-params.model';
-import {AssetCommonDiagramHelper} from '../asset/asset-common-diagram.helper';
-import {LegacyDiagramLayoutComponent} from '../../../../shared/components/diagram-layout/legacy-diagram-layout.component';
-// import {TaskGraphDiagramHelper} from './task-graph-diagram.helper';
+import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
@@ -31,7 +29,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	// References
 	@ViewChild('dropdownFooter', {static: false}) dropdownFooter: ElementRef;
 	@ViewChild('innerComboBox', {static: false}) innerComboBox: ComboBoxComponent;
-	@ViewChild('graph', {static: false}) graph: LegacyDiagramLayoutComponent;
+	@ViewChild('graph', {static: false}) graph: any;
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 	private searchOnScroll = true;
@@ -232,14 +230,6 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.showLabels = !this.showLabels;
 	}
 
-	zoomGraphOut() {
-		this.graph.zoomOut();
-	}
-
-	zoomGraphIn() {
-		this.graph.zoomIn();
-	}
-
 	/**
 	 * Generate the item template for the task items to show in the format taskId : Description
 	 * @event dataItem contains the task item information
@@ -390,7 +380,6 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.graphLabels[index].checked = !this.graphLabels[index].checked;
 		// TODO: filter nodes for removing labels on graph
 		this.categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
-		console.log(this.categories);
 		if (this.categories.length > 0 && this.assetId) {
 			let tempNodesData = Object.assign({}, this.currentNodesData);
 			tempNodesData.nodes.forEach( node => {
@@ -401,14 +390,12 @@ export class ArchitectureGraphComponent implements OnInit {
 			this.updateNodeData(tempNodesData, false);
 		} else {
 			this.categories = [];
-			// TODO: remove all labels
-			console.log('remove back all labels');
 			this.updateNodeData(this.currentNodesData, true);
 		}
 	}
 
 	updateNodeData(data, iconsOnly) {
-		const diagramHelper = new AssetCommonDiagramHelper();
+		const diagramHelper = new ArchitectureGraphDiagramHelper();
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
 			currentUserId: 1,
@@ -417,7 +404,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			extras: {
 				diagramOpts: {
 					autoScale: Diagram.Uniform,
-					allowZoom: false
+					allowZoom: true
 				},
 				isExpandable: false
 			}

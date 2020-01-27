@@ -31,7 +31,6 @@ export class ArchitectureGraphDiagramHelper {
 	 */
 	diagramData(params?: any): IDiagramData {
 		const d = this.data(params.data);
-		console.log('diagram data: ', params);
 		return {
 			nodeDataArray: d.nodeDataArray,
 			linkDataArray: d.linkDataArray,
