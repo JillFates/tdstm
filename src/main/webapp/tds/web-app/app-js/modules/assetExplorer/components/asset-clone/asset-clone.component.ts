@@ -72,7 +72,7 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 	                        </tds-button-custom>
                             <tds-button-custom
                                     *ngIf="canCloneAssets()"
-		                            icon="clone"
+		                            icon="copy"
                                     [disabled]="newAssetName.value.length == 0"
                                     (click)="cloneAssetValidations(false)"
                                     tooltip="Clone">
