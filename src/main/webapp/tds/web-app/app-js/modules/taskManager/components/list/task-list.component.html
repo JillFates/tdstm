@@ -295,30 +295,7 @@
 						>
 							<label>{{ column.label }}</label>
 						</div>
-						<!--						<span *ngIf="column.type === 'action'">-->
-						<!--
-							<tds-button [flat]="true" (click)="toggleFiltering()" *ngIf="column.type === 'action'">
-								<clr-icon shape="filter" class="grid-filter-button is-solid">
-								<span *ngIf="filterCounter(); let counter" class="badge badge-warning">{{counter}}</span>
-								</clr-icon>
-							</tds-button>
-						-->
-						<!--						</span>-->
 					</ng-template>
-
-					<!-- edit action column -->
-					<!--
-					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-						<div class="btn-link">
-							<clr-dropdown>
-								<tds-button icon="ellipsis-vertical" clrDropdownTrigger class="contextual-menu"></tds-button>
-								<clr-dropdown-menu *clrIfOpen>
-									<a clrDropdownItem (click)="onOpenTaskEditHandler(dataItem)">Edit Task</a>
-								</clr-dropdown-menu>
-							</clr-dropdown>
-						</div>
-					</ng-template>
-					-->
 
 					<!-- task Number -->
 					<ng-template

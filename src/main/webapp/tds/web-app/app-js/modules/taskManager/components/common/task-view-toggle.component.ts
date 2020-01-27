@@ -12,7 +12,7 @@ const routeNames = {
 @Component({
 	selector: 'tds-task-view-toggle',
 	template: `
-		<div kendoTooltip position="bottom" filter="span" tooltipClass="tvt-tooltip" class="text-center k-align-self-center">
+		<div kendoTooltip position="top" filter="span" tooltipClass="tvt-tooltip" class="text-center k-align-self-center">
 			<span
 			title="Task Manager"
 			id="task-manager"
