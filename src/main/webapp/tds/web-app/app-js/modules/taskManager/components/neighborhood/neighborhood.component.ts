@@ -970,8 +970,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Set new adornment for given node
-	 * @param {any} data
+	 * remove node from the diagram
+	 * @param {any} taskId
 	 */
 	removeGraphNode(taskId: any): void {
 		this.graph.diagram.commit(d => {
