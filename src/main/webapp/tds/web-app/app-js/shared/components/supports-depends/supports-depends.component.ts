@@ -97,6 +97,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
                     <tds-combobox
+		                    [required]="true"
 		                    [allowEmptyValue]="true"
                             [(model)]="dataItem.assetDepend"
                             [(metaParam)]="dataItem.assetClass.id"
@@ -219,6 +220,8 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
                     <tds-combobox
+                            [required]="true"
+                            [allowEmptyValue]="true"
                             [(model)]="dataItem.assetDepend"
                             [(metaParam)]="dataItem.assetClass.id"
                             [serviceRequest]="getAssetListForComboBox"
