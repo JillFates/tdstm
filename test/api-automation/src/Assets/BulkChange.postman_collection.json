@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "815fdbb1-8d5c-48a8-a995-b7e8afa1fcbc",
+		"_postman_id": "fbad4e46-1201-447a-9132-cffcb829f605",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1663,6 +1663,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
