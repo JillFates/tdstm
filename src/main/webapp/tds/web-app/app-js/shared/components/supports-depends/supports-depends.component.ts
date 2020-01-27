@@ -78,6 +78,7 @@ declare var jQuery: any;
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
                             [(ngModel)]="dataItem.dataFlowFreq"
+                            (valueChange)="onChangeInternalModel()"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -96,6 +97,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
                     <tds-combobox
+		                    [allowEmptyValue]="true"
                             [(model)]="dataItem.assetDepend"
                             [(metaParam)]="dataItem.assetClass.id"
                             [serviceRequest]="getAssetListForComboBox"
@@ -112,6 +114,7 @@ declare var jQuery: any;
                                         [(ngModel)]="dataItem.assetDepend.moveBundle"
                                         [ngClass]="getMoveBundleColor(dataItem)"
                                         (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
+                                        (valueChange)="onChangeInternalModel()"
                                         required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -121,6 +124,7 @@ declare var jQuery: any;
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="typeList"
                             [(ngModel)]="dataItem.type"
+                            (valueChange)="onChangeInternalModel()"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -130,6 +134,7 @@ declare var jQuery: any;
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="statusList"
                             [(ngModel)]="dataItem.status"
+                            (valueChange)="onChangeInternalModel()"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -497,6 +502,7 @@ export class SupportsDependsComponent implements OnInit {
 	 * And update the Object Model
 	 */
 	private onChangeInternalModel(): void {
+		console.log('on change internal model');
 		let validForm = true;
 		// Validate the Supports Table
 		this.dataGridSupportsOnHelper.gridData.data.forEach((dataItem: any) => {
