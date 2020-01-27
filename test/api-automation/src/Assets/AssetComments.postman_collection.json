@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "51cf9c0c-c407-40af-accc-cdc85561b778",
+		"_postman_id": "06bde14f-c0ae-4c4d-bd63-39bd4e20a19c",
 		"name": "Asset Comments",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -141,7 +141,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1\n\n",
+					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
 					"host": [
 						"{{host}}"
 					],
@@ -414,7 +414,10 @@
 							"",
 							"//This code cleans up the global variables created through code that should live only in this collection ",
 							"pm.environment.unset(\"deviceID\");",
-							"pm.environment.unset(\"commentId\");"
+							"pm.environment.unset(\"commentId\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}

@@ -93,7 +93,7 @@
             <div>
                 <table class="dashboard-stat-table">
                     <tr>
-                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated|PlanReady', _ufp: 'true'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.validated}}</td><td>Validated</td></a>
+                        <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated', _ufp: 'true'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.validated}}</td><td>Validated</td></a>
                     </tr>
                     <tr>
                         <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'PlanReady', _ufp: 'true'}"><td class="dashboard-stat-td-l">{{planningDashboardModel.analysis.planReady}}</td><td>Plan Ready</td></a>
@@ -326,12 +326,12 @@
                                 <td class="execution-data-column"><a [routerLink]="['/asset','views',3,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Unassigned', _ufp: 'true'}">{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedOtherPerc}}%)</a></td>
                                 <td *ngFor="let other of planningDashboardModel.execution.otherList" class="execution-data-column">
                                     <span *ngIf="other.count==0" class='colorGrey'>0</span>
-                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_event: other.moveEvent, _ufp: 'true'}" *ngIf="other.count!=0">
+                                    <a [routerLink]="['/asset','views',3,'show']" [queryParams]="{_event: other.moveEvent, _ufp: 'true'}" *ngIf="other.count!=0">
                                         {{other.count}}
                                     </a>
                                 </td>
                                 <td class="execution-data-column">
-                                    <a *ngIf="planningDashboardModel.execution.otherDonePerc > 0" [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Moved', _ufp: 'true'}">{{planningDashboardModel.execution.otherDonePerc}}%</a>
+                                    <a *ngIf="planningDashboardModel.execution.otherDonePerc > 0" [routerLink]="['/asset','views',3,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Moved', _ufp: 'true'}">{{planningDashboardModel.execution.otherDonePerc}}%</a>
                                 </td>
                             </tr>
                             <tr>

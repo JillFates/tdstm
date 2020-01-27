@@ -723,7 +723,12 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		], false, false)
 			.then(result => {
 				if (result && result.shouldEdit) {
-					this.editTask({task: {id: result.id && result.id.id}});
+					return this.editTask({task: {id: result.id && result.id.id}});
+				}
+				if (result && result.isDeleted) {
+					const taskId = result.id && result.id.id;
+					return this.taskService.deleteTaskComment(taskId)
+						.subscribe(() => this.removeGraphNode(taskId));
 				}
 			}).catch(result => {
 			if (result) {
@@ -762,7 +767,11 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					{provide: TaskDetailModel, useValue: clone(model)}
 				], false, false)
 					.then(result => {
-						if (result) {
+						if (result && result.isDeleted) {
+							const taskId = result.id && result.id.id;
+							return this.taskService.deleteTaskComment(taskId)
+								.subscribe(() => this.removeGraphNode(taskId));
+						} else if (result) {
 							this.updateGraphNode(result.assetComment);
 						}
 
@@ -958,6 +967,20 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				d.centerRect(node.actualBounds);
 			}
 		});
+	}
+
+	/**
+	 * remove node from the diagram
+	 * @param {any} taskId
+	 */
+	removeGraphNode(taskId: any): void {
+		this.graph.diagram.commit(d => {
+			const node = d.findNodeForKey(taskId) || d.nodes
+				.filter(n => n.data.key === taskId || n.data.id === taskId).first();
+			if (node) {
+				d.remove(node);
+			}
+		})
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

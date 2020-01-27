@@ -3,7 +3,10 @@ package net.transitionmanager.imports
 import net.transitionmanager.asset.AssetEntityAttributeLoaderService
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.DeviceService
+import net.transitionmanager.command.ScheduleImportAPIActionCommand
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -88,6 +91,8 @@ class ImportService implements ServiceMethods {
 	CustomDomainService               customDomainService
 	MessageSource                     messageSource
 	AssetOptionsService               assetOptionsService
+	FileSystemService 				  fileSystemService
+	DataImportService				  dataImportService
 
 	static final String indent = '&nbsp;&nbsp;&nbsp;'
 	static final String NULL_INDICATOR='NULL'
@@ -3099,4 +3104,35 @@ class ImportService implements ServiceMethods {
 		session.setAttribute 'TOTAL_ASSETS', count
 	}
 
+	/**
+	 * Process a request from API in {@code ImportController#processFile} method.
+	 * @param actionCommand an instance of {@code ScheduleImportAPIActionCommand}
+	 * 					already validated by {@code ControlleMethods#validateCommand}
+	 * @return
+	 */
+	Map processFile(ScheduleImportAPIActionCommand actionCommand){
+
+		String fileName = fileSystemService.transferFileToFileSystem(actionCommand, FileSystemService.ETL_SOURCE_DATA_PREFIX)
+
+		DataScript dataScript = DataScript.where {
+			project == actionCommand.project
+			if (actionCommand.dataScriptId) {
+				id == actionCommand.dataScriptId
+			} else {
+				name == actionCommand.dataScriptName
+				'provider.name' == actionCommand.providerName
+			}
+		}.get()
+
+		if (!dataScript) {
+			throw new InvalidParamException('Specified DataView was not found')
+		}
+
+		return dataImportService.scheduleETLTransformDataJob(
+				actionCommand.project,
+				dataScript.id,
+				fileName,
+				actionCommand.sendNotification
+		)
+	}
 }

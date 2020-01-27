@@ -220,7 +220,7 @@ export class TaskEditCreateModelHelper {
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: PriorityList,
 			asset: {id: asset.id, text: asset.name},
-			assignedTo: {id : (assetComment.assignedTo) || null, text: detail.assignedTo},
+			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
 			event: {id: (assetComment.moveEvent) || null, text: detail.eventName},
 			category: assetComment.category,
