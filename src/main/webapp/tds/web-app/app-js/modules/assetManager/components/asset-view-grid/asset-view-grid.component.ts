@@ -46,8 +46,6 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../../assetExplorer/model/asset-entity.model';
 import {TaskCommentDialogComponent} from '../../../assetExplorer/components/task-comment/dialog/task-comment-dialog.component';
-import {SingleCommentModel} from '../../../assetExplorer/components/single-comment/model/single-comment.model';
-import {SingleCommentComponent} from '../../../assetExplorer/components/single-comment/single-comment.component';
 import {AssetModalModel} from '../../../assetExplorer/model/asset-modal.model';
 import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-edit.component';
 import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';
@@ -64,6 +62,8 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {NavigationEnd, Router} from '@angular/router';
+import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
+import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -433,7 +433,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel},
 			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.XXL, true).then(result => {
+		], DIALOG_SIZE.LG, true).then(result => {
 			if (result) {
 				console.log('Show Task Result',  result);
 			}
@@ -490,7 +490,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel},
 			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.XXL, true).then(result => {
+		], DIALOG_SIZE.LG, true).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
@@ -501,7 +501,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	protected createComment(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
-		let singleCommentModel: SingleCommentModel = {
+		let assetCommentModel: AssetCommentModel = {
 			modal: {
 				title: 'Create Comment',
 				type: ModalType.CREATE
@@ -518,8 +518,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
-		this.dialog.extra(SingleCommentComponent, [
-			{provide: SingleCommentModel, useValue: singleCommentModel}
+		this.dialog.extra(AssetCommentViewEditComponent, [
+			{provide: AssetCommentModel, useValue: assetCommentModel}
 		], false, false).then(result => {
 			console.log('RESULT SINGLE COMMENT', result);
 			this.onReload();
