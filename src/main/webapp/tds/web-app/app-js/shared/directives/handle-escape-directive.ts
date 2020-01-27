@@ -1,4 +1,13 @@
-import {Directive, ElementRef, OnInit, HostListener, Output, EventEmitter, Renderer2} from '@angular/core';
+import {
+	Directive,
+	ElementRef,
+	OnInit,
+	HostListener,
+	Output,
+	EventEmitter,
+	Renderer2,
+	AfterViewInit
+} from '@angular/core';
 import {KEYSTROKE} from '../model/constants';
 
 // controls that will be ignored
@@ -11,7 +20,7 @@ enum WhiteListControls {
 const IS_LIST_OPEN_ATTR = 'is-list-open';
 
 @Directive({ selector: '[tds-handle-escape]' })
-export class UIHandleEscapeDirective implements OnInit {
+export class UIHandleEscapeDirective implements OnInit, AfterViewInit {
 	@Output() escPressed: EventEmitter<any> = new EventEmitter();
 
 	constructor(private el: ElementRef, private renderer: Renderer2) {
@@ -20,6 +29,16 @@ export class UIHandleEscapeDirective implements OnInit {
 	ngOnInit() {
 		// the form needs to have tabindex defined in order it can be able to detect keyboard events
 		this.renderer.setAttribute(this.el.nativeElement, 'tabindex',  '0');
+	}
+
+	ngAfterViewInit(): void {
+		// Remove the tabindex=0 added by clarity to the .modal-body that is preventing of listening esc events
+		setTimeout(() => {
+			const modalBody = this.el.nativeElement.querySelector('.modal-body');
+			if (modalBody) {
+				this.renderer.removeAttribute(modalBody, 'tabindex');
+			}
+		}, 1000);
 	}
 
 	@HostListener('keyup', ['$event']) handleKeyboardEventUp(event: KeyboardEvent) {

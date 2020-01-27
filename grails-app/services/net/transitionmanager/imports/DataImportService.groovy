@@ -2038,7 +2038,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				securityService.currentUsername, dataScriptId, filename)
 
 		// return progress key
-		return ['progressKey': key]
+		return ['progressKey': key, 'jobTriggerName': jobTriggerName]
 	}
 
 	/**

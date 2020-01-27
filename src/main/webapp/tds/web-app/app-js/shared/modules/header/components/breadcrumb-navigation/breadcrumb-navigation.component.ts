@@ -33,7 +33,7 @@ declare var jQuery: any;
             </div>
 						<div class="clr-col-4 clr-align-self-center">
                 <div
-                    class="breadcrumb-container licensing-banner-message"
+                    class="licensing-banner-message"
                     *ngIf="userContext.license && userContext.license.banner">
                     <div class="callout">
                         {{ userContext.license?.banner }}

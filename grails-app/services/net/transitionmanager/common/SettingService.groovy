@@ -113,6 +113,7 @@ class SettingService implements ServiceMethods {
         } else {
             return null
         }
+
     }
 
     /**
@@ -219,11 +220,7 @@ class SettingService implements ServiceMethods {
         settingMap?.fields?.each { Map<String, Map<String, List<String>>> field ->
             List<String> values = field.constraints?.values
             if ( values ) {
-                Set newValues = new HashSet()
-                for (v in values) {
-                    newValues << StringUtils.trim(v)
-                }
-                field.constraints.values = newValues.toList()
+                field.constraints.values = values*.trim().unique()
             }
         }
     }

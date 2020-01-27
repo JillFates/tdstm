@@ -41,6 +41,7 @@ import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/a
 import { AssetViewShowCreateButtonComponent } from './components/asset-view-show/asset-view-show-create-button.component';
 import { AssetViewConfigSaveButtonComponent } from './components/asset-view-config/asset-view-config-save-button.component';
 import { TabStripModule } from '@progress/kendo-angular-layout';
+import {AssetCommentModule} from '../assetComment/asset-comment.module';
 
 @NgModule({
 	imports: [
@@ -49,6 +50,7 @@ import { TabStripModule } from '@progress/kendo-angular-layout';
 		SharedModule,
 		FormsModule,
 		AssetExplorerModule,
+		AssetCommentModule,
 		// Kendo
 		DropDownListModule,
 		GridModule,

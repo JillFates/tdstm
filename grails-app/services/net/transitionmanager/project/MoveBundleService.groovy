@@ -213,7 +213,6 @@ class MoveBundleService implements ServiceMethods {
 	def dependencyConsoleMap(Project project, Long moveBundleId, List<Long> tagIds, String tagMatch, String isAssigned, dependencyBundle, boolean graph = false, subsection =  null, groupId =  null, assetName = null) {
 		Date startAll = new Date()
 		List dependencyConsoleList = []
-		Map queryParams = [:]
 
 		// This will hold the totals of each, element 0 is all and element 1 will be All minus group 0
 		Map stats = [
@@ -228,8 +227,8 @@ class MoveBundleService implements ServiceMethods {
 		String virtualTypes = AssetType.virtualServerTypesAsString
 		String storageTypes = AssetType.storageTypesAsString
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
-		String tagQuery = tagService.getTagsQuery(tagIds, tagMatch, queryParams)
-		String tagJoins = tagService.getTagsJoin(tagIds, tagMatch)
+		String tagJoins = tagService.getTagsJoin(tagIds, 'ANY') //passing in any because we want the join regardless of the tag matching.
+		String tagsSelect = tagService.getTagSelect(tagIds)
 
 		StringBuilder depSql = new StringBuilder("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
@@ -247,6 +246,7 @@ class MoveBundleService implements ServiceMethods {
 			SUM(if(a.asset_class = '$AssetClass.DATABASE', 1, 0)) AS dbCount,
 			SUM(if(a.asset_class = '$AssetClass.APPLICATION', 1, 0)) AS appCount,
 			COALESCE(nr.needsReview, 0) AS needsReview
+			$tagsSelect
 
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
@@ -258,7 +258,7 @@ class MoveBundleService implements ServiceMethods {
 				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id
 				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes}))
 			GROUP BY adb.dependency_bundle) nr ON nr.dependency_bundle=adb.dependency_bundle
-			WHERE adb.project_id=${project.id} $tagQuery""")
+			WHERE adb.project_id=${project.id}""")
 
 		if (dependencyBundle) {
 			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))
@@ -280,20 +280,29 @@ class MoveBundleService implements ServiceMethods {
 
 		depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
 
-		def dependList = []
+		def dependList = jdbcTemplate.queryForList(depSql.toString())
 
-		if(queryParams){
-			NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getJdbcTemplate().getDataSource())
-			dependList = template.queryForList(depSql.toString(), queryParams)
-		} else{
-			dependList = jdbcTemplate.queryForList(depSql.toString())
+
+		if (moveBundleId || tagIds) {
+			List<Long> groupTags = []
+
+			dependList = dependList.findResults { result ->
+				if (result.tags) {
+					groupTags = result.tags.split(',').collect { id ->
+						Long.parseLong(id)
+					}
+				} else {
+					groupTags = []
+				}
+
+				if ((moveBundleId && result.moveBundles.contains(moveBundleId as String)) ||
+					(tagIds && tagMatch == 'ALL' && groupTags.containsAll(tagIds)) ||
+					(tagIds && tagMatch == 'ANY' && groupTags.intersect(tagIds))) {
+					return result
+				}
+			}
 		}
 
-		if (moveBundleId) {
-		 	dependList = dependList.collect{ if( it.moveBundles.contains(moveBundleId as String)){ it } }
-		}
-
-		dependList.removeAll([null])
 		def groups = dependList.dependencyBundle
 		if (dependencyBundle == null) {
 			session.setAttribute('Dep_Groups', (groups as JSON).toString())
