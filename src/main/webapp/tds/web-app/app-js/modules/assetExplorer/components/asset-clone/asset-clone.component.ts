@@ -106,7 +106,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 		private dialogService: UIDialogService,
 		private prompt: UIPromptService) {
 		super('#asset-clone-component');
-		this.modalOptions = { isResizable: true, isCentered: true };
+		this.modalOptions = { isResizable: false, isCentered: true };
 		this.uniqueAssetName = false;
 	}
 

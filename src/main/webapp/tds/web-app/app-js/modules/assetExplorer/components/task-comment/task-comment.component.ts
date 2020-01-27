@@ -1,8 +1,6 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 import { TaskCommentService } from '../../service/task-comment.service';
-import { SingleCommentComponent } from '../single-comment/single-comment.component';
-import { SingleCommentModel } from '../single-comment/model/single-comment.model';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { ModalType } from '../../../../shared/model/constants';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';

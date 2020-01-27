@@ -46,8 +46,6 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../../assetExplorer/model/asset-entity.model';
 import {TaskCommentDialogComponent} from '../../../assetExplorer/components/task-comment/dialog/task-comment-dialog.component';
-import {SingleCommentModel} from '../../../assetExplorer/components/single-comment/model/single-comment.model';
-import {SingleCommentComponent} from '../../../assetExplorer/components/single-comment/single-comment.component';
 import {AssetModalModel} from '../../../assetExplorer/model/asset-modal.model';
 import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-edit.component';
 import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';

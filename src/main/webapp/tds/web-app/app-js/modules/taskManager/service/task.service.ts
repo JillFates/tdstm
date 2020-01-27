@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { SingleCommentModel } from '../../assetExplorer/components/single-comment/model/single-comment.model';
+import { AssetCommentModel } from '../../assetComment/model/asset-comment.model';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import { catchError, map } from 'rxjs/operators';
@@ -142,7 +142,7 @@ export class TaskService {
 	 * @param model
 	 * @returns {Observable<any>}
 	 */
-	saveComment(model: SingleCommentModel): Observable<any> {
+	saveComment(model: AssetCommentModel): Observable<any> {
 		const request: any = {
 			comment: model.comment,
 			category: model.category,
