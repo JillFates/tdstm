@@ -8,6 +8,7 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.Task
 import org.springframework.jdbc.core.BatchPreparedStatementSetter
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import java.sql.PreparedStatement
 import java.sql.SQLException
@@ -21,6 +22,10 @@ class TimelineService implements ServiceMethods {
      * with a better performance.
      */
     JdbcTemplate jdbcTemplate
+    /**
+     * Instance of {@code NamedParameterJdbcTemplate} to query task dependencies
+     */
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
     /**
      * Execute critical path analysis using  using a List of {@code TimelineTask} and a List of {@code TimelineDependency}
@@ -49,7 +54,7 @@ class TimelineService implements ServiceMethods {
      *
      * @param moveEvent the event to retrieve tasks for
      * @param viewUnpublished show only published tasks or all tasks
-     * @return List<Task>                            a list of tasks
+     * @return List<Task>                                    a list of tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineTask> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
@@ -99,7 +104,7 @@ class TimelineService implements ServiceMethods {
      * Used to get the list of task dependencies for a given list of tasks
      *
      * @param List <AssetComment> a list of tasks
-     * @return List<TimelineDependency>  a list of the tasks dependencies associated to a MoveEvent
+     * @return List<TimelineDependency>          a list of the tasks dependencies associated to a MoveEvent
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineDependency> getTaskDependencies(MoveEvent event) {
@@ -117,7 +122,7 @@ class TimelineService implements ServiceMethods {
                          from task_dependency TD
                                   join asset_comment SUC on TD.asset_comment_id = SUC.asset_comment_id
                                   join asset_comment PRE on TD.predecessor_id = PRE.asset_comment_id
-                                  join (select asset_comment_id as id from asset_comment WHERE move_event_id = ?) as tasks_ids
+                                  join (select asset_comment_id as id from asset_comment WHERE move_event_id = :event_id) as tasks_ids
                                        on TD.asset_comment_id = tasks_ids.id
                          UNION
                          select TD.task_dependency_id as task_dependency_id,
@@ -128,17 +133,17 @@ class TimelineService implements ServiceMethods {
                          from task_dependency TD
                                   join asset_comment SUC on TD.asset_comment_id = SUC.asset_comment_id
                                   join asset_comment PRE on TD.predecessor_id = PRE.asset_comment_id
-                                  join (select asset_comment_id as id from asset_comment WHERE move_event_id = ?) as tasks_ids
+                                  join (select asset_comment_id as id from asset_comment WHERE move_event_id = :event_id) as tasks_ids
                                        on TD.predecessor_id = tasks_ids.id
                      ) as results
-                where results.successor_id in (select asset_comment_id as id from asset_comment WHERE move_event_id = ?)
-                  and results.predecessor_id in (select asset_comment_id as id from asset_comment WHERE move_event_id = ?)
+                where results.successor_id in (select asset_comment_id as id from asset_comment WHERE move_event_id = :event_id)
+                  and results.predecessor_id in (select asset_comment_id as id from asset_comment WHERE move_event_id = :event_id)
             """.stripIndent()
 
-            dependencies = jdbcTemplate.queryForList(
+            dependencies = namedParameterJdbcTemplate.queryForList(
                     query,
-                    [event.id, event.id, event.id, event.id].toArray()
-               ).collect { TimelineDependency.fromResultSet(it) }
+                    [event_id: event.id]
+            ).collect { TimelineDependency.fromResultSet(it) }
         }
 
         return dependencies
