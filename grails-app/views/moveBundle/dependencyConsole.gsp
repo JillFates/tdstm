@@ -178,19 +178,19 @@
 						</div>
 
 						<div class="clr-form-control">
-							<label for="plannedMoveBundleList" class="clr-control-label" style="width: 4rem; min-width: unset;">Plan Status</label>
-							<div class="clr-control-container">
-								<div class="clr-select-wrapper">
-									<g:select name="moveBundle" id="plannedMoveBundleList" class="clr-select" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}"></g:select>
-								</div>
-							</div>
-						</div>
-							
-						<div class="clr-form-control">
-							<label for="plannedStatus" class="clr-control-label" style="width: 4rem; min-width: unset;">Bundle</label>
+							<label for="plannedStatus" class="clr-control-label" style="width: 4rem; min-width: unset;">Plan Status</label>
 							<div class="clr-control-container">
 								<div class="clr-select-wrapper">
 									<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value" class="clr-select"></g:select>
+								</div>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<label for="plannedMoveBundleList" class="clr-control-label" style="width: 4rem; min-width: unset;">Bundle</label>
+							<div class="clr-control-container">
+								<div class="clr-select-wrapper">
+									<g:select name="moveBundle" id="plannedMoveBundleList" class="clr-select" from="${moveBundle}" optionKey="id" optionValue="name" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}"></g:select>
 								</div>
 							</div>
 						</div>
@@ -262,8 +262,8 @@
 				<g:render template="/person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">
-				<g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
-				<g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
+				<g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id" optionValue="name"  noSelection="${['':'Please Select']}"></g:select><br></br>
+				<g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" optionValue="name" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
 			<g:render template="/assetEntity/dependentAdd" />
 			<g:render template="/assetEntity/initAssetEntityData"/>
