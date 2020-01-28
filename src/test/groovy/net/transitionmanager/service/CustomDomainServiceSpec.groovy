@@ -109,7 +109,8 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			service.metaClass.clearCustomFields = { Project project, String assetClassName, List<String> fieldNames -> clearCustomFieldsCalled = true }
 
 		expect: 'when updateFieldData is called the flags are set appropriately'
-			service.updateFieldData(oldFieldSpec, newFieldSpec, AssetType.APPLICATION.name, defaultProject)
+			String updateString = service.updateFieldData(oldFieldSpec, newFieldSpec)
+			service.clearCustomFieldsForClass(AssetType.APPLICATION.name, defaultProject, [updateString])
 			dataDateToDateTimeCalled == dataDateToDateTimeSet
 			dataDateTimeToDateCalled == dataDateTimeToDateSet
 			dataToYesNoCalled == dataToYesNoSet
