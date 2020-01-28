@@ -38,7 +38,7 @@
 
 				<button id="fullscreenButtonId" class="btn btn-outline"  onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Fullscreen</div>
 
-			<div id="controlPanelId" class="graphPanel openPanel">
+			<div id="controlPanelId" class="graphPanel ">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
 						<td class="controlPanelControl" colspan="3">
