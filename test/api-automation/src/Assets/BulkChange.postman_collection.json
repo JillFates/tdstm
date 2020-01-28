@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "252d65a2-e699-4175-b5d7-f876540bfc02",
+		"_postman_id": "973a1711-8f9f-41e6-b22c-0683c302150b",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -797,7 +797,7 @@
 			"response": []
 		},
 		{
-			"name": "List tagAssetss after bulk remove",
+			"name": "List tagAssets after bulk remove",
 			"event": [
 				{
 					"listen": "test",
@@ -1128,7 +1128,7 @@
 			"response": []
 		},
 		{
-			"name": "List tagAssetss after bulk replace",
+			"name": "List tagAssets after bulk replace",
 			"event": [
 				{
 					"listen": "test",
@@ -1504,6 +1504,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1658,6 +1663,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1816,6 +1826,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -2000,12 +2015,12 @@
 			"response": []
 		},
 		{
-			"name": "Get Asset 1 replace size",
+			"name": "Get Asset 1 new PlanStatus",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "a01d9520-a038-4cee-86b1-87b854048e2f",
+						"id": "8db769f4-eafb-4af6-9f58-59d36fa9560f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2017,9 +2032,7 @@
 							"    ",
 							"    var assetID = pm.variables.get(\"asset1\"); ",
 							"    pm.expect(record.id).to.eql(assetID);",
-							"    pm.expect(record.size).to.eql(null);",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
-							"",
 							"});"
 						],
 						"type": "text/javascript"
@@ -2054,12 +2067,12 @@
 			"response": []
 		},
 		{
-			"name": "Get Asset 2 replace size",
+			"name": "Get Asset 2 new PlanStatus",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "dbda6db1-31b3-47d4-ab72-cf43715f26a0",
+						"id": "8db769f4-eafb-4af6-9f58-59d36fa9560f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2071,7 +2084,6 @@
 							"    ",
 							"    var assetID = pm.variables.get(\"asset2\"); ",
 							"    pm.expect(record.id).to.eql(assetID);",
-							"    pm.expect(record.size).to.eql(null);",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
 							"});"
 						],
@@ -4036,7 +4048,7 @@
 			"response": []
 		},
 		{
-			"name": "Bulk change replace PlanStatus Reset Copy",
+			"name": "Bulk change replace PlanStatus Reset",
 			"event": [
 				{
 					"listen": "test",
