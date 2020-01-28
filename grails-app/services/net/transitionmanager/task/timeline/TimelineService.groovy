@@ -103,7 +103,7 @@ class TimelineService implements ServiceMethods {
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineDependency> getTaskDependencies(MoveEvent event) {
-        List<TimelineDependency> dependencies
+        List<TimelineDependency> dependencies = []
 
         if (event) {
             String query = """
@@ -138,10 +138,7 @@ class TimelineService implements ServiceMethods {
             dependencies = jdbcTemplate.queryForList(
                     query,
                     [event.id, event.id, event.id, event.id].toArray()
-            ).collect { TimelineDependency.fromResultSet(it) }
-
-        } else {
-            dependencies = []
+               ).collect { TimelineDependency.fromResultSet(it) }
         }
 
         return dependencies
