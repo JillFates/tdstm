@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
@@ -48,7 +48,7 @@ class BulkAssetETLService implements ServiceMethods {
 		}
 
 		try {
-			List<Map> assets = getAssets(ids, queryFilter, currentProject)
+			List<AssetEntity> assets = getAssets(ids, queryFilter, currentProject)
 			List<Map> assetsUsingLabels = replaceLabels(assets, fieldMapping)
 			List<Object> tempFileObject = fileSystemService.createTemporaryFile('','json')
 
@@ -120,9 +120,11 @@ class BulkAssetETLService implements ServiceMethods {
 		return assets.collect { AssetEntity asset ->
 			updatedRow = [:]
 
-			GormUtil.persistentProperties(asset).each { property ->
-				String label = fieldMapping[property]?.label ?: property
-				def value = asset."$property"
+			fieldMapping[asset.assetClass.name()].each { String key, Map mapValue ->
+				String label = mapValue?.label ?: key
+				def domain = (AssetClass.domainClassFor(asset.assetClass)).get(asset.id)
+				def value = domain."$key"
+
 				if(value  &&(value instanceof String || value instanceof  Long || value instanceof Integer || value instanceof Date || value instanceof Double)) {
 					updatedRow[label] = value
 				} else if(value && value instanceof Enum){
