@@ -36,7 +36,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	private reloadOnOpen = false;
 	private firstChange = true;
 	public datasource: any[] = [{id: '', text: ''}];
-	public showControlPanel = true;
+	public showControlPanel = false;
 	public data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	public ctxOpts:  ITdsContextMenuOption;
 	public diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
@@ -132,7 +132,6 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (this.urlParams && this.urlParams.assetId) {
 			this.assetId = this.urlParams.assetId;
 			this.loadData();
-			this.showControlPanel = false;
 		}
 		this.getArchitectureGraphPreferences();
 		this.initSearchModel();
