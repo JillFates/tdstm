@@ -481,8 +481,8 @@
 										// fix for low networks, retry 5 times until the values are established
 										// completely by the gsp file
 										TDSUtilFunctions.retryFunction(
-												5,
-												2500,
+												6,
+												1500,
 												function () {
 													return $('#searchBoxId').length;
 												},
