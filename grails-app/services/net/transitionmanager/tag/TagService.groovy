@@ -294,7 +294,7 @@ class TagService implements ServiceMethods {
 	 */
 	String getTagSelect(List<Long> tagIds) {
 		if (tagIds) {
-			return ",COALESCE(group_concat(t.tag_id),'') as tags"
+			return ",COALESCE(group_concat(distinct ta.tag_id),'') as tags"
 		}
 
 		return ''
@@ -339,8 +339,8 @@ class TagService implements ServiceMethods {
 		if (tagIds && tagMatch == 'ANY') {
 			return """
 					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-					LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
 				"""
+			// LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
 		}
 
 		return ''

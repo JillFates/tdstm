@@ -1525,8 +1525,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def asset
 
 		if (params.entity != 'graph') {
-			depMap = moveBundleService.dependencyConsoleMap(project, null, null, null, null,
-				params.dependencyBundle != "null" ? params.dependencyBundle : "all")
+			def dependencyBundle = params.dependencyBundle
+			if( dependencyBundle == null || dependencyBundle == 'null' ) {
+				dependencyBundle = "all"
+			}
+			def moveBundleId = NumberUtils.toLong(params.bundle)
+			List<Long>tagIds = params['tags[]'].collect { it.toLong() }
+			depMap = moveBundleService.dependencyConsoleMap(project, moveBundleId, tagIds,
+					'ANY', '0', dependencyBundle)
 			depMap = depMap.gridStats
 		}
 		else {
