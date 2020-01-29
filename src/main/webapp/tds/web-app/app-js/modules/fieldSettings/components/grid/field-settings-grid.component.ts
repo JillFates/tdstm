@@ -95,13 +95,14 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	};
 
 	public isEditing = false;
-	private isFilterDisabled = false;
+	public isFilterDisabled = false;
 	public sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
 	protected resettingChanges = false;
 	protected lastEditedControl = null;
 	public availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 	public showFilters = false;
+	public columns: Array<string> = ['field', 'order', 'label', 'shared', 'highlighting', 'required', 'display', 'default value', 'control', 'Tooltip Help'];
 
 	// Only APPLICATION asset types has the plan methodology feature.
 	private planMethodology = null;
