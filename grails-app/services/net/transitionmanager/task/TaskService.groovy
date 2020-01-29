@@ -1077,10 +1077,10 @@ class TaskService implements ServiceMethods {
 	 * Used to clear all Task data that are associated to a task batch
 	 * @param moveEventId
 	 */
-	def resetTaskDataForTaskBatch(TaskBatch taskBatch) {
+	def resetTaskDataForTaskBatch(TaskBatch taskBatch, Project project) {
 		try {
 			if (taskBatch.eventId) {
-				return resetTaskDataForTasks(taskBatch.eventId)
+				return resetTaskDataForTasks(taskBatch, project)
 			} else {
 				def tasksMap = getTaskBatchTaskLists(taskBatch.id)
 				return resetTaskDataForTasks(tasksMap)
@@ -1150,10 +1150,10 @@ class TaskService implements ServiceMethods {
 	 * Resets the {@code AssetComment#status} of all the remaining tasks to {AssetCommentStatus#PENDING}
 	 * Delete all instances of {@code CommentNote} associated to any of this tasks
 	 *
-	 * @param eventId  The id of the event to which all tasks are associated
+	 * @param taskBatch  The task batch to which all tasks belong
 	 * @return A confirmation message
 	 */
-	def resetTaskDataForTasks(Long eventId) {
+	def resetTaskDataForTasks(TaskBatch taskBatch, Project project) {
 		// We want to find all AssetComment records that are associated with assets that are
 		// with bundles that are part of the event. With that list, we will reset the
 		// AssetComment status to PENDING by default or READY if there are no predecessors and clear several other properties.
@@ -1161,17 +1161,17 @@ class TaskService implements ServiceMethods {
 		def msg
 		log.info("resetTaskDataForTasks() was called")
 
-		if (!eventId) {
+		if (!taskBatch.eventId) {
 			throw new IllegalArgumentException('eventId was not found')
 		}
-		MoveEvent event = MoveEvent.get(eventId)
+		MoveEvent event = get(MoveEvent, taskBatch.eventId, project)
 
 		// use the event to run the CPA
 		CPAResults cpaResults = timelineService.updateTaskFromCPA(event, true)
 		TaskTimeLineGraph graph = cpaResults.graph
 
-		List<Long> allTasks = graph.getVertices()*.taskId ?: 0
-		List<Long> tasksNoPred = graph.getStarts()*.taskId ?:0
+		List<Long> allTasks = graph.getVertices()*.taskId ?: []
+		List<Long> tasksNoPred = graph.getStarts()*.taskId ?: []
 
 		// now update the tasks status with the CPA results
 		try {
@@ -1182,16 +1182,19 @@ class TaskService implements ServiceMethods {
 				UPDATE AssetComment
 				SET status = :status, actStart = null, dateResolved = null,
 				    resolvedBy = null, statusUpdated = null
-				WHERE id in (:ids)'''
+				WHERE id in (:ids)
+				and taskBatch = :taskBatch'''
 
 			if (allTasks) {
-				taskResetCnt = AssetComment.executeUpdate(updateHql, [status: ACS.PENDING, ids: allTasks - tasksNoPred])
+				// set all tasks with predecessors to pending
+				taskResetCnt = AssetComment.executeUpdate(updateHql, [status: ACS.PENDING, ids: allTasks - tasksNoPred, taskBatch: taskBatch])
+				// also, delete any of the audit comments that are created during the event
+				notesDeleted = CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1", [ids: allTasks])
 			}
 			if (tasksNoPred) {
-				taskResetCnt += AssetComment.executeUpdate(updateHql, [status: ACS.READY, ids: tasksNoPred])
+				// set all tasks with no predecessors to ready
+				taskResetCnt += AssetComment.executeUpdate(updateHql, [status: ACS.READY, ids: tasksNoPred, taskBatch: taskBatch])
 			}
-			// Delete any of the audit comments that are created during the event
-			notesDeleted = CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1", [ids: allTasks])
 
 			msg = "$taskResetCnt tasks reset and $notesDeleted audit notes were deleted"
 		} catch(e) {
@@ -5216,7 +5219,7 @@ class TaskService implements ServiceMethods {
 		securityService.requirePermission Permission.TaskPublish
 		controllerService.getRequiredProject()
 
-		resetTaskDataForTaskBatch(get(TaskBatch, taskBatchId, currentProject))
+		resetTaskDataForTaskBatch(get(TaskBatch, taskBatchId, currentProject), currentProject)
 	}
 
 	/**
