@@ -141,13 +141,13 @@
 		</ng-template>
 	</kendo-grid-column>
 
-	<kendo-grid-column field="field" title="Field">
+	<kendo-grid-column field="field" title="{{columns[columnIndex]}}">
 		<ng-template
 			kendoGridHeaderTemplate
 			let-column
 			let-columnIndex="columnIndex"
 		>
-			<span class="column text-capitalize">
+			<span class="column">
 				{{columns[columnIndex]}}
 			</span>
 		</ng-template>
@@ -182,7 +182,7 @@
 		</ng-template>
 	</kendo-grid-column>
 
-	<kendo-grid-column field="order" title="Order" [width]="100">
+	<kendo-grid-column field="order" title="{{columns[columnIndex]}}" [width]="100">
 		<ng-template
 			kendoGridHeaderTemplate
 			let-column
@@ -232,7 +232,7 @@
 		</ng-template>
 	</kendo-grid-column>
 
-	<kendo-grid-column field="label" title="Label" [width]="150">
+	<kendo-grid-column field="label" title="{{columns[columnIndex]}}" [width]="150">
 		<ng-template
 			kendoGridHeaderTemplate
 			let-column
@@ -270,7 +270,7 @@
 
 	<kendo-grid-column
 		field="shared"
-		title="Shared"
+		title="{{columns[columnIndex]}}"
 		[width]="65"
 		[class]="{ 'text-center': !isEditing }"
 		
@@ -308,7 +308,7 @@
 		</ng-template>
 	</kendo-grid-column>
 
-	<kendo-grid-column field="imp" title="Highlighting" [width]="155">
+	<kendo-grid-column field="imp" title="{{columns[columnIndex]}}" [width]="155">
 		<ng-template
 			kendoGridHeaderTemplate
 			let-column
@@ -340,7 +340,7 @@
 
 	<kendo-grid-column
 		field="constraints.required"
-		title="Required"
+		title="{{columns[columnIndex]}}"
 		[width]="100"
 		[class]="{ 'text-center': !isEditing }"
 	>
@@ -383,6 +383,7 @@
 	<kendo-grid-column
 		field="show"
 		[width]="90"
+		title="{{columns[columnIndex]}}"
 		[class]="{ 'text-center': !isEditing }"
 	>
 		<ng-template
@@ -418,7 +419,7 @@
 		</ng-template>
 	</kendo-grid-column>
 
-	<kendo-grid-column field="default" title="Default Value">
+	<kendo-grid-column field="default" title="{{columns[columnIndex]}}">
 		<ng-template
 			kendoGridHeaderTemplate
 			let-column
@@ -469,7 +470,7 @@
 		</ng-template>
 	</kendo-grid-column>
 
-	<kendo-grid-column field="control" title="Control" [width]="150">
+	<kendo-grid-column field="control" title="{{columns[columnIndex]}}" [width]="150">
 		<ng-template
 			kendoGridHeaderTemplate
 			let-column
@@ -518,7 +519,7 @@
 		</ng-template>
 	</kendo-grid-column>
 
-	<kendo-grid-column field="tip" title="Tooltip Help">
+	<kendo-grid-column field="tip" title="{{columns[columnIndex]}}">
 		<ng-template
 			kendoGridHeaderTemplate
 			let-column
