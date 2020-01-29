@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "204b0b89-952d-4a2f-85b6-f6caea49ea98",
+		"_postman_id": "0cc84b04-2e2a-431d-b90d-67a4f507f7b9",
 		"name": "Task Creation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -356,7 +356,8 @@
 							"pm.environment.unset(\"apiActionId\");",
 							"pm.environment.unset(\"jwt_token\");",
 							"pm.environment.unset(\"tokenHeaderName\");",
-							"pm.environment.unset(\"token\");"
+							"pm.environment.unset(\"token\");",
+							"pm.environment.unset(\"event1\");"
 						],
 						"type": "text/javascript"
 					}
