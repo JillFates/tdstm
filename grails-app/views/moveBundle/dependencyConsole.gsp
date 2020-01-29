@@ -478,7 +478,7 @@
 										break; // do nothing, we are already there
 							case "map":
 										getList("graph", '${groupId}');
-										// fix for low networks, retry 5 times until the values are established
+										// fix for low networks, retry n times until the values are established
 										// completely by the gsp file
 										TDSUtilFunctions.retryFunction(
 												6,
