@@ -25,6 +25,7 @@ declare var jQuery: any;
         <!-- Full Width Column -->
         <div class="content-wrapper">
             <div class="container">
+                <tds-dialog></tds-dialog>
                 <tds-ui-loader></tds-ui-loader>
                 <tds-ui-toast></tds-ui-toast>
                 <tds-breadcrumb-navigation></tds-breadcrumb-navigation>

@@ -3,24 +3,23 @@ import {
 	Component,
 	OnInit,
 	ViewChild,
-	HostListener,
-	Inject,
+	Input, Output, EventEmitter,
 } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import {Subject} from 'rxjs/Subject';
 import {
-	UIActiveDialogService,
 	UIDialogService,
 } from '../../../../shared/services/ui-dialog.service';
-import { ActionType } from '../../../dataScript/model/data-script.model';
-import { ProviderModel } from '../../model/provider.model';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { KEYSTROKE } from '../../../../shared/model/constants';
-import { ProviderService } from '../../service/provider.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { ProviderAssociatedComponent } from '../provider-associated/provider-associated.component';
-import { ProviderAssociatedModel } from '../../model/provider-associated.model';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { Permission } from '../../../../shared/model/permission.model';
+import {ActionType} from '../../../dataScript/model/data-script.model';
+import {ProviderModel} from '../../model/provider.model';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ProviderService} from '../../service/provider.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
+import {ProviderAssociatedModel} from '../../model/provider-associated.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {Permission} from '../../../../shared/model/permission.model';
+import {Dialog, DialogButtonType} from 'tds-component-library';
+import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: 'provider-view-edit',
@@ -34,33 +33,32 @@ import { Permission } from '../../../../shared/model/permission.model';
 		`,
 	],
 })
-export class ProviderViewEditComponent implements OnInit {
-	@ViewChild('providerNameElement', { read: ElementRef, static: true })
-	providerNameElement: ElementRef;
-	@ViewChild('providerContainer', { static: false })
-	providerContainer: ElementRef;
+export class ProviderViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+	@Input() buttons: any;
+	@Output() successEvent: EventEmitter<any> = new EventEmitter<any>();
+
+	@ViewChild('providerNameElement', {read: ElementRef, static: true}) providerNameElement: ElementRef;
+	@ViewChild('providerForm', {read: NgForm, static: true}) providerForm: NgForm;
+	@ViewChild('providerContainer', {static: false}) providerContainer: ElementRef;
+
 	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
+	public modalType = ActionType.VIEW;
 	private dataSignature: string;
 	protected isUnique = true;
 	private providerName = new Subject<String>();
 
 	constructor(
-		public originalModel: ProviderModel,
-		public modalType: ActionType,
 		public promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private prompt: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private providerService: ProviderService,
 		private permissionService: PermissionService
 	) {
-		this.providerModel = Object.assign({}, this.originalModel);
-		this.modalTitle = this.getModalTitle(this.modalType);
-		this.dataSignature = JSON.stringify(this.providerModel);
-		this.providerName.next(this.providerModel.name);
+		super();
 	}
 
 	/**
@@ -69,13 +67,62 @@ export class ProviderViewEditComponent implements OnInit {
 	protected onSaveProvider(): void {
 		this.providerService.saveProvider(this.providerModel).subscribe(
 			(result: any) => {
-				this.activeDialog.close(result);
+				this.onAcceptSuccess(result);
 			},
 			err => console.log(err)
 		);
 	}
 
 	ngOnInit(): void {
+		this.providerModel = Object.assign({}, this.data.providerModel);
+		this.modalType = this.data.actionType;
+		this.modalTitle = this.getModalTitle(this.modalType);
+		this.dataSignature = JSON.stringify(this.providerModel);
+		this.providerName.next(this.providerModel.name);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			disabled: () => !this.permissionService.hasPermission(Permission.ProviderUpdate),
+			active: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.changeToEditProvider.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
+			disabled: () => !this.providerForm.form.valid || !this.isUnique || this.isEmptyValue() || !this.providerForm.form.dirty,
+			type: DialogButtonType.ACTION,
+			action: this.onSaveProvider.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.modalType !== this.actionTypes.CREATE,
+			disabled: () => !this.permissionService.hasPermission(Permission.ProviderDelete),
+			type: DialogButtonType.ACTION,
+			action: this.onDeleteProvider.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEditDialog.bind(this)
+		});
+
 		this.providerName
 			.debounceTime(800) // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged() // ignore if next search term is same as previous
@@ -95,12 +142,6 @@ export class ProviderViewEditComponent implements OnInit {
 						);
 				}
 			});
-		setTimeout(() => {
-			// Delay issues on Auto Focus
-			if (this.providerNameElement) {
-				this.providerNameElement.nativeElement.focus();
-			}
-		}, 500);
 	}
 
 	protected onValidateUniqueness(): void {
@@ -133,14 +174,12 @@ export class ProviderViewEditComponent implements OnInit {
 				)
 				.then(confirm => {
 					if (confirm) {
-						this.activeDialog.dismiss();
-					} else {
-						this.focusForm();
+						this.onCancelClose();
 					}
 				})
 				.catch(error => console.log(error));
 		} else {
-			this.activeDialog.dismiss();
+			this.onCancelClose();
 		}
 	}
 
@@ -161,8 +200,6 @@ export class ProviderViewEditComponent implements OnInit {
 					if (confirm) {
 						this.modalType = this.actionTypes.VIEW;
 						this.modalTitle = this.getModalTitle(this.modalType);
-					} else {
-						this.focusForm();
 					}
 				})
 				.catch(error => console.log(error));
@@ -178,7 +215,6 @@ export class ProviderViewEditComponent implements OnInit {
 	protected changeToEditProvider(): void {
 		this.modalType = this.actionTypes.EDIT;
 		this.modalTitle = this.getModalTitle(this.modalType);
-		this.focusForm();
 	}
 
 	/**
@@ -207,7 +243,7 @@ export class ProviderViewEditComponent implements OnInit {
 								.deleteProvider(this.providerModel.id)
 								.subscribe(
 									result => {
-										this.activeDialog.close(result);
+										this.onCancelClose(result);
 									},
 									err => console.log(err)
 								);
@@ -215,18 +251,6 @@ export class ProviderViewEditComponent implements OnInit {
 					})
 					.catch(error => console.log('Closed'));
 			});
-	}
-
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(
-		event: KeyboardEvent
-	) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
 	}
 
 	/**
@@ -239,10 +263,6 @@ export class ProviderViewEditComponent implements OnInit {
 			term = this.providerModel.name.trim();
 		}
 		return term === '';
-	}
-
-	private focusForm() {
-		this.providerContainer.nativeElement.focus();
 	}
 
 	/**
@@ -259,11 +279,10 @@ export class ProviderViewEditComponent implements OnInit {
 			: 'Provider Detail';
 	}
 
-	protected isDeleteAvailable(): boolean {
-		return this.permissionService.hasPermission(Permission.ProviderDelete);
-	}
-
-	protected isUpdateAvailable(): boolean {
-		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		super.onCancelClose();
 	}
 }

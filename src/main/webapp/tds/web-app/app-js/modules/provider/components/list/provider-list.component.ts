@@ -1,44 +1,38 @@
 // Angular
 import {
 	Component,
+	ComponentFactoryResolver,
 	ElementRef,
 	HostListener,
 	OnDestroy,
 	OnInit,
 	Renderer2,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-
+import {ActivatedRoute} from '@angular/router';
 // Services
-import { ProviderService } from '../../service/provider.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import {ProviderService} from '../../service/provider.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 // Components
-import { ProviderViewEditComponent } from '../view-edit/provider-view-edit.component';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { ProviderAssociatedComponent } from '../provider-associated/provider-associated.component';
+import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
 // Models
-import {
-	COLUMN_MIN_WIDTH,
-	ActionType,
-} from '../../../dataScript/model/data-script.model';
-import { ProviderModel, ProviderColumnModel } from '../../model/provider.model';
-import {
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-	GRID_DEFAULT_PAGE_SIZE,
-} from '../../../../shared/model/constants';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { ProviderAssociatedModel } from '../../model/provider-associated.model';
-import { Permission } from '../../../../shared/model/permission.model';
+import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
+import {ProviderColumnModel, ProviderModel} from '../../model/provider.model';
+import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {ProviderAssociatedModel} from '../../model/provider-associated.model';
+import {Permission} from '../../../../shared/model/permission.model';
 // Kendo
-import { SelectableSettings } from '@progress/kendo-angular-grid';
-import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { HeaderActionButtonData } from 'tds-component-library';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {SelectableSettings} from '@progress/kendo-angular-grid';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'provider-list',
@@ -68,7 +62,9 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	public disabledClearFilters: any;
 
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
+		private oldDialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private providerService: ProviderService,
 		private prompt: UIPromptService,
@@ -143,7 +139,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 			.deleteContext(dataItem.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((result: any) => {
-				this.dialogService
+				this.oldDialogService
 					.extra(
 						ProviderAssociatedComponent,
 						[
@@ -213,22 +209,22 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param {ProviderModel} providerModel
 	 * @param {number} actionType
 	 */
-	private openProviderDialogViewEdit(
-		providerModel: ProviderModel,
-		actionType: number
-	): void {
-		this.dialogService
-			.open(ProviderViewEditComponent, [
-				{ provide: ProviderModel, useValue: providerModel },
-				{ provide: Number, useValue: actionType },
-			])
-			.then(result => {
-				// update the list to reflect changes, it keeps the filter
-				this.reloadData();
-			})
-			.catch(result => {
-				console.log('Dismissed Dialog');
-			});
+	private openProviderDialogViewEdit(providerModel: ProviderModel, actionType: number): void {
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ProviderViewEditComponent,
+			data: {
+				providerModel: providerModel,
+				actionType: actionType
+			},
+			modalConfiguration: {
+				title: 'Provider Detail',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((result: any) => {
+			this.reloadData();
+		});
 	}
 
 	private selectRow(dataItemId: number): void {
