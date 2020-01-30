@@ -40,6 +40,7 @@ export class DataGridOperationsHelper {
 	private checkboxSelectionConfig: any;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private notifier: NotifierService;
+	public showFilters;
 
 	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
 		// to notify grid height changes
@@ -110,7 +111,7 @@ export class DataGridOperationsHelper {
 				filter.value = column.filter;
 			}
 		}
-		if (column.type === 'date') {
+		if (column.type === 'date' || column.type === 'datetime') {
 			const { init, end } = DateUtils.getInitEndFromDate(column.filter);
 			if (filter) {
 				this.state.filter.filters = this.getFiltersExcluding(column.property);
@@ -145,21 +146,25 @@ export class DataGridOperationsHelper {
 	 * @param {any} state: Current filters state
 	 * @returns void
 	 */
-	public clearFilter(column: any): void {
+	public clearFilter(column: any, state: State = null): void {
+		const currentState: State = state || this.state;
+
 		column.filter = '';
-		this.state.filter.filters = this.getFiltersExcluding(column.property);
-		this.filterChange(this.state.filter);
+		currentState.filter.filters = this.getFiltersExcluding(
+			column.customPropertyName ? column.customPropertyName : column.property);
+		this.filterChange(currentState.filter);
 	}
 
 	/**
 	 * Clears all filters of all filterable columns.
 	 * @param columns
+	 * @param state: Optional Current filters state
 	 */
-	public clearAllFilters(columns: Array<GridColumnModel>): void {
+	public clearAllFilters(columns: Array<GridColumnModel>, state: State = null): void {
 		columns
 			.filter(column => column.filterable)
 			.forEach(column => {
-				this.clearFilter(column);
+				this.clearFilter(column, state);
 			});
 	}
 
@@ -191,8 +196,9 @@ export class DataGridOperationsHelper {
 	 * On Filter Change.
 	 * @param {CompositeFilterDescriptor} filter
 	 */
-	public filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
+	public filterChange(filter: CompositeFilterDescriptor, state: State = null): void {
+		const currentState = state || this.state;
+		currentState.filter = filter;
 		this.loadPageData();
 	}
 
@@ -405,10 +411,25 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * Returns the number of distinct currently selected filters
+	 * Returns true if grid has filters applied
 	 */
-	public getFilterCounter(): number {
-		const filters = pathOr(0, ['filter', 'filters'], this.state);
+	public hasFilterApplied(): boolean {
+		return this.state && this.state.filter && this.state.filter.filters.length > 0;
+	}
+
+	/**
+	 * Show/Hide filters
+	 */
+	public toggleFilters(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	/**
+	 * Returns the number of distinct currently selected filters
+	 * @param state optionally pass the state otherwise use the current state
+	 */
+	public getFilterCounter(state: State = null): number {
+		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
 		return uniq(filters.map((filter: any) => filter.field)).length;
 	}
 }

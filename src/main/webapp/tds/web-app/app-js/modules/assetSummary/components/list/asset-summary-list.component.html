@@ -1,46 +1,65 @@
 <!-- Main content -->
 <div class="content body asset-summary-list-component">
     <section>
-        <div>
-            <div class="box-body box-with-empty-header">
-                <kendo-grid
-                        [data]="gridData"
-                        [resizable]="true">
-                    <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <div class="checkbox just-planning">
-                            <input id="justPlanning" type="checkbox" [(ngModel)]="justPlanning" (change)="onChangeJustPlanning($event.currentTarget.checked)" name="justPlanning" class="component-action-just-planning">
-                            <label for="justPlanning" class="just-planing-label">
-                                Just Planning
-                            </label>
-                        </div>
-                        <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
-                    </ng-template>
-                    <kendo-grid-column *ngFor="let column of assetSummaryColumnModel.columns" field="{{column.property}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-                        <ng-template kendoGridHeaderTemplate let-columnIndex="columnIndex">
-                            <div (click)="onClickHeader($event, column.property)">
-                                <label> {{column.label}} </label>
-                            </div>
-                        </ng-template>
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'bundle'" let-dataItem >
-                            <a routerLink="/bundle/list" [queryParams]="{'show': dataItem['bundle'].id}" class="overflow-ellipsis"> {{dataItem['bundle'].name}} </a>
-                        </ng-template>
-                        <ng-template kendoGridCellTemplate *ngIf="column.property !== 'bundle' && column.property !=='device'" let-dataItem>
-                            <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" [queryParams]="{'moveBundle.id': dataItem['bundle'].id}" class="overflow-ellipsis" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
-                        </ng-template>
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'device'" let-dataItem>
-                            <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" [queryParams]="{'moveBundle.id': dataItem['bundle'].id, 'assetType': ' -VM\|Virtual'}" class="overflow-ellipsis" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
-                        </ng-template>
-                        <ng-template kendoGridFooterTemplate let-dataItem>
-                            <div *ngIf="column.property === 'bundle'">
-                                {{'GLOBAL.TOTAL' | translate}}
-                            </div>
-                            <a [routerLink]="['/asset','views', total[column.property].viewId,'show']" class="overflow-ellipsis" *ngIf="total[column.property] && total[column.property].total > 0 && column.property !== 'device'"> {{ total[column.property].total }}</a>
-                            <a [routerLink]="['/asset','views', total[column.property].viewId,'show']"[queryParams]="{'assetType': ' -VM\|Virtual'}" class="overflow-ellipsis" *ngIf="total[column.property] && total[column.property].total > 0 && column.property === 'device'"> {{ total[column.property].total }}</a>
-                        </ng-template>
-                    </kendo-grid-column>
-                </kendo-grid>
+        <div class="button-bar">
+            <div class="inline">
+
+                <!-- Just Planning checkbox -->
+                <clr-checkbox-wrapper class="inline">
+                    <input
+                            clrCheckbox
+                            id="justPlanning"
+                            type="checkbox"
+                            name="justPlanning"
+                            class="component-action-just-planning"
+                            [(ngModel)]="justPlanning"
+                            (change)="onChangeJustPlanning($event.currentTarget.checked)"
+                    />
+                    <label
+                            class="clr-control-label clr-control-label-sm inline"
+                            for="justPlanning"
+                    >
+                        Just Planning
+                    </label>
+                </clr-checkbox-wrapper>
             </div>
-            <!-- /.box-body -->
+            <div class="float-right header-buttons">
+                <tds-grid-header-action-buttons
+                        (refresh)="reloadData()"
+                        [hasClearAllFilters]="false"
+                        [actionButtons]="headerActionButtons">
+                </tds-grid-header-action-buttons>
+            </div>
         </div>
+        <div class="box-body box-with-empty-header">
+            <kendo-grid
+                    [data]="gridData"
+                    [resizable]="true">
+                <kendo-grid-column *ngFor="let column of assetSummaryColumnModel.columns" field="{{column.property}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                    <ng-template kendoGridHeaderTemplate let-columnIndex="columnIndex">
+                        <div (click)="onClickHeader($event, column.property)">
+                            <label> {{column.label}} </label>
+                        </div>
+                    </ng-template>
+                    <ng-template kendoGridCellTemplate *ngIf="column.property === 'bundle'" let-dataItem >
+                        <a routerLink="/bundle/list" [queryParams]="{'show': dataItem['bundle'].id}" class="overflow-ellipsis"> {{dataItem['bundle'].name}} </a>
+                    </ng-template>
+                    <ng-template kendoGridCellTemplate *ngIf="column.property !== 'bundle' && column.property !=='device'" let-dataItem>
+                        <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" [queryParams]="{'moveBundle.id': dataItem['bundle'].id}" class="overflow-ellipsis" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
+                    </ng-template>
+                    <ng-template kendoGridCellTemplate *ngIf="column.property === 'device'" let-dataItem>
+                        <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" [queryParams]="{'moveBundle.id': dataItem['bundle'].id, 'assetType': ' -VM\|Virtual'}" class="overflow-ellipsis" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
+                    </ng-template>
+                    <ng-template kendoGridFooterTemplate let-dataItem>
+                        <div *ngIf="column.property === 'bundle'">
+                            {{'GLOBAL.TOTAL' | translate}}
+                        </div>
+                        <a [routerLink]="['/asset','views', total[column.property].viewId,'show']" class="overflow-ellipsis" *ngIf="total[column.property] && total[column.property].total > 0 && column.property !== 'device'"> {{ total[column.property].total }}</a>
+                        <a [routerLink]="['/asset','views', total[column.property].viewId,'show']"[queryParams]="{'assetType': ' -VM\|Virtual'}" class="overflow-ellipsis" *ngIf="total[column.property] && total[column.property].total > 0 && column.property === 'device'"> {{ total[column.property].total }}</a>
+                    </ng-template>
+                </kendo-grid-column>
+            </kendo-grid>
+        </div>
+        <!-- /.box-body -->
     </section>
 </div>

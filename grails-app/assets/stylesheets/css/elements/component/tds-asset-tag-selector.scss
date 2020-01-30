@@ -48,6 +48,9 @@
 
       span {
         margin-right: unset;
+        div {
+          border-radius: 2px;
+        }
       }
 
       span:not(.k-select) {
@@ -195,12 +198,10 @@
 
 .asset-tag-selector-component-content {
   .label.tag {
-    display: inline-block;
-    margin-right: 2px;
-    margin-bottom: 2px;
-    vertical-align: baseline;
-    text-align: center;
-    width: inherit;
+    border-radius: 2px;
+    border: 0;
+    width: unset;
+    font-weight: 500;
   }
 
   line-height: 21px {

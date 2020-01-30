@@ -122,10 +122,8 @@ import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.com
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
 import { PreferencesResolveService } from './resolves/preferences-resolve.service';
-import { DiagramLayoutComponent } from './components/diagram-layout/diagram-layout.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CircleCountdownComponent } from './components/circle-countdown/circle-countdown.component';
-import {DiagramContextMenuComponent} from './components/diagram-layout/context-menu/diagram-context-menu.component';
 import {MenusModule} from '@progress/kendo-angular-menu';
 import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
@@ -214,10 +212,8 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
 		PowerComponent,
-		DiagramLayoutComponent,
 		CircleCountdownComponent,
 		TDSCheckboxComponent,
-		DiagramContextMenuComponent,
 		TaskStatusIndicatorComponent
 	],
 	exports: [
@@ -284,9 +280,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		SafeHtmlPipe,
 		TDSModalPageWrapperComponent,
 		PowerComponent,
-		DiagramLayoutComponent,
 		FontAwesomeModule,
-		DiagramContextMenuComponent,
 		CircleCountdownComponent,
 		TdsComponentLibraryModule,
 		TaskStatusIndicatorComponent,
@@ -340,7 +334,7 @@ export class SharedModule {
 					provide: HTTP_INTERCEPTORS,
 					useClass: KendoFileUploadInterceptor,
 					useFactory: HTTPKendoFactory,
-					deps: [KendoFileHandlerService],
+					deps: [KendoFileHandlerService, Router, Store, WindowService],
 					multi: true,
 				},
 				{

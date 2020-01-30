@@ -133,8 +133,8 @@ export class DataScriptViewEditComponent implements OnInit {
 				(result: any) => {
 					this.activeDialog.close(result);
 				},
-				err => console.log(err)
-			);
+				err => err)
+			;
 	}
 
 	ngOnInit(): void {
@@ -235,6 +235,7 @@ export class DataScriptViewEditComponent implements OnInit {
 				)
 				.then(confirm => {
 					if (confirm) {
+						this.dataScriptModel = Object.assign({}, this.originalModel);
 						this.changeToViewDataScript();
 					} else {
 						this.focusForm();

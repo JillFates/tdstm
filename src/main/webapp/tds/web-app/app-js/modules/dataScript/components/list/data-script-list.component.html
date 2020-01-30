@@ -1,5 +1,6 @@
 <!-- Main content -->
 <div class="content body tds-kendo-grid data-script-list-component">
+
 	<section>
 		<div *ngIf="dataScriptColumnModel">
 			<div class="box-body box-with-empty-header">
@@ -24,17 +25,18 @@
 					(pageChange)="pageChange($event)"
 					[rowSelected]="isRowSelected"
 					[ngClass]="{ 'hide-filter': !showFilters }"
-					class="page-height data-script-list row-actions-4-children"
+					class="page-height data-script-list row-actions-4-children fixed-context-menu"
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="button-bar">
 							<div class="inline float-right">
-								<tds-button-custom
-									[icon]="'sync'"
-									[tooltip]="'Refresh'"
-									(click)="reloadDataScripts()"
-								>
-								</tds-button-custom>
+								<tds-grid-header-action-buttons
+										(refresh)="onReload()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
+								<!--
 								<tds-button-create
 									[id]="'btnCreateDataScript'"
 									[title]="
@@ -46,6 +48,13 @@
 									(click)="onCreateDataScript()"
 								>
 								</tds-button-create>
+								<tds-button-custom
+										[icon]="'sync'"
+										[tooltip]="'Refresh'"
+										(click)="reloadDataScripts()"
+								>
+								</tds-button-custom>
+								-->
 							</div>
 						</div>
 					</ng-template>
@@ -79,8 +88,6 @@
 							kendoGridCellTemplate
 							let-dataItem
 							let-rowIndex="rowIndex"
-							let-isComment="dataItem.taskAndCommentFlags.comment"
-							let-isIssue="dataItem.taskAndCommentFlags.issue"
 						>
 							<div class="action-button btn-link">
 								<clr-dropdown>
@@ -138,11 +145,7 @@
 						field="{{ column.property }}"
 						format="{{ column.format }}"
 						[width]="
-							commonShrunkColumns.includes(column.label)
-								? commonShrunkColumnWidth
-								: !column.width
-								? COLUMN_MIN_WIDTH
-								: column.width
+							!column.width ? COLUMN_MIN_WIDTH : column.width
 						"
 					>
 						<ng-template kendoGridHeaderTemplate>
@@ -150,38 +153,22 @@
 						</ng-template>
 
 						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div
-								class="has-feedback"
-								*ngIf="
-									column.property && column.type !== 'action'
-								"
-								style="margin-bottom:0px;"
-							>
-								<div
-									*ngIf="
-										column.type === 'date';
-										then dateFilter;
-										else stringFilter
-									"
-								></div>
+							<div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
+								<div *ngIf="column.type === 'date'; then dateFilter; else stringFilter"></div>
 								<ng-template #dateFilter>
-									<div
-										class="filter-input"
-										(click)="onClickTemplate($event)"
-									>
+									<div class="filter-input" >
 										<kendo-datepicker
 											[format]="dateFormat"
 											[(ngModel)]="column.filter"
-											(valueChange)="onFilter(column)"
-										></kendo-datepicker>
+											(valueChange)="onFilter(column)">
+										</kendo-datepicker>
 										<tds-button
 											*ngIf="column.filter"
 											(click)="clearValue(column)"
 											[title]="'Clear Filter'"
 											icon="times-circle"
 											[small]="true"
-											[flat]="true"
-										>
+											[flat]="true">
 										</tds-button>
 									</div>
 								</ng-template>

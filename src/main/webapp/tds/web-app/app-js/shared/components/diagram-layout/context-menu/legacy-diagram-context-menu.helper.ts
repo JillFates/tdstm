@@ -1,8 +1,8 @@
-import {ContainerComp, IDiagramContextMenuField} from '../model/diagram-context-menu.model';
+import {ContainerComp, IDiagramContextMenuField} from '../model/legacy-diagram-context-menu.model';
 import {TaskValidationHelper} from '../../../../modules/taskManager/components/common/task-validation.helper';
 import {IGraphTask, TASK_OPTION_LABEL} from '../../../../modules/taskManager/model/graph-task.model';
 
-export class DiagramContextMenuHelper {
+export class LegacyDiagramContextMenuHelper {
 
 	constructor() { /* Constructor */ }
 

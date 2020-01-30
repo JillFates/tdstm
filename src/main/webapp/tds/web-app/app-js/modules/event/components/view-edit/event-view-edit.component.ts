@@ -25,7 +25,7 @@ export class EventViewEditComponent implements OnInit {
 	public eventId;
 	public editing = false;
 	protected userTimeZone: string;
-	protected userDateFormat: string;
+	protected userDateTimeFormat: string;
 	private requiredFields = ['name'];
 	@ViewChild('startTimePicker', {static: false}) startTimePicker;
 	@ViewChild('completionTimePicker', {static: false}) completionTimePicker;
@@ -58,7 +58,7 @@ export class EventViewEditComponent implements OnInit {
 			apiActionBypass: false
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
-		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
+		this.userDateTimeFormat = this.preferenceService.getUserDateTimeFormat();
 		this.eventModel = Object.assign({}, defaultEvent, this.eventModel);
 		this.getModel(this.eventId);
 	}

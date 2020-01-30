@@ -24,18 +24,21 @@ export class ProjectColumnModel {
 		this.columns = [
 			{
 				label: 'Project Code',
+				filterable: true,
 				property: 'projectCode',
 				type: 'text',
 				width: '*'
 			},
 			{
 				label: 'Name',
+				filterable: true,
 				property: 'projectName',
 				type: 'text',
 				width: '*'
 			},
 			{
 				label: 'Start Date',
+				filterable: true,
 				property: 'startDate',
 				type: 'date',
 				format: dateFormat,
@@ -43,6 +46,7 @@ export class ProjectColumnModel {
 			},
 			{
 				label: 'Completion Date',
+				filterable: true,
 				property: 'completionDate',
 				type: 'date',
 				format: dateFormat,
@@ -50,6 +54,7 @@ export class ProjectColumnModel {
 			},
 			{
 				label: 'Comment',
+				filterable: true,
 				property: 'comment',
 				type: 'text',
 				width: '*'

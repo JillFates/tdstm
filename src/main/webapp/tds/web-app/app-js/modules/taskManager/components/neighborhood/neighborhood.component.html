@@ -1,7 +1,6 @@
 <div class="neighborhood-container content body">
   <div class="row task-manager-header">
     <div class="col-md-4 k-align-self-center">
-      <p class="task-graph-title">Task Graph</p>
     </div>
     <div class="col-md-4 text-center k-align-self-center">
       <tds-task-view-toggle></tds-task-view-toggle>
@@ -74,22 +73,39 @@
         View Unpublished
       </label>
 
-      <label class="task-chk-container" *ngIf="hasCycles">
-        <input  type="checkbox" [(ngModel)]="showCycles" (ngModelChange)="highlightCycles()" />
+      <label class="task-chk-container" [ngClass]="{'disabled': !hasCycles}">
+        <input
+                type="checkbox"
+                [(ngModel)]="showCycles"
+                (ngModelChange)="highlightCycles()"
+                [disabled]="!hasCycles"/>
         <span class="checkmark"></span>
-        Highlight Cycles
+        Cycles
       </label>
     </div>
 
   </div>
-  <div class="row diagram-container">
-    <tds-diagram-layout
-		[nodeData]="nodeData$ | async"
-    [currentUser]="currentUser$ | async"
-    [contextMenuOptions]="ctxMenuOpts$ | async"
-    (nodeClicked)="onNeighborhood($event)"
-    (backTofullGraph)="viewFullGraphFromCache()"
-    (nodeUpdated)="updateGraphCache($event)"
-    #graph></tds-diagram-layout>
+  <div class="clr-row task-graph-diagram-container">
+    <tds-lib-diagram-layout
+          [style.width]="'100%'"
+          [data]="diagramData$ | async"
+          (nodeClicked)="onNeighborhood($event)"
+          (backToFullGraph)="viewFullGraphFromCache()"
+          (diagramAnimationFinished)="onDiagramAnimationFinished()"
+          (ctxMenuActionDispatched)="onActionDispatched($event)"
+          (nodeUpdated)="updateGraphCache($event)"
+          (diagramClicked)="diagramClicked()"
+          #graph
+    ></tds-lib-diagram-layout>
+<!--    <tds-diagram-layout-->
+<!--		[nodeData]="nodeData$ | async"-->
+<!--    [currentUser]="currentUser$ | async"-->
+<!--    [contextMenuOptions]="ctxMenuOpts$ | async"-->
+<!--    (nodeClicked)="onNeighborhood($event)"-->
+<!--    (backTofullGraph)="viewFullGraphFromCache()"-->
+<!--    (nodeUpdated)="updateGraphCache($event)"-->
+<!--    (diagramClicked)="diagramClicked()"-->
+<!--    #graph></tds-diagram-layout>-->
   </div>
+
 </div>

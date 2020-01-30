@@ -21,7 +21,7 @@ class EmailDispatch {
 	static constraints = {
 		createdBy nullable: true
 		createdDate nullable: true
-		fromAddress blank: false
+		fromAddress nullable: true
 		lastModified nullable: true
 		paramsJson nullable: true
 		sentDate nullable: true

@@ -19,7 +19,6 @@ class TasksMenuModule extends Module {
         tasksPages {tasksMenu.find("li.menu-child-item")}
         tasksSections { tasksMenu.find("li",class:"menu-parent-item")}
         taskCount { tasksMenu.find("span#todoCountProjectId")}
-        tasksMyTasksItem { tasksMenu.find("li.menu-parent-tasks-my-tasks")}
         tasksManagerItem { tasksMenu.find("li.menu-parent-tasks-task-manager")}
         tasksGraphItem { tasksMenu.find("li.menu-parent-tasks-task-graph")}
         tasksTimelineItem { tasksMenu.find("li.menu-parent-tasks-task-timeline")}

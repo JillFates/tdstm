@@ -1,5 +1,5 @@
-<div
-	tds-autofocus
+<div tds-autofocus tds-handle-escape>
+	<div
 	class="tds-modal-content has-side-nav data-script-view-edit-component"
 	#dataScriptContainer
 >
@@ -41,28 +41,19 @@
 								>
 							</label>
 							<div
-								class="col-sm-8"
-								*ngIf="modalType !== actionTypes.VIEW"
-							>
-								<kendo-dropdownlist
-									*ngIf="
-										providerList && providerList.length > 0
-									"
-									#dataScriptProvider
-									id="dataScriptProvider"
-									name="dataScriptProvider"
-									class="form-control"
-									[data]="providerList"
-									[textField]="'name'"
-									[valueField]="'id'"
-									[defaultItem]="dataScriptModel.provider"
-									[(ngModel)]="dataScriptModel.provider"
-									required
-									class="form-control"
-									[ngClass]="{
-										'has-error':
-											dataScriptForm.touched &&
-											dataScriptModel.provider &&
+								class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+								<kendo-dropdownlist *ngIf="providerList && providerList.length > 0"
+													#dataScriptProvider
+													id="dataScriptProvider"
+													name="dataScriptProvider"
+													class="form-control"
+													[data]="providerList"
+													[textField]="'name'"
+													[valueField]="'id'"
+													[defaultItem]="dataScriptModel.provider"
+													[(ngModel)]="dataScriptModel.provider"
+													required
+													[ngClass]="{'has-error': dataScriptForm.touched && dataScriptModel.provider &&
 											!dataScriptModel.provider.id
 									}"
 								>
@@ -126,72 +117,7 @@
 								}}</label>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-sm-3 control-label">Mode:</label>
-							<div class="col-sm-8">
-								<div
-									class="row"
-									style="margin-top: 6px;"
-									*ngIf="modalType !== actionTypes.VIEW"
-								>
-									<div class="col-sm-3">
-										<clr-radio-wrapper>
-											<input
-												clrRadio
-												type="radio"
-												class="radio-aligned"
-												name="dataScriptModeType"
-												[value]="dataScriptMode.IMPORT"
-												[(ngModel)]="
-													dataScriptModel.mode
-												"
-												checked
-											/>
-											<label>Import</label>
-										</clr-radio-wrapper>
-									</div>
-									<div class="col-sm-3">
-										<clr-radio-wrapper>
-											<input
-												clrRadio
-												type="radio"
-												class="radio-aligned"
-												name="dataScriptModeType"
-												[value]="dataScriptMode.EXPORT"
-												[(ngModel)]="
-													dataScriptModel.mode
-												"
-											/>
-											<label>Export</label>
-										</clr-radio-wrapper>
-									</div>
-								</div>
-								<div
-									class="row"
-									style="margin-top: 6px;"
-									*ngIf="modalType === actionTypes.VIEW"
-								>
-									<div class="col-sm-3">
-										<label
-											class="label-detail"
-											*ngIf="
-												dataScriptModel.mode ===
-												dataScriptMode.IMPORT
-											"
-											>Import</label
-										>
-										<label
-											class="label-detail"
-											*ngIf="
-												dataScriptModel.mode ===
-												dataScriptMode.EXPORT
-											"
-											>Export</label
-										>
-									</div>
-								</div>
-							</div>
-						</div>
+
 					</div>
 				</div>
 				<div>
@@ -220,6 +146,36 @@
 								class="form-control"
 								[(ngModel)]="dataScriptModel.description"
 							></textarea>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-8">
+							<span class="checkbox">
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										name="isAutoProcess"
+										id="isAutoProcess"
+										[disabled]="modalType === actionTypes.VIEW"
+										[(ngModel)]="dataScriptModel.isAutoProcess"/>
+									<label>Used to automatically transform, import and post data into TM</label>
+								</clr-checkbox-wrapper>
+							</span>
+							<span class="checkbox">
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										name="useWithAssetActions"
+										id="useWithAssetActions"
+										[disabled]="modalType === actionTypes.VIEW"
+										[(ngModel)]="dataScriptModel.useWithAssetActions"/>
+									<label>Use with asset actions</label>
+								</clr-checkbox-wrapper>
+							</span>
 						</div>
 					</div>
 				</div>
@@ -253,7 +209,7 @@
 			*ngIf="modalType === actionTypes.VIEW"
 			(click)="changeToEditDataScript()"
 			[disabled]="!isUpdateAvailable()"
-			title="Edit Name"
+			title="Edit Info"
 		>
 		</tds-button-edit>
 		<tds-button-custom
@@ -289,4 +245,5 @@
 		>
 		</tds-button-cancel>
 	</div>
+</div>
 </div>

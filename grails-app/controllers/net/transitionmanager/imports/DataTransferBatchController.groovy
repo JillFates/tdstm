@@ -142,7 +142,6 @@ class DataTransferBatchController implements ControllerMethods {
 		}
 
 		DataviewManageImportBatchesExcel dataviewParams = populateCommandObject(DataviewManageImportBatchesExcel)
-		validateCommandObject(dataviewParams)
 
 		Map findAllParams = [sort: "dateCreated", order: "desc"]
 		if(dataviewParams.max > 0) {

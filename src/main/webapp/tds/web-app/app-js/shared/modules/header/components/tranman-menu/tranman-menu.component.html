@@ -8,10 +8,10 @@
                 <li class="menu-child-item menu-admin-portal">
                     <a href="/tdstm/admin/home">Admin Portal</a>
                 </li>
-                <li *ngIf="!userContext.licenseInfo.license.isManager && hasPermission(permission.LicenseAdministration)" class="menu-child-item menu-admin-license-admin">
+                <li *ngIf="!userContext.license.isManager && hasPermission(permission.LicenseAdministration)" class="menu-child-item menu-admin-license-admin">
                     <a [routerLink]="['/license','admin','list']">License Admin</a>
                 </li>
-                <li *ngIf="userContext.licenseInfo?.license.isManager" class="menu-child-item menu-admin-license-manager">
+                <li *ngIf="userContext.license?.isManager" class="menu-child-item menu-admin-license-manager">
                     <a [routerLink]="['/license','manager','list']">License Manager</a>
                 </li>
                 <li class="menu-child-item menu-admin-notice-manager">
@@ -20,7 +20,7 @@
                 <li *ngIf="hasPermission(permission.RolePermissionView)" class="menu-child-item menu-admin-role">
                     <a href="/tdstm/permissions/show">Role Permissions</a>
                 </li>
-                <ng-container *ngIf="!userContext.licenseInfo.license.isManager">
+                <ng-container *ngIf="userContext.license && !userContext.license.isManager">
                     <li class="menu-child-item menu-admin-asset-options">
                     <a href="/tdstm/assetEntity/assetOptions">Asset Options</a>
                 </li>
@@ -55,7 +55,7 @@
                 </ng-container>
             </ul>
         </li>
-        <ng-container *ngIf="!userContext.licenseInfo?.license.isManager">
+        <ng-container *ngIf="!userContext.license?.isManager">
             <li class="dropdown menu-parent-projects">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
@@ -117,9 +117,6 @@
                         <a [routerLink]="['/asset','views']">Manage Views</a>
                     </li>
                     <li class="divider"></li>
-                    <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                        <a [routerLink]="['/asset','views',1,'show']" id="1">All Assets</a>
-                    </li>
                     <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',7,'show']" id="7">Applications</a>
                     </li>
@@ -136,16 +133,14 @@
                         <a [routerLink]="['/asset','views',6,'show']" id="6">Logical Storage</a>
                     </li>
                     <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                        <a [routerLink]="['/asset','views',1,'show']" id="1">
-                            <img src="/tdstm/assets/icons/magnifier.png" width="16" height="16">All Assets
-                        </a>
+                        <a [routerLink]="['/asset','views',1,'show']" id="1">All Assets</a>
                     </li>
                     <li class="divider"></li>
                     <li class="menu-child-item menu-parent-assets-dependencies-list">
                         <a [routerLink]="['dependencies','list']">Dependencies</a>
                     </li>
                     <li class="menu-child-item menu-parent-assets-comments-list">
-                        <a [routerLink]="['/assetcomment','list']">Comments</a>
+                        <a [routerLink]="['assetcomment','list']">Comments</a>
                     </li>
                     <li class="divider"></li>
                     <li *ngIf="hasPermission(permission.DepAnalyzerView)" class="menu-child-item menu-parent-assets-dependency-analyzer">
@@ -207,13 +202,9 @@
             <li *ngIf="hasPermission(permission.TaskView)" class="dropdown menu-parent-tasks">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
-
-                    <li class="menu-child-item menu-parent-tasks-my-tasks">
-                        <a href="/tdstm/task/listUserTasks">{{'TASK_MANAGER.MY_TASKS' | translate}} ({{taskTodoCount}})</a>
-                    </li>
-										<li *ngIf="hasPermission(permission.TaskManagerView)" class="menu-child-item menu-parent-tasks-task-manager">
-											<a [routerLink]="['/taskManager','list']">Task Manager</a>
-										</li>
+					<li *ngIf="hasPermission(permission.TaskManagerView)" class="menu-child-item menu-parent-tasks-task-manager">
+					    <a [routerLink]="['/taskManager','list']">Task Manager ({{taskTodoCount}})</a>
+					</li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-graph">
                         <a href="/tdstm/task/taskGraph?initSession=true">Task Graph</a>
                     </li>

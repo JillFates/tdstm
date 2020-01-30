@@ -114,7 +114,7 @@ class PlanningDashboardData {
 		return [
 			assignedAppPerc: percentageMetrics.assignedAppPerc,
 			confirmedAppPerc: percentageMetrics.confirmedAppPerc,
-			validated: basicMetrics.applicationCount - validateMetrics.unknownAppToValidate,
+			validated: validateMetrics.validated,
 			planReady: validateMetrics.planReady,
 			appDependenciesCount: dependencyMetrics.appDependenciesCount,
 			serverDependenciesCount: dependencyMetrics.serverDependenciesCount,
@@ -477,9 +477,9 @@ class PlanningDashboardData {
 		long fileToValidate
 		long otherToValidate
 		long planReady
+		long validated
 		long phyStorageToValidate
 		long psToValidate
-		long unknownAppToValidate
 		long vsToValidate
 
 		void calculate() {
@@ -490,13 +490,14 @@ class PlanningDashboardData {
 			Map validateArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.UNKNOWN]
 			Map deviceValidateArgs = validateArgs + [assetClass:AssetClass.DEVICE]
 			Map planReadyArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.PLAN_READY]
+			Map validatedArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.VALIDATED]
 
 			appToValidate = getAssetCount('Application', validateArgs, basicValidateClauses)
-			unknownAppToValidate = getAssetCount('Application', validateArgs, basicValidateClauses)
 			dbToValidate = getAssetCount('Database', validateArgs, basicValidateClauses)
 			fileToValidate = getAssetCount('Files', validateArgs, basicValidateClauses)
 			otherToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.nonOtherTypes], otherValidateClauses)
 			planReady = getAssetCount('Application', planReadyArgs, basicValidateClauses)
+			validated = getAssetCount('Application', validatedArgs, basicValidateClauses)
 			phyStorageToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.storageTypes], deviceValidateClauses)
 			psToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.physicalServerTypes], deviceValidateClauses)
 			vsToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.virtualServerTypes], deviceValidateClauses)
@@ -595,9 +596,9 @@ class PlanningDashboardData {
 			}
 
 			Map openIssuesParams = [project: project, type: AssetCommentType.TASK, event: moveEvent,
-			                        status : [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.PENDING]]
+			                        statusExcluded : AssetCommentStatus.COMPLETED ]
 			String openIssuesQuery = """SELECT count(*) FROM AssetComment WHERE project=:project
-				AND commentType=:type AND status IN (:status) AND moveEvent=:event AND isPublished=true"""
+				AND commentType=:type AND status <> :statusExcluded AND moveEvent=:event AND isPublished=true"""
 			Long openIssueCount = AssetComment.executeQuery(openIssuesQuery, openIssuesParams)[0]
 
 			metrics['openTasks'] << [moveEvent: moveEvent.id, count: openIssueCount]

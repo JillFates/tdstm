@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3d79b34f-2de1-4427-b072-42805a230125",
+		"_postman_id": "90f648fb-7397-4d04-87cd-a659dd267682",
 		"name": "Notices CRUD",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -228,6 +235,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -328,6 +340,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -426,6 +443,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -519,6 +541,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -611,6 +638,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"url": {
@@ -694,6 +726,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"url": {
@@ -732,7 +769,10 @@
 							"pm.environment.unset(\"mandatoryNotice\");",
 							"pm.environment.unset(\"preLoginNoticeId\");",
 							"pm.environment.unset(\"mandatoryNoticeId\");",
-							"pm.environment.unset(\"postLoginNoticeId\");"
+							"pm.environment.unset(\"postLoginNoticeId\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -784,6 +824,11 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"url": {

@@ -39,7 +39,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Updated',
 		property: 'updatedTime',
 		type: 'text',
-		width: 180,
+		width: 120,
 		filterable: false,
 		locked: false
 	},

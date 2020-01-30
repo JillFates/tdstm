@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -18,6 +19,7 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskDependency
 import spock.lang.See
 import spock.util.mop.ConfineMetaClassChanges
+
 /**
  * Test about ETL Current Element (CE):
  */
@@ -42,7 +44,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can assign DOMAIN variable'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -106,7 +108,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an Exception domain class is not Dependency'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -149,7 +151,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an Exception if asset is null values'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -190,7 +192,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an Exception if asset is not a DOMAIN'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -232,7 +234,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an Exception if asset has not an AssetEntity domain'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -276,7 +278,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an Exception if asset is not defined before define an asset dependency type'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -320,7 +322,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an Exception if Dependency type is incorrect'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -368,7 +370,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an Exception if dependent has not an AssetEntity parameter'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model
 				xraysrv01,Dell,PE2950
 			""".stripIndent())
@@ -423,7 +425,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 	void 'test can create an asset and dependent for Dependency using domain command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				name,mfg,model,application id,vendor name,technology,url
 				xraysrv01,Dell,PE2950,152254,Microsoft,(xlsx updated),www.microsoft.com
 			'''.stripIndent())
@@ -605,7 +607,7 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 	void 'test can use domain command with application and devices to auto populate Dependency'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application,vendor,server_name,manufacturer,model,server_guid
 				Exchange,Microsoft,exchangedb01,VMWare,VM,123-abc-456-def
 			'''.stripIndent())

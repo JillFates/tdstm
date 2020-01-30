@@ -280,5 +280,9 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException unknownTag(String tagName) {
         new ETLProcessorException("Unknown Tag: '$tagName'")
     }
+
+    static ETLProcessorException unknownETLMapDefinition(String label) {
+        new ETLProcessorException("Unknown ETL Map definition: '$label'")
+    }
 }
 

@@ -1,6 +1,32 @@
+.content-middle
+	display: flex
+	align-items: center
+	h2
+		margin-top: 0
+.breadcrumb-container
+	cursor: default
+	padding: 0 5px
+	list-style: none
+	border-radius: 4px
+	li
+		display: inline-block
+		color: $color--black3
+		font-weight: bold
+	li + li:before
+		padding: 0 5px
+		color: #ccc
+		content: "\003E"
+	> .licensing-banner-message
+		&.breadcumb-1
+			right: 7%
+		&.breadcumb-2
+			right: 9%
+		&.breadcumb-3
+			right: 10%
+		&.breadcumb-4
+			right: 12%
 div.license-warning-component
 .btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus
-	outline: none
 	outline: none
 	box-shadow: none
 a.licensing-error-warning
@@ -15,6 +41,10 @@ div.license-warning-message-button
   text-align: center
   margin-top: 10px
 
+
+.breadcrumb-container.licensing-banner-message
+	background: none !important
+
 .licensing-banner-message
 	text-align: center
 	.callout
@@ -24,10 +54,7 @@ div.license-warning-message-button
 		background: $color-active-light4
 		border: 1px solid $color-active-light3
 		padding: 2px
-		bottom: 10px
-		position: absolute
-		left: 0
-		right: 0
+		position: relative
 		margin: 0
 @media(min-width: 992px)
 	.licensing-banner-message
@@ -37,7 +64,7 @@ div.license-warning-message-button
 		position: relative !important
 
 @media (max-width: 991px)
-	.content-header>.breadcrumb.licensing-banner-message
+	.breadcrumb.licensing-banner-message
 		background: none
 		.callout
 			margin-right: 0px

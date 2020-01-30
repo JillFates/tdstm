@@ -1,8 +1,9 @@
 import { ActivatedRoute } from '@angular/router';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 import {pathOr} from 'ramda';
 import {
 	CellClickEvent,
@@ -33,6 +34,7 @@ import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
+import { HeaderActionButtonData } from 'tds-component-library';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { Store } from '@ngxs/store';
@@ -43,12 +45,16 @@ import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.help
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
 import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'task-list',
 	templateUrl: './task-list.component.html'
 })
-export class TaskListComponent {
+export class TaskListComponent implements OnInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	@ViewChild('gridComponent', {static: false}) gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
@@ -79,7 +85,9 @@ export class TaskListComponent {
 	private rowsExpandedMap: any;
 	// Contains the Action Bar Details for each row
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
+	public hasViewUnpublishedPermission = false;
 	public isFiltering  = false;
+	public allTasksPermission: boolean;
 
 	constructor(
 		private taskService: TaskService,
@@ -87,12 +95,14 @@ export class TaskListComponent {
 		private userPreferenceService: PreferenceService,
 		private loaderService: UILoaderService,
 		private store: Store,
+		private permissionService: PermissionService,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
-		this.justMyTasks = false;
+		this.allTasksPermission = this.permissionService.hasPermission(Permission.TaskManagerAllTasks);
+		this.justMyTasks = !this.allTasksPermission;
 		this.loading = true;
 		this.hideGrid = true;
 		this.rowsExpanded = false;
@@ -106,7 +116,36 @@ export class TaskListComponent {
 		this.rowsExpandedMap = {};
 		this.currentPage = 1;
 		this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+		this.hasViewUnpublishedPermission = this.permissionService.hasPermission(Permission.TaskViewUnpublished);
 		this.onLoad();
+	}
+
+	/**
+	 * On Init: remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+	 */
+	ngOnInit(): void {
+		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
+		if (contentWrapper) {
+			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
+			// 45px is the header height, 31px is the footer height
+			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
+		}
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translate.transform('TASK_MANAGER.CREATE_TASK'),
+				show: true,
+				onClick: this.onCreateTaskHandler.bind(this),
+			},
+			{
+				icon: 'pencil',
+				title: this.translate.transform('TASK_MANAGER.BULK_ACTION'),
+				show: true,
+				onClick: this.onBulkActionHandler.bind(this),
+			},
+		];
 	}
 
 	/**
@@ -117,7 +156,7 @@ export class TaskListComponent {
 	 */
 	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
 		service.close();
-		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
+		let index = parseInt(customColumn.charAt(customColumn.length - 1), 10) + 1;
 		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
 			.subscribe(result => {
 				this.buildCustomColumns(result.customColumns, result.assetCommentFields);
@@ -129,7 +168,7 @@ export class TaskListComponent {
 	 * On Event select change.
 	 */
 	onEventSelect(selected: any): void {
-		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 0));
+		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 10));
 		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
 		this.onFiltersChange();
 	}
@@ -210,12 +249,12 @@ export class TaskListComponent {
 				} else if (result.shouldEdit) {
 					this.onOpenTaskEditHandler(result.id);
 				} else {
-					this.search(parseInt(taskRow.id, 0));
+					this.search(parseInt(taskRow.id, 10));
 				}
 			}
 		}).catch(result => {
 			if (result) {
-				this.search(parseInt(taskRow.id, 0));
+				this.search(parseInt(taskRow.id, 10));
 			}
 		});
 	}
@@ -249,7 +288,7 @@ export class TaskListComponent {
 									this.search();
 								});
 							} else {
-								this.search(parseInt(taskRow.id, 0));
+								this.search(parseInt(taskRow.id, 10));
 							}
 						}
 					}).catch(result => {
@@ -342,31 +381,52 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
-	 * @param $event: any
-	 */
-	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		this.loadTaskActionInfoModel($event.dataItem.id).subscribe(() => {
-			// loaded.
-		});
-		this.rowsExpandedMap[$event.index] = true;
-	}
-
-	/**
 	 * Responsible for fetching the latest data for the action bar
 	 * @param taskId
 	 */
 	refreshActionBar(taskId: any): void {
-		this.loadTaskActionInfoModel(taskId).subscribe(() => {
-			// loaded.
-		});
+		this.getInfoModelAndUpdateTaskActions([taskId])
+			.subscribe(() => {
+				// updated action bar row
+			});
 	}
+
 	/**
 	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
 	 */
 	onRowDetailCollapseHandler($event: DetailCollapseEvent): void {
-		this.rowsExpandedMap[$event.index] = false;
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onCollapseRow($event.index);
+			});
+	}
+
+	/**
+	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
+	 * @param $event: any
+	 */
+	onRowDetailExpandHandler($event: DetailExpandEvent): void {
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onExpandRow($event.index);
+			});
+	}
+
+	/**
+	 * Set the flag to Collapse of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onCollapseRow(index: number): void {
+		this.rowsExpandedMap[index] = false;
+	}
+
+	/**
+	 * Set the flag to Expand of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onExpandRow(index: number): void {
+		this.rowsExpandedMap[index] = true;
 	}
 
 	/**
@@ -432,14 +492,6 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Determines if current columns has been filtered (contains value).
-	 */
-	areFiltersDirty(): boolean {
-		return (this.columnsModel
-			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
-	}
-
-	/**
 	 * On bulk action button click, expand all rows that can be actionable (ready or started status)
 	 */
 	onBulkActionHandler(): void {
@@ -447,27 +499,24 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
 			let taskIds = taskRows.map(task => task.id);
-			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
-				for (const taskId in result) {
-					if (result.hasOwnProperty(taskId)) {
-						const taskActionInfoModel = result[taskId];
-						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+			this.getInfoModelAndUpdateTaskActions(taskIds)
+				.subscribe(() => {
+					// take into account that grid could been filtered
+					const rowCounter = pathOr(0, ['gridData', 'data', 'length'], this.grid);
+					for (let i = 0; i < rowCounter; i++ ) {
+						if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+							this.gridComponent.expandRow(i);
+							this.rowsExpandedMap[i] = true;
+						}
 					}
-				}
-				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
-					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
-						this.gridComponent.expandRow(i);
-						this.rowsExpandedMap[i] = true;
-					}
-				}
-			});
-			this.rowsExpanded = true;
+					this.rowsExpanded = true;
+				});
 		} else {
 			taskRows.forEach((taskRow, index) => {
 				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(index);
 			});
 			this.rowsExpanded = false;
@@ -486,14 +535,31 @@ export class TaskListComponent {
 			expandedEvent.dataItem = $event.dataItem;
 			// collapse
 			if (this.rowsExpandedMap[$event.rowIndex]) {
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow($event.rowIndex);
 				// expand
 			} else {
-				this.onRowDetailExpandHandler(expandedEvent);
+				this.onExpandRow(expandedEvent.index);
 				this.gridComponent.expandRow($event.rowIndex);
 			}
 		}
+	}
+
+	/**
+	 * Ge the task actions of the selected task and updates is model
+	 * @param taskIds
+	 */
+	getInfoModelAndUpdateTaskActions(taskIds: number[]): Observable<void> {
+		return this.taskService.getBulkTaskActionInfo(taskIds)
+			.pipe(map((result: any) => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				return;
+			}));
 	}
 
 	/**
@@ -538,6 +604,9 @@ export class TaskListComponent {
 		}
 		const filterColumn = { ...column };
 		if (filterColumn.property.startsWith('userSelectedCol')) {
+			// save the reference to the custom property name
+			column.customPropertyName =  this.currentCustomColumns[filterColumn.property];
+			// use the new property name
 			filterColumn.property = this.currentCustomColumns[filterColumn.property];
 		}
 		const result = this.grid.getFilter(filterColumn);
@@ -587,10 +656,10 @@ export class TaskListComponent {
 					// Custom Columns, TaskPref
 					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
 					// Task list size
-					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					this.pageSize = listSize ? parseInt(listSize, 10) : GRID_DEFAULT_PAGE_SIZE;
 					this.grid.state.take = this.pageSize;
 					// Task View Unpublished
-					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
+					this.viewUnpublished = this.hasViewUnpublishedPermission && unpublished ? (unpublished === 'true' || unpublished === '1') : false;
 					// Just Remaining
 					this.justRemaining = justRemaining ? justRemaining === '1' : false;
 					// params were transferred to local properties,
@@ -614,7 +683,7 @@ export class TaskListComponent {
 	private loadEventListAndSearch(currentEventId: any): void {
 		this.reportService.getEventList().subscribe(result => {
 			this.eventList = [this.allEventsOption].concat(result.data);
-			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 0));
+			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 10));
 			if (match) {
 				this.selectedEvent = match;
 			} else {
@@ -714,9 +783,9 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		for (let rowIndex in this.rowsExpandedMap) {
 			if (rowIndex) {
-				let rowNum = parseInt(rowIndex, 0);
+				let rowNum = parseInt(rowIndex, 10);
 				expandedEvent.index = rowNum;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(rowNum);
 			}
 		}
@@ -754,7 +823,7 @@ export class TaskListComponent {
 			taskId = taskId.toString();
 		}
 		return new Observable(observer => {
-			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+			this.taskService.getTaskActionInfo(parseInt(taskId, 10))
 				.subscribe((result: TaskActionInfoModel) => {
 					const taskActionInfoModel = result;
 					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
@@ -764,7 +833,7 @@ export class TaskListComponent {
 		});
 	}
 
-	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel): void {
 		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
 
 		// Update the grid row with new information from the endpoint (status, assignTo, etc)
@@ -798,7 +867,7 @@ export class TaskListComponent {
 	/**
 	 * Toggle the flag to show/hide grid filters
 	 */
-	public toggleFiltering() {
+	public toggleFiltering(): void {
 		this.isFiltering = !this.isFiltering;
 	}
 
@@ -815,5 +884,21 @@ export class TaskListComponent {
 	public pageChangeTaskGrid(event: PageChangeEvent): void {
 		// this.tasksPage = event;
 		// this.loadTasksGrid();
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.isFiltering = false;
+		this.grid.clearAllFilters(this.columnsModel);
+		this.onFiltersChange();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCounter() === 0 && this.hasDashboardFilters() === false;
 	}
 }

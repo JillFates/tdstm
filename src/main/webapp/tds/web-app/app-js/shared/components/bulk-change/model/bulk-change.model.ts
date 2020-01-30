@@ -1,6 +1,7 @@
 export enum BulkActions {
 	Edit,
-	Delete
+	Delete,
+	Run
 }
 
 export enum BulkChangeType {
@@ -18,7 +19,9 @@ export class BulkChangeModel {
 	public affected: number;
 	public showEdit?: boolean;
 	public showDelete?: boolean;
+	public showAction?: boolean;
 	public bulkChangeType?: BulkChangeType;
+	public viewId?: number;
 	selectedAssets: Array<any>;
 }
 

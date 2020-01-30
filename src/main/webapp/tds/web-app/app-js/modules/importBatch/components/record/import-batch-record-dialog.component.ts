@@ -26,7 +26,7 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 		private translatePipe: TranslatePipe) {
 			super('#import-batch-record-dialog');
 			this.isWindowMaximized = false;
-			this.modalOptions = { isFullScreen: true, isResizable: true, isDraggable: true };
+			this.modalOptions = { isFullScreen: false, isResizable: true, isDraggable: true };
 	}
 
 	/**

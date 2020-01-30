@@ -13,8 +13,12 @@
   .row-controls
     .header-controls
       align-items: center
+      > clr-checkbox-wrapper:not(:last-child)
+          margin-right: 15px
   form
     height: 12%
+    input[type=checkbox][disabled] + label
+      cursor: not-allowed
   .badge
     padding: 0
   .task-action-buttons
@@ -39,6 +43,8 @@
     font-size: 14px
     line-height: 24px
     margin: unset
+  .task-updated-cell
+    padding: 2px 6px
   .select-event-list
     width: 150px
     max-width: 150px

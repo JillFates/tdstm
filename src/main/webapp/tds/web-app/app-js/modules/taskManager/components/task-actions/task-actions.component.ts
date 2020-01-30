@@ -47,7 +47,7 @@ export interface TaskActionsOptions {
             </tds-button>
             <div *ngIf="showDelayActions && showDelay()"
                  class="task-action-buttons">
-                <span class="delay">Delay for:</span>
+                <label class="delay">Delay for:</label>
                 <tds-button (click)="onDelay(1)">
                     1 day
                 </tds-button>

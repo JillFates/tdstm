@@ -16,10 +16,10 @@ export class SessionExpired {
 	static readonly type = '[Auth] SessionExpired';
 }
 
-export class Permissions {
+export class GetPermissions {
 	static readonly type = '[Auth] getPermissions';
 }
 
-export class LicenseInfo {
-	static readonly type = '[Auth] getLicenseInfo';
+export class GetLicense {
+	static readonly type = '[Auth] getLicense';
 }

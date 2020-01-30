@@ -3,6 +3,7 @@ import {Component} from '@angular/core';
 import {FormGroup, FormControl} from '@angular/forms';
 // NGXS
 import {Store} from '@ngxs/store';
+import {Logout} from '../../../../../modules/auth/action/login.actions';
 // Component
 import {UserPreferencesComponent} from '../preferences/user-preferences.component';
 import {UserEditPersonComponent} from '../edit-person/user-edit-person.component';
@@ -16,11 +17,10 @@ import {UserContextModel} from '../../../../../modules/auth/model/user-context.m
 import {PersonModel} from '../../../../components/add-person/model/person.model';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {PageMetadataModel} from '../../model/page-metadata.model';
-import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
 import {ReplaySubject} from 'rxjs';
-import {SetUserContextPerson} from '../../../../../modules/user/actions/user-context.actions';
+import {SetUserContextPerson} from '../../../../../modules/auth/action/user-context-person.actions';
 
 declare var jQuery: any;
 

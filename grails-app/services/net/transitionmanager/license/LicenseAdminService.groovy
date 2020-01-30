@@ -278,7 +278,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				String errorMessage = ''
 				int gracePeriodDays = 0
 
-				List<License> licenseObjs = licenses.collect { DomainLicense lic -> getLicenseObj(lic) }
+				List<License> licenseObjs = licenses.findResults { DomainLicense lic -> getLicenseObj(lic) }
 
 				licenseObjs = licenseObjs.findAll { License lic ->
 					Map jsonData = JSON.parse(lic.subject)
@@ -466,9 +466,10 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 			licObj = manager.getLicense(id)
 		}catch(Exception ex){
 			log.error(ex.message)
+			log.error("Error loading license data: Wrong License Certificate, Perhaps copied from another server?")
 			licenseProvider.remove(id)
 			license.status = DomainLicense.Status.CORRUPT
-			//return license.save()
+			license.save()
 			return false
 		}
 		//Validate if is valid

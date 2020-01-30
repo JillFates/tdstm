@@ -1,5 +1,5 @@
-<div
-	tds-autofocus
+<div tds-autofocus tds-handle-escape>
+	<div
 	class="tds-modal-content has-side-nav event-view-edit-component"
 	id="event-view-edit-component"
 	data-backdrop="static"
@@ -121,7 +121,7 @@
 								<td valign="top" class="value">
 									{{
 										savedModel?.estStartTime
-											| tdsDateTime: userTimeZone
+											| tdsDateTime: userTimeZone:userDateTimeFormat
 									}}
 								</td>
 							</tr>
@@ -134,7 +134,7 @@
 								<td valign="top" class="value">
 									{{
 										savedModel?.estCompletionTime
-											| tdsDateTime: userTimeZone
+											| tdsDateTime: userTimeZone:userDateTimeFormat
 									}}
 								</td>
 							</tr>
@@ -362,4 +362,5 @@
 		></tds-button-delete>
 		<tds-button-close (click)="cancelCloseDialog()"></tds-button-close>
 	</div>
+</div>
 </div>

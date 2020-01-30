@@ -286,6 +286,21 @@ class TagService implements ServiceMethods {
 	}
 
 	/**
+	 * Gets the select for tags ids, as a list if filtering on tag Ids.
+	 *
+	 * @param tagIds the tag ids being filtered on.
+	 *
+	 * @return the select for tag ids in a list.
+	 */
+	String getTagSelect(List<Long> tagIds) {
+		if (tagIds) {
+			return ",COALESCE(group_concat(t.tag_id),'') as tags"
+		}
+
+		return ''
+	}
+
+	/**
 	 * Generates up the query for filtering by tags, if there are any. To use this the asset_entity table must be joined with the alias a.
 	 *
 	 * @param tagIds The tag ids to filter by.

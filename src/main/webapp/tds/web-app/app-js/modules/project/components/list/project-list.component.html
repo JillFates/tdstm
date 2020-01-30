@@ -26,7 +26,7 @@
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
-							<div class="clr-col-12 grid-actions">
+							<div class="clr-col-4 grid-actions project-active-completed-options">
 								<clr-radio-wrapper>
 									<input
 										type="radio"
@@ -49,17 +49,14 @@
 									/>
 									<label>Show Completed Projects</label>
 								</clr-radio-wrapper>
-
-								<tds-button
-									icon="sync"
-									(click)="reloadData()"
-								></tds-button>
-
-								<tds-button-create
-									[displayLabel]="'false'"
-									*ngIf="canEditProject"
-									(click)="openCreateProject()"
-								></tds-button-create>
+							</div>
+							<div class="clr-col-8 grid-actions">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons"
+                                        (clearFilters)="clearAllFilters()"
+                                        [disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
 							</div>
 						</div>
 					</ng-template>

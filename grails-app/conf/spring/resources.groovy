@@ -13,6 +13,8 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ldap.core.GrailsSimpleDirContextAuthenticationStrategy
 import grails.plugin.springsecurity.ldap.core.SimpleAuthenticationSource
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
+import net.transitionmanager.security.CsrfFilter
+import net.transitionmanager.security.RequireCsrfProtectionMatcher
 import net.transitionmanager.task.TaskFacade
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -21,6 +23,7 @@ import org.springframework.security.ldap.DefaultSpringSecurityContextSource
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch
 import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator
 import org.springframework.security.web.access.ExceptionTranslationFilter
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository
 
 beans = {
 	// uses the grails dataSource from DataSource.groovy
@@ -48,6 +51,12 @@ beans = {
 	postAuthenticationChecks(TdsPostAuthenticationChecks) {
 		grailsApplication = ref('grailsApplication')
 		passwordService = ref('passwordService')
+	}
+
+	requireCsrfProtectionMatcher(RequireCsrfProtectionMatcher)
+	csrfTokenRepository(HttpSessionCsrfTokenRepository)
+	csrfFilter(CsrfFilter, ref('csrfTokenRepository')) {
+		requireCsrfProtectionMatcher = ref('requireCsrfProtectionMatcher')
 	}
 
 	userPasswordEncoderListener(UserPasswordEncoderListener)

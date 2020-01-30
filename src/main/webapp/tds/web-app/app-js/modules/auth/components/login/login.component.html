@@ -7,11 +7,12 @@
 						<img src="/tdstm/tds/web-app/assets/images/transitionLargeLogo.svg" alt="Transition Manager Logo" />
 					</a>
 				</h1>
-				<form clrForm action="signIn" name="loginForm" class="login-form is-fullwidth" #loginForm="ngForm" clrLayout="vertical" >
+				<form clrForm action="signIn" name="loginForm" class="login-form is-fullwidth" #loginForm="ngForm" clrLayout="vertical" (keyup.enter)="onLogin()">
 					<clr-select-container class="clr-col-12" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
 						<select clrSelect
 								name="authority"
 								[(ngModel)]="loginModel.authority"
+								(keydown.enter)="$event.stopImmediatePropagation(); $event.preventDefault(); onLogin();"
 								required>
 							<option value="Select {{ loginInfo.config?.authorityLabel }}" disabled>Select {{ loginInfo.config?.authorityLabel }}</option>
 							<option *ngFor=" let authority of loginInfo.config.authorityList"
@@ -84,7 +85,7 @@
 							Log In
 						</tds-button>
 					</div>
-					<div class="build-info">{{loginInfo.buildVersion}} <strong> Patent Pending</strong></div>
+					<div class="build-info">{{loginInfo.buildVersion}} Patent Pending</div>
 				</form>
 			</section>
 		</div>

@@ -132,12 +132,15 @@ export class BundleViewEditComponent implements OnInit {
 
 	public switchToEdit() {
 		this.editing = true;
-		if (this.bundleModel.startTime) {
-			this.startTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.startTime);
-		}
-		if (this.bundleModel.completionTime) {
-			this.completionTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.completionTime);
-		}
+		// Small delay when switch so the elements are visible
+		setTimeout(() => {
+			if (this.bundleModel.startTime) {
+				this.startTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.startTime);
+			}
+			if (this.bundleModel.completionTime) {
+				this.completionTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.completionTime);
+			}
+		});
 	}
 
 	/**

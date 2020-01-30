@@ -82,7 +82,7 @@ class RoomController implements ControllerMethods {
 
 	@HasPermission(Permission.RoomCreate)
 	def save() {
-		RoomCommand roomCommand = populateCommandObject(RoomCommand)
+		RoomCommand roomCommand = populateCommandObject(RoomCommand, false)
 		flash.message = roomService.save(roomCommand)
 		redirect(action: "list", params: [viewType: "list"])
 	}
@@ -343,7 +343,7 @@ class RoomController implements ControllerMethods {
 			assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
 				spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 				def powerConnectors = AssetCableMap.executeQuery(
-					'FROM AssetCableMap WHERE assetFromPort.type=? AND assetFrom=?0', ["Power", assetEntity])
+					'FROM AssetCableMap WHERE assetFromPort.type=:type AND assetFrom=:asset', [type: "Power", asset: assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
 				def rackPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 				if (powerConnectorsAssigned) {

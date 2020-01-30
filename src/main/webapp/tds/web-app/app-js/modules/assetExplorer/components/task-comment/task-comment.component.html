@@ -38,12 +38,13 @@
 							<label>View Unpublished Tasks</label>
 						</clr-checkbox-wrapper>
 						<div class="btn-sm">
-							<tds-button
+							<tds-button-add
 								[disabled]="!isTaskCreateAvailable()"
-								(click)="openTaskCreate()"
-								icon="plus"
-								>Create</tds-button
-							>
+								iconClass="is-solid"
+                                [displayLabel]="false"
+								tooltip="Create Task"
+								(click)="openTaskCreate()">
+							</tds-button-add>
 						</div>
 					</div>
 				</div>
@@ -154,12 +155,13 @@
 							<label>View All Comments</label>
 						</clr-checkbox-wrapper>
 						<div class="btn-sm">
-							<tds-button
-								[disabled]="!isCommentCreateAvailable()"
-								(click)="createComment()"
-								icon="plus"
-								>Create</tds-button
-							>
+							<tds-button-add
+									[disabled]="!isCommentCreateAvailable()"
+									iconClass="is-solid"
+									[displayLabel]="false"
+									tooltip="Create comment"
+									(click)="createComment()">
+							</tds-button-add>
 						</div>
 					</div>
 				</div>

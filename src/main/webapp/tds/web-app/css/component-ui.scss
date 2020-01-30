@@ -49,6 +49,11 @@ kendo-grid {
         float: right;
       }
     }
+
+  	// Fix issue displaying check icon within a grid
+	.clr-checkbox-wrapper {
+		box-sizing: border-box;
+	}
 }
 
 task-comment kendo-grid.k-grid .k-grid-content {

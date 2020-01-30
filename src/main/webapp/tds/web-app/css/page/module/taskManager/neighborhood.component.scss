@@ -4,9 +4,14 @@
   height: 100%;
 }
 
-.diagram-container {
+.neighborhood-container.content {
+  padding-top: 5px !important;
+}
+
+.task-graph-diagram-container {
   width: 100%;
   height: 100%;
+  min-height: 700px;
   margin-left: 0;
   z-index: 70;
 }
@@ -100,6 +105,15 @@
   width: 0;
 }
 
+.task-chk-container.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-chk-container input:disabled {
+  cursor: not-allowed;
+}
+
 /* Create a custom checkbox */
 .checkmark {
   position: absolute;
@@ -183,3 +197,33 @@
 .k-icon {
   font-family: "WebComponentsIcons", serif !important;
 }
+
+//#graph-control-btn-group {
+//  position: absolute;
+//  bottom: 40px;
+//  left: 40px;
+//  z-index: 999;
+//}
+
+//#graph-control-btn-group > .btn {
+//  background-color: #dddddd !important;
+//  border-color: #c4d0dc !important;
+//  color: #333333 !important;
+//  width: 100% !important;
+//  padding: 0 .2rem 0 .2rem !important;
+//  min-width: 1.5rem !important;
+//  border-radius: 0.3rem !important;
+//  margin: 0 0 0.05rem 0 !important;
+//}
+//
+//#graph-control-btn-group > .btn:hover {
+//  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
+//}
+//
+//#graph-control-btn-group > .btn:active {
+//  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
+//}
+//
+//#graph-control-btn-group > .btn:focus {
+//  outline: none !important;
+//}

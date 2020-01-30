@@ -541,18 +541,14 @@ application id,vendor name,technology,location
 			ProgressCallback callback = Mock(ProgressCallback)
 
 		when: 'Service executes the script with incorrect syntax'
-			def (ETLProcessor etlProcessor, String outputFilename) = service.executeAndSaveResultsInFile(
+			ETLProcessorResult results = service.executeAndRetrieveResults(
 				GMDEMO,
 				54321l,
 				script,
 				fileSystemService.getTemporaryFullFilename(applicationDataSetFileName),
 				callback)
 
-		then: 'Service result a valid filename with results'
-			outputFilename != null
-
-		and: 'Service result returns the instance of ETLProcessor and its results'
-			def results = etlProcessor.finalResult()
+		then: 'Service result returns the instance of ETLProcessor and its results'
 			results.domains.size() == 1
 
 			results.domains[0].domain == ETLDomain.Application.name()
@@ -573,7 +569,6 @@ application id,vendor name,technology,location
 				]
 			)
 
-
 			results.domains[0].data[1].fields.id.value == 152255l
 			results.domains[0].data[1].fields.id.originalValue == '152255'
 			results.domains[0].data[1].fields.id.find.results == [152255l]
@@ -587,21 +582,17 @@ application id,vendor name,technology,location
 				]
 			)
 
-
 			results.domains[0].data[0].fields.appVendor.value == 'Microsoft'
 			results.domains[0].data[0].fields.appVendor.originalValue == 'Microsoft'
 			!results.domains[0].data[0].fields.appVendor.find.query
-
 
 			results.domains[0].data[1].fields.appVendor.value == 'Mozilla'
 			results.domains[0].data[1].fields.appVendor.originalValue == 'Mozilla'
 			!results.domains[0].data[1].fields.appVendor.find.query
 
-
 			results.domains[0].data[0].fields.environment.value == 'Production'
 			results.domains[0].data[0].fields.environment.originalValue == 'Production'
 			!results.domains[0].data[0].fields.environment.find.query
-
 
 			results.domains[0].data[1].fields.environment.value == 'Production'
 			results.domains[0].data[1].fields.environment.originalValue == 'Production'
@@ -613,14 +604,7 @@ application id,vendor name,technology,location
 				1 * reportProgress(50, false, RUNNING, '')
 				1 * reportProgress(100, false, RUNNING, '')
 				1 * reportProgress(100, true, RUNNING, '')
-				1 * reportProgress(100, true, COMPLETED, { it != null })
 			}
-
-		cleanup:
-			if (outputFilename) {
-				fileSystemService.deleteTemporaryFile(outputFilename)
-			}
-
 	}
 
 	static Map fieldSpecsMap = [

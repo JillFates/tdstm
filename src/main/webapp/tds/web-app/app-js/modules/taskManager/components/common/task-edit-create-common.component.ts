@@ -116,8 +116,8 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 			this.isEventLocked = this.model.predecessorList.length > 0 || this.model.successorList.length > 0;
 
 			const commonCalls = [
-				this.taskManagerService.getStatusList(this.model.id),
-				this.taskManagerService.getAssignedTeam(this.model.id),
+				this.taskManagerService.getStatusList(),
+				this.taskManagerService.getAssignedTeam(this.model.id, this.taskDetailModel.modal.type === ModalType.CREATE),
 				this.taskManagerService.getStaffRoles(),
 				this.userPreferenceService.getUserDatePreferenceAsKendoFormat(),
 				this.taskManagerService.getActionList()
@@ -141,7 +141,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 					this.model.statusList = status;
 					personList = personList || [];
 					// Add Unassigned and Auto options to staff list
-					personList.push({id: 'AUTO', nameRole: 'Automatic', sortOn: 'Automatic'});
+					personList.push({id: 'AUTO', nameRole: 'Automated Task', sortOn: 'Automated Task'});
 					this.model.personList = personList
 						.sort((a, b) => SortUtils.compareByProperty(a, b, 'sortOn'))
 						.map((item) => ({id: item.id, text: item.nameRole}));

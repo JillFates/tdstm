@@ -6,8 +6,9 @@ div.license-warning-message-button
 	text-align: center
 	margin-top: 10px
 
-.licensing-banner-message
+.legacy-licensing-banner-message
 	text-align: center
+	width: 100%
 	.callout
 		line-height: 25px
 		font-size: 12px
@@ -15,23 +16,57 @@ div.license-warning-message-button
 		background: $color-active-light4
 		border: 1px solid $color-active-light3
 		padding: 2px
-		bottom: 10px
-		position: absolute
-		left: 0
-		right: 0
+		position: relative
 		margin: 0
 
 @media(min-width: 992px)
-	.licensing-banner-message
+	.legacy-licensing-banner-message
 		float: initial !important
 		max-width: 400px
 		margin: 0 auto
 		position: relative !important
-		top: -25px !important
 
 @media (max-width: 991px)
-	.content-header>.breadcrumb.licensing-banner-message
+	.content-header>.legacy-breadcrumb.legacy-licensing-banner-message
 		background: none
 		.callout
 			margin-right: 0px
 			position: initial !important
+.legacy-content-middle
+	display: flex
+	align-items: center
+	h2
+		margin-top: 0
+.legacy-breadcrumb
+	cursor: default
+	padding: 0 5px
+	list-style: none
+	border-radius: 4px
+	float: right
+	li
+		display: inline-block
+		color: $color--black3
+		font-weight: bold
+	li + li:before
+		padding: 0 5px
+		color: #ccc
+		content: "\003E"
+	> .legacy-licensing-banner-message
+		&.breadcumb-1
+			right: 7%
+		&.breadcumb-2
+			right: 9%
+		&.breadcumb-3
+			right: 10%
+		&.breadcumb-4
+			right: 12%
+
+.legacy-breadcrumb.licensing-banner-message
+	background: none !important
+
+.legacy-licensing-banner-message-container
+	display: grid
+	width: 100%
+.legacy-breadcrumb-container
+	text-align: right
+	display: grid

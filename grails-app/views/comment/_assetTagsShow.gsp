@@ -1,8 +1,6 @@
 <tr style="order: 2000">
-    <th class="label N" nowrap="nowrap">
-        <label>
-            Tags
-        </label>
+    <th class="N" nowrap="nowrap">
+        Tags
     </th>
     <g:if test="${tagAssetsFromServer}">
         <td nowrap="nowrap" class="N asset-tag-selector-component-content" colspan="7" id="tmAssetTagViewSelector">

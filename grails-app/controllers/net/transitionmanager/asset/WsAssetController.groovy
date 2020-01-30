@@ -64,7 +64,7 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def checkForUniqueName(){
-		UniqueNameCommand command = populateCommandObject(UniqueNameCommand)
+		UniqueNameCommand command = populateCommandObject(UniqueNameCommand, false)
 		boolean unique = true
 		AssetClass assetClassSample
 		Long foundAssetId
@@ -126,7 +126,7 @@ class WsAssetController implements ControllerMethods {
 		log.debug("assetId: {}, name: {}, dependencies: {}", assetId, name, dependencies)
 
 		List<String> errors = []
-		CloneAssetCommand command = populateCommandObject(CloneAssetCommand)
+		CloneAssetCommand command = populateCommandObject(CloneAssetCommand, false)
 		Project project = getProjectForWs()
 
 		if (command.cloneDependencies && !securityService.hasPermission(Permission.AssetCloneDependencies)) {
@@ -188,7 +188,6 @@ class WsAssetController implements ControllerMethods {
 	   Project project = projectForWs
 
 	   BulkDeleteDependenciesCommand command = populateCommandObject(BulkDeleteDependenciesCommand)
-	   validateCommandObject(command)
 	   renderAsJson(resp: assetService.bulkDeleteDependencies(project, command.dependencies))
    }
 
@@ -390,7 +389,7 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.BundleView)
 	def retrieveBundleChange() {
-		BundleChangeCommand command = populateCommandObject(BundleChangeCommand)
+		BundleChangeCommand command = populateCommandObject(BundleChangeCommand, false)
 		Project project = getProjectForWs()
 
 		// The id of the bundle retrieve from the asset in the dependency (if such dependency exists).
@@ -457,7 +456,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetCreate)
 	def saveAsset() {
 		// Populate the command with the data coming from the request.
-		AssetCommand command = populateCommandObject(AssetCommand)
+		AssetCommand command = populateCommandObject(AssetCommand, false)
 		// Save the new asset.
 		AssetEntity asset = assetEntityService.saveOrUpdateAsset(command)
 		renderSuccessJson(['id': asset.id])
@@ -470,7 +469,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetEdit)
 	def updateAsset(Long id) {
 		// Populate the command with the data coming from the request.
-		AssetCommand command = populateCommandObject(AssetCommand)
+		AssetCommand command = populateCommandObject(AssetCommand, false)
 		// Update the asset.
 		assetEntityService.saveOrUpdateAsset(command)
 		renderSuccessJson('Success!')
@@ -566,7 +565,7 @@ class WsAssetController implements ControllerMethods {
 		// Retrieve the project for the user.
 		Project project = getProjectForWs()
 		// Populate the command object with the data coming from the request
-		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand)
+		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand, false)
 		// Save or update the comment
 		commentService.saveOrUpdateAssetComment(project, command)
 	}

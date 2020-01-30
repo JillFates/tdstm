@@ -391,7 +391,7 @@ class SearchQueryHelper {
 	 */
 	private static AssetDependency fetchAssetDependencyByAssets(Map fieldsInfo, Map context ) {
 		Object primary
-		AssetEntity supporting
+		Object supporting
 		AssetDependency dependency
 
 		log.debug 'fetchAssetDependencyByAssets() was called'

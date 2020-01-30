@@ -66,7 +66,7 @@ grails {
 	exceptionresolver.params.exclude = ['password']
 	pagination.default = "20"
 	pagination.max = "20"
-	mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
+	mail.default.from = "TDS TransitionManager <tds.transition.manager@gmail.com>"
 	stringchararrayaccessor.disabled = true // Eliminates warning error - see TM-3681
 	web.disable.multipart=false
 	scaffolding.templates.domainSuffix = 'Instance'
@@ -163,7 +163,7 @@ environments {
 			logging.jul.usebridge = true
 			serverURL = 'http://localhost:8080/tdstm'
 
-			//mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
+			mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
 			/*
 			mail {
 				host = "smtp.gmail.com"

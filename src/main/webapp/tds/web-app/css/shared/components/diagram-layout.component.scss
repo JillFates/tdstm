@@ -17,7 +17,7 @@
   height: 20%;
   max-height: 150px;
   top: 10px;
-  left: 20px;
+  left: 15px;
   background-color: aliceblue;
   z-index: 71; /* make sure its in front */
   border: solid 1px blue;
@@ -25,36 +25,6 @@
 
 .reset-overview-index {
   z-index: 2;
-}
-
-#graph-control-btn-group {
-  position: absolute;
-  bottom: 40px;
-  left: 40px;
-  z-index: 999;
-}
-
-#graph-control-btn-group > .btn {
-  background-color: #dddddd !important;
-  border-color: #c4d0dc !important;
-  color: #333333 !important;
-  width: 100% !important;
-  padding: 0 .2rem 0 .2rem !important;
-  min-width: 1.5rem !important;
-  border-radius: 0.3rem !important;
-  margin: 0 0 0.05rem 0 !important;
-}
-
-#graph-control-btn-group > .btn:hover {
-  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
-}
-
-#graph-control-btn-group > .btn:active {
-  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
-}
-
-#graph-control-btn-group > .btn:focus {
-  outline: none !important;
 }
 
 .diagram-card {
@@ -85,17 +55,15 @@
 
   .diagram-card-content {
     width: auto;
-    padding: 5px;
+    padding: 5px 0 5px 0;
     font-size: 1em;
     background-color: #fff;
     color: #333;
   }
 
-  .diagram-card-content > .row:nth-child(odd){
-    background-color: #333;
-    color: #fff;
-    border-radius: 3px;
-    box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
+  .diagram-card-content > .row{
+    width: 100%;
+    margin: 0;
   }
 }
 

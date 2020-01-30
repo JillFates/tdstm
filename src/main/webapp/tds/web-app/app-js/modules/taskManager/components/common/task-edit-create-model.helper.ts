@@ -8,7 +8,6 @@ import {ModalType} from '../../../../shared/model/constants';
 import {SingleNoteModel} from '../../../assetExplorer/components/single-note/model/single-note.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskService} from '../../service/task.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 export class TaskEditCreateModelHelper {
@@ -221,7 +220,7 @@ export class TaskEditCreateModelHelper {
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: PriorityList,
 			asset: {id: asset.id, text: asset.name},
-			assignedTo: {id : (assetComment.assignedTo) || null, text: detail.assignedTo},
+			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
 			event: {id: (assetComment.moveEvent) || null, text: detail.eventName},
 			category: assetComment.category,
@@ -733,7 +732,7 @@ export class TaskEditCreateModelHelper {
 		return Observable.create((observer) => {
 			let singleNoteModel: SingleNoteModel = {
 				modal: {
-					title: 'Create Note',
+					title: 'Note Create',
 					type: ModalType.CREATE
 				},
 				note: ''

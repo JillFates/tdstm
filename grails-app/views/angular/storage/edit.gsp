@@ -58,7 +58,7 @@
             role="form" 
             #form="ngForm" 
             novalidate>
-            <div tdsScrollSection class="grid-form">
+            <div tdsScrollSection class="grid-form three-column">
                 <div class="clr-form-control">
                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
                     <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="1" value="${asset.assetName}" ngmodel="model.asset.assetName" />

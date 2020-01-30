@@ -36,6 +36,7 @@ import {
 } from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import { CheckboxStates } from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import { HeaderActionButtonData } from 'tds-component-library';
 import { DependencyResults } from '../../model/dependencies.model';
 import {
 	GridColumnModel,
@@ -66,6 +67,8 @@ interface ComponentState {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	@ViewChild('tdsBulkChangeButton', { static: false })
 	tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid', { static: false }) grid: GridComponent;
@@ -95,12 +98,15 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		protected bulkCheckboxService: BulkCheckboxService,
 		private dependenciesService: DependenciesService,
 		private openAssetDependenciesService: OpenAssetDependenciesService,
-		private translatePipe: TranslatePipe,
+		private translateService: TranslatePipe,
 		protected assetService: DependecyService,
 		private permissionService: PermissionService
 	) {}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [];
+
 		// set the initial component state
 		this.state = this.getInitialComponentState();
 		// set the open assets handler
@@ -396,7 +402,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			this.state
 		).filter((item: any) => item.field !== column.property);
 
-		if (column.filter !== '') {
+		if (column.filter) {
 			filters.push({
 				field: column.property,
 				operator: 'contains',
@@ -409,11 +415,15 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.componentState.next(clonedState);
 	}
 
+	/**
+	 * On Clear all filters
+	 */
 	public onClearFilters(): void {
 		this.state.gridState.filter.filters = [];
 		this.dependenciesColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
+		this.showFilters = false;
 		this.onFilter({filter: ''});
 	}
 
@@ -516,14 +526,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * reloads data when the user clicks on refresh
 	 */
 	protected reloadData(): void {
-		this.setupGridColumns();
-		this.openAssetsHandler = this.openAssetDependenciesService.getOpenAssetsHandler(
-			this.actionableAssets
-		);
-		this.state = this.getInitialComponentState();
-		this.setupBulkCheckboxService();
-		this.setupComponentStateObservable();
-		this.setupTagsFilterStateObservable();
+		this.changeState({});
 	}
 
 	protected toggleFilter(): void {
@@ -541,4 +544,12 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			0
 		);
 	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
 }

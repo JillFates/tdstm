@@ -27,19 +27,13 @@
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
-							<div class="clr-col-12 grid-actions">
-								<tds-button
-									icon="sync"
-									(click)="reloadData()"
-								></tds-button>
-								<tds-button
-									icon="plus"
-									[title]="
-										'LICENSE.CREATE_LICENSE' | translate
-									"
-									(click)="onCreateLicense()"
-									[id]="'btnCreate'"
-								></tds-button>
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
 							</div>
 						</div>
 					</ng-template>
@@ -74,8 +68,6 @@
 							kendoGridCellTemplate
 							let-dataItem
 							let-rowIndex="rowIndex"
-							let-isComment="dataItem.taskAndCommentFlags.comment"
-							let-isIssue="dataItem.taskAndCommentFlags.issue"
 						>
 							<div class="action-button btn-link">
 								<clr-dropdown>
@@ -250,6 +242,7 @@
 								"
 								>{{ 'LICENSE.PRODUCTION' | translate }}</span
 							>
+							<span *ngIf="dataItem.status === licenseStatus.CORRUPT">{{ 'GLOBAL.CORRUPT' | translate }}</span>
 						</ng-template>
 					</kendo-grid-column>
 					<!-- PAGER COMPONENT -->

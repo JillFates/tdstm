@@ -50,6 +50,7 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
+		'CORRUPT': 'Corrupt',
 		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
@@ -115,6 +116,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATABASE': 'Create DB',
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
+		'CONFIGURE_VIEW': 'Configure View',
 		'SHOW_COMMENTS': 'Show Comments',
 		'SHOW_TASKS': 'Show Tasks',
 		'GRID': {
@@ -148,6 +150,10 @@ export const en_DICTIONARY: Object = {
 				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel',
 				'CONFIRM_DELETE_DEPENDENCIES': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel'
 			},
+			'RUN': {
+				'CONFIRM_RUN_ASSETS': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel',
+				'CONFIRM_RUN_DEPENDENCIES': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel'
+			},
 			'ACTIONS': {
 				'ADD': 'Add to existing',
 				'CLEAR': 'Clear field',
@@ -171,7 +177,8 @@ export const en_DICTIONARY: Object = {
 		'RACK': 'Rack',
 		'DEPENDENCY': 'Dependency',
 		'CABLING': 'Cabling',
-		'COMMENT': 'Comment'
+		'COMMENT': 'Comment',
+		'VIEW': 'Export View'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
@@ -237,6 +244,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project'
 	},
 	'DEPENDENCIES': {
+		'CREATE_DEPENDENCY': 'Create Dependency',
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
@@ -279,10 +287,12 @@ export const en_DICTIONARY: Object = {
 		'BUNDLES': {
 			'BUNDLES': 'Bundles',
 			'LIST': 'Bundle List',
+			'CREATE_BUNDLE': 'Create Bundle',
 		}
 	},
 	'PROJECT': {
 		'PROJECTS': 'Projects',
+		'CREATE_PROJECT': 'Create Projects',
 		'SELECT_PROJECT': 'Select a Project',
 		'MISSING_PROJECT': 'Your account is missing an active project. Please select one in order to proceed.',
 		'NO_ACTIVE_PROJECTS': 'There are currently no active projects to choose from.  Please contact your administrator for assistance.'
@@ -354,6 +364,11 @@ export const en_DICTIONARY: Object = {
 		'PRODUCTION': 'Production',
 	},
 	'IMPORT_ASSETS': {
+		'AUTO_IMPORT': {
+			'HEADLINE': 'The results will be automatically loaded into Imported Batch(es) and posted',
+			'INITIATE_IMPORT': 'Schedule Job',
+			'CHECKBOX_LABEL': 'Email me the results of the Import process'
+		},
 		'MANUAL_IMPORT': {
 			'IMPORT_ASSETS_ETL': 'Import Assets (ETL)',
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
@@ -447,9 +462,15 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'ERROR_TITLE': 'Oops! Something went wrong.',
 		'ERROR_MESSAGE': 'The TransitionManager team will fix this as soon as possible.',
 		'UNAUTHORIZED_TITLE': 'You don\'t have permission to view this page.',
+		'UNLICENSED_TITLE': 'A license is required in order to enable all features of this application.',
 		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
 		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
-		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.'
+		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.',
+		'CSRF_UNAUTHORIZED_MESSAGE': 'CSRF Verification failed.',
+		'CSRF_INVALID': 'CSRF Token missing or incorrect.',
+		'WHY_THIS': 'Why am I seeing this?',
+		'LICENSE_EXPIRED': 'Your TransitionManager license is missing, expired or is otherwise no longer valid for this project.',
+		'LICENSE_ADMINISTRATOR': 'Your Administrator can manage the license from the Admin Menu, or if you are the Administrator and need assistance, please open a ticket at:'
 	},
 	'PROVIDER': {
 		'CREATE_PROVIDER': 'Create Provider',
@@ -460,10 +481,11 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'DELETE_MODEL' : 'Are you sure you want to delete this model? There is no undo for this action',
 	},
 	'TASK_MANAGER': {
+		'BULK_ACTION': 'Bulk Action',
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',
-		'CREATE_TASK': 'Create Task',
-		'EDIT_TASK': 'Edit Task',
+		'CREATE_TASK': 'Task Create',
+		'EDIT_TASK': 'Task Edit',
 		'TASK': 'Task',
 		'TASK_MANAGER': 'Task Manager',
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',

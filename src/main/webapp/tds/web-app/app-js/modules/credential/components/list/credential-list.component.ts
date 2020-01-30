@@ -7,9 +7,11 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { DateUtils } from '../../../../shared/utils/date.utils';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 // Components
 import { CredentialViewEditComponent } from '../view-edit/credential-view-edit.component';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 // Models
 import { Permission } from '../../../../shared/model/permission.model';
 import {
@@ -41,6 +43,7 @@ import {
 	COMMON_SHRUNK_COLUMNS_WIDTH,
 	COMMON_SHRUNK_COLUMNS,
 } from '../../../../shared/constants/common-shrunk-columns';
+import {HeaderActionButtonData} from 'tds-component-library';
 
 @Component({
 	selector: 'credential-list',
@@ -58,6 +61,8 @@ import {
 	],
 })
 export class CredentialListComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected gridColumns: any[];
 
 	protected state: State = {
@@ -89,6 +94,7 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -96,8 +102,13 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private credentialService: CredentialService,
 		private prompt: UIPromptService,
-		private userContext: UserContextService
+		private userContext: UserContextService,
+		private translateService: TranslatePipe
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['credentials'];
@@ -105,6 +116,18 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('CREDENTIAL.CREATE_CREDENTIAL'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreate.bind(this),
+			},
+		];
+
 		this.userContext
 			.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
@@ -339,14 +362,23 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}
@@ -360,5 +392,21 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.credentialColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
 	}
 }

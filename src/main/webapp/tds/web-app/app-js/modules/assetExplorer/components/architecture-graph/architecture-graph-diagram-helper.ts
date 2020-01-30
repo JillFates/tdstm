@@ -43,7 +43,7 @@ export class ArchitectureGraphDiagramHelper {
 			lowScaleTemplate: this.lowScaleNodeTemplate(),
 			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
-			rootAsset: params.rootAsset,
+			rootNode: params.rootAsset,
 			// extras: params.extras && params.extras
 		};
 	}

@@ -1,5 +1,6 @@
 databaseChangeLog = {
 	include file: '20140307-sequence-logic.groovy' // Run on every migration to assure the tdstm_sequencer stored proc exists
+	include file: 'version/v4_7_2/20191219-delete-orphaned-dataviews-and-add-constraints.groovy' // Fix dataview constraints before running 20190930-fix-dataviews.groovy
 	include file: 'version/v4_7_1/20190930-fix-dataviews.groovy' //TM-15976 added to the beginning to fix the ability to upgrade from 4.5, because of a bug in a previous migration
 	include file: '20180508-add-asset-class-to-transferbatch.groovy'
 	include file: '20180508-migrate-and-remove-eav.groovy'
@@ -81,6 +82,12 @@ databaseChangeLog = {
 	include file: 'version/v4_7_2/20191009-drop-tables-move-bundle-step-and-step-snapshot.groovy'
 	include file: 'version/v5_0_0/20190920-add_fk_to_party_relationship.groovy'
 	include file: 'version/v5_0_0/20191112-add_fk_to_asset_comment_asset.groovy'
+	include file: 'version/v4_7_2/20191028-batch-management-auto-process-import.groovy'
+	include file: 'version/v4_7_2/20191119-add-use_with_asset_actions.groovy'
 	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 	include file: 'version/v5_0_0/20190925-updating-password-hashing.groovy'
+	include file: 'version/v5_0_0/20191126-permissions-for-consolidating-task-view-and-task-manager.groovy'
+	include file: 'version/v4_7_2/20200103-making-from-address-nullable.groovy'
+	include file: 'version/v5_0_0/20200110-add-tbd-conflict-depdency-group-columns-to-common-columns-view.groovy'
+	include file: 'version/v5_0_0/20200114-drop-depdencyBundle-column.groovy'
 }

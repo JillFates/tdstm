@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.NumberUtil
@@ -17,6 +18,7 @@ import net.transitionmanager.project.Project
 import spock.lang.See
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
+
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -95,7 +97,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property Name with loaded Data Value'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -194,7 +196,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property Name with loaded Data Value using a list of FindCondition'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -291,7 +293,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property Name with DOMAIN bound instance'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -415,7 +417,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void "test exception when [with] keyword is not found"() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -507,7 +509,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void "test exception when [into] keyword is not found"() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -599,7 +601,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void "test exception when [into] keyword is not found in find with multiple fields"() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -639,7 +641,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void "test exception when [find operation] keywords are not found"(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -733,7 +735,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -876,7 +878,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables and using find conditions'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -1021,7 +1023,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can grab the reference to the FINDINGS to be used later'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -1125,7 +1127,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property Name with loaded Data Value for a findId'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -1198,7 +1200,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1237,7 +1239,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can throw an Exception if find command uses an invalid Find Operator'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1276,7 +1278,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<Application> applications = [
@@ -1433,7 +1435,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can collect error messages in find command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			GroovyMock(AssetEntity, global: true)
@@ -1535,7 +1537,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
 				1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
 				2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
@@ -1658,7 +1660,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""device id,model name,manufacturer name,rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""device id,model name,manufacturer name,rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
 				152254,SRW24G1,LINKSYS,${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
 				152255,ZPHA MODULE,TippingPoint,13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
 				152256,Slideaway,ATEN,${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
@@ -1779,7 +1781,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(deviceDataSetContent)
 
 			List<AssetEntity> assetEntities = [
 				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
@@ -1864,7 +1866,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
 				${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
 				13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
 				${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
@@ -1917,7 +1919,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find element using integer transformation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -2009,7 +2011,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find element using number transformation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -2099,7 +2101,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property and create the target property automatically with 0 results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			GroovyMock(AssetEntity, global: true)
@@ -2186,7 +2188,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property and create the target property automatically with 1 result'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -2287,7 +2289,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can find a domain Property and create the target property automatically with more than 1 results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -2389,7 +2391,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@ConfineMetaClassChanges([AssetEntity, AssetDependency])
 	void 'test can create new results using domain command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				Primary App,Primary Server,Supporting App,Supporting Server
 				ERP,xraysrv001,Oracle7-Cluster,zuludb01""".stripIndent())
 
@@ -2630,7 +2632,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-10695')
 	void 'test can ignore row explicitly using find command without results'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -2754,7 +2756,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-10695')
 	void 'test can ignore row implicitly using find command before a load command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -2876,7 +2878,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-10695')
 	void 'test can ignore row implicitly using find command before a initialize command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -2991,7 +2993,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-10695')
 	void 'test can ignore row implicitly using find command before a whenNotFound command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -3091,7 +3093,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-10695')
 	void 'test can ignore row implicitly using find command before a whenFound command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -3191,7 +3193,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-10695')
 	void 'test can ignore row implicitly using find command before a domain command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -3293,7 +3295,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-11192')
 	void 'test can register an error if find by id is not using a long value'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -3399,7 +3401,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can reference domain names by a String value dynamically in domain command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				name,type
 				xray,App
 				zulu,Srv
@@ -3448,7 +3450,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can reference domain names by an Element value dynamically in domain command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				name,type
 				xray,App
 				zulu,Srv
@@ -3497,7 +3499,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can reference domain names by a String value dynamically in find command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				name,type
 				xray,App
 				zulu,Srv
@@ -3629,7 +3631,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can reference domain names by an Element value dynamically in find command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 				name,type
 				xray,App
 				zulu,Srv
@@ -3760,7 +3762,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-9493')
 	void 'test can find a domain Property Name with loaded Data Value using an internal cache'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Microsoft,(xlsx updated),ACME Data Center
@@ -3880,7 +3882,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	@See('TM-9493')
 	void 'test can disable internal cache using an ETL script command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Microsoft,(xlsx updated),ACME Data Center
@@ -4006,7 +4008,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void "test can throw an exception when user uses undefined variable statement #etlSentence"() {
 
 		setup:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 			""".stripIndent())
@@ -4069,7 +4071,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	void 'test can enable console and log FINDINGS variable'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description
 				xraysrv01,100,XRay SRV
 			""".stripIndent())

@@ -63,7 +63,6 @@ declare var jQuery: any;
 								<div class="form-group row">
 									<div class="col-sm-offset-2 col-sm-3">
 										<tds-button-custom
-												class="btn-primary"
 												(click)="onGenerateReport()"
 												title="Generate"
 												tooltip="Generate report"
@@ -126,6 +125,7 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 		this.hideFilters = false;
 		this.generatedReport = false;
 		this.reportResult = null;
+		this.html = null;
 		this.onLoad();
 	}
 

@@ -75,6 +75,7 @@ export interface IGraphTask {
 	predecessorList?: number[];
 	successorList?: number[];
 	team?: string;
+	assetType?: string;
 }
 
 interface IAssetEntity {
@@ -121,4 +122,11 @@ export const enum TASK_OPTION_LABEL {
 	EDIT = 'Edit',
 	ASSIGN_TO_ME = 'Assign to me',
 	NEIGHBORHOOD = 'Neighborhood'
+}
+
+export const enum TASK_TOOLTIP_FIELDS {
+	STATUS = 'Status',
+	ASSIGNED_TO = 'Assigned To',
+	TEAM = 'Team',
+	ASSET = 'Asset'
 }

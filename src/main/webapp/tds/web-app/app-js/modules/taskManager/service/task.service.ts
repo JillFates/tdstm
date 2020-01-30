@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { SingleCommentModel } from '../../assetExplorer/components/single-comment/model/single-comment.model';
+import { AssetCommentModel } from '../../assetComment/model/asset-comment.model';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import { catchError, map } from 'rxjs/operators';
@@ -96,13 +96,13 @@ export class TaskService {
 
 	/**
 	 * Get the Current Team Assigned for the Comment
-	 * @returns {Observable<any>}
+	 * @param commentId: any
+	 * @param forTaskCreate: boolean, if true it will send the request even if commentId is null or empty.
 	 */
-	getAssignedTeam(commentId: any): Observable<any> {
-		if ( !commentId || commentId === null ) {
+	getAssignedTeam(commentId: any, forTaskCreate = false): Observable<any> {
+		if ( (!commentId || commentId === null) && !forTaskCreate) {
 			return Observable.of([]);
 		}
-
 		return this.http.post(`${ this.baseURL }/assetEntity/updateAssignedToSelect?format=json&forView=&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
@@ -126,12 +126,8 @@ export class TaskService {
 	 * Get the status list for the asset id provided
 	 * @returns {Observable<any>}
 	 */
-	getStatusList(commentId: any): Observable<any> {
-		if ( !commentId || commentId === null ) {
-			return Observable.of([]);
-		}
-
-		return this.http.post(`${ this.baseURL }/assetEntity/updateStatusSelect?format=json&id=${ commentId }`, null)
+	getStatusList(): Observable<any> {
+		return this.http.post(`${ this.baseURL }/assetEntity/updateStatusSelect?format=json`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
 			})
@@ -154,7 +150,7 @@ export class TaskService {
 	 * @param model
 	 * @returns {Observable<any>}
 	 */
-	saveComment(model: SingleCommentModel): Observable<any> {
+	saveComment(model: AssetCommentModel): Observable<any> {
 		const request: any = {
 			comment: model.comment,
 			category: model.category,
@@ -278,7 +274,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	updateTask(payload: any): Observable<any> {
-		const url = `${ this.baseURL }/assetEntity/updateComment`;
+		const url = `${ this.baseURL }/ws/task/saveTask`;
 		return this.http.post(url, JSON.stringify(payload))
 			.map((response: any) => response)
 			.catch((error: any) => error);
@@ -310,7 +306,8 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	createTask(payload: any): Observable<any> {
-		const url = `${ this.baseURL }/assetEntity/saveComment`;
+		const url = `${ this.baseURL }/ws/task/saveTask`;
+
 		return this.http.post(url, JSON.stringify(payload))
 			.map((response: any) => response)
 			.catch((error: any) => error);
@@ -499,7 +496,7 @@ export class TaskService {
 	getTaskActionInfo(taskId: number): Observable<any> {
 		return this.http.get(this.TASK_ACTION_INFO_URL.replace('{taskId}', taskId.toString()))
 			.pipe(map((response: any) => {
-				return this.convertToTaskActionInfoModel(response);
+				return this.convertToTaskActionInfoModel(response.data || response);
 				}),
 				catchError(error => {
 					console.error(error);

@@ -71,7 +71,9 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 
 	ngOnInit() {
 		this.model = { ...this.originalModel };
-		this.model.typeId = this.model.typeId;
+		if (this.model.needAcknowledgement) {
+			this.model.typeId = NOTICE_TYPE_MANDATORY;
+		}
 		this.noticeIsLocked = this.model.locked;
 		this.model.active = StringUtils.stringToBoolean(this.model.active);
 		const currentType = this.typeDataSource.find(
@@ -79,10 +81,6 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		);
 		if (currentType) {
 			this.typeName = currentType.name;
-		}
-
-		if (this.model.needAcknowledgement) {
-			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
 
 		this.noticeType = { typeId: (this.model && this.model.typeId) || null };

@@ -399,8 +399,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 				storage: [0, 0]
 			]
 
-			dependencyConsole.dependencyBundleCount == 4
-
 	}
 
 
@@ -410,19 +408,19 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ANY', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-					[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
-					[dependencyBundle: 1, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
+				[dependencyBundle: 0, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
 			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [2, 2],
+				server : [11, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '08. Test Dependency Console Map Filtered by tags ALL tag1'() {
@@ -430,20 +428,20 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ALL', null, null)
 		then: ''
-			dependencyConsole.dependencyConsoleList == [
-					[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
-					[dependencyBundle: 1, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
+			dependencyConsole.dependencyConsoleList ==  [
+				[dependencyBundle:0, appCount:0, serverCount:3, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict'],
+				[dependencyBundle:1, appCount:0, serverCount:4, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict'],
+				[dependencyBundle:2, appCount:0, serverCount:2, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict'],
+				[dependencyBundle:3, appCount:0, serverCount:2, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict']
 			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [2, 2],
+				server : [11, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '09. Test Dependency Console Map Filtered by tags ANY tag1 + tag2'() {
@@ -452,19 +450,19 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ANY', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-					[dependencyBundle: 0, appCount: 0, serverCount: 0, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupDone'],
-					[dependencyBundle: 1, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
+				[dependencyBundle: 0, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
 			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [3, 3],
+				server : [11, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '10. Test Dependency Console Map Filtered by tags ALL tag1 + tag2'() {
@@ -472,17 +470,20 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			moveBundleService.generateDependencyGroups(project.id, connectionTypes, statusTypes, null, userLogin.getUsername(), null)
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ALL', null, null)
 		then: ''
-			dependencyConsole.dependencyConsoleList == []
+			dependencyConsole.dependencyConsoleList == [
+				[dependencyBundle: 0, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
+			]
 
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [0, 0],
+				server : [11, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
-
-			dependencyConsole.dependencyBundleCount == 4
 	}
 
 	void '11. Create move bundle'() {

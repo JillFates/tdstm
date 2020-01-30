@@ -1,5 +1,6 @@
 <div
 	tds-handle-escape
+	tds-autofocus
 	(escPressed)="cancelCloseDialog()"
 	style="width:600px"
 	class="tds-modal-content has-side-nav project-create-component"
@@ -37,6 +38,7 @@
 									></b
 								>
 							</td>
+							
 							<td valign="top" class="value">
 								<kendo-dropdownlist
 									[(ngModel)]="projectModel.clientId"

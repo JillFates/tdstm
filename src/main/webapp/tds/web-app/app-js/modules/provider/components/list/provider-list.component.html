@@ -18,24 +18,18 @@
 					[pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
 					[selectable]="selectableSettings"
 					[ngClass]="{ 'hide-filter': !showFilters }"
-					class="page-height row-actions-2-children"
+					class="page-height row-actions-2-children fixed-context-menu"
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
 							<div class="clr-col-12">
 								<div class="pull-right">
-									<tds-button-add
-                                            iconClass="is-solid"
-											[disabled]="!isCreateAvailable()"
-											[displayLabel]="false"
-											[title]="
-										'PROVIDER.CREATE_PROVIDER' | translate
-									"
-											(click)="onCreateProvider()"
-											[id]="'btnCreateProvider'">
-									</tds-button-add>
-									<tds-button-sync [displayLabel]="false" (click)="reloadData()">
-									</tds-button-sync>
+									<tds-grid-header-action-buttons
+											[actionButtons]="headerActionButtons"
+											(clearFilters)="clearAllFilters()"
+											[disableClearFilters]="disabledClearFilters"
+											(refresh)="reloadData()">
+									</tds-grid-header-action-buttons>
 								</div>
 							</div>
 						</div>
@@ -71,8 +65,6 @@
 							kendoGridCellTemplate
 							let-dataItem
 							let-rowIndex="rowIndex"
-							let-isComment="dataItem.taskAndCommentFlags.comment"
-							let-isIssue="dataItem.taskAndCommentFlags.issue"
 						>
 							<div class="action-button btn-link">
 								<clr-dropdown>

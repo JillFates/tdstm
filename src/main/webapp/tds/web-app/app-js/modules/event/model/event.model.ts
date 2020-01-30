@@ -5,33 +5,39 @@ export class EventColumnModel {
 		this.columns = [
 			{
 				label: 'Name',
+				filterable: true,
 				property: 'name',
 				type: 'text',
 				width: 'auto'
 			}, {
 				label: 'Estimated Start',
+				filterable: true,
 				property: 'estStartTime',
 				type: 'date',
 				format: dateFormat,
 				width: 'auto',
 			}, {
 				label: 'Estimated Completion',
+				filterable: true,
 				property: 'estCompletionTime',
 				type: 'date',
 				format: dateFormat,
 				width: 'auto',
 			}, {
 				label: 'Description',
+				filterable: true,
 				property: 'description',
 				type: 'text',
 				width: 'auto',
 			}, {
 				label: 'Runbook Status',
+				filterable: true,
 				property: 'runbookStatus',
 				type: 'text',
 				width: 'auto'
 			}, {
 				label: 'Bundles',
+				filterable: true,
 				property: 'moveBundlesString',
 				type: 'text',
 				width: 'auto'
@@ -94,6 +100,7 @@ export class EventPlanStatus {
 	description: string;
 	eventTitle: string;
 	startDate: string;
+	complDate: string;
 	status: string;
 
 	constructor() {

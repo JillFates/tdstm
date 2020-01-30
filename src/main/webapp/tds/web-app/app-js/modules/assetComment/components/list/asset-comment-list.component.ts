@@ -35,11 +35,13 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { AssetCommentViewEditComponent } from '../view-edit/asset-comment-view-edit.component';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import {
 	COMMON_SHRUNK_COLUMNS,
 	COMMON_SHRUNK_COLUMNS_WIDTH,
 } from '../../../../shared/constants/common-shrunk-columns';
-
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 declare var jQuery: any;
 
 @Component({
@@ -47,8 +49,10 @@ declare var jQuery: any;
 	templateUrl: 'asset-comment-list.component.html',
 })
 export class AssetCommentListComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected gridColumns: any[];
-
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 	protected state: State = {
 		sort: [
 			{
@@ -83,8 +87,13 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		private preferenceService: PreferenceService,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
-		private renderer: Renderer2
+		private renderer: Renderer2,
+		private translateService: TranslatePipe,
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['assetComments'];
@@ -92,6 +101,9 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [];
+
 		this.preferenceService
 			.getUserDatePreferenceAsKendoFormat()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
@@ -126,6 +138,7 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.assetCommentColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
+		this.showFilters = false;
 		this.onFilter({filter: ''});
 	}
 
@@ -247,8 +260,11 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	public filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
 	/**
@@ -273,7 +289,17 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.unsubscribeOnDestroy$.complete();
 	}
 
+	/**
+	 * Determines if user has permission to edit comments
+	 */
 	protected isCommentEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return !this.hasFilterApplied();
 	}
 }

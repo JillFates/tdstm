@@ -20,12 +20,12 @@ import-batch-record-fields
     margin-top: 15px !important
 
     .fieldsFilterLabel
+      padding-left: 0
       margin-top: 5px
       padding-right: 0px
 
-    .fieldsFilter
-      padding-left: 0px
-      padding-right: 0px
+    kendo-dropdownlist
+      display: inline-block !important
 
     .fieldsFilterText
       .fa-times
@@ -34,6 +34,8 @@ import-batch-record-fields
         pointer-events: all
         margin-right: 25px
         width: 10px
+        position: absolute
+        top: -3px
 
     .row
       margin: 0px 10px 0px 0px
@@ -46,7 +48,6 @@ import-batch-record-fields
         background-color: #f6f6f6
 
     kendo-grid
-      height: 40vh
       .k-header
         padding-left: $grid-left-padding
       .k-grid-table
@@ -74,8 +75,8 @@ import-batch-record-fields
 
     .footer
       margin-top: 30px
-
       button
+        width: 100px
         margin-right: 5px
 
 
@@ -83,24 +84,26 @@ $popup-label-font-size: 13px
 $popup-kendo-grid-max-height: 200px
 .fields-info-popup
   .popup-content
-    border: 1px solid #656565
+    border: 0
+    min-height: inherit
     .popup-header
-      padding: 5px 3px 0px 10px
-      background-color: #5f9fcf
+      padding: 0
+      background-color: #d9e4ea
       display: inline-block
       width: 100%
-      label
+      .fields-info-popup-label
         float: left
         display: inline
-        padding-right: 0
-        color: #ffffff
+        padding-left: 10px
+        padding-top: 5px
+        color: #575757
       i
         float: right
         cursor: pointer
         font-size: smaller
-        color: #ffffff
+        color: #575757
         display: inline
-        margin-top: 5px
+        margin-top: 8px
         margin-right:  5px
     .popup-body
       padding: 10px 15px 15px 15px
@@ -110,9 +113,12 @@ $popup-kendo-grid-max-height: 200px
           max-height: $popup-kendo-grid-max-height
           .domain-group-header
             width: 65%
+          .k-grouping-row + tr td
+            border-top-width: 0
         .footer-results
-          margin-top: 5px
+          margin-top: 15px
           label
+            margin-right: 5px
             font-size: $popup-label-font-size
           .badge
             margin-right: 2px

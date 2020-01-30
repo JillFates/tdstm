@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {IGraphTask} from '../../modules/taskManager/model/graph-task.model';
-import {ILinkPath} from '../components/diagram-layout/model/diagram-layout.model';
+import {ILinkPath} from '../components/diagram-layout/model/legacy-diagram-layout.model';
 
 type FullGraphCache = { requestId: number, isMoveEvent: boolean, data: IGraphTask[], linksPath: ILinkPath[] };
 

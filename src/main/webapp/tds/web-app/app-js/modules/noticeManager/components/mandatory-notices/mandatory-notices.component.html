@@ -1,7 +1,7 @@
-<div *ngIf="getCurrentNotice(); let notice" tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()"
+<div *ngIf="getCurrentNotice(); let notice" tds-autofocus tds-handle-escape (escPressed)="onCancel()"
      class="tds-modal-content notice-eula-html-content">
     <div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+		<button (click)="onCancel()" type="button" class="close" aria-label="Close">
 			<clr-icon aria-hidden="true" shape="close"></clr-icon>
 		</button>
         <h4 class="modal-title">{{notice.title}}</h4>

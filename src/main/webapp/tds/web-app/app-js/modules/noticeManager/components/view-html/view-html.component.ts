@@ -22,7 +22,7 @@ export class ViewHtmlComponent extends UIExtraDialog {
 		this.modalOptions = {isFullScreen: false, isResizable: false};
 	}
 
-	protected cancelCloseDialog($event): void {
+	protected cancelCloseDialog(): void {
 		this.close();
 	}
 

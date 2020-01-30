@@ -75,7 +75,7 @@ export class PlanningDashboardComponent {
 					{
 						type: 'Other Devices',
 						img: '/tdstm/assets/icons/svg/other_menu.svg',
-						link: ['/asset', 'views', 4, 'show'],
+						link: ['/asset', 'views', 3, 'show'],
 						queryParamMain: {_assetType: 'other', _ufp: 'true'},
 						queryParam: {common_validation: 'Unknown', _assetType: 'other',  _ufp: 'true'},
 						total: 0,

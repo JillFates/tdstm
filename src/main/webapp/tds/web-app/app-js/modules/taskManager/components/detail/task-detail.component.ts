@@ -1,10 +1,10 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {DIALOG_SIZE, KEYSTROKE, ModalType} from '../../../../shared/model/constants';
+import {Component, OnInit} from '@angular/core';
+import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
@@ -12,7 +12,6 @@ import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/mo
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
-import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {WindowService} from '../../../../shared/services/window.service';
@@ -75,24 +74,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
-		// DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone())
-		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.subscribe((preferences: any[]) => {
-			this.hasChanges = false;
+		this.hasChanges = false;
+		this.dateFormat = this.userPreferenceService.getUserDateFormat();
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 
-			this.dateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-			this.userTimeZone = preferences[PREFERENCES_LIST.CURR_TZ] || DateUtils.TIMEZONE_GMT;
-
-			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
-				this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
-			} else {
-				this.currentUserId = this.userContext.user.id;
-			}
-			this.loadTaskDetail();
-			this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
-			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
-			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-		});
+		if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
+			this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
+		} else {
+			this.currentUserId = this.userContext.user.id;
+		}
+		this.loadTaskDetail();
+		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
+		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
+		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 	}
 
 	/**
@@ -135,9 +129,12 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 						}
 					});
 			});
-		this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
-			.subscribe((result: TaskActionInfoModel) => {
-			this.taskActionInfoModel = result;
+		const taskId = parseInt(this.taskDetailModel.id, 0);
+		this.taskManagerService.getBulkTaskActionInfo([taskId])
+			.subscribe((result: TaskActionInfoModel[]) => {
+				if (result && result[taskId]) {
+					this.taskActionInfoModel = result[taskId];
+				}
 		});
 	}
 

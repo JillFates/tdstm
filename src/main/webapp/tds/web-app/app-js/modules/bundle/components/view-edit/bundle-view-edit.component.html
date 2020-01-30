@@ -1,5 +1,5 @@
-<div
-	tds-autofocus
+<div tds-autofocus tds-handle-escape>
+	<div
 	class="tds-modal-content has-side-nav bundle-view-edit-component"
 	id="bundle-view-edit-component"
 	data-backdrop="static"
@@ -90,6 +90,7 @@
 
 							<td valign="top" class="value">
 								<a
+									(click)="cancelCloseDialog()"
 									routerLink="event/list"
 									[queryParams]="{
 										show: savedModel?.moveEvent.id
@@ -138,7 +139,7 @@
 			</div>
 		</div>
 		<div *ngIf="editing">
-			<form clrForm action="save" method="post" name="bundleEditForm">
+			<form clrForm action="save" method="post" name="bundleEditForm" clrLayout="horizontal">
 				<!-- Name -->
 				<clr-input-container>
 					<label>Name</label>
@@ -198,27 +199,25 @@
 				</clr-select-container>
 
 				<!-- Start Time -->
-				<div class="clr-form-control">
-					<div class="clr-control-container">
-						<label for="startTimePicker" class="clr-control-label"
-							>Start Time</label
-						>
+				<div class="clr-form-control clr-row">
+					<div class="clr-col-2 bundle-time-picker">
+						<label for="startTimePicker" class="clr-control-label">Start Time</label>
+					</div>
+					<div class="clr-col-6">
 						<tds-datetime-control
-							#startTimePicker
-							name="startTime"
-							[(ngModel)]="bundleModel.startTime"
+								#startTimePicker
+								name="startTime"
+								[(ngModel)]="bundleModel.startTime"
 						></tds-datetime-control>
 					</div>
 				</div>
 
 				<!-- Completion Time -->
-				<div class="clr-form-control">
-					<div class="clr-control-container">
-						<label
-							for="completionTimePicker"
-							class="clr-control-label"
-							>Completion Time</label
-						>
+				<div class="clr-form-control  clr-row">
+					<div class="clr-col-2 bundle-time-picker">
+						<label for="completionTimePicker" class="clr-control-label">Completion Time</label>
+					</div>
+					<div class="clr-col-6">
 						<tds-datetime-control
 							#completionTimePicker
 							name="completionTime"
@@ -280,15 +279,6 @@
 		</div>
 	</div>
 
-	<div class="modal-footer content-end">
-		<tds-button
-			icon="trash"
-			theme="danger"
-			(click)="confirmDeleteBundleAndAssets()"
-			>Delete Bundle & Assets</tds-button
-		>
-	</div>
-
 	<nav class="modal-sidenav btn-link">
 		<tds-button-edit
 			*ngIf="!editing && canEditBundle"
@@ -307,8 +297,8 @@
 			(click)="saveForm()"
 		></tds-button-save>
 		<tds-button-delete
-			tooltip="Delete"
-			(click)="confirmDeleteBundle()"
+			tooltip="Delete Bundle & Assets"
+			(click)="confirmDeleteBundleAndAssets()"
 		></tds-button-delete>
 		<tds-button-close
 			*ngIf="!editing"
@@ -320,4 +310,5 @@
 			(click)="cancelEdit()"
 		></tds-button-cancel>
 	</nav>
+</div>
 </div>

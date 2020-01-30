@@ -1,6 +1,6 @@
 <%@page defaultCodec="html" %>
 <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-	<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
+	<tbody [ngClass]="{'one-column':!showDetails, 'three-column':showDetails}">
 		<tds:clrRowDetail style="order: 5" field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" />
 		<tds:clrRowDetail style="order: 10" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
 		<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}" />

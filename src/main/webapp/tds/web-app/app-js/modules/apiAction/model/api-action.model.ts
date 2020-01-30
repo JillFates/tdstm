@@ -32,50 +32,59 @@ export class APIActionColumnModel {
 				type: 'text',
 				width: 186,
 				locked: true,
+				filterable: true,
 				isActionable: true,
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
 				type: 'text',
+				filterable: true,
 				width: 180
 			}, {
 				label: 'Description',
 				property: 'description',
 				type: 'text',
+				filterable: true,
 				width: 300
 			},
 			{
 				label: 'Type',
 				property: 'actionType',
 				type: 'text',
+				filterable: true,
 				width: 125
 			},
 			{
 				label: 'Method',
 				property: 'dictionaryMethodName',
 				type: 'text',
+				filterable: true,
 				width: 125
 			}, {
 				label: 'Data',
 				property: 'producesData',
 				type: 'boolean',
+				filterable: true,
 				width: 100
 			}, {
 				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
 				type: 'text',
+				filterable: true,
 				width: 180
 			}, {
 				label: 'Created',
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
+				filterable: true,
 				width: 150
 			}, {
 				label: 'Last Updated',
 				property: 'lastUpdated',
 				type: 'date',
 				format: dateFormat,
+				filterable: true,
 				width: 150
 			}
 		];

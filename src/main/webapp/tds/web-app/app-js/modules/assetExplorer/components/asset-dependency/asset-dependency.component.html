@@ -1,5 +1,6 @@
 <div
 	class="modal fade in asset-dependency-component"
+	tds-handle-escape (escPressed)="cancelCloseDialog()"
 	[ngClass]="{
 		'dependency-show': !isEditing,
 		'dependency-edit': isEditing,

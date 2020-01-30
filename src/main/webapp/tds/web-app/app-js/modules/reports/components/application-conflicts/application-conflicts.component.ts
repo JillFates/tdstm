@@ -27,6 +27,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	reportBundle = '';
 	reportOwner = '';
 	planningBundles: any;
+	userTimeZone;
 	public model = {
 		moveBundleList: [],
 		appOwnerList: [],
@@ -65,6 +66,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				const [userContext, bundles] = results;
 				this.userContext = userContext;
 				this.dateFormatTime = this.preferenceService.getUserDateTimeFormat();
+				this.userTimeZone = this.preferenceService.getUserTimeZone();
 				if (bundles) {
 					this.model.moveBundleList = bundles.moveBundles
 						.map((bundle: any) => ({id: bundle.id.toString(), name: bundle.name}));

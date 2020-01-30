@@ -1,21 +1,7 @@
 <div class="asset-explorer-view-show-component">
 	<section
 		*ngIf="getDynamicConfiguration(); let config"
-		class="page-asset-explorer-config"
-	>
-		<div class="button-bar text-right">
-			<div>
-				<!-- Refresh button -->
-				<tds-button-custom
-					[flat]="true"
-					[icon]="'repeat'"
-					[tooltip]="'Refresh View'"
-					(click)="onQuery()"
-				>
-				</tds-button-custom>
-			</div>
-		</div>
-
+		class="page-asset-explorer-config">
 		<div class="button-bar">
 			<div class="inline">
 				<!-- Asset Views dropdown -->
@@ -67,41 +53,23 @@
 				</clr-checkbox-wrapper>
 			</div>
 
-			<div class="inline float-right">
+			<div class="float-right header-buttons">
 				<!-- Create button -->
 				<tds-asset-show-create-button
 					*ngIf="assetExplorerViewGrid"
 					[createButtonState]="
 						assetExplorerViewGrid.createButtonState
 					"
-					(createAsset)="onCreateAsset($event)"
-				>
+					(createAsset)="onCreateAsset($event)">
 				</tds-asset-show-create-button>
 
-				<!-- Export button -->
-				<tds-button-custom
-					[icon]="'download-cloud'"
-					(click)="onExport()"
-					[tooltip]="'Export View'"
-				>
-				</tds-button-custom>
-
-				<!-- Clear All Filters button -->
-				<tds-button-custom
-					[disabled]="!filterCount()"
-					[icon]="'times'"
-					(click)="onClearAllFilters()"
-					[tooltip]="'Clear All Filters'"
-				>
-				</tds-button-custom>
-
-				<!-- Configure/Edit view button -->
-				<tds-button-custom
-					[icon]="'cog'"
-					(click)="onEdit()"
-					[tooltip]="'Configure View'"
-				>
-				</tds-button-custom>
+				<!-- All other buttons -->
+				<tds-grid-header-action-buttons
+						(refresh)="onQuery()"
+						[actionButtons]="headerActionButtons"
+						(clearFilters)="onClearAllFilters()"
+						[disableClearFilters]="disableClearFilters">
+				</tds-grid-header-action-buttons>
 			</div>
 		</div>
 		<div class="box-body">

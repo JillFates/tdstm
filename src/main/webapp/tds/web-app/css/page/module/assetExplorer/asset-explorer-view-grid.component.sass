@@ -1,5 +1,5 @@
 @mixin asset-tag-style
-  border-radius: 0
+  border-radius: 2px
   border: 0
   height: 100% !important
   padding: 5px 7px
@@ -12,6 +12,9 @@
   color: black
 
 asset-explorer-view-grid, .asset-explorer-view-grid-component
+  clr-checkbox-wrapper
+    margin: 0
+
   kendo-grid-list
     height: 70vh
 
@@ -28,6 +31,12 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
     &:not(.actions-column)
       overflow: hidden !important
 
+  kendo-grid
+    .action-button.btn-link
+      display: flex
+      justify-content: center
+      align-items: center
+
   $grid-font-icon-size: 20px
 
   .k-grid-pager
@@ -35,9 +44,6 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
       font-size: $grid-font-icon-size
 
   .k-grid-header
-    tds-indeterminate-checkbox
-      .clr-control-label
-        margin-left: 4px
     .k-filter-row
       td
         vertical-align: top
@@ -105,6 +111,18 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
             margin-top: 3px
       input.form-control[name="common.assetName"]
         width: 98%
+
+    // Hide the vertical column line separator for the first header column
+    // and center the filter column of all assets view (TM-16757)
+    th[aria-colindex="1"]
+      position: unset
+      .tds-indeterminate-checkbox
+        position: absolute
+        top: 10px
+    th[aria-colindex="2"]
+      display: flex
+      justify-content: center
+      align-items: center
 
   .kendo-grid-toolbar__refresh-btn
     margin-top: unset!important
@@ -202,10 +220,6 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
         font-size: 13px
         padding-right: 5px
 
-  .clr-checkbox-wrapper
-    input[type=checkbox]+label::after
-      top: 3px
-      left: 3px
   .assetsSelector
     .tds-indeterminate-checkbox
       label
@@ -226,7 +240,8 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
         margin-bottom: 0
         margin-top: 0
         clr-icon
-          margin-bottom: 2px
+          width: 33px
+          margin-top: 4px
 
 kendo-popup.assets-view-grid
   kendo-list

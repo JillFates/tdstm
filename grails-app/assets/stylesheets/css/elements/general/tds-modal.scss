@@ -129,8 +129,8 @@
         }
 
         .grid-form {
-          display: grid;
           grid-template-columns: 49% 49%;
+          display: grid;
           column-gap: 2%;
 
           .source-target-wrapper {
@@ -144,6 +144,10 @@
               color: #454545;
               font-weight: 600;
             }
+          }
+
+          &.three-column {
+            grid-template-columns: 32% 32% 32%;
           }
 
           .clr-form-control {
@@ -285,6 +289,25 @@
               tr,
               .source-target-wrapper {
                 width: 49%;
+
+                tr {
+                  width: 100%;
+                }
+              }
+
+              .source-target-wrapper {
+                + .source-target-wrapper {
+                  margin-left: 2%;
+                }
+              }
+            }
+
+            &.three-column {
+              width: 100%;
+
+              tr,
+              .source-target-wrapper {
+                width: 32%;
 
                 tr {
                   width: 100%;

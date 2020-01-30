@@ -1,11 +1,13 @@
 package com.tdsops.etl
 
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
  * ETLBinding represents all the custom bindings associated a DSL ETL Script.
  * It'll use from outside the script to pass variables into it.
  */
+@CompileStatic
 class ETLBinding extends Binding {
 
 	Set dynamicVariables = [] as Set

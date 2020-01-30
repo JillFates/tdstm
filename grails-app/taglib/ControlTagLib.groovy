@@ -23,6 +23,7 @@ class ControlTagLib {
 	def clrRowDetail = { Map attrs -> 
 		Map fieldSpec = attrs.field ?: [:]
 		def fieldValue = attrs.value ?: ""
+        def fieldClass = attrs.class ?: ""
 		if (!fieldSpec) {
 			throw new InvalidParamException('<tds:clrRowDetail> tag requires field=fieldSpec Map')
 		}
@@ -30,10 +31,18 @@ class ControlTagLib {
 		StringBuilder tr = new StringBuilder("\n")
 		tr.append('<tr')
 		if(fieldValue == '') {
-			tr.append(' class="nodata"')
+            if (fieldClass == '') {
+             fieldClass = 'nodata';
+            } else {
+                fieldClass << ' nodata';
+            }
 		}
 		
 		out << tr.toString()
+
+        if (fieldClass != '') {
+            out << attribute("class", fieldClass);
+        }
 	
 		// This is necessary so that we can specify the order of the fields.
 		def style = attrs.style ?: ""

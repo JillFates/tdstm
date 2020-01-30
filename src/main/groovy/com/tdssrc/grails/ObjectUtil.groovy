@@ -6,14 +6,18 @@ package com.tdssrc.grails
  */
 class ObjectUtil {
 
-	/**
-	 * Checks if an {@code Object} instance is null and
-	 * @param object
-	 * @return
-	 */
-	static boolean isNotNullOrBlankString(Object object) {
-		return object != null || (object instanceof CharSequence && StringUtil.isNotBlank(object))
-	}
+    /**
+     * Checks if an {@code Object} instance is null of if it is not null and it is a String value and it is not empty.
+     * @param object
+     * @return
+     */
+    static boolean isNotNullOrBlankString(Object object) {
+        if (object != null && object instanceof CharSequence) {
+            return StringUtil.isNotBlank(object)
+        } else {
+            return object != null
+        }
+    }
 
 
 }

@@ -10,7 +10,7 @@
 				<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
 					<clr-icon aria-hidden="true" shape="close"></clr-icon>
 				</button>
-				<h4 class="modal-title">Bulk Change Action</h4>
+				<h4 class="modal-title">Bulk Change</h4>
 			</div>
 			<div class="modal-body">
 				<div class="modal-body-container">
@@ -18,20 +18,60 @@
 						<div class="box-body">
 							<div class="row">
 								<div class="col-md-12">
+
 									<div class="form-group">
 										{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[bulkChangeModel.affected, itemType.toLowerCase()] }}
 									</div>
+
 									<div class="form-group" *ngIf="showEdit">
 										<label>
 											<input type="radio" [value]="ACTION.Edit" name="operation" [(ngModel)]="selectedAction" checked> Edit {{itemType}}
 										</label>
 									</div>
+
 									<div class="form-group" *ngIf="showDelete">
 										<label>
 											<input type="radio" [value]="ACTION.Delete" name="operation" [(ngModel)]="selectedAction">Delete {{itemType}}
 										</label>
 									</div>
+									
 
+									<div class="form-group" *ngIf="showRun">
+										<label>
+											<input type="radio" [value]="ACTION.Run" name="operation" [(ngModel)]="selectedAction">Apply ETL to {{itemType}}
+										</label>
+										<div class="row sub-panel" *ngIf="selectedAction === ACTION.Run">
+											<div class="col-sm-9">
+												<select [(ngModel)]="selectedScriptOption"
+														name="dataScriptOptions"
+														id="dataScriptOptions"
+														class="form-control pd-top-5">
+													<option *ngFor="let option of dataScriptOptions"
+															[ngValue]="option">{{option.name | translate}}</option>
+												</select>
+
+												<div>
+													<div class="form-group">
+														<div class="col-sm-12">
+															<div class= "checkbox">
+																<label for="sendEmailNotification">
+																	<input
+																		id="sendEmailNotification"
+																		name="sendEmailNotification"
+																		type="checkbox"
+																		[(ngModel)]="sendEmailNotification" />
+																		<span class ="checkbox-label">
+																			Email results to me
+																		</span>
+																	
+																</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>

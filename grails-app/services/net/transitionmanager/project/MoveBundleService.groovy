@@ -16,7 +16,6 @@ import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetOptions
@@ -27,9 +26,7 @@ import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.party.PartyType
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
@@ -38,6 +35,7 @@ import net.transitionmanager.task.TaskService
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -214,11 +212,10 @@ class MoveBundleService implements ServiceMethods {
 	 */
 	def dependencyConsoleMap(Project project, Long moveBundleId, List<Long> tagIds, String tagMatch, String isAssigned, dependencyBundle, boolean graph = false, subsection =  null, groupId =  null, assetName = null) {
 		Date startAll = new Date()
-		def dependencyConsoleList = []
-		Map queryParams = [:]
+		List dependencyConsoleList = []
 
 		// This will hold the totals of each, element 0 is all and element 1 will be All minus group 0
-		def stats = [
+		Map stats = [
 			app: [0,0],
 			db: [0,0],
 			server: [0,0],
@@ -230,10 +227,10 @@ class MoveBundleService implements ServiceMethods {
 		String virtualTypes = AssetType.virtualServerTypesAsString
 		String storageTypes = AssetType.storageTypesAsString
 		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
-		String tagQuery = tagService.getTagsQuery(tagIds, tagMatch, queryParams)
-		String tagJoins = tagService.getTagsJoin(tagIds, tagMatch)
+		String tagJoins = tagService.getTagsJoin(tagIds, 'ANY') //passing in any because we want the join regardless of the tag matching.
+		String tagsSelect = tagService.getTagSelect(tagIds)
 
-		def depSql = new StringBuilder("""SELECT
+		StringBuilder depSql = new StringBuilder("""SELECT
 			adb.dependency_bundle AS dependencyBundle,
 			COUNT(distinct adb.asset_id) AS assetCnt,
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
@@ -249,6 +246,7 @@ class MoveBundleService implements ServiceMethods {
 			SUM(if(a.asset_class = '$AssetClass.DATABASE', 1, 0)) AS dbCount,
 			SUM(if(a.asset_class = '$AssetClass.APPLICATION', 1, 0)) AS appCount,
 			COALESCE(nr.needsReview, 0) AS needsReview
+			$tagsSelect
 
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
@@ -260,7 +258,7 @@ class MoveBundleService implements ServiceMethods {
 				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id
 				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes}))
 			GROUP BY adb.dependency_bundle) nr ON nr.dependency_bundle=adb.dependency_bundle
-			WHERE adb.project_id=${project.id} $tagQuery""")
+			WHERE adb.project_id=${project.id}""")
 
 		if (dependencyBundle) {
 			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))
@@ -282,20 +280,29 @@ class MoveBundleService implements ServiceMethods {
 
 		depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
 
-		def dependList = []
+		def dependList = jdbcTemplate.queryForList(depSql.toString())
 
-		if(queryParams){
-			NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(getJdbcTemplate().getDataSource())
-			dependList = template.queryForList(depSql.toString(), queryParams)
-		} else{
-			dependList = jdbcTemplate.queryForList(depSql.toString())
+
+		if (moveBundleId || tagIds) {
+			List<Long> groupTags = []
+
+			dependList = dependList.findResults { result ->
+				if (result.tags) {
+					groupTags = result.tags.split(',').collect { id ->
+						Long.parseLong(id)
+					}
+				} else {
+					groupTags = []
+				}
+
+				if ((moveBundleId && result.moveBundles.contains(moveBundleId as String)) ||
+					(tagIds && tagMatch == 'ALL' && groupTags.containsAll(tagIds)) ||
+					(tagIds && tagMatch == 'ANY' && groupTags.intersect(tagIds))) {
+					return result
+				}
+			}
 		}
 
-		if (moveBundleId) {
-		 	dependList = dependList.collect{ if( it.moveBundles.contains(moveBundleId as String)){ it } }
-		}
-
-		dependList.removeAll([null])
 		def groups = dependList.dependencyBundle
 		if (dependencyBundle == null) {
 			session.setAttribute('Dep_Groups', (groups as JSON).toString())
@@ -364,63 +371,45 @@ class MoveBundleService implements ServiceMethods {
 
 		boolean showTabs = subsection != null
 
-		def entities = assetEntityService.entityInfo(project)
+		Map entities = assetEntityService.entityInfo(project)
 
 		// Used by the Assignment Dialog
-		def allMoveBundles = MoveBundle.findAllByProject(project, [sort: 'name'])
+		List<Map> allMoveBundles = MoveBundle.executeQuery("""
+			SELECT new Map(id as id, name as name, useForPlanning as useForPlanning) 
+			FROM MoveBundle 
+			WHERE project =:project 
+			ORDER BY name ASC""", [project: project]
+		)
+
 		def planningMoveBundles = allMoveBundles.findAll{return it.useForPlanning}
 		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def assetDependencyList = AssetDependencyBundle.executeQuery(
-				'SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=?0', [project])
-
-		// JPM - don't think that this is required
-		// def personList = partyRelationshipService.getCompanyStaff(project.client?.id)
-		List<PartyGroup> companiesList = PartyGroup.findAllByPartyType(PartyType.load('COMPANY'), [sort: 'name'])
-
-		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 
 		def depGrpCrt = project.depConsoleCriteria ? JSON.parse(project.depConsoleCriteria) : [:]
-		def generatedDate = TimeUtil.formatDateTime(depGrpCrt.modifiedDate)
-		def staffRoles = taskService.getRolesForStaff()
-		def compactPref = userPreferenceService.getPreference(PREF.DEP_CONSOLE_COMPACT)
-		def map = [
-			company: project.client,
-			asset: 'apps',
-			date: generatedDate,
-			dependencyType: entities.dependencyType,
+		String generatedDate = TimeUtil.formatDateTime(depGrpCrt.modifiedDate)
+		String compactPref = userPreferenceService.getPreference(PREF.DEP_CONSOLE_COMPACT)
+
+		Map map = [
+			asset                : 'apps',
+			date                 : generatedDate,
+			dependencyType       : entities.dependencyType,
 			dependencyConsoleList: dependencyConsoleList,
-			dependencyStatus: entities.dependencyStatus,
-			assetDependency: new AssetDependency(),
-			moveBundle: planningMoveBundles,
-			allMoveBundles: allMoveBundles,
-			planStatusOptions: planStatusOptions,
-
-			gridStats:stats,
-
-			//assetDependencyList: 	assetDependencyList,
-			dependencyBundleCount: 	assetDependencyList.size(),
-			servers: entities.servers,
-			applications: entities.applications,
-			dbs: entities.dbs,
-			files: entities.files,
-			networks:entities.networks,
-
-			partyGroupList:companiesList,
-			// personList:personList,
-			staffRoles:staffRoles,
-			availabaleRoles:availabaleRoles,
-			moveBundleId : moveBundleId,
-			isAssigned:isAssigned,
-			moveBundleList:allMoveBundles,
-			depGrpCrt:depGrpCrt,
-			compactPref: compactPref,
-			showTabs:showTabs,
-			tabName: subsection,
-			groupId: groupId,
-			assetName: assetName,
-			// Tags Properties
-			tagIds: tagIds,
-			tagMatch: tagMatch
+			dependencyStatus     : entities.dependencyStatus,
+			assetDependency      : new AssetDependency(),
+			moveBundle           : planningMoveBundles,
+			allMoveBundles       : allMoveBundles,
+			planStatusOptions    : planStatusOptions,
+			gridStats            : stats,
+			isAssigned           : isAssigned,
+			moveBundleList       : allMoveBundles,
+			depGrpCrt            : depGrpCrt,
+			compactPref          : compactPref,
+			showTabs             : showTabs,
+			tabName              : subsection,
+			groupId              : groupId,
+			assetName            : assetName,
+			//Tags Properties
+			tagIds               : tagIds,
+			tagMatch             : tagMatch
 		]
 
 		log.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
@@ -688,12 +677,8 @@ class MoveBundleService implements ServiceMethods {
 	 * @param projectId : related project
 	 */
 	private void cleanDependencyGroupsStatus(projectId) {
-		jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=0 WHERE project_id = $projectId ")
-
 		// Deleting previously generated dependency bundle table .
 		jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId")
-		// TODO: THIS SHOULD NOT BE NECESSARY GOING FORWARD - THIS COLUMN is being dropped.
-		jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId")
 
 		// Reset hibernate session since we just cleared out the data directly
 		GormUtil.flushAndClearSession()

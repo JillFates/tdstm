@@ -139,34 +139,30 @@
 			</div>
 		</div>
 		<div tdsScrollSection class="clr-row">
-			<div  class="clr-col-12">
-				<g:render 
-					template="/angular/common/commentList" 
-					model="[
-						asset:applicationInstance, 
-						prefValue: prefValue, 
-						viewUnpublishedValue: viewUnpublishedValue, 
-						currentUserId: currentUserId,
-						showTask:true,
-						showComment:false,
-					]" >
-				</g:render>
-			</div>
+			<g:render
+				template="/angular/common/commentList"
+				model="[
+					asset:applicationInstance,
+					prefValue: prefValue,
+					viewUnpublishedValue: viewUnpublishedValue,
+					currentUserId: currentUserId,
+					showTask:true,
+					showComment:false,
+				]" >
+			</g:render>
 		</div>
 		<div tdsScrollSection class="clr-row">
-			<div  class="clr-col-12">
-				<g:render 
-					template="/angular/common/commentList" 
-					model="[
-						asset:applicationInstance, 
-						prefValue: prefValue, 
-						viewUnpublishedValue: viewUnpublishedValue, 
-						currentUserId: currentUserId,
-						showTask:false,
-						showComment:true,
-					]" >
-				</g:render>
-			</div>
+			<g:render
+				template="/angular/common/commentList"
+				model="[
+					asset:applicationInstance,
+					prefValue: prefValue,
+					viewUnpublishedValue: viewUnpublishedValue,
+					currentUserId: currentUserId,
+					showTask:false,
+					showComment:true,
+				]" >
+			</g:render>
 		</div>
 	</div>
 

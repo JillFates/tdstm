@@ -1,5 +1,5 @@
 import {IGraphTask} from '../../../../modules/taskManager/model/graph-task.model';
-import {IContextMenuIcon} from './context-menu-icon.model';
+import {IContextMenuIcon} from './legacy-context-menu-icon.model';
 
 export interface IDiagramContextMenuModel {
 	selectedNode?: IGraphTask;

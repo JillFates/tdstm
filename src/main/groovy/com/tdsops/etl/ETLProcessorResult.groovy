@@ -13,14 +13,12 @@ import groovy.transform.CompileStatic
  * <br>
  * Every part of the results are covered in formatter functions.
  */
-@ConfigureMarshalling
 class ETLProcessorResult {
 
 	static final Integer CURRENT_VERSION = 2
 	/**
 	 * ETL Processor used to collect results in a ETL Procesor Result instance.
 	 */
-	@DoNotMarshall
 	ETLProcessor processor
 	/**
 	 * Defines JSON version for the import the process.
@@ -34,17 +32,15 @@ class ETLProcessorResult {
 	/**
 	 * Current reference for the domain instance and its contents
 	 */
-	@DoNotMarshall
 	DomainResult reference
 	/**
 	 * Collection of results with their data fields map
 	 */
-	List<Map<String, DomainResult>> domains = []
+	List<DomainResult> domains = (List<DomainResult>)[]
 	/**
 	 * Result row index position in the reference.data list
 	 * @see DomainResult#data
 	 */
-	@DoNotMarshall
 	Integer resultIndex = -1
 
 	/**
@@ -55,7 +51,7 @@ class ETLProcessorResult {
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
-			originalFilename: processor.dataSetFacade.fileName(),
+			originalFilename: processor.getFilename()
 		]
 	}
 
@@ -88,6 +84,7 @@ class ETLProcessorResult {
 	 * After that, It saves the new element in the data results.
 	 * @param element an instance of Element
 	 */
+	@CompileStatic
 	void loadElement(Element element) {
 		RowResult currentRow = findOrCreateCurrentRow()
 		currentRow.ignore = false
@@ -261,11 +258,12 @@ class ETLProcessorResult {
 	 *
 	 * @return and instance of RowResult
 	 */
+	@CompileStatic
 	RowResult findOrCreateCurrentRow() {
 		if (resultIndex == -1) {
 			reference.data.add(new RowResult(
 				fieldsValidator: processor.fieldsValidator,
-				rowNum: processor.iterateIndex.pos,
+				rowNum: processor.currentRowIndex,
 				domain: reference.domain)
 			)
 			resultIndex = reference.data.size() - 1
@@ -278,6 +276,7 @@ class ETLProcessorResult {
 	 * @return an instance of RowResult
 	 * @see RowResult* @see ETLProcessorResult#resultIndex
 	 */
+	@CompileStatic
 	RowResult currentRow() {
 		return reference.data[resultIndex]
 	}
@@ -287,6 +286,7 @@ class ETLProcessorResult {
 	 * @param fieldNameOrLabel a name or label for a domain field.
 	 * @return an object with value content
 	 */
+	@CompileStatic
 	Object getFieldValue(String fieldNameOrLabel) {
 		if (resultIndex >= 0) {
 
@@ -477,7 +477,6 @@ class ETLProcessorResult {
  * </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class DomainResult {
 
 	/**
@@ -555,7 +554,6 @@ class DomainResult {
  * </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class RowResult {
 
 	String op = ImportOperationEnum.INSERT
@@ -564,12 +562,9 @@ class RowResult {
 	Boolean warn = false
 	Boolean duplicate = false
 	List<String> errors = []
-	@DoNotMarshall
 	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
-	@DoNotMarshall
 	String domain
-	@DoNotMarshall
 	ETLFieldsValidator fieldsValidator
 	List<String> comments = []
 	TagResults tags
@@ -578,6 +573,7 @@ class RowResult {
 	 * Add element to the current row data
 	 * @param element
 	 */
+	@CompileStatic
 	void addLoadElement(Element element) {
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.addLoadElement(element)
@@ -624,6 +620,20 @@ class RowResult {
 		this.errorCount = fieldData.errors.size()
 	}
 
+	/**
+	 * Returns <tt>true</tt> if {@code RowResult#fields} Map contains a mapping for the specified
+	 * fieldName.
+	 * @param fieldName a String field Name
+	 * @return true if {@code RowResult#fields} Map fieldName key
+	 */
+	Boolean containsKey(String fieldName){
+		return fields.containsKey(fieldName)
+	}
+
+	/**
+	 * Used to store a FoundElement into the ELT Result
+	 * @param foundElement
+	 */
 	void addFoundElement(FoundElement foundElement) {
 		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition)
 		fieldData.addFoundElement(foundElement)
@@ -668,6 +678,7 @@ class RowResult {
 	 * @param element
 	 * @return
 	 */
+	@CompileStatic
 	FieldResult findOrCreateFieldData(ETLFieldDefinition fieldDefinition) {
 		if (!fields.containsKey(fieldDefinition.name)) {
 			fields[fieldDefinition.name] = new FieldResult(fieldOrder: fields.size(), fieldDefinition: fieldDefinition)
@@ -779,10 +790,7 @@ class RowResult {
  *}* </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class FieldResult {
-
-	@DoNotMarshall
 	ETLFieldDefinition fieldDefinition
 	Object originalValue
 	Object value
@@ -867,7 +875,6 @@ class FieldResult {
 }
 
 @CompileStatic
-@ConfigureMarshalling
 class FindResult {
 
 	List<QueryResult> query = []
@@ -946,7 +953,6 @@ class FindResult {
  * @return
  */
 @CompileStatic
-@ConfigureMarshalling
 class QueryResult {
 
 	String domain
@@ -992,9 +998,6 @@ class QueryResult {
  * @see com.tdsops.etl.ETLProcessor#tagRemove(java.lang.String)
  * @see com.tdsops.etl.ETLProcessor#tagReplace(java.lang.String, java.lang.String)
  */
-
-@CompileStatic
-@ConfigureMarshalling
 class TagResults {
 
 	Set<String> add = [] as Set

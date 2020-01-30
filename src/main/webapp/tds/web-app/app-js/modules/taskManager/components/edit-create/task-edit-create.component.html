@@ -14,7 +14,7 @@
 				 [options]="modalOptions"
 				 [style.width.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_HEIGHT"
 				 [style.height.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_WIDTH">
-			<div class="modal-header hola">
+			<div class="modal-header">
 				<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
 					<clr-icon aria-hidden="true" shape="close"></clr-icon>
 				</button>
@@ -329,7 +329,6 @@
 													<label>Status</label>
 												</td>
 												<td class="valueNW task-status vertical-note-status">
-													<!--                                                    [class]="'form-control status task-' + model.status.toLowerCase()"-->
 													<tds-task-status-indicator
 														*ngIf="model.status"
 														[propertyName]="'status'"
@@ -341,7 +340,6 @@
 														[data]="model.statusList"
 														[(ngModel)]="model.status">
 													</kendo-dropdownlist>
-
 												</td>
 												<td colspan="4"></td>
 											</tr>
