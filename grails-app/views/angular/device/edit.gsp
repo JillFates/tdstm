@@ -370,7 +370,7 @@
 			</tds-button-edit>
 			<tds-button-save 
 				(click)="submitForm($event)" 
-				[disabled]="!(this.isDirty() && this.form.valid)"
+				[disabled]="(!(this.isDirty() && this.form.valid)) || !isDependenciesValidForm"
 				[permissions]="['${Permission.AssetEdit}']" 
 				tooltip="Save Asset" 
 				icon="floppy"
