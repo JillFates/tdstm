@@ -187,6 +187,7 @@ class ETLProcessorResult {
 	 */
 	void addTag(String tag) {
 		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		currentRow.addTag(tag)
 	}
 
@@ -200,6 +201,7 @@ class ETLProcessorResult {
 	 */
 	void removeTag(String tag) {
 		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		currentRow.removeTag(tag)
 	}
 
@@ -214,6 +216,7 @@ class ETLProcessorResult {
 	 */
 	void replaceTag(String currentTag, String newTag) {
 		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		currentRow.replaceTag(currentTag, newTag)
 	}
 
