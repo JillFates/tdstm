@@ -66,8 +66,8 @@ declare var jQuery: any;
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Comment</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Delete</a>
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Comment Create</a>
+								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -184,8 +184,8 @@ declare var jQuery: any;
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Comment</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Delete</a>
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Comment Create</a>
+								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
