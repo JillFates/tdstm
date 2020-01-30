@@ -31,7 +31,7 @@
 							<!-- Grid -->
 							<kendo-grid
 								*ngIf="gridHelper"
-								class="page-height narrow-rows clickable-rows row-actions-2-children"
+								class="page-height narrow-rows fixed-context-menu row-actions-2-children"
 								[ngClass]="{ 'hide-filter': !showFilters }"
 								[data]="gridHelper.gridData"
 								[filterable]="true"
@@ -82,14 +82,14 @@
 											<clr-dropdown>
 												<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
 												<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-													<a clrDropdownItem *ngIf="isEditAvailable(report)"
+													<a clrDropdownItem *ngIf="isEditAvailable(dataItem)"
 														 title="Edit View"
-														 (click)="onEditReport(report)">
+														 (click)="onEditReport(dataItem)">
 														Edit
 													</a>
-													<a clrDropdownItem *ngIf="isDeleteAvailable(report) && !report.isSystem"
+													<a clrDropdownItem *ngIf="isDeleteAvailable(dataItem) && !dataItem.isSystem"
 														 title="Delete View"
-														 (click)="onDeleteReport(report)">
+														 (click)="onDeleteReport(dataItem)">
 														Delete
 													</a>
 												</clr-dropdown-menu>

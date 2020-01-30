@@ -55,7 +55,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 			{
 				icon: 'plus-circle',
 				iconClass: 'is-solid',
-				title: this.translateService.transform('GLOBAL.CREATE'),
+				title: 'Create View',
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateReport.bind(this),
@@ -96,17 +96,6 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * unsubscribe from all subscriptions on destroy hook.
-	 * @HostListener decorator ensures the OnDestroy hook is called on events like
-	 * Page refresh, Tab close, Browser close, navigation to another view.
-	 */
-	@HostListener('window:beforeunload')
-	ngOnDestroy(): void {
-		this.unsubscribeOnDestroy$.next();
-		this.unsubscribeOnDestroy$.complete();
-	}
-
-	/**
 	 * On Folder option change.
 	 * @param folderOpen
 	 * @param $event
@@ -116,12 +105,8 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 			$event.preventDefault();
 		}
 		this.dictionary.set(LAST_SELECTED_FOLDER, folderOpen);
-		this.reportGroupModels.forEach((folder) => folder.open = false);
 		this.selectedFolder = this.reportGroupModels.filter((folder) => folder.name === folderOpen.name)[0];
-		if (this.selectedFolder) {
-			this.selectedFolder.open = true;
-		}
-		this.gridHelper.reloadData(this.selectedFolder.views);
+		this.reloadData();
 	}
 
 	/**
@@ -180,11 +165,18 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	 * Reloads Grid data.
 	 */
 	protected reloadData() {
+		const selectedFolder = this.reportGroupModels.find((r: ViewGroupModel) => r.name === this.selectedFolder.name);
 		this.assetExpService.getReports()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(result => {
 				this.reportGroupModels = result as ViewGroupModel[];
-				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
+				this.reportGroupModels.forEach((folder: ViewGroupModel) => {
+					folder.open = false;
+					if (folder.name === selectedFolder.name) {
+						folder.open = true;
+						this.selectedFolder = folder;
+					}
+				});
 				this.gridHelper.reloadData(this.selectedFolder.views);
 			});
 	}
@@ -279,5 +271,16 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	 */
 	private onDisableClearFilter(): boolean {
 		return this.gridHelper.getFilterCounter() === 0;
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

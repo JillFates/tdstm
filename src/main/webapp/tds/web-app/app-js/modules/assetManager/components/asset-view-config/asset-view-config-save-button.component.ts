@@ -2,9 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ViewModel } from '../../../assetExplorer/model/view.model';
 import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 
 @Component({
 	selector: 'tds-asset-view-config-save-button',
@@ -13,7 +11,7 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 				 class="btn-group">
 			<tds-button *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
 									[id]="'btnSave'"
-									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
+									[disabled]="(!assetExplorerService.isSaveAvailable(this.model) || !isValid) || !isDirty()"
 									[title]="'GLOBAL.SAVE' | translate"
 									(click)="onSave()"
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
@@ -31,12 +29,15 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 				<tds-button [title]="''" icon="angle down" clrDropdownTrigger
 										[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"></tds-button>
 				<clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
-					<li>
-						<a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
-					</li>
-					<li>
-						<a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
-					</li>
+					<button clrDropdownItem class="btn"
+									[disabled]="!isDirty()"
+									(click)="onSave()">
+						{{ 'GLOBAL.SAVE' | translate }}
+					</button>
+					<button clrDropdownItem class="btn"
+									(click)="onSaveAs()">
+						{{ 'GLOBAL.SAVE_AS' | translate }}
+					</button>
 				</clr-dropdown-menu>
 			</clr-dropdown>
 		</div>
@@ -67,9 +68,7 @@ export class AssetViewConfigSaveButtonComponent {
 
 	constructor(
 		private assetExplorerService: AssetExplorerService,
-		private permissionService: PermissionService) {
-		// silence is golden.
-	}
+		private permissionService: PermissionService) {}
 
 	isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
@@ -111,7 +110,7 @@ export class AssetViewConfigSaveButtonComponent {
 	 */
 	shouldDisplayDropdownButton(): boolean {
 		return this.model.id && (this.model.isOwner || (
-			this.model.isSystem && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))
+				this.model.isSystem && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))
 			)
 		);
 	}
