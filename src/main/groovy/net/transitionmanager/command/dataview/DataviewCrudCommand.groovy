@@ -16,7 +16,6 @@ class DataviewCrudCommand implements CommandObject {
 	/*
 	 * a map of the dataview definition
 	 */
-//	Map schema
 	DataviewSchemaCommand schema = new DataviewSchemaCommand()
 	/*
 	 * flag that the view is to be shared
@@ -42,5 +41,8 @@ class DataviewCrudCommand implements CommandObject {
 	static constraints = {
 		id nullable: true
 		overridesView nullable: true
+		saveAsOption nullable: true
+		// TODO : JPM 1/2020 : add validation logic to the saveAsOption or does the binding error is enum is not resolved?
+		}
 	}
 }

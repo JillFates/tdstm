@@ -5,6 +5,7 @@ import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.person.FavoriteDataview
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import org.grails.web.json.JSONObject
 
 /**
  * Database table mapping for 'report'.
@@ -49,7 +50,7 @@ class Dataview {
 			isOwner   : isOwner(currentPersonId),
 			isFavorite: isFavorite(currentPersonId),
 			isOverride: isOverrideView(),
-			schema    : JsonUtil.parseJson(reportSchema),
+			schema    : schemaAsJSONObject(),
 			createdBy : getOwnerName(),
 			createdOn : TimeUtil.formatDate(dateCreated),
 			overridesView: overridesView,
@@ -102,6 +103,14 @@ class Dataview {
 			return person.toString()
 		}
 		return ''
+	}
+
+	/**
+	 * Returns the schema as a Map instead of a JSON string
+	 * @return
+	 */
+	JSONObject schemaAsJSONObject() {
+		reportSchema ? JsonUtil.parseJson(reportSchema) : null
 	}
 
 	def beforeInsert = {

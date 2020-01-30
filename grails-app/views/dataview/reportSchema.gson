@@ -1,5 +1,5 @@
-import net.transitionmanager.command.assetFieldSettings.DataviewSchemaColumnCommand
 import net.transitionmanager.command.dataview.DataviewSchemaCommand
+import net.transitionmanager.command.dataview.DataviewSchemaColumnCommand
 
 model {
     DataviewSchemaCommand result

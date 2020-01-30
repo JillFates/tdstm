@@ -59,23 +59,38 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 
 	/**
 	 * Returns an specific Dataview as a map(json) result.
-	 * @param id to search by.
-	 * @param _override (optional) true by default, returns the overriden view of the requested system view
-	 * if set to false returns the requested view directly
-	 * @return
+	 * @param id - the id of the dataview to return
+	 * @param _override - when present for the request for a system view that has an overridden version, this flag is
+	 * used to indicate to return the underlying system view instead of the overridden version.
+	 * @return the dataView specification and the saveOptions based on the user's permissions and the view being accessed
 	 */
 	def getDataview(Integer id) {
+		Person whom = currentPerson()
+		Project project = projectForWs
+
+		Dataview dataview = dataviewService.fetch(project, whom, id, shouldShowOverridenView())
+		Map saveOptions = dataviewService.generateSaveOptions(project, whom, dataview)
+		Map dataviewMap = dataview.toMap( whom.id )
+
+		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
+	}
+
+	/**
+	 * Used to determine if the getDataview request stipulated to NOT override the view, hence return the default system view
+	 * The _override=0 parameter indicates that when referencing a system view that has been overridden, that the
+	 * actual system view should be returned instead.
+	 * @return true if the _override parameter is not present
+	 */
+	private Boolean shouldShowOverridenView() {
 		final String overrideParamName = '_override'
+		// The _override parameter indicates that when referencing an overridden system view, that the overridden view
+		// should be the one to return
 		boolean override = true
 		if ( params.containsKey(overrideParamName) ) {
 			override = BooleanUtils.toBoolean( params[overrideParamName] )
 		}
 
-		Dataview dataview = dataviewService.fetch(id)
-		Project currentProject = securityService.userCurrentProject
-		Map saveOptions = dataviewService.generateSaveOptions(dataview, currentProject)
-		Map dataviewMap = dataview.toMap(securityService.currentPersonId)
-		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
+		return override
 	}
 
 	/**
@@ -87,8 +102,9 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@HasPermission(Permission.AssetExplorerEdit)
 	def updateDataview(Integer id) {
 		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
+		validateCommandObject(command)
 		Person whom = currentPerson()
-		Map dataviewMap = dataviewService.update(whom, projectForWs, id, command).toMap(whom.id)
+		Map dataviewMap = dataviewService.update(projectForWs, whom, id, command).toMap(whom.id)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -120,7 +136,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 */
 	@HasPermission(Permission.AssetExplorerDelete)
 	def deleteDataview(Integer id) {
-		dataviewService.delete(id)
+		dataviewService.delete(projectForWs, currentPerson(), id)
 		renderSuccessJson([status: DELETE_OK_STATUS] )
 	}
 
