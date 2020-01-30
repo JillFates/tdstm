@@ -19,7 +19,7 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-supports-depends',
 	template: `
-        <kendo-grid
+        	<kendo-grid
                 *ngIf="dataGridSupportsOnHelper"
                 class="tds-table"
                 [data]="dataGridSupportsOnHelper.gridData"
@@ -62,12 +62,12 @@ declare var jQuery: any;
 
                 <!-- Action -->
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-					<div class="action-button btn-group btn-link">
+					<div class="action-button btn-link">
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-							<clr-dropdown-menu *clrIfOpen>
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Asset</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Delete Asset</a>
+							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Comment</a>
+								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -137,7 +137,7 @@ declare var jQuery: any;
             <kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
         </kendo-grid>
 
-        <kendo-grid
+        	<kendo-grid
                 *ngIf="dataGridDependsOnHelper"
                 class="tds-table"
                 [data]="dataGridDependsOnHelper.gridData"
@@ -180,12 +180,12 @@ declare var jQuery: any;
 
                 <!-- Action -->
 				<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-					<div class="action-button btn-group btn-link">
+					<div class="action-button btn-link">
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-							<clr-dropdown-menu *clrIfOpen>
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Asset</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Delete Asset</a>
+							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Comment</a>
+								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -463,7 +463,7 @@ export class SupportsDependsComponent implements OnInit {
 					provide: AssetComment,
 					useValue: assetComment
 				}
-			], true, false)
+			], false, false)
 			.then((result) => {
 				dataItem.comment = result.comment;
 			}).catch((error) => console.log(error));
