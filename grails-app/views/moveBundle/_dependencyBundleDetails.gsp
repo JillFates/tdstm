@@ -15,19 +15,19 @@
 					<g:each in="${dependencyConsoleList}" var="asset" status="depIndex">
 						<g:if test="${depIndex == 0}">
 							<td id="span_${asset.dependencyBundle}" class="pointer"
-								onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle}, $('#asset-tag-selector').val())"
+								onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})"
 								title="Assets with no matching Dependencies:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
 								<span class="depGroup">Remnants</span>
 							</td>
 							<td id="span_onePlus" class="pointer"
-								onclick="getList( $('#tabTypeId').val(), 'onePlus', $('#asset-tag-selector').val())"
+								onclick="getList( $('#tabTypeId').val(), 'onePlus')"
 								title="All Grouped Assets:&#013;Apps: &Tab;${gridStats.app[1]}&#013;Servers: &Tab;${gridStats.server[1] + gridStats.vm[1]}&#013;DBs: &Tab;${gridStats.db[1]}&#013;Storage: &Tab;${gridStats.storage[1]}">
 								<span class="depGroup">Grouped</span>
 							</td>
 						</g:if>
 						<g:else>
 							<td id="span_${asset.dependencyBundle}" class="${asset.statusClass} pointer"
-								onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle}, $('#asset-tag-selector').val())"
+								onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})"
 								title="Group ${asset.dependencyBundle}:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
 								<span class="depGroup">${asset.dependencyBundle}</span>
 							</td>

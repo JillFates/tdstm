@@ -247,7 +247,7 @@
 				$('#refreshButtonId').addClass('warning-change');
 			});
 
-			function getList(value, dependencyBundle, tags) {
+			function getList(value, dependencyBundle) {
 				$('#refreshButtonId').removeClass('warning-change');
 				$('#refreshButtonId').prop('title','Refreshes the graph');
 				$('#moveBundleSelectId').dialog("close")
@@ -315,7 +315,7 @@
 					ajaxRequest = ${remoteFunction(
 							controller:'assetEntity',
 							action:'retrieveLists',
-							params: '{entity: value, dependencyBundle: dependencyBundle, bundle: bundle, tags: tags}',
+							params: '{entity: value, dependencyBundle: dependencyBundle, bundle: bundle}',
 							onComplete:'listUpdate(XMLHttpRequest)'
 					)}
 					if ($('#svgContainerId').size() == 0) {
