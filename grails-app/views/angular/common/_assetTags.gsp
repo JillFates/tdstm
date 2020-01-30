@@ -5,7 +5,7 @@
             Tags
         </label>
     </th>
-    <td style="display: flex;">
+    <td style="display: flex;" class="fit-tags-to-view">
         <div *ngFor="let tag of assetTags" class="label tag"
               [ngClass]="tag.css">
             {{tag.name}}
