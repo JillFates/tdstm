@@ -138,6 +138,9 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.loadAssetsForDropDown();
 	}
 
+	/**
+	 * A call to the Architecture graph service for getting the default graph data for the current user
+	 */
 	getArchitectureGraphPreferences() {
 		this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
 			this.dataForSelect = res.assetClassesForSelect;
@@ -150,6 +153,9 @@ export class ArchitectureGraphComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Loads assets for dropdown when you are scrolling on the list
+	 */
 	loadAssetsForDropDown() {
 		this.architectureGraphService.getAssetsForArchitectureGraph(this.comboBoxSearchModel.query, this.comboBoxSearchModel.value, this.comboBoxSearchModel.maxPage, this.comboBoxSearchModel.currentPage, 'ALL').subscribe((res: any) => {
 			this.comboBoxSearchResultModel = res;
@@ -161,6 +167,9 @@ export class ArchitectureGraphComponent implements OnInit {
 		});
 	}
 
+	/**
+	 *  Sets the selected asset ID for retrieving it's graph data
+	 */
 	onAssetSelected(event) {
 		if (event) {
 			this.graphLabels.forEach(item => {
@@ -183,6 +192,9 @@ export class ArchitectureGraphComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Shows/hides the control panel
+	 */
 	toggleControlPanel() {
 		if (this.showLegend) {
 			this.showLegend = !this.showLegend;
@@ -190,6 +202,9 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.showControlPanel = !this.showControlPanel;
 	}
 
+	/**
+	 * Reduces the levels up of the graph and reload the data
+	 */
 	extractLevelsUp() {
 		if (this.levelsUp > 0) {
 			this.levelsUp--;
@@ -197,16 +212,25 @@ export class ArchitectureGraphComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Adds the levels up of the graph and reload the data
+	 */
 	addLevelsUp() {
 		this.levelsUp++;
 		this.loadData();
 	}
 
+	/**
+	 * Reduces the levels down of the graph and reload the data
+	 */
 	addLevelsDown() {
 		this.levelsDown++;
 		this.loadData();
 	}
 
+	/**
+	 * Adds the levels down of the graph and reload the data
+	 */
 	extractLevelsDown() {
 		if (this.levelsDown > 0) {
 			this.levelsDown--;
@@ -375,6 +399,10 @@ export class ArchitectureGraphComponent implements OnInit {
 		// do crazy logic here
 	}
 
+	/**
+	 * shows or hides the labels of the asset on the graph based on what's selected on the labels checkboxes
+	 * @param index of the selected checkbox
+	 */
 	updateGraphLabels(index) {
 		this.graphLabels[index].checked = !this.graphLabels[index].checked;
 		// TODO: filter nodes for removing labels on graph
@@ -393,6 +421,11 @@ export class ArchitectureGraphComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * 	Sends new data to the graph when updating labels
+	 *  @param data graph data and configuration
+	 *  @param iconsOnly if show the labels or not
+	 */
 	updateNodeData(data, iconsOnly) {
 		const diagramHelper = new ArchitectureGraphDiagramHelper();
 		this.data$.next(diagramHelper.diagramData({
@@ -410,10 +443,16 @@ export class ArchitectureGraphComponent implements OnInit {
 		}));
 	}
 
+	/**
+	 * Generate the graph with the current data
+	 */
 	regenerateGraph() {
 		this.loadData();
 	}
 
+	/**
+	 * Save the preferences changed on the control panel
+	*/
 	savePreferences() {
 		const valueData = {
 			assetClass: 'ALL',
@@ -429,6 +468,9 @@ export class ArchitectureGraphComponent implements OnInit {
 		})
 	}
 
+	/**
+	 * Gets the default graph preferences from Backend
+	 * */
 	resetDefaults() {
 		this.getArchitectureGraphPreferences();
 	}
