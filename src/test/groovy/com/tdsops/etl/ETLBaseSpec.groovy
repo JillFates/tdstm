@@ -114,11 +114,10 @@ abstract class ETLBaseSpec extends Specification {
      * @param sheetContent
      * @return
      */
-    protected List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
+    protected List buildSpreadSheetXLSXDataSet(String sheetName, String sheetContent) {
 
         def (String fileName, OutputStream outputStream) = getFileSystemService().createTemporaryFile('unit-test-', 'xlsx')
         Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
-
 
         addSheetInXLSXWorkBook(workbook, sheetName, sheetContent)
 

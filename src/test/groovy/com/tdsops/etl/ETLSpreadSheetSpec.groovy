@@ -62,7 +62,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can define a sheet for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -120,7 +120,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read labels by default in first row by default for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -166,7 +166,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can define a quoted string sheet for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications Tab', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications Tab', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -209,7 +209,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 	void 'test can read labels by an ordinal sheet number for a spreadSheet DataSet'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -254,7 +254,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 	void 'test can throw an exception if sheet number is incorrect for a spreadSheet DataSet'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -279,7 +279,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 	void 'test can throw an exception if sheet name is incorrect for a spreadSheet DataSet'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -304,7 +304,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 	void 'test can throw an exception if sheet name case is incorrect for a spreadSheet DataSet'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -330,7 +330,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read labels by default using sheet number zero for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -375,7 +375,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read labels using sheet number as a sheet name for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('2', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('2', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -421,7 +421,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read labels skipping rows for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications',
 				"invalid headers, are not part, of the valid\n" + ApplicationDataSet)
 
 		and:
@@ -470,7 +470,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read iterate rows for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -586,7 +586,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read labels skipping rows before for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications',
 				"invalid headers, are not part, of the valid\n" + ApplicationDataSet)
 
 		and:
@@ -628,7 +628,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read labels skipping more than one row before for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications',
 				"invalid headers, are not part, of the valid\n" +
 					"Another, Lines with, invalid, headers, are not part, of the valid\n" +
 					ApplicationDataSet)
@@ -674,7 +674,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read rows skipping rows before an iteration for a XLSX  spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications',
 				"invalid headers, are not part, of the valid\n" + ApplicationDataSet)
 
 		and:
@@ -716,7 +716,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read rows skipping rows before an iteration for a XLS spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSDataSet('Applications',
 				"invalid headers, are not part, of the valid\n" + ApplicationDataSet)
 
 		and:
@@ -758,7 +758,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	void 'test can read rows ignoring rows in the middle of an iteration for a spreadSheet DataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
