@@ -43,6 +43,5 @@ class DataviewCrudCommand implements CommandObject {
 		overridesView nullable: true
 		saveAsOption nullable: true
 		// TODO : JPM 1/2020 : add validation logic to the saveAsOption or does the binding error is enum is not resolved?
-		}
 	}
 }

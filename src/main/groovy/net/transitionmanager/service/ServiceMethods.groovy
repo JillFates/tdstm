@@ -8,6 +8,7 @@ import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.common.Timezone
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.LogicException
 import net.transitionmanager.project.Project
 import grails.core.GrailsApplication
 import net.transitionmanager.security.Permission
@@ -228,6 +229,18 @@ trait ServiceMethods {
 		String i18nMsg = i18nMessage(messageCode, args as Object[], defaultMessage, locale)
 		Exception ex = exception.newInstance(i18nMsg)
 		throw ex
+	}
+
+	/**
+	 * Used to throw an exception in switch/default when the logic wasn't handled
+	 * @param switchValue - the value for the switch statement
+	 * @throws LogicException
+	 */
+	void throwSwitchNotHandledException(String switchValue) {
+		throwException(LogicException.class,
+				   'core.logic.switchCaseUnhandled',
+				   "The programming logic encounted an unexpected switch value of ${switchValue}"
+		)
 	}
 
 	/**
