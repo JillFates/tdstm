@@ -174,6 +174,7 @@ class ETLProcessorResult {
 	 */
 	void addComments(CommentElement commentElement) {
 		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		currentRow.addComments(commentElement)
 	}
 
