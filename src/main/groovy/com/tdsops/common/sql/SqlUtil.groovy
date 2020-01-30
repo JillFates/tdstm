@@ -837,7 +837,7 @@ class SqlUtil {
 
 		FieldSpec fieldSpec = fsd.searchInfo?.fieldSpec
 
-		if(fieldSpec.control == ControlType.NUMBER.value()){
+		if(fieldSpec && fieldSpec.control == ControlType.NUMBER.value()){
 			return true
 		}
 
