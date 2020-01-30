@@ -133,7 +133,6 @@ export class AssetExplorerService {
 	}
 
 	hasMaximumFavorites(length: number): boolean {
-		console.log(length);
 		return this.FAVORITES_MAX_SIZE < length;
 	}
 

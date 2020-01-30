@@ -1,4 +1,4 @@
-<div class="content body">
+<div>
 	<section class="content page-asset-explorer-index">
 		<div class="row">
 			<div class="col-md-2 asset-explorer-index-left-menu">
@@ -25,110 +25,155 @@
 			<!-- /.col -->
 			<div class="col-md-10 asset-explorer-index-container">
 				<div class="box box-primary">
-					<div class="box-header with-border">
-						<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
-						<div class="pull-right">
-							<tds-grid-header-action-buttons
-									(refresh)="loadData()"
-									[actionButtons]="headerActionButtons"
-									(clearFilters)="onClearAllFilters()"
-									[disableClearFilters]="disableClearFilters">
-							</tds-grid-header-action-buttons>
-						</div>
-						<!-- /.box-tools -->
-					</div>
 					<!-- /.box-header -->
 					<div class="box-body">
 						<div class="table-responsive">
-							<table class="table clarity-table-grid fixed-header row-actions-2-children">
-								<thead>
-								<tr>
-									<th class="asset-explorer-td-actions">
-										<tds-button class="filter-trigger" [flat]="true" (click)="toggleFilter()">
-											<clr-icon shape="filter" class="grid-filter-button is-solid">
-												<span *ngIf="searchText && searchText.length" class="badge badge-warning">1</span>
-											</clr-icon>
-										</tds-button>
-									</th>
-									<th
-										*ngFor="let column of gridColumns"
-										[ngClass]="column.headerClass">
-										<div (click)="changeSort(column.property)" class="sortable-column">
-											{{ column.label | translate }}
-											<span class="k-icon" [ngClass]="{ 'k-i-sort-asc-sm': column?.sort?.isSorting && column.sort.isAscending ,
-														'k-i-sort-desc-sm': column?.sort?.isSorting && !column.sort.isAscending}"></span>
+							<!-- Grid -->
+							<kendo-grid
+								*ngIf="gridHelper"
+								class="page-height narrow-rows fixed-context-menu row-actions-2-children"
+								[ngClass]="{ 'hide-filter': !showFilters }"
+								[data]="gridHelper.gridData"
+								[filterable]="true"
+								[sort]="gridHelper.state.sort"
+								[sortable]="{mode:'single'}"
+								(sortChange)="changeSort($event)"
+								[skip]="gridHelper.state.skip"
+								[resizable]="true"
+								[pageable]="{pageSizes: gridHelper.defaultPageOptions, info: true}"
+								[pageSize]="gridHelper.state.take">
+
+								<!-- Toolbar Template -->
+								<ng-template kendoGridToolbarTemplate [position]="'top'">
+									<div class="clr-row">
+										<div class="clr-col-2">
+											<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
 										</div>
-										<div *ngIf="column.filterable && showAssetsFilter">
-											<div class="filter-input">
-<!--												(filter)="searchText = $event;"-->
-												<tds-filter-input
-                                                        [columnType]="column.type"
-														[value]="searchText || ''"
-														(filter)="onFilter($event, column)"
-														placeholder="{{'GLOBAL.FILTER' | translate}}">
-												</tds-filter-input>
+										<div class="clr-col-10">
+											<div class="pull-right">
+												<tds-grid-header-action-buttons
+													(refresh)="reloadData()"
+													[actionButtons]="headerActionButtons"
+													(clearFilters)="gridHelper.clearAllFilters(gridColumns)"
+													[disableClearFilters]="disableClearFilters">
+												</tds-grid-header-action-buttons>
 											</div>
 										</div>
-									</th>
-								</tr>
-								</thead>
-								<tbody *ngIf="selectedFolder">
-								<tr *ngFor="let report of selectedFolder.views | filter:{ name: searchText}">
-									<td class="asset-explorer-td-actions">
-										<div class="action-button btn-group btn-link">
+									</div>
+								</ng-template>
+
+								<!-- Show Filters / Actions column -->
+								<kendo-grid-column [width]="60"
+																	 [class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+																	 [minResizableWidth]="60">
+									<ng-template kendoGridHeaderTemplate>
+										<tds-button [flat]="true" (click)="toggleFilter()">
+											<clr-icon shape="filter" class="grid-filter-button is-solid">
+												<span
+													*ngIf="gridHelper.getFilterCounter()"
+													class="badge badge-warning">
+													{{ gridHelper.getFilterCounter() }}
+												</span>
+											</clr-icon>
+										</tds-button>
+									</ng-template>
+									<ng-template kendoGridCellTemplate let-dataItem>
+										<div class="action-button btn-link">
 											<clr-dropdown>
 												<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
 												<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-													<a clrDropdownItem *ngIf="isEditAvailable(report)"
+													<a clrDropdownItem *ngIf="isEditAvailable(dataItem)"
 														 title="Edit View"
-														 (click)="onEditReport(report)">
+														 (click)="onEditReport(dataItem)">
 														Edit
 													</a>
-													<a clrDropdownItem *ngIf="isDeleteAvailable(report) && !report.isSystem"
+													<a clrDropdownItem *ngIf="isDeleteAvailable(dataItem) && !dataItem.isSystem"
 														 title="Delete View"
-														 (click)="onDeleteReport(report)">
+														 (click)="onDeleteReport(dataItem)">
 														Delete
 													</a>
 												</clr-dropdown-menu>
 											</clr-dropdown>
 										</div>
-									</td>
-									<td class="asset-explorer-td-favorite">
+									</ng-template>
+								</kendo-grid-column>
+
+								<!-- Columns -->
+								<kendo-grid-column
+									*ngFor="let column of gridColumns"
+									[resizable]="column.resizable"
+									field="{{ column.property }}"
+									[locked]="column.locked"
+									format="{{ column.format }}"
+									[headerClass]="column.headerClass ? column.headerClass : ''"
+									[headerStyle]="column.headerStyle ? column.headerStyle : ''"
+									[class]="column.cellClass ? column.cellClass : ''"
+									[style]="column.cellStyle ? column.cellStyle : ''"
+									[width]="!column.width ? 100 : column.width"
+									[columnMenu]="column.columnMenu">
+
+									<!-- Header Template -->
+									<ng-template kendoGridHeaderTemplate>
+										<div class="sortable-column">
+											<label>{{ column.label | translate }}</label>
+										</div>
+									</ng-template>
+
+									<!-- Cell Templates -->
+									<ng-template kendoGridCellTemplate *ngIf="column.property === 'isFavorite'" let-dataItem>
 										<tds-button-custom
 											[flat]="true"
 											[icon]="'star'"
-											[iconClass]="report.isFavorite ? 'is-solid' : ''"
-											[tooltip]="report.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
+											[iconClass]="dataItem.isFavorite ? 'is-solid' : ''"
+											[tooltip]="dataItem.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
 											class="favorite-button text-yellow"
-											(click)="toggleFavorite(report)">
+											(click)="toggleFavorite(dataItem)">
 										</tds-button-custom>
-									</td>
-									<td class="asset-explorer-column-name">
-										<a class="link-text"
-											 [routerLink]="['/asset','views',report.id,'show']">
-											{{report.name}}
+									</ng-template>
+									<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem>
+										<a class="link-text" [title]="dataItem.name"
+											 [routerLink]="['/asset','views',dataItem.id,'show']">
+											{{dataItem.name}}
 										</a>
-									</td>
-									<td class="asset-explorer-td-created-by">
-										{{report.createdBy}}
-									</td>
-									<td class="asset-explorer-td-created-on">
-										{{report.createdOn}}
-									</td>
-									<td class="asset-explorer-td-updated-on">
-										{{report.updatedOn}}
-									</td>
-									<td class="asset-explorer-td-is-shared text-center">
-										<span class="glyphicon glyphicon-ok" *ngIf="report.isShared"></span>
-									</td>
-									<td class="asset-explorer-td-is-system text-center">
-										<span class="glyphicon glyphicon-ok" *ngIf="report.isSystem"></span>
-									</td>
-								</tr>
-								</tbody>
-							</table>
-							<!-- /.table -->
+									</ng-template>
+									<ng-template kendoGridCellTemplate *ngIf="column.property === 'isShared'" let-dataItem>
+										<span class="glyphicon glyphicon-ok" *ngIf="dataItem.isShared"></span>
+									</ng-template>
+									<ng-template kendoGridCellTemplate *ngIf="column.property === 'isSystem'" let-dataItem>
+										<span class="glyphicon glyphicon-ok" *ngIf="dataItem.isSystem"></span>
+									</ng-template>
+
+									<!-- Filter Template -->
+									<ng-template kendoGridFilterCellTemplate let-filter>
+										<div class="filter-input" *ngIf="column.filterable">
+											<tds-filter-input
+												name="{{column.property}}"
+												[value]="column.filter || ''"
+												[columnType]="column.type"
+												placeholder="{{'GLOBAL.FILTER' | translate}}"
+												(filter)="gridHelper.onFilterWithValue($event, column)">
+											</tds-filter-input>
+										</div>
+									</ng-template>
+								</kendo-grid-column>
+
+								<!-- Pagination Footer -->
+								<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+									<div class="clr-col-4"></div>
+									<div class="clr-col-8">
+										<tds-grid-pager
+											[total]="total"
+											[totalPages]="totalPages"
+											[currentPage]="currentPage"
+											[pageSize]="gridHelper.state.take"
+											[pageSizes]="gridHelper.defaultPageOptions"
+											(pageChange)="gridHelper.pageChange($event)">
+										</tds-grid-pager>
+									</div>
+								</ng-template>
+							</kendo-grid>
 						</div>
+
 						<!-- /.report-grid -->
 					</div>
 					<!-- /.box-body -->

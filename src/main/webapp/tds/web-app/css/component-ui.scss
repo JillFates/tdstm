@@ -77,3 +77,9 @@ task-comment kendo-grid.k-grid .k-grid-content {
 		}
 	}
 }
+
+tds-grid-header-action-buttons {
+  .btn clr-icon {
+    margin-right: 0 !important;
+  }
+}
