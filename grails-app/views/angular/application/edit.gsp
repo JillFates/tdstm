@@ -200,12 +200,10 @@
 					</tds-combobox-group>
 				</div>
 
-				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
-					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
-							[(ngModel)]="model.asset.shutdownDuration"/>
-					<span>m</span>
-				</div>
+				<tdsAngular:inputLabelAndField
+						field="${standardFieldSpecs.shutdownDuration}"
+						value="${asset.shutdownDuration}"
+						ngmodel="model.asset.shutdownDuration" tabindex="32"/>
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
@@ -235,11 +233,10 @@
 					</tds-combobox-group>
 				</div>
 
-				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"/>
-					<span>m</span>
-				</div>
+				<tdsAngular:inputLabelAndField
+						field="${standardFieldSpecs.testingDuration}"
+						value="${asset.testingDuration}"
+						ngmodel="model.asset.testingDuration" tabindex="36"/>
 
 				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
 			</div>
