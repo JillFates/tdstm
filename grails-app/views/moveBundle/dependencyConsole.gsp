@@ -24,6 +24,7 @@
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="keyevent_constants.js" />
 		<g:javascript src="graph.js" />
+		<g:javascript src="tds-util.js" />
 		<g:javascript src="generator/runtime.js" />
 		<g:javascript src="generator/generator.js" />
 	</head>
@@ -475,12 +476,22 @@
 						switch ('${tabName}') {
 								case "apps":
 										break; // do nothing, we are already there
-								case "map":
+							case "map":
 										getList("graph", '${groupId}');
-										window.setTimeout(function() {
-                        					$('#searchBoxId').val(assetName);
-                        					GraphUtil.performSearch();
-										}, 2500)
+										// fix for low networks, retry n times until the values are established
+										// completely by the gsp file
+										TDSUtilFunctions.retryFunction(
+												6,
+												1500,
+												function () {
+													return $('#searchBoxId').length;
+												},
+												function () {
+													$('#searchBoxId').val(assetName);
+													GraphUtil.performSearch();
+												}
+										);
+
 										break;
 								case "all":
 										getList("all", '${groupId}');

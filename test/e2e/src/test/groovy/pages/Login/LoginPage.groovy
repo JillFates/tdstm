@@ -18,10 +18,12 @@ class LoginPage extends Page {
     }
 
     static content = {
+        domain {$("select", name:"authority")}
+        domainSelectorValues(wait:true, required:false) { $("option")}
         username { $("#usernameid") }
         password { $("input", name:"password") }
-        submitButton { $("#submitButton") }
-        errorMessage { $("div", class:"message")}
+        submitButton { $("tds-button#loginBtn") }
+        errorMessage { $("span", class:"alert-text")}
         commonsModule { module CommonsModule }
     }
 
@@ -37,6 +39,7 @@ class LoginPage extends Page {
          * The following two lines will use the credentials in the testData.txt file unless
          * different credentials are provided when executing.
          */
+        selectDomain()
         username = System.properties['tm.creds.username']?: userCredentials.user
         password =  System.properties['tm.creds.password'] ?: userCredentials.pass
         submitButton.click()
@@ -101,5 +104,11 @@ class LoginPage extends Page {
             true //We break once the user is locked
         } else if(verifyLockedUserError()) //This is the scenario where the username is already locked, so we do nothing
             true
+    }
+
+    def selectDomain(){
+        domain.click()
+        waitFor { domainSelectorValues.size() > 0 }
+        domainSelectorValues[1].click()
     }
 }

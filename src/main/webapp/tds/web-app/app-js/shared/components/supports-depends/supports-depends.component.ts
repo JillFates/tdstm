@@ -19,7 +19,7 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-supports-depends',
 	template: `
-        <kendo-grid
+        	<kendo-grid
                 *ngIf="dataGridSupportsOnHelper"
                 class="tds-table"
                 [data]="dataGridSupportsOnHelper.gridData"
@@ -62,12 +62,12 @@ declare var jQuery: any;
 
                 <!-- Action -->
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-					<div class="action-button btn-group btn-link">
+					<div class="action-button btn-link">
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-							<clr-dropdown-menu *clrIfOpen>
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Asset</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Delete Asset</a>
+							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Comment Create</a>
+								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -78,6 +78,7 @@ declare var jQuery: any;
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
                             [(ngModel)]="dataItem.dataFlowFreq"
+                            (valueChange)="onChangeInternalModel()"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -96,6 +97,8 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
                     <tds-combobox
+		                    [required]="true"
+		                    [allowEmptyValue]="true"
                             [(model)]="dataItem.assetDepend"
                             [(metaParam)]="dataItem.assetClass.id"
                             [serviceRequest]="getAssetListForComboBox"
@@ -112,6 +115,7 @@ declare var jQuery: any;
                                         [(ngModel)]="dataItem.assetDepend.moveBundle"
                                         [ngClass]="getMoveBundleColor(dataItem)"
                                         (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
+                                        (valueChange)="onChangeInternalModel()"
                                         required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -121,6 +125,7 @@ declare var jQuery: any;
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="typeList"
                             [(ngModel)]="dataItem.type"
+                            (valueChange)="onChangeInternalModel()"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -130,6 +135,7 @@ declare var jQuery: any;
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="statusList"
                             [(ngModel)]="dataItem.status"
+                            (valueChange)="onChangeInternalModel()"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -137,7 +143,7 @@ declare var jQuery: any;
             <kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
         </kendo-grid>
 
-        <kendo-grid
+        	<kendo-grid
                 *ngIf="dataGridDependsOnHelper"
                 class="tds-table"
                 [data]="dataGridDependsOnHelper.gridData"
@@ -180,12 +186,12 @@ declare var jQuery: any;
 
                 <!-- Action -->
 				<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-					<div class="action-button btn-group btn-link">
+					<div class="action-button btn-link">
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-							<clr-dropdown-menu *clrIfOpen>
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Edit Asset</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Delete Asset</a>
+							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Comment Create</a>
+								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -214,6 +220,8 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
                     <tds-combobox
+                            [required]="true"
+                            [allowEmptyValue]="true"
                             [(model)]="dataItem.assetDepend"
                             [(metaParam)]="dataItem.assetClass.id"
                             [serviceRequest]="getAssetListForComboBox"
@@ -463,7 +471,7 @@ export class SupportsDependsComponent implements OnInit {
 					provide: AssetComment,
 					useValue: assetComment
 				}
-			], true, false)
+			], false, false)
 			.then((result) => {
 				dataItem.comment = result.comment;
 			}).catch((error) => console.log(error));
