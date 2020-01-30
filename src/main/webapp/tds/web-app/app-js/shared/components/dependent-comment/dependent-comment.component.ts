@@ -44,7 +44,7 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
                     </div>
                     <div class="modal-sidenav btn-link">
 	                    <tds-button-edit class="selected-button"></tds-button-edit>
-						<tds-button-save (click)="onUpdateComment()"></tds-button-save>
+						<tds-button-save (click)="onUpdateComment()" [disabled]="dependentForm && !dependentForm.dirty"></tds-button-save>
 						<tds-button-cancel (click)="cancelCloseDialog()" data-dismiss="modal"></tds-button-cancel>
                     </div>
             </div>
