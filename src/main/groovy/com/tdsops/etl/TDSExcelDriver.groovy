@@ -169,6 +169,7 @@ class TDSExcelDriver extends ExcelDriver {
 
 			Row row = rows.next()
 			rowsProcessed += 1
+			dataset.params.currentRowIndex = rowsProcessed
 			Iterator cells = row.cellIterator()
 			List<Field> fields = []
 			cells.each { Cell cell ->

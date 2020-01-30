@@ -671,7 +671,49 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can read rows skipping rows before an iteration for a spreadSheet DataSet'() {
+	void 'test can read rows skipping rows before an iteration for a XLSX  spreadSheet DataSet'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+				"invalid headers, are not part, of the valid\n" + ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						sheet 'Applications'
+						skip 1
+						read labels
+						skip 1
+						domain Application
+						iterate {
+							extract 'vendor name' load 'Vendor'
+						}
+						""".stripIndent())
+
+		then: 'Results contains'
+			etlProcessor.finalResult().domains.size() == 1
+
+		and: 'Results contains values'
+			with(etlProcessor.finalResult().domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 1
+				with(data[0].fields.appVendor) {
+					originalValue == 'Mozilla'
+					value == 'Mozilla'
+				}
+			}
+
+		cleanup:
+			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read rows skipping rows before an iteration for a XLS spreadSheet DataSet'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
