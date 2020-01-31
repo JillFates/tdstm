@@ -30,13 +30,12 @@ class CommonsModule extends Module {
     }
 
     def clickUserMenu(){
-        //waitForLoader(5)
+        waitForLoader(5)
         userMenu.click()
     }
 
     def logout(){
-        waitForLoader(30)
-        clickUserMenu()
+        waitFor(30){clickUserMenu()}
         waitFor(30){logoutBtn.displayed}
         waitForLoader(3)
         waitFor(30){logoutBtn.click()}
