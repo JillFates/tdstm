@@ -82,7 +82,7 @@ export class AssetCommonShow implements OnInit {
 		jQuery('body').addClass('modal-open');
 	}
 
-	showDependencyView(assetId: number, dependencyAsset: number, deleteRowId = '') {
+	showDependencyView(type: string, assetId: number, dependencyAsset: number, rowId = '') {
 		this.assetService.getDependencies(assetId, dependencyAsset)
 			.subscribe((result) => {
 				jQuery('body').addClass('modal-open');
@@ -90,22 +90,26 @@ export class AssetCommonShow implements OnInit {
 					{ provide: 'ASSET_DEP_MODEL', useValue: result }])
 					.then(res => {
 						if (res && res.delete) {
-							if (deleteRowId) {
-								jQuery(`#${deleteRowId}.asset-detail-supports-row`).remove();
-
-								const supportsCounter = jQuery('#asset-detail-supports-counter');
-								const currentRows = jQuery('.asset-detail-supports-row');
-								if (currentRows.length >= 0 && supportsCounter.length) {
-									// decrease the counter badge
-									supportsCounter.text(currentRows.length > 99 ? '99+' : currentRows.length);
-								}
-							}
+							this.deleteDependencyRow(type, rowId)
 						}
 					})
 					.catch(res => {
 						console.log(res);
 					});
 			}, (error) => console.log(error));
+	}
+
+	private deleteDependencyRow(type: string, rowId: string): void {
+		if (rowId) {
+			jQuery(`#${rowId}.asset-detail-${type}-row`).remove();
+
+			const counter = jQuery(`#asset-detail-${type}-counter`);
+			const currentRows = jQuery(`.asset-detail-${type}-row`);
+			if (currentRows.length >= 0 && counter.length) {
+				// decrease the counter badge
+				counter.text(currentRows.length > 99 ? '99+' : currentRows.length);
+			}
+		}
 	}
 
 	/**

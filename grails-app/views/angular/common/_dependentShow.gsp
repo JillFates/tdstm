@@ -17,7 +17,8 @@
 		</thead>
 		<tbody>
 			<g:each in="${dependentAssets}" var="dependent" status="i">
-				<tr>
+				<g:set var="dependentRow">${assetEntity.id}${dependent.dependent.id}</g:set>
+				<tr id="${dependentRow}" class="asset-detail-dependent-row">
 					<td (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 						${dependent.dependent?.assetType}
 					</td>
@@ -51,11 +52,11 @@
 							${dependent.dependent?.moveBundle}
 						</td>
 					</g:else>
-					<td nowrap="nowrap" (click)="showDependencyView(${assetEntity.id}, ${dependent.dependent.id})">
+					<td nowrap="nowrap" (click)="showDependencyView('dependent', ${assetEntity.id}, ${dependent.dependent.id}, ${dependentRow})">
 						${dependent.type}&nbsp;
 						<g:render template="/angular/common/dependentComment" model="[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
 					</td>
-					<td (click)="showDependencyView(${assetEntity.id}, ${dependent.dependent.id})">
+					<td (click)="showDependencyView('dependent',  ${assetEntity.id}, ${dependent.dependent.id}, ${dependentRow})">
 						<g:if test="${dependent.status == 'Validated'}">
 							<span class="status status-Ready">
 								<clr-icon shape="thumbs-up" class="is-solid"></clr-icon>
