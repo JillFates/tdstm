@@ -207,9 +207,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		if (change.dependencies) {
 			if (change.type === DependencyType.dependencyA) {
 				this.editedDependencies.aDependencyHasChanged = true;
-				console.log('Changing dependency a');
 			} else {
-				console.log('Changing dependency b');
 				this.editedDependencies.bDependencyHasChanged = true;
 			}
 			this.editedDependencies.dependencies = change.dependencies;
