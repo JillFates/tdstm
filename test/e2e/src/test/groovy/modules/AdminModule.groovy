@@ -29,7 +29,7 @@ class AdminModule extends Module{
 
     static content = {
         menuContainer { $("div", class: "menu-top-container") }
-        menuBar { menuContainer.find("div#navbar-collapse") }
+        menuBar { menuContainer.find("div#mobile-nav") }
         adminItem { menuBar.find("li.menu-parent-admin") }
         adminMenu { adminItem.find("ul", class: "dropdown-menu menu-item-expand") }
         adminSections { adminMenu.find("li", class: "menu-parent-admin") }
