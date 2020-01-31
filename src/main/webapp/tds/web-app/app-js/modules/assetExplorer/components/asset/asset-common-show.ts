@@ -82,6 +82,13 @@ export class AssetCommonShow implements OnInit {
 		jQuery('body').addClass('modal-open');
 	}
 
+	/**
+	 * Show the dependency dialog, in case a dependency is removed update the corresponding grid
+	 * @param type Dependency type (support/ dependent on)
+	 * @param assetId Main Asset id
+	 * @param dependencyAsset  id of the asset dependent
+	 * @param rowId Id fo the row to be deleted
+	 */
 	showDependencyView(type: string, assetId: number, dependencyAsset: number, rowId = '') {
 		this.assetService.getDependencies(assetId, dependencyAsset)
 			.subscribe((result) => {
@@ -89,8 +96,9 @@ export class AssetCommonShow implements OnInit {
 				this.dialogService.extra(AssetDependencyComponent, [
 					{ provide: 'ASSET_DEP_MODEL', useValue: result }])
 					.then(res => {
+						// if the dependency was deleted remove it from the grid
 						if (res && res.delete) {
-							this.deleteDependencyRow(type, rowId)
+							this.deleteDependencyRowUpdateCounter(type, rowId)
 						}
 					})
 					.catch(res => {
@@ -99,7 +107,13 @@ export class AssetCommonShow implements OnInit {
 			}, (error) => console.log(error));
 	}
 
-	private deleteDependencyRow(type: string, rowId: string): void {
+	/**
+	 * Delete the dependency row and update the corresponding counter
+	 * Supports and Dependent grids are generated through a gsp file, so we need to remove the row via JQuery
+	 * @param type Type of dependency (support or dependent)
+	 * @param rowId Id fo the row to be deleted
+	 */
+	private deleteDependencyRowUpdateCounter(type: string, rowId: string): void {
 		if (rowId) {
 			jQuery(`#${rowId}.asset-detail-${type}-row`).remove();
 
