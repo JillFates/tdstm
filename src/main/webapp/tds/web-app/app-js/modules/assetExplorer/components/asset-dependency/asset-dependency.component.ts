@@ -115,7 +115,30 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	 * @return {void)
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.hasChanges()) {
+			this.promptForSave()
+				.then(confirm => {
+					if (confirm) {
+						this.dismiss();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.dismiss();
+		}
+	}
+
+	/**
+	 * Launch the prompt modal asking for saving changes
+	 *
+	 */
+	private promptForSave(): Promise<any> {
+		return this.promptService.open(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'),
+		)
 	}
 
 	/**
@@ -156,12 +179,23 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Cancel the edit changes
+	 * Cancel the edit changes, if there is changes prompt for saving
 	 * @return {void)
 	 */
 	protected cancelEdit(): void {
-		this.setEditMode(false);
-		this.editedDependencies = this.getInitialEditDependencies();
+		if (this.hasChanges()) {
+			this.promptForSave()
+				.then(confirm => {
+					if (confirm) {
+						this.setEditMode(false);
+						this.editedDependencies = this.getInitialEditDependencies();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.setEditMode(false);
+			this.editedDependencies = this.getInitialEditDependencies();
+		}
 	}
 
 	/**
@@ -173,7 +207,9 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		if (change.dependencies) {
 			if (change.type === DependencyType.dependencyA) {
 				this.editedDependencies.aDependencyHasChanged = true;
+				console.log('Changing dependency a');
 			} else {
+				console.log('Changing dependency b');
 				this.editedDependencies.bDependencyHasChanged = true;
 			}
 			this.editedDependencies.dependencies = change.dependencies;
@@ -232,6 +268,13 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						}, (error) => console.log('Error:', error));
 				}
 			});
+	}
+
+	/**
+	 * Determines if there is changes in place
+	 */
+	private hasChanges(): boolean {
+		return this.editedDependencies.dependencies;
 	}
 
 	/**
