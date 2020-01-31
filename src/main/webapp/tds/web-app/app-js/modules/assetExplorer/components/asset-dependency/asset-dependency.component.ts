@@ -187,15 +187,21 @@ export class AssetDependencyComponent extends UIExtraDialog {
 			this.promptForSave()
 				.then(confirm => {
 					if (confirm) {
-						this.setEditMode(false);
-						this.editedDependencies = this.getInitialEditDependencies();
+						this.changeToViewMode();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.setEditMode(false);
-			this.editedDependencies = this.getInitialEditDependencies();
+			this.changeToViewMode();
 		}
+	}
+
+	/**
+	 * Se the current view mode to read mode
+	 */
+	private changeToViewMode(): void {
+		this.setEditMode(false);
+		this.editedDependencies = this.getInitialEditDependencies();
 	}
 
 	/**
@@ -246,7 +252,6 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		this.confirmDelete()
 			.then((result) => {
 				if (result) {
-					console.log(result);
 					const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
 
 					const dependencyChange = {
@@ -258,7 +263,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						.subscribe((result) => {
 							if (result) {
 								if (dependencyType === DependencyType.dependencyA) {
-									this.cancelCloseDialog();
+									this.dismiss();
 								} else {
 									this.dependencyB = null;
 								}
