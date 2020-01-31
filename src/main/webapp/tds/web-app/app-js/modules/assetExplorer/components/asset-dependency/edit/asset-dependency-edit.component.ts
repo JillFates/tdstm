@@ -47,6 +47,7 @@ export class AssetDependencyEditComponent implements OnInit {
 
 	/**
 	 * Notify to the host component changes on some dependency
+	 * @param {event} event Type of event which starts the change
 	 * @param {DependencyType} type Type of dependency thas was changed
 	 * @return {void)
 	 */
