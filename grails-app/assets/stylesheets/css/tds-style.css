@@ -1599,6 +1599,8 @@ body.error-handling div.error-page {
       font-size: 27px; }
     body.error-handling div.error-page div.error-content p {
       font-size: 18px; }
+      body.error-handling div.error-page div.error-content p.action-description {
+        font-size: 15px; }
 
 i.licensing-error-warning {
   color: #FFCC00;
@@ -1639,6 +1641,9 @@ div.license-warning-message-button {
 div.content-wrapper div.container .body table.asset-summary-table {
   border-spacing: 2px;
   border-collapse: initial; }
+
+div.content-wrapper div.container .indent {
+  padding-left: 30px; }
 
 div.content-wrapper div.container .body table#assetListIdGrid div.ui-jqgrid-bdiv {
   overflow-x: hidden !important; }

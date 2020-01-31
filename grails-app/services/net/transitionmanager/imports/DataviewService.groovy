@@ -678,13 +678,13 @@ class DataviewService implements ServiceMethods {
 			// Test covers 3a (remainder), 3c, 3d
 			if (! foundDuplicateName && isNotDefaultProject) {
 				foundDuplicateName = Dataview.where {
-					project.id = project.id
+					project.id == project.id
 					name == dataviewCommand.name
 					if (dataviewCommand.id) {
 						id != dataviewCommand.id
 					}
-					( 	person.id == dataview.person.id || \
- 						(person.id != dataview.person.id && dataview.isShared) )
+					( 	person.id == dataviewCommand.person.id || \
+ 						(person.id != dataviewCommand.person.id && dataviewCommand.isShared) )
 				}.count() > 0
 			}
 			if (foundDuplicateName) {
