@@ -30,7 +30,7 @@ class CommonsModule extends Module {
     }
 
     def clickUserMenu(){
-        waitFor(120){userMenu.click()}
+        waitFor(30){userMenu.click()}
 
     }
 
