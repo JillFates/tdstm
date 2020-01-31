@@ -59,7 +59,7 @@ export class ArchitectureGraphDiagramHelper {
 
 		dataCopy.nodes.map((t: IAssetNode) => {
 			t.key = t.id;
-			t.iconPath = t.assetClass && ASSET_ICONS[t.assetClass.toLowerCase()].icon;
+			t.iconPath = ASSET_ICONS[t.assetClass.toLowerCase()] && ASSET_ICONS[t.assetClass.toLowerCase()].icon;
 			nodeDataArr.push(t);
 		});
 		dataCopy.links
