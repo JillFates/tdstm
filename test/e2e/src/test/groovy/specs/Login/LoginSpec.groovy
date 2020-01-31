@@ -21,7 +21,7 @@ class LoginSpec extends GebReportingSpec {
         then: "The user should be logged in and menu should be displayed"
             at MenuPage
         and: "The User logs out"
-            waitFor(30){commonsModule.logout()}
+            commonsModule.logout()
     }
 
     def "2. Login to Transition Manager with a wrong password twice - Negative Scenario"(){
