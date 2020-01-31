@@ -50,7 +50,7 @@ export class AssetDependencyEditComponent implements OnInit {
 	 * @param {DependencyType} type Type of dependency thas was changed
 	 * @return {void)
 	 */
-	public notifyChanges(type: DependencyType): void {
+	public notifyChanges(event: any, type: DependencyType): void {
 		this.change.emit({type, dependencies: this.dependencies});
 	}
 }
