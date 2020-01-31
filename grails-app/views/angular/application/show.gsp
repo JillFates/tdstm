@@ -57,7 +57,7 @@
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Supports
-                            <span class="badge">
+                            <span class="badge" id="asset-detail-supports-counter">
                                 <g:if test="${supportAssets.size() > 99}">
                                     99+
                                 </g:if>

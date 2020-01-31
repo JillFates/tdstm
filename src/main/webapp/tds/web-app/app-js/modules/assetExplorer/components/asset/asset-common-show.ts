@@ -82,14 +82,29 @@ export class AssetCommonShow implements OnInit {
 		jQuery('body').addClass('modal-open');
 	}
 
-	showDependencyView(assetId: number, dependencyAsset: number) {
+	showDependencyView(assetId: number, dependencyAsset: number, deleteRowId = '') {
 		this.assetService.getDependencies(assetId, dependencyAsset)
 			.subscribe((result) => {
 				jQuery('body').addClass('modal-open');
 				this.dialogService.extra(AssetDependencyComponent, [
 					{ provide: 'ASSET_DEP_MODEL', useValue: result }])
-					.then(res => console.log(res))
-					.catch(res => console.log(res));
+					.then(res => {
+						if (res && res.delete) {
+							if (deleteRowId) {
+								jQuery(`#${deleteRowId}.asset-detail-supports-row`).remove();
+
+								const supportsCounter = jQuery('#asset-detail-supports-counter');
+								const currentRows = jQuery('.asset-detail-supports-row');
+								if (currentRows.length >= 0 && supportsCounter.length) {
+									// decrease the counter badge
+									supportsCounter.text(currentRows.length > 99 ? '99+' : currentRows.length);
+								}
+							}
+						}
+					})
+					.catch(res => {
+						console.log(res);
+					});
 			}, (error) => console.log(error));
 	}
 

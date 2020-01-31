@@ -263,7 +263,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						.subscribe((result) => {
 							if (result) {
 								if (dependencyType === DependencyType.dependencyA) {
-									this.dismiss();
+									this.close({delete: true});
 								} else {
 									this.dependencyB = null;
 								}

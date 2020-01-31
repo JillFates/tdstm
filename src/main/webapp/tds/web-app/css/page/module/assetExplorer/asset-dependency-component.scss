@@ -1,7 +1,10 @@
 .asset-dependency-component {
-	.modal-body {
-		padding: 0 24px 34px 24px;
-	}
+  	.tds-modal-content {
+     	 padding-bottom: 25px;
+		.modal-body {
+			padding: 0 24px 34px 24px;
+		}
+  	}
 
 	&.dependency-show {
 		.dependency-row {
