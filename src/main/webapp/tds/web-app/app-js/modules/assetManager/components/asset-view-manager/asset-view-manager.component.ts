@@ -48,7 +48,6 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		private dictionary: DictionaryService,
 		private translateService: TranslatePipe,
 		private preferenceService: PreferenceService) {
-		this.sortBy = 'name';
 		this.report = this.route.snapshot.data['reports'] as Observable<ViewGroupModel[]>;
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
@@ -78,6 +77,34 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 			// 45px is the header height, 31px is the footer height
 			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
 		}
+	}
+
+	/**
+	 * Load & Setup grid settings based on user preferences.
+	 * @param preferences
+	 */
+	private setupDefaultSettings(preferences: any[]) {
+		this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		this.gridColumns = AssetViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
+		this.reportGroupModels = this.report;
+		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
+		this.sortBy = preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT];
+		if (!this.sortBy) {
+			this.sortBy = 'name';
+			this.preferenceService.setPreference(PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT, this.sortBy)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
+		}
+		this.gridHelper = new DataGridOperationsHelper(
+			[],
+			[{
+				dir: 'asc',
+				field: this.sortBy
+			}],
+			null,
+			null,
+			GRID_DEFAULT_PAGE_SIZE);
+		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
 	}
 
 	/**
@@ -242,28 +269,6 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 					});
 			}
 		}
-	}
-
-	/**
-	 * Load & Setup grid settings based on user preferences.
-	 * @param preferences
-	 */
-	private setupDefaultSettings(preferences: any[]) {
-		this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-		this.gridColumns = AssetViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
-		this.reportGroupModels = this.report;
-		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
-		this.sortBy = preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT];
-		this.gridHelper = new DataGridOperationsHelper(
-			[],
-			[{
-				dir: 'asc',
-				field: this.sortBy
-			}],
-			null,
-			null,
-			GRID_DEFAULT_PAGE_SIZE);
-		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
 	}
 
 	/**
