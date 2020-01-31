@@ -1366,7 +1366,15 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
 				Class refDomain = GormUtil.getDomainPropertyType(domainClass, fieldName)
+
+
 				valueToSet = SearchQueryHelper.findEntityByMetaData(fieldName, fieldsInfo, context, domain)
+
+				//TM-16914 fixes an issue where the value already exists in this session, and the valueToSet becomes detached.
+				if(!valueToSet.isAttached() && valueToSet.id == existingValue.id){
+					valueToSet = existingValue
+				}
+
 				recordAnySearchQueryHelperErrors(fieldName, fieldsInfo, context)
 				log.debug 'bindFieldsInfoValuesToEntity() {} {} {} {}',
 					fieldName, refDomain.getName(), (valueToSet ? valueToSet.getClass().getName() : null), valueToSet
