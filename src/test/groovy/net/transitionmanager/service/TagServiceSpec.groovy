@@ -289,7 +289,7 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 		when:
 			String query = service.getTagsQuery([1, 2, 3], 'ANY', queryParams)
 		then:
-			query == "AND t.tag_id in (:tagIds)"
+			query == "AND ta.tag_id in (:tagIds)"
 			queryParams == ['tagIds': [1, 2, 3]]
 	}
 
