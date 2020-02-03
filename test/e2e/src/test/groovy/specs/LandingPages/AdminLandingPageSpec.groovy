@@ -41,7 +41,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The User Clicks in the Admin > Menu'
-            adminModule.goToAdminMenu()
+            waitFor(30){adminModule.goToAdminMenu()}
 
         then: 'The number of elements displayed matches'
         //We set the number of elements as 16 because we need to take into account the divisions among items
