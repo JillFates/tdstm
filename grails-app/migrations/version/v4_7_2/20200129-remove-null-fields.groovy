@@ -15,7 +15,7 @@ databaseChangeLog = {
 		grailsChange {
 			change {
 				// List dataviews that requires updates
-				List<Dataview> dataViewList = Dataview.findAllByIdGreaterThan(7l)
+				List<Dataview> dataViewList = Dataview.list()
 
 				// Dataview reportSchema modification closure
 				Closure changeScript = { settingsJson ->
