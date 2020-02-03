@@ -50,7 +50,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can count number of iterate loop used in a simple ETL script using a ProgressCallback'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', """
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', """
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 			""".stripIndent().trim())
@@ -161,7 +161,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can count number of iterate loop used in a complex ETL script'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', """
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', """
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 			""".stripIndent().trim())
@@ -301,7 +301,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress using a iterator using from and to'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', """
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', """
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
