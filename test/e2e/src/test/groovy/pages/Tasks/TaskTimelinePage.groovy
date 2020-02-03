@@ -16,8 +16,8 @@ class TaskTimelinePage extends Page {
     }
 
     static content = {
-        taskTimelinePageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        taskTimelinePageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        taskTimelinePageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        taskTimelinePageBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
         tasksModule { module TasksMenuModule}
         commonsModule { module CommonsModule }
     }

@@ -10,12 +10,13 @@ class TagsPage extends Page{
     static at = {
         title == "Manage Tags"
         pageHeaderName.text().trim() == "Manage Tags"
-        createBtn.text() == "Create Tag"
-        tagsGrid.displayed
+        pageBreadcrumbs[0].text() == "Project"
+        pageBreadcrumbs[1].text() == "Manage Tags"
     }
 
     static content = {
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
+        pageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         createBtn { $('button.k-grid-add-command')}
         tagsGrid {$('div[role=grid]')}
         tagsGridDataRows {tagsGrid.find(".k-grid-container .k-grid-content tr[kendogridlogicalrow]")}

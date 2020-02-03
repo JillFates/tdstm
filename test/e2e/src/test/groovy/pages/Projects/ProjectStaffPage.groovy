@@ -14,7 +14,7 @@ class ProjectStaffPage extends Page {
     }
 
     static content = {
-        modaltitle { $("section", class:"content-header").find("h1")}
+        modaltitle { $("section", class:"content-header").find("h2")}
         team { $('b#teamLabel')}
         onlyClientStaff { $('b#onlyClientStaffLabel')}
         onlyAssignedLabel { $('b#onlyAssignedLabel')}

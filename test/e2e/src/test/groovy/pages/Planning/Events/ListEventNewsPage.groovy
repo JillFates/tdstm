@@ -12,9 +12,9 @@ class ListEventNewsPage extends Page {
     }
 
     static content = {
-        listEventNewsPageTitle { $("section", class:"content-header").find("h1")}
+        listEventNewsPageTitle { $("section", class:"content-header").find("h2")}
         planningModule { module PlanningMenuModule}
-        listEventNewsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        listEventNewsPageBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
     }
 
 

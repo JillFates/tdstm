@@ -8,19 +8,14 @@ import geb.waiting.WaitTimeoutException
 class CookbookPage extends Page {
 
     static at = {
-        waitFor {createRecipeButton.displayed}
-        createRecipeButton.text() == "Create Recipe..."
-        //  TODO following item have the checkbox inside the label
-        //  viewArchivedCBoxLabel == "View Archived Recipes"
-        taskGenerationTab.text() == "Task Generation"
-        historyTab.text() == "History"
-        editorTab.text()  == "Editor"
-        versionsTab.text() == "Versions"
+
+        //  TODO Refactor the whole page
+        pageTitle.text()  == "Cookbook"
     }
 
     static content = {
-        pageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        pageBreadcrumb { $("o1", class:"breadcrumb")}
+        pageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        pageBreadcrumb { $("o1", class:"legacy-breadcrumb").find("li a")}
         loadingIndicator(required:false, wait:true){ $("#cookbookRecipesEditor").find("loading-indicator").find("div","ng-show":"isLoading")}
         successMessage { $("#cookbookRecipesEditor").find("div.alert.alert-success.animateShow")}
         createRecipeButton { $("a#generateRecipe")}

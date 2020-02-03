@@ -12,7 +12,7 @@ class UserActivationEmailsPage extends Page {
     }
 
     static content = {
-        modaltitle { $("section", class:"content-header").find("h1")}
+        modaltitle { $("section", class:"content-header").find("h2")}
         customMessage {$("textarea", name:"customMessage")}
         sendActivationEmail {$("input" , type:"submit" , value:"Send Activation Emails")}
         projectsModule { module ProjectsMenuModule}
