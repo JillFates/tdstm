@@ -68,6 +68,7 @@ class AdminModule extends Module{
     }
 
     def goToAdminMenu() {
+        waitFor(30) {adminItem}
         waitFor{adminItem.displayed}
         waitFor(30){adminItem.click()}
     }
