@@ -201,15 +201,10 @@ class BulkAssetChangeServiceIntegrationSpec extends Specification {
 			JSONObject fieldSpec = loadFieldSpecJson()
 
 			Setting.findAllByProject(project)*.delete(flush:true)
-			customDomainService.metaClass.clearCustomFieldsForClass = {Project project, String assetClassName, List<String> updateFieldStrings-> 0}
 			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 			initialized = true
 		}
-	}
-
-	void cleanup() {
-		GroovySystem.metaClassRegistry.removeMetaClass CustomDomainService
 	}
 
 

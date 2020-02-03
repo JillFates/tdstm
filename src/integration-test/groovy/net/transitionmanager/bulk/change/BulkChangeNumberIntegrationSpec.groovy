@@ -103,13 +103,9 @@ class BulkChangeNumberIntegrationSpec extends Specification {
 		Project project = projectTestHelper.createProjectWithDefaultBundle()
 		JSONObject fieldSpec = loadFieldSpecJson()
 		Setting.findAllByProject(project)*.delete(flush:true)
-		customDomainService.metaClass.clearCustomFieldsForClass = {Project project1, String assetClassName, List<String> updateFieldStrings-> 0}
 		customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 	}
 
-	void cleanup() {
-		GroovySystem.metaClassRegistry.removeMetaClass CustomDomainService
-	}
 
 	void 'Test clear'() {
 		when: 'clear is called with a list of assets'

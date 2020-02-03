@@ -40,12 +40,7 @@ class CustomDomainServiceTests extends Specification {
         // Clone the Field Specifications Setting records
         Project defProject = Project.get(Project.DEFAULT_PROJECT_ID)
         Setting.findAllByProject(defProject)*.delete(flush:true)
-        customDomainService.metaClass.clearCustomFieldsForClass = {Project project, String assetClassName, List<String> updateFieldStrings-> 0}
         customDomainService.saveFieldSpecs(defProject, CustomDomainService.ALL_ASSET_CLASSES, loadFieldSpecJson())
-    }
-
-    void cleanup() {
-        GroovySystem.metaClassRegistry.removeMetaClass CustomDomainService
     }
 
     private static final String CUSTOM1_LABEL = 'Description'
