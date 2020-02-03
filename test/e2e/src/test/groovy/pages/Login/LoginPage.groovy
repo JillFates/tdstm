@@ -14,7 +14,7 @@ class LoginPage extends Page {
         title == "Login"
         waitFor(8){username.displayed}
         waitFor(8){password.displayed}
-        waitFor(8){submitButton.displayed}
+        //waitFor(8){submitButton.displayed}
     }
 
     static content = {
@@ -50,6 +50,7 @@ class LoginPage extends Page {
     @param: numAttempts  set the number of attempts, after the 3rd one the user gets locked so we use 2 by default
      */
     def loginWrongPass(Integer numAttempts = 2) {
+        selectDomain()
         def log=new Login()
         def credentials=log.readCredentials()
 
@@ -69,25 +70,29 @@ class LoginPage extends Page {
     @param: numAttempts  set the number of attempts
      */
     def loginWrongUser(Integer numAttempts = 2) {
+        selectDomain()
         while (numAttempts != 0) {
             username = CommonActions.getRandomString(10)
             password = CommonActions.getRandomString(8)
             submitButton.click()
             verifyWrongUserError()
             numAttempts--
-            commonsModule.waitForLoader(5)
+            commonsModule.waitForLoader(10)
         }
     }
 
     def verifyWrongPassError(){
-        errorMessage.text() == "Username and password are required"
+        waitFor(2){errorMessage.displayed}
+        errorMessage.text() == "Username and password are invalid"
     }
 
     def verifyWrongUserError(){
+        waitFor(2){errorMessage.displayed}
         errorMessage.text() == "Invalid username and/or password"
     }
 
     def verifyLockedUserError(){
+        waitFor(2){errorMessage.displayed}
         errorMessage.text().contains("Your account is presently locked")
     }
 
