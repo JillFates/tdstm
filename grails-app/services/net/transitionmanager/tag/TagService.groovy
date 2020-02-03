@@ -317,7 +317,7 @@ class TagService implements ServiceMethods {
 
 		if (tagMatch == 'ANY') {
 			queryParams.tagIds = tagIds
-			return "AND t.tag_id in (:tagIds)"
+			return "AND ta.tag_id in (:tagIds)"
 
 		} else {
 			queryParams.tagIds = tagIds
