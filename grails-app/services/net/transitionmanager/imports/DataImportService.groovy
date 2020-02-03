@@ -795,7 +795,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 * set the status to PENDING.
 	 * @param batch - the batch that the ImportBatchRecord
 	 */
-	@NotTransactional()
+	@Transactional()
 	private void updateBatchStatus(Long batchId) {
 		Integer count = ImportBatchRecord.where {
 			importBatch.id == batchId

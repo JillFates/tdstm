@@ -21,6 +21,7 @@ import { CHECK_ACTION } from './model/check-action.model';
 			[ngClass]="class"
 			(click)="onCheckThumbBindAction()"
 			[disabled]="disabled"
+			[title]="tooltip"
 		>
 			<i aria-hidden="true" [ngClass]="getIcon()"> </i>
 			<span *ngIf="name" style="margin-right: 3px;"> {{ name }} </span>
@@ -40,6 +41,7 @@ export class CheckActionComponent implements DoCheck {
 	@Input('name') name: string;
 	@Input('disabled') disabled = false;
 	@Input('class') class = '';
+	@Input('tooltip') tooltip = '';
 	@Input('noneStateIcon') private noneStateIcon = '';
 	private checkActionModel = CHECK_ACTION;
 

@@ -37,6 +37,7 @@
 			</div>
 			<div class="modal-sidenav form-group-center">
 				<nav class="modal-sidenav btn-link">
+					<tds-button-save *ngIf="showActionButtons()"(click)="onSaveClicked()" [disabled]="!detailFieldsComponent.areOverrideValuesDirty()"></tds-button-save>
 					<tds-button-close (click)="onCancelCloseDialog()"></tds-button-close>
 				</nav>
 			</div>
