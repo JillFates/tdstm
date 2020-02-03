@@ -47,6 +47,7 @@ section.page-asset-explorer-index
       margin-bottom: 0
       .box-body
       h3.box-title-grid-list
+        margin-top: 0
         padding-top: 4px
         font-size: 21px
         font-weight: 600
@@ -60,47 +61,8 @@ section.page-asset-explorer-index
         input.txt-search
           width: 500px
 
-      .clarity-table-grid
-        tbody
-          max-height: 70vh
-        // column widths
-        .asset-explorer-td-actions,
-        .asset-explorer-td-favorite,
-        .asset-explorer-td-is-shared,
-        .asset-explorer-td-is-system
-          width: 70px
-          max-width: 70px
-        .asset-explorer-column-name
-            width: 900px
-            max-width: 900px
+  .link-text
+    font-weight: bold
 
-        @media (max-width: 1700px)
-          .asset-explorer-column-name
-            width: 800px
-            max-width: 800px
-        @media (max-width: 1600px)
-          .asset-explorer-column-name
-            width: 700px
-            max-width: 700px
-        @media (max-width: 1500px)
-          .asset-explorer-column-name
-            width: 650px
-            max-width: 650px
-        @media (max-width: 1400px)
-          .asset-explorer-column-name
-            width: 450px
-            max-width: 450px
-        @media (max-width: 1215px)
-          .asset-explorer-column-name
-            width: 350px
-            max-width: 350px
-        @media (max-width: 1150px)
-          .asset-explorer-column-name
-            width: 250px
-            max-width: 250px
-
-        .asset-explorer-td-created-on,
-        .asset-explorer-td-created-by,
-        .asset-explorer-td-updated-on
-          width: 100px
-          max-width: 100px
+  kendo-grid.k-grid.page-height .k-grid-container
+    max-height: calc( 96vh - var(--subtraction-height) - var(--filter-height))

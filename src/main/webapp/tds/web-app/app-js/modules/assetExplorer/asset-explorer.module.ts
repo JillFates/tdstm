@@ -18,6 +18,7 @@ import {TagService} from '../assetTags/service/tag.service';
 import {ManufacturerService} from './service/manufacturer.service';
 import {ModelService} from './service/model.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
+import { ArchitectureGraphService} from './components/architecture-graph/service/architecture-graph.service';
 // Components
 import {AssetShowComponent} from './components/asset/asset-show.component';
 import {AssetEditComponent} from './components/asset/asset-edit.component';
@@ -89,7 +90,8 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		DependecyService,
 		TagService,
 		ManufacturerService,
-		ModelService
+		ModelService,
+		ArchitectureGraphService
 	],
 	exports: [
 		AssetShowComponent,

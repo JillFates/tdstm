@@ -45,5 +45,12 @@ export const ASSET_ICONS: IconModel = {
 		icon: '../assets/icons/png/other.png',
 		color: '#fff',
 		background: '#99d9ea'
+	},
+	storage: {
+		iconAlt: '\uf04e',
+		// tslint:disable-next-line:max-line-length
+		icon: '../assets/icons/png/other.png',
+		color: '#fff',
+		background: '#99d9ea'
 	}
 };
