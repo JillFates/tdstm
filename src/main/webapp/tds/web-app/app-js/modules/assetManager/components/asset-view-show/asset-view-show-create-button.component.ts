@@ -8,9 +8,9 @@ import { ASSET_ENTITY_DIALOG_TYPES } from '../../../assetExplorer/model/asset-en
 		<clr-dropdown style="margin-right: 12px">
 			<tds-button clrDropdownTrigger
 									[type]="'button'"
-									[title]="'Create Asset'"
+									[title]="'Create'"
 									[iconClass]="'is-solid'"
-									[icon]="'plus-circle'">
+									[icon]="'plus'">
 			</tds-button>
 			<clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
 				<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
