@@ -22,6 +22,7 @@ import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class CustomDomainService implements ServiceMethods {
     static final String ALL_ASSET_CLASSES = 'ASSETS'
@@ -35,6 +36,8 @@ class CustomDomainService implements ServiceMethods {
 
     static final List<String> CUSTOM_REQUIRED_BULK_ACTIONS = ["replace"]
     static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
+
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
     SettingService settingService
     /**
@@ -217,8 +220,6 @@ class CustomDomainService implements ServiceMethods {
 
         Map currentStoredFieldSpecs = [:]
 
-        // This list will contain all the portions of SQL code for updating the fields that are being added/updated.
-        List<String> updateFieldStrings = []
 
         try{
             currentStoredFieldSpecs = allFieldSpecs(project, domain)
@@ -227,6 +228,9 @@ class CustomDomainService implements ServiceMethods {
 
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
+
+            // This list will contain all the portions of SQL code for updating the fields that are being added/updated.
+            List<String> updateFieldStrings = []
 
             if (customFieldSpec) {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
@@ -779,17 +783,16 @@ class CustomDomainService implements ServiceMethods {
      * @return the number of assets that were updated (-1 if the list is null or empty).
      */
     @Transactional
-    Integer clearCustomFieldsForClass(Project project, String assetClassName, List<String> updateFieldStrings) {
-        Integer results = -1
-        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+    Long clearCustomFieldsForClass(Project project, String assetClassName, List<String> updateFieldStrings) {
+        Long recordsUpdated = -1
+        String assetClass = AssetClass.safeValueOf(assetClassName).name()
         if (updateFieldStrings) {
             String updateString = updateFieldStrings.join(", ")
-            String sql = "UPDATE AssetEntity SET $updateString WHERE project=:project AND assetClass=:assetClass"
+            String sql = "UPDATE asset_entity SET $updateString WHERE project_id=:project AND asset_class=:assetClass"
 
-           results = AssetEntity.executeUpdate(sql, [project: project, assetClass: assetClass]
-            )
+            recordsUpdated = namedParameterJdbcTemplate.update(sql,[project: project.id, assetClass: assetClass])
         }
-        return results
+        return recordsUpdated
     }
 
     /**
