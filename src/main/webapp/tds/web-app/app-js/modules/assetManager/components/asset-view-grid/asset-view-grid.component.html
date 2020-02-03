@@ -290,9 +290,9 @@
 					*ngIf="column.property === 'tagAssets'"
 			>
 				<div
-						class="single-line-tags"
-						(mouseleave)="refreshTableSize($event)"
-						[ngClass]="showFullTags ? 'show-full-tags' : ''"
+					(mouseleave)="refreshTableSize($event)"
+					[ngClass]="showFullTags ? 'show-full-tags' : ''"
+					class="single-line-tags"
 				>
 					<ng-template
 							ngFor

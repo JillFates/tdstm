@@ -15,6 +15,7 @@ import {UserManageStaffComponent} from '../../../../shared/modules/header/compon
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -32,7 +33,8 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			windowService: WindowService,
-			architectureGraphService: ArchitectureGraphService
+			architectureGraphService: ArchitectureGraphService,
+			assetTagUIWrapperService: AssetTagUIWrapperService
 			) {
 				super(
 					activeDialog,
@@ -43,7 +45,8 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 					notifierService,
 					userContextService,
 					windowService,
-					architectureGraphService
+					architectureGraphService,
+					assetTagUIWrapperService
 				);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;

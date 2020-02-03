@@ -53,4 +53,36 @@ export class AssetTagUIWrapperService {
 		}
 		return retVal;
 	}
+
+	updateTagsWidthForAssetShowView(selector, toCleanSelector, parentSelector): void {
+		let allTagsDivs = document.querySelectorAll(selector);
+		document.querySelectorAll(toCleanSelector).forEach( node => {
+			node.parentNode.removeChild(node);
+		});
+		console.log(allTagsDivs);
+		const maxSizeWidth = (<HTMLElement>document.querySelector(parentSelector)).offsetWidth;
+		console.log('maxSizeWidth', maxSizeWidth);
+		allTagsDivs.forEach( el => {
+			console.log('el', el);
+			let castedEl = (<HTMLElement>el);
+			let tags = castedEl.querySelectorAll('div .label.tag');
+			let allTagsWidth = 0;
+			let bestFit = 0;
+			console.log('tags', tags);
+			if (tags.length > 1) {
+				tags.forEach((tag: HTMLElement) => {
+					allTagsWidth += tag.offsetWidth;
+				});
+				console.log('alltags width', allTagsWidth, maxSizeWidth);
+				if (allTagsWidth > maxSizeWidth) {
+					bestFit = this.testBestFit(maxSizeWidth, tags);
+					console.log('best fit', bestFit);
+					let span = document.createElement('span');
+					span.innerHTML = '...';
+					span.className = 'dots-for-tags';
+					castedEl.insertBefore(span, castedEl.children[bestFit]);
+				}
+			}
+		});
+		};
 }
