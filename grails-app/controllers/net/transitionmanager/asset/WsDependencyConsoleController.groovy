@@ -129,5 +129,7 @@ class WsDependencyConsoleController implements ControllerMethods, PaginationMeth
 
 		moveBundleService.assignAssets(assetsAssignment.assets, assetsAssignment.tagIds, assetsAssignment.moveBundle, assetsAssignment.planStatus, project)
 
+		renderSuccessJson()
+
 	}
 }
