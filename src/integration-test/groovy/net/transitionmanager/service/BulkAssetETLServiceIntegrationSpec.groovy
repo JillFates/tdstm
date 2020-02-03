@@ -26,6 +26,7 @@ import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.util.mop.ConfineMetaClassChanges
 import test.helper.AssetEntityTestHelper
 import test.helper.DataviewTestHelper
 import test.helper.PersonTestHelper
@@ -141,6 +142,7 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 		JSONObject fieldSpec = loadFieldSpecJson()
 
 		Setting.findAllByProject(project)*.delete(flush: true)
+		customDomainService.metaClass.clearCustomFieldsForClass = {Project project, String assetClassName, List<String> updateFieldStrings-> 0}
 		customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 		DataScript dataScript = new DataScript(
@@ -169,6 +171,10 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 			dataScriptId: dataScript.id,
 			ids: [device.id, device2.id]
 		)
+	}
+
+	void cleanup() {
+		GroovySystem.metaClassRegistry.removeMetaClass CustomDomainService
 	}
 
 
