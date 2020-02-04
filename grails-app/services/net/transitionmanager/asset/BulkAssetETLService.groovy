@@ -122,8 +122,8 @@ class BulkAssetETLService implements ServiceMethods {
 
 			fieldMapping[asset.assetClass.name()].each { String key, Map mapValue ->
 				String label = mapValue?.label ?: key
-				def domain = (AssetClass.domainClassFor(asset.assetClass)).get(asset.id)
-				def value = domain."$key"
+
+				def value = asset."$key"
 
 				if(value  &&(value instanceof String || value instanceof  Long || value instanceof Integer || value instanceof Date || value instanceof Double)) {
 					updatedRow[label] = value
