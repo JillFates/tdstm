@@ -684,10 +684,7 @@ class UserPreferenceService {
 	 * @return the UserPreference if found otherwise null
 	 */
 	private UserPreference getUserPreference(UserLogin userLogin, String preferenceCode) {
-		UserPreference userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode)
-		UserPreference lookedUpUserPreference = UserPreference.get(userPreference)
-		userPreference.discard()
-		return lookedUpUserPreference
+		UserPreference.get(new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode))
 	}
 
 	/**
