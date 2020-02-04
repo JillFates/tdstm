@@ -176,6 +176,7 @@ dependencies {
 		useful for testing application in the development or test environments.
 	 */
 	compile 'org.grails.plugins:greenmail:2.0.0.RC2'
+	compile 'com.google.flatbuffers:flatbuffers-java:1.11.0'
 
 }
 

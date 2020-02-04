@@ -1,0 +1,14 @@
+namespace net.transitionmanager.fbs;
+
+table ETLProcessorResult {
+    rows: [RowResult]; // Vector of tables.
+    version: ulong;
+}
+
+table RowResult {
+    rowNum: int;
+    errorCount: int;
+    domain: string;
+}
+
+root_type ETLProcessorResult;
