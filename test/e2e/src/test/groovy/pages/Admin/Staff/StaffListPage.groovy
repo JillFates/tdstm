@@ -20,8 +20,8 @@ class   StaffListPage extends Page {
     }
 
     static content = {
-        staffPageTitle(wait:true)   { $("section", 	class:"content-header").find("h1")}
-        pageBreadcrumbs             { $("ol", class:"breadcrumb").find("li a")}
+        staffPageTitle(wait:true)   { $("section", 	class:"content-header").find("h2")}
+        pageBreadcrumbs             { $("ol", class:"legacy-breadcrumb").find("li a")}
         pageMessage (required: false, wait:true) { $("div", class:"message").not("div", class:"nodisplay")}
         companySelector             { $('select#filterSelect', name:'companyId')}
         companySelectorDefault      { companySelector.find("option", selected:"selected")}

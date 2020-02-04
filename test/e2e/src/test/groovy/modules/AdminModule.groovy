@@ -28,8 +28,8 @@ class AdminModule extends Module{
     }
 
     static content = {
-        menuContainer { $("div", class: "navbar-ul-container-full-menu") }
-        menuBar { menuContainer.find("ul.nav.navbar-nav.ng-star-inserted") }
+        menuContainer { $("div", class: "menu-top-container") }
+        menuBar { menuContainer.find("div#mobile-nav") }
         adminItem { menuBar.find("li.menu-parent-admin") }
         adminMenu { adminItem.find("ul", class: "dropdown-menu menu-item-expand") }
         adminSections { adminMenu.find("li", class: "menu-parent-admin") }
@@ -68,6 +68,7 @@ class AdminModule extends Module{
     }
 
     def goToAdminMenu() {
+        waitFor(30) {adminItem}
         waitFor{adminItem.displayed}
         waitFor(30){adminItem.click()}
     }

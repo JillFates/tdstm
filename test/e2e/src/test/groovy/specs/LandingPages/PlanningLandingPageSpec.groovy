@@ -38,15 +38,14 @@ class PlanningLandingPageSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "1. The Planning Menu has the Events/Bundles titles and Event Details"() {
+    def "1. The Planning has the correct number of elements"() {
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The User Clicks on the Planning Menu'
             planningModule.goToPlanningMenu()
 
-        then: 'The Events and Bundles titles are displayed'
-            planningModule.verifyEventsTitle()
-            planningModule.verifyBundlesTitle()
+        then: 'The correct number of items are displayed'
+            planningModule.planningMenu.children().size() == 6
             at MenuPage
     }
 

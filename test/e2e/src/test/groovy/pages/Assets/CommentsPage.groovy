@@ -14,8 +14,8 @@ class CommentsPage extends Page {
     }
 
     static content = {
-        commentsPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        commentsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
+        commentsPageTitle (wait:true) { $("section", 	class:"content-header").find("h2")}
+        commentsPageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }
