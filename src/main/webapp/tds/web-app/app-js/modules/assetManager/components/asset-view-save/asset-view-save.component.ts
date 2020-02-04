@@ -31,7 +31,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                         <div class="form-group" style="padding-left:160px;">
                             <div *ngIf="hasMaintainAssetList()">
                                 <div class="radio">
-                                    <div *ngIf="!isThereOnlyAssetViewOption()">
+                                    <div *ngIf="!isThereOnlySaveMyView()">
                                         <label>
                                             <input type="radio"
                                                    name="radio-mode"
@@ -78,7 +78,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                     </div>
                                 </div>
                             </div>
-                            <div *ngIf="hasMaintainAssetList() && !isThereOnlyAssetViewOption()">
+                            <div *ngIf="hasMaintainAssetList() && !isThereOnlySaveMyView()">
                                 <div class="radio" style="position:inherit">
                                     <label for="overrideMe">
                                         <input id="overrideMe" type="radio" name="radio-mode"
@@ -89,7 +89,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                     </label>
                                 </div>
                             </div>
-                            <div *ngIf="hasMaintainSystemList() && !isThereOnlyAssetViewOption()">
+                            <div *ngIf="hasMaintainSystemList() && !isThereOnlySaveMyView()">
                                 <div class="radio">
                                     <label for="overrideAll">
                                         <input id="overrideAll" type="radio" name="radio-mode"
@@ -155,7 +155,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public myMiewClass() {
-		return this.isThereOnlyAssetViewOption() ? '' : 'indent';
+		return this.isThereOnlySaveMyView() ? '' : 'indent';
 	}
 
 	public confirmCloseDialog() {
@@ -215,11 +215,14 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		return this.permissionService.hasPermission(Permission.AssetExplorerSystemList);
 	}
 
-	public isThereOnlyAssetViewOption(): boolean {
+	public isThereOnlySaveMyView(): boolean {
 		return (
-			this.saveOptions &&
-			this.saveOptions.saveAsOptions.length === 1 &&
-			this.saveOptions.saveAsOptions[0] === E_SAVE_AS_OPTIONS.MY_VIEW
+			!this.saveOptions ||
+			(
+				this.saveOptions &&
+				this.saveOptions.saveAsOptions.length === 1 &&
+				this.saveOptions.saveAsOptions[0] === E_SAVE_AS_OPTIONS.MY_VIEW
+			)
 		);
 	}
 
