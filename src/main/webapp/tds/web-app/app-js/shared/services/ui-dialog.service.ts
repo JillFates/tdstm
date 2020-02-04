@@ -150,10 +150,10 @@ export class UIExtraDialog implements OnDestroy {
 		}).modal('show');
 		// make it draggable
 		if (draggable) {
-			this.modalIntance.draggable({
-				handle: '.modal-header',
-				containment: 'window'
-			});
+			// this.modalIntance.draggable({
+			// 	handle: '.modal-header',
+			// 	containment: 'window'
+			// });
 		}
 		this.processMultipleDialogBackgrounds();
 	}

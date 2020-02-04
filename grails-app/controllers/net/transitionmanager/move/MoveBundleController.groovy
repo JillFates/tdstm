@@ -626,8 +626,7 @@ class MoveBundleController implements ControllerMethods {
 				console.groupId,
 				console.assetName
 		)
-		render(template: 'dependencyBundleDetails',
-		       model: model)
+		render(template: 'dependencyBundleDetails', model: model)
 	}
 
 	@HasPermission(Permission.DepAnalyzerGenerate)

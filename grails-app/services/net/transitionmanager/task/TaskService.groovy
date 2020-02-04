@@ -1475,7 +1475,7 @@ class TaskService implements ServiceMethods {
 			MoveEvent event = get(MoveEvent, contextObj.eventId, currentProject)
 		}
 
-		def assets = getAssocAssets(contextObj)
+		def assets = getAssocAssets(contextObj, currentProject)
 		if (!assets) {
 			throw new EmptyResultException("The selected event does not have any assets with the associated Tags or Bundles.")
 		}
@@ -1571,27 +1571,30 @@ class TaskService implements ServiceMethods {
 	/**
 	 * Used to find assets associated with a given context object based on selected event and tags.
 	 * @param context - the context object to find associated assets for
+	 * @param project - the project
 	 * @return list of assets
 	 */
-	List<AssetEntity> getAssocAssets(Object contextObj) {
-
+	List<AssetEntity> getAssocAssets(Object contextObj, Project project) {
 		// Fetch the tags selected by the user running the Task Generation.
 		List<Long> tagIds = contextObj.getTagIds()
 		// Retrieve the bundles associated with the selected event (if any).
-			List<Long> bundleIds = getBundleIds(contextObj)
+		List<Long> bundleIds = getBundleIds(contextObj)
+
+		// if the event has no bundles and the user specified no tags then return empty array
+		if (!tagIds && !bundleIds) {
+			return []
+		}
 
 		return AssetEntity.createCriteria().list {
 			createAlias('moveBundle', 'mb')
 			if (tagIds) {
 				createAlias('tagAssets', 'ta')
-				createAlias('ta.tag', 't')
 			}
+			eq ('a.project', project)
 			eq ('mb.useForPlanning', true)
 			or {
 				if (tagIds) {
-					'in' ('t.id', tagIds)
-					// Assets must belong to a planning bundle.
-
+					'in' ('ta.tag.id', tagIds)
 				}
 			if (bundleIds) {
 					'in' ('mb.id', bundleIds)
@@ -1703,7 +1706,7 @@ class TaskService implements ServiceMethods {
 		Person whom = taskBatch.createdBy
 
 		def contextObj = taskBatch.context()
-		def assets = getAssocAssets(contextObj)
+		def assets = getAssocAssets(contextObj, project)
 
 		List<Long> bundleIds = []
 		if (assets) {
