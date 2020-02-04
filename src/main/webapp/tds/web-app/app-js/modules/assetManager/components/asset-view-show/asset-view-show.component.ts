@@ -377,7 +377,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	public canSaveAs(): boolean {
 		// If it's a system view
-		return this.saveOptions.saveAs;
+		return (
+			this.saveOptions &&
+			Array.isArray(this.saveOptions.saveAsOptions) &&
+			this.saveOptions.saveAsOptions.length > 0
+		);
 	}
 
 	public isEditAvailable(): boolean {
