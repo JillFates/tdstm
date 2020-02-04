@@ -1,17 +1,18 @@
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.web.context.ServletContextHolder
 import net.transitionmanager.asset.AssetEntityController
 import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
-import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.UserLogin
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
@@ -117,6 +118,7 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 
 		when: 'the user preference is removed'
 			userPreferenceService.removePreference(PREF.MAX_ASSET_LIST)
+			GormUtil.flushAndClearSession()
 		and: 'paginationMaxRowValue is called with a valid value'
 			expectedValue == Pagination.MAX_OPTIONS[2].toString()
 			controller.params.max = expectedValue
