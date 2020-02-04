@@ -125,12 +125,19 @@ class BulkAssetETLService implements ServiceMethods {
 
 				def value = asset."$key"
 
-				if(value  &&(value instanceof String || value instanceof  Long || value instanceof Integer || value instanceof Date || value instanceof Double)) {
+				if (value != null) {
+					switch (value) {
+						case String || Number || Date || Boolean:
+							break
+						case Enum:
+							value = value.name()
+							break
+						case { GormUtil.isDomainClass(it) }:
+							value = value.id
+							break
+					}
+
 					updatedRow[label] = value
-				} else if(value && value instanceof Enum){
-					updatedRow[label] = value.name()
-				} else if(GormUtil.isDomainClass(value)){
-					updatedRow[label] = value.id
 				}
 			}
 
