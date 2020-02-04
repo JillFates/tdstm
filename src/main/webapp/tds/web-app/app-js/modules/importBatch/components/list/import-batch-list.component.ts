@@ -8,7 +8,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
-	DIALOG_SIZE, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
+	DIALOG_SIZE, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
 	PROMPT_DELETE_ITEMS_CONFIRMATION
 } from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
@@ -233,7 +233,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	private confirmArchive(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
 		this.promptService.open(
-			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(ids.length === 1 ? this.ARCHIVE_ITEM_CONFIRMATION : this.ARCHIVE_ITEMS_CONFIRMATION),
 			'Confirm', 'Cancel').then(result => {
 			if (result) {
@@ -265,7 +265,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	private confirmUnarchive(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
 		this.promptService.open(
-			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(ids.length === 1 ? this.UNARCHIVE_ITEM_CONFIRMATION : this.UNARCHIVE_ITEMS_CONFIRMATION),
 			'Confirm', 'Cancel').then(result => {
 			if (result) {

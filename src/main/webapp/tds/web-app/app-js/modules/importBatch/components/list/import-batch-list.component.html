@@ -22,7 +22,7 @@
 				<ng-template kendoGridToolbarTemplate [position]="'top'">
 					<div class="clr-row">
 						<div class="clr-col-12">
-							<div class="pull-right">
+							<div class="pull-right header-action-buttons">
 								<clr-checkbox-wrapper class="inline">
 									<input
 										clrCheckbox
@@ -150,7 +150,7 @@
 							*ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED' ; then progressBarTemplate else statusTemplate;"></div>
 						<ng-template #progressBarTemplate>
 							<div>{{ dataItem.status.label }}</div>
-							<div class="progress" style="margin-bottom: 0px;">
+							<div class="progress">
 								<div class="progress-bar" role="progressbar" [style.width.%]="dataItem.currentProgress">
 									{{dataItem.currentProgress}}%
 								</div>

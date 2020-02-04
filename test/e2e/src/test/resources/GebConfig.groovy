@@ -13,65 +13,65 @@ import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 
 waiting {
-    timeout = 20
+	timeout = 20
 }
 
 environments {
 
     // Grid default URL
-    System.properties['browser.location.default'] = "http://chrome:4444"
+	System.properties['browser.location.default'] = "http://chrome:4444"
 
     // Use Grid default URL if browser.location is not set
     def browserLocation = System.properties['browser.location'] ?: System.properties['browser.location.default']
 
-    // run via “./gradlew chromeTest”
-    // See: http://code.google.com/p/selenium/wiki/ChromeDriver
-    chrome {
-        atCheckWaiting = 10
+	// run via “./gradlew chromeTest”
+	// See: http://code.google.com/p/selenium/wiki/ChromeDriver
+	chrome {
+		atCheckWaiting = 10
 
         if (browserLocation == 'local') {  // use local browser (not grid)
             println "browser.location: Using local chrome browser : ${browserLocation}"
             driver = {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.addArguments("--start-maximized");
-                new ChromeDriver(chromeOptions)
+								new ChromeDriver(chromeOptions)
             }
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
             driver = {
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
-                ChromeOptions options = new ChromeOptions();
+								ChromeOptions options = new ChromeOptions();
 
-                options.addArguments("--headless");
-                options.addArguments("--start-maximized");
-                options.addArguments("--enable-automation");
-                options.addArguments("--no-sandbox");
-                options.addArguments("--disable-infobars");
-                options.addArguments("--disable-dev-shm-usage");
-                options.addArguments("--disable-browser-side-navigation");
-                options.addArguments("--disable-gpu");
-                options.addArguments("--window-size=2048,1080");
+								options.addArguments("--headless");
+								options.addArguments("--start-maximized");
+				        options.addArguments("--enable-automation");
+				        options.addArguments("--no-sandbox");
+				        options.addArguments("--disable-infobars");
+				        options.addArguments("--disable-dev-shm-usage");
+				        options.addArguments("--disable-browser-side-navigation");
+				        options.addArguments("--disable-gpu");
+                        options.addArguments("--window-size=2048,1080");
 
-                options.addArguments("--verbose");
-                options.addArguments("--enable-logging");
-                options.addArguments("--v=1");
-                options.addArguments("--user-data-dir=/home/automation");
-                options.addArguments("--log-path=chromedriver.log")
+								options.addArguments("--verbose");
+								options.addArguments("--enable-logging");
+								options.addArguments("--v=1");
+								options.addArguments("--user-data-dir=/home/automation");
+								options.addArguments("--log-path=chromedriver.log")
 
-                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+								capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
                 capabilities.setCapability("acceptSslCerts", true)
                 capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
 
-                new RemoteWebDriver(new URL(browserLocation), capabilities)
-            }
+								new RemoteWebDriver(new URL(browserLocation), capabilities)
+				    }
         }
-    }
+	}
 
-    // run via “./gradlew firefoxTest”
-    // See: http://code.google.com/p/selenium/wiki/FirefoxDriver
-    firefox {
-        atCheckWaiting = 10
+	// run via “./gradlew firefoxTest”
+	// See: http://code.google.com/p/selenium/wiki/FirefoxDriver
+	firefox {
+		atCheckWaiting = 10
 
         if (browserLocation == 'local') {  // use local browser (not grid)
             println "browser.location: Using local firefox browser : ${browserLocation}"
@@ -96,7 +96,7 @@ environments {
             }
         }
 
-    }
+	}
 
 //	println "*** START - All System Properties settings seen by GebConfig ***"
 //	def tmgc = System.properties as TreeMap
