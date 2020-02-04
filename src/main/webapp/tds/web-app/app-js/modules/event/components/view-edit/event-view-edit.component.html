@@ -208,6 +208,7 @@
 								<tds-asset-tag-selector
 									[tagList]="availableTags"
 									[model]="{ tags: eventModel.tagIds }"
+									[showSwitch]="showSwitch"
 									(valueChange)="onAssetTagChange($event)"
 								></tds-asset-tag-selector>
 							</td>
@@ -220,10 +221,12 @@
 							<td class="value">
 								<kendo-multiselect
 									id="moveBundle"
-									[data]="availableBundles"
-									[(ngModel)]="eventModel.moveBundle"
 									textField="name"
 									valueField="id"
+									[data]="availableBundles"
+									[(ngModel)]="eventModel.moveBundle"
+									[clearButton]= "showClearButton"
+									(valueChange) = "clearButtonBundleChange($event)"
 								></kendo-multiselect>
 							</td>
 						</tr>

@@ -88,9 +88,9 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translateService.transform('PROVIDER.CREATE_PROVIDER'),
+				title: this.translateService.transform('GLOBAL.CREATE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateProvider.bind(this),

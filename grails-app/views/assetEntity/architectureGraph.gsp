@@ -35,8 +35,8 @@
 					<button id="controlPanelTabId" class="btn activeTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)">Control Panel</button>
 					<button id="legendTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)">Legend</button>
 				</div>
-
-				<button id="fullscreenButtonId" class="btn btn-outline"  onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Fullscreen</div>
+				<button id="fullscreenButtonId" class="btn btn-outline"  onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Fullscreen</button>
+			</div>
 
 			<div id="controlPanelId" class="graphPanel ">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >

@@ -270,6 +270,23 @@ export const en_DICTIONARY: Object = {
 		'ASSETS_BY_PROVIDERS_AND_ASSET_TYPE': 'Assets by Providers and Asset Type',
 		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
+	'ARCHITECTURE': {
+		'ARCHITECTURE_GRAPH': 'Architecture Graph',
+		'CONTROL_PANEL': 'Control Panel',
+		'LEGEND': 'Legend',
+		'FULLSCREEN': 'Fullscreen',
+		'SELECT_AN_ASSET': 'Select an Asset',
+		'FILTER_LABELS': 'Filter Labels',
+		'TIERS_ABOVE': 'Tiers above',
+		'TIERS_BELOW': 'Tiers below',
+		'SHOW_CYCLICAL_REFERENCE': 'Show Cyclical Reference',
+		'SHOW_LABELS': 'Show Labels: ',
+		'SPACING': 'Spacing',
+		'REGENERATE_GRAPH': 'Regenerate Graph',
+		'SAVE_PREFERENCES': 'Save Preferences',
+		'RESET_DEFAULTS': 'Reset Default',
+		'ASSET_CLASSES': 'Asset Classes: '
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',

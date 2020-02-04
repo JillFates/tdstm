@@ -81,9 +81,9 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translateService.transform('PLANNING.BUNDLES.CREATE_BUNDLE'),
+				title: this.translateService.transform('GLOBAL.CREATE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.openCreateBundle.bind(this),

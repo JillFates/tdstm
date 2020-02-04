@@ -121,6 +121,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = GRID_DEFAULT_PAGE_SIZE;
 	public maxOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	public currentPageSize = this.maxDefault;
 	private _viewId: number;
 	public fieldNotFound = FIELD_NOT_FOUND;
 	gridData: GridDataResult;
@@ -174,8 +175,10 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.getPreferences()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((preferences: any) => {
-				this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
-				this.bulkCheckboxService.setPageSize(this.gridState.take);
+				let pageSize = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
+				this.updateGridState({take: pageSize});
+				this.currentPageSize = pageSize;
+				this.bulkCheckboxService.setPageSize(pageSize);
 				this.toggleTagsColumn = (preferences[PREFERENCE_WRAP_TAGS_COLUMN]) ? preferences[PREFERENCE_WRAP_TAGS_COLUMN].toString() === 'true' : false;
 				this.showFullTags = this.toggleTagsColumn;
 				this.onReload();
