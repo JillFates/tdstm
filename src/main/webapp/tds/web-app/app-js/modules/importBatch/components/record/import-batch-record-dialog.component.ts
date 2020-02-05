@@ -33,7 +33,7 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog implements A
 	ngAfterViewInit() {
 		this.cdr.detectChanges();
 	}
-	
+
 	/**
 	 * On close dialog.
 	 */
