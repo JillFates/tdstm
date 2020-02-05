@@ -13,6 +13,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
+import net.minidev.json.JSONObject
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.dataview.DataviewApiFilterParam
 import net.transitionmanager.command.dataview.DataviewApiParamsCommand
@@ -358,7 +359,7 @@ class DataviewService implements ServiceMethods {
 	Dataview create(Project currentProject, Person whom, DataviewCrudCommand dataviewCommand) {
 		validateDataviewCreateAccessOrException(dataviewCommand, currentProject, whom)
 		validateOverrideViewFiltersMatch(dataviewCommand)
-		validateViewNameUniqueness(project, whom, dataviewCommand)
+		validateViewNameUniqueness(currentProject, whom, dataviewCommand)
 
 		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
 
@@ -428,7 +429,8 @@ class DataviewService implements ServiceMethods {
 		if (dataviewCommand.overridesView) {
 			// Get the list of filters from the orginal system view
 			Map systemViewFilters = [:]
-			dataviewCommand.overridesView.schemaAsJSONObject()?.columns.each {
+			JSONObject schema = dataviewCommand.overridesView.schemaAsJSONObject()
+			schema?.columns.each {
 				systemViewFilters.put(it.property, [filter: it.filter, label: it.label] )
 			}
 
@@ -446,8 +448,8 @@ class DataviewService implements ServiceMethods {
 			}
 			// Iterate over the systemViewsFilters that have filters (probably none) and make sure that they're the same
 			// First get a short list of systemView columns that are not in the override view
-			List<String>systemViewColumnNames = systemViewFilters.keySet()
-			List<String>overrideViewColumnNames = dataviewCommand.overridesView.schemaAsJSONObject()?.columns.collect { it.property }
+			List<String>systemViewColumnNames = systemViewFilters.keySet() as List
+			List<String>overrideViewColumnNames = schema?.columns.collect { it.property }
 			List<String>missingSystemColumns = systemViewColumnNames - overrideViewColumnNames
 			missingSystemColumns.each {
 				if (systemViewFilters[it].filter) {
