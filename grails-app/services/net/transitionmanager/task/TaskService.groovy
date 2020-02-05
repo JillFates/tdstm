@@ -1641,7 +1641,7 @@ class TaskService implements ServiceMethods {
 			if (tagIds) {
 				createAlias('tagAssets', 'ta')
 			}
-			eq ('a.project', project)
+			eq ('project', project)
 			eq ('mb.useForPlanning', true)
 			or {
 				if (tagIds) {
