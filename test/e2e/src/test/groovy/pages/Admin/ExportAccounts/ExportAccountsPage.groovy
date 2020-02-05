@@ -13,7 +13,7 @@ class ExportAccountsPage extends Page {
 
     static content = {
         adminModule { module AdminModule}
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
         userLoginsOptions {$("select#loginChoice option")}
         staffingOptions {$("form div input[type=radio]")}
         exportButton {$("form button[type=submit]")}

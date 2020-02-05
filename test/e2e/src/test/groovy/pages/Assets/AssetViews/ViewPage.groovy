@@ -21,11 +21,11 @@ class ViewPage extends Page{
     }
     static content = {
         view (wait:true) { $("section.page-asset-explorer-config")}
-        sectionHeaderTitle { $("section.content-header h1")}
+        sectionHeaderTitle { $("section.content-header h2")}
         clearBtn {$("button#btnClean")}
         createButton {$("button[type=button]", text: "Create")}
         bulkChangeButton {$('#btnBulkChange')}
-        exportViewButton {$("button#btnExport")}
+        exportViewButton {$("button" , title:"Export View")}
         exportModalContainer {$('#tdsUiDialog')}
         fileNameField {exportModalContainer.find("input", id: "fileName")}
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}

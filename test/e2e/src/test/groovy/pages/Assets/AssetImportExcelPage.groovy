@@ -13,8 +13,8 @@ class AssetImportExcelPage extends Page {
     }
 
     static content = {
-        assetImportPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        assetImportBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        assetImportPageTitle (wait:true) { $("section", 	class:"content-header").find("h2")}
+        assetImportBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }

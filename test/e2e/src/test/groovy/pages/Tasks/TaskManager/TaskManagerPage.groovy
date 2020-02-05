@@ -7,8 +7,9 @@ class TaskManagerPage extends Page{
 
     static at = {
         tmHeaderTitle.text() == "Task Manager"
-        tmJustRemainingCB.value() == "on"
-        tmJustMyTasksCB.value() != "on"
+        pageBreadcrumbs[0].text()   == "Task"
+        pageBreadcrumbs[1].text()   == "Task Manager"
+
     }
 
     static content = {
@@ -16,7 +17,8 @@ class TaskManagerPage extends Page{
         projEventUser               { $("a#nav-project-name")}
 
         // START Layout elements
-        tmHeaderTitle { $("section", class:"content-header").find("h1")}
+        tmHeaderTitle { $("section", class:"content-header").find("h2")}
+        pageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         tmJustRemainingCB { $("input#justRemainingCB")}
         tmJustMyTasksCB { $("input#justMyTasksCB")}
         tmViewUnpublishedCB { $("input#viewUnpublishedCB")}

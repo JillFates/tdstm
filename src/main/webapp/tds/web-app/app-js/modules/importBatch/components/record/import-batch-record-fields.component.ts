@@ -230,6 +230,9 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 * Checks if input overrided values are not empty or with a text value.
 	 */
 	public areOverrideValuesDirty(): boolean {
+		if (!this.fieldsInfo) {
+			return false;
+		}
 		let currentImportValues = this.fieldsInfo.map( item => item.importValue);
 		if (this.originalImportValues !== JSON.stringify(currentImportValues)) {
 			this.saveStatus.state = CHECK_ACTION.NONE;
@@ -273,7 +276,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	/**
 	 * On Update button click.
 	 */
-	protected onUpdate(): void {
+	public onUpdate(): void {
 		let newFieldsValues: Array<{fieldName: string, value: string}> = [];
 		for (let field of this.fieldsInfo) {
 			if (!field.importValue) {
@@ -332,7 +335,7 @@ export class ImportBatchRecordFieldsComponent implements OnInit {
 	 * Hide Action buttons if Record is already completed.
 	 * @returns {boolean}
 	 */
-	protected showActionButtons(): boolean {
+	public showActionButtons(): boolean {
 		return this.batchRecord.status.code === BatchStatus.PENDING;
 	}
 

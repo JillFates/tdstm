@@ -25,22 +25,22 @@ class CommonsModule extends Module {
         kendoMultiselectTagsListOptions { kendoDropdownList.find("div.asset-tag-selector-single-item")}
         kendoMultiselectSelectedList { $("#asset-tag-selector-component kendo-taglist li div")}
         kendoDropdownListOptions { kendoDropdownList.find("li.k-item")}
-        userMenu {$("nav.navbar-static-top").find("div.navbar-custom-menu").find("li.user-menu")}
-        logoutBtn {userMenu.find(class:"pull-right")}
+        userMenu {$("li.dropdown.user.user-menu")}
+        logoutBtn {$("ul.dropdown-menu").find("li")[4].find("a")}
     }
 
     def clickUserMenu(){
-        //waitForLoader(5)
-        userMenu.click()
+        waitFor(30){userMenu.click()}
+
     }
 
     def logout(){
-        waitFor(30){clickUserMenu()}
+        clickUserMenu()
         waitFor(30){logoutBtn.displayed}
-        waitForLoader(3)
+        waitForLoader(10)
         waitFor(30){logoutBtn.click()}
+        waitForLoader(10)
         true
-
     }
 
     def waitForLoader(Integer secondsToWait = null) {
