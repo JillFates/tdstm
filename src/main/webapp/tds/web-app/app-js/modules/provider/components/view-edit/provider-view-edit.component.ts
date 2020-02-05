@@ -179,6 +179,9 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			).subscribe((result: any) => {
 				if (result.confirm === DialogConfirmAction.CONFIRM) {
+					// Put back original model
+					this.providerModel = JSON.parse(this.dataSignature);
+					this.dataSignature = JSON.stringify(this.providerModel);
 					this.modalType = this.actionTypes.VIEW;
 					this.modalTitle = this.getModalTitle(this.modalType);
 				}
