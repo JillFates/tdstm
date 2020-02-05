@@ -33,7 +33,6 @@ class WsTimelineController implements ControllerMethods {
     def timeline() {
 
         CalculateTimelineCommandObject commandObject = populateCommandObject(CalculateTimelineCommandObject)
-        validateCommandObject(commandObject)
 
         MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
         userPreferenceService.setPreference(UserPreferenceEnum.MOVE_EVENT, moveEvent.id)
@@ -126,7 +125,6 @@ class WsTimelineController implements ControllerMethods {
     def calculateCPA() {
 
         ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
-        validateCommandObject(commandObject)
 
         MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
         CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
@@ -142,7 +140,6 @@ class WsTimelineController implements ControllerMethods {
     def baseline() {
 
         ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
-        validateCommandObject(commandObject)
 
         MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
         CPAResults cpaResults = timelineService.updateTaskFromCPA(moveEvent, commandObject.viewUnpublished)
@@ -160,7 +157,6 @@ class WsTimelineController implements ControllerMethods {
     def exportCPA() {
 
         ExportTimelineCommand commandObject = populateCommandObject(ExportTimelineCommand)
-        validateCommandObject(commandObject)
 
         MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
         CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.showAll)
