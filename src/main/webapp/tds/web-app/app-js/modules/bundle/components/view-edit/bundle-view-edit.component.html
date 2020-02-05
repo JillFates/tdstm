@@ -161,7 +161,9 @@
 						[(ngModel)]="bundleModel.description"
 						id="description"
 						name="description"
+						maxlength="255"
 					/>
+					<clr-control-helper>{{bundleModel.description?.length}}/255</clr-control-helper>
 				</clr-input-container>
 
 				<!-- From -->

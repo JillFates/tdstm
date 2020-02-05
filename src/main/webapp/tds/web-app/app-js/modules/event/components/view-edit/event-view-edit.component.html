@@ -191,12 +191,17 @@
 								<label for="description">Description: </label>
 							</td>
 							<td class="value">
-                                <input
-                                    clrInput
-									type="text"
-									id="description"
-									[(ngModel)]="eventModel.description"
-								/>
+								<clr-input-container>
+									<input
+										clrInput
+										type="text"
+										[(ngModel)]="eventModel.description"
+										id="description"
+										name="description"
+										maxlength="255"
+									/>
+									<clr-control-helper>{{eventModel.description?.length}}/255</clr-control-helper>
+								</clr-input-container>
 							</td>
 						</tr>
 
