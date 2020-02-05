@@ -11,11 +11,11 @@ import {
 import {ActivatedRoute} from '@angular/router';
 // Services
 import {ProviderService} from '../../service/provider.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
 import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -25,14 +25,12 @@ import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-scrip
 import {ProviderColumnModel, ProviderModel} from '../../model/provider.model';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {UserContextModel} from '../../../auth/model/user-context.model';
-import {ProviderAssociatedModel} from '../../model/provider-associated.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {DialogConfirmAction, DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
 // Kendo
 import {SelectableSettings} from '@progress/kendo-angular-grid';
 import {ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'provider-list',
@@ -64,7 +62,6 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private dialogService: DialogService,
-		private oldDialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private providerService: ProviderService,
 		private prompt: UIPromptService,
@@ -139,31 +136,29 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 			.deleteContext(dataItem.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((result: any) => {
-				this.oldDialogService
-					.extra(
-						ProviderAssociatedComponent,
-						[
-							{
-								provide: ProviderAssociatedModel,
-								useValue: result,
-							},
-						],
-						false,
-						false
-					)
-					.then((toDelete: any) => {
-						if (toDelete) {
-							this.providerService
-								.deleteProvider(dataItem.id)
-								.subscribe(
-									result => {
-										this.reloadData();
-									},
-									err => console.log(err)
-								);
-						}
-					})
-					.catch(error => console.log('Closed'));
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: ProviderAssociatedComponent,
+					data: {
+						providerAssociatedModel: result,
+					},
+					modalConfiguration: {
+						title: 'Confirmation Required',
+						draggable: true,
+						modalSize: ModalSize.MD
+					}
+				}).subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						this.providerService
+							.deleteProvider(dataItem.id)
+							.subscribe(
+								result => {
+									this.reloadData();
+								},
+								err => console.log(err)
+							);
+					}
+				});
 			});
 	}
 
