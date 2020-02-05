@@ -91,19 +91,19 @@ export class UserDashboardComponent implements OnInit {
 		this.populateData();
 	}
 
-	 public selectProjectByID(id): any {
+	public selectProjectByID(id): any {
 		// Please disregard linting on the following line, comparison should be '==' (See TM-16490)
 		const project = this.projectList.find(p => id == p.id); // tslint:disable-line
 		if (project) {
 			this.selectedProject = project;
 			return project;
 		}
-			return null;
+		return null;
 	}
-		
+
 	private populateData(): void {
 		this.userService
-			.fetchModelForUserDashboard(this.selectedProject ? this.selectedProject.id:'')
+			.fetchModelForUserDashboard(this.selectedProject ? this.selectedProject.id : '')
 			.subscribe(result => {
 				this.fetchApplicationsForGrid();
 				this.fetchEventNewsForGrid();
