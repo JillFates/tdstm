@@ -3,6 +3,7 @@ package net.transitionmanager.task.timeline
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.Task
@@ -54,7 +55,59 @@ class TimelineService implements ServiceMethods {
      *
      * @param moveEvent the event to retrieve tasks for
      * @param viewUnpublished show only published tasks or all tasks
-     * @return List<Task>                                    a list of tasks
+     * @return List<Task>                                        a list of tasks
+     */
+    @CompileStatic(TypeCheckingMode.SKIP)
+    List<TimelineTask> getEventTasks(TaskBatch taskBatch) {
+        List<TimelineTask> tasks
+
+        if (taskBatch) {
+            tasks = Task.executeQuery(""" 
+                    SELECT t.id,
+                           t.taskNumber,
+                           t.comment,
+                           t.duration,
+                           t.isCriticalPath,
+                           t.status,
+                           t.actStart,
+                           t.statusUpdated,
+                           t.durationScale,
+                           t.estStart,
+                           t.estFinish,
+                           t.latestFinish,
+                           t.slack,
+                           t.role,
+                           t.apiAction.id,
+                           t.apiAction.name,
+                           t.assignedTo.id,
+                           t.assignedTo.firstName,
+                           t.assignedTo.lastName,
+                           t.assetEntity.id,
+                           t.assetEntity.assetName,
+                           t.assetEntity.assetType,
+                           t.assetEntity.assetClass
+                                   
+                    from Task t
+                    left outer join t.apiAction
+                    left outer join t.assignedTo
+                    left outer join t.assetEntity
+                    left outer join t.taskBatch 
+                   where t.taskBatch.id = :task_batch_id
+                """, [task_batch_id: taskBatch.id]).collect { TimelineTask.fromResultSet(it) }
+
+        } else {
+            tasks = []
+        }
+
+        return tasks
+    }
+
+    /**
+     * Used to load all related tasks associated with an event
+     *
+     * @param moveEvent the event to retrieve tasks for
+     * @param viewUnpublished show only published tasks or all tasks
+     * @return List<Task>                                        a list of tasks
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineTask> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
@@ -101,10 +154,57 @@ class TimelineService implements ServiceMethods {
     }
 
     /**
+     * Used to get the list of task dependencies for a given {@code MoveEvent}
+     *
+     * @param MoveEvent event
+     * @return List<TimelineDependency>              a list of the tasks dependencies associated to a MoveEvent
+     */
+    @CompileStatic(TypeCheckingMode.SKIP)
+    List<TimelineDependency> getTaskDependencies(List<TimelineTask> taskList) {
+        List<TimelineDependency> dependencies = []
+
+        if (taskList) {
+            List<Long> ids = taskList*.id
+
+            String query = """
+                select distinct task_dependency_id, successor_id, successor_task_number, predecessor_id, predecessor_task_number
+                from (
+                         select TD.task_dependency_id as task_dependency_id,
+                                TD.asset_comment_id   as successor_id,
+                                SUC.task_number       as successor_task_number,
+                                TD.predecessor_id     as predecessor_id,
+                                PRE.task_number       as predecessor_task_number
+                         from task_dependency TD
+                                  join asset_comment SUC on TD.asset_comment_id = SUC.asset_comment_id
+                                  join asset_comment PRE on TD.predecessor_id = PRE.asset_comment_id
+                         where TD.predecessor_id in (:tasks_ids)
+                         UNION
+                         select TD.task_dependency_id as task_dependency_id,
+                                TD.asset_comment_id   as successor_id,
+                                SUC.task_number       as successor_task_number,
+                                TD.predecessor_id     as predecessor_id,
+                                PRE.task_number       as predecessor_task_number
+                         from task_dependency TD
+                                  join asset_comment SUC on TD.asset_comment_id = SUC.asset_comment_id
+                                  join asset_comment PRE on TD.predecessor_id = PRE.asset_comment_id
+                         where TD.asset_comment_id in (:tasks_ids)
+                     ) as results                
+            """.stripIndent()
+
+            dependencies = namedParameterJdbcTemplate.queryForList(
+                    query,
+                    [event_id: event.id]
+            ).collect { TimelineDependency.fromResultSet(it) }
+        }
+
+        return dependencies
+    }
+
+    /**
      * Used to get the list of task dependencies for a given list of tasks
      *
      * @param List <AssetComment> a list of tasks
-     * @return List<TimelineDependency>          a list of the tasks dependencies associated to a MoveEvent
+     * @return List<TimelineDependency>              a list of the tasks dependencies associated to a MoveEvent
      */
     @CompileStatic(TypeCheckingMode.SKIP)
     List<TimelineDependency> getTaskDependencies(MoveEvent event) {

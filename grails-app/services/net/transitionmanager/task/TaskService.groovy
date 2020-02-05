@@ -61,6 +61,8 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
+import net.transitionmanager.task.timeline.TimelineDependency
+import net.transitionmanager.task.timeline.TimelineTask
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.quartz.Scheduler
@@ -1087,14 +1089,11 @@ class TaskService implements ServiceMethods {
 		def msg
 		log.info("resetTaskData() was called")
 
-		// get all the tasks from the task batch
-		List<Task> tasks = Task.where {
-			taskBatch == taskBatch
-		}.list()
-
 		// use the TimeLineGraph to calculate the tasks with and without predecessors
-		List<TaskDependency> taskDependencies = timelineService.getTaskDependencies(tasks)
-		TaskTimeLineGraph graph= timelineService.createTaskTimeLineGraph(tasks, taskDependencies)
+		List<TimelineTask> timelineTasks = timelineService.getEventTasks(taskBatch)
+		List<TimelineDependency> timelineDependencies = timelineService.getTaskDependencies(timelineTasks)
+
+		TaskTimeLineGraph graph = timelineService.createTaskTimeLineGraph(timelineTasks, timelineDependencies)
 		List<Long> allTasks = graph.getVertices()*.taskId ?: []
 		List<Long> tasksNoPred = graph.getStarts()*.taskId ?: []
 
