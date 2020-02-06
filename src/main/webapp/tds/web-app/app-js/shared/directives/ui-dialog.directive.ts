@@ -147,10 +147,19 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		jQuery(window).resize(function () {
 			let modalDialogs = jQuery(document).find('.modal-dialog');
 			if (modalDialogs) {
-				for (let m = 0; m <= modalDialogs.length; m++) {
-					jQuery(modalDialogs[m]).css({
-						'left': (jQuery(window).width() - jQuery(modalDialogs[m]).width()) / 2
-					});
+				let valid = true;
+				try {
+					let dynamicContent = jQuery(jQuery(document).find('.modal-dialog').parent()[0])
+					valid = !dynamicContent.hasClass('dynamic-host-component');
+				} catch (e) {
+					//
+				}
+				if (valid) {
+					for (let m = 0; m <= modalDialogs.length; m++) {
+						jQuery(modalDialogs[m]).css({
+							'left': (jQuery(window).width() - jQuery(modalDialogs[m]).width()) / 2
+						});
+					}
 				}
 			}
 		});
