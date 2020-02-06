@@ -823,7 +823,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
