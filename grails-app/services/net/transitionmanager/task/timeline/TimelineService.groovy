@@ -193,7 +193,7 @@ class TimelineService implements ServiceMethods {
 
             dependencies = namedParameterJdbcTemplate.queryForList(
                     query,
-                    [event_id: event.id]
+                    [tasks_ids: ids]
             ).collect { TimelineDependency.fromResultSet(it) }
         }
 
