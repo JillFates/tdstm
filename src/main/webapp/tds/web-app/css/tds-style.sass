@@ -1,17 +1,8 @@
-// USING A CUSTOM BEM http://getbem.com/introduction/
-// .block {}
-// .block-element {}
-// .block--modifier {}
-// .block-element--modifier {}
-@import "/tdstm/tds/web-app/assets/modules/clarity/css/clr-icons.min.css"
-@import "/tdstm/tds/web-app/assets/modules/clarity/css/clr-ui.min.css"
-@import "/tdstm/tds/web-app/assets/modules/roboto-fontface/css/roboto/roboto-fontface.css"
+@import "../../node_modules/tds-component-library/themes.scss"
 
 // Include all basic elements for UI.
 @import "base/index"
-// Kendo Customization
-@import "kendo/kendo"
-
+@import "kendo/clarity"
 /* General Elements */
 // TODO:  these elements below should be placed in the elements/index.sass
 @import "elements/forms/forms"
@@ -62,9 +53,7 @@
 @import "layout/header_top"
 @import "layout/main-content"
 @import "layout/footer-content"
-
 @import "bootstrap-overrides"
 @import "clarity-overrides"
 @import "kendo-overrides"
-@import "../../node_modules/tds-component-library/themes.scss"
 @import "component-ui"
