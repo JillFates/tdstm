@@ -4,6 +4,7 @@ import geb.Page
 import modules.CommonsModule
 import modules.ProjectsMenuModule
 import geb.waiting.WaitTimeoutException
+import org.openqa.selenium.Keys
 
 class ProjectListPage extends Page {
 
