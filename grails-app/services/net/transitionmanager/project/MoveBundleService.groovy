@@ -210,7 +210,8 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties
 	 */
-	def dependencyConsoleMap(Project project, Long moveBundleId, List<Long> tagIds, String tagMatch, String isAssigned, dependencyBundle, boolean graph = false, subsection =  null, groupId =  null, assetName = null) {
+	def dependencyConsoleMap(Project project, Long moveBundleId, List<Long> tagIds, String tagMatch, String isAssigned,
+							 dependencyBundle, boolean graph = false, subsection =  null, groupId =  null, assetName = null) {
 		Date startAll = new Date()
 		List dependencyConsoleList = []
 

@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.Color
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
@@ -288,7 +289,7 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 		when:
 			String query = service.getTagsQuery([1, 2, 3], 'ANY', queryParams)
 		then:
-			query == "AND t.tag_id in (:tagIds)"
+			query == "AND ta.tag_id in (:tagIds)"
 			queryParams == ['tagIds': [1, 2, 3]]
 	}
 
@@ -324,12 +325,13 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 
 
 	void 'Test getTagsJoin with ids, tagMatch: ANY'() {
+		setup:
+			def tagIds = [1,2,3]
 			when:
-				String query = service.getTagsJoin([1,2,3], 'ANY')
+				String query = service.getTagsJoin(tagIds, 'ANY')
 			then:
 				query.stripIndent() == """
-					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-					LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
+		            LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id and ta.tag_id in (${GormUtil.asCommaDelimitedString(tagIds)})
 				""".stripIndent()
 	}
 
