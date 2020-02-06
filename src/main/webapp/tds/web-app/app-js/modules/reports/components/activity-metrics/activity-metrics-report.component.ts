@@ -6,7 +6,7 @@ import {ReportComponent} from '../report.component';
 @Component({
 	selector: 'tds-activity-metrics-report',
 	template: `
-		<div class="content body">
+		<div class="content body activity-metrics-report">
 			<tds-report-toggle-filters
 				[hideFilters]="hideFilters"
 				(reload)="onReload()"
