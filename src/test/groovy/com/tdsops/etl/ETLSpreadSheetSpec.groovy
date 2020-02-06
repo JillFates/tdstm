@@ -696,7 +696,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read rows skipping rows before an iteration for a XLS spreadSheet DataSet'() {

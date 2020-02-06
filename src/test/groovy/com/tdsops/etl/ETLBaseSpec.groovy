@@ -131,7 +131,7 @@ abstract class ETLBaseSpec extends Specification implements DataTest {
         WorkbookUtil.saveToOutputStream(workbook, outputStream)
 
         ExcelConnection con = new ExcelConnection(
-                path: getFileSystemService().temporaryDirectory,
+                path: getFileSystemServiceTestBean().temporaryDirectory,
                 fileName: fileName,
                 driver: TDSExcelDriver)
         ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
@@ -147,7 +147,7 @@ abstract class ETLBaseSpec extends Specification implements DataTest {
      */
     protected List buildSpreadSheetXLSDataSet(String sheetName, String sheetContent) {
 
-        def (String fileName, OutputStream outputStream) = getFileSystemService().createTemporaryFile('unit-test-', 'xls')
+        def (String fileName, OutputStream outputStream) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'xls')
         Workbook workbook = WorkbookUtil.createWorkbook('xls')
 
         addSheetInXLSWorkBook(workbook, sheetName, sheetContent)

@@ -305,7 +305,7 @@ class ETLCommentsSpec extends ETLBaseSpec implements DataTest {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
