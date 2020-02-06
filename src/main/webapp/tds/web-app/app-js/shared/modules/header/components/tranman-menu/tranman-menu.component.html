@@ -149,7 +149,7 @@
                     <li *ngIf="hasPermission(permission.ArchitectureView)" class="menu-child-item menu-parent-assets-architecture-graph">
                         <a href="/tdstm/assetEntity/architectureViewer" class="mmlink">Architecture Graph</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.ArchitectureView)" class="menu-child-item menu-parent-assets-architecture-graph">
+                    <li *ngIf="hasPermission(permission.ArchitectureView)" class="menu-child-item menu-parent-assets-architecture-graph-gojs">
                         <a [routerLink]="['/asset','architecture-graph']">GoJS Architecture Graph</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetExport) || hasPermission(permission.AssetImport) || hasPermission(permission.DataTransferBatchView)" class="divider"></li>

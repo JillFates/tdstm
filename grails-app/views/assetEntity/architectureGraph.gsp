@@ -279,7 +279,7 @@
 
 		// get the params to use for the request
 		var params = {};
-		if ($('#assetSelectId').val() != '') {
+		if ($('#assetSelectId').val() !== '') {
 			params.assetId = $('#assetSelectId').val();
 		} else if (initialAssetId) {
 			params.assetId = initialAssetId;
@@ -300,7 +300,7 @@
 		});
 
 		var svgElement = d3.select('#graphSvgId');
-		if (svgElement.size() == 0) {
+		if (svgElement.size() === 0) {
 			var spinnerDiv = $('#spinnerDivId').clone().css('display','block');
 			$('#svgContainerId').html(spinnerDiv);
 		} else {
@@ -311,6 +311,7 @@
 	// loads the graph code into the DOM
 	function loadGraph (response) {
 		ajaxRequest = null;
+		// $('#svgContainerId').html($.parseHTML(response.responseText, '', true));
 		$('#svgContainerId').html(response.responseText);
 	}
 
@@ -322,22 +323,22 @@
 		var minusButton = input.parent().children('.minus');
 
 
-		if (action == 'add') {
+		if (action === 'add') {
 			if (plusButton.hasClass('disabled'))
 				return;
-			if (ids.indexOf(input.attr('id')) != -1)
+			if (ids.indexOf(input.attr('id')) !== -1)
 				input.val(Math.min(oldValue + 1, parameterRanges[input.attr('name')][1]));
-		} else if (action == 'sub') {
+		} else if (action === 'sub') {
 			if (minusButton.hasClass('disabled'))
 				return;
-			if (ids.indexOf(input.attr('id')) != -1)
+			if (ids.indexOf(input.attr('id')) !== -1)
 				input.val(Math.max(oldValue - 1, parameterRanges[input.attr('name')][0]));
 		}
-		if (input.val() == parameterRanges[input.attr('name')][0])
+		if (input.val() === parameterRanges[input.attr('name')][0])
 			minusButton.addClass('disabled');
 		else
 			minusButton.removeClass('disabled');
-		if (input.val() == parameterRanges[input.attr('name')][1])
+		if (input.val() === parameterRanges[input.attr('name')][1])
 			plusButton.addClass('disabled');
 		else
 			plusButton.removeClass('disabled');
@@ -349,7 +350,6 @@
 		element.select2( {
 			minimumInputLength: 0,
 			width: '100%',
-
 			placeholder: "Filter: All Classes",
 			data: data
 		} );
