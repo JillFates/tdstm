@@ -152,7 +152,7 @@
 														 [(ngModel)]="field.selected">
 											<label style="width:100%;padding-left:25px;"
 														 [ngClass]="field.imp + ' text-delimited'"
-														 [title]="field.label">
+														 [title]="field.tip || field.label">
 												{{ field.label }}
 											</label>
 										</clr-checkbox-wrapper>

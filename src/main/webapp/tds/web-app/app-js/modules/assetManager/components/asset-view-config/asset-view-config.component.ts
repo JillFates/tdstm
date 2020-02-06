@@ -325,7 +325,8 @@ export class AssetViewConfigComponent implements OnInit {
 				locked: false,
 				edit: false,
 				label: field.label,
-				filter: ''
+				filter: '',
+				tip: field.tip || ''
 			});
 			if (this.model.schema.columns.length === 1) {
 				this.model.schema.sort = {
@@ -415,6 +416,7 @@ export class AssetViewConfigComponent implements OnInit {
 			this.assetExplorerService.previewQuery(params)
 				.subscribe(result => {
 					this.data = result;
+					this.addToolTipsToColumns();
 					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
@@ -524,6 +526,22 @@ export class AssetViewConfigComponent implements OnInit {
 			.filter((column: ViewColumn) => !column.locked);
 
 		return Boolean(nonLocked.length);
+	}
+
+	/**
+	 * Add to every current schema column selected its corresponding tooltip
+	 */
+	addToolTipsToColumns(): void {
+		this.model.schema.columns.forEach((column: ViewColumn) => {
+			const currentDomain = (column.domain || '');
+			const domain = this.allFields.find((field: FieldSettingsModel) => field.domain === currentDomain.toUpperCase());
+			if (domain) {
+				const currentField = domain['fields'].find((field: FieldSettingsModel) => field.field === column.property);
+				if (currentField) {
+					column.tip = currentField.tip;
+				}
+			}
+		});
 	}
 
 }
