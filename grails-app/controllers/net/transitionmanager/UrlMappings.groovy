@@ -1170,6 +1170,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/saveOptions/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "saveOptions"
+			]
+		}
+
 		"/ws/assetExplorer/previewQuery" {
 			controller = "wsAssetExplorer"
 			action = [

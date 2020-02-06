@@ -231,21 +231,23 @@ class DataviewService implements ServiceMethods {
 	 * @return - A list of the save as methods that are available for the dataview.
 	 */
 	Map generateSaveOptions(Project project, Person whom, Dataview dataview) {
-		List saveAsOptions = []
+		Set saveAsOptions = []
 
 		boolean hasGlobalOverridePerm = hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
 		boolean hasProjectOverridePerm = hasPermission(Permission.AssetExplorerOverrideAllUserProject)
+		boolean isDefaultProject = project.isDefaultProject()
+		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
 
 		// Determine the saveAsOptions
-		if ( project && ! project.isDefaultProject() ) {
+		if ( project && ! isDefaultProject ) {
 			// User can always save as My View in projects other than the DEFAULT project
 			if (hasPermission(Permission.AssetExplorerSaveAs)){
-				saveAsOptions.push(ViewSaveAsOptionEnum.MY_VIEW.name())	
+				saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
 			}
 			
 			// Check to see if user already has an overridden version of a system view for themselves and if not
 			// then they get the OVERRIDE_FOR_ME option
-			if ( dataview.overridesView || dataview.isSystem) {
+			if ( dataview?.overridesView || dataview?.isSystem) {
 				if (Dataview.where {
 					project.id == project.id
 					// Make sure we're querying on the root system view id
@@ -253,13 +255,15 @@ class DataviewService implements ServiceMethods {
 					person.id == whom.id
 					isShared == false
 				}.count() == 0) {
-					saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name())
+					saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
 				}
 			}
 
 			// Check to see if anybody has an overridden version of a system view for ALL users and if not
 			// then they get the OVERRIDE_FOR_ALL option, as long as they also have that permission.
-			if (	hasProjectOverridePerm &&
+			if (	dataview &&
+					isOverrideable &&
+					hasProjectOverridePerm &&
 					Dataview.where {
 						project.id == project.id
 						// Make sure we're querying on the root system view id
@@ -271,7 +275,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		// See about if the user can Save As OVERRIDE_FOR_ALL globally across all projects
-		if (project?.isDefaultProject() && hasGlobalOverridePerm ) {
+		if (dataview && isOverrideable && project?.isDefaultProject() && hasGlobalOverridePerm ) {
 			Dataview.where {
 				project.id == project.id
 				// Make sure we're querying on the root system view id
@@ -284,19 +288,39 @@ class DataviewService implements ServiceMethods {
 
 		// Determine if the user can save the current view
 		Boolean canSaveCurrentView = false
-		if ( dataview.personId == whom.id ) {
-			canSaveCurrentView = (dataview.projectId == project.id)
-		} else {
-			boolean hasPerm = ( dataview.project.isDefaultProject() ? hasGlobalOverridePerm : hasProjectOverridePerm )
-			canSaveCurrentView = (hasPerm &&
-					dataview.isShared &&
-					dataview.overridesView &&
-					dataview.projectId == project.id)
+		if (dataview) {
+			if (dataview.personId == whom.id) {
+				canSaveCurrentView = (dataview.projectId == project.id)
+			} else {
+				boolean hasPerm = (dataview.project.isDefaultProject() ? hasGlobalOverridePerm : hasProjectOverridePerm)
+				canSaveCurrentView = (hasPerm &&
+						dataview.isShared &&
+						dataview.overridesView &&
+						dataview.projectId == project.id)
+			}
+		}
+
+		// Determine if the person has the ability to share a view
+		boolean canShare = hasPermission(
+				(isDefaultProject ? Permission.AssetExplorerSystemCreate :  Permission.AssetExplorerPublish) )
+
+		// Determine if the Override options in the Save Modal should appear regardless of options available
+		boolean canOverride = false
+		if ( isOverrideable ) {
+			if (isDefaultProject) {
+				// If in the Default
+				canOverride = hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
+			} else {
+				canOverride = hasAnyPermission(
+						[Permission.AssetExplorerCreate, Permission.AssetExplorerOverrideAllUserProject])
+			}
 		}
 
 		return [
-			"save": canSaveCurrentView,
-			"saveAsOptions": saveAsOptions
+			canOverride: canOverride,
+			canShare: canShare,
+			save: canSaveCurrentView,
+			saveAsOptions: saveAsOptions as List
 		]
 	}
 
@@ -373,9 +397,10 @@ class DataviewService implements ServiceMethods {
 
 		Dataview dataview = new Dataview()
 		dataview.with {
+			isShared = dataviewCommand.isShared
+			name = dataviewCommand.name
 			person = whom
             project = currentProject
-			isShared = dataviewCommand.isShared
 			reportSchema = schema
 		}
 
@@ -691,8 +716,7 @@ class DataviewService implements ServiceMethods {
 					if (dataviewCommand.id) {
 						id != dataviewCommand.id
 					}
-					( 	person.id == dataviewCommand.person.id || \
- 						(person.id != dataviewCommand.person.id && dataviewCommand.isShared) )
+					( 	person.id == whom.id || (person.id != whom.id && dataviewCommand.isShared) )
 				}.count() > 0
 			}
 			if (foundDuplicateName) {

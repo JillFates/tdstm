@@ -75,6 +75,18 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
 	}
 
+	def saveOptions(Integer id) {
+		Dataview dataview
+		Person whom = currentPerson()
+		Project project = projectForWs
+
+		if (id) {
+			dataview = dataviewService.fetch(project, whom, id, shouldShowOverridenView())
+		}
+
+		renderAsJson( saveOptions: dataviewService.generateSaveOptions(project, whom, dataview) )
+	}
+
 	/**
 	 * Used to determine if the getDataview request stipulated to NOT override the view, hence return the default system view
 	 * The _override=0 parameter indicates that when referencing a system view that has been overridden, that the
@@ -86,6 +98,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		// The _override parameter indicates that when referencing an overridden system view, that the overridden view
 		// should be the one to return
 		boolean override = true
+
 		if ( params.containsKey(overrideParamName) ) {
 			override = BooleanUtils.toBoolean( params[overrideParamName] )
 		}
