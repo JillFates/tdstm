@@ -51,9 +51,9 @@
 
                     <!-- Action -->
 					<kendo-grid-column
-						[width]="60"
+						[width]="55"
 						[class]="{ 'k-custom-command-column': true }"
-						[minResizableWidth]="60"
+						[minResizableWidth]="55"
 					>
 						<ng-template
 							kendoGridHeaderTemplate
@@ -160,7 +160,9 @@
 					>
 						<!-- Header Template -->
 						<ng-template kendoGridHeaderTemplate>
-							<label>{{ column.label }}</label>
+							<div class="sortable-column">
+								<label>{{ column.label }}</label>
+							</div>
 						</ng-template>
 
 						<!-- Cell Templates -->
