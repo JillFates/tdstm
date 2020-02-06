@@ -1,6 +1,7 @@
 package net.transitionmanager.license
 
 import com.github.icedrake.jsmaz.Smaz
+import com.tdssrc.grails.jasypt.GormEncryptedDateAsStringType
 import groovy.json.JsonBuilder
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
@@ -36,8 +37,11 @@ class License {
 	String      bannerMessage
 
 	/** Date when the change was performed */
-	Date dateCreated
-	Date lastUpdated
+	Date 		dateCreated
+	Date 		lastUpdated
+
+	/** Last time that we saw this License in compliance (number of servers or other constrains) */
+	Date 		lastCompliance
 
 	static mapping = {
 		id 			generator: 'assigned'
@@ -47,6 +51,7 @@ class License {
 		version		false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
+		lastCompliance	type: GormEncryptedDateAsStringType
 	}
 
 	static constraints = {
@@ -56,6 +61,7 @@ class License {
 		requestNote 	nullable:true
 		hash 			nullable:true
 		bannerMessage	nullable:true
+		lastCompliance	nullable:true
 	}
 
 	static transients = [ 'projectInstance' ]

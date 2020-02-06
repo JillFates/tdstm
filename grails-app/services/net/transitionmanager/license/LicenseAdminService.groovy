@@ -26,6 +26,7 @@ import net.transitionmanager.license.prefs.TDSPasswordProvider
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.beans.factory.InitializingBean
@@ -247,8 +248,6 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 
 		Map licState = (Map)cacheEl?.getObjectValue()
 
-		// licState = null  //testing proposes
-
 		// If the license wasn't in the cache then one will be created and added
 		if(!licState) {
 			log.debug("LOAD LICENSE FROM STORE")
@@ -281,9 +280,9 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				List<License> licenseObjs = licenses.findResults { DomainLicense lic -> getLicenseObj(lic) }
 
 				licenseObjs = licenseObjs.findAll { License lic ->
-					Map jsonData = JSON.parse(lic.subject)
+					Map jsonData 	   = JSON.parse(lic.subject)
 					gracePeriodDays    = Math.max( gracePeriodDays, jsonData.gracePeriodDays ?: 0)
-					String hostName 	 = jsonData.hostName
+					String hostName	   = jsonData.hostName
 					String websitename = jsonData.websitename
 					String projectName = JSON.parse(jsonData.project)?.name
 
@@ -341,8 +340,8 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 									            Math.max(stackLic.goodAfterDate, lic.goodAfterDate),
 							  goodBeforeDate: (! stackLic.goodBeforeDate ) ? lic.goodBeforeDate :
 									            Math.min(stackLic.goodBeforeDate, lic.goodBeforeDate),
-							  subject: (! stackLic.subject) ?: lic.subject,
-							  productKey: (! stackLic.productKey) ?: lic.productKey,
+							  subject: stackLic.subject ?: lic.subject,
+							  productKey: stackLic.productKey ?: lic.productKey,
 					]
 				}
 
@@ -351,6 +350,8 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				licState.numberOfLicenses = stackedlicense.numberOfLicenses
 				licState.goodAfterDate = stackedlicense.goodAfterDate ? new Date(stackedlicense.goodAfterDate) : null
 				licState.goodBeforeDate = stackedlicense.goodBeforeDate ? new Date(stackedlicense.goodBeforeDate) : null
+				licState.domainLicId = stackedlicense.productKey
+
 				if (firstLicense) {
 					licState.type = firstLicense.type
 					licState.banner = firstLicense.bannerMessage
@@ -371,18 +372,32 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					return licState
 				}
 
+				DomainLicense domLicense = DomainLicense.get(licState.domainLicId)
 				if ( numServers > licState.numberOfLicenses ) {
+					if (! domLicense.lastCompliance) {
+						domLicense.lastCompliance = now
+						domLicense.save()
+					}
+
+					licState.lastCompliantDate = domLicense.lastCompliance
+
 					int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
 					if( gracePeriod > 0 ) {
 						licState.state = State.UNLICENSED // State.NONCOMPLIANT
 						licState.message = "The Server count has exceeded the license limit of ${licState.numberOfLicenses} by ${numServers - licState.numberOfLicenses} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
-						licState.valid = true
+						// licState.valid = true
+						licState.valid = false
 					} else {
 						licState.state = State.UNLICENSED // State.INBREACH
 						licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${licState.numberOfLicenses} to re-enable all application features."
 						licState.valid = false
 					}
+
 				} else {
+					if ( domLicense.lastCompliance ) {
+						domLicense.lastCompliance = null
+						domLicense.save()
+					}
 					licState.state = State.VALID
 					licState.message = ""
 					licState.lastCompliantDate = now
@@ -414,7 +429,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @return
 	 */
 	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate){
-		lastCompliantDate = lastCompliantDate ?: new Date()
+		assert lastCompliantDate != null
 		Date graceDate = DateUtils.addDays(lastCompliantDate, gracePeriodDays)
 		Date now = new Date()
 		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
