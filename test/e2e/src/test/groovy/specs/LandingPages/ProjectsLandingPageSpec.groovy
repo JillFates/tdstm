@@ -64,8 +64,9 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
         when: 'The user goes to the Project Details page'
             projectsModule.goToProjectsDetails()
 
-        then: 'The PProject Details Page is loaded successfully'
+        then: 'The Project Details modal is loaded successfully'
             at ProjectDetailsPage
+            closeProjectModal()
     }
 
     def "4. Verify the Projects Staff Landing Page"() {

@@ -73,3 +73,26 @@
 		display: block !important;
 	}
 }
+
+// TODO: Remove after Bootstrap completely removed
+tds-grid-header-action-buttons .btn clr-icon {
+	margin-right: 0 !important;
+}
+kendo-grid {
+	.k-grid-header {
+		.k-grid-header-wrap {
+			tr {
+				th {
+					a.k-link {
+						label {
+							display: initial;
+							max-width: initial;
+							margin-bottom: initial;
+							font-weight: initial;
+						}
+					}
+				}
+			}
+		}
+	}
+}

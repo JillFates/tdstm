@@ -14,7 +14,7 @@ class UserDetailsPage extends Page {
     }
 
     static content = {
-        udPageTitle { $("section", class:"content-header").find("h1")}
+        udPageTitle { $("section", class:"content-header").find("h2")}
         pageMessage (required: false, wait:true) { $("div", class:"message")}
         adminModule { module AdminModule}
         udButtonsForm { $("form", action:"/tdstm/userLogin/list")}

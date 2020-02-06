@@ -279,12 +279,16 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			this.assetTagsDirty ||
 			!ramdaEquals(this.initialModel, this.model)
 		) {
-			this.promptSaveChanges(false);
+			this.promptSaveChanges(this.model.assetId === undefined);
 		} else {
-			this.showAssetDetailView(
-				this.model.asset.assetClass.name,
-				this.model.assetId
-			);
+			if (this.model.assetId) {
+				this.showAssetDetailView(
+					this.model.asset.assetClass.name,
+					this.model.assetId
+				);
+			} else {
+				this.cancelCloseDialog();
+			}
 		}
 	}
 

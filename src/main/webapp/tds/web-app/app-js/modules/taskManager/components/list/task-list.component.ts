@@ -133,9 +133,9 @@ export class TaskListComponent implements OnInit {
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translate.transform('TASK_MANAGER.CREATE_TASK'),
+				title: this.translate.transform('GLOBAL.CREATE'),
 				show: true,
 				onClick: this.onCreateTaskHandler.bind(this),
 			},

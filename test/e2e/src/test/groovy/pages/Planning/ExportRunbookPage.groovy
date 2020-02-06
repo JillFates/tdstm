@@ -12,9 +12,9 @@ class ExportRunbookPage extends Page {
     }
 
     static content = {
-        exportRunbookPageTitle { $("section", class:"content-header").find("h1")}
+        exportRunbookPageTitle { $("section", class:"content-header").find("h2")}
         planningModule { module PlanningMenuModule}
-        exportRunbookPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        exportRunbookPageBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
     }
 
 

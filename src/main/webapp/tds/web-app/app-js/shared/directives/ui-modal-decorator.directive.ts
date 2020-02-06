@@ -136,15 +136,15 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	 */
 	private enableDraggable(enable: boolean): void {
 		const element = jQuery(jQuery(this.el.nativeElement).closest('.modal-dialog'));
-
-		if (enable) {
-			element.draggable({
-				containment: '#tdsUiDialog',
-				handle: '.modal-header'
-			});
-		} else {
-			element.draggable('destroy');
-		}
+		// Draggable completely disabled
+		// if (enable) {
+		// 	element.draggable({
+		// 		containment: '#tdsUiDialog',
+		// 		handle: '.modal-header'
+		// 	});
+		// } else {
+		// 	element.draggable('destroy');
+		// }
 
 		return;
 	}

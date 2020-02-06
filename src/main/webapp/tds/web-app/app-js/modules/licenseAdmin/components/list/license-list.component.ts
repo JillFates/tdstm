@@ -103,9 +103,9 @@ export class LicenseListComponent implements OnInit {
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translateService.transform('LICENSE.CREATE_LICENSE'),
+				title: this.translateService.transform('GLOBAL.CREATE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateLicense.bind(this),

@@ -3134,7 +3134,8 @@ table.text-center th {
 }
 .login-page,
 .register-page {
-  background: #d2d6de;
+  background: #fff url(/tdstm/tds/web-app/assets/images/login-background.jpg) no-repeat;
+  background-size: cover;
 }
 .login-box,
 .register-box {
@@ -3158,6 +3159,9 @@ table.text-center th {
 .login-box-body .form-control-feedback,
 .register-box-body .form-control-feedback {
   color: #777;
+}
+.login-box-body .clr-input {
+    width: 100%;
 }
 .login-box-msg,
 .register-box-msg {

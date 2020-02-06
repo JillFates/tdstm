@@ -161,7 +161,7 @@
 						(click)="onClickTemplate($event)"
 				>
 					<div [ngClass]="{ 'field-not-found': column?.notFound }">
-						<label>
+						<label [title]="column.tip || column.label">
 							{{ getPropertyLabel(column) }}
 							<i
 									class="fa fa-fw fa-warning"
@@ -334,6 +334,7 @@
 						[totalPages]="totalPages"
 						[currentPage]="currentPage"
 						[pageSizes]="maxOptions"
+						[pageSize]="currentPageSize"
 						(pageChange)="onPageChangeHandler($event)"
 				>
 				</tds-grid-pager>

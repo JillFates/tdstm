@@ -1,6 +1,6 @@
 <!-- Main content -->
 <div class="api-action-list-component">
-    <div class="box-body box-with-empty-header" [ngClass]="{'is-filtering': isFiltering}">
+    <div class="box-body box-with-empty-header">
         <kendo-grid
                 [data]="gridData"
                 [filter]="state.filter"
@@ -14,6 +14,7 @@
                 (sortChange)="sortChange($event)"
                 [pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
                 (pageChange)="pageChange($event)"
+                [ngClass]="{ 'hide-filter': !isFiltering }"
                 class="page-height row-actions-2-children fixed-context-menu"
                 [selectable]="true">
             <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -90,7 +91,7 @@
 
                 <!--	Filters-->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <div class="filter-input" *ngIf="isFiltering && column.property && column.type !== 'action'">
+                    <div class="filter-input" *ngIf="column.property && column.type !== 'action'">
                         <div *ngIf="column.type === 'text' || column.type === 'date' || column.type === 'boolean'; then inputFilterTemplate"></div>
                         <ng-template #inputFilterTemplate>
                             <tds-filter-input
