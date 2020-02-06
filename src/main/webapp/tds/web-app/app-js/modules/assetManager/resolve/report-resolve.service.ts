@@ -30,7 +30,7 @@ export class ReportResolveService implements Resolve<any> {
 				}
 			});
 		} else {
-			return this.assetExplorerService.getReport(reportId).map(reports => {
+			return this.assetExplorerService.getReport(reportId, {queryParamsObj: route.queryParams}).map(reports => {
 				return reports;
 			}).catch((err) => {
 				console.error('ReportResolveService:', 'An Error Occurred trying to fetch Single Report ' + reportId);

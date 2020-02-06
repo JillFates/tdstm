@@ -65,16 +65,16 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
+	private queryParams: any = {};
 	private readonly overrideAssetViewStates: any = {
 		IS_OVERRIDE_CHILD: {
 			icon: 'layer-minus',
-			isOverride: true,
+			isOverriden: true,
 			label: 'Revert to Project View',
-
 		},
 		IS_OVERRIDE_PARENT: {
 			icon: 'layer-group',
-			isOverride: true,
+			isOverriden: false,
 			label: 'Display Personal System View'
 		},
 		IS_NOT_OVERRIDE: {
@@ -156,15 +156,15 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	private handleOverrideState(model): void {
-		if (model.isOverride) {
-			if (model.overrideView) {
-				this.currentOverrideState = this.overrideAssetViewStates.IS_OVERRIDE_CHILD;
-			} else {
-				this.currentOverrideState = this.overrideAssetViewStates.IS_OVERRIDE_PARENT;
-			}
+	private handleOverrideState({isOverride, hasOverride}: ViewModel): void {
+		const { IS_OVERRIDE_CHILD, IS_OVERRIDE_PARENT, IS_NOT_OVERRIDE } = this.overrideAssetViewStates;
+
+		if (isOverride) {
+			this.currentOverrideState = IS_OVERRIDE_CHILD;
+		} else if (hasOverride) {
+			this.currentOverrideState = IS_OVERRIDE_PARENT;
 		} else {
-			this.currentOverrideState = this.overrideAssetViewStates.IS_NOT_OVERRIDE;
+			this.currentOverrideState = IS_NOT_OVERRIDE;
 		}
 	}
 
@@ -225,6 +225,13 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		if (this.isEditAvailable()) {
 			this.router.navigate(['asset', 'views', this.model.id, 'edit']);
 		}
+	}
+
+	public toggleAssetView() {
+		const _overrides = !this.queryParams._overrides;
+		return this.router.navigate(['/asset', 'views', this.model.id, 'show'], {
+			queryParams: { _overrides }
+		});
 	}
 
 	public onSave() {
@@ -431,28 +438,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
 
-	public isDefaultProject(): boolean {
-		return (
-			this.userContext &&
-			this.userContext.project &&
-			this.userContext.defaultProject &&
-			this.userContext.project.id === this.userContext.defaultProject.id
-		);
-	}
-
 	public isSaveButtonDisabled(): boolean {
-		if (!this.model.id) {
-			return !(
-				(
-					this.isDefaultProject() &&
-					this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate)
-				) || (
-					!this.isDefaultProject() &&
-					this.permissionService.hasPermission(Permission.AssetExplorerCreate)
-				)
-			);
-		}
-		return false;
+		return !this.canSave() && !this.canSaveAs();
 	}
 
 	/**

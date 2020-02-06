@@ -55,11 +55,12 @@
                         >
             </tds-button-custom>
 
-            <tds-button-custom *ngIf="currentOverrideState && currentOverrideState.isOverride"
+            <tds-button-custom 
                         class="pull-right no-action-button"
                         isIconButton="true"
                         [icon]="currentOverrideState.icon"
                         [tooltip]="currentOverrideState.offLabel"
+                        (clik)="toggleAssetView()"
                         >
             </tds-button-custom>
         </div>
