@@ -22,8 +22,7 @@ class ProjectListPage extends Page {
         // TODO: We have to refactor the whole projectView thing because everything changed
         //projectView                 { $("div#gview_projectGridIdGrid")}
         //headerBarTitle          { $("span", class:"ui-jqgrid-title") }
-        //createProjectBtn(wait:true) {$(type: "button", title: "Create")}
-        createProjectBtn(wait:true) {$("tds-button")[2]}
+        createProjectBtn(wait:true) {$(type: "button", title: "Create")}
         showCompletedBtn            {$("label.clr-control-label")[1]}
         toggleListBtn               { projectView.find("a", class:"ui-jqgrid-titlebar-close HeaderButton")}
         projectGridHeader           { projectView.find("div#ui-jqgrid-hbox")}
