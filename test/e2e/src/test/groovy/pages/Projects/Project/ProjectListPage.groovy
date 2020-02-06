@@ -50,7 +50,7 @@ class ProjectListPage extends Page {
     }
 
     def clickOnCreateButton(){
-        waitFor {createProjectBtn.click()}
+        waitFor (30){createProjectBtn.click()}
     }
 
     def filterByName(name){
