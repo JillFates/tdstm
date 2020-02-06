@@ -8,7 +8,7 @@ import geb.waiting.WaitTimeoutException
 class ProjectListPage extends Page {
 
     static at = {
-        projectPageTitle.text() == "Projects - Active"
+        waitFor{projectPageTitle.text() == "Projects - Active"}
         pageBreadcrumbs[0].text() == "Projects"
         pageBreadcrumbs[1].text() == "Active"
 
@@ -22,8 +22,8 @@ class ProjectListPage extends Page {
         // TODO: We have to refactor the whole projectView thing because everything changed
         //projectView                 { $("div#gview_projectGridIdGrid")}
         //headerBarTitle          { $("span", class:"ui-jqgrid-title") }
-        createProjectBtn(wait:true) {$(type: "button", title: "Create Projects")}
-        showCompletedBtn            {$ ("div", class:"project-active-completed-options"). find("input", name:"active")}
+        createProjectBtn(wait:true) {$(type: "button", title: "Create")}
+        showCompletedBtn            {$("label.clr-control-label")[1]}
         toggleListBtn               { projectView.find("a", class:"ui-jqgrid-titlebar-close HeaderButton")}
         projectGridHeader           { projectView.find("div#ui-jqgrid-hbox")}
         columnsHeader               { projectGridHeader.find("tr", class: "ui-jqgrid-labels ui-sortable")}
@@ -32,15 +32,21 @@ class ProjectListPage extends Page {
         projectGridRows             { projectView.find("table#projectGridIdGrid").find("tr.ui-widget-content")}
         gridSize                    { projectGridRows.size()}
         rowSize                     { projectGridHeaderCols.size()}
-        projectNameFilter           { $("input#gs_projectCode")}
+        projectNameFilter (wait:true) { $("input" ,  placeholder:"Filter Name")}
         projectGridPager            { $("div#pg_projectGridIdGridPager")}
-        projectNameGridField        {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode")}
-        projectNameColumn  {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_name")}
+        projectNameGridField        {$("tbody", "role": "presentation")}
+        projectNameColumn  {$("td", "role": "gridcell", "aria-colindex": "3")}
+        projectCodeColumn  {$("td", "role": "gridcell", "aria-colindex": "2")}
         projectDeletedMessage { $("#messageDivId")}
-        showActiveBtn { projectView.find("input", type: "button", value: "Show Active Projects")}
+        showActiveBtn {$("clr-radio-wrapper.clr-radio-wrapper")[0]}
         projectsModule { module ProjectsMenuModule}
         commonsModule { module CommonsModule}
         noRecords (required: false) {$(".ui-paging-info", text:'No records to view')}
+        filterButton {$("tds-button")[5]}
+    }
+
+    def clickFilterButton(){
+        waitFor{filterButton.click()}
     }
 
     def clickOnCreateButton(){
@@ -90,7 +96,7 @@ class ProjectListPage extends Page {
     }
 
     def clickOnFirstListedProject(){
-        waitFor {projectNameGridField[0].find("a").click()}
+        waitFor {projectCodeColumn[0].find("a").click()}
     }
 
     def getFirstProjectName(){
@@ -98,5 +104,9 @@ class ProjectListPage extends Page {
     }
     def getFirstProjectCode(){
         projectNameGridField[0].text()
+    }
+
+    def projectIsListed(name){
+        waitFor{ projectNameGridField.find("a", text: contains(name)).first().displayed }
     }
 }

@@ -48,7 +48,7 @@ class ProjectCreationSpec extends GebReportingSpec {
         given: 'The user navigates to Project menu'
             at MenuPage
         when: 'The user clicks on Active Projects link'
-            projectsModule.goToProjectsActive()
+            waitFor (40) { projectsModule.goToProjectsActive()}
         then: 'Project List Page should be displayed'
             at ProjectListPage
      }
@@ -75,10 +75,8 @@ class ProjectCreationSpec extends GebReportingSpec {
             pcCompletionDate  = projCompDate
         and: 'The user clicks on Save button'
             waitFor {pcSaveBtn.click()}
-        then: 'Project Details Page is displayed'
-            at ProjectDetailsPage
-        and: 'Message saying project created is displayed'
-            waitFor {pdPageMessage.text().contains(projName + " was created")}
+        then: 'Project List Page is displayed'
+            at ProjectListPage
     }
 
     def "4. Go to Project List to search new project"() {
@@ -94,9 +92,11 @@ class ProjectCreationSpec extends GebReportingSpec {
         given: 'The user is in Project List Page'
             at ProjectListPage
         when: 'The user set project filter name'
+            clickFilterButton()
             waitFor { projectNameFilter.click() }
             projectNameFilter = projName
         then: 'Project created should be displayed in the grid'
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
+           // waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
+            projectIsListed projName
     }
 }
