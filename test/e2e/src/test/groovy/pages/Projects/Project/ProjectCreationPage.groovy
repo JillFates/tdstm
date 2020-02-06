@@ -13,7 +13,8 @@ class ProjectCreationPage extends Page{
         pcPageTitle (wait: true){ $("div", class:"modal-title")}
         pcPageMessage (required: false, wait:true) { $("div", class:"message")}
         pcPageForm (wait: true){ $("div", class:"tds-modal-content")}
-        pcClientSelector { $("kendo-dropdownlist#client")}
+        //pcClientSelector { $("kendo-dropdownlist#client")}
+        pcClientSelector (wait: true) {$("kendo-dropdownlist").find("span")[1]}
         pcClientItem (required: false) { $("li.k-item.ng-star-inserted:nth-child(1)")}
         pcProjectCode { pcPageForm.find("input#projectCode")}
         pcProjectName { pcPageForm.find("input#projectName")}
