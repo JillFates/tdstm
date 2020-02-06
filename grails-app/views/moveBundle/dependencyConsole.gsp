@@ -283,7 +283,7 @@
 				$('#refreshButtonId').addClass('warning-change');
 			});
 
-			function getList(value, dependencyBundle, force, distance, labels) {
+			function getList(value, dependencyBundle) {
 				$('#refreshButtonId').removeClass('warning-change');
 				$('#refreshButtonId').prop('title','Refreshes the graph');
 				$('#moveBundleSelectId').dialog("close")
@@ -348,7 +348,12 @@
 					GraphUtil.disableFullscreen();
 					$('#assetCheck').attr('checked','false');
 					var bundle = $("#planningBundleSelectId").val()
-					ajaxRequest = ${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'"entity=" + value + "&dependencyBundle=" + dependencyBundle + "&bundle=" + bundle', onComplete:'listUpdate(XMLHttpRequest)') }
+					ajaxRequest = ${remoteFunction(
+							controller:'assetEntity',
+							action:'retrieveLists',
+							params: '{entity: value, dependencyBundle: dependencyBundle, bundle: bundle}',
+							onComplete:'listUpdate(XMLHttpRequest)'
+					)}
 					if ($('#svgContainerId').size() == 0) {
 						if ($('#items1 .tabInner div table').size() > 0)
 							spinnerDiv.css('width', $('#items1 .tabInner div table').innerWidth() - 10);

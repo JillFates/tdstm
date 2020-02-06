@@ -149,7 +149,9 @@
 						"
 					>
 						<ng-template kendoGridHeaderTemplate>
-							<label> {{ column.label }}</label>
+							<div class="sortable-column">
+								<label> {{ column.label }}</label>
+							</div>
 						</ng-template>
 
 						<ng-template kendoGridFilterCellTemplate let-filter>
