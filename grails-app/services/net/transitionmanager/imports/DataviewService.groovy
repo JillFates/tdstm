@@ -314,7 +314,7 @@ class DataviewService implements ServiceMethods {
 	Dataview update(Project project, Person whom, Long id, DataviewCrudCommand dataviewCommand) {
 		Dataview dataview = dataviewCommand.id
 
-		validateDataviewUpdateAccessOrException(project, whom, id, dataviewCommand, dataview)
+		validateDataviewUpdateAccessOrException(project, whom, dataviewCommand, dataview)
 		validateOverrideViewFiltersMatch(dataviewCommand)
 		validateViewNameUniqueness(project, whom, dataviewCommand)
 
@@ -359,6 +359,14 @@ class DataviewService implements ServiceMethods {
 	Dataview create(Project currentProject, Person whom, DataviewCrudCommand dataviewCommand) {
 		validateDataviewCreateAccessOrException(dataviewCommand, currentProject, whom)
 		validateOverrideViewFiltersMatch(dataviewCommand)
+
+		// If the user is overriding a System View, they may be overriding their own override or
+		// a shared override so it's important to get the root system view being overridden
+		if (dataviewCommand.overridesView) {
+			dataviewCommand.overridesView = getRootSystemView(dataviewCommand.overridesView)
+			// use the name from the view that is being overridden
+			dataviewCommand.name = dataviewCommand.overridesView.name
+		}
 		validateViewNameUniqueness(currentProject, whom, dataviewCommand)
 
 		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
@@ -369,13 +377,6 @@ class DataviewService implements ServiceMethods {
             project = currentProject
 			isShared = dataviewCommand.isShared
 			reportSchema = schema
-			if (dataviewCommand.overridesView) {
-				overridesView = getRootSystemView(dataviewCommand.overridesView)
-				// use the name from the view that is being overridden
-				name = dataviewCommand.overridesView.name
-			} else {
-				name = dataviewCommand.name
-			}
 		}
 
 		dataview.save()
@@ -414,11 +415,14 @@ class DataviewService implements ServiceMethods {
 		if (dataview.isSystem && dataview.overridesView == null) {
 			return dataview
 		}
+		if (dataview.overridesView.isSystem) {
+			return dataview.overridesView
+		}
 		if (depth < 1) {
 			throwException(InvalidConfigurationException, 'dataview.validate.overrideNestingExceeded', [],
 					'There is an unexpected amount of nested overridden system views')
 		}
-		return getRootSystemView(dataview, --depth)
+		return getRootSystemView(dataview.overridesView, --depth)
 	}
 
 	/**
@@ -427,7 +431,7 @@ class DataviewService implements ServiceMethods {
 	 */
 	void validateOverrideViewFiltersMatch(DataviewCrudCommand dataviewCommand) {
 		if (dataviewCommand.overridesView) {
-			// Get the list of filters from the orginal system view
+			// Get the list of filters fzrom the orginal system view
 			Map systemViewFilters = [:]
 			JSONObject schema = dataviewCommand.overridesView.schemaAsJSONObject()
 			schema?.columns.each {
@@ -500,12 +504,14 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 * Validates if the whom updating a dataview has permission to it.
-	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
+	 * @param project - the current project for the user context
+	 * @param whom - the whom that is attempting to access the view
+	 * @param dataviewCommand - the JSON object containing information about the Dataview to create
 	 * @param dataview - original object from database
 	 * @throws net.transitionmanager.exception.UnauthorizedException
 	 */
-	void validateDataviewUpdateAccessOrException(Project project, Person person, Long id, DataviewCrudCommand dataviewCommand, Dataview dataview) {
-		validateDataviewViewAccessOrException(project, person, dataview)
+	void validateDataviewUpdateAccessOrException(Project project, Person whom, DataviewCrudCommand dataviewCommand, Dataview dataview) {
+		validateDataviewViewAccessOrException(project, whom, dataview)
 
 		// Make sure that the name is unique across the all cases
 		validateViewNameUniqueness(project, whom, dataviewCommand)
