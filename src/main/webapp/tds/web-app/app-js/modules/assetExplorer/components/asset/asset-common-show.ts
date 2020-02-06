@@ -3,7 +3,7 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependecyService} from '../../service/dependecy.service';
-import {HostListener, OnInit} from '@angular/core';
+import {HostListener, OnInit, AfterContentInit } from '@angular/core';
 import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetShowComponent} from './asset-show.component';
@@ -17,10 +17,11 @@ import {ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
 import {Diagram, Layout, Link} from 'gojs';
 import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 declare var jQuery: any;
 
-export class AssetCommonShow implements OnInit {
+export class AssetCommonShow implements OnInit, AfterContentInit {
 
 	protected userDateFormat: string;
 	protected userTimeZone: string;
@@ -45,7 +46,8 @@ export class AssetCommonShow implements OnInit {
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
 		protected windowService: WindowService,
-		protected architectureGraphService: ArchitectureGraphService
+		protected architectureGraphService: ArchitectureGraphService,
+		private assetTagUIWrapperService?: AssetTagUIWrapperService
 	) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
@@ -67,6 +69,16 @@ export class AssetCommonShow implements OnInit {
 	 */
 	ngOnInit(): void {
 		jQuery('[data-toggle="popover"]').popover();
+	}
+
+	ngAfterContentInit(): void {
+		setTimeout(() => {
+			let tagsDiv = <HTMLElement>document.querySelector('.tags-container');
+			let tableRow = <HTMLElement>document.querySelector('.one-column');
+			let tableRowSiblingWidth = <HTMLElement>(<HTMLElement>document.querySelector('.fit-tags-to-view')).previousSibling;
+			tagsDiv.style.width = (tableRow.offsetWidth - tableRowSiblingWidth.offsetWidth) + 'px';
+			this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
+		}, 500);
 	}
 
 	cancelCloseDialog(): void {

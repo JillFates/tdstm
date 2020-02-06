@@ -265,6 +265,39 @@ tds-ui-dialog {
             }
           }
 
+          .fit-tags-to-view {
+              height: 30px;
+            .tags-container {
+              height: 25px;
+              overflow: hidden;
+            }
+            .dots-for-tags {
+              display: inline-block;
+              margin: 2px;
+              vertical-align: baseline;
+              text-align: center;
+              width: auto;
+              font-weight: 600;
+              font-size: 11px;
+              padding-right: 30px;
+            }
+            &:hover {
+            .tags-container {
+              height: auto;
+              overflow: unset;
+            }
+            .label.tag {
+              margin-bottom: 3px;
+              width: auto;
+              display: inline-block;
+            }
+            .dots-for-tags {
+              display: none;
+              padding-right: 10px;
+            }
+            }
+          }
+
           // tds-diagram-layout styling in body
           .modal-body-graph {
             min-height: 300px;
@@ -278,8 +311,9 @@ tds-ui-dialog {
           .label.tag {
             border-radius: 2px;
             border: 0;
-            width: unset;
+            //width: unset;
             font-weight: 500;
+            display: inline;
           }
         }
       }
