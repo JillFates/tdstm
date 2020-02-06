@@ -351,18 +351,22 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Test dataDateToDateTime'() {
 
-        given: 'a project'
-            Project project = projectHelper.createProjectWithDefaultBundle()
-            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
-        and: 'the project has field settings specifications'
-            projectService.cloneDefaultSettings(project)
-        and: 'the project has assets with existing data values'
-            createAssets(project)
+        given: 'a project field settings specifications and some assets'
+            Project project
+            Project.withNewTransaction {
+                project = projectHelper.createProjectWithDefaultBundle()
+                Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+                projectService.cloneDefaultSettings(project)
+                createAssets(project)
+            }
 
         when: ''
             String updateString = customDomainService.dataDateToDateTime('custom21')
             customDomainService.clearCustomFieldsForClass(project, AssetClass.DEVICE.name(), [updateString])
-            List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
+            List<AssetEntity> assetList
+            AssetEntity.withNewTransaction {
+                assetList = AssetEntity.findAllByProject(project)*.refresh()
+            }
         then: ''
             assetList[0].custom20 == '2019-03-21T21:31:00Z'
             assetList[0].custom21 == '2019-08-16T00:00:00Z'
@@ -403,13 +407,14 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Test dataDateTimeToDate'() {
 
-        given: 'a project'
-            Project project = projectHelper.createProjectWithDefaultBundle()
-            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
-        and: 'the project has field settings specifications'
-            projectService.cloneDefaultSettings(project)
-        and: 'the project has assets with existing data values'
-            createAssets(project)
+        given: 'a project field settings specifications and some assets'
+            Project project
+            Project.withNewTransaction {
+                project = projectHelper.createProjectWithDefaultBundle()
+                Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+                projectService.cloneDefaultSettings(project)
+                createAssets(project)
+            }
 
         when: ''
             String updateString = customDomainService.dataDateTimeToDate('custom20')
@@ -456,13 +461,14 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Test StringToYesNo'() {
 
-        given: 'a project'
-            Project project = projectHelper.createProjectWithDefaultBundle()
-            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
-        and: 'the project has field settings specifications'
-            projectService.cloneDefaultSettings(project)
-        and: 'the project has assets with existing data values'
-            createAssets(project)
+        given: 'a project field settings specifications and some assets'
+            Project project
+            Project.withNewTransaction {
+                project = projectHelper.createProjectWithDefaultBundle()
+                Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+                projectService.cloneDefaultSettings(project)
+                createAssets(project)
+            }
 
         when: ''
             String updateString = customDomainService.dataToYesNo('custom22')
@@ -509,13 +515,14 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Test ListToYesNo'() {
 
-        given: 'a project'
-            Project project = projectHelper.createProjectWithDefaultBundle()
-            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
-        and: 'the project has field settings specifications'
-            projectService.cloneDefaultSettings(project)
-        and: 'the project has assets with existing data values'
-            createAssets(project)
+        given: 'a project field settings specifications and some assets'
+            Project project
+            Project.withNewTransaction {
+                project = projectHelper.createProjectWithDefaultBundle()
+                Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+                projectService.cloneDefaultSettings(project)
+                createAssets(project)
+            }
 
         when: ''
             String updateString = customDomainService.dataToYesNo('custom23')
@@ -561,13 +568,14 @@ class CustomDomainServiceTests extends Specification {
 
     void 'Test dataToString'() {
 
-        given: 'a project'
-            Project project = projectHelper.createProjectWithDefaultBundle()
-            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
-        and: 'the project has field settings specifications'
-            projectService.cloneDefaultSettings(project)
-        and: 'the project has assets with existing data values'
-            createAssets(project)
+        given: 'a project field settings specifications and some assets'
+            Project project
+            Project.withNewTransaction {
+                project = projectHelper.createProjectWithDefaultBundle()
+                Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+                projectService.cloneDefaultSettings(project)
+                createAssets(project)
+            }
 
         when: ''
             String updateString = customDomainService.dataToString('custom24', 5)
