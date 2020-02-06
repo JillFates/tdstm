@@ -79,7 +79,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      */
     @HasPermission(Permission.ETLScriptView)
     def validateUniqueName (String name) {
-        DataScriptNameValidationCommand cmd = populateCommandObject(DataScriptNameValidationCommand)
+        DataScriptNameValidationCommand cmd = populateCommandObject(DataScriptNameValidationCommand, false)
         boolean isUnique = dataScriptService.validateUniqueName(cmd)
         renderSuccessJson([isUnique: isUnique])
     }
@@ -90,7 +90,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      */
     @HasPermission(Permission.ETLScriptView)
     def list() {
-        ListCommand command = populateCommandObject(ListCommand)
+        ListCommand command = populateCommandObject(ListCommand, false)
         List<DataScript> dataScripts = dataScriptService.getDataScripts(projectForWs, command.providerId, command.useWithAssetActions)?.sort {it.name}
         renderSuccessJson(dataScripts*.toMap(DataScript.BASE_INFO))
     }
@@ -126,9 +126,6 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     def initiateTestScript() {
 
         DataScriptValidateScriptCommand command = populateCommandObject(DataScriptValidateScriptCommand.class)
-        if (!command.validate()) {
-            throw new InvalidParamException('Invalid parameters')
-        }
 
         Project project = securityService.getUserCurrentProjectOrException()
 

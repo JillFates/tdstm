@@ -9,7 +9,6 @@ import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
 import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
-import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeConstraintType
@@ -38,6 +37,7 @@ import net.transitionmanager.asset.CommentService
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.command.task.ListTaskCommand
+import net.transitionmanager.command.task.TaskCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CoreService
@@ -51,6 +51,7 @@ import net.transitionmanager.exception.RecipeException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
@@ -59,10 +60,12 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -79,6 +82,10 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_PERSON_CODE
+
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -105,6 +112,7 @@ class TaskService implements ServiceMethods {
 	LinkGenerator              grailsLinkGenerator
 	CoreService                coreService
 	CredentialService          credentialService
+	UserPreferenceService	   userPreferenceService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -418,7 +426,7 @@ class TaskService implements ServiceMethods {
 				throw new EmptyResultException('Task was not found')
 			}
 
-			if (! AssetCommentStatus.CanInvokeActionStatusCodes.contains(taskWithLock.status)) {
+			if (! ACS.CanInvokeActionStatusCodes.contains(taskWithLock.status)) {
 				throwException(InvalidRequestException, 'apiAction.task.message.taskNotInActionableState', 'Task status must be in the Ready or Started state in order to invoke an action')
 			}
 
@@ -464,8 +472,8 @@ class TaskService implements ServiceMethods {
 			taskWithLock.actStart = taskWithLock.apiActionInvokedAt
 
 			// Make sure that the status is STARTED instead
-			if (taskWithLock.status != AssetCommentStatus.STARTED) {
-				setTaskStatus(taskWithLock, AssetCommentStatus.STARTED, whom)
+			if (taskWithLock.status != ACS.STARTED) {
+				setTaskStatus(taskWithLock, ACS.STARTED, whom)
 			}
 			taskWithLock.save(flush: true, failOnError: true)
 
@@ -497,7 +505,7 @@ class TaskService implements ServiceMethods {
 
 			if (taskWithLock) {
 				addNote(taskWithLock, whom, "Invoke action ${taskWithLock.apiAction.name} failed : $errMsg")
-				setTaskStatus(taskWithLock, AssetCommentStatus.HOLD, whom)
+				setTaskStatus(taskWithLock, ACS.HOLD, whom)
 			}
 
 			// TODO : JPM 6/2019 : We should have a general TM exception that we know the message can displayed to the user
@@ -579,7 +587,7 @@ class TaskService implements ServiceMethods {
 		// Trigger the action if it is automatic and the action is local
 		// and task already exist (it fails with task not found when task has not been saved yet)
 		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally() && task.id) {
-			if (AssetCommentStatus.CanInvokeActionStatusCodes.contains(status) ) {
+			if (ACS.CanInvokeActionStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
@@ -1376,7 +1384,7 @@ class TaskService implements ServiceMethods {
 		neighbors = { tId, depth ->
 			// log.info "In the hood $depth for $tId"
 			if (depth > 0 && (viewUnpublished || AssetComment.read(tId)?.isPublished)) {
-				def td = TaskDependency.executeQuery('from TaskDependency td where td.' + findProp + '.id=?', [tId])
+				def td = TaskDependency.executeQuery('from TaskDependency td where td.' + findProp + '.id=?0', [tId])
 				// log.info "Found ${td.size()} going to $predOrSucc"
 				if (td.size() > 0) {
 					if (depth > 0) {
@@ -5364,6 +5372,18 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
+	 *
+	 *  Counts All tasks by an assetEntity.
+	 *
+	 *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.TASK
+	 *
+	 * @param assetEntity The asset to look up the count of tasks for.
+	 */
+	def countByAssetEntity(AssetEntity assetEntity) {
+		AssetComment.countByAssetEntityAndCommentType(assetEntity, AssetCommentType.TASK)
+	}
+
+	/**
 	 * Fills the methodParams with the Label of the fieldName and the contextDesc that gives a user readable name
 	 * to be consistent with the API Action Parameters dialog
 	 * @param project where we are getting the fieldSpecs
@@ -5615,6 +5635,8 @@ class TaskService implements ServiceMethods {
 				category: it.category
 			]
 
+			AssetEntity asset = GrailsHibernateUtil.unwrapIfProxy(it.assetEntity)
+
 			// now with all this, build a row
 			[
 				id:it.id,
@@ -5632,9 +5654,9 @@ class TaskService implements ServiceMethods {
 				score: it.score ?: 0,
 				taskStatus: status ? 'task_' + it.status.toLowerCase() : 'task_na',
 				dueClass: dueClass,
-				assetEntityId: it.assetEntity?.id,
-				assetEntityAssetType: it.assetEntity?.assetType ,
-				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
+				assetEntityId: asset?.id,
+				assetEntityAssetType: asset?.assetType ,
+				assetEntityAssetClass: asset?.assetClass?.toString(),
 				instructionsLinkURL: instructionsLinkURL ?: '',
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
@@ -5665,13 +5687,13 @@ class TaskService implements ServiceMethods {
 	String getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
 
 		String updatedClass = ''
-		if (task.status == AssetCommentStatus.READY) {
+		if (task.status == ACS.READY) {
 			if (elapsedSec >= MINUTES_CONSIDERED_LATE) {   // 10 minutes
 				updatedClass = 'task_late'
 			} else if (elapsedSec >= MINUTES_CONSIDERED_TARDY) {  // 5 minutes
 				updatedClass = 'task_tardy'
 			}
-		} else if (task.status == AssetCommentStatus.STARTED) {
+		} else if (task.status == ACS.STARTED) {
 			def dueInSecs = elapsedSec - (task.duration ?: 0) * 60
 			if (dueInSecs >= MINUTES_CONSIDERED_LATE) {
 				updatedClass='task_late'
@@ -5755,7 +5777,7 @@ class TaskService implements ServiceMethods {
 		boolean taskIsActionable = task.isActionable()
 
 		// Determine the Estimated Start CSS
-		if (estStartInMin && (task.status in [ AssetCommentStatus.PENDING, AssetCommentStatus.READY ]) )  {
+		if (estStartInMin && (task.status in [ ACS.PENDING, ACS.READY ]) )  {
 			// Note that in the future when we have have slack calculations in the tasks, we can
 			// flag tasks that started late and won't finished by critical path finish times but for
 			// now we will just flag tasks that didn't start by their est start.
@@ -5835,5 +5857,157 @@ class TaskService implements ServiceMethods {
 				}
 		}
 		return result
+	}
+
+
+	/**
+	 * Create or update an existing Task based on the given TaskCommand instance.
+	 * @param project - user's active project.
+	 * @param taskCommand - Command Object containing the fields for updating the Task.
+	 * @return a Map with information required by the front-end -- along with the task we send other things just as CSS based on the status.
+	 */
+	Map createOrUpdateTask(Project project, TaskCommand taskCommand) {
+		UserLogin userLogin = securityService.userLogin
+		Task task
+		Date now = new Date()
+
+		// If a task id was provided, then fetch that task (fail if not found).
+		if (taskCommand.id) {
+			// Fetch the Task from the database.
+			task = GormUtil.findInProject(project, Task, taskCommand.id, true)
+			// Validate that the status hasn't been updated by someone else. If so, fail accordingly.
+			if (taskCommand.status && taskCommand.status != task.status && task.status != ACS.READY) {
+				Person responsible = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
+				String errorMsg
+				switch (task.status) {
+					case STARTED:
+						boolean isProjMgr = partyRelationshipService.staffHasFunction(project, userLogin.person, RoleType.CODE_TEAM_PROJ_MGR)
+						log.debug "Task already STARTED - isPM? $isProjMgr, whoDidIt=$responsible, username=${userLogin.username}"
+						if (responsible.id != userLogin.person.id && !isProjMgr) {
+							errorMsg = "The task was previously STARTED by $responsible"
+						}
+						break
+					case COMPLETED:
+						errorMsg = "The task was previously COMPLETED by $responsible"
+						break
+					default:
+						errorMsg = "The task status was changed to ${task.status}."
+				}
+				if (errorMsg) {
+					throw new InvalidParamException(errorMsg)
+				}
+			}
+			// If there's no task id, a new Task should be created.
+		} else {
+			// Create a new Task instance.
+			task = new Task(project: project, createdBy: userLogin.person)
+			// Assign the task a new number.
+			task.taskNumber = sequenceService.next(project.client.id, 'TaskNumber')
+			// Update a few preferences as needed.
+			userPreferenceService.setPreference(userLogin, UserPreferenceEnum.TASK_CREATE_STATUS, taskCommand.status)
+			if (taskCommand.category) {
+				userPreferenceService.setPreference(userLogin, UserPreferenceEnum.TASK_CREATE_CATEGORY, taskCommand.category)
+			}
+		}
+
+		// List of TaskCommand properties that are to be skipped when assigning values to the task domain instance.
+		List<String> ignoreProperties = [ 'apiActionId', 'assetEntity', 'assignedTo', 'currentStatus', 'deletedPreds',
+										  'id', 'isResolved', 'manageDependency', 'moveEvent', 'note', 'override',
+										  'prevAsset', 'taskDependency', 'taskSuccessor' ]
+
+		// Populate the domain object with some basic fields.
+		taskCommand.populateDomain(task, true, ignoreProperties)
+
+		List<Map> references = [
+				[taskField: 'apiAction', commandField: 'apiActionId', domain: ApiAction],
+				[taskField: 'assetEntity', commandField: 'assetEntity', domain: AssetEntity],
+				[taskField: 'moveEvent', commandField: 'moveEvent', domain: MoveEvent]
+		]
+
+		references.each { Map referenceInfo ->
+			Long referenceId = taskCommand[referenceInfo['commandField']]
+			def reference = null
+			if (referenceId) {
+				reference = GormUtil.findInProject(project, referenceInfo['domain'], referenceId, true)
+			}
+			task[referenceInfo['taskField']] = reference
+		}
+
+		// Deal with task assignment.
+		if (taskCommand.assignedTo != null) {
+			// If the parameter is '0', then the task is unassigned.
+			if (taskCommand.assignedTo == '0') {
+				task.assignedTo = null
+				// Check if assigned to Automatic.
+			} else if (taskCommand.assignedTo.toString() == AUTOMATIC_PERSON_CODE) {
+				task.assignedTo = securityService.getAutomaticPerson()
+			} else {
+				Person person = Person.get(taskCommand.assignedTo)
+				List<Map> projectStaff = partyRelationshipService.getProjectStaff(project.id)
+				if (projectStaff.find { it.staff.id.toString() == taskCommand.assignedTo }) {
+					task.assignedTo = person
+				} else {
+					throw new InvalidParamException("User (${userLogin.username}) attempted to assign unrelated person (${task.assignedTo}) to project ($project).")
+				}
+			}
+		}
+
+		setTaskStatus(task, taskCommand.status, userLogin.person)
+
+		// Having set all the fields, save the domain object.
+		task.save(flush: true)
+
+		Closure manageDependencies = { List<String> dependencies, boolean isPred ->
+			dependencies.each { String dependency ->
+				String[] depInfo = dependency.split("_")
+				String taskDependencyId = depInfo[0]
+				String taskId = depInfo[1]
+				Task depTask = get(Task, taskId, project)
+				if (isPred) {
+					commentService.saveAndUpdateTaskDependency(depTask, task, taskDependencyId, task.id)
+				} else {
+					commentService.saveAndUpdateTaskDependency(task, depTask, taskDependencyId, taskId)
+				}
+			}
+		}
+
+
+		// Check if we need add / delete dependencies.
+		if (taskCommand.manageDependency) {
+			// Delete dependencies if needed.
+			if (taskCommand.deletedPreds) {
+				TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( :deletedPreds ) ", [deletedPreds:taskCommand.deletedPreds])
+			}
+			// Update dependencies where the current task is the successor.
+			manageDependencies(taskCommand.taskDependency, false)
+			// Update dependencies where the current task is the predecessor.
+			manageDependencies(taskCommand.taskSuccessor, true)
+
+		}
+
+		boolean addingNote = taskCommand.note != null
+		if (addingNote) {
+			CommentNote note = new CommentNote(createdBy: userLogin.person, dateCreated: now, note: taskCommand.note, isAudit: 0, assetComment: task)
+			note.save(flush: true)
+		}
+
+		if (task.assignedTo && commentService.shouldSendNotification(task, task.assignedTo, !taskCommand.id, addingNote)) {
+			String tzId = userPreferenceService.timeZone
+			String userDTFormat = userPreferenceService.dateFormat
+			commentService.dispatchTaskEmail([taskId: task.id, tzId: tzId, isNew: !taskCommand.id , userDTFormat: userDTFormat])
+		}
+
+		String css = task.dueDate < now ? 'Lightpink' : 'White'
+		boolean isNotResolved = task.isResolved()
+
+		return [
+				assetComment: task.taskToMap(),
+				status: isNotResolved,
+				cssClass: css,
+				statusCss: getCssClassForStatus(task.status),
+				assignedToName: task.assignedTo ? (task.assignedTo.firstName + " " + task.assignedTo.lastName): "",
+				lastUpdatedDate: TimeUtil.formatDateTime(task.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13),
+				lastUpdatedTimePassed: TimeUtil.elapsed(task.lastUpdated)
+		]
 	}
 }

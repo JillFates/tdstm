@@ -1,6 +1,6 @@
 package com.tdsops.tm.enums.domain
 
-
+import groovy.transform.Memoized
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
@@ -66,13 +66,27 @@ enum AssetClass {
 	/**
 	 * The Asset Class Options used for filtering
 	 */
-	static final String classOptionsDefinition
+	@Deprecated
+	static final String classOptionsDefinitionsLegacy
 	static {
 		List<String> results = ["{ id: 'ALL', 'text': 'Filter: All Classes' }"]
 		for (String key in classOptions.keySet()) {
 			results.push("{ id: '$key', 'text': '${classOptions[key]}' }".toString())
 		}
-		classOptionsDefinition = results
+		classOptionsDefinitionsLegacy = results
+	}
+
+	@Memoized
+	static List getClassOptionsDefinitions() {
+		List classOptionsDefinitions = [[id: 'ALL', 'text': 'Filter: All Classes']]
+
+		for (String key in classOptions.keySet()) {
+			classOptionsDefinitions << (
+				[id: key, 'text': classOptions[key]]
+			)
+		}
+
+		return classOptionsDefinitions
 	}
 
 	/**

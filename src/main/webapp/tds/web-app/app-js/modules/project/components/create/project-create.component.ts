@@ -29,8 +29,8 @@ export class ProjectCreateComponent implements OnInit {
 	public transformResult: ApiResponseModel;
 	public transformInProcess = false;
 
-	@ViewChild('startDatePicker') startDatePicker;
-	@ViewChild('completionDatePicker') completionDatePicker;
+	@ViewChild('startDatePicker', {static: false}) startDatePicker;
+	@ViewChild('completionDatePicker', {static: false}) completionDatePicker;
 	constructor(
 		private projectService: ProjectService,
 		private promptService: UIPromptService,

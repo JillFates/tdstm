@@ -8,6 +8,12 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {PlanningDashboardComponent} from './components/dashboard/planning-dashboard.component';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_SECTION = 'menu-parent-dashboard';
+
 export class PlanningStates {
 	public static readonly PLANNING_DASHBOARD = {
 		url: 'dashboard'
@@ -22,7 +28,7 @@ export const PlanningRoute: Routes = [
 			page: {
 				title: 'Planning Dashboard',
 				menu: ['PLANNING.DASHBOARD', 'PLANNING.PLANNING'],
-				instruction: ''
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-dashboard-planning-dashboard', subMenu: true}
 			},
 			requiresAuth: true,
 		},

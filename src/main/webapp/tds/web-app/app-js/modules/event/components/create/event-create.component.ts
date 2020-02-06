@@ -6,7 +6,6 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {KEYSTROKE} from '../../../../shared/model/constants';
-import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
 	selector: `event-create`,
@@ -16,6 +15,8 @@ export class EventCreateComponent implements OnInit {
 	public bundles: any[] = [];
 	public runbookStatuses: string[] = [];
 	public assetTags: any[] = [];
+	public showSwitch = false;
+	public showClearButton = false;
 	public eventModel: EventModel = null;
 	private defaultModel = null;
 	private requiredFields = ['name'];
@@ -66,6 +67,10 @@ export class EventCreateComponent implements OnInit {
 
 	public onAssetTagChange(event) {
 		this.eventModel.tagIds = event.tags;
+	}
+
+	public clearButtonBundleChange(event) {
+		this.showClearButton =  event && event.length > 1;
 	}
 
 	public saveForm() {

@@ -6,17 +6,15 @@ class PlanningMenuModule extends Module {
 
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
-        menuBar { menuContainer.find("div#navbar-collapse")}
+        menuBar { menuContainer.find("div#mobile-nav") }
 
         planningItem { menuBar.find("li.menu-parent-planning") }
         planningMenu  { planningItem.find("ul",class:"dropdown-menu menu-item-expand")}
-        planningEventsTitle { planningMenu.find("li.menu-parent-item")[0]}
         planningListEvents { planningMenu.find("li.menu-parent-planning-event-list")}
         planningEventDetails { planningMenu.find("li.menu-parent-planning-event-detail-list")}
         planningListEventNews { planningMenu.find("li.menu-parent-planning-event-news")}
         planningPreEventCheckList { planningMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/reports/preEventCheckList")}
         planningExportRunbook { planningMenu.find("li.menu-parent-planning-export-runbook")}
-        planningBundlesTitle { planningMenu.find("li.menu-parent-item")[1]}
         planningListBundles { planningMenu.find("li.menu-parent-planning-list-bundles")}
         bundleName (required:false) {$("li.menu-parent-planning-selected-bundle")}
     }
@@ -73,14 +71,6 @@ class PlanningMenuModule extends Module {
         selectMenu(planningItem)
         waitFor(30){planningListBundles}
         selectItem(planningListBundles)
-    }
-
-    def verifyEventsTitle(){
-        planningEventsTitle.isDisplayed()
-    }
-
-    def verifyBundlesTitle(){
-        planningBundlesTitle.isDisplayed()
     }
 
     def vaildateDisplayedBundleName(bdlName){

@@ -15,9 +15,9 @@ class ListBundlesPage extends Page {
     }
 
     static content = {
-        listBundlesPageTitle { $("section", class:"content-header").find("h1")}
+        listBundlesPageTitle { $("section", class:"content-header").find("h2")}
         planningModule { module PlanningMenuModule}
-        listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
+        listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         createButton {$("button",class:"action-toolbar-btn")}
         rows (required:false) {$('tdoby',role="presentation")}
         individualRows (required:false) {$('table.k-grid-table').find('tr',role:'row')}

@@ -1,5 +1,6 @@
 div.cookbook_recipes_editor /* Review if necessary to left this or not*/
   div.alert
+    font-size: 14px;
     position: fixed
     width: 300px
     left: 50%
@@ -8,6 +9,13 @@ div.cookbook_recipes_editor /* Review if necessary to left this or not*/
     z-index: 100
     padding: 5px 15px
     text-align: center
+    button.close
+      position: absolute;
+      right: 8px;
+      top: 4px;
+      font-size: 25px;
+      color: #000;
+      height: 10px;
   div.alert
    -webkit-transition: all ease 0.5s
    transition: all ease 0.5s
@@ -29,17 +37,18 @@ div.body
       margin-left: 12px
   div.alert-message-icon
     float: left
-  div.alert.alert-success
-    min-width: 450px
-    z-index: 1060
-    padding: 13px
-    background-color: #dff0d8 !important
-    color: #3c763d !important
-    text-align: left
-  div.alert.alert-danger
-    min-width: 450px
-    z-index: 1060
-    padding: 13px
-    background-color: #f2dede !important
-    color: #a94442 !important
-    text-align: left
+	
+//   div.alert.alert-success
+//     min-width: 450px
+//     z-index: 1060
+//     padding: 13px
+//     background-color: #dff0d8 !important
+//     color: #3c763d !important
+//     text-align: left
+//   div.alert.alert-danger
+//     min-width: 450px
+//     z-index: 1060
+//     padding: 13px
+//     background-color: #f2dede !important
+//     color: #a94442 !important
+//     text-align: left

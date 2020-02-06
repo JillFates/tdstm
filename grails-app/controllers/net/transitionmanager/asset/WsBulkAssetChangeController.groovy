@@ -21,7 +21,6 @@ class WsBulkAssetChangeController implements ControllerMethods {
 	@HasPermission(Permission.AssetEdit)
 	def change() {
 		BulkChangeCommand bulkChange = populateCommandObject(BulkChangeCommand)
-		validateCommandObject(bulkChange)
 		bulkAssetChangeService.bulkChange(projectForWs, bulkChange)
 
 		renderSuccessJson()
@@ -33,7 +32,6 @@ class WsBulkAssetChangeController implements ControllerMethods {
 	@HasPermission(Permission.AssetEdit)
 	def runETL() {
 		BulkETLCommand bulkETL = populateCommandObject(BulkETLCommand)
-		validateCommandObject(bulkETL)
 		renderSuccessJson(bulkAssetETLService.runBulkETL(projectForWs, bulkETL))
 	}
 }

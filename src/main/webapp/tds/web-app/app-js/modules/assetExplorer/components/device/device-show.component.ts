@@ -21,6 +21,7 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import { forkJoin } from 'rxjs';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -42,11 +43,23 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			private permissionService: PermissionService,
-			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
-				this.mainAsset = modelId;
-				this.assetTags = metadata.assetTags;
-				this.manufacturerName = null;
+			windowService: WindowService,
+			architectureGraphService: ArchitectureGraphService
+		) {
+			super(
+				activeDialog,
+				dialogService,
+				assetService,
+				prompt,
+				assetExplorerService,
+				notifierService,
+				userContextService,
+				windowService,
+				architectureGraphService
+			);
+			this.mainAsset = modelId;
+			this.assetTags = metadata.assetTags;
+			this.loadThumbnailData(this.mainAsset);
 		}
 
 		getManufacturer(manufacturerName): string {
@@ -113,7 +126,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetEditComponent, [
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
-				DIALOG_SIZE.LG);
+				DIALOG_SIZE.XXL);
 		}
 
 		protected isManufacturerLinkAvailable(): boolean {

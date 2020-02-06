@@ -1,148 +1,138 @@
 <%@page defaultCodec="html" %>
-
-<table class="planning-application-table">
-	<tbody>
-		<tr>
-			<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${asset.assetName}"/>
-
-			<td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">${asset.assetName}</td>
-			<tds:inputLabel field="${standardFieldSpecs.description}" value="${asset.description}"/>
-			<td colspan="3" class="${standardFieldSpecs.description.imp}" >${asset.description}</td>
-		</tr>
-		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${asset.supportType}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.userCount}" value="${asset.userCount}" tooltipDataPlacement="bottom"/>
-		</tr>
-		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${asset.appVersion}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
-			<td class="valueNW ${standardFieldSpecs.sme.imp}">
-				<span class="clickableText" (click)="launchManageStaff(${asset.sme?.id})">
+<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
+	<tbody [ngClass]="{'one-column':!showDetails, 'three-column':showDetails}">
+		<tds:clrRowDetail style="order: 5" field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" />
+		<tds:clrRowDetail style="order: 10" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+		<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}" />
+		<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.userCount}" value="${asset.userCount}" />
+		<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.appVersion}" value="${asset.appVersion}" />
+		<tr style="order: 30">
+			<tds:clrInputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
+			<td>
+				<a (click)="launchManageStaff(${asset.sme?.id})">
 					<tds:nameAndCompany client="${client}" person="${asset.sme}" />
-                </span>
+                </a>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.userLocations}" value="${asset.userLocations}" tooltipDataPlacement="bottom"/>
 		</tr>
-		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
-			<td class="valueNW ${standardFieldSpecs.sme2.imp}">
-				<span class="clickableText" (click)="launchManageStaff(${asset.sme2?.id})">
+		<tds:clrRowDetail style="order: 35" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
+		<tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.userLocations}" value="${asset.userLocations}" />
+		<tds:clrRowDetail style="order: 45" field="${standardFieldSpecs.appTech}" value="${asset.appTech}" />
+		<tr style="order: 50">
+			<tds:clrInputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
+			<td>
+				<a (click)="launchManageStaff(${asset.sme2?.id})">
 					<tds:nameAndCompany client="${client}" person="${asset.sme2}" />
-				</span>
+                </a>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.criticality}" value="${asset.criticality}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.useFrequency}" value="${asset.useFrequency}" tooltipDataPlacement="bottom"/>
 		</tr>
-		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appSource}" value="${asset.appSource}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
-			<td class="valueNW ${standardFieldSpecs.appOwner.imp}">
-				<span class="clickableText" (click)="launchManageStaff(${asset.appOwner?.id})">
+		<tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.criticality}" value="${asset.criticality}" />
+		<tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.useFrequency}" value="${asset.useFrequency}" />
+		<tds:clrRowDetail style="order: 65" field="${standardFieldSpecs.appSource}" value="${asset.appSource}" />
+		<tr style="order: 70">
+			<tds:clrInputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
+			<td>
+				<a (click)="launchManageStaff(${asset.appOwner?.id})">
 					<tds:nameAndCompany client="${client}" person="${asset.appOwner}" />
-				</span>
+                </a>
 			</td>
-			<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-				<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-					${standardFieldSpecs.moveBundle.label} : Dep. Group
-				</label>
-			</td>
-			<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
+		</tr>
+		<tr style="order: 75">
+			<th class="${standardFieldSpecs.moveBundle.imp?:''}">
+				${standardFieldSpecs.moveBundle.label} : Dep. Group
+			</th>
+			<td>
 				${asset?.moveBundle}
+				<g:if test="${dependencyBundleNumber}">:</g:if>
 				<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}" tooltipDataPlacement="bottom"/>
 		</tr>
-		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.license}" value="${asset.license}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.businessUnit}" value="${asset.businessUnit}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${asset.drRtoDesc}" tooltipDataPlacement="bottom"/>
+		<tds:clrRowDetail style="order: 80" field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}" />
+		<tds:clrRowDetail style="order: 85" field="${standardFieldSpecs.license}" value="${asset.license}" />
+		<tds:clrRowDetail style="order: 90" field="${standardFieldSpecs.businessUnit}" value="${asset.businessUnit}" />
+		<tds:clrRowDetail style="order: 95" field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
+		<tds:clrRowDetail style="order: 100" field="${standardFieldSpecs.drRtoDesc}" value="${asset.drRtoDesc}" />
+		<tr style="order: 105">
+			<tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
+			<td>{{ '${asset?.retireDate}' | tdsDate: userDateFormat }}</td>
 		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}" />
-			<td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
-                {{ '${asset?.retireDate}' | tdsDate: userDateFormat }}
-            </td>
-
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc == '?' ? '' : asset.testProc}" tooltipDataPlacement="bottom"/>
+		<tds:clrRowDetail style="order: 110" field="${standardFieldSpecs.validation}" value="${asset.validation}" />
+		<tds:clrRowDetail style="order: 115" field="${standardFieldSpecs.testProc}" value="${asset.testProc}" />
+		<tr style="order: 120">
+			<tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
+			<td>
+				{{ '${asset?.maintExpDate}' | tdsDate: userDateFormat }}
+			</td>
 		</tr>
-		<tr>
-			<td></td>
-			<td></td>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}" />
-			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
-                {{ '${asset?.maintExpDate}' | tdsDate: userDateFormat }}
-            </td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency == '?' ? '' : asset.latency}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc == '?' ? '' : asset.startupProc}" tooltipDataPlacement="bottom"/>
+		<tr style="order: 125">
+			<tds:clrInputLabel field="${standardFieldSpecs.latency}" value="${asset.latency}"/>
+			<td>${asset.latency == '?' ? '' : asset.latency}</td>
 		</tr>
-		<tr>
-			<tds:inputLabel field="${standardFieldSpecs.url}" value="${asset.url}" />
-			<td class="valueNW ${standardFieldSpecs.url.imp}" ><tds:textAsLink  text="${asset.url}" target="_new"/></td>
-
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
-			<td class="valueNW ${standardFieldSpecs.shutdownBy.imp}" nowrap="nowrap">
-			<g:if test="${shutdownById == -1}">
-				${shutdownBy}
-			</g:if>
-			<g:else>
-				<span class="clickableText" (click)="launchManageStaff(${shutdownById})">
+		<tr style="order: 130">
+			<tds:clrInputLabel field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}"/>
+			<td>${asset.startupProc == '?' ? '' : asset.startupProc}</td>
+		</tr>
+		<tr style="order: 135">
+			<tds:clrInputLabel field="${standardFieldSpecs.url}" value="${asset.url}"/>
+			<td><tds:textAsLink  text="${asset.url}" target="_new"/></td>
+		</tr>
+		<tds:clrRowDetail style="order: 140" field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+		<tr style="order: 145">
+			<tds:clrInputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
+			<td nowrap="nowrap">
+				<g:if test="${shutdownById == -1}">
 					${shutdownBy}
-				</span>
-			</g:else>
-			<g:if test="${asset.shutdownFixed ==1 }">
-				<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed" checked="checked"/>
-				<label for="shutdownFixedId" >Fixed</label>
-			</g:if>
+				</g:if>
+				<g:else>
+					<a (click)="launchManageStaff(${shutdownById})">
+						${shutdownBy}
+					</a>
+				</g:else>
+				<g:if test="${asset.shutdownFixed ==1 }">
+					<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed" checked="checked"/>
+					<label for="shutdownFixedId" >Fixed</label>
+				</g:if>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}" tooltipDataPlacement="bottom"/>
 		</tr>
-		<tr>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
-			<td class="valueNW ${standardFieldSpecs.startupBy.imp}" nowrap="nowrap" >
-			<g:if test="${startupById == -1}">
-				${startupBy}
-			</g:if>
-			<g:else>
-				<span class="clickableText" (click)="launchManageStaff(${startupById})">
+		<tds:clrRowDetail style="order: 150" field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}" />
+		<tr style="order: 155">
+			<tds:clrInputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
+			<td>
+				<g:if test="${startupById == -1}">
 					${startupBy}
-				</span>
-			</g:else>
-			<g:if test="${asset.startupFixed ==1 }">
-				<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${asset.startupFixed}" checked="checked"/>
-				<label for="startupFixedId" >Fixed</label>
-			</g:if>
+				</g:if>
+				<g:else>
+					<a (click)="launchManageStaff(${startupById})">
+						${startupBy}
+					</a>
+				</g:else>
+				<g:if test="${asset.startupFixed ==1 }">
+					<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${asset.startupFixed}" checked="checked"/>
+					<label for="startupFixedId" >Fixed</label>
+				</g:if>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
-			<td class="valueNW ${standardFieldSpecs.testingBy.imp}" nowrap="nowrap">
-			<g:if test="${testingById == -1}">
-				${testingBy}
-			</g:if>
-			<g:else>
-				<span class="clickableText" (click)="launchManageStaff(${testingById})">
-					${testingBy}
-				</span>
-			</g:else>
-			<g:if test="${asset.testingFixed ==1 }">
-				<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
-				<label for="testingFixedId" >Fixed</label>
-			</g:if>
-			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}" tooltipDataPlacement="bottom"/>
 		</tr>
+		<tds:clrRowDetail style="order: 160" field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" />
+		<tr style="order: 165">
+			<tds:clrInputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
+			<td>
+				<g:if test="${testingById == -1}">
+					${testingBy}
+				</g:if>
+				<g:else>
+					<a (click)="launchManageStaff(${testingById})">
+						${testingBy}
+					</a>
+				</g:else>
+				<g:if test="${asset.testingFixed ==1 }">
+					<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
+					<label for="testingFixedId" >Fixed</label>
+				</g:if>
+			</td>
+		</tr>
+		<tds:clrRowDetail style="order: 170" field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}" />
 		<g:render template="/angular/common/customShow" model="[asset:asset,customs:customs]"></g:render>
-        <g:render template="/angular/common/assetTags"></g:render>
 	</tbody>
 </table>
 
-
+	
 

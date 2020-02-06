@@ -18,6 +18,8 @@ import {SetEvent} from '../../action/event.actions';
 export class EventViewEditComponent implements OnInit {
 	public eventModel: EventModel = null;
 	public savedModel: EventModel = null;
+	public showSwitch = false;
+	public showClearButton = false;
 	public availableBundles: any[] = [];
 	public runbookStatuses: string[] = [];
 	public availableTags: any[] = [];
@@ -25,10 +27,10 @@ export class EventViewEditComponent implements OnInit {
 	public eventId;
 	public editing = false;
 	protected userTimeZone: string;
-	protected userDateFormat: string;
+	protected userDateTimeFormat: string;
 	private requiredFields = ['name'];
-	@ViewChild('startTimePicker') startTimePicker;
-	@ViewChild('completionTimePicker') completionTimePicker;
+	@ViewChild('startTimePicker', {static: false}) startTimePicker;
+	@ViewChild('completionTimePicker', {static: false}) completionTimePicker;
 	constructor(
 		private eventsService: EventsService,
 		private permissionService: PermissionService,
@@ -58,7 +60,7 @@ export class EventViewEditComponent implements OnInit {
 			apiActionBypass: false
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
-		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
+		this.userDateTimeFormat = this.preferenceService.getUserDateTimeFormat();
 		this.eventModel = Object.assign({}, defaultEvent, this.eventModel);
 		this.getModel(this.eventId);
 	}
@@ -143,6 +145,10 @@ export class EventViewEditComponent implements OnInit {
 
 	public onAssetTagChange(event) {
 		this.eventModel.tagIds = event.tags;
+	}
+
+	public clearButtonBundleChange(event) {
+		this.showClearButton =  event && event.length > 1;
 	}
 
 	public saveForm() {

@@ -1,8 +1,8 @@
 package apidoc.net.tranistionmanager.aip.v1_0
 
 import geb.spock.GebSpec
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
 import groovy.json.JsonSlurper
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder

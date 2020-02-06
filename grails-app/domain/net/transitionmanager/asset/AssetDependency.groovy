@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.person.Person
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.FUTURE
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
@@ -58,6 +59,8 @@ class AssetDependency {
 
 	static mapping = {
 		autoTimestamp false
+		asset fetch: 'join', lazy: false
+		dependent fetch: 'join', lazy: false
 		comment sqltype: 'text'
 		createdBy column: 'created_by'
 		id column: 'asset_dependency_id'
@@ -86,16 +89,22 @@ class AssetDependency {
 	/** Helper Fetchers ************************/
 	static List<AssetDependency> fetchSupportedDependenciesOf(AssetEntity assetEntity){
 		return AssetDependency.findAll(
-			'from AssetDependency where dependent=? order by asset.assetType, asset.assetName asc',
+			'from AssetDependency where dependent=?0 order by asset.assetType, asset.assetName asc',
 			[assetEntity]
-		)
+		).collect{
+			it.asset = GrailsHibernateUtil.unwrapIfProxy(it.asset)
+			it
+		}
 	}
 
 	static List<AssetDependency> fetchRequiredDependenciesOf(AssetEntity assetEntity){
 		return AssetDependency.findAll(
-			'from AssetDependency where asset=? order by dependent.assetType, dependent.assetName asc',
+			'from AssetDependency where asset=?0 order by dependent.assetType, dependent.assetName asc',
 			[assetEntity]
-		)
+		).collect{
+			it.asset = GrailsHibernateUtil.unwrapIfProxy(it.asset)
+			it
+		}
 	}
 
 	/**
@@ -107,7 +116,7 @@ class AssetDependency {
 			id: id,
 			asset: [
 				id: asset.id,
-				assetClass: AssetClass.getClassOptionValueForAsset(asset),
+				assetClass: AssetClass.getClassOptionValueForAsset(GrailsHibernateUtil.unwrapIfProxy(asset)),
 				moveBundle: asset.moveBundleName,
 				name: asset.assetName
 			],
@@ -120,7 +129,7 @@ class AssetDependency {
 			dataFlowFreq: dataFlowFreq,
 			dependent: [
 				id: dependent.id,
-				assetClass: AssetClass.getClassOptionValueForAsset(dependent),
+				assetClass: AssetClass.getClassOptionValueForAsset(GrailsHibernateUtil.unwrapIfProxy(dependent)),
 				moveBundle: dependent.moveBundleName,
 				name: dependent.assetName
 			],

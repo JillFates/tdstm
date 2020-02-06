@@ -66,7 +66,7 @@ class ModelService implements ServiceMethods {
 				WHERE assetToPort IN (FROM ModelConnector
 				                      WHERE model=:fromModel)''',
 				[status: AssetCableStatus.UNKNOWN, fromModel: fromModel])
-		ModelConnector.executeUpdate('DELETE ModelConnector WHERE model=?', [fromModel])
+		ModelConnector.executeUpdate('DELETE ModelConnector WHERE model=?0', [fromModel])
 
 		GormUtil.copyUnsetValues(toModel, fromModel, notToUpdate)
 		save toModel
@@ -75,7 +75,7 @@ class ModelService implements ServiceMethods {
 		def toModelAlias = ModelAlias.findAllByModel(toModel).name
 		if (!toModelAlias.contains(fromModel.modelName)){
 			def fromModelAlias = ModelAlias.findAllByModel(fromModel)
-			ModelAlias.executeUpdate('DELETE ModelAlias WHERE model=?', [fromModel])
+			ModelAlias.executeUpdate('DELETE ModelAlias WHERE model=?0', [fromModel])
 
 			// Delete model record
 			fromModel.delete(flush: true)

@@ -5,42 +5,74 @@
  * however a implemented service will be in charge of passing the emitter to this directive
  */
 
-import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
-import {NotifierService} from '../services/notifier.service';
-import {AlertType, AlertModel} from '../model/alert.model';
-import {KEYSTROKE} from '../model/constants';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { NotifierService } from '../services/notifier.service';
+import { AlertType, AlertModel } from '../model/alert.model';
+import { KEYSTROKE } from '../model/constants';
 
 @Component({
 	selector: 'tds-ui-toast',
 	template: `
-        <div class="message-wrapper">
-            <div class="message-wrapper-container" *ngIf="showsPopUp && !disabledPopUp">
-                <div class="alert alert-danger alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.DANGER">
-                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-                    <h5><i class="icon fa fa-ban"></i>{{alertModel.message}}</h5>
-                </div>
-                <div class="alert alert-warning alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.WARNING">
-                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-                    <h5><i class="icon fa fa-warning"></i>{{alertModel.message}}</h5>
-                </div>
-                <div class="alert alert-success alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.SUCCESS">
-                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-                    <h5><i class="icon fa fa-check"></i>{{alertModel.message}}</h5>
-                </div>
-                <div class="alert alert-info alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.INFO">
-                    <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-                    <h5><i class="icon fa fa-info"></i>{{alertModel.message}}</h5>
-                </div>
-            </div>
-        </div>
-	`
+		<div class="message-wrapper">
+			<div
+				class="message-wrapper-container"
+				*ngIf="showsPopUp && !disabledPopUp"
+			>
+				<div
+					class="alert alert-dismissable fadeIn"
+					[ngClass]="{
+						'alert-danger':
+							alertModel.alertType === alertType.DANGER,
+						'alert-warning':
+							alertModel.alertType === alertType.WARNING,
+						'alert-success':
+							alertModel.alertType === alertType.SUCCESS,
+						'alert-info': alertModel.alertType === alertType.INFO
+					}"
+					[ngSwitch]="alertModel.alertType"
+				>
+					<i *ngSwitchCase="alertType.DANGER" class="icon fa fa-ban">
+					</i>
+
+					<i
+						*ngSwitchCase="alertType.WARNING"
+						class="icon fa fa-warning"
+					>
+					</i>
+
+					<i
+						*ngSwitchCase="alertType.SUCCESS"
+						class="icon fa fa-check"
+					>
+					</i>
+
+					<i *ngSwitchCase="alertType.INFO" class="icon fa fa-info">
+					</i>
+
+					<span *ngSwitchDefault></span>
+
+					<h5>
+						{{ alertModel.message }}
+					</h5>
+					<button
+						#closePopUpDialog
+						type="button"
+						class="close"
+						(click)="onCloseDialog()"
+						aria-hidden="true"
+					>
+						<clr-icon shape="times"></clr-icon>
+					</button>
+				</div>
+			</div>
+		</div>
+	`,
 })
-
 export class UIToastDirective {
-
-	@ViewChild('closePopUpDialog') closePopUpDialog: ElementRef;
-	private alertModel = AlertModel;
-	private alertType = AlertType;
+	@ViewChild('closePopUpDialog', { static: false })
+	closePopUpDialog: ElementRef;
+	protected alertModel = AlertModel;
+	protected alertType = AlertType;
 
 	public showsPopUp = false;
 	public disabledPopUp = false;
@@ -70,19 +102,19 @@ export class UIToastDirective {
 		this.notifierService.on('alertTypeDisable', (event: any) => {
 			this.disabledPopUp = event.disable;
 		});
-		this.notifierService.on(AlertType.DANGER, (event) => {
+		this.notifierService.on(AlertType.DANGER, event => {
 			this.showPopUp(AlertType.DANGER, event.message);
 		});
-		this.notifierService.on(AlertType.DANGER, (event) => {
+		this.notifierService.on(AlertType.DANGER, event => {
 			this.showPopUp(AlertType.DANGER, event.message);
 		});
-		this.notifierService.on(AlertType.WARNING, (event) => {
+		this.notifierService.on(AlertType.WARNING, event => {
 			this.showPopUp(AlertType.WARNING, event.message);
 		});
-		this.notifierService.on(AlertType.SUCCESS, (event) => {
+		this.notifierService.on(AlertType.SUCCESS, event => {
 			this.showPopUp(AlertType.SUCCESS, event.message);
 		});
-		this.notifierService.on(AlertType.INFO, (event) => {
+		this.notifierService.on(AlertType.INFO, event => {
 			this.showPopUp(AlertType.INFO, event.message);
 		});
 	}
@@ -104,10 +136,11 @@ export class UIToastDirective {
 	 * Detect if the use has pressed the on Escape to close the popup.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(
+		event: KeyboardEvent
+	) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.hidePopUp();
 		}
 	}
-
 }

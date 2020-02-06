@@ -2,6 +2,18 @@ import { INTERVAL } from '../../../shared/model/constants';
 import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
 import {AgentMethodModel} from './agent.model';
 
+export enum EventReactions {
+	Status,
+	Success,
+	Default ,
+	Error   ,
+	Failed,
+	Lapsed  ,
+	Stalled,
+	BeforeInvocation,
+	PostInvocation,
+};
+
 export class APIActionColumnModel {
 	columns: any[];
 
@@ -19,51 +31,61 @@ export class APIActionColumnModel {
 				property: 'name',
 				type: 'text',
 				width: 186,
-				locked: true
+				locked: true,
+				filterable: true,
+				isActionable: true,
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
 				type: 'text',
+				filterable: true,
 				width: 180
 			}, {
 				label: 'Description',
 				property: 'description',
 				type: 'text',
+				filterable: true,
 				width: 300
 			},
 			{
 				label: 'Type',
 				property: 'actionType',
 				type: 'text',
+				filterable: true,
 				width: 125
 			},
 			{
 				label: 'Method',
 				property: 'dictionaryMethodName',
 				type: 'text',
+				filterable: true,
 				width: 125
 			}, {
 				label: 'Data',
 				property: 'producesData',
 				type: 'boolean',
-				width: 90
+				filterable: true,
+				width: 100
 			}, {
 				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
 				type: 'text',
+				filterable: true,
 				width: 180
 			}, {
 				label: 'Created',
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 160
+				filterable: true,
+				width: 150
 			}, {
 				label: 'Last Updated',
 				property: 'lastUpdated',
 				type: 'date',
 				format: dateFormat,
-				width: 160
+				filterable: true,
+				width: 150
 			}
 		];
 	}
@@ -78,8 +100,7 @@ export class APIActionParameterColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 64,
-				locked: true
+				width: 64
 			},
 			{
 				label: 'custom',

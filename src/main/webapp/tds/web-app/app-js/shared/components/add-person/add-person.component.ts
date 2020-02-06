@@ -12,12 +12,12 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 	template: `
         <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in add-person-component" id="add-person-component" data-backdrop="static" tabindex="0" role="dialog">
             <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content" tds-ui-modal-decorator=""
+                <div class="tds-modal-content" tds-ui-modal-decorator=""
                      [options]="modalOptions">
                     <div class="modal-header">
-                        <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+						<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
+							<clr-icon aria-hidden="true" shape="close"></clr-icon>
+						</button>
                         <h4 class="modal-title">Person Create</h4>
                     </div>
                     <div class="modal-body">
@@ -127,18 +127,10 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
                             </form>
                         </div>
                     </div>
-                    <div class="modal-footer form-group-center">
-                        <button type="button"
-                                [disabled]="!canSave()"
-                                class="btn btn-primary pull-left component-action-save" (click)="save()"><span
-                                class="fa fa-fw fa-floppy-o"></span> Save
-                        </button>
-                        <button type="button"
-                                class="btn btn-default pull-right component-action-cancel" (click)="cancelCloseDialog()">
-                            <span class="glyphicon glyphicon-ban-circle"></span>
-                            <span>Cancel</span>
-                        </button>
-                    </div>
+					<div class="modal-footer form-group-center">
+						<tds-button theme="primary" (click)="save()" icon="floppy" title="Save" [disabled]="!canSave()">Save</tds-button>
+						<tds-button (click)="cancelCloseDialog($event)" icon="ban" title="Cancel">Cancel</tds-button>
+					</div>
                 </div>
             </div>
         </div>

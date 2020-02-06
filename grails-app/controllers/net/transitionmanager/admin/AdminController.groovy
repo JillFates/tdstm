@@ -1,7 +1,5 @@
 package net.transitionmanager.admin
 
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetOptions
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.os.Shell
 import com.tdsops.common.security.AESCodec
@@ -10,49 +8,46 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.controller.ServiceResults
-import net.transitionmanager.model.Model
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventSnapshot
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
-import net.transitionmanager.imports.AccountImportExportService
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.AssetOptionsService
-import net.transitionmanager.security.AuditService
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CoreService
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.imports.AccountImportExportService
+import net.transitionmanager.model.Model
 import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.MoveEventSnapshot
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.UserLogin
 import org.springframework.jdbc.core.JdbcTemplate
-
-import java.lang.management.ManagementFactory
-import java.lang.management.MemoryMXBean
-import java.lang.management.MemoryUsage
-import java.lang.management.OperatingSystemMXBean
-import java.lang.management.RuntimeMXBean
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class AdminController implements ControllerMethods {
 
 	AccountImportExportService accountImportExportService
-	AuditService auditService
-	ControllerService controllerService
-	CoreService coreService
-	JdbcTemplate jdbcTemplate
-	PartyRelationshipService partyRelationshipService
-	ProjectService projectService
-	UserService userService
-	AssetOptionsService assetOptionsService
-	MoveEventService moveEventService
+	AuditService               auditService
+	ControllerService          controllerService
+	CoreService                coreService
+	JdbcTemplate               jdbcTemplate
+	PartyRelationshipService   partyRelationshipService
+	ProjectService             projectService
+	UserService                userService
+	AssetOptionsService        assetOptionsService
+	MoveEventService           moveEventService
+	SystemInfoService          systemInfoService
 
 	static final String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
 
@@ -1375,71 +1370,7 @@ class AdminController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def systemInfo() {
-		Project project = controllerService.getProjectForPage(this)
-		if (!project) {
-			return
-		}
-
-		InetAddress addr = InetAddress.getLocalHost();
-		String fqdn = addr.getCanonicalHostName()
-
-		int MegaBytes = 1024
-
-		Runtime rt = Runtime.getRuntime()
-		long freeMemory = rt.freeMemory() / MegaBytes
-		long totalMemory = rt.totalMemory() / MegaBytes
-		long maxMemory = rt.maxMemory() / MegaBytes
-		long usedMemory = totalMemory - freeMemory
-
-		MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean()
-		MemoryUsage memNonHeap = memoryMXBean.getNonHeapMemoryUsage()
-		MemoryUsage memHeap = memoryMXBean.getHeapMemoryUsage()
-
-		OperatingSystemMXBean osMxBean = ManagementFactory.getOperatingSystemMXBean()
-		RuntimeMXBean rtMXBean = ManagementFactory.getRuntimeMXBean()
-
-		long heapUsed = memHeap.getUsed() / MegaBytes
-		long heapCommitted = memHeap.getCommitted() / MegaBytes
-		long heapMax = memHeap.getMax() / MegaBytes
-
-		long nonHeapUsed = memNonHeap.getUsed() / MegaBytes
-		long nonHeapCommitted = memNonHeap.getCommitted() / MegaBytes
-		long nonHeapMax = memNonHeap.getMax() / MegaBytes
-
-		long sysMemSize = osMxBean.getTotalPhysicalMemorySize() / MegaBytes
-		long sysMemFree = osMxBean.getFreePhysicalMemorySize() / MegaBytes
-		long swapSize = osMxBean.getTotalSwapSpaceSize() / MegaBytes
-		long swapFree = osMxBean.getFreeSwapSpaceSize() / MegaBytes
-		long virtMemCommit = osMxBean.getCommittedVirtualMemorySize() / MegaBytes
-
-		Map sysProps = rtMXBean.getSystemProperties()
-
-			[
-			fqdn      		 : fqdn,
-			freeMemory       : freeMemory,
-			 totalMemory     : totalMemory,
-			 maxMemory       : maxMemory,
-			 usedMemory      : usedMemory,
-			 memoryMXBean    : memoryMXBean,
-			 memNonHeap      : memNonHeap,
-			 memHeap         : memHeap,
-			 osMxBean        : osMxBean,
-			 rtMXBean        : rtMXBean,
-			 heapUsed        : heapUsed,
-			 heapCommitted   : heapCommitted,
-			 heapMax         : heapMax,
-			 nonHeapUsed     : nonHeapUsed,
-			 nonHeapCommitted: nonHeapCommitted,
-			 nonHeapMax      : nonHeapMax,
-			 sysMemSize      : sysMemSize,
-			 sysMemFree      : sysMemFree,
-			 swapSize        : swapSize,
-			 swapFree        : swapFree,
-			 virtMemCommit   : virtMemCommit,
-			 sysProps        : sysProps,
-			 osMxBean        : osMxBean,
-			 rt              : rt,
-			 groovyVersion   : GroovySystem.getVersion()]
+		systemInfoService.getInfo()
 	}
 
 	/**

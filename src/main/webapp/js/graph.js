@@ -303,10 +303,12 @@ var GraphUtil = (function ($) {
 	// changes the graph to fullscreen mode
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
+		$('#dependecyDivIdDesc').css('display', 'none');
+		$('#dependencyTableWrapperId').css('margin-top', '0');
 		if ($('#fullscreenButtonId').hasClass('showMenu'))
-			$('#fullscreenButtonId').children('h4').html('Show Menu');
+			$('#fullscreenButtonId').html('Show Menu');
 		else
-			$('#fullscreenButtonId').children('h4').html('Normal View');
+			$('#fullscreenButtonId').html('Normal View');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -314,7 +316,9 @@ var GraphUtil = (function ($) {
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
-		$('#fullscreenButtonId').children('h4').html('Full Screen');
+		$('#dependecyDivIdDesc').css('display', 'block');
+		$('#dependencyTableWrapperId').css('margin-top', '10px');
+		$('#fullscreenButtonId').html('Full Screen');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -368,11 +372,11 @@ var GraphUtil = (function ($) {
 		if($('#dependenciesPanelId').size() == 0)
 			return
 		if($('#dependenciesPanelId').has_scrollbar()) {
-			$('.dependency_panel_action_buttons').css('position', 'absolute');
-			$('.dependency_panel_action_buttons').css('bottom', '0');
+			// $('.dependency_panel_action_buttons').css('position', 'absolute');
+			// $('.dependency_panel_action_buttons').css('bottom', '0');
 		} else {
-			$('.dependency_panel_action_buttons').css('position', '');
-			$('.dependency_panel_action_buttons').css('bottom', '5px');
+			// $('.dependency_panel_action_buttons').css('position', '');
+			// $('.dependency_panel_action_buttons').css('bottom', '5px');
 		}
 	};
 
@@ -948,10 +952,13 @@ var GraphUtil = (function ($) {
 
 	// Used by the defaults button to reset all control values to their default state
 	public.resetToDefaults = function (preferenceName) {
+		let defaults;
 		// resets the force layout parameters
 		$('table.labelTree input[type="text"]').each(function() {
-			if (defaults[$(this).attr('name')])
-				$(this).val( defaults[$(this).attr('name')] )
+			if(defaults){
+				if (defaults[$(this).attr('name')])
+					$(this).val( defaults[$(this).attr('name')] )
+			}
 		});
 
 		// resets the user's graph preferences to the defaults

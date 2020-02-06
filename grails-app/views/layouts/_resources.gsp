@@ -17,9 +17,10 @@
 <g:if test="${isLicenseManagerEnabled}">
     <link rel="stylesheet" href="${resource(dir: 'tds/web-app/css', file: 'managerStyle.css')}">
 </g:if>
-<!-- Blue Skin -->
-<link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
 
+<%-- <!-- Blue Skin -->
+<link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
+ --%>
 <!-- jQuery -->
 <!-- LEGACY AND SUPPORT LEGACY CODE START -->
 <%-- What is this for?  --%>
@@ -38,5 +39,10 @@
 
 <!-- Boosttrap -->
 <script src="${resource(dir: 'dist/js/vendors/bootstrap/dist/js', file: 'bootstrap.min.js')}"></script>
+
+<!-- Clarity -->
+<script src="${resource(dir: 'tds/web-app/assets/modules/clarity/js', file: 'clr-icons.min.js')}"></script>
+<script src="${resource(dir: 'tds/web-app/assets/modules/webcomponents/js', file: 'custom-elements.min.js')}"></script>
+
 <!-- TDSTMLayout App -->
 <script src="${resource(dir: 'dist/js', file: 'TDSTMLayout.min.js')}"></script>

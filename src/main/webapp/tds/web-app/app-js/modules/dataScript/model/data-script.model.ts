@@ -13,35 +13,42 @@ export class DataScriptColumnModel {
 				locked: true
 			}, {
 				label: 'Name',
+				filterable: true,
 				property: 'name',
 				type: 'text',
-				locked: true
+				locked: true,
+				width: 230
 			}, {
 				label: 'Provider',
+				filterable: true,
 				property: 'provider.name',
 				type: 'text',
 				width: 220
 			}, {
 				label: 'Description',
+				filterable: true,
 				property: 'description',
 				type: 'text'
 			}, {
 				label: 'Mode',
+				filterable: true,
 				property: 'modeFormat',
 				type: 'text',
-				width: 200
+				width: 120
 			}, {
 				label: 'Date Create',
+				filterable: true,
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 160
 			}, {
 				label: 'Last Modified',
+				filterable: true,
 				property: 'lastUpdated',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 160
 			}
 		];
 	}

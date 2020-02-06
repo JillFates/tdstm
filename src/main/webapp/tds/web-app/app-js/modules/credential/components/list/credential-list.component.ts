@@ -1,54 +1,81 @@
 // Angular
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 // Services
-import {CredentialService} from '../../service/credential.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
+import { CredentialService } from '../../service/credential.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { UserContextService } from '../../../auth/service/user-context.service';
+import { DateUtils } from '../../../../shared/utils/date.utils';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 // Components
-import {CredentialViewEditComponent} from '../view-edit/credential-view-edit.component';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import { CredentialViewEditComponent } from '../view-edit/credential-view-edit.component';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 // Models
-import {Permission} from '../../../../shared/model/permission.model';
-import {CredentialColumnModel, CredentialModel} from '../../model/credential.model';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {DIALOG_SIZE} from '../../../../shared/model/constants';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import { Permission } from '../../../../shared/model/permission.model';
+import {
+	CredentialColumnModel,
+	CredentialModel,
+} from '../../model/credential.model';
+import { UserContextModel } from '../../../auth/model/user-context.model';
+import { DIALOG_SIZE } from '../../../../shared/model/constants';
+import {
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	GRID_DEFAULT_PAGE_SIZE,
+} from '../../../../shared/model/constants';
 import {
 	COLUMN_MIN_WIDTH,
 	ActionType,
 	BooleanFilterData,
-	DefaultBooleanFilterData
+	DefaultBooleanFilterData,
 } from '../../../../shared/model/data-list-grid.model';
 // Kendo
-import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-import {ReplaySubject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
-import {COMMON_SHRUNK_COLUMNS_WIDTH, COMMON_SHRUNK_COLUMNS} from '../../../../shared/constants/common-shrunk-columns';
+import {
+	process,
+	CompositeFilterDescriptor,
+	State,
+} from '@progress/kendo-data-query';
+import { CellClickEvent, GridDataResult } from '@progress/kendo-angular-grid';
+import { ReplaySubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import {
+	COMMON_SHRUNK_COLUMNS_WIDTH,
+	COMMON_SHRUNK_COLUMNS,
+} from '../../../../shared/constants/common-shrunk-columns';
+import {HeaderActionButtonData} from 'tds-component-library';
 
 @Component({
 	selector: 'credential-list',
 	templateUrl: 'credential-list.component.html',
-	styles: [`
-		#btnCreate { margin-left: 16px; }
-		.action-header { width:100%; text-align:center; }
-	`]
+	styles: [
+		`
+			#btnCreate {
+				margin-left: 16px;
+			}
+			.action-header {
+				width: 100%;
+				text-align: center;
+			}
+		`,
+	],
 })
 export class CredentialListComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected gridColumns: any[];
 
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
+	protected state: State = {
+		sort: [
+			{
+				dir: 'asc',
+				field: 'name',
+			},
+		],
 		filter: {
 			filters: [],
-			logic: 'and'
-		}
+			logic: 'and',
+		},
 	};
 	public skip = 0;
 	public pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -66,6 +93,8 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -73,7 +102,13 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private credentialService: CredentialService,
 		private prompt: UIPromptService,
-		private userContext: UserContextService) {
+		private userContext: UserContextService,
+		private translateService: TranslatePipe
+	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['credentials'];
@@ -81,12 +116,31 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		this.userContext.getUserContext()
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreate.bind(this),
+			},
+		];
+
+		this.userContext
+			.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
-				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
-				this.credentialColumnModel = new CredentialColumnModel(`{0:${this.dateFormat}}`);
-				this.gridColumns = this.credentialColumnModel.columns.filter((column) => column.type !== 'action');
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(
+					userContext.dateFormat
+				);
+				this.credentialColumnModel = new CredentialColumnModel(
+					`{0:${this.dateFormat}}`
+				);
+				this.gridColumns = this.credentialColumnModel.columns.filter(
+					column => column.type !== 'action'
+				);
 			});
 	}
 
@@ -125,11 +179,19 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	 */
 	protected onEdit(dataItem: any): void {
 		let credential: CredentialModel = dataItem;
-		this.credentialService.getCredential(credential.id)
+		this.credentialService
+			.getCredential(credential.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe( (response: CredentialModel) => {
-			this.openCredentialDialogViewEdit(response, ActionType.EDIT, credential);
-		}, err => console.log(err));
+			.subscribe(
+				(response: CredentialModel) => {
+					this.openCredentialDialogViewEdit(
+						response,
+						ActionType.EDIT,
+						credential
+					);
+				},
+				err => console.log(err)
+			);
 	}
 
 	/**
@@ -137,16 +199,24 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'Confirm deletion of ' + dataItem.name + ' credential?', 'Yes', 'No')
-			.then((res) => {
+		this.prompt
+			.open(
+				'Confirmation Required',
+				'Confirm deletion of ' + dataItem.name + ' credential?',
+				'Yes',
+				'No'
+			)
+			.then(res => {
 				if (res) {
-					this.credentialService.deleteCredential(dataItem.id)
+					this.credentialService
+						.deleteCredential(dataItem.id)
 						.pipe(takeUntil(this.unsubscribeOnDestroy$))
 						.subscribe(
-						(result) => {
-							this.reloadData();
-						},
-						(err) => console.log(err));
+							result => {
+								this.reloadData();
+							},
+							err => console.log(err)
+						);
 				}
 			});
 	}
@@ -157,41 +227,67 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
-			let credential: CredentialModel = event['dataItem'] as CredentialModel;
+			let credential: CredentialModel = event[
+				'dataItem'
+			] as CredentialModel;
 			this.selectRow(credential.id);
-			this.credentialService.getCredential(credential.id)
+			this.credentialService
+				.getCredential(credential.id)
 				.pipe(takeUntil(this.unsubscribeOnDestroy$))
-				.subscribe( (response: CredentialModel) => {
-				this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
-			}, err => console.log(err));
+				.subscribe(
+					(response: CredentialModel) => {
+						this.openCredentialDialogViewEdit(
+							response,
+							ActionType.VIEW,
+							credential
+						);
+					},
+					err => console.log(err)
+				);
 		}
 	}
 
 	protected reloadData(): void {
-		this.credentialService.getCredentials()
+		this.credentialService
+			.getCredentials()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => {
-					if (this.lastCreatedRecordId && this.lastCreatedRecordId !== 0) {
-						this.selectRow(this.lastCreatedRecordId);
-						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedRecordId);
-						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW, lastCredentialModel);
-						this.lastCreatedRecordId = 0;
-					}
-				}, 500);
-			},
-			(err) => console.log(err));
+				result => {
+					this.resultSet = result;
+					this.gridData = process(this.resultSet, this.state);
+					setTimeout(() => {
+						if (
+							this.lastCreatedRecordId &&
+							this.lastCreatedRecordId !== 0
+						) {
+							this.selectRow(this.lastCreatedRecordId);
+							let lastCredentialModel = this.gridData.data.find(
+								dataItem =>
+									dataItem.id === this.lastCreatedRecordId
+							);
+							this.openCredentialDialogViewEdit(
+								lastCredentialModel,
+								ActionType.VIEW,
+								lastCredentialModel
+							);
+							this.lastCreatedRecordId = 0;
+						}
+					}, 500);
+				},
+				err => console.log(err)
+			);
 	}
 
 	private reloadItem(originalModel: CredentialModel): void {
-		this.credentialService.getCredential(originalModel.id)
+		this.credentialService
+			.getCredential(originalModel.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe( (response: CredentialModel) => {
-			Object.assign(originalModel, response);
-		}, err => console.log(err));
+			.subscribe(
+				(response: CredentialModel) => {
+					Object.assign(originalModel, response);
+				},
+				err => console.log(err)
+			);
 	}
 
 	/**
@@ -199,23 +295,35 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	 * @param {CredentialModel} credentialModel
 	 * @param {number} actionType
 	 */
-	private openCredentialDialogViewEdit(credentialModel: CredentialModel, actionType: number, originalModel?: CredentialModel): void {
-		this.dialogService.open(CredentialViewEditComponent, [
-			{ provide: CredentialModel, useValue: credentialModel },
-			{ provide: Number, useValue: actionType }
-		], DIALOG_SIZE.XLG, false).then( (result: CredentialModel) => {
-			if (result && result.id) {
-				if (actionType === ActionType.CREATE) {
-					this.lastCreatedRecordId = result.id;
-					this.reloadData();
-				} else {
-					this.reloadItem(originalModel);
+	private openCredentialDialogViewEdit(
+		credentialModel: CredentialModel,
+		actionType: number,
+		originalModel?: CredentialModel
+	): void {
+		this.dialogService
+			.open(
+				CredentialViewEditComponent,
+				[
+					{ provide: CredentialModel, useValue: credentialModel },
+					{ provide: Number, useValue: actionType },
+				],
+				DIALOG_SIZE.XLG,
+				false
+			)
+			.then((result: CredentialModel) => {
+				if (result && result.id) {
+					if (actionType === ActionType.CREATE) {
+						this.lastCreatedRecordId = result.id;
+						this.reloadData();
+					} else {
+						this.reloadItem(originalModel);
+					}
 				}
-			}
-		}).catch(result => {
-			this.reloadData();
-			console.log('Dismissed Dialog');
-		});
+			})
+			.catch(result => {
+				this.reloadData();
+				console.log('Dismissed Dialog');
+			});
 	}
 
 	private selectRow(dataItemId: number): void {
@@ -255,6 +363,27 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * Set on/off the filter icon indicator
+	 */
+	protected toggleFilter(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
+	protected filterCount(): number {
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
+	}
+
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
+	protected hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
+	}
+
+	/**
 	 * unsubscribe from all subscriptions on destroy hook.
 	 * @HostListener decorator ensures the OnDestroy hook is called on events like
 	 * Page refresh, Tab close, Browser close, navigation to another view.
@@ -263,5 +392,21 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.credentialColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
 	}
 }

@@ -1,6 +1,5 @@
 package com.tdsops
 
-
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLBaseSpec
@@ -12,26 +11,10 @@ import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
 import com.tdsops.etl.dataset.ETLDataset
-import grails.test.mixin.Mock
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.project.Project
 import spock.lang.See
 
-@Mock([AssetEntity, Application, Database])
 class ETLTagsSpec extends ETLBaseSpec {
-
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-		}
-	}
 
 	Project GMDEMO
 	Project TMDEMO
@@ -106,7 +89,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -164,7 +147,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -222,7 +205,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -280,7 +263,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -340,7 +323,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -399,7 +382,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -461,7 +444,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -524,7 +507,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -732,7 +715,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -784,7 +767,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 

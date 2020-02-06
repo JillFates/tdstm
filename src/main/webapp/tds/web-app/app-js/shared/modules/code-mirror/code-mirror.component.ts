@@ -1,14 +1,25 @@
-import {Component, ViewChild, ElementRef, Output, EventEmitter, Input, OnInit} from '@angular/core';
+import {
+	Component,
+	ViewChild,
+	ElementRef,
+	Output,
+	EventEmitter,
+	Input,
+	OnInit,
+} from '@angular/core';
 import * as CodeMirror from 'codemirror/lib/codemirror';
 
 @Component({
 	selector: 'code-mirror',
-	template: '<textarea  #codeMirror></textarea>',
-	exportAs: 'codeMirror'
+	template: '<textarea #codeMirror></textarea>',
+	exportAs: 'codeMirror',
 })
 export class CodeMirrorComponent implements OnInit {
-	@ViewChild('codeMirror') el: ElementRef;
-	@Output() change = new EventEmitter<{ newValue: string, oldValue: string }>();
+	@ViewChild('codeMirror', { static: true }) el: ElementRef;
+	@Output() change = new EventEmitter<{
+		newValue: string;
+		oldValue: string;
+	}>();
 	@Input() model: string;
 	@Input() mode;
 	@Output() modelChange = new EventEmitter<string>();
@@ -26,11 +37,14 @@ export class CodeMirrorComponent implements OnInit {
 	ngOnInit(): void {
 		this.instance = CodeMirror.fromTextArea(this.el.nativeElement, {
 			mode: this.mode,
-			lineNumbers: true
+			lineNumbers: true,
 		});
 		this.instance.setValue(this.model);
 		this.instance.on('change', () => {
-			this.change.emit({newValue: this.instance.getValue(), oldValue: this.model});
+			this.change.emit({
+				newValue: this.instance.getValue(),
+				oldValue: this.model,
+			});
 			this.modelChange.emit(this.instance.getValue());
 		});
 	}
@@ -55,7 +69,11 @@ export class CodeMirrorComponent implements OnInit {
 			this.currentErrorLines = [];
 		}
 		for (let line of lineNumbers) {
-			const lineHandle = this.instance.addLineClass(line, 'background', 'line-with-syntax-errors');
+			const lineHandle = this.instance.addLineClass(
+				line,
+				'background',
+				'line-with-syntax-errors'
+			);
 			this.currentErrorLines.push(lineHandle);
 		}
 	}
@@ -65,7 +83,11 @@ export class CodeMirrorComponent implements OnInit {
 	 */
 	public clearSyntaxErrors(): void {
 		for (let line of this.currentErrorLines) {
-			this.instance.removeLineClass(line, 'background', 'line-with-syntax-errors');
+			this.instance.removeLineClass(
+				line,
+				'background',
+				'line-with-syntax-errors'
+			);
 		}
 		this.currentErrorLines = [];
 	}

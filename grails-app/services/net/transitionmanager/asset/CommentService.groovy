@@ -904,4 +904,16 @@ class CommentService implements ServiceMethods {
 			}
 		}.list()
 	}
+
+	/**
+	 *
+	 *  Counts All tasks by an assetEntity.
+	 *
+	 *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.COMMENT
+	 *
+	 * @param assetEntity The asset to look up the count of tasks for.
+	 */
+	def countByAssetEntity(AssetEntity assetEntity) {
+		AssetComment.countByAssetEntityAndCommentType(assetEntity, AssetCommentType.COMMENT)
+	}
 }

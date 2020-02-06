@@ -1,49 +1,70 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 // Component
-import {RequestLicenseComponent} from '../request/request-license.component';
-import {CreatedLicenseComponent} from '../created-license/created-license.component';
-import {LicenseDetailComponent} from '../detail/license-detail.component';
+import { RequestLicenseComponent } from '../request/request-license.component';
+import { CreatedLicenseComponent } from '../created-license/created-license.component';
+import { LicenseDetailComponent } from '../detail/license-detail.component';
+import { HeaderActionButtonData } from 'tds-component-library';
 // Service
-import {LicenseAdminService} from '../../service/license-admin.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UserContextService} from '../../../auth/service/user-context.service';
+import { LicenseAdminService } from '../../service/license-admin.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { PreferenceService } from '../../../../shared/services/preference.service';
+import { UserContextService } from '../../../auth/service/user-context.service';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { Permission } from '../../../../shared/model/permission.model';
 // Model
-import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, DIALOG_SIZE} from '../../../../shared/model/constants';
+import {
+	COLUMN_MIN_WIDTH,
+	ActionType,
+} from '../../../dataScript/model/data-script.model';
+import {
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	GRID_DEFAULT_PAGE_SIZE,
+	DIALOG_SIZE,
+} from '../../../../shared/model/constants';
 import {
 	LicenseColumnModel,
 	LicenseType,
 	LicenseStatus,
 	LicenseEnvironment,
-	LicenseModel, RequestLicenseModel
+	LicenseModel,
+	RequestLicenseModel,
 } from '../../model/license.model';
 // Kendo
-import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {DateUtils} from '../../../../shared/utils/date.utils';
+import {
+	State,
+	process,
+	CompositeFilterDescriptor,
+} from '@progress/kendo-data-query';
+import { CellClickEvent, GridDataResult } from '@progress/kendo-angular-grid';
+import { UserContextModel } from '../../../auth/model/user-context.model';
+import { DateUtils } from '../../../../shared/utils/date.utils';
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-license-list',
-	templateUrl: 'license-list.component.html'
+	templateUrl: 'license-list.component.html',
 })
 export class LicenseListComponent implements OnInit {
+	protected gridColumns: any[];
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
+	protected state: State = {
+		sort: [
+			{
+				dir: 'asc',
+				field: 'name',
+			},
+		],
 		filter: {
 			filters: [],
-			logic: 'and'
-		}
+			logic: 'and',
+		},
 	};
 	public skip = 0;
 	public pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -57,6 +78,8 @@ export class LicenseListComponent implements OnInit {
 	public licenseType = LicenseType;
 	public licenseStatus = LicenseStatus;
 	public licenseEnvironment = LicenseEnvironment;
+	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -65,16 +88,41 @@ export class LicenseListComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private prompt: UIPromptService,
 		private route: ActivatedRoute,
-		private userContextService: UserContextService) {
+		private userContextService: UserContextService,
+		private translateService: TranslatePipe,
+	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.resultSet = this.route.snapshot.data['licenses'];
 		this.gridData = process(this.resultSet, this.state);
 	}
 
 	ngOnInit() {
-		this.userContextService.getUserContext()
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateLicense.bind(this),
+			},
+		];
+		this.userContextService
+			.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
-				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
-				this.licenseColumnModel = new LicenseColumnModel(`{0:${this.dateFormat}}`);
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(
+					userContext.dateFormat
+				);
+				this.licenseColumnModel = new LicenseColumnModel(
+					`{0:${this.dateFormat}}`
+				);
+				this.gridColumns = this.licenseColumnModel.columns.filter(
+					(column: { type: string }) => column.type !== 'action'
+				);
 			});
 	}
 
@@ -123,14 +171,23 @@ export class LicenseListComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'You are about to delete the selected license. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
+		this.prompt
+			.open(
+				'Confirmation Required',
+				'You are about to delete the selected license. Do you want to proceed?',
+				'Yes',
+				'No'
+			)
+			.then(res => {
 				if (res) {
-					this.licenseAdminService.deleteLicense(dataItem.id).subscribe(
-						(result) => {
-							this.reloadData();
-						},
-						(err) => console.log(err));
+					this.licenseAdminService
+						.deleteLicense(dataItem.id)
+						.subscribe(
+							result => {
+								this.reloadData();
+							},
+							err => console.log(err)
+						);
 				}
 			});
 	}
@@ -139,29 +196,37 @@ export class LicenseListComponent implements OnInit {
 	 * Request a New License
 	 */
 	protected onCreateLicense(): void {
-		this.dialogService.open(RequestLicenseComponent, []).then((requestLicenseModel: RequestLicenseModel) => {
-			setTimeout(() => {
-				this.openCreatedLicenseDialog(requestLicenseModel);
-			}, 500);
-			if (requestLicenseModel) {
-				this.reloadData();
-			}
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+		this.dialogService
+			.open(RequestLicenseComponent, [])
+			.then((requestLicenseModel: RequestLicenseModel) => {
+				setTimeout(() => {
+					this.openCreatedLicenseDialog(requestLicenseModel);
+				}, 500);
+				if (requestLicenseModel) {
+					this.reloadData();
+				}
+			})
+			.catch(result => {
+				console.log('Dismissed Dialog');
+			});
 	}
 
 	/**
 	 * Opens a dialog to show to the user that the request has been created and next steps to follow
 	 */
-	private openCreatedLicenseDialog(requestLicenseModel: RequestLicenseModel): void {
-		this.dialogService.open(CreatedLicenseComponent, [
-			{provide: RequestLicenseModel, useValue: requestLicenseModel}
-		]).then(() => {
-			console.log('Dismissed Dialog');
-		}).catch(() => {
-			console.log('Dismissed Dialog');
-		});
+	private openCreatedLicenseDialog(
+		requestLicenseModel: RequestLicenseModel
+	): void {
+		this.dialogService
+			.open(CreatedLicenseComponent, [
+				{ provide: RequestLicenseModel, useValue: requestLicenseModel },
+			])
+			.then(() => {
+				console.log('Dismissed Dialog');
+			})
+			.catch(() => {
+				console.log('Dismissed Dialog');
+			});
 	}
 
 	/**
@@ -169,12 +234,15 @@ export class LicenseListComponent implements OnInit {
 	 */
 	protected reloadData(): void {
 		this.licenseAdminService.getLicenses().subscribe(
-			(result) => {
+			result => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
-				jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+				jQuery('.k-grid-content-locked').addClass(
+					'element-height-100-per-i'
+				);
 			},
-			(err) => console.log(err));
+			err => console.log(err)
+		);
 	}
 
 	/**
@@ -182,16 +250,22 @@ export class LicenseListComponent implements OnInit {
 	 * @param licenseModel
 	 */
 	private openLicenseViewEdit(licenseModel: LicenseModel): void {
-		this.dialogService.open(LicenseDetailComponent, [
-			{ provide: LicenseModel, useValue: licenseModel }
-		], DIALOG_SIZE.LG, false).then( (result: LicenseModel) => {
-			if (result && result.id) {
-				//
-			}
-		}).catch(result => {
-			this.reloadData();
-			console.log('Dismissed Dialog');
-		});
+		this.dialogService
+			.open(
+				LicenseDetailComponent,
+				[{ provide: LicenseModel, useValue: licenseModel }],
+				DIALOG_SIZE.LG,
+				false
+			)
+			.then((result: LicenseModel) => {
+				if (result && result.id) {
+					//
+				}
+			})
+			.catch(result => {
+				this.reloadData();
+				console.log('Dismissed Dialog');
+			});
 	}
 
 	/**
@@ -205,5 +279,49 @@ export class LicenseListComponent implements OnInit {
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
+	 * Set on/off the filter icon indicator
+	 */
+	protected toggleFilter(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
+	protected filterCount(): number {
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
+	}
+
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
+	protected hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.licenseColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Determines if user has the permission to create licences
+	 */
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.LicenseAdministration);
 	}
 }

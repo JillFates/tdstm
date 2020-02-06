@@ -895,24 +895,24 @@ class GormUtil{
 		StringBuilder hql = new StringBuilder("from $tableName x where ")
 		boolean first=true
 		int paramIndex=0
-		props.each { propName ->
+		props.eachWithIndex { propName, index ->
 			params << domainObj[propName]
 			if (first) {
 				first=false
 			} else {
 				hql.append(' AND ')
 			}
-			hql.append("x.$propName=?")
+			hql.append("x.$propName=?$index")
 		}
 
-		keys.each { keyName ->
+		keys.eachWithIndex { keyName, index ->
 			params << replaceKeys[keyName]
 			if (first) {
 				first = false
 			} else {
 				hql.append(' AND ')
 			}
-			hql.append("x.$keyName=?")
+			hql.append("x.$keyName=?${index + props.size()}")
 		}
 
 		String hqlStr = hql.toString()
@@ -957,13 +957,13 @@ class GormUtil{
 		StringBuilder hql = new StringBuilder('From ' + domainName + ' x Where ')
 		List params = []
 		int paramIndex=0
-		propertiesMap.each { propName, value ->
+		propertiesMap.eachWithIndex { propName, value, index ->
 			if (first) {
 				first=false
 			} else {
 				hql.append(" ${operator.toString()} ")
 			}
-			hql.append("x.$propName=?")
+			hql.append("x.$propName=?$index")
 			params << value
 		}
 		String hqlStr = hql.toString()
@@ -1008,13 +1008,13 @@ class GormUtil{
 				boolean first=true
 				List params=[]
 				int paramIndex=0
-				attribs.properties.each { propName ->
+				attribs.properties.eachWithIndex { propName, index ->
 					if (first) {
 						first=false
 					} else {
 						hql.append(' OR ')
 					}
-					hql.append("x.$propName=?")
+					hql.append("x.$propName=?$index")
 					params << (attribs.transform ? attribs.transform.call(domainObject) : domainObject)
 				}
 				String hqlStr = hql.toString()

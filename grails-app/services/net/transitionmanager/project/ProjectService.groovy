@@ -1,32 +1,5 @@
 package net.transitionmanager.project
 
-import net.transitionmanager.action.ApiActionService
-import net.transitionmanager.action.ApiCatalogService
-import net.transitionmanager.asset.ApplicationAssetMap
-import net.transitionmanager.asset.AssetCableMap
-import net.transitionmanager.command.ProjectCommand
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.common.FileSystemService
-import net.transitionmanager.common.SequenceService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.imports.DataScriptService
-import net.transitionmanager.license.LicenseAdminService
-import net.transitionmanager.license.LicenseCommonService
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.PersonService
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.security.AuditService
-import net.transitionmanager.security.CredentialService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.tag.TagService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetDependencyBundle
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetType
-import net.transitionmanager.exception.ConfigurationException
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.sql.SqlUtil
@@ -44,41 +17,68 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.metric.ProjectDailyMetric
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.ApiCatalogService
 import net.transitionmanager.action.Credential
+import net.transitionmanager.action.Provider
+import net.transitionmanager.asset.ApplicationAssetMap
+import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.command.ProjectCommand
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.KeyValue
+import net.transitionmanager.common.SequenceService
+import net.transitionmanager.common.Setting
+import net.transitionmanager.exception.ConfigurationException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.DataScriptService
 import net.transitionmanager.imports.DataTransferBatch
 import net.transitionmanager.imports.DataTransferComment
 import net.transitionmanager.imports.DataTransferValue
 import net.transitionmanager.imports.Dataview
-import net.transitionmanager.common.KeyValue
+import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.license.License
+import net.transitionmanager.license.LicenseAdminService
+import net.transitionmanager.license.LicenseCommonService
+import net.transitionmanager.metric.ProjectDailyMetric
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelSync
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.party.PartyRelationshipType
 import net.transitionmanager.person.Person
-import net.transitionmanager.action.Provider
-import net.transitionmanager.asset.Rack
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreference
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.search.FieldSearchData
+import net.transitionmanager.security.AuditService
+import net.transitionmanager.security.CredentialService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagService
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.Recipe
 import net.transitionmanager.task.RecipeVersion
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.Setting
-import net.transitionmanager.imports.TaskBatch
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.person.UserPreference
-import net.transitionmanager.search.FieldSearchData
-import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.time.DateUtils
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 class ProjectService implements ServiceMethods {
@@ -103,11 +103,11 @@ class ProjectService implements ServiceMethods {
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
-	static final String DEFAULT_PROJECT_LOGO_DIR = 'assets/images'
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'tds/web-app/assets/images'
 
-	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
+	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'transitionLogo.svg'
 
-	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
+	static final String DEFAULT_LIC_MANAGER_LOGO = 'transitionLogo.svg'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -404,11 +404,16 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
-		managers = managers.sort { it.partyIdTo?.lastName }
-		List<Map<String,?>> managersMap = managers.collect { it -> [
-				  id  : it.partyIdTo.id,
-				  name: it.partyIdTo.toString()
-		]}
+		Party partyTo
+		managers = managers.sort { GrailsHibernateUtil.unwrapIfProxy(it.partyIdTo)?.lastName }
+		List<Map<String, ?>> managersMap = managers.collect { it ->
+			partyTo = GrailsHibernateUtil.unwrapIfProxy(it.partyIdTo)
+
+			[
+				id  : partyTo.id,
+				name: partyTo.toString()
+			]
+		}
 
 		[
 			clients : getAllClients(),
@@ -1157,8 +1162,7 @@ class ProjectService implements ServiceMethods {
 			partyIdFrom.id == project.id
 			partyIdTo.id in nonClientStaffIds
 		}
-		.projections { property 'partyIdTo.id' }
-				.list()
+		.projections { property 'partyIdTo.id' }.list()
 
 		// Add to the staffIds list all of the staff of the project client as they're all fair game
 		PartyGroup client = project.client
@@ -1905,6 +1909,7 @@ class ProjectService implements ServiceMethods {
 	 * @param projectCommand
 	 * @return
 	 */
+	@Transactional
 	Project createOrUpdateProject(ProjectCommand projectCommand) {
 		Project project
 		if (projectCommand.id > 0) {

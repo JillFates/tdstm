@@ -11,16 +11,20 @@ export class ProviderColumnModel {
 				locked: true
 			}, {
 				label: 'Name',
+				filterable: true,
 				property: 'name',
 				type: 'text',
 				width: 246,
+				isActionable: true,
 			}, {
 				label: 'Description',
+				filterable: true,
 				property: 'description',
 				type: 'text',
 				width: 300,
 			}, {
 				label: 'Date Create',
+				filterable: true,
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,

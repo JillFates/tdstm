@@ -43,7 +43,7 @@ div.graphContainer
         user-select: none
         font-size: 12px
       div.graphPanelTab
-        border: 1px solid green
+        border: 1px solid #0077b8
         border-bottom: 0px
         margin-bottom: 0px
         padding-left: 8px
@@ -61,7 +61,7 @@ div.graphContainer
           z-index: 2
         &:not(.activeTab)
           background-color: #dddddd
-          border-bottom: 1px solid green
+          border-bottom: 1px solid #0077b8
         &#legendTabId
         &#dependenciesPanelTabId
           border-left-width: 0px
@@ -71,7 +71,7 @@ div.graphContainer
           margin: 0px
       & > div
         &.hasBorders
-          border: 1px solid green
+          border: 1px solid #0077b8
           display: inline-block
         &.spacer
           background-color: transparent !important
@@ -79,9 +79,6 @@ div.graphContainer
           text-align: center
           width: auto
           cursor: pointer
-        &:not(.spacer).hasBorders
-          border-left: 1px solid green
-          border-right: 1px solid green
       div.graphTabButton
         background-position: 5px 50%
         background-repeat: no-repeat
@@ -118,22 +115,24 @@ div.graphContainer
         height: 22px !important
         background-position: 2px 2px !important
         padding: 0px !important
+        color: black
+        font-size: 16px
         &#zoomOutButtonId
-          background-image: url(../icons/magifier_zoom_out.png)
+        // background-image: url(../icons/magifier_zoom_out.png)
         &#zoomInButtonId
-          background-image: url(../icons/magnifier_zoom_in.png)
+      // background-image: url(../icons/magnifier_zoom_in.png)
       div.toolButton
         width: 22px !important
         height: 22px !important
         background-position: 3px 3px !important
         padding: 0px !important
-        margin-left: 3px !important;
+        margin-left: 3px !important
         &#lassoButtonId
           background-image: url(../icons/shape_handles.png)
         &#selectionAddButtonId
           background-image: url(../icons/tag_blue_add.png)
         &.toolActive
-          background-color: lightgreen;
+          background-color: lightgreen
       #highlightFormId
         &:not(.newHighlightForm)
           display: inline-block !important
@@ -146,15 +145,11 @@ div.graphContainer
           z-index: 2
           display: inline-block
           position: relative
-          //margin-bottom: 4px !important
-          border: 1px solid green
           height: 22px
-          //vertical-align: top
           input#searchBoxId
             width: 193px
             height: 20px
             margin: 0px !important
-            border: 0px
             vertical-align: top
             &::-ms-clear
               display: none
@@ -174,9 +169,8 @@ div.graphContainer
             display: inline-block
             height: 20px
             width: 20px
-            background-image: url(../icons/find.png)
-            background-position: 2px 2px !important
-            background-repeat: no-repeat
+            color: black
+            font-size: 16px
       span.controlSpan
         margin-left: 10px
         input, select
@@ -192,16 +186,22 @@ div.graphContainer
           height: 22px
     div.graphPanel
       float: left
-      border: 1px solid #008000
-      margin-left: 0px
-      margin-top: 0px
-      padding: 5px
+      border: 1px solid #0077b8
+      margin-left: 15px
+      margin-top: 15px
+      padding: 10px 5px 5px 5px
       background-color: white
       position: absolute
-      padding-top: 10px
       z-index: 1
+      overflow-y: scroll
+      min-height: 90px
+      max-height: 430px
+      top: 50px
+      &::-webkit-scrollbar
+        width: 0
       &.openPanel
         display: block
+        z-index: 75
       &:not(.openPanel)
         display: none
       .hasChanges
@@ -237,7 +237,12 @@ div.graphContainer
           filter: saturate(1.5)
         &:active
           filter: saturate(10)
+        &.plus
+          color: green
+        &.minus
+          color: red
         &.disabled
+          color: grey
           filter: saturate(0)
           opacity: 0.5
           cursor: default
@@ -312,10 +317,9 @@ div.graphContainer
             text-align: center
             width: 40px
   div#svgContainerId
-    border: 1px solid rgb(0, 128, 0)
-    border-width: 1px
-    padding: 0px !important
-    margin: 0px !important
+    border: 1px solid #0077b8
+    padding: 0 !important
+    margin: 0 !important
     overflow: hidden
     font-size: 0
     position: relative
@@ -326,6 +330,41 @@ div.graphContainer
   button.baseline-btn
     margin: 0 10px
 
+
+div.graphContainer
+  &:not(.fullscreen)
+    div#toolsContainerId
+      div.graphPanel
+        &:not(.depAnalyzer)
+          @media screen and (min-height: 601px)
+            height: 400px !important
+          @media screen and (max-height: 600px)
+            height: 250px !important
+          @media screen and (max-height: 445px)
+            height: 142px !important
+          @media screen and (max-height: 344px)
+            height: 90px !important
+      div.graphPanel
+        &.depAnalyzer
+          @media screen and (min-height: 825px)
+            height: 385px !important
+          @media screen and (max-height: 824px)
+            height: 300px !important
+          @media screen and (max-height: 731px)
+            height: 200px !important
+          @media screen and (max-height: 640px)
+            height: 150px !important
+          @media screen and (max-height: 590px)
+            height: 100px !important
+
+div.content-wrapper
+  z-index: 70 !important
+  overflow: auto
+  div.container
+    z-index: 75 !important
+div.main-footer
+  position: relative
+
 // fullscreen specific styles
 div.graphContainer.fullscreen
   background-color: #ffffff
@@ -334,26 +373,31 @@ div.graphContainer.fullscreen
   z-index: 95
   div#toolsContainerId
     position: fixed
+    top: 5px
+    left: 5px
     z-index: 96
     div#graphToolbarId
       top: 0px
       left: 0px
       & > div, & > span
         vertical-align: top
+      .btn
+        margin-top: 0px
       div.graphPanelTab
         border-top-width: 0px
         &:not(.activeTab)
-          border-bottom: 1px solid green
+          border-bottom: 1px solid #0077b8
       & > *:not(.graphPanelTab)
         opacity: 0.8
       .graphTabButton
         border-top-width: 0px !important
-      #fullscreenButtonId
-        background-image: url(../icons/layout_content.png)
     div.graphPanel
       margin-top: -1px
-      top: 25px
+      top: 50px
       left: 0px
+      height: 400px
+      @media screen and (max-width: 440px)
+        height: 280px !important
     div#controlPanelId
       .controlPanelLabel
         padding: 0px
@@ -378,7 +422,7 @@ div.graphContainer.fullscreen
 #spinnerDivId
   width: 800px
   height: 300px
-  border: 1px solid green
+  border: 1px solid #0077b8
   padding: 5px
   margin: 5px
   &.graph
@@ -397,7 +441,7 @@ div.graphContainer.fullscreen
 // custom right click context menu for graphs
 .customMenu
   display: none
-  z-index: 1000
+  z-index: 75
   position: fixed
   overflow: hidden
   border: 1px solid #CCC

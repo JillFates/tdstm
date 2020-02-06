@@ -9,10 +9,12 @@ export class UIAutofocusDirective implements OnInit, AfterViewInit {
 	ngOnInit() {
 		// mark the host element as focusable
 		this.renderer.setAttribute(this.el.nativeElement, 'tabindex',  '0');
+		// disable the border focus
+		this.renderer.setStyle(this.el.nativeElement, 'outline-width', 0);
 	}
 
 	ngAfterViewInit() {
 		// we need to delay because the bootstrap effect displaying modals
-		setTimeout(() => this.el.nativeElement.focus(), 500);
+		setTimeout(() => this.el.nativeElement.focus(), 1000);
 	}
 }

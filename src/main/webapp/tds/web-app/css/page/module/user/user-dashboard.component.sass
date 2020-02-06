@@ -1,113 +1,107 @@
 .user-dashboard-component
-  width: 97%
-  margin: 24px auto 24px auto
-  .event-status-toolbar
-    display: inline
-    margin-left: 30px
-    font-weight: 600
-    input
-      vertical-align: sub
-      margin: 4px 4px 0 15px
-    span
-      font-size: 14px
-      font-weight: 700
-  .panel-heading span
-    font-size: 14px
-    font-weight: 700
-  .panel-heading .k-widget.k-dropdown.k-header
-      margin-left: 5px
-  strong
-    vertical-align: middle
-    margin-left: 5px
-  span
-    vertical-align: middle
-    margin-left: 5px
-  .kendo-grid-toolbar__refresh-btn
-    margin: 0
-  .k-grid
-    margin-top: 24px
-    max-height: 400px
-    .k-plus::before
-      font-family: fontawesome
-      content: "\f101"!important
-    .k-minus::before
-      font-family: fontawesome
-      content: "\f103"!important
-    a
-      color: #666
-      font-weight: bold
-      text-decoration: none
-      cursor: pointer
-    .k-grid-content
-      font-family: helvetica, arial, sans-serif
-      font-size: 12px
-    .btn
-      margin-right: 16px
-      padding: 4px 8px
-    tr.k-detail-row > .k-hierarchy-cell
-      border-right: 0
-    tr.k-detail-row div
-      display: inline
-    .k-header
-      padding: 6px !important
-      font-size: 14px
-    td
-      padding: 2px 6px
-    .status-column
-      padding: 0
-      text-overflow: unset
-      span
-        padding: 1000% 38px 1000% 6px
-      .task_hold
-        background-color: #FFFF33 !important
-        color: black
-        font-weight: bold
-      .task_hold_overtime
-        background-color: #FF0000
-        color: black
-        font-weight: bold
-      .task_planned
-        background-color: #FFFFFF
-        color: gray
-        font-weight: bold
-      .task_pending
-        background-color: #FFFFFF
-        color: black
-        font-weight: bold
-      .task_ready
-        background-color: green !important
-        color: white
-        font-weight: bold
-      .task_started
-        background-color: darkturquoise !important
-        color: white
-        font-weight: bold
-      .task_completed2
-        background-color: #5478BA
-      .task_completed5
-        background-color: #4468AA
-      .task_completed
-        background-color: #24488A
-        color: white
-        font-weight: bold
-      .task_done2
-        background-color: #5478BA
-      .task_done5
-        background-color: #4468AA
-      .task_done
-        background-color: #24488A
-        color: white
-        font-weight: bold
-      .task_na
-        background-color: lightgray
-      .task_term
-        background-color: black
-      .task_tardy
-        background-color: #FFC266
-      .task_late
-        background-color: #FF9900
-      .task_overdue
-        color: red
-  .k-grid.clickable-grid
-    td
-      cursor: pointer
+	$primary-text-color: #18394B
+	.project
+		.title
+			color: $primary-text-color
+			font-weight: bold
+			font-size: 14px
+			line-height: 24px
+			padding-left: 8px
+	.grid-header
+		.title
+			color: $primary-text-color
+			font-weight: bold
+			font-size: 14px
+			line-height: 24px
+		.description
+			font-weight: normal
+			font-size: 10px
+			line-height: 16px
+			margin-left: 5px
+	margin: 24px 15px 24px 15px
+	tds-button-custom.flat
+		tds-button
+			button
+				padding: 0
+				margin: 0
+	.project-selection-form
+		.clr-form-control
+			margin-top: 0
+			.clr-control-label
+				flex: none
+				width: auto
+	.project-selection
+		font-size: 13px
+		padding-left: 0
+		font-weight: 500
+		line-height: 18px
+	.event-status-toolbar
+		display: inline
+		margin-left: 30px
+		font-weight: 600
+		input
+			vertical-align: sub
+			margin: 4px 4px 0 15px
+		span
+			font-size: 14px
+			font-weight: 700
+	.panel-heading span
+		font-size: 14px
+		font-weight: 700
+	.panel-heading .k-widget.k-dropdown.k-header
+		margin-left: 5px
+	strong
+		vertical-align: middle
+		margin-left: 5px
+	.kendo-grid-toolbar__refresh-btn
+		margin: 0
+	.event-list
+		max-height: 600px
+		.k-grid
+			height: 100%
+			.k-grid-aria-root
+				height: 80%
+	.task-summary .k-grid
+		max-height: 800px
+		min-height: 200px
+	.k-grid
+		//margin-top: 24px
+		//max-height: 400px
+		.k-plus::before
+			font-family: fontawesome
+			content: "\f101"!important
+		.k-minus::before
+			font-family: fontawesome
+			content: "\f103"!important
+		a
+			color: #666
+			font-weight: bold
+			text-decoration: none
+			cursor: pointer
+		.k-grid-content
+			font-family: helvetica, arial, sans-serif
+			font-size: 12px
+		tr.k-detail-row > .k-hierarchy-cell
+			border-right: 0
+		tr.k-detail-row div
+			display: inline
+		td
+			padding: 2px 12px
+	.k-grid.clickable-grid
+		td
+			cursor: pointer
+	.table-containers
+		max-height: 600px
+		.event-news-table, .applications-table, .active-people-table
+			.k-grid
+				.k-grid-aria-root
+					max-height: 200px
+	clr-radio-wrapper
+		margin: auto 5px
+	tds-button-custom
+		margin-left: 10px
+		clr-icon
+			position: relative
+			top: 1px
+
+

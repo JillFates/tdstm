@@ -1,21 +1,18 @@
 package com.tdsops.etl
 
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import grails.test.mixin.Mock
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
-
 /**
  * Using SpreadSheet in ETL script. It manages the following commands:
  * <ul>
@@ -24,26 +21,15 @@ import net.transitionmanager.common.FileSystemService
  *     <li><b>read labels on 2</b></li>
  * </ul>
  */
-
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
-class ETLSpreadSheetSpec extends ETLBaseSpec {
+class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-	}
-
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model
 		String.mixin StringAppendElement
 	}
 
@@ -81,7 +67,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can define more than one sheet for a spreadSheet DataSet'() {
@@ -114,7 +100,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels by default in first row by default for a spreadSheet DataSet'() {
@@ -160,7 +146,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can define a quoted string sheet for a spreadSheet DataSet'() {
@@ -204,7 +190,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		and:
 			etlProcessor.currentRowIndex == 1
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels by an ordinal sheet number for a spreadSheet DataSet'() {
@@ -249,7 +235,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if sheet number is incorrect for a spreadSheet DataSet'() {
@@ -274,7 +260,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			e.message == 'Sheet number 10 not found in workbook'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if sheet name is incorrect for a spreadSheet DataSet'() {
@@ -299,7 +285,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			e.message == "Sheet 'Active Applications' not found in workbook"
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if sheet name case is incorrect for a spreadSheet DataSet'() {
@@ -324,7 +310,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			e.message == "Sheet 'applications' not found in workbook"
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels by default using sheet number zero for a spreadSheet DataSet'() {
@@ -369,7 +355,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels using sheet number as a sheet name for a spreadSheet DataSet'() {
@@ -415,7 +401,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels skipping rows for a spreadSheet DataSet'() {
@@ -464,7 +450,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read iterate rows for a spreadSheet DataSet'() {
@@ -508,7 +494,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read iterate rows for more than one sheet in a spreadSheet DataSet'() {
@@ -580,7 +566,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels skipping rows before for a spreadSheet DataSet'() {
@@ -622,7 +608,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.column(3).label == 'location'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels skipping more than one row before for a spreadSheet DataSet'() {
@@ -668,7 +654,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.column(3).label == 'location'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read rows skipping rows before an iteration for a XLSX  spreadSheet DataSet'() {
@@ -752,7 +738,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read rows ignoring rows in the middle of an iteration for a spreadSheet DataSet'() {
@@ -796,7 +782,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	static final String ApplicationDataSet = """
