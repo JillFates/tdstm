@@ -363,7 +363,10 @@ class CustomDomainServiceTests extends Specification {
         when: ''
             String updateString = customDomainService.dataDateToDateTime('custom21')
             customDomainService.clearCustomFieldsForClass(project, AssetClass.DEVICE.name(), [updateString])
-            List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
+            List<AssetEntity> assetList
+            AssetEntity.withNewTransaction {
+                assetList = AssetEntity.findAllByProject(project)*.refresh()
+            }
         then: ''
             assetList[0].custom20 == '2019-03-21T21:31:00Z'
             assetList[0].custom21 == '2019-08-16T00:00:00Z'
