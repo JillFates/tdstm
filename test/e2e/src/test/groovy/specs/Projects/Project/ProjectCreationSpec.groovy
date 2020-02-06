@@ -9,6 +9,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.error.RequiredPageContentNotPresent
+import org.openqa.selenium.Keys
 
 import geb.driver.CachingDriverFactory
 
@@ -67,7 +68,7 @@ class ProjectCreationSpec extends GebReportingSpec {
             at ProjectCreationPage
         when: 'The user fill all required fields'
             waitFor {pcClientSelector.click()}
-            waitFor {pcClientItem.click()}
+            pcClientItem.click()
             pcProjectCode = projName
             pcProjectName = projName
             pcDescription = projDesc
