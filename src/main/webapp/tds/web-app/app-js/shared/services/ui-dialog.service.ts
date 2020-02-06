@@ -150,10 +150,10 @@ export class UIExtraDialog implements OnDestroy {
 		}).modal('show');
 		// make it draggable
 		if (draggable) {
-			this.modalIntance.draggable({
-				handle: '.modal-header',
-				containment: 'window'
-			});
+			// this.modalIntance.draggable({
+			// 	handle: '.modal-header',
+			// 	containment: 'window'
+			// });
 		}
 		this.processMultipleDialogBackgrounds();
 	}
@@ -175,14 +175,11 @@ export class UIExtraDialog implements OnDestroy {
 	 */
 	private processMultipleDialogBackgrounds(closingDialog?: boolean): void {
 		let divs = jQuery('tds-ui-dialog div.modal.fade.in');
-		let index = divs.length;
-
+		let index = 1;
 		for (let div of divs) {
 			if (!closingDialog) {
 				this.currentActiveModalDivIndex = index;
-				if (!jQuery(div).hasClass('allow-modal-background')) {
-					jQuery(div).addClass('no-background');
-				}
+				jQuery(div).addClass('no-background');
 				if (index === divs.length) {
 					jQuery(div).removeClass('no-background');
 				}

@@ -21,7 +21,7 @@ declare var jQuery: any;
         <div class="modal fade" id="tdsUiDialog" data-backdrop="static"
             style="overflow-y: auto" role="dialog">
             <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
-                <div class="tds-modal-content">
+                <div class="modal-content">
                     <div #view></div>
                 </div>
             </div>
@@ -63,10 +63,6 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			if (this.reject) {
 				this.reject();
 			}
-		});
-		jQuery(this.el.nativeElement).draggable({
-			handle: '.modal-header',
-			containment: 'window'
 		});
 	}
 
@@ -130,7 +126,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				'display': 'block',
 				'visibility': 'hidden'
 			}).css({
-				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 0) + 'px',
+				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 30) + 'px',
 				'left': (jQuery(window).width() - modalDialog.width()) / 2
 			}).css({
 				'visibility': 'visible'
