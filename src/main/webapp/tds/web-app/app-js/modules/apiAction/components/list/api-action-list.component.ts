@@ -316,7 +316,6 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.isFiltering = false;
 		this.dataGridOperationsHelpter.clearAllFilters(this.apiActionColumnModel.columns, this.state);
 		this.reloadData();
 	}
