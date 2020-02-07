@@ -26,8 +26,6 @@
 								<div class="pull-right">
 									<tds-grid-header-action-buttons
 											[actionButtons]="headerActionButtons"
-											(clearFilters)="clearAllFilters()"
-											[disableClearFilters]="disabledClearFilters"
 											(refresh)="reloadData()">
 									</tds-grid-header-action-buttons>
 								</div>
@@ -129,7 +127,7 @@
 								<tds-filter-input
 										name="{{column.property}}"
 										[value]="column.filter || ''"
-                                        [columnType]="column.type"
+										[columnType]="column.type"
 										placeholder="{{'GLOBAL.FILTER' | translate}}"
 										(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
 								</tds-filter-input>

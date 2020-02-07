@@ -37,7 +37,6 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-undo,
 	`,
 	template: `
-<!--        [ngClass]="hostClasses.length ? hostClasses.value : ''"-->
 		<tds-button
 				[id]="id"
 				[type]="type"

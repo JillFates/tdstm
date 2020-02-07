@@ -34,9 +34,7 @@
 							<div class="clr-col-12 pull-right">
 								<tds-grid-header-action-buttons
 										(refresh)="reloadTagList()"
-										[actionButtons]="headerActionButtons"
-										(clearFilters)="clearAllFilters()"
-										[disableClearFilters]="disableClearFilters">
+										[actionButtons]="headerActionButtons">
 								</tds-grid-header-action-buttons>
 								<!-- Use a hidden button so that we don't have to override kendo's button styles -->
 								<button id="addButton"

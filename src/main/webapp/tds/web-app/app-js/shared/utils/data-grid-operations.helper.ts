@@ -406,7 +406,6 @@ export class DataGridOperationsHelper {
 		if (column.filter === '' && column.type === 'boolean') {
 			root.filters = root.filters.filter((filter: any) => filter.field !== column.property);
 		}
-
 		return root;
 	}
 
