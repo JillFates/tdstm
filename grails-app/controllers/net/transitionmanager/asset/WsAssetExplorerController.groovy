@@ -53,7 +53,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		Person currentPerson = securityService.loadCurrentPerson()
 		Project currentProject = securityService.userCurrentProject
 		List<Dataview> dataviews = dataviewService.list(currentPerson, currentProject)
-		List<Map> listMap = dataviews*.toMap(currentPerson.id).sort{a, b -> a.name?.compareToIgnoreCase b.name}
+		List<Map> listMap = dataviews*.toMap(currentProject, currentPerson).sort{a, b -> a.name?.compareToIgnoreCase b.name}
 		renderSuccessJson(listMap)
 	}
 
@@ -137,7 +137,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		Project project = projectForWs
 				//dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
 
-		Map dataviewMap = dataviewService.create(project, person, command).toMap(person.id)
+		Map dataviewMap = dataviewService.create(project, person, command).toMap(project, person)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
