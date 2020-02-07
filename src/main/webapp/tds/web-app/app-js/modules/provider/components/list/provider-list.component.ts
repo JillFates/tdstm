@@ -124,7 +124,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openProviderDialogViewEdit(dataItem, ActionType.EDIT);
+		this.openProviderDialogViewEdit(dataItem, ActionType.EDIT, true);
 	}
 
 	/**
@@ -204,16 +204,17 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param {ProviderModel} providerModel
 	 * @param {number} actionType
 	 */
-	private openProviderDialogViewEdit(providerModel: ProviderModel, actionType: number): void {
+	private openProviderDialogViewEdit(providerModel: ProviderModel, actionType: ActionType, openFromList = false): void {
 		this.dialogService.open({
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: ProviderViewEditComponent,
 			data: {
 				providerModel: providerModel,
-				actionType: actionType
+				actionType: actionType,
+				openFromList: openFromList
 			},
 			modalConfiguration: {
-				title: 'Provider Detail',
+				title: 'Provider',
 				draggable: true,
 				modalSize: ModalSize.MD
 			}

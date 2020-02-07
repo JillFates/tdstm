@@ -140,6 +140,10 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 						);
 				}
 			});
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle(this.modalType));
+		});
 	}
 
 	protected onValidateUniqueness(): void {
@@ -178,17 +182,23 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			).subscribe((result: any) => {
-				if (result.confirm === DialogConfirmAction.CONFIRM) {
+				if (result.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 					// Put back original model
 					this.providerModel = JSON.parse(this.dataSignature);
 					this.dataSignature = JSON.stringify(this.providerModel);
 					this.modalType = this.actionTypes.VIEW;
-					this.modalTitle = this.getModalTitle(this.modalType);
+					this.setTitle(this.getModalTitle(this.modalType));
+				} else {
+					this.onCancelClose();
 				}
 			});
 		} else {
-			this.modalType = this.actionTypes.VIEW;
-			this.modalTitle = this.getModalTitle(this.modalType);
+			if (!this.data.openFromList) {
+				this.modalType = this.actionTypes.VIEW;
+				this.setTitle(this.getModalTitle(this.modalType));
+			} else {
+				this.onCancelClose();
+			}
 		}
 	}
 
@@ -197,7 +207,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 	 */
 	protected changeToEditProvider(): void {
 		this.modalType = this.actionTypes.EDIT;
-		this.modalTitle = this.getModalTitle(this.modalType);
+		this.setTitle(this.getModalTitle(this.modalType));
 	}
 
 	/**
