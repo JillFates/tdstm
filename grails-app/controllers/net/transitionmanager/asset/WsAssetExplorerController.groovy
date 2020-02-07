@@ -70,7 +70,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 
 		Dataview dataview = dataviewService.fetch(project, whom, id, shouldShowOverridenView())
 		Map saveOptions = dataviewService.generateSaveOptions(project, whom, dataview)
-		Map dataviewMap = dataview.toMap( whom.id )
+		Map dataviewMap = dataview.toMap( project, whom )
 
 		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
 	}

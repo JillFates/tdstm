@@ -40,21 +40,22 @@ class Dataview {
 	 * @param currentPersonId current person in session.
 	 * @return
 	 */
-	Map toMap(Long currentPersonId) {
+	Map toMap(Project project, Person whom) {
 
 		Map data = [
-			id        : id,
-			name      : name,
-			isSystem  : isSystem,
-			isShared  : isShared,
-			isOwner   : isOwner(currentPersonId),
-			isFavorite: isFavorite(currentPersonId),
-			isOverride: isOverrideView(),
-			schema    : schemaAsJSONObject(),
-			createdBy : getOwnerName(),
-			createdOn : TimeUtil.formatDate(dateCreated),
+			id           : id,
+			name         : name,
+			hasOverride  : hasOverride(project),
+			isSystem     : isSystem,
+			isShared     : isShared,
+			isOwner      : isOwner(whom.id),
+			isFavorite   : isFavorite(whom.id),
+			isOverride   : isOverrideView(),
+			schema       : schemaAsJSONObject(),
+			createdBy    : getOwnerName(),
+			createdOn    : TimeUtil.formatDate(dateCreated),
 			overridesView: overridesView,
-			updatedOn : TimeUtil.formatDate(lastModified)
+			updatedOn    : TimeUtil.formatDate(lastModified)
 		]
 		return data
 	}
@@ -91,6 +92,31 @@ class Dataview {
 	 */
 	boolean isOverrideView() {
 		return overridesView != null
+	}
+
+	/**
+	 * Used to determine if the current view has an override
+	 * @param project
+	 * @return returns true if the current view is a system and there is one or more overridden versions of the view
+	 * in the default project and/or in the project referenced.
+	 */
+	boolean hasOverride(Project project) {
+		boolean overridden = false
+		if (id && isSystem && project) {
+			def x = Dataview.createCriteria().count() {
+				and {
+					eq('overridesView.id', id)
+					'in'('id', [project.id, Project.DEFAULT_PROJECT_ID])
+				}
+			}
+			overridden = x > 0
+
+//			overridden = Dataview.where {
+//					project.id in [project.id, Project.DEFAULT_PROJECT_ID]
+//					overridesView.id == id
+//				}.count() > 0
+		}
+		return overridden
 	}
 
 	/**

@@ -18,12 +18,15 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Ignore
+
 
 import java.security.InvalidParameterException
 
 @Integration
 @Rollback
-class DataviewServiceIntegrationSpec extends Specification{
+@Ignore
+class DataviewServiceIntegrationSpec extends Specification {
 
 	@Shared
 	SecurityService securityService
