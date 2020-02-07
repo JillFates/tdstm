@@ -402,6 +402,7 @@ class DataviewService implements ServiceMethods {
 			person = whom
             project = currentProject
 			reportSchema = schema
+			overridesView = dataviewCommand.overridesView
 		}
 
 		dataview.save()
