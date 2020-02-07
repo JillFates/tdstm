@@ -275,13 +275,13 @@ class DataviewService implements ServiceMethods {
 		}
 
 		// See about if the user can Save As OVERRIDE_FOR_ALL globally across all projects
-		if (dataview && isOverrideable && project?.isDefaultProject() && hasGlobalOverridePerm ) {
-			Dataview.where {
+		if (dataview && isOverrideable && project?.isDefaultProject() && hasGlobalOverridePerm) {
+			if (Dataview.where {
 				project.id == project.id
 				// Make sure we're querying on the root system view id
 				overridesView.id == (dataview.overridesView ? dataview.overridesView.id : dataview.id)
 				isShared == true
-			}.count() == 0 {
+			}.count() == 0) {
 				saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
 			}
 		}
