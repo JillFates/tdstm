@@ -130,7 +130,7 @@ class TDSExcelDriver extends ExcelDriver {
 		int additionalRows = limit + offsetRows + (header ? (1 as int) : (0 as int))
 
 		rows.each { Row row ->
-			if (row.rowNum >= additionalRows) return
+			if (!(workbook instanceof StreamingWorkbook) && row.rowNum >= additionalRows) return
 			Iterator cells = row.cellIterator()
 			LinkedHashMap<String, Object> updater = [:]
 
