@@ -37,7 +37,7 @@ class DependencyAnalyzerServiceIntegrationSpec extends  Specification{
 	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
 
 	@Shared
-	test.helper.ProjectTestHelper projectTestHelper
+	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 
 	@Shared
 	Project project
@@ -103,9 +103,6 @@ class DependencyAnalyzerServiceIntegrationSpec extends  Specification{
 	Date now
 
 	void setup() {
-		if(!projectTestHelper) {
-			projectTestHelper = new test.helper.ProjectTestHelper()
-		}
 		project = projectTestHelper.createProject()
 		otherProject = projectTestHelper.createProject()
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
