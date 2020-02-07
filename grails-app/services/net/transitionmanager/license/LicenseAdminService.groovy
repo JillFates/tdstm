@@ -280,9 +280,9 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				List<License> licenseObjs = licenses.findResults { DomainLicense lic -> getLicenseObj(lic) }
 
 				licenseObjs = licenseObjs.findAll { License lic ->
-					Map jsonData 	    = JSON.parse(lic.subject)
+					Map jsonData       = JSON.parse(lic.subject)
 					gracePeriodDays    = Math.max( gracePeriodDays, jsonData.gracePeriodDays ?: 0)
-					String hostName	 = jsonData.hostName
+					String hostName    = jsonData.hostName
 					String websitename = jsonData.websitename
 					String projectName = JSON.parse(jsonData.project)?.name
 
