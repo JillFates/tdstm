@@ -1,7 +1,7 @@
 package net.transitionmanager.license
 
 import com.github.icedrake.jsmaz.Smaz
-import com.tdssrc.grails.jasypt.GormEncryptedDateAsStringType
+import com.tdssrc.grails.gorm.GormEncryptedDateAsStringType
 import groovy.json.JsonBuilder
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
@@ -51,15 +51,15 @@ class License {
 		version		false
 		activationDate	column:'valid_start'
 		expirationDate	column:'valid_end'
-		lastCompliance	type: GormEncryptedDateAsStringType
+		lastCompliance type: GormEncryptedDateAsStringType
 	}
 
 	static constraints = {
 		method 			nullable:true
-		activationDate 	nullable:true
-		expirationDate 	nullable:true
+		activationDate nullable:true
+		expirationDate nullable:true
 		requestNote 	nullable:true
-		hash 			nullable:true
+		hash 			   nullable:true
 		bannerMessage	nullable:true
 		lastCompliance	nullable:true
 	}

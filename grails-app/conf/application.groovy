@@ -514,12 +514,5 @@ Specify jndi name of datasource to monitor in production environment
     }
 }*/
 
-jasypt {
-	algorithm = "PBEWITHSHA256AND256BITAES-CBC-BC"
-	providerName = "BC"
-	password = "summoned20homeward44lyle"
-	keyObtentionIterations = 1000
-}
-
 // TM-11135 Change so that GORM save defaults to failOnError:true
 grails.gorm.failOnError = true

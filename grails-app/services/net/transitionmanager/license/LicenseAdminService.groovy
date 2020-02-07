@@ -280,9 +280,9 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				List<License> licenseObjs = licenses.findResults { DomainLicense lic -> getLicenseObj(lic) }
 
 				licenseObjs = licenseObjs.findAll { License lic ->
-					Map jsonData 	   = JSON.parse(lic.subject)
+					Map jsonData 	    = JSON.parse(lic.subject)
 					gracePeriodDays    = Math.max( gracePeriodDays, jsonData.gracePeriodDays ?: 0)
-					String hostName	   = jsonData.hostName
+					String hostName	 = jsonData.hostName
 					String websitename = jsonData.websitename
 					String projectName = JSON.parse(jsonData.project)?.name
 
@@ -385,8 +385,8 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					if( gracePeriod > 0 ) {
 						licState.state = State.UNLICENSED // State.NONCOMPLIANT
 						licState.message = "The Server count has exceeded the license limit of ${licState.numberOfLicenses} by ${numServers - licState.numberOfLicenses} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
-						// licState.valid = true
-						licState.valid = false
+						licState.valid = true
+						// licState.valid = false
 					} else {
 						licState.state = State.UNLICENSED // State.INBREACH
 						licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${licState.numberOfLicenses} to re-enable all application features."
