@@ -6,7 +6,6 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
-import {UserContextService} from '../../../auth/service/user-context.service';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
 
 @Component({
@@ -23,12 +22,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                 <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
                       #noticeForm='ngForm'>
                     <div class="box-body">
-                        <div>
-                            <label for="name" class="col-sm-3 control-label">
-                                {{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}:
-                            </label>
-                        </div>
-                        <div class="form-group" style="padding-left:160px;">
+                        <div class="form-group save-views-container">
                             <div *ngIf="hasMaintainAssetList()">
                                 <div class="radio">
                                     <div *ngIf="!isThereOnlySaveMyView()">
@@ -42,7 +36,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                             <span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
                                         </label>
                                     </div>
-                                    <div class="col-sm-9" [attr.class]="">
+                                    <div class="col-sm-9 my-views-child" [attr.class]="">
                                         <label for="name" style="padding: 0;font-weight: bold">
                                             {{ 'GLOBAL.VIEW_NAME' | translate }}:*
                                         </label>
@@ -58,7 +52,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                         <span *ngIf="!isUnique"
                                               class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
 
-                                        <div class="checkbox">
+                                        <div class="checkbox" *ngIf="saveOptions.canShare">
                                             <label>
                                                 <input type="checkbox" name="shared" [disabled]="!isSaveInMyViewMode()"
                                                        [(ngModel)]="model.isShared">
@@ -78,7 +72,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                     </div>
                                 </div>
                             </div>
-                            <div *ngIf="hasMaintainAssetList() && !isThereOnlySaveMyView()">
+                            <div *ngIf="saveOptions.canOverride">
                                 <div class="radio" style="position:inherit">
                                     <label for="overrideMe">
                                         <input id="overrideMe" type="radio" name="radio-mode"
@@ -89,7 +83,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                     </label>
                                 </div>
                             </div>
-                            <div *ngIf="hasMaintainSystemList() && !isThereOnlySaveMyView()">
+                            <div *ngIf="saveOptions.canOverride">
                                 <div class="radio">
                                     <label for="overrideAll">
                                         <input id="overrideAll" type="radio" name="radio-mode"
@@ -136,7 +130,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService,
-		private userContextService: UserContextService,
 		private notifier: NotifierService) {
 		this.preModel = model;
 		this.saveOptions = saveOptions;
@@ -205,14 +198,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	 */
 	public hasMaintainAssetList(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
-	}
-
-	/**
-	 * Validate if user can maintain system lists
-	 * @returns {boolean}
-	 */
-	public hasMaintainSystemList(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetExplorerSystemList);
 	}
 
 	public isThereOnlySaveMyView(): boolean {

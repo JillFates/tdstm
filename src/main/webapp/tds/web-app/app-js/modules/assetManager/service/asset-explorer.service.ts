@@ -64,8 +64,9 @@ export class AssetExplorerService {
 			.catch((error: any) => error);
 	}
 
-	getReport(id: number): Observable<ViewModel> {
-		return this.http.get(`${this.assetExplorerUrl}/view/${id}`)
+	getReport(id: number, { queryParamsObj }: any = {}): Observable<ViewModel> {
+		const queryParams = Object.entries(queryParamsObj).map( ([key, value]) => `${key}=${value}`).join('&');
+		return this.http.get(`${this.assetExplorerUrl}/view/${id}?${queryParams}`)
 			.map((response: any) => {
 				if (response && response.status === 'success' && response.data) {
 					return response.data;
