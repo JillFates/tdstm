@@ -25,7 +25,7 @@ import java.security.InvalidParameterException
 
 @Integration
 @Rollback
-@Ignore
+@Ignore		// TODO : JPM 2/20202 : Remove the @Ignore TM-17042
 class DataviewServiceIntegrationSpec extends Specification {
 
 	@Shared
