@@ -61,6 +61,8 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
+import net.transitionmanager.task.timeline.TimelineDependency
+import net.transitionmanager.task.timeline.TimelineTask
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.quartz.Scheduler
@@ -70,9 +72,11 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
 import java.sql.Timestamp
 import java.text.DateFormat
+import net.transitionmanager.task.timeline.TimelineService
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
+import net.transitionmanager.task.timeline.CPAResults
 
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
@@ -105,6 +109,7 @@ class TaskService implements ServiceMethods {
 	LinkGenerator              grailsLinkGenerator
 	CoreService                coreService
 	CredentialService          credentialService
+	TimelineService            timelineService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -1055,62 +1060,64 @@ class TaskService implements ServiceMethods {
 		}
 	}
 
-
-	/**
-	 * Used to clear all Task data that are associated to a specified event
-	 * @param moveEventId
-	 */
-	def resetTaskData(MoveEvent moveEvent) {
-		try {
-			def tasksMap = getMoveEventTaskLists(moveEvent.id)
-			return resetTaskDataForTasks(tasksMap)
-		} catch(e) {
-			log.error "An error occurred while trying to Reset tasks for moveEvent $moveEvent on project $moveEvent.project\n$e"
-			throw new RuntimeException("An unexpected error occured")
-		}
-	}
-
 	/**
 	 * Used to clear all Task data that are associated to a task batch
-	 * @param moveEventId
+	 * @param taskBatch  The {@code TaskBatch} the tasks are associated to
 	 */
 	def resetTaskDataForTaskBatch(TaskBatch taskBatch) {
 		try {
-			def tasksMap = getTaskBatchTaskLists(taskBatch.id)
-			return resetTaskDataForTasks(tasksMap)
+				return resetTaskData(taskBatch)
 		} catch(e) {
 			log.error "An error occurred while trying to Reset tasks for taskBatch $taskBatch on project $taskBatch.project\n$e"
-			throw new RuntimeException("An unexpected error occured")
+			throw new RuntimeException("An unexpected error occurred")
 		}
 	}
 
-	def resetTaskDataForTasks(def tasksMap) {
-		// We want to find all AssetComment records that are associate with assets that are
-		// with bundles that are part of the event. With that list, we will reset the
-		// AssetComment status to PENDING by default or READY if there are no predecessors and clear several other properties.
-		// We will also delete Task notes that are auto generated during the runbook execution.
+	/**
+	 * Given an Task Batch, reset all Tasks associated
+	 * and delete any Audit Comments related.
+	 *
+	 * Gets a list of {@code AssetComment} ids associated to the {@code TaskBatch}
+	 * Resets the {@code AssetComment#status} of all the tasks with no predecessors to {AssetCommentStatus#READY}
+	 * Resets the {@code AssetComment#status} of all the remaining tasks to {AssetCommentStatus#PENDING}
+	 * Delete all instances of {@code CommentNote} associated to any of this tasks
+	 *
+	 * @param taskBatch  The task batch to which all tasks belong
+	 * @return A confirmation message
+	 */
+	def resetTaskData(TaskBatch taskBatch) {
 		def msg
 		log.info("resetTaskData() was called")
+
+		// use the TimeLineGraph to calculate the tasks with and without predecessors
+		List<TimelineTask> timelineTasks = timelineService.getEventTasks(taskBatch)
+		List<TimelineDependency> timelineDependencies = timelineService.getTaskDependencies(timelineTasks)
+
+		TaskTimeLineGraph graph = timelineService.createTaskTimeLineGraph(timelineTasks, timelineDependencies)
+		List<Long> allTasks = graph.getVertices()*.taskId ?: []
+		List<Long> tasksNoPred = graph.getStarts()*.taskId ?: []
+
+		// now reset the tasks
 		try {
 			int taskResetCnt = 0
 			int notesDeleted = 0
 
 			String updateHql = '''
-				UPDATE AssetComment
-				SET status = :status, actStart = null, actStart = null, dateResolved = null,
+				UPDATE Task
+				SET status = :status, actStart = null, dateResolved = null,
 				    resolvedBy = null, statusUpdated = null
-				WHERE id in (:ids)'''
+				WHERE id in (:ids)
+				and taskBatch = :taskBatch'''
 
-			if (tasksMap.tasksWithPred) {
-				taskResetCnt = AssetComment.executeUpdate(updateHql, [status: ACS.PENDING, ids: tasksMap.tasksWithPred])
+			if (allTasks) {
+				// set all tasks with predecessors to pending
+				taskResetCnt = Task.executeUpdate(updateHql, [status: ACS.PENDING, ids: allTasks - tasksNoPred, taskBatch: taskBatch])
+				// also, delete any of the audit comments that are created during the event
+				notesDeleted = CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1", [ids: allTasks])
 			}
-			if (tasksMap.tasksNoPred) {
-				taskResetCnt += AssetComment.executeUpdate(updateHql, [status: ACS.READY, ids: tasksMap.tasksNoPred])
-			}
-			if (tasksMap.tasksWithNotes) {
-				// Delete any of the audit comments that are created during the event
-				notesDeleted = CommentNote.executeUpdate("DELETE FROM CommentNote cn WHERE cn.assetComment.id IN (:ids) AND cn.isAudit=1",
-					[ids: tasksMap.tasksWithNotes])
+			if (tasksNoPred) {
+				// set all tasks with no predecessors to ready
+				taskResetCnt += Task.executeUpdate(updateHql, [status: ACS.READY, ids: tasksNoPred, taskBatch: taskBatch])
 			}
 
 			msg = "$taskResetCnt tasks reset and $notesDeleted audit notes were deleted"
@@ -1119,67 +1126,6 @@ class TaskService implements ServiceMethods {
 			throw new RuntimeException("An unexpected error occurred")
 		}
 		return msg
-	}
-
-	/**
-	 * Returns a map containing several lists of AssetComment ids for a specified moveEvent that include keys
-	 * tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
-	 * @param moveEventID
-	 * @param manualTasks - boolean flag if manually created tasks should be included in list (default true)
-	 * @return map of tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
-	 */
-	def getMoveEventTaskLists(def moveEventId, def manualTasks=true) {
-		return getTaskListsFor(moveEventId, "move_event_id", manualTasks)
-	}
-
-	/**
-	 * Returns a map containing several lists of AssetComment ids for a specified taskBatch that include keys
-	 * tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
-	 * @param taskBatchId
-	 * @param manualTasks - boolean flag if manually created tasks should be included in list (default true)
-	 * @return map of tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
-	 */
-	def getTaskBatchTaskLists(def taskBatchId, def manualTasks = true) {
-		return getTaskListsFor(taskBatchId, "task_batch_id", manualTasks)
-	}
-
-	/**
-	 * Returns a map containing several lists of AssetComment ids for a specified field that include keys
-	 * tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
-	 * @param keyId the id of the field
-	 * @param field the name of the field
-	 * @param manualTasks - boolean flag if manually created tasks should be included in list (default true)
-	 * @return map of tasksWithPred, tasksNoPred, TasksAll and TasksWithNotes
-	 */
-	def getTaskListsFor(keyId, String field, boolean manualTasks = true) {
-		String manTasksSQL = manualTasks ? '' : ' AND c.auto_generated = true'
-		String query = """SELECT c.asset_comment_id AS id,
-				(SELECT count(*) FROM task_dependency t WHERE t.asset_comment_id = c.asset_comment_id) AS predCount,
-				(SELECT count(*) FROM comment_note n WHERE n.asset_comment_id = c.asset_comment_id) AS noteCount
-			FROM asset_comment c
-			WHERE
-				c.$field = $keyId AND
-				c.category IN (${GormUtil.asQuoteCommaDelimitedString(runbookCategories)}) """ + manTasksSQL
-		log.debug "getMoveEventTaskLists: query = $query"
-		def tasksList = jdbcTemplate.queryForList(query)
-
-		List<Long> tasksWithPred = []
-		List<Long> tasksNoPred = []
-		List<Long> tasksWithNotes = []
-		List<Long> tasksAll = []
-
-		// Iterate over the results and add the ids to the appropriate arrays
-		tasksList.each {
-			tasksAll << it.id
-			if (it.predCount == 0) {
-				tasksNoPred << it.id
-			} else {
-				tasksWithPred << it.id
-			}
-			if (it.noteCount > 0) tasksWithNotes << it.id
-		}
-
-		[tasksAll: tasksAll, tasksWithPred: tasksWithPred, tasksNoPred: tasksNoPred, tasksWithNotes: tasksWithNotes]
 	}
 
 	List<Map<String, Object>> getTasksOfBatch(String taskBatchId) {
