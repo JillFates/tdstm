@@ -103,18 +103,12 @@ class Dataview {
 	boolean hasOverride(Project project) {
 		boolean overridden = false
 		if (id && isSystem && project) {
-			def x = Dataview.createCriteria().count() {
-				and {
-					eq('overridesView.id', id)
-					'in'('id', [project.id, Project.DEFAULT_PROJECT_ID])
-				}
-			}
-			overridden = x > 0
-
-//			overridden = Dataview.where {
-//					project.id in [project.id, Project.DEFAULT_PROJECT_ID]
-//					overridesView.id == id
-//				}.count() > 0
+			// Note that the where closure didn't work correctly reference id directly, hence the dvId variable
+			Long dvId = this.id		
+			overridden = Dataview.where {
+					project.id in [project.id, Project.DEFAULT_PROJECT_ID]
+					overridesView.id == dvId
+				}.count() > 0
 		}
 		return overridden
 	}
