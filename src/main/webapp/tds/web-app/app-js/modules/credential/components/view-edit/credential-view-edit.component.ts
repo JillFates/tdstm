@@ -20,7 +20,6 @@ import {ObjectUtils} from '../../../../shared/utils/object.utils';
 // Other
 import * as R from 'ramda';
 import {Observable} from 'rxjs';
-import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'credential-view-edit',
@@ -170,18 +169,17 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		this.getProviders();
 		this.getAuthMethods();
 		this.getCredentialEnumsConfig();
-		this.modalTitle =
-			this.modalType === ActionType.CREATE
-				? 'Credential Create'
-				: this.modalType === ActionType.EDIT
-				? 'Credential Edit'
-				: 'Credential Detail';
+
 		// for create initialize the validations different
 		if (this.modalType === ActionType.CREATE) {
 			this.credentialModel.requestMode = this.requestMode.BASIC_AUTH;
 			this.requiredFields.push('password');
 			this.validExpressionResult.valid = false;
 		}
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle(this.modalType));
+		});
 	}
 
 	/**
@@ -393,7 +391,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 	 */
 	protected changeToEditCredential(): void {
 		this.modalType = this.actionTypes.EDIT;
-		this.modalTitle = 'Credential Edit';
+		this.setTitle(this.getModalTitle(this.modalType));
 	}
 
 	/**
@@ -403,7 +401,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 	protected onDeleteCredential(): void {
 		this.dialogService.confirm(
 			this.translatePipe.transform(
-				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'
 			),
 			this.translatePipe.transform(
 				'GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION'
@@ -480,5 +478,25 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 	 */
 	public onDismiss(): void {
 		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ActionType} modalType
+	 * @returns {string}
+	 */
+	private getModalTitle(modalType: ActionType): string {
+		// Every time we change the title, it means we switched to View, Edit or Create
+		setTimeout(() => {
+			// This ensure the UI has loaded since Kendo can change the signature of an object
+			this.dataSignature = JSON.stringify(this.credentialModel);
+		}, 1000);
+
+		if (modalType === ActionType.CREATE) {
+			return 'Credential Create';
+		}
+		return modalType === ActionType.EDIT
+			? 'Credential Edit'
+			: 'Credential Detail';
 	}
 }
