@@ -154,9 +154,14 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
-	protected onFilter(column: any): void {
-		const root = this.credentialService.filterColumn(column, this.state);
-		this.filterChange(root);
+	protected onFilter(column: any, event: any = null): void {
+		column.filter = event;
+		if (!event) {
+			this.clearValue(column);
+		} else {
+			const root = this.credentialService.filterColumn(column, this.state);
+			this.filterChange(root);
+		}
 	}
 
 	protected clearValue(column: any): void {
@@ -398,7 +403,6 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.showFilters = false;
 		this.dataGridOperationsHelper.clearAllFilters(this.credentialColumnModel.columns, this.state);
 		this.reloadData();
 	}
