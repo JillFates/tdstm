@@ -124,7 +124,9 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openProviderDialogViewEdit(dataItem, ActionType.EDIT, true);
+		if (this.isUpdateAvailable()) {
+			this.openProviderDialogViewEdit(dataItem, ActionType.EDIT, true);
+		}
 	}
 
 	/**
@@ -132,34 +134,36 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.providerService
-			.deleteContext(dataItem.id)
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe((result: any) => {
-				this.dialogService.open({
-					componentFactoryResolver: this.componentFactoryResolver,
-					component: ProviderAssociatedComponent,
-					data: {
-						providerAssociatedModel: result,
-					},
-					modalConfiguration: {
-						title: 'Confirmation Required',
-						draggable: true,
-						modalSize: ModalSize.MD
-					}
-				}).subscribe((data: any) => {
-					if (data.confirm === DialogConfirmAction.CONFIRM) {
-						this.providerService
-							.deleteProvider(dataItem.id)
-							.subscribe(
-								result => {
-									this.reloadData();
-								},
-								err => console.log(err)
-							);
-					}
+		if (this.isDeleteAvailable()) {
+			this.providerService
+				.deleteContext(dataItem.id)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe((result: any) => {
+					this.dialogService.open({
+						componentFactoryResolver: this.componentFactoryResolver,
+						component: ProviderAssociatedComponent,
+						data: {
+							providerAssociatedModel: result,
+						},
+						modalConfiguration: {
+							title: 'Confirmation Required',
+							draggable: true,
+							modalSize: ModalSize.MD
+						}
+					}).subscribe((data: any) => {
+						if (data.confirm === DialogConfirmAction.CONFIRM) {
+							this.providerService
+								.deleteProvider(dataItem.id)
+								.subscribe(
+									result => {
+										this.reloadData();
+									},
+									err => console.log(err)
+								);
+						}
+					});
 				});
-			});
+		}
 	}
 
 	/**

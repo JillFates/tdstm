@@ -6,10 +6,7 @@ import {AUTH_METHODS, CredentialModel, REQUEST_MODE} from '../../model/credentia
 import {ProviderModel} from '../../../provider/model/provider.model';
 import {ActionType} from '../../../../shared/model/data-list-grid.model';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
-import {
-	CHECK_ACTION,
-	OperationStatusModel,
-} from '../../../../shared/components/check-action/model/check-action.model';
+import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 // Component
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
@@ -174,7 +171,6 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		if (this.modalType === ActionType.CREATE) {
 			this.credentialModel.requestMode = this.requestMode.BASIC_AUTH;
 			this.requiredFields.push('password');
-			this.validExpressionResult.valid = false;
 		}
 
 		setTimeout(() => {
