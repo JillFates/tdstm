@@ -159,9 +159,14 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
-	protected onFilter(column: any): void {
-		const root = this.eventsService.filterColumn(column, this.state);
-		this.filterChange(root);
+	protected onFilter(column: any, event: any = null): void {
+		column.filter = event;
+		if (!event) {
+			this.clearValue(column);
+		} else {
+			const root = this.eventsService.filterColumn(column, this.state);
+			this.filterChange(root);
+		}
 	}
 
 	protected clearValue(column: any): void {
@@ -284,7 +289,6 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.showFilters = false;
 		this.dataGridOperationsHelper.clearAllFilters(this.eventColumnModel.columns, this.state);
 		this.reloadData();
 	}

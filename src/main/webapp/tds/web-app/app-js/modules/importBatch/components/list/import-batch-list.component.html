@@ -52,8 +52,6 @@
 								</tds-button-delete>
 								<tds-grid-header-action-buttons
 									[actionButtons]="[]"
-									(clearFilters)="dataGridOperationsHelper.clearAllFilters(columnsModel.columns)"
-									[disableClearFilters]="disableClearFilters"
 									(refresh)="onToggleViewArchived()">
 								</tds-grid-header-action-buttons>
 							</div>
@@ -80,19 +78,23 @@
 
 				<!-- Show Filters / Actions column -->
 				<kendo-grid-column *ngIf="!viewArchived"
-													 [width]="60"
+													 [field]="'_showFilters'"
+													 [headerClass]="'text-center'"
+													 [sortable]="false"
 													 [class]="{ 'k-custom-command-column': true, 'actions-column': true }"
-													 [minResizableWidth]="60">
+													 [width]="80"
+													 [minResizableWidth]="80">
+					<!-- Toggle Filters button -->
 					<ng-template kendoGridHeaderTemplate>
-						<tds-button [flat]="true" (click)="toggleFilter()">
-							<clr-icon shape="filter" class="grid-filter-button is-solid">
-							<span
-								*ngIf="dataGridOperationsHelper.getFilterCounter()"
-								class="badge badge-warning">
-								{{ dataGridOperationsHelper.getFilterCounter() }}
-							</span>
-							</clr-icon>
-						</tds-button>
+						<tds-grid-show-hide-filters-button [filterCount]="dataGridOperationsHelper.getFilterCounter()"
+																							 (toggleFilters)="toggleFilter()">
+						</tds-grid-show-hide-filters-button>
+					</ng-template>
+					<!-- Clear all Filters button -->
+					<ng-template kendoGridFilterCellTemplate let-filter>
+						<tds-grid-clear-all-filters-button [show]="dataGridOperationsHelper.getFilterCounter()"
+																							 (clearFilters)="dataGridOperationsHelper.clearAllFilters(columnsModel.columns)">
+						</tds-grid-clear-all-filters-button>
 					</ng-template>
 					<ng-template kendoGridCellTemplate let-dataItem>
 						<div class="k-grid-ignore-click" style="cursor: default;">
@@ -163,17 +165,18 @@
 						</ng-template>
 					</ng-template>
 
-					<!-- Filter Template -->
+					<!-- Filter Inputs -->
 					<ng-template kendoGridFilterCellTemplate let-filter>
 						<div class="filter-input"
 								 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )">
-							<tds-filter-input
-								name="{{column.property}}"
+							<tds-grid-filter-input
+								[name]="column.property"
 								[value]="column.filter || ''"
 								[columnType]="column.type"
-								placeholder="{{'GLOBAL.FILTER' | translate}}"
+								[dateFormat]="column.format"
+								[placeholder]="'GLOBAL.FILTER' | translate"
 								(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
-							</tds-filter-input>
+							</tds-grid-filter-input>
 						</div>
 					</ng-template>
 
