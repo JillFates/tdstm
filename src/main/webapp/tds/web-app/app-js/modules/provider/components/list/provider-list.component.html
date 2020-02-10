@@ -35,30 +35,24 @@
 
 					<!-- Show Filters / Actions column -->
 					<kendo-grid-column
-						[width]="60"
+						[field]="'_showFilters'"
+						[headerClass]="'text-center'"
+						[sortable]="false"
 						[class]="{ 'k-custom-command-column': true }"
-						[minResizableWidth]="60"
-					>
-						<ng-template
-							kendoGridHeaderTemplate
-							let-column
-							let-columnIndex="columnIndex"
-						>
-							<tds-button [flat]="true" (click)="toggleFilter()">
-								<clr-icon
-									shape="filter"
-									class="grid-filter-button is-solid"
-								>
-									<span
-										*ngIf="filterCount(); let filterCounter"
-										class="badge badge-warning"
-									>
-										{{ filterCounter }}
-									</span>
-								</clr-icon>
-							</tds-button>
+						[width]="60"
+						[minResizableWidth]="60">
+						<!-- Toggle Filters button -->
+						<ng-template kendoGridHeaderTemplate>
+							<tds-grid-show-hide-filters-button [filterCount]="filterCount()"
+																								 (toggleFilters)="toggleFilter()">
+							</tds-grid-show-hide-filters-button>
 						</ng-template>
-
+						<!-- Clear all Filters button -->
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<tds-grid-clear-all-filters-button [show]="filterCount()"
+																								 (clearFilters)="clearAllFilters()">
+							</tds-grid-clear-all-filters-button>
+						</ng-template>
 						<ng-template
 							kendoGridCellTemplate
 							let-dataItem
@@ -119,18 +113,14 @@
 						</ng-template>
 
 						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div
-								class="filter-input"
-								*ngIf="column.property && column.type !== 'action'"
-								style="margin-bottom:0px;"
-							>
-								<tds-filter-input
-										name="{{column.property}}"
-										[value]="column.filter || ''"
-										[columnType]="column.type"
-										placeholder="{{'GLOBAL.FILTER' | translate}}"
-										(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
-								</tds-filter-input>
+							<div class="filter-input">
+								<tds-grid-filter-input
+									[name]="column.property"
+									[value]="column.filter || ''"
+									[columnType]="column.type"
+									[placeholder]="'GLOBAL.FILTER' | translate"
+									(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
+								</tds-grid-filter-input>
 							</div>
 						</ng-template>
 					</kendo-grid-column>
