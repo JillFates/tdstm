@@ -18,6 +18,10 @@ import { NotifierService } from '../services/notifier.service';
 
 declare var jQuery: any;
 
+/**
+ * TODO: (dontiveros) migrate usage of Grid Helper to Helper class from component-library.
+ * @deprecated Please user Grid Helper class from component-library.
+ */
 export class DataGridOperationsHelper {
 	public gridData: GridDataResult = {
 		data: [],
