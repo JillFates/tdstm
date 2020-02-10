@@ -219,10 +219,12 @@
 					</button>
 				</div>
 
+				<!-- Show Filters / Actions column -->
 				<kendo-grid-column
 					[field]="'_showFilters'"
 					[headerClass]="'text-center'"
 					[sortable]="false"
+					[columnMenu]="false"
 					[class]="{ 'k-custom-command-column': true }"
 					[width]="60"
 					[minResizableWidth]="60">
