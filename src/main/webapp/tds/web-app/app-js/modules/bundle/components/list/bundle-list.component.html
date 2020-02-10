@@ -28,57 +28,32 @@
 						<div class="clr-row">
 							<div class="clr-col-12 pull-right">
 								<tds-grid-header-action-buttons
-										(refresh)="reloadData()"
-										[actionButtons]="headerActionButtons"
-										(clearFilters)="clearAllFilters()"
-										[disableClearFilters]="disableClearFilters">
+									(refresh)="reloadData()"
+									[actionButtons]="headerActionButtons">
 								</tds-grid-header-action-buttons>
 							</div>
 						</div>
-                        <!--
-						<div class="clr-row">
-							<div class="clr-col-4 grid-label">
-							</div>
-							<div class="clr-col-8 grid-actions">
-								<div *ngIf="canEditBundle">
-									<tds-button
-										icon="plus"
-										(click)="openCreateBundle()"
-									></tds-button>
-									<tds-button
-											icon="sync"
-											(click)="reloadData()"
-									></tds-button>
-								</div>
-							</div>
-						</div>
-						-->
 					</ng-template>
 
 					<!-- Show Filters / Actions column -->
 					<kendo-grid-column
-						[width]="60"
+						[field]="'_showFilters'"
+						[headerClass]="'text-center'"
+						[sortable]="false"
 						[class]="{ 'k-custom-command-column': true }"
-						[minResizableWidth]="60"
-					>
-						<ng-template
-							kendoGridHeaderTemplate
-							let-column
-							let-columnIndex="columnIndex"
-						>
-							<tds-button [flat]="true" (click)="toggleFilter()">
-								<clr-icon
-									shape="filter"
-									class="grid-filter-button is-solid"
-								>
-									<span
-										*ngIf="hasFilterApplied()"
-										class="badge badge-warning"
-									>
-										{{ filterCount() }}
-									</span>
-								</clr-icon>
-							</tds-button>
+						[width]="60"
+						[minResizableWidth]="60">
+						<!-- Toggle Filters button -->
+						<ng-template kendoGridHeaderTemplate>
+							<tds-grid-show-hide-filters-button [filterCount]="filterCount()"
+																								 (toggleFilters)="toggleFilter()">
+							</tds-grid-show-hide-filters-button>
+						</ng-template>
+						<!-- Clear all Filters button -->
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<tds-grid-clear-all-filters-button [show]="filterCount()"
+																								 (clearFilters)="clearAllFilters()">
+							</tds-grid-clear-all-filters-button>
 						</ng-template>
 					</kendo-grid-column>
 
@@ -115,7 +90,7 @@
 							<a
 								style="color:#2C61AA;font-weight:bold"
 								(click)="showBundle(dataItem.id, dataItem.name)"
-								>{{ dataItem[column.property] }}</a
+							>{{ dataItem[column.property] }}</a
 							>
 						</ng-template>
 						<ng-template
@@ -124,108 +99,21 @@
 							let-dataItem
 						>
 							<div class="checkbox-container">
-								<tds-checkbox [(inputModel)]="dataItem[column.property]" [disabled]="true"> 															 >
+								<tds-checkbox [(inputModel)]="dataItem[column.property]" [disabled]="true"> >
 								</tds-checkbox>
 							</div>
 						</ng-template>
+						<!-- Filter Inputs -->
 						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div
-								class="has-feedback"
-								*ngIf="
-									column.property && column.type !== 'action'
-								"
-								style="margin-bottom:0px;"
-							>
-								<div
-									*ngIf="column.type === 'date'"
-									class="filter-input"
-								>
-									<kendo-datepicker
-										[format]="dateFormat"
-										[(ngModel)]="column.filter"
-										(valueChange)="onFilter(column)"
-									></kendo-datepicker>
-									<tds-button
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										[title]="'Clear Filter'"
-										icon="times-circle"
-										[small]="true"
-										[flat]="true"
-									>
-									</tds-button>
-								</div>
-								<div
-									*ngIf="column.type === 'text'"
-									class="filter-input"
-								>
-									<input
-										clrInput
-										type="text"
-										(keyup)="onFilter(column)"
-										class="text-filter"
-										name="{{ column.property }}"
-										[(ngModel)]="column.filter"
-										placeholder="Filter {{ column.label }}"
-										value=""
-									/>
-									<tds-button
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										[title]="'Clear Filter'"
-										icon="times-circle"
-										[small]="true"
-										[flat]="true"
-									>
-									</tds-button>
-								</div>
-								<div
-									*ngIf="column.type === 'number'"
-									class="filter-input"
-								>
-									<kendo-numerictextbox
-										(valueChange)="onFilter(column)"
-										[decimals]="0"
-										[min]="0"
-										[autoCorrect]="true"
-										format="\#"
-										placeholder="Filter {{ column.label }}"
-										name="{{ column.property }}"
-										[(ngModel)]="column.filter"
-									>
-									</kendo-numerictextbox>
-									<tds-button
-										*ngIf="
-											column.filter !== undefined &&
-											column.filter !== ''
-										"
-										(click)="clearValue(column)"
-										[title]="'Clear Filter'"
-										icon="times-circle"
-										[small]="true"
-										[flat]="true"
-									>
-									</tds-button>
-								</div>
-								<div
-									*ngIf="column.type === 'boolean'"
-									class="filter-input"
-								>
-									<kendo-dropdownlist
-										[data]="booleanFilterData"
-										[(ngModel)]="column.filter"
-										(valueChange)="onFilter(column)"
-									></kendo-dropdownlist>
-									<tds-button
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										[title]="'Clear Filter'"
-										icon="times-circle"
-										[small]="true"
-										[flat]="true"
-									>
-									</tds-button>
-								</div>
+							<div class="filter-input">
+								<tds-grid-filter-input
+									[name]="column.property"
+									[value]="column.filter || ''"
+									[columnType]="column.type"
+									[dateFormat]="dateFormat"
+									[placeholder]="'GLOBAL.FILTER' | translate"
+									(filter)="onFilter(column, $event)">
+								</tds-grid-filter-input>
 							</div>
 						</ng-template>
 					</kendo-grid-column>

@@ -128,9 +128,14 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
-	protected onFilter(column: any): void {
-		const root = this.assetCommentService.filterColumn(column, this.state);
-		this.filterChange(root);
+	protected onFilter(column: any, event: any = null): void {
+		column.filter = event;
+		if (!event) {
+			this.clearValue(column);
+		} else {
+			const root = this.assetCommentService.filterColumn(column, this.state);
+			this.filterChange(root);
+		}
 	}
 
 	public onClearFilters(): void {
@@ -138,7 +143,6 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.assetCommentColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
-		this.showFilters = false;
 		this.onFilter({filter: ''});
 	}
 
