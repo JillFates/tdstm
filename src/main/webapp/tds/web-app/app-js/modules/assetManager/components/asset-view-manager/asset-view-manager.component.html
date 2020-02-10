@@ -61,19 +61,23 @@
 								</ng-template>
 
 								<!-- Show Filters / Actions column -->
-								<kendo-grid-column [width]="60"
+								<kendo-grid-column [field]="'_showFilters'"
+																	 [headerClass]="'text-center'"
+																	 [sortable]="false"
 																	 [class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+																	 [width]="60"
 																	 [minResizableWidth]="60">
+									<!-- Toggle Filters button -->
 									<ng-template kendoGridHeaderTemplate>
-										<tds-button [flat]="true" (click)="toggleFilter()">
-											<clr-icon shape="filter" class="grid-filter-button is-solid">
-												<span
-													*ngIf="gridHelper.getFilterCounter()"
-													class="badge badge-warning">
-													{{ gridHelper.getFilterCounter() }}
-												</span>
-											</clr-icon>
-										</tds-button>
+										<tds-grid-show-hide-filters-button [filterCount]="gridHelper.getFilterCounter()"
+																											 (toggleFilters)="toggleFilter()">
+										</tds-grid-show-hide-filters-button>
+									</ng-template>
+									<!-- Clear all Filters button -->
+									<ng-template kendoGridFilterCellTemplate let-filter>
+										<tds-grid-clear-all-filters-button [show]="gridHelper.getFilterCounter()"
+																											 (clearFilters)="gridHelper.clearAllFilters(gridColumns)">
+										</tds-grid-clear-all-filters-button>
 									</ng-template>
 									<ng-template kendoGridCellTemplate let-dataItem>
 										<div class="action-button btn-link">
@@ -144,13 +148,13 @@
 									<!-- Filter Template -->
 									<ng-template kendoGridFilterCellTemplate let-filter>
 										<div class="filter-input" *ngIf="column.filterable">
-											<tds-filter-input
-												name="{{column.property}}"
+											<tds-grid-filter-input
+												[name]="column.property"
 												[value]="column.filter || ''"
 												[columnType]="column.type"
-												placeholder="{{'GLOBAL.FILTER' | translate}}"
+												[placeholder]="'GLOBAL.FILTER' | translate"
 												(filter)="gridHelper.onFilterWithValue($event, column)">
-											</tds-filter-input>
+											</tds-grid-filter-input>
 										</div>
 									</ng-template>
 								</kendo-grid-column>
