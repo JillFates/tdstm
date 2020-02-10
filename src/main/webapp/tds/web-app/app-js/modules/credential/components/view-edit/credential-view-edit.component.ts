@@ -1,86 +1,85 @@
-import { Component, ElementRef, HostListener, QueryList, ViewChild, ViewChildren, } from '@angular/core';
-import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
-import { AUTH_METHODS, CredentialModel, REQUEST_MODE, } from '../../model/credential.model';
-import { ProviderModel } from '../../../provider/model/provider.model';
-import { CredentialService } from '../../service/credential.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { ActionType } from '../../../../shared/model/data-list-grid.model';
-import { KEYSTROKE } from '../../../../shared/model/constants';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { NgForm } from '@angular/forms';
-import { ObjectUtils } from '../../../../shared/utils/object.utils';
-import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
+// Angular
+import {Component, ElementRef, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {NgForm} from '@angular/forms';
+// Model
+import {AUTH_METHODS, CredentialModel, REQUEST_MODE} from '../../model/credential.model';
+import {ProviderModel} from '../../../provider/model/provider.model';
+import {ActionType} from '../../../../shared/model/data-list-grid.model';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 import {
 	CHECK_ACTION,
 	OperationStatusModel,
 } from '../../../../shared/components/check-action/model/check-action.model';
+// Component
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+// Service
+import {CredentialService} from '../../service/credential.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
+// Other
 import * as R from 'ramda';
-import { Observable } from 'rxjs';
-
-declare var jQuery: any;
+import {Observable} from 'rxjs';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'credential-view-edit',
 	templateUrl: 'credential-view-edit.component.html',
 	styles: [
-		`
-			.has-error,
-			.has-error:focus {
-				border: 1px #f00 solid;
-			}
-			.invalid-form {
-				color: red;
-				font-weight: bold;
-			}
-			#httpMethod {
-				width: 75px;
-			}
-			.radio-aligned {
-				margin: 4px 4px 0;
-				vertical-align: top;
-			}
-			.label-detail {
-				font-weight: normal;
-				cursor: pointer;
-			}
-			.check-action {
-				margin-left: 12px !important;
-			}
+			`
+            .has-error,
+            .has-error:focus {
+                border: 1px #f00 solid;
+            }
+
+            .invalid-form {
+                color: red;
+                font-weight: bold;
+            }
+
+            #httpMethod {
+                width: 75px;
+            }
+
+            .radio-aligned {
+                margin: 4px 4px 0;
+                vertical-align: top;
+            }
+
+            .label-detail {
+                font-weight: normal;
+                cursor: pointer;
+            }
+
+            .check-action {
+                margin-left: 12px !important;
+            }
 		`,
 	],
 })
-export class CredentialViewEditComponent {
+export class CredentialViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	// Forms
-	@ViewChild('apiActionForm', { static: false }) apiActionForm: NgForm;
-	@ViewChild('apiActionReactionForm', { static: false })
-	apiActionReactionForm: NgForm;
+	@ViewChild('credentialForm', {static: false}) credentialForm: NgForm;
 
 	@ViewChild('apiActionProvider', {
 		read: DropDownListComponent,
-		static: true,
-	})
-	apiActionProvider: DropDownListComponent;
-	@ViewChild('credentialStatus', {
-		read: DropDownListComponent,
-		static: true,
-	})
-	credentialStatus: DropDownListComponent;
+		static: true
+	}) apiActionProvider: DropDownListComponent;
+	@ViewChild('credentialStatus', {read: DropDownListComponent, static: true}) credentialStatus: DropDownListComponent;
 	@ViewChild('apiActionAgentMethod', {
 		read: DropDownListComponent,
-		static: true,
-	})
-	apiActionAgentMethod: DropDownListComponent;
+		static: true
+	}) apiActionAgentMethod: DropDownListComponent;
 	@ViewChild('apiActionCredential', {
 		read: DropDownListComponent,
-		static: true,
+		static: true
 	})
 	apiActionCredential: DropDownListComponent;
 
-	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<
-		CodeMirrorComponent
-	>;
-	@ViewChild('credentialsContainer', { static: false })
+	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
+	@ViewChild('credentialsContainer', {static: false})
 	credentialsContainer: ElementRef;
 
 	public codeMirrorComponent: CodeMirrorComponent;
@@ -98,6 +97,7 @@ export class CredentialViewEditComponent {
 	public isEditing = false;
 	public checkActionModel = CHECK_ACTION;
 	public operationStatusModel = new OperationStatusModel();
+	public modalType = ActionType.VIEW;
 	public validExpressionResult = {
 		valid: true,
 		error: '',
@@ -112,17 +112,61 @@ export class CredentialViewEditComponent {
 	];
 
 	constructor(
-		public originalModel: CredentialModel,
-		public modalType: ActionType,
-		public promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService,
-		private prompt: UIPromptService,
+		public dialogService: DialogService,
 		private credentialService: CredentialService,
 		private translatePipe: TranslatePipe
 	) {
+		super();
+	}
+
+	ngOnInit(): void {
 		// Sub Objects are not being created, just copy
-		this.credentialModel = R.clone(this.originalModel);
+		this.credentialModel = R.clone(this.data.credentialModel);
 		this.dataSignature = JSON.stringify(this.credentialModel);
+		this.modalType = this.data.actionType;
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
+			active: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.changeToEditCredential.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
+			disabled: () => this.isFormInvalid(this.credentialForm) || !this.isDirty(),
+			type: DialogButtonType.ACTION,
+			action: this.onSaveCredential.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.modalType !== this.actionTypes.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.onDeleteCredential.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEditDialog.bind(this)
+		});
+
 		this.getProviders();
 		this.getAuthMethods();
 		this.getCredentialEnumsConfig();
@@ -278,13 +322,13 @@ export class CredentialViewEditComponent {
 	}
 
 	/**
-	 * Createm Save or Update the Credential forom the model
+	 * Create Save or Update the Credential from the model
 	 */
 	private saveCredential(): void {
 		this.credentialService.saveCredential(this.credentialModel).subscribe(
 			(result: any) => {
 				if (result && result.id) {
-					this.activeDialog.close(result);
+					super.onAcceptSuccess(result);
 				}
 			},
 			err => console.log(err)
@@ -304,67 +348,43 @@ export class CredentialViewEditComponent {
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
 				)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.close(null);
-					} else {
-						this.focusForm();
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
 					}
-				})
-				.catch(error => console.log(error));
+				});
 		} else {
-			this.activeDialog.close(null);
+			super.onCancelClose();
 		}
 	}
 
 	public cancelEditDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
 				)
-				.then(confirm => {
-					if (confirm) {
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
 						this.modalType = this.actionTypes.VIEW;
 						this.modalTitle = 'Credential Detail';
-					} else {
-						this.focusForm();
 					}
-				})
-				.catch(error => console.log(error));
+				});
 		} else {
 			this.modalType = this.actionTypes.VIEW;
 			this.modalTitle = 'Credential Detail';
-		}
-	}
-
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(
-		event: KeyboardEvent
-	) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
 		}
 	}
 
@@ -374,7 +394,6 @@ export class CredentialViewEditComponent {
 	protected changeToEditCredential(): void {
 		this.modalType = this.actionTypes.EDIT;
 		this.modalTitle = 'Credential Edit';
-		this.focusForm();
 	}
 
 	/**
@@ -382,23 +401,17 @@ export class CredentialViewEditComponent {
 	 * @param dataItem
 	 */
 	protected onDeleteCredential(): void {
-		this.prompt
-			.open(
-				'Confirmation Required',
-				'Do you want to proceed?',
-				'Yes',
-				'No'
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+			),
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION'
 			)
-			.then(res => {
-				if (res) {
-					this.credentialService
-						.deleteCredential(this.credentialModel.id)
-						.subscribe(
-							result => {
-								this.activeDialog.dismiss(result);
-							},
-							err => console.log(err)
-						);
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.onCancelClose();
 				}
 			});
 	}
@@ -458,11 +471,14 @@ export class CredentialViewEditComponent {
 		);
 	}
 
-	private focusForm() {
-		this.credentialsContainer.nativeElement.focus();
-	}
-
 	protected isCheckSyntaxDisabled(): boolean {
 		return this.operationStatusModel.state === CHECK_ACTION.VALID;
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

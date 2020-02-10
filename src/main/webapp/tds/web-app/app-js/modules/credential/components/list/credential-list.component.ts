@@ -1,62 +1,47 @@
 // Angular
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, ComponentFactoryResolver, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 // Services
-import { CredentialService } from '../../service/credential.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {CredentialService} from '../../service/credential.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
-import { CredentialViewEditComponent } from '../view-edit/credential-view-edit.component';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import {CredentialViewEditComponent} from '../view-edit/credential-view-edit.component';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 // Models
-import { Permission } from '../../../../shared/model/permission.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {CredentialColumnModel, CredentialModel} from '../../model/credential.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {
-	CredentialColumnModel,
-	CredentialModel,
-} from '../../model/credential.model';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { DIALOG_SIZE } from '../../../../shared/model/constants';
-import {
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-	GRID_DEFAULT_PAGE_SIZE,
-} from '../../../../shared/model/constants';
-import {
-	COLUMN_MIN_WIDTH,
 	ActionType,
 	BooleanFilterData,
+	COLUMN_MIN_WIDTH,
 	DefaultBooleanFilterData,
 } from '../../../../shared/model/data-list-grid.model';
+import {DialogConfirmAction, DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
 // Kendo
-import {
-	process,
-	CompositeFilterDescriptor,
-	State,
-} from '@progress/kendo-data-query';
-import { CellClickEvent, GridDataResult } from '@progress/kendo-angular-grid';
-import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import {
-	COMMON_SHRUNK_COLUMNS_WIDTH,
-	COMMON_SHRUNK_COLUMNS,
-} from '../../../../shared/constants/common-shrunk-columns';
-import {HeaderActionButtonData} from 'tds-component-library';
+import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 @Component({
 	selector: 'credential-list',
 	templateUrl: 'credential-list.component.html',
 	styles: [
-		`
-			#btnCreate {
-				margin-left: 16px;
-			}
-			.action-header {
-				width: 100%;
-				text-align: center;
-			}
+			`
+            #btnCreate {
+                margin-left: 16px;
+            }
+
+            .action-header {
+                width: 100%;
+                text-align: center;
+            }
 		`,
 	],
 })
@@ -97,11 +82,11 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private route: ActivatedRoute,
-		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private credentialService: CredentialService,
-		private prompt: UIPromptService,
 		private userContext: UserContextService,
 		private translateService: TranslatePipe
 	) {
@@ -199,26 +184,19 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.prompt
-			.open(
-				'Confirmation Required',
-				'Confirm deletion of ' + dataItem.name + ' credential?',
-				'Yes',
-				'No'
-			)
-			.then(res => {
-				if (res) {
-					this.credentialService
-						.deleteCredential(dataItem.id)
-						.pipe(takeUntil(this.unsubscribeOnDestroy$))
-						.subscribe(
-							result => {
-								this.reloadData();
-							},
-							err => console.log(err)
-						);
-				}
-			});
+		this.dialogService.confirm('Confirmation Required', 'Confirm deletion of ' + dataItem.name + ' credential?').subscribe((data: any) => {
+			if (data.confirm === DialogConfirmAction.CONFIRM) {
+				this.credentialService
+					.deleteCredential(dataItem.id)
+					.pipe(takeUntil(this.unsubscribeOnDestroy$))
+					.subscribe(
+						result => {
+							this.reloadData();
+						},
+						err => console.log(err)
+					);
+			}
+		});
 	}
 
 	/**
@@ -229,7 +207,7 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 		if (event.columnIndex > 0) {
 			let credential: CredentialModel = event[
 				'dataItem'
-			] as CredentialModel;
+				] as CredentialModel;
 			this.selectRow(credential.id);
 			this.credentialService
 				.getCredential(credential.id)
@@ -239,7 +217,8 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 						this.openCredentialDialogViewEdit(
 							response,
 							ActionType.VIEW,
-							credential
+							credential,
+							true
 						);
 					},
 					err => console.log(err)
@@ -298,32 +277,32 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	private openCredentialDialogViewEdit(
 		credentialModel: CredentialModel,
 		actionType: number,
-		originalModel?: CredentialModel
+		originalModel?: CredentialModel,
+		openFromList = false
 	): void {
-		this.dialogService
-			.open(
-				CredentialViewEditComponent,
-				[
-					{ provide: CredentialModel, useValue: credentialModel },
-					{ provide: Number, useValue: actionType },
-				],
-				DIALOG_SIZE.XLG,
-				false
-			)
-			.then((result: CredentialModel) => {
-				if (result && result.id) {
-					if (actionType === ActionType.CREATE) {
-						this.lastCreatedRecordId = result.id;
-						this.reloadData();
-					} else {
-						this.reloadItem(originalModel);
-					}
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: CredentialViewEditComponent,
+			data: {
+				credentialModel: credentialModel,
+				actionType: actionType,
+				openFromList: openFromList
+			},
+			modalConfiguration: {
+				title: 'Credential',
+				draggable: true,
+				modalSize: ModalSize.LG
+			}
+		}).subscribe((result: any) => {
+			if (result && result.id) {
+				if (actionType === ActionType.CREATE) {
+					this.lastCreatedRecordId = result.id;
+					this.reloadData();
+				} else {
+					this.reloadItem(originalModel);
 				}
-			})
-			.catch(result => {
-				this.reloadData();
-				console.log('Dismissed Dialog');
-			});
+			}
+		});
 	}
 
 	private selectRow(dataItemId: number): void {

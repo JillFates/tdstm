@@ -35,8 +35,6 @@ import {Subject} from 'rxjs/Subject';
 })
 export class ProviderViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
-	@Input() buttons: any;
-	@Output() successEvent: EventEmitter<any> = new EventEmitter<any>();
 
 	@ViewChild('providerForm', {read: NgForm, static: true}) providerForm: NgForm;
 
