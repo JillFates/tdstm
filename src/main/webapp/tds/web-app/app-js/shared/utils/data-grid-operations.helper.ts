@@ -438,7 +438,7 @@ export class DataGridOperationsHelper {
 }
 
 /**
- * emove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+ * Remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
  * TODO: (dontiveros) we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
  */
 export const fixContentWrapper = () => {
