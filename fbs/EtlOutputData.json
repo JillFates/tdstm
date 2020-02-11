@@ -1,0 +1,1252 @@
+{
+  "ETLInfo": {
+    "originalFilename": "/tmp/EtlSampleData_2Z1scLRqEIg21Y5zYe5sTaAa5oqE21wo.csv"
+  },
+  "consoleLog": "",
+  "domains": [
+    {
+      "data": [
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 1",
+              "update": null,
+              "value": "Application 1",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Application",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Application 1"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 1,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 2",
+              "update": null,
+              "value": "Application 2",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Application",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Application 2"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 2,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 3",
+              "update": null,
+              "value": "Application 3",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Application",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Application 3"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 3,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 4",
+              "update": null,
+              "value": "Application 4",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Application",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Application 4"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 4,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 5",
+              "update": null,
+              "value": "Application 5",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Application",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Application 5"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 5,
+          "warn": false,
+          "tags": null
+        }
+      ],
+      "domain": "Application",
+      "fieldLabelMap": {
+        "assetName": "Name",
+        "description": "Description",
+        "id": "Id"
+      },
+      "fieldNames": [
+        "assetName",
+        "description",
+        "id"
+      ]
+    },
+    {
+      "data": [
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 1",
+              "update": null,
+              "value": "Server 1",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "assetType": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server",
+              "update": null,
+              "value": "Server",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 3,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Device",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Server 1"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 1,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 2",
+              "update": null,
+              "value": "Server 2",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "assetType": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server",
+              "update": null,
+              "value": "Server",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 3,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Device",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Server 2"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 2,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 3",
+              "update": null,
+              "value": "Server 3",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "assetType": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server",
+              "update": null,
+              "value": "Server",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 3,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Device",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Server 3"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 3,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 4",
+              "update": null,
+              "value": "Server 4",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "assetType": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server",
+              "update": null,
+              "value": "Server",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 3,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Device",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Server 4"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 4,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "assetName": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 5",
+              "update": null,
+              "value": "Server 5",
+              "warn": false
+            },
+            "description": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "2019-12-23 12:41:04",
+              "update": null,
+              "value": "Created at: 2019-12-23 12:41:04",
+              "warn": false
+            },
+            "assetType": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server",
+              "update": null,
+              "value": "Server",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 3,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Device",
+                    "criteria": [
+                      {
+                        "propertyName": "assetName",
+                        "operator": "eq",
+                        "value": "Server 5"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 5,
+          "warn": false,
+          "tags": null
+        }
+      ],
+      "domain": "Device",
+      "fieldLabelMap": {
+        "assetName": "Name",
+        "description": "Description",
+        "assetType": "Device Type",
+        "id": "Id"
+      },
+      "fieldNames": [
+        "assetName",
+        "description",
+        "assetType",
+        "id"
+      ]
+    },
+    {
+      "data": [
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "asset": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 1",
+              "update": null,
+              "value": "Application 1",
+              "warn": false
+            },
+            "dependent": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 1",
+              "update": null,
+              "value": "Server 1",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Dependency",
+                    "criteria": [
+                      {
+                        "propertyName": "asset",
+                        "operator": "eq",
+                        "value": "Application 1"
+                      },
+                      {
+                        "propertyName": "dependent",
+                        "operator": "eq",
+                        "value": "Server 1"
+                      },
+                      {
+                        "propertyName": "type",
+                        "operator": "eq",
+                        "value": "Runs On"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 1,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "asset": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 2",
+              "update": null,
+              "value": "Application 2",
+              "warn": false
+            },
+            "dependent": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 2",
+              "update": null,
+              "value": "Server 2",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Dependency",
+                    "criteria": [
+                      {
+                        "propertyName": "asset",
+                        "operator": "eq",
+                        "value": "Application 2"
+                      },
+                      {
+                        "propertyName": "dependent",
+                        "operator": "eq",
+                        "value": "Server 2"
+                      },
+                      {
+                        "propertyName": "type",
+                        "operator": "eq",
+                        "value": "Runs On"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 2,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "asset": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 3",
+              "update": null,
+              "value": "Application 3",
+              "warn": false
+            },
+            "dependent": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 3",
+              "update": null,
+              "value": "Server 3",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Dependency",
+                    "criteria": [
+                      {
+                        "propertyName": "asset",
+                        "operator": "eq",
+                        "value": "Application 3"
+                      },
+                      {
+                        "propertyName": "dependent",
+                        "operator": "eq",
+                        "value": "Server 3"
+                      },
+                      {
+                        "propertyName": "type",
+                        "operator": "eq",
+                        "value": "Runs On"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 3,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "asset": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 4",
+              "update": null,
+              "value": "Application 4",
+              "warn": false
+            },
+            "dependent": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 4",
+              "update": null,
+              "value": "Server 4",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Dependency",
+                    "criteria": [
+                      {
+                        "propertyName": "asset",
+                        "operator": "eq",
+                        "value": "Application 4"
+                      },
+                      {
+                        "propertyName": "dependent",
+                        "operator": "eq",
+                        "value": "Server 4"
+                      },
+                      {
+                        "propertyName": "type",
+                        "operator": "eq",
+                        "value": "Runs On"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 4,
+          "warn": false,
+          "tags": null
+        },
+        {
+          "comments": [],
+          "duplicate": false,
+          "errorCount": 0,
+          "errors": [],
+          "fields": {
+            "asset": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 0,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Application 5",
+              "update": null,
+              "value": "Application 5",
+              "warn": false
+            },
+            "dependent": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 1,
+              "find": {
+                "matchOn": null,
+                "query": [],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": "Server 5",
+              "update": null,
+              "value": "Server 5",
+              "warn": false
+            },
+            "id": {
+              "create": null,
+              "errors": [],
+              "fieldOrder": 2,
+              "find": {
+                "matchOn": null,
+                "query": [
+                  {
+                    "domain": "Dependency",
+                    "criteria": [
+                      {
+                        "propertyName": "asset",
+                        "operator": "eq",
+                        "value": "Application 5"
+                      },
+                      {
+                        "propertyName": "dependent",
+                        "operator": "eq",
+                        "value": "Server 5"
+                      },
+                      {
+                        "propertyName": "type",
+                        "operator": "eq",
+                        "value": "Runs On"
+                      }
+                    ]
+                  }
+                ],
+                "results": [],
+                "size": 0
+              },
+              "init": null,
+              "originalValue": null,
+              "update": null,
+              "value": null,
+              "warn": false
+            }
+          },
+          "op": "Insert",
+          "rowNum": 5,
+          "warn": false,
+          "tags": null
+        }
+      ],
+      "domain": "Dependency",
+      "fieldLabelMap": {
+        "asset": "asset",
+        "dependent": "dependent",
+        "type": "type",
+        "id": "id"
+      },
+      "fieldNames": [
+        "asset",
+        "dependent",
+        "id"
+      ]
+    }
+  ],
+  "version": 2
+}

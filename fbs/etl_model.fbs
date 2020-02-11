@@ -1,14 +1,90 @@
 namespace net.transitionmanager.fbs;
 
-table ETLProcessorResult {
-    rows: [RowResult]; // Vector of tables.
+table FBSETLProcessorResult {
+    ETLInfo: FBSETLInfo;
+    consoleLog: string;
+    domains: [FBSDomainResult];
     version: ulong;
 }
 
-table RowResult {
-    rowNum: int;
-    errorCount: int;
-    domain: string;
+/// "ETLInfo": {
+///     "originalFilename": "/tmp/EtlSampleData_2Z1scLRqEIg21Y5zYe5sTaAa5oqE21wo.csv"
+/// },
+table FBSETLInfo {
+    originalFilename: string;
 }
 
-root_type ETLProcessorResult;
+//table FBSFieldLabelMapValue{
+//
+//}
+
+//struct FBSFieldLabelMap {
+//    name: string (key);
+//}
+
+table FBSDomainResult {
+    domain: string;
+    fieldNames: [string];
+    //fieldLabelMap:????;
+    data: [FBSRowResult];
+}
+
+table FBSQueryResultMap {
+    key: string (key);
+    name: string;
+}
+//////////////
+// "criteria": [
+//      {"propertyName": "assetName", "operator": "eq","value": "zulu01"},
+//      {"propertyName": "priority", "operator": "gt","value": 2},
+// ],
+table FBSQueryResult {
+    domain: string;
+    criteria: [FBSQueryResultMap];
+}
+
+table FBSFindResult {
+    query: [FBSQueryResult];
+    results: [long];
+    size: int;
+    matchOn: int;
+}
+
+table FBSFieldResult {
+    key: string (key);
+    originalValue: string;
+    value: string;
+    init: string;
+    type: string;
+    fieldOrder: int;
+    errors: [string];
+    warn: bool;
+    find: FBSFindResult;
+}
+
+table FBSTagReplace {
+    key: string (key);
+    value: string;
+}
+
+table FBSTagResults {
+    add: [string];
+    remove: [string];
+    replace: [FBSTagReplace];
+}
+
+table FBSRowResult {
+    op: string;
+    rowNum: int;
+    errorCount: int = 0;
+    warn: bool;
+    duplicate: bool;
+    errors: [string];
+    ignore: bool;
+    fields: [FBSFieldResult];
+    domain: string;
+    comments: [string];
+    tags: FBSTagResults;
+}
+
+root_type FBSETLProcessorResult;
