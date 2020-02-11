@@ -156,7 +156,7 @@ export class ProviderListComponent implements OnInit {
 	private onDelete = async (dataItem: ProviderModel): Promise<void> => {
 		try {
 			if (this.isDeleteAvailable()) {
-				const context = await this.providerService.deleteContext(dataItem.id);
+				const context = await this.providerService.deleteContext(dataItem.id).toPromise();
 
 				const confirmation = await this.dialogService.open({
 					componentFactoryResolver: this.componentFactoryResolver,
