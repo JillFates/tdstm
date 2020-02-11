@@ -293,6 +293,13 @@
 
         .k-grid-toolbar {
           padding-bottom: 0;
+          // TODO this section is located over the grid toolbar, so we need to take into account when the
+          // task manager is going to be refactored to use the new grid
+          .table-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+          }
         }
 
         .k-grid-content {
@@ -306,13 +313,6 @@
 
         .api-action-combobox {
           width: 100%;
-        }
-      }
-
-      tds-button {
-        button {
-          color: unset;
-          border-color: unset;
         }
       }
     }
