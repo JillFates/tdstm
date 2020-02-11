@@ -37,7 +37,7 @@ export class ProviderListComponent implements OnInit {
 	private headerActions: HeaderActionButtonData[];
 
 	private gridSettings: GridSettings = {
-		defaultSort: [{field: 'title', dir: 'asc'}],
+		defaultSort: [{field: 'name', dir: 'asc'}],
 		sortSettings: {mode: 'single'},
 		filterable: true,
 		pageable: true,
