@@ -436,3 +436,15 @@ export class DataGridOperationsHelper {
 		return uniq(filters.map((filter: any) => filter.field)).length;
 	}
 }
+
+/**
+ * emove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+ * TODO: (dontiveros) we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
+ */
+export const fixContentWrapper = () => {
+	const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
+	if (contentWrapper) {
+		// 45px is the header height, 31px is the footer height
+		setTimeout(() => (contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))');
+	}
+}

@@ -31,6 +31,7 @@ import { ASSET_ENTITY_DIALOG_TYPES } from '../../../assetExplorer/model/asset-en
 import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
 import { takeUntil } from 'rxjs/operators';
 import { Observable, ReplaySubject } from 'rxjs';
+import { fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 
 declare var jQuery: any;
 
@@ -86,6 +87,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
+		fixContentWrapper();
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
