@@ -363,22 +363,26 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 	public cancelEditDialog(): void {
 		if (this.isDirty()) {
 			this.dialogService.confirm(
-				this.translatePipe.transform(
-					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-				),
-				this.translatePipe.transform(
-					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-				)
-			)
-				.subscribe((data: any) => {
-					if (data.confirm === DialogConfirmAction.CONFIRM) {
-						this.modalType = this.actionTypes.VIEW;
-						this.modalTitle = 'Credential Detail';
-					}
-				});
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
+					// Put back original model
+					this.credentialModel = JSON.parse(this.dataSignature);
+					this.dataSignature = JSON.stringify(this.credentialModel);
+					this.modalType = this.actionTypes.VIEW;
+					this.setTitle(this.getModalTitle(this.modalType));
+				} else {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			this.modalType = this.actionTypes.VIEW;
-			this.modalTitle = 'Credential Detail';
+			if (!this.data.openFromList) {
+				this.modalType = this.actionTypes.VIEW;
+				this.setTitle(this.getModalTitle(this.modalType));
+			} else {
+				this.onCancelClose();
+			}
 		}
 	}
 
@@ -486,7 +490,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		setTimeout(() => {
 			// This ensure the UI has loaded since Kendo can change the signature of an object
 			this.dataSignature = JSON.stringify(this.credentialModel);
-		}, 1000);
+		}, 800);
 
 		if (modalType === ActionType.CREATE) {
 			return 'Credential Create';

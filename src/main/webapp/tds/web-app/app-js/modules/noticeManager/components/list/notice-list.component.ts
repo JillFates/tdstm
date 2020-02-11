@@ -56,6 +56,7 @@ export class NoticeListComponent implements OnInit {
 	protected dateFormat = '';
 
 	@ViewChild(GridComponent, { static: false }) gridComponent: GridComponent;
+
 	constructor(
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
