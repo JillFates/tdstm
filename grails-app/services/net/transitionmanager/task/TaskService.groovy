@@ -1105,7 +1105,7 @@ class TaskService implements ServiceMethods {
 			String updateHql = '''
 				UPDATE Task
 				SET status = :status, actStart = null, dateResolved = null,
-				    resolvedBy = null, statusUpdated = null
+				    resolvedBy = null, statusUpdated = null, percentage_complete = 0
 				WHERE id in (:ids)
 				and taskBatch = :taskBatch'''
 
