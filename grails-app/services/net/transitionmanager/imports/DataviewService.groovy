@@ -1235,7 +1235,7 @@ class DataviewService implements ServiceMethods {
 						WHERE status IN ('${UNKNOWN}','${QUESTIONED}') AND AD.dependent=AE)
 				)
 			""",
-			type          : Integer,
+			type          : Long,
 			namedParameter: 'tbd',
 			alias         : 'tbd',
 			join          : ''
@@ -1248,7 +1248,7 @@ class DataviewService implements ServiceMethods {
 				  AND asset=AE
 				  AND AD.dependent.moveBundle != AE.moveBundle)
 			""",
-			type          : Integer,
+			type          : Long,
 			namedParameter: 'conflict',
 			alias         : 'conflict',
 			join          : ''
@@ -1260,7 +1260,7 @@ class DataviewService implements ServiceMethods {
 				AC.isPublished = true AND
 				AC.commentType = '${AssetCommentType.COMMENT}')
 			""",
-			type          : Integer,
+			type          : Long,
 			namedParameter: 'commentCount',
 			alias         : 'commentCount',
 			join          : ''
@@ -1273,7 +1273,7 @@ class DataviewService implements ServiceMethods {
 				AC.commentType = '${AssetCommentType.ISSUE}')
 
 			""",
-			type          : Integer,
+			type          : Long,
 			namedParameter: 'taskCount',
 			alias         : 'taskCount',
 			join          : ''

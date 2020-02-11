@@ -198,9 +198,14 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	protected onFilter(column: any): void {
-		const root = this.dataIngestionService.filterColumn(column, this.state);
-		this.filterChange(root);
+	protected onFilter(column: any, event: any = null): void {
+		column.filter = event;
+		if (!event) {
+			this.clearValue(column);
+		} else {
+			const root = this.dataIngestionService.filterColumn(column, this.state);
+			this.filterChange(root);
+		}
 	}
 
 	protected clearValue(column: any): void {
@@ -414,7 +419,6 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		(this.dataScriptColumnModel.columns || []).forEach((column: GridColumnModel) => {
 			this.clearValue(column);
 		});
-		this.showFilters = false;
 		this.reloadDataScripts();
 	}
 

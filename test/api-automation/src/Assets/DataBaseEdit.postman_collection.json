@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ee8ee868-4db0-47d6-950e-00db98ff9ac4",
+		"_postman_id": "69954b87-487e-4e8d-8b30-5ce376e09ee3",
 		"name": "DataBase Edit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -253,6 +253,11 @@
 					{
 						"key": "cookie",
 						"value": "JSESSIONID=AA6C158AFDC275336E92F21A40035AEF"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {

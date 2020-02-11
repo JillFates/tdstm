@@ -395,24 +395,29 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * Update each Filter on a manual way
 	 * @param column
 	 */
-	public onFilter(column: any): void {
-		const filters = pathOr(
-			[],
-			['gridState', 'filter', 'filters'],
-			this.state
-		).filter((item: any) => item.field !== column.property);
+	public onFilter(column: any, event: any = null): void {
+		column.filter = event;
+		if (!event) {
+			this.onClearValue(column);
+		} else {
+			const filters = pathOr(
+				[],
+				['gridState', 'filter', 'filters'],
+				this.state
+			).filter((item: any) => item.field !== column.property);
 
-		if (column.filter) {
-			filters.push({
-				field: column.property,
-				operator: 'contains',
-				value: column.filter,
-			});
+			if (column.filter) {
+				filters.push({
+					field: column.property,
+					operator: 'contains',
+					value: column.filter,
+				});
+			}
+
+			const clonedState = clone(this.state);
+			clonedState.gridState.filter.filters = filters;
+			this.componentState.next(clonedState);
 		}
-
-		const clonedState = clone(this.state);
-		clonedState.gridState.filter.filters = filters;
-		this.componentState.next(clonedState);
 	}
 
 	/**
@@ -423,7 +428,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.dependenciesColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
-		this.showFilters = false;
 		this.onFilter({filter: ''});
 	}
 

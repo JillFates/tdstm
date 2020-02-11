@@ -275,7 +275,6 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.showFilters = false;
 		this.dataGridOperationsHelper.clearAllFilters(this.gridColumns);
 	}
 
