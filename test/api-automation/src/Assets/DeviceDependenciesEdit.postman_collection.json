@@ -264,11 +264,6 @@
 							"pm.environment.set(\"assetStatus\", assetStatus);",
 							"pm.environment.set(\"assetId\", assetId);",
 							"pm.environment.set(\"assetClass\", assetClass);",
-							"console.log(assetClass);",
-							"console.log(type);",
-							"console.log(assetStatus);",
-							"console.log(assetId);",
-							"console.log(assetName);",
 							"});"
 						],
 						"type": "text/javascript"
