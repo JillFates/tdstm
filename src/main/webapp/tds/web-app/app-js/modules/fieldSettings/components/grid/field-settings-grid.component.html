@@ -73,12 +73,13 @@
 					[displayLabel]="false"
 				>
 				</tds-button-cancel>
-				<tds-button-add
+				<tds-button-custom
 					[id]="'btnAddCustom'"
+					[icon]="'plus'"
 					[displayLabel]="false"
-					[tooltip]="'FIELD_SETTINGS.CREATE_CUSTOM' | translate"
+					[tooltip]="'GLOBAL.CREATE' | translate"
 					(click)="onAddCustom()"
-				></tds-button-add>
+				></tds-button-custom>
 			</div>
 		</div>
 	</ng-template>
