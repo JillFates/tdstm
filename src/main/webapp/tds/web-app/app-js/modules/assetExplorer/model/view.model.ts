@@ -11,7 +11,7 @@ export class ViewModel {
 	isOverride?: boolean;
 	saveAsOption?: string;
 	schema?: ViewSpec;
-	overridesView?: number;
+	overridesView?: any;
 	constructor() {
 		this.schema = new ViewSpec();
 		this.isOwner = true;

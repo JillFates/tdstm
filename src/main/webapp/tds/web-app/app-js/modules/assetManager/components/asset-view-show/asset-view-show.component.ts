@@ -26,12 +26,10 @@ import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.compone
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
-import { Store } from '@ngxs/store';
-import { UserContextModel } from '../../../auth/model/user-context.model';
 
 declare var jQuery: any;
 
-//TODO: take out color of the toggles
+//TODO: take out color of the state
 interface OverrideState {
 	icon?: string;
 	isOverride?: boolean;
@@ -57,7 +55,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
-	private userContext: UserContextModel;
 	protected readonly SAVE_BUTTON_ID = 'btnSave';
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	public currentOverrideState: OverrideState;
@@ -101,8 +98,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
-		private assetTagUIWrapperService: AssetTagUIWrapperService,
-		private store: Store) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
@@ -116,20 +112,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	ngOnInit(): void {
 
-		// Get all Query Params
-		this.route.queryParams.subscribe((params) => {
-			const _override = params._override === 'true' || params._override === true;
-			this.queryParams = { _override };
-		});
+		this.handleQueryParams();
 		this.globalQueryParams = this.route.snapshot.queryParams;
 		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
 
 		this.reloadStrategy();
 		this.initialiseComponent();
-
-		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-			this.userContext = userContext;
-		});
 	}
 
 	/**
@@ -161,6 +149,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 					this.model = dataView ;
 					this.dataSignature = this.stringifyCopyOfModel(this.model);
 					this.initialiseComponent();
+					this.handleOverrideState(this.model);
 				}
 			}
 		});
@@ -238,8 +227,15 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public toggleAssetView() {
-		
-		return this.router.navigate(['/asset', 'views', this.model.id, 'show'], {
+		let dataViewId;
+		const _override = !this.queryParams._override;
+
+		if (this.model.overridesView){
+			dataViewId = this.model.overridesView.id
+		} else {
+			dataViewId = this.model.id;
+		}
+		return this.router.navigate(['/asset', 'views', dataViewId, 'show'], {
 			queryParams: { _override }
 		});
 	}
@@ -260,9 +256,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = this.stringifyCopyOfModel(this.model);
-			const edit = this.model.overridesView ? '' : 'edit';
+			const mode = this.model.overridesView ? 'show' : 'edit';
 			setTimeout(() => {
-				this.router.navigate(['asset', 'views', this.model.id, edit]);
+				this.router.navigate(['asset', 'views', this.model.id, mode]);
 			});
 		}).catch(result => {
 			console.log('error');
@@ -350,6 +346,13 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		return assetQueryParams;
 	}
 
+	private handleQueryParams() {
+		this.route.queryParams.subscribe((params) => {
+			const _override = !params._override || params._override === 'true' || params._override === true;
+			this.queryParams = { _override };
+		});
+	}
+
 	/**
 	 * Removes isFavorite property from view model and returns stringified json.
 	 * @param {ViewModel} model
@@ -384,11 +387,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Determines determines the string of the save button label.
 	 * @returns {string}
 	 */
-	getSaveButtonLabel() {
+	public getSaveButtonLabel() {
 		if (!this.canSave() && this.canSaveAs()) {
-			return this.translateService.transform('GLOBAL.SAVE_AS');
+			return 'GLOBAL.SAVE_AS'
 		} else {
-			return this.translateService.transform('GLOBAL.SAVE');
+			return 'GLOBAL.SAVE'
 		}
 	}
 
