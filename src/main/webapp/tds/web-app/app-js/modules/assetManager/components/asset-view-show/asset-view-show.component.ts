@@ -30,9 +30,12 @@ import { Store } from '@ngxs/store';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 
 declare var jQuery: any;
+
+//TODO: take out color of the toggles
 interface OverrideState {
 	icon?: string;
 	isOverride?: boolean;
+	color?: string;
 	offLabel?: string;
 	onLabel?: string;
 }
@@ -68,12 +71,16 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private queryParams: any = {};
 	private readonly overrideAssetViewStates: any = {
 		IS_OVERRIDE_CHILD: {
-			icon: 'layer-minus',
+			// icon: 'layer-minus',
+			icon: 'cog',
+			color: 'black',
 			isOverriden: true,
 			label: 'Revert to Project View',
 		},
 		IS_OVERRIDE_PARENT: {
-			icon: 'layer-group',
+			icon: 'cog',
+			color: 'red',
+			// icon: 'layer-group',
 			isOverriden: false,
 			label: 'Display Personal System View'
 		},
@@ -110,7 +117,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	ngOnInit(): void {
 
 		// Get all Query Params
-		this.route.queryParams.subscribe(map => map);
+		this.route.queryParams.subscribe((params) => {
+			const _override = params._override === 'true' || params._override === true;
+			this.queryParams = { _override };
+		});
 		this.globalQueryParams = this.route.snapshot.queryParams;
 		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
 
@@ -228,9 +238,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public toggleAssetView() {
-		const _overrides = !this.queryParams._overrides;
+		
 		return this.router.navigate(['/asset', 'views', this.model.id, 'show'], {
-			queryParams: { _overrides }
+			queryParams: { _override }
 		});
 	}
 
@@ -250,8 +260,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = this.stringifyCopyOfModel(this.model);
+			const edit = this.model.overridesView ? '' : 'edit';
 			setTimeout(() => {
-				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+				this.router.navigate(['asset', 'views', this.model.id, edit]);
 			});
 		}).catch(result => {
 			console.log('error');
@@ -370,6 +381,18 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * Determines determines the string of the save button label.
+	 * @returns {string}
+	 */
+	getSaveButtonLabel() {
+		if (!this.canSave() && this.canSaveAs()) {
+			return this.translateService.transform('GLOBAL.SAVE_AS');
+		} else {
+			return this.translateService.transform('GLOBAL.SAVE');
+		}
+	}
+
+	/**
 	 * Determines if current user can Save view.
 	 * @returns {boolean}
 	 */
@@ -452,6 +475,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			saveButtonId: this.getSaveButtonId(),
 			canSave: this.canSave(),
 			canSaveAs: this.canSaveAs(),
+			saveButtonLabel: this.getSaveButtonLabel(),
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
 			disableSaveButton: this.isSaveButtonDisabled()

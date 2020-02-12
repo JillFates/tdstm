@@ -6,7 +6,7 @@
                         (click)="save(config.saveButtonId)"
                         [ngClass]="{'btn-default':!config.isDirty,'btn-success':config.isDirty}"
                         [disabled] = "config.disableSaveButton"
-                        [title]="config.canSaveAs ? translateService.transform('GLOBAL.SAVE_AS') : translateService.transform('GLOBAL.SAVE') "
+                        [title]="config.saveButtonLabel"
                         [attr.id]="config.saveButtonId">
                 </tds-button-save>
 
@@ -55,12 +55,14 @@
                         >
             </tds-button-custom>
 
+            
             <tds-button-custom 
                         class="pull-right no-action-button"
                         isIconButton="true"
+                        style ="color: {{currentOverrideState.color}}"
                         [icon]="currentOverrideState.icon"
                         [tooltip]="currentOverrideState.offLabel"
-                        (clik)="toggleAssetView()"
+                        (click)="toggleAssetView()"
                         >
             </tds-button-custom>
         </div>
