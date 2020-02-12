@@ -311,9 +311,10 @@ tds-ui-dialog {
           .label.tag {
             border-radius: 2px;
             border: 0;
-            //width: unset;
             font-weight: 500;
-            display: inline;
+            margin-bottom: 3px;
+            width: auto;
+            display: inline-block;
           }
         }
       }
