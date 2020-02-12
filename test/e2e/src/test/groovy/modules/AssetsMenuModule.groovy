@@ -22,8 +22,8 @@ class AssetsMenuModule extends Module {
         assetsDependItem { assetsMenu.find("li.menu-parent-assets-dependencies-list")}
         assetsCommentsItem { assetsMenu.find("li.menu-parent-assets-comments-list")}
         assetsDepAnalyzerItem { assetsMenu.find("li.menu-parent-assets-dependency-analyzer")}
-        assetsArchGraphItem { assetsMenu.find("li.menu-parent-assets-architecture-graph")[0]}
-        assetsGoJSArchGraphItem { assetsMenu.find("li.menu-parent-assets-architecture-graph")[1]}
+        assetsArchGraphItem { assetsMenu.find("li.menu-parent-assets-architecture-graph")}
+        assetsGoJSArchGraphItem { assetsMenu.find("li.menu-parent-assets-architecture-graph-gojs")}
         assetsImportETLItem { assetsMenu.find("li.menu-parent-assets-import-assets-etl")}
         assetsImportExcelItem { assetsMenu.find("li.menu-parent-assets-import-assets")}
         assetsManageBatchesETLItem { assetsMenu.find("li.menu-parent-assets-manage-dep-batches")}

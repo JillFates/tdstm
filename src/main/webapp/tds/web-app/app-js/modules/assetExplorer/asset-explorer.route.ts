@@ -30,7 +30,9 @@ export const AssetExplorerrRoute: Routes = [
 		path: AssetExplorerStates.ARCHITECTURE_GRAPH.url,
 		data: {
 			page: {
-				title: 'Architecture Graph', instruction: '', menu: ['ASSETS.ASSETS', 'Architecture Graph']
+				title: 'Architecture Graph', instruction: '',
+				menu: ['ASSETS.ASSETS', 'Go JS Architecture Graph'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-architecture-graph-gojs', subMenu: false }
 			}
 		},
 		component: ArchitectureGraphComponent,

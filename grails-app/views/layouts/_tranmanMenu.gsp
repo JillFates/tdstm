@@ -196,7 +196,7 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">
-                                <li class="menu-child-item menu-parent-assets-architecture-graph">
+                                <li class="menu-child-item menu-parent-assets-architecture-graph-gojs">
                                     <g:link controller="module" action="taskManager" id="architecture-graph">GoJS Architecture Graph</g:link>
                                 </li>
                             </tds:hasPermission>
