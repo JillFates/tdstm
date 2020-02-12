@@ -5,10 +5,12 @@
             Tags
         </label>
     </th>
-    <td style="display: flex;">
-        <div *ngFor="let tag of assetTags" class="label tag"
-              [ngClass]="tag.css">
-            {{tag.name}}
+    <td class="fit-tags-to-view">
+        <div class="tags-container">
+            <span *ngFor="let tag of assetTags" class="label tag"
+                  [ngClass]="tag.css">
+                {{tag.name}}
+            </span>
         </div>
     </td>
 </tr>

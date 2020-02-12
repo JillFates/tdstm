@@ -6,7 +6,7 @@ class AssetsMenuModule extends Module {
 
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
-        menuBar { menuContainer.find("div#navbar-collapse")}
+        menuBar { menuContainer.find("div#mobile-nav") }
 
         assetsItem { menuBar.find("li.menu-parent-assets")}
         assetsMenu { assetsItem.find("ul",class:"dropdown-menu menu-item-expand")}
@@ -18,12 +18,12 @@ class AssetsMenuModule extends Module {
         assetsDevicesItem { assetsMenu.find("li.menu-parent-assets-all-list a")}
         assetsServersItem { assetsMenu.find("li.menu-parent-assets-server-list a")}
         assetsDatabasesItem { assetsMenu.find("li.menu-parent-assets-database-list a")}
-        assetsStorageItem { assetsMenu.find("li.menu-parent-assets-storage-list a")}
         assetsLogicalItem { assetsMenu.find("li.menu-parent-assets-storage-logical-list a")}
         assetsDependItem { assetsMenu.find("li.menu-parent-assets-dependencies-list")}
         assetsCommentsItem { assetsMenu.find("li.menu-parent-assets-comments-list")}
         assetsDepAnalyzerItem { assetsMenu.find("li.menu-parent-assets-dependency-analyzer")}
-        assetsArchGraphItem { assetsMenu.find("li.menu-parent-assets-architecture-graph")}
+        assetsArchGraphItem { assetsMenu.find("li.menu-parent-assets-architecture-graph")[0]}
+        assetsGoJSArchGraphItem { assetsMenu.find("li.menu-parent-assets-architecture-graph")[1]}
         assetsImportETLItem { assetsMenu.find("li.menu-parent-assets-import-assets-etl")}
         assetsImportExcelItem { assetsMenu.find("li.menu-parent-assets-import-assets")}
         assetsManageBatchesETLItem { assetsMenu.find("li.menu-parent-assets-manage-dep-batches")}
@@ -105,6 +105,11 @@ class AssetsMenuModule extends Module {
     def goToArchitectureGraph(){
         selectMenu(assetsItem)
         selectItem(assetsArchGraphItem)
+    }
+
+    def goToGoJSArchitectureGraph(){
+        selectMenu(assetsItem)
+        selectItem(assetsGoJSArchGraphItem)
     }
 
     def goToComments(){

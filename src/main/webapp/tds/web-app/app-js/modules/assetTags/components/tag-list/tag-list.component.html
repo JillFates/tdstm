@@ -33,46 +33,39 @@
 						<div class="clr-row">
 							<div class="clr-col-12 pull-right">
 								<tds-grid-header-action-buttons
-										(refresh)="reloadTagList()"
-										[actionButtons]="headerActionButtons"
-										(clearFilters)="clearAllFilters()"
-										[disableClearFilters]="disableClearFilters">
+									(refresh)="reloadTagList()"
+									[actionButtons]="headerActionButtons">
 								</tds-grid-header-action-buttons>
 								<!-- Use a hidden button so that we don't have to override kendo's button styles -->
 								<button id="addButton"
-										kendoGridAddCommand
-										*ngIf="canCreate()"
-										style="display: none;"
-										type="button">
+												kendoGridAddCommand
+												*ngIf="canCreate()"
+												style="display: none;"
+												type="button">
 								</button>
 							</div>
 						</div>
-                    </ng-template>
+					</ng-template>
 
-                    <!-- Action -->
+					<!-- Show Filters / Actions column -->
 					<kendo-grid-column
-						[width]="60"
+						[field]="'_showFilters'"
+						[headerClass]="'text-center'"
+						[sortable]="false"
 						[class]="{ 'k-custom-command-column': true }"
-						[minResizableWidth]="60"
-					>
-						<ng-template
-							kendoGridHeaderTemplate
-							let-column
-							let-columnIndex="columnIndex"
-						>
-							<tds-button [flat]="true" (click)="toggleFilters()">
-								<clr-icon
-									shape="filter"
-									class="grid-filter-button is-solid"
-								>
-									<span
-										*ngIf="hasFilterApplied()"
-										class="badge badge-warning"
-									>
-										{{ filterCount() }}
-									</span>
-								</clr-icon>
-							</tds-button>
+						[width]="55"
+						[minResizableWidth]="55">
+						<!-- Toggle Filters button -->
+						<ng-template kendoGridHeaderTemplate>
+							<tds-grid-show-hide-filters-button [filterCount]="filterCount()"
+																								 (toggleFilters)="toggleFilters()">
+							</tds-grid-show-hide-filters-button>
+						</ng-template>
+						<!-- Clear all Filters button -->
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<tds-grid-clear-all-filters-button [show]="filterCount()"
+																								 (clearFilters)="clearAllFilters()">
+							</tds-grid-clear-all-filters-button>
 						</ng-template>
 						<ng-template
 							let-dataItem
@@ -132,7 +125,7 @@
 										<a
 											clrDropdownItem
 											kendoGridCancelCommand
-											>Cancel</a
+										>Cancel</a
 										>
 									</clr-dropdown-menu>
 								</clr-dropdown>
@@ -160,7 +153,9 @@
 					>
 						<!-- Header Template -->
 						<ng-template kendoGridHeaderTemplate>
-							<label>{{ column.label }}</label>
+							<div class="sortable-column">
+								<label>{{ column.label }}</label>
+							</div>
 						</ng-template>
 
 						<!-- Cell Templates -->
@@ -258,12 +253,13 @@
 						<!-- Filter Template -->
 						<ng-template kendoGridFilterCellTemplate let-filter>
 							<div class="filter-input" *ngIf="column.property !== 'color'">
-								<tds-filter-input
-										[name]="column.property"
-										[value]="column.filter || ''"
-										[columnType]="column.type"
-										(filter)="gridSettings.onFilterWithValue($event, column)">
-								</tds-filter-input>
+								<tds-grid-filter-input
+									[name]="column.property"
+									[value]="column.filter || ''"
+									[columnType]="column.type"
+									[placeholder]="'GLOBAL.FILTER' | translate"
+									(filter)="gridSettings.onFilterWithValue($event, column)">
+								</tds-grid-filter-input>
 							</div>
 						</ng-template>
 

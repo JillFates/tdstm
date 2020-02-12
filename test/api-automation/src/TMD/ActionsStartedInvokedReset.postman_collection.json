@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2da4260d-fdeb-460a-a17f-9c458721ae0d",
+		"_postman_id": "5261bf99-05bd-49ec-97e2-215dd61ea0a8",
 		"name": "Actions Started Invoked Reset",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1279,7 +1279,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"publicKey\":\"{{publicKey}}\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/task/{{taskID}}/recordRemoteActionStarted",

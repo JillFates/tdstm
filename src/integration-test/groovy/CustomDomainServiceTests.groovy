@@ -381,7 +381,8 @@ class CustomDomainServiceTests extends Specification {
             createAssets(project)
 
         when: ''
-            customDomainService.dataDateToDateTime(project, AssetClass.DEVICE.name(), 'custom21')
+            String updateString = customDomainService.dataDateToDateTime('custom21')
+            customDomainService.clearCustomFieldsForClass(project, AssetClass.DEVICE.name(), [updateString])
             List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
         then: ''
             assetList[0].custom20 == '2019-03-21T21:31:00Z'
@@ -432,7 +433,9 @@ class CustomDomainServiceTests extends Specification {
             createAssets(project)
 
         when: ''
-            customDomainService.dataDateTimeToDate(project, AssetClass.DEVICE.name(), 'custom20')
+            String updateString = customDomainService.dataDateTimeToDate('custom20')
+            customDomainService.clearCustomFieldsForClass(project, AssetClass.DEVICE.name(), [updateString])
+
             List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
         then: ''
             assetList[0].custom20 == '2019-03-21'
@@ -483,7 +486,8 @@ class CustomDomainServiceTests extends Specification {
             createAssets(project)
 
         when: ''
-            customDomainService.dataToYesNo(project, AssetClass.DEVICE.name(), 'custom22')
+            String updateString = customDomainService.dataToYesNo('custom22')
+            customDomainService.clearCustomFieldsForClass(project, AssetClass.DEVICE.name(), [updateString])
             List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
         then: ''
             assetList[0].custom20 == '2019-03-21T21:31:00Z'
@@ -535,7 +539,8 @@ class CustomDomainServiceTests extends Specification {
             createAssets(project)
 
         when: ''
-            customDomainService.dataToYesNo(project, AssetClass.DEVICE.name(), 'custom23')
+            String updateString = customDomainService.dataToYesNo('custom23')
+            customDomainService.clearCustomFieldsForClass(project, AssetClass.DEVICE.name(), [updateString])
             List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
         then: ''
             assetList[0].custom20 == '2019-03-21T21:31:00Z'
@@ -586,7 +591,8 @@ class CustomDomainServiceTests extends Specification {
             createAssets(project)
 
         when: ''
-            customDomainService.dataToString(project, AssetClass.DEVICE.name(), 'custom24', 5)
+            String updateString = customDomainService.dataToString('custom24', 5)
+            customDomainService.clearCustomFieldsForClass(project, AssetClass.DEVICE.name(), [updateString])
             List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
         then: ''
             assetList[0].custom20 == '2019-03-21T21:31:00Z'

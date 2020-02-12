@@ -106,32 +106,26 @@
 	<div class="row footer">
 		<tds-check-action
 			*ngIf="showActionButtons()"
-			[disabled]="!areOverrideValuesDirty()"
-			[name]="'Save'"
-			(onClick)="onUpdate()"
-			[noneStateIcon]="'glyphicon glyphicon-floppy-disk'"
-			[class]="'btn-sm col-sm-1'"
-			[(model)]="saveStatus">
-		</tds-check-action>
-		<tds-check-action
-			*ngIf="showActionButtons()"
 			[disabled]="areOverrideValuesDirty()"
 			[name]="'Process'"
 			(onClick)="onProcess()"
-			[noneStateIcon]="'glyphicon glyphicon-retweet'"
+			[noneStateIcon]="'fa fa-exchange'"
 			[class]="'btn-sm col-sm-1'"
-			[(model)]="processStatus">
+			[(model)]="processStatus"
+			[tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_IMMEDIATE_PROCESS' | translate">
 		</tds-check-action>
 		<button *ngIf="showIncludeButton()"
 						(click)="onInclude()"
-						class="btn btn-default btn-sm col-sm-1" type="button">
+						class="btn btn-default btn-sm col-sm-1" type="button"
+						[title]="'IMPORT_BATCH.DETAIL.CLICK_TO_TOGGLE_IGNORE' | translate">
 			<i class="glyphicon glyphicon-plus"></i>
 			Include
 		</button>
 		<button *ngIf="showIgnoreButton()"
 						(click)="onIgnore()"
-						class="btn btn-default btn-sm col-sm-1" type="button">
-			<i class="glyphicon glyphicon-eye-close"></i>
+						class="btn btn-default btn-sm col-sm-1" type="button"
+						[title]="'IMPORT_BATCH.DETAIL.CLICK_TO_TOGGLE_IGNORE' | translate">
+			<i class="fa fa-eye-slash"></i>
 			Ignore
 		</button>
 		<!--        <button (click)="onCancel()"-->

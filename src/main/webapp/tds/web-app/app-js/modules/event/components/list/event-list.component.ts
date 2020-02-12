@@ -95,7 +95,6 @@ export class EventListComponent implements OnInit {
 			gridRowActions: this.gridRowActions,
 			gridSettings: this.gridSettings,
 			headerActionButtons: this.headerActions,
-			showDataReloadButton: false,
 			loadData: this.loadData,
 		};
 

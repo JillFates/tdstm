@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ImportBatchModel} from '../../model/import-batch.model';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
@@ -12,7 +12,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 	selector: 'import-batch-record-dialog',
 	templateUrl: 'import-batch-record-dialog.component.html'
 })
-export class ImportBatchRecordDialogComponent extends UIExtraDialog {
+export class ImportBatchRecordDialogComponent extends UIExtraDialog implements AfterViewInit {
 
 	@ViewChild('detailFieldsComponent', {static: false}) detailFieldsComponent: ImportBatchRecordFieldsComponent;
 	private batchRecordUpdatedFlag = false;
@@ -23,10 +23,15 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 		public importBatch: ImportBatchModel,
 		public batchRecord: ImportBatchRecordModel,
 		private promptService: UIPromptService,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private cdr: ChangeDetectorRef) {
 			super('#import-batch-record-dialog');
 			this.isWindowMaximized = false;
 			this.modalOptions = { isFullScreen: false, isResizable: true, isDraggable: true };
+	}
+
+	ngAfterViewInit() {
+		this.cdr.detectChanges();
 	}
 
 	/**
@@ -45,6 +50,13 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 		} else {
 			this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
 		}
+	}
+
+	/**
+	 * On save button clicked.
+	 */
+	public onSaveClicked(): void {
+		this.detailFieldsComponent.onUpdate();
 	}
 
 	/**
@@ -73,5 +85,9 @@ export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 	 */
 	protected restoreWindow() {
 		this.isWindowMaximized = false;
+	}
+
+	protected showActionButtons(): boolean {
+		return this.detailFieldsComponent ? this.detailFieldsComponent.showActionButtons() : false;
 	}
 }

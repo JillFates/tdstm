@@ -102,9 +102,9 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.dataGridOperationsHelpter = new DataGridOperationsHelper([]);
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translate.transform('API_ACTION.CREATE_ACTION'),
+				title: this.translate.transform('GLOBAL.CREATE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreate.bind(this),
@@ -316,7 +316,6 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.isFiltering = false;
 		this.dataGridOperationsHelpter.clearAllFilters(this.apiActionColumnModel.columns, this.state);
 		this.reloadData();
 	}

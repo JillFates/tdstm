@@ -92,6 +92,10 @@ import { BooleanFilterData, GridColumnModel } from '../../model/data-list-grid.m
 
 	`,
 })
+/**
+ * TODO: dontiveros - This was already implemented on the component library as "<tds-grid-filter-input/>". We can remove this component later.
+ * @Deprecated: This was already implemented on the component library as "<tds-grid-filter-input/>". We can remove this component later.
+ */
 export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	@Input() name = '';
 	@Input() placeholder = '';

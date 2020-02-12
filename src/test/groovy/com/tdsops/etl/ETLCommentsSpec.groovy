@@ -258,4 +258,55 @@ class ETLCommentsSpec extends ETLBaseSpec implements DataTest {
 				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
+
+	@See('TM-11482')
+	void 'test can add a comment without other ETL command'() {
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				name,cpu,description
+				xraysrv01,100,Description FOOBAR
+				zuludb01,10,Some description
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, dataSet, debugConsole, validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				iterate {
+					load 'comments' with SOURCE.'description'
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					data.size() == 2
+					assertWith(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						comments == ['Description FOOBAR']
+					}
+
+					assertWith(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						comments == ['Some description']
+					}
+				}
+
+			}
+
+		cleanup:
+			if (fileName) {
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
+			}
+	}
+
 }

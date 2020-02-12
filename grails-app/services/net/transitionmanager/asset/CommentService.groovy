@@ -646,7 +646,7 @@ class CommentService implements ServiceMethods {
 			a long. */
 		taskDepId = NumberUtil.toLong(taskDepId)
 		def taskDependency = TaskDependency.get(taskDepId)
-		if (taskDependency && taskDependency.predecessor.id != Long.parseLong(depId)) {
+		if (taskDependency && taskDependency.predecessor.id != NumberUtil.toLong(depId)) {
 			taskDependency.predecessor = dependent
 			taskDependency.assetComment = task
         } else if( !taskDependency ) {

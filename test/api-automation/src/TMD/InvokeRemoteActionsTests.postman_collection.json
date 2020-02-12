@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0cb0c225-a6ca-4a78-a9ca-4c89883d3cbc",
+		"_postman_id": "a7505a32-4a94-45e1-b653-898ccf05a820",
 		"name": "InvokeRemoteActionsTests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -269,6 +269,69 @@
 			"response": []
 		},
 		{
+			"name": "Create PowerShell Action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var responseObject = JSON.parse(responseBody);",
+							"var apiID = responseObject.data.id;",
+							"pm.environment.set(\"psActionID\", apiID);",
+							"pm.environment.set(\"apiActionId\", apiID);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{PowerShellActionName}}\",\r\n  \"dictionaryMethodName\": \"Select...\",\r\n  \"remoteCredentialMethod\": \"PROMPTED\",\r\n  \"description\": \"\",\r\n  \"provider\":{\"id\":\"{{providerId}}\"},\r\n  \"script\": \"Update-TaskProgress -Progress 25 -Message 'The task executed'\",\r\n  \"apiCatalog\": {\r\n    \"id\": 0\r\n  },\r\n  \"connectorMethod\": \"0\",\r\n  \"httpMethod\": \"Select...\",\r\n  \"endpointUrl\": \"\",\r\n  \"docUrl\": \"\",\r\n  \"producesData\": 0,\r\n  \"isPolling\": 0,\r\n  \"pollingInterval\": 0,\r\n  \"pollingLapsedAfter\": 0,\r\n  \"pollingStalledAfter\": 0,\r\n  \"isRemote\": true,\r\n  \"debugEnabled\": false,\r\n  \"actionType\": \"POWER_SHELL\",\r\n  \"reactionScripts\": \"{\\\"STATUS\\\":\\\"// Check the HTTP response code for a 200 OK \\\\n if (response.status == SC.OK) { \\\\n \\\\t return SUCCESS \\\\n } else { \\\\n \\\\t return ERROR \\\\n}\\\",\\\"SUCCESS\\\":\\\"// Update the task status that the task completed\\\\n task.started()\\\",\\\"DEFAULT\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.stderr )\\\\n\\\",\\\"ERROR\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.stderr )\\\",\\\"FAILED\\\":\\\"\\\",\\\"LAPSED\\\":\\\"\\\",\\\"STALLED\\\":\\\"\\\",\\\"PRE\\\":\\\"\\\",\\\"FINAL\\\":\\\"\\\"}\",\r\n  \"defaultDataScript\": {\r\n    \"id\": null\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create Task",
 			"event": [
 				{
@@ -371,69 +434,6 @@
 			"response": []
 		},
 		{
-			"name": "Create PowerShell Action",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});",
-							"",
-							"var responseObject = JSON.parse(responseBody);",
-							"var apiID = responseObject.data.id;",
-							"pm.environment.set(\"psActionID\", apiID);",
-							"pm.environment.set(\"apiActionId\", apiID);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "{{tokenHeaderName}}",
-						"value": "{{token}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"{{PowerShellActionName}}\",\r\n  \"dictionaryMethodName\": \"Select...\",\r\n  \"remoteCredentialMethod\": \"PROMPTED\",\r\n  \"description\": \"\",\r\n  \"provider\":{\"id\":\"{{providerId}}\"},\r\n  \"script\": \"Update-TaskProgress -Progress 25 -Message 'The task executed'\",\r\n  \"apiCatalog\": {\r\n    \"id\": 0\r\n  },\r\n  \"connectorMethod\": \"0\",\r\n  \"httpMethod\": \"Select...\",\r\n  \"endpointUrl\": \"\",\r\n  \"docUrl\": \"\",\r\n  \"producesData\": 0,\r\n  \"isPolling\": 0,\r\n  \"pollingInterval\": 0,\r\n  \"pollingLapsedAfter\": 0,\r\n  \"pollingStalledAfter\": 0,\r\n  \"isRemote\": true,\r\n  \"debugEnabled\": false,\r\n  \"actionType\": \"POWER_SHELL\",\r\n  \"reactionScripts\": \"{\\\"STATUS\\\":\\\"// Check the HTTP response code for a 200 OK \\\\n if (response.status == SC.OK) { \\\\n \\\\t return SUCCESS \\\\n } else { \\\\n \\\\t return ERROR \\\\n}\\\",\\\"SUCCESS\\\":\\\"// Update the task status that the task completed\\\\n task.started()\\\",\\\"DEFAULT\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.stderr )\\\\n\\\",\\\"ERROR\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.stderr )\\\",\\\"FAILED\\\":\\\"\\\",\\\"LAPSED\\\":\\\"\\\",\\\"STALLED\\\":\\\"\\\",\\\"PRE\\\":\\\"\\\",\\\"FINAL\\\":\\\"\\\"}\",\r\n  \"defaultDataScript\": {\r\n    \"id\": null\r\n  }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/tdstm/ws/apiAction",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"ws",
-						"apiAction"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Invoke Remote action",
 			"event": [
 				{
@@ -491,7 +491,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"publicKey\":\"{{publicKey}}\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/task/{{taskID}}/recordRemoteActionStarted",

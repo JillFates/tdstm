@@ -115,7 +115,30 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	 * @return {void)
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.hasChanges()) {
+			this.promptForSave()
+				.then(confirm => {
+					if (confirm) {
+						this.dismiss();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.dismiss();
+		}
+	}
+
+	/**
+	 * Launch the prompt modal asking for saving changes
+	 *
+	 */
+	private promptForSave(): Promise<any> {
+		return this.promptService.open(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'),
+		)
 	}
 
 	/**
@@ -156,10 +179,27 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Cancel the edit changes
+	 * Cancel the edit changes, if there is changes prompt for saving
 	 * @return {void)
 	 */
 	protected cancelEdit(): void {
+		if (this.hasChanges()) {
+			this.promptForSave()
+				.then(confirm => {
+					if (confirm) {
+						this.changeToViewMode();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.changeToViewMode();
+		}
+	}
+
+	/**
+	 * Se the current view mode to read mode
+	 */
+	private changeToViewMode(): void {
 		this.setEditMode(false);
 		this.editedDependencies = this.getInitialEditDependencies();
 	}
@@ -212,7 +252,6 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		this.confirmDelete()
 			.then((result) => {
 				if (result) {
-					console.log(result);
 					const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
 
 					const dependencyChange = {
@@ -224,7 +263,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						.subscribe((result) => {
 							if (result) {
 								if (dependencyType === DependencyType.dependencyA) {
-									this.cancelCloseDialog();
+									this.close({delete: true});
 								} else {
 									this.dependencyB = null;
 								}
@@ -232,6 +271,13 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						}, (error) => console.log('Error:', error));
 				}
 			});
+	}
+
+	/**
+	 * Determines if there is changes in place
+	 */
+	private hasChanges(): boolean {
+		return this.editedDependencies.dependencies;
 	}
 
 	/**

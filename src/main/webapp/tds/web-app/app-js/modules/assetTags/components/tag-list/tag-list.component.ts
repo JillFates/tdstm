@@ -371,7 +371,6 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.showFilters = false;
 		this.gridSettings.clearAllFilters(this.gridColumns.columns);
 		this.reloadTagList();
 	}

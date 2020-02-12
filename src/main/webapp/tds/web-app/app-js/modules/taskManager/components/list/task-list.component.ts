@@ -890,7 +890,6 @@ export class TaskListComponent implements OnInit {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.isFiltering = false;
 		this.grid.clearAllFilters(this.columnsModel);
 		this.onFiltersChange();
 	}

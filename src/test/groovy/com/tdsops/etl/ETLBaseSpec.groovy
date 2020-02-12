@@ -14,6 +14,7 @@ import net.transitionmanager.asset.Room
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
+import org.apache.poi.hssf.usermodel.HSSFRow
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
@@ -120,13 +121,36 @@ abstract class ETLBaseSpec extends Specification implements DataTest {
      * @param sheetContent
      * @return
      */
-    protected List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
+    protected List buildSpreadSheetXLSXDataSet(String sheetName, String sheetContent) {
 
         def (String fileName, OutputStream outputStream) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'xlsx')
         Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
 
+        addSheetInXLSXWorkBook(workbook, sheetName, sheetContent)
 
-        addSheetInWorkBook(workbook, sheetName, sheetContent)
+        WorkbookUtil.saveToOutputStream(workbook, outputStream)
+
+        ExcelConnection con = new ExcelConnection(
+                path: getFileSystemServiceTestBean().temporaryDirectory,
+                fileName: fileName,
+                driver: TDSExcelDriver)
+        ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
+
+        return [fileName, new DataSetFacade(dataSet)]
+    }
+
+    /**
+     * Builds a SpreadSheet dataSet for an Excel content
+     * @param sheetName
+     * @param sheetContent
+     * @return
+     */
+    protected List buildSpreadSheetXLSDataSet(String sheetName, String sheetContent) {
+
+        def (String fileName, OutputStream outputStream) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'xls')
+        Workbook workbook = WorkbookUtil.createWorkbook('xls')
+
+        addSheetInXLSWorkBook(workbook, sheetName, sheetContent)
 
         WorkbookUtil.saveToOutputStream(workbook, outputStream)
 
@@ -145,7 +169,23 @@ abstract class ETLBaseSpec extends Specification implements DataTest {
      * @param sheetName
      * @param sheetContent
      */
-    protected void addSheetInWorkBook(Workbook workbook, String sheetName, String sheetContent) {
+    protected void addSheetInXLSWorkBook(Workbook workbook, String sheetName, String sheetContent) {
+        Sheet sheet = workbook.createSheet(sheetName)
+        sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
+            HSSFRow currentRow = sheet.createRow(rowNumber)
+            line.split(",").eachWithIndex { String cellContent, int columnNumber ->
+                Cell cell = currentRow.createCell(columnNumber)
+                WorkbookUtil.setCellValue(cell, cellContent)
+            }
+        }
+    }
+    /**
+     * Adds a Sheet in a Workbook instance using the sheet name and the sheet contents
+     * @param workbook
+     * @param sheetName
+     * @param sheetContent
+     */
+    protected void addSheetInXLSXWorkBook(Workbook workbook, String sheetName, String sheetContent) {
         Sheet sheet = workbook.createSheet(sheetName)
         sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
             XSSFRow currentRow = sheet.createRow(rowNumber)

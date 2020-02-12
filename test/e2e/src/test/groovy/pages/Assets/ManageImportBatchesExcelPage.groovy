@@ -13,8 +13,8 @@ class ManageImportBatchesExcelPage extends Page {
     }
 
     static content = {
-        manageImportBatchPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        manageImportBatchBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        manageImportBatchPageTitle (wait:true) { $("section", 	class:"content-header").find("h2")}
+        manageImportBatchBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }

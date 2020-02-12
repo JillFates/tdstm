@@ -18,6 +18,10 @@ import { NotifierService } from '../services/notifier.service';
 
 declare var jQuery: any;
 
+/**
+ * TODO: (dontiveros) migrate usage of Grid Helper to Helper class from component-library.
+ * @deprecated Please user Grid Helper class from component-library.
+ */
 export class DataGridOperationsHelper {
 	public gridData: GridDataResult = {
 		data: [],
@@ -406,7 +410,6 @@ export class DataGridOperationsHelper {
 		if (column.filter === '' && column.type === 'boolean') {
 			root.filters = root.filters.filter((filter: any) => filter.field !== column.property);
 		}
-
 		return root;
 	}
 
