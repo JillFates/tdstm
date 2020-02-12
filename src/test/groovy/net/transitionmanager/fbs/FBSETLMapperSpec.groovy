@@ -19,6 +19,8 @@ import net.transitionmanager.project.Project
 import spock.lang.See
 import spock.util.mop.ConfineMetaClassChanges
 
+import java.nio.ByteBuffer
+
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database])
 class FBSETLMapperSpec extends ETLBaseSpec {
 
@@ -96,12 +98,17 @@ class FBSETLMapperSpec extends ETLBaseSpec {
 					
 				}
 			""".stripIndent())
-		    ETLFlatBuffersMapper mapper = new ETLFlatBuffersMapper(etlProcessor.finalResult())
 
-		     FlatBufferBuilder bufferBuilder = mapper.build()
+			
+
+		    ETLFlatBuffersConverter mapper = new ETLFlatBuffersConverter(etlProcessor.finalResult())
+		    FlatBufferBuilder bufferBuilder = mapper.build()
+
+		    ByteBuffer buf = bufferBuilder.dataBuffer()
+            FBSProcessorResult result = FBSProcessorResult.getRootAsFBSProcessorResult(buf)
 
 		then: ''
-		    bufferBuilder.sizedByteArray() != null
+            result != null
 
 		cleanup:
 			if(fileName) fileSystemService.deleteTemporaryFile(fileName)

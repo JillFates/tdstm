@@ -2,83 +2,349 @@
 
 package net.transitionmanager.fbs;
 
-import java.nio.*;
-import java.lang.*;
-import java.util.*;
-import com.google.flatbuffers.*;
+import com.google.flatbuffers.FlatBufferBuilder;
+import com.google.flatbuffers.Table;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
+/**
+ * <p>This part of the model represents the following JSON part in the ETLProcessorResult structure:</p>
+ * <pre>
+ *  "assetName" :{
+ *     "create": null,
+ *     "errors": [],
+ *     "fieldOrder": 0,
+ *     "find": {
+ *       "matchOn": null,
+ *       "query": [],
+ *       "results": [],
+ *       "size": 0
+ *     },
+ *     "init": null,
+ *     "originalValue": "Server 1",
+ *     "update": null,
+ *     "value": "Server 1",
+ *     "warn": false
+ * }
+ * </pre>
+ * <p>Example of an instance creation:</p>
+ * <pre>
+ *  FBSFieldResult.createFBSFieldResult(builder,
+ *          builder.createString('assetName'),
+ *          builder.createString('originalValue'),
+ *          builder.createString('value'),
+ *          builder.createString('init'),
+ *          builder.createString('String'),
+ *          1,
+ *          FBSRowResult.createErrorsVector(builder, (int[]) [builder.createString('Quick Error Example')]),
+ *          true,
+ *          findOffset,
+ *          createOffset,
+ *          updateOffset
+ *  )
+ * </pre>
+ */
 public final class FBSFieldResult extends Table {
-  public static FBSFieldResult getRootAsFBSFieldResult(ByteBuffer _bb) { return getRootAsFBSFieldResult(_bb, new FBSFieldResult()); }
-  public static FBSFieldResult getRootAsFBSFieldResult(ByteBuffer _bb, FBSFieldResult obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
-  public FBSFieldResult __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
-
-  public String key() { int o = __offset(4); return o != 0 ? __string(o + bb_pos) : null; }
-  public ByteBuffer keyAsByteBuffer() { return __vector_as_bytebuffer(4, 1); }
-  public ByteBuffer keyInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 4, 1); }
-  public String originalValue() { int o = __offset(6); return o != 0 ? __string(o + bb_pos) : null; }
-  public ByteBuffer originalValueAsByteBuffer() { return __vector_as_bytebuffer(6, 1); }
-  public ByteBuffer originalValueInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 6, 1); }
-  public String value() { int o = __offset(8); return o != 0 ? __string(o + bb_pos) : null; }
-  public ByteBuffer valueAsByteBuffer() { return __vector_as_bytebuffer(8, 1); }
-  public ByteBuffer valueInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 8, 1); }
-  public String init() { int o = __offset(10); return o != 0 ? __string(o + bb_pos) : null; }
-  public ByteBuffer initAsByteBuffer() { return __vector_as_bytebuffer(10, 1); }
-  public ByteBuffer initInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 10, 1); }
-  public String type() { int o = __offset(12); return o != 0 ? __string(o + bb_pos) : null; }
-  public ByteBuffer typeAsByteBuffer() { return __vector_as_bytebuffer(12, 1); }
-  public ByteBuffer typeInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 12, 1); }
-
-  public static int createFBSFieldResult(FlatBufferBuilder builder,
-      int keyOffset,
-      int originalValueOffset,
-      int valueOffset,
-      int initOffset,
-      int typeOffset) {
-    builder.startObject(5);
-    FBSFieldResult.addType(builder, typeOffset);
-    FBSFieldResult.addInit(builder, initOffset);
-    FBSFieldResult.addValue(builder, valueOffset);
-    FBSFieldResult.addOriginalValue(builder, originalValueOffset);
-    FBSFieldResult.addKey(builder, keyOffset);
-    return FBSFieldResult.endFBSFieldResult(builder);
-  }
-
-  public static void startFBSFieldResult(FlatBufferBuilder builder) { builder.startObject(5); }
-  public static void addKey(FlatBufferBuilder builder, int keyOffset) { builder.addOffset(0, keyOffset, 0); }
-  public static void addOriginalValue(FlatBufferBuilder builder, int originalValueOffset) { builder.addOffset(1, originalValueOffset, 0); }
-  public static void addValue(FlatBufferBuilder builder, int valueOffset) { builder.addOffset(2, valueOffset, 0); }
-  public static void addInit(FlatBufferBuilder builder, int initOffset) { builder.addOffset(3, initOffset, 0); }
-  public static void addType(FlatBufferBuilder builder, int typeOffset) { builder.addOffset(4, typeOffset, 0); }
-  public static int endFBSFieldResult(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    builder.required(o, 4);  // key
-    return o;
-  }
-
-  @Override
-  protected int keysCompare(Integer o1, Integer o2, ByteBuffer _bb) { return compareStrings(__offset(4, o1, _bb), __offset(4, o2, _bb), _bb); }
-
-  public static FBSFieldResult __lookup_by_key(FBSFieldResult obj, int vectorLocation, String key, ByteBuffer bb) {
-    byte[] byteKey = key.getBytes(Table.UTF8_CHARSET.get());
-    int span = bb.getInt(vectorLocation - 4);
-    int start = 0;
-    while (span != 0) {
-      int middle = span / 2;
-      int tableOffset = __indirect(vectorLocation + 4 * (start + middle), bb);
-      int comp = compareStrings(__offset(4, bb.capacity() - tableOffset, bb), byteKey, bb);
-      if (comp > 0) {
-        span = middle;
-      } else if (comp < 0) {
-        middle++;
-        start += middle;
-        span -= middle;
-      } else {
-        return (obj == null ? new FBSFieldResult() : obj).__assign(tableOffset, bb);
-      }
+    public static FBSFieldResult getRootAsFBSFieldResult(ByteBuffer _bb) {
+        return getRootAsFBSFieldResult(_bb, new FBSFieldResult());
     }
-    return null;
-  }
+
+    public static FBSFieldResult getRootAsFBSFieldResult(ByteBuffer _bb, FBSFieldResult obj) {
+        _bb.order(ByteOrder.LITTLE_ENDIAN);
+        return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb));
+    }
+
+    public void __init(int _i, ByteBuffer _bb) {
+        bb_pos = _i;
+        bb = _bb;
+        vtable_start = bb_pos - bb.getInt(bb_pos);
+        vtable_size = bb.getShort(vtable_start);
+    }
+
+    public FBSFieldResult __assign(int _i, ByteBuffer _bb) {
+        __init(_i, _bb);
+        return this;
+    }
+
+    public String key() {
+        int o = __offset(4);
+        return o != 0 ? __string(o + bb_pos) : null;
+    }
+
+    public ByteBuffer keyAsByteBuffer() {
+        return __vector_as_bytebuffer(4, 1);
+    }
+
+    public ByteBuffer keyInByteBuffer(ByteBuffer _bb) {
+        return __vector_in_bytebuffer(_bb, 4, 1);
+    }
+
+    public String originalValue() {
+        int o = __offset(6);
+        return o != 0 ? __string(o + bb_pos) : null;
+    }
+
+    public ByteBuffer originalValueAsByteBuffer() {
+        return __vector_as_bytebuffer(6, 1);
+    }
+
+    public ByteBuffer originalValueInByteBuffer(ByteBuffer _bb) {
+        return __vector_in_bytebuffer(_bb, 6, 1);
+    }
+
+    public String value() {
+        int o = __offset(8);
+        return o != 0 ? __string(o + bb_pos) : null;
+    }
+
+    public ByteBuffer valueAsByteBuffer() {
+        return __vector_as_bytebuffer(8, 1);
+    }
+
+    public ByteBuffer valueInByteBuffer(ByteBuffer _bb) {
+        return __vector_in_bytebuffer(_bb, 8, 1);
+    }
+
+    public String init() {
+        int o = __offset(10);
+        return o != 0 ? __string(o + bb_pos) : null;
+    }
+
+    public ByteBuffer initAsByteBuffer() {
+        return __vector_as_bytebuffer(10, 1);
+    }
+
+    public ByteBuffer initInByteBuffer(ByteBuffer _bb) {
+        return __vector_in_bytebuffer(_bb, 10, 1);
+    }
+
+    public String type() {
+        int o = __offset(12);
+        return o != 0 ? __string(o + bb_pos) : null;
+    }
+
+    public ByteBuffer typeAsByteBuffer() {
+        return __vector_as_bytebuffer(12, 1);
+    }
+
+    public ByteBuffer typeInByteBuffer(ByteBuffer _bb) {
+        return __vector_in_bytebuffer(_bb, 12, 1);
+    }
+
+    public int fieldOrder() {
+        int o = __offset(14);
+        return o != 0 ? bb.getInt(o + bb_pos) : 0;
+    }
+
+    public String errors(int j) {
+        int o = __offset(16);
+        return o != 0 ? __string(__vector(o) + j * 4) : null;
+    }
+
+    public int errorsLength() {
+        int o = __offset(16);
+        return o != 0 ? __vector_len(o) : 0;
+    }
+
+    public boolean warn() {
+        int o = __offset(18);
+        return o != 0 ? 0 != bb.get(o + bb_pos) : false;
+    }
+
+    public FBSFindResult find() {
+        return find(new FBSFindResult());
+    }
+
+    public FBSFindResult find(FBSFindResult obj) {
+        int o = __offset(20);
+        return o != 0 ? obj.__assign(__indirect(o + bb_pos), bb) : null;
+    }
+
+    public FBSCreate create(int j) {
+        return create(new FBSCreate(), j);
+    }
+
+    public FBSCreate create(FBSCreate obj, int j) {
+        int o = __offset(22);
+        return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null;
+    }
+
+    public int createLength() {
+        int o = __offset(22);
+        return o != 0 ? __vector_len(o) : 0;
+    }
+
+    public FBSCreate createByKey(String key) {
+        int o = __offset(22);
+        return o != 0 ? FBSCreate.__lookup_by_key(null, __vector(o), key, bb) : null;
+    }
+
+    public FBSCreate createByKey(FBSCreate obj, String key) {
+        int o = __offset(22);
+        return o != 0 ? FBSCreate.__lookup_by_key(obj, __vector(o), key, bb) : null;
+    }
+
+    public FBSUpdate update(int j) {
+        return update(new FBSUpdate(), j);
+    }
+
+    public FBSUpdate update(FBSUpdate obj, int j) {
+        int o = __offset(24);
+        return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null;
+    }
+
+    public int updateLength() {
+        int o = __offset(24);
+        return o != 0 ? __vector_len(o) : 0;
+    }
+
+    public FBSUpdate updateByKey(String key) {
+        int o = __offset(24);
+        return o != 0 ? FBSUpdate.__lookup_by_key(null, __vector(o), key, bb) : null;
+    }
+
+    public FBSUpdate updateByKey(FBSUpdate obj, String key) {
+        int o = __offset(24);
+        return o != 0 ? FBSUpdate.__lookup_by_key(obj, __vector(o), key, bb) : null;
+    }
+
+    public static int createFBSFieldResult(FlatBufferBuilder builder,
+                                           int keyOffset,
+                                           int originalValueOffset,
+                                           int valueOffset,
+                                           int initOffset,
+                                           int typeOffset,
+                                           int fieldOrder,
+                                           int errorsOffset,
+                                           boolean warn,
+                                           int findOffset,
+                                           int createOffset,
+                                           int updateOffset) {
+        builder.startObject(11);
+        FBSFieldResult.addUpdate(builder, updateOffset);
+        FBSFieldResult.addCreate(builder, createOffset);
+        FBSFieldResult.addFind(builder, findOffset);
+        FBSFieldResult.addErrors(builder, errorsOffset);
+        FBSFieldResult.addFieldOrder(builder, fieldOrder);
+        FBSFieldResult.addType(builder, typeOffset);
+        FBSFieldResult.addInit(builder, initOffset);
+        FBSFieldResult.addValue(builder, valueOffset);
+        FBSFieldResult.addOriginalValue(builder, originalValueOffset);
+        FBSFieldResult.addKey(builder, keyOffset);
+        FBSFieldResult.addWarn(builder, warn);
+        return FBSFieldResult.endFBSFieldResult(builder);
+    }
+
+    public static void startFBSFieldResult(FlatBufferBuilder builder) {
+        builder.startObject(11);
+    }
+
+    public static void addKey(FlatBufferBuilder builder, int keyOffset) {
+        builder.addOffset(0, keyOffset, 0);
+    }
+
+    public static void addOriginalValue(FlatBufferBuilder builder, int originalValueOffset) {
+        builder.addOffset(1, originalValueOffset, 0);
+    }
+
+    public static void addValue(FlatBufferBuilder builder, int valueOffset) {
+        builder.addOffset(2, valueOffset, 0);
+    }
+
+    public static void addInit(FlatBufferBuilder builder, int initOffset) {
+        builder.addOffset(3, initOffset, 0);
+    }
+
+    public static void addType(FlatBufferBuilder builder, int typeOffset) {
+        builder.addOffset(4, typeOffset, 0);
+    }
+
+    public static void addFieldOrder(FlatBufferBuilder builder, int fieldOrder) {
+        builder.addInt(5, fieldOrder, 0);
+    }
+
+    public static void addErrors(FlatBufferBuilder builder, int errorsOffset) {
+        builder.addOffset(6, errorsOffset, 0);
+    }
+
+    public static int createErrorsVector(FlatBufferBuilder builder, int[] data) {
+        builder.startVector(4, data.length, 4);
+        for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]);
+        return builder.endVector();
+    }
+
+    public static void startErrorsVector(FlatBufferBuilder builder, int numElems) {
+        builder.startVector(4, numElems, 4);
+    }
+
+    public static void addWarn(FlatBufferBuilder builder, boolean warn) {
+        builder.addBoolean(7, warn, false);
+    }
+
+    public static void addFind(FlatBufferBuilder builder, int findOffset) {
+        builder.addOffset(8, findOffset, 0);
+    }
+
+    public static void addCreate(FlatBufferBuilder builder, int createOffset) {
+        builder.addOffset(9, createOffset, 0);
+    }
+
+    public static int createCreateVector(FlatBufferBuilder builder, int[] data) {
+        builder.startVector(4, data.length, 4);
+        for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]);
+        return builder.endVector();
+    }
+
+    public static void startCreateVector(FlatBufferBuilder builder, int numElems) {
+        builder.startVector(4, numElems, 4);
+    }
+
+    public static void addUpdate(FlatBufferBuilder builder, int updateOffset) {
+        builder.addOffset(10, updateOffset, 0);
+    }
+
+    public static int createUpdateVector(FlatBufferBuilder builder, int[] data) {
+        builder.startVector(4, data.length, 4);
+        for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]);
+        return builder.endVector();
+    }
+
+    public static void startUpdateVector(FlatBufferBuilder builder, int numElems) {
+        builder.startVector(4, numElems, 4);
+    }
+
+    public static int endFBSFieldResult(FlatBufferBuilder builder) {
+        int o = builder.endObject();
+        builder.required(o, 4);  // key
+        return o;
+    }
+
+    @Override
+    protected int keysCompare(Integer o1, Integer o2, ByteBuffer _bb) {
+        return compareStrings(__offset(4, o1, _bb), __offset(4, o2, _bb), _bb);
+    }
+
+    public static FBSFieldResult __lookup_by_key(FBSFieldResult obj, int vectorLocation, String key, ByteBuffer bb) {
+        byte[] byteKey = key.getBytes(Table.UTF8_CHARSET.get());
+        int span = bb.getInt(vectorLocation - 4);
+        int start = 0;
+        while (span != 0) {
+            int middle = span / 2;
+            int tableOffset = __indirect(vectorLocation + 4 * (start + middle), bb);
+            int comp = compareStrings(__offset(4, bb.capacity() - tableOffset, bb), byteKey, bb);
+            if (comp > 0) {
+                span = middle;
+            } else if (comp < 0) {
+                middle++;
+                start += middle;
+                span -= middle;
+            } else {
+                return (obj == null ? new FBSFieldResult() : obj).__assign(tableOffset, bb);
+            }
+        }
+        return null;
+    }
 }
 

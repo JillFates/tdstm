@@ -11,67 +11,7 @@
           "duplicate": false,
           "errorCount": 0,
           "errors": [],
-          "fields": {
-            "assetName": {
-              "create": null,
-              "errors": [],
-              "fieldOrder": 0,
-              "find": {
-                "matchOn": null,
-                "query": [],
-                "results": [],
-                "size": 0
-              },
-              "init": null,
-              "originalValue": "Application 1",
-              "update": null,
-              "value": "Application 1",
-              "warn": false
-            },
-            "description": {
-              "create": null,
-              "errors": [],
-              "fieldOrder": 1,
-              "find": {
-                "matchOn": null,
-                "query": [],
-                "results": [],
-                "size": 0
-              },
-              "init": null,
-              "originalValue": "2019-12-23 12:41:04",
-              "update": null,
-              "value": "Created at: 2019-12-23 12:41:04",
-              "warn": false
-            },
-            "id": {
-              "create": null,
-              "errors": [],
-              "fieldOrder": 2,
-              "find": {
-                "matchOn": null,
-                "query": [
-                  {
-                    "domain": "Application",
-                    "criteria": [
-                      {
-                        "propertyName": "assetName",
-                        "operator": "eq",
-                        "value": "Application 1"
-                      }
-                    ]
-                  }
-                ],
-                "results": [],
-                "size": 0
-              },
-              "init": null,
-              "originalValue": null,
-              "update": null,
-              "value": null,
-              "warn": false
-            }
-          },
+          "fields": {},
           "op": "Insert",
           "rowNum": 1,
           "warn": false,

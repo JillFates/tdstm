@@ -799,9 +799,11 @@ class FieldResult {
 	 * Define order in which fields are created during an ETL script execution
 	 * <pre>
 	 *  domain Device
-	 *  iterate {*  	extract 1 load 'Name'
+	 *  iterate { //
+	 *  	extract 1 load 'Name'
 	 *  	extract 2 load 'Description'
-	 *}* </pre>
+	 *  	....
+	 * </pre>
 	 * Then {@code RowResult.data} will be added using this order:
 	 * <pre>
 	 *  rowResult.data.put('assetName', new FieldResult(fieldOrder: 0, value:..))

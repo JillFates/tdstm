@@ -4,11 +4,11 @@ import com.google.flatbuffers.FlatBufferBuilder
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLProcessorResult
 
-class ETLFlatBuffersMapper {
+class ETLFlatBuffersConverter {
 
     ETLProcessorResult result
 
-    ETLFlatBuffersMapper(ETLProcessorResult result) {
+    ETLFlatBuffersConverter(ETLProcessorResult result) {
         this.result = result
     }
 
@@ -16,7 +16,7 @@ class ETLFlatBuffersMapper {
 
         FlatBufferBuilder builder = new FlatBufferBuilder(1024)
 
-        int processorResult = FBSETLProcessorResult.createFBSETLProcessorResult(
+        int processorResult = FBSProcessorResult.createFBSProcessorResult(
                 builder,
                 mapETLInfoOffset(builder, result),
                 mapConsoleLogOffset(builder, result),

@@ -2,49 +2,190 @@
 
 package net.transitionmanager.fbs;
 
-import java.nio.*;
-import java.lang.*;
-import java.util.*;
-import com.google.flatbuffers.*;
+import com.google.flatbuffers.FlatBufferBuilder;
+import com.google.flatbuffers.Table;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 @SuppressWarnings("unused")
+/**
+ * <p>This part of the model represents the following JSON part in the ETLProcessorResult structure:</p>
+ * <pre>
+ *     "domains": [
+ *         "data": [...],
+ *         "domain": "Application",
+ *         "fieldLabelMap": {...},
+ *         "fieldNames": [...]
+ *     ]
+ * </pre>
+ *
+ * <p>Example of an instance creation:</p>
+ * <pre>
+ * FBSDomainResult.createFBSDomainResult(
+ *         builder,
+ *         builder.createString('Device'),
+ *         FBSDomainResult.createFieldNamesVector(builder, (int[]) [
+ *                 builder.createString('assetName'),
+ *                 builder.createString('description'),
+ *                 builder.createString('id')
+ *         ]),
+ *         fieldsLabelMapOffset,
+ *         FBSDomainResult.createDataVector(builder, dataOffset)
+ * )
+ * </pre>
+ * @see FBSFieldLabelMap
+ * @see FBSRowResult
+ */
 public final class FBSDomainResult extends Table {
-  public static FBSDomainResult getRootAsFBSDomainResult(ByteBuffer _bb) { return getRootAsFBSDomainResult(_bb, new FBSDomainResult()); }
-  public static FBSDomainResult getRootAsFBSDomainResult(ByteBuffer _bb, FBSDomainResult obj) { _bb.order(ByteOrder.LITTLE_ENDIAN); return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb)); }
-  public void __init(int _i, ByteBuffer _bb) { bb_pos = _i; bb = _bb; vtable_start = bb_pos - bb.getInt(bb_pos); vtable_size = bb.getShort(vtable_start); }
-  public FBSDomainResult __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
+    public static FBSDomainResult getRootAsFBSDomainResult(ByteBuffer _bb) {
+        return getRootAsFBSDomainResult(_bb, new FBSDomainResult());
+    }
 
-  public String domain() { int o = __offset(4); return o != 0 ? __string(o + bb_pos) : null; }
-  public ByteBuffer domainAsByteBuffer() { return __vector_as_bytebuffer(4, 1); }
-  public ByteBuffer domainInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 4, 1); }
-  public String fieldNames(int j) { int o = __offset(6); return o != 0 ? __string(__vector(o) + j * 4) : null; }
-  public int fieldNamesLength() { int o = __offset(6); return o != 0 ? __vector_len(o) : 0; }
-  public FBSRowResult data(int j) { return data(new FBSRowResult(), j); }
-  public FBSRowResult data(FBSRowResult obj, int j) { int o = __offset(8); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
-  public int dataLength() { int o = __offset(8); return o != 0 ? __vector_len(o) : 0; }
+    public static FBSDomainResult getRootAsFBSDomainResult(ByteBuffer _bb, FBSDomainResult obj) {
+        _bb.order(ByteOrder.LITTLE_ENDIAN);
+        return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb));
+    }
 
-  public static int createFBSDomainResult(FlatBufferBuilder builder,
-      int domainOffset,
-      int fieldNamesOffset,
-      int dataOffset) {
-    builder.startObject(3);
-    FBSDomainResult.addData(builder, dataOffset);
-    FBSDomainResult.addFieldNames(builder, fieldNamesOffset);
-    FBSDomainResult.addDomain(builder, domainOffset);
-    return FBSDomainResult.endFBSDomainResult(builder);
-  }
+    public void __init(int _i, ByteBuffer _bb) {
+        bb_pos = _i;
+        bb = _bb;
+        vtable_start = bb_pos - bb.getInt(bb_pos);
+        vtable_size = bb.getShort(vtable_start);
+    }
 
-  public static void startFBSDomainResult(FlatBufferBuilder builder) { builder.startObject(3); }
-  public static void addDomain(FlatBufferBuilder builder, int domainOffset) { builder.addOffset(0, domainOffset, 0); }
-  public static void addFieldNames(FlatBufferBuilder builder, int fieldNamesOffset) { builder.addOffset(1, fieldNamesOffset, 0); }
-  public static int createFieldNamesVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
-  public static void startFieldNamesVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
-  public static void addData(FlatBufferBuilder builder, int dataOffset) { builder.addOffset(2, dataOffset, 0); }
-  public static int createDataVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
-  public static void startDataVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
-  public static int endFBSDomainResult(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
+    public FBSDomainResult __assign(int _i, ByteBuffer _bb) {
+        __init(_i, _bb);
+        return this;
+    }
+
+    public String domain() {
+        int o = __offset(4);
+        return o != 0 ? __string(o + bb_pos) : null;
+    }
+
+    public ByteBuffer domainAsByteBuffer() {
+        return __vector_as_bytebuffer(4, 1);
+    }
+
+    public ByteBuffer domainInByteBuffer(ByteBuffer _bb) {
+        return __vector_in_bytebuffer(_bb, 4, 1);
+    }
+
+    public String fieldNames(int j) {
+        int o = __offset(6);
+        return o != 0 ? __string(__vector(o) + j * 4) : null;
+    }
+
+    public int fieldNamesLength() {
+        int o = __offset(6);
+        return o != 0 ? __vector_len(o) : 0;
+    }
+
+    public FBSFieldLabelMap fieldLabelMap(int j) {
+        return fieldLabelMap(new FBSFieldLabelMap(), j);
+    }
+
+    public FBSFieldLabelMap fieldLabelMap(FBSFieldLabelMap obj, int j) {
+        int o = __offset(8);
+        return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null;
+    }
+
+    public int fieldLabelMapLength() {
+        int o = __offset(8);
+        return o != 0 ? __vector_len(o) : 0;
+    }
+
+    public FBSFieldLabelMap fieldLabelMapByKey(String key) {
+        int o = __offset(8);
+        return o != 0 ? FBSFieldLabelMap.__lookup_by_key(null, __vector(o), key, bb) : null;
+    }
+
+    public FBSFieldLabelMap fieldLabelMapByKey(FBSFieldLabelMap obj, String key) {
+        int o = __offset(8);
+        return o != 0 ? FBSFieldLabelMap.__lookup_by_key(obj, __vector(o), key, bb) : null;
+    }
+
+    public FBSRowResult data(int j) {
+        return data(new FBSRowResult(), j);
+    }
+
+    public FBSRowResult data(FBSRowResult obj, int j) {
+        int o = __offset(10);
+        return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null;
+    }
+
+    public int dataLength() {
+        int o = __offset(10);
+        return o != 0 ? __vector_len(o) : 0;
+    }
+
+    public static int createFBSDomainResult(FlatBufferBuilder builder,
+                                            int domainOffset,
+                                            int fieldNamesOffset,
+                                            int fieldLabelMapOffset,
+                                            int dataOffset) {
+        builder.startObject(4);
+        FBSDomainResult.addData(builder, dataOffset);
+        FBSDomainResult.addFieldLabelMap(builder, fieldLabelMapOffset);
+        FBSDomainResult.addFieldNames(builder, fieldNamesOffset);
+        FBSDomainResult.addDomain(builder, domainOffset);
+        return FBSDomainResult.endFBSDomainResult(builder);
+    }
+
+    public static void startFBSDomainResult(FlatBufferBuilder builder) {
+        builder.startObject(4);
+    }
+
+    public static void addDomain(FlatBufferBuilder builder, int domainOffset) {
+        builder.addOffset(0, domainOffset, 0);
+    }
+
+    public static void addFieldNames(FlatBufferBuilder builder, int fieldNamesOffset) {
+        builder.addOffset(1, fieldNamesOffset, 0);
+    }
+
+    public static int createFieldNamesVector(FlatBufferBuilder builder, int[] data) {
+        builder.startVector(4, data.length, 4);
+        for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]);
+        return builder.endVector();
+    }
+
+    public static void startFieldNamesVector(FlatBufferBuilder builder, int numElems) {
+        builder.startVector(4, numElems, 4);
+    }
+
+    public static void addFieldLabelMap(FlatBufferBuilder builder, int fieldLabelMapOffset) {
+        builder.addOffset(2, fieldLabelMapOffset, 0);
+    }
+
+    public static int createFieldLabelMapVector(FlatBufferBuilder builder, int[] data) {
+        builder.startVector(4, data.length, 4);
+        for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]);
+        return builder.endVector();
+    }
+
+    public static void startFieldLabelMapVector(FlatBufferBuilder builder, int numElems) {
+        builder.startVector(4, numElems, 4);
+    }
+
+    public static void addData(FlatBufferBuilder builder, int dataOffset) {
+        builder.addOffset(3, dataOffset, 0);
+    }
+
+    public static int createDataVector(FlatBufferBuilder builder, int[] data) {
+        builder.startVector(4, data.length, 4);
+        for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]);
+        return builder.endVector();
+    }
+
+    public static void startDataVector(FlatBufferBuilder builder, int numElems) {
+        builder.startVector(4, numElems, 4);
+    }
+
+    public static int endFBSDomainResult(FlatBufferBuilder builder) {
+        int o = builder.endObject();
+        return o;
+    }
 }
 

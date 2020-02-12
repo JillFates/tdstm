@@ -12,22 +12,25 @@ import java.nio.ByteOrder;
 /**
  * <p>This part of the model represents the following JSON part in the ETLProcessorResult structure:</p>
  * <pre>
- *  "replace": {"TAG I", "TAG II"}
+ *  "update": {
+ *     "assetType": "VM"
+ *  }
  * </pre>
  * <p>Example of an instance creation:</p>
  * <pre>
- *  FBSTagReplace.createFBSTagReplace(builder,
- *     builder.createString('TAG V'),
- *     builder.createString('TAG X')
+ *  FBSUpdate.createFBSUpdate(builder,
+ *      builder.createString('assetType'),
+ *      builder.createString('VM'),
+ *      builder.createString('String')
  *  ),
  * </pre>
  */
-public final class FBSTagReplace extends Table {
-    public static FBSTagReplace getRootAsFBSTagReplace(ByteBuffer _bb) {
-        return getRootAsFBSTagReplace(_bb, new FBSTagReplace());
+public final class FBSUpdate extends Table {
+    public static FBSUpdate getRootAsFBSUpdate(ByteBuffer _bb) {
+        return getRootAsFBSUpdate(_bb, new FBSUpdate());
     }
 
-    public static FBSTagReplace getRootAsFBSTagReplace(ByteBuffer _bb, FBSTagReplace obj) {
+    public static FBSUpdate getRootAsFBSUpdate(ByteBuffer _bb, FBSUpdate obj) {
         _bb.order(ByteOrder.LITTLE_ENDIAN);
         return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb));
     }
@@ -39,21 +42,21 @@ public final class FBSTagReplace extends Table {
         vtable_size = bb.getShort(vtable_start);
     }
 
-    public FBSTagReplace __assign(int _i, ByteBuffer _bb) {
+    public FBSUpdate __assign(int _i, ByteBuffer _bb) {
         __init(_i, _bb);
         return this;
     }
 
-    public String key() {
+    public String name() {
         int o = __offset(4);
         return o != 0 ? __string(o + bb_pos) : null;
     }
 
-    public ByteBuffer keyAsByteBuffer() {
+    public ByteBuffer nameAsByteBuffer() {
         return __vector_as_bytebuffer(4, 1);
     }
 
-    public ByteBuffer keyInByteBuffer(ByteBuffer _bb) {
+    public ByteBuffer nameInByteBuffer(ByteBuffer _bb) {
         return __vector_in_bytebuffer(_bb, 4, 1);
     }
 
@@ -70,30 +73,49 @@ public final class FBSTagReplace extends Table {
         return __vector_in_bytebuffer(_bb, 6, 1);
     }
 
-    public static int createFBSTagReplace(FlatBufferBuilder builder,
-                                          int keyOffset,
-                                          int valueOffset) {
-        builder.startObject(2);
-        FBSTagReplace.addValue(builder, valueOffset);
-        FBSTagReplace.addKey(builder, keyOffset);
-        return FBSTagReplace.endFBSTagReplace(builder);
+    public String type() {
+        int o = __offset(8);
+        return o != 0 ? __string(o + bb_pos) : null;
     }
 
-    public static void startFBSTagReplace(FlatBufferBuilder builder) {
-        builder.startObject(2);
+    public ByteBuffer typeAsByteBuffer() {
+        return __vector_as_bytebuffer(8, 1);
     }
 
-    public static void addKey(FlatBufferBuilder builder, int keyOffset) {
-        builder.addOffset(0, keyOffset, 0);
+    public ByteBuffer typeInByteBuffer(ByteBuffer _bb) {
+        return __vector_in_bytebuffer(_bb, 8, 1);
+    }
+
+    public static int createFBSUpdate(FlatBufferBuilder builder,
+                                      int nameOffset,
+                                      int valueOffset,
+                                      int typeOffset) {
+        builder.startObject(3);
+        FBSUpdate.addType(builder, typeOffset);
+        FBSUpdate.addValue(builder, valueOffset);
+        FBSUpdate.addName(builder, nameOffset);
+        return FBSUpdate.endFBSUpdate(builder);
+    }
+
+    public static void startFBSUpdate(FlatBufferBuilder builder) {
+        builder.startObject(3);
+    }
+
+    public static void addName(FlatBufferBuilder builder, int nameOffset) {
+        builder.addOffset(0, nameOffset, 0);
     }
 
     public static void addValue(FlatBufferBuilder builder, int valueOffset) {
         builder.addOffset(1, valueOffset, 0);
     }
 
-    public static int endFBSTagReplace(FlatBufferBuilder builder) {
+    public static void addType(FlatBufferBuilder builder, int typeOffset) {
+        builder.addOffset(2, typeOffset, 0);
+    }
+
+    public static int endFBSUpdate(FlatBufferBuilder builder) {
         int o = builder.endObject();
-        builder.required(o, 4);  // key
+        builder.required(o, 4);  // name
         return o;
     }
 
@@ -102,7 +124,7 @@ public final class FBSTagReplace extends Table {
         return compareStrings(__offset(4, o1, _bb), __offset(4, o2, _bb), _bb);
     }
 
-    public static FBSTagReplace __lookup_by_key(FBSTagReplace obj, int vectorLocation, String key, ByteBuffer bb) {
+    public static FBSUpdate __lookup_by_key(FBSUpdate obj, int vectorLocation, String key, ByteBuffer bb) {
         byte[] byteKey = key.getBytes(Table.UTF8_CHARSET.get());
         int span = bb.getInt(vectorLocation - 4);
         int start = 0;
@@ -117,7 +139,7 @@ public final class FBSTagReplace extends Table {
                 start += middle;
                 span -= middle;
             } else {
-                return (obj == null ? new FBSTagReplace() : obj).__assign(tableOffset, bb);
+                return (obj == null ? new FBSUpdate() : obj).__assign(tableOffset, bb);
             }
         }
         return null;
