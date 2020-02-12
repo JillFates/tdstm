@@ -40,7 +40,6 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 @Transactional
 class MoveBundleService implements ServiceMethods {
@@ -212,91 +211,51 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties
 	 */
-	def dependencyConsoleMap(Project project, Long moveBundleId, List<Long> tagIds, String tagMatch, String isAssigned,
-							 dependencyBundle, boolean graph = false, subsection =  null, groupId =  null, assetName = null) {
+	def dependencyConsoleMap(
+		Project project,
+		Long moveBundleId,
+		List<Long> tagIds,
+		String tagMatch,
+		String isAssigned,
+		dependencyBundle,
+		boolean graph = false,
+		subsection =  null,
+		groupId =  null,
+		assetName = null) {
+
 		Date startAll = new Date()
 		List dependencyConsoleList = []
+		List dependListTags = []
+		String query = dependencyConsoleQuery(project, tagIds, dependencyBundle)
+		List dependList = jdbcTemplate.queryForList(query)
 
 		// This will hold the totals of each, element 0 is all and element 1 will be All minus group 0
 		Map stats = [
-			app: [0,0],
-			db: [0,0],
-			server: [0,0],
-			vm: [0,0],
-			storage: [0,0]
+			app    : [0, 0],
+			db     : [0, 0],
+			server : [0, 0],
+			vm     : [0, 0],
+			storage: [0, 0]
 		]
 
-		String physicalTypes = AssetType.physicalServerTypesAsString
-		String virtualTypes = AssetType.virtualServerTypesAsString
-		String storageTypes = AssetType.storageTypesAsString
-		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
-		String tagJoins = tagService.getTagsJoin(tagIds, 'ANY') //passing in any because we want the join regardless of the tag matching.
-		String tagsSelect = tagService.getTagSelect(tagIds)
-
-		StringBuilder depSql = new StringBuilder("""SELECT
-			adb.dependency_bundle AS dependencyBundle,
-			COUNT(distinct adb.asset_id) AS assetCnt,
-			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
-			SUM(if(a.plan_status='$AssetEntityPlanStatus.UNASSIGNED',1,0)) AS statusUnassigned,
-			SUM(if(a.validation<>'${ValidationType.PLAN_READY}',1,0)) AS notBundleReady,
-			SUM(if(a.asset_class = '$AssetClass.DEVICE'
-				AND if(m.model_id > -1, m.asset_type in ($physicalTypes), a.asset_type in ($physicalTypes)), 1, 0)) AS serverCount,
-			SUM(if(a.asset_class = '$AssetClass.DEVICE'
-				AND if(m.model_id > -1, m.asset_type in ($virtualTypes), a.asset_type in ($virtualTypes)), 1, 0)) AS vmCount,
-			SUM(if((a.asset_class = '$AssetClass.STORAGE')
-				OR (a.asset_class = '$AssetClass.DEVICE'
-				AND if(m.model_id > -1, m.asset_type in ($storageTypes), a.asset_type in ($storageTypes))), 1, 0)) AS storageCount,
-			SUM(if(a.asset_class = '$AssetClass.DATABASE', 1, 0)) AS dbCount,
-			SUM(if(a.asset_class = '$AssetClass.APPLICATION', 1, 0)) AS appCount,
-			COALESCE(nr.needsReview, 0) AS needsReview
-			$tagsSelect
-
-			FROM asset_dependency_bundle adb
-			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
-			LEFT OUTER JOIN model m ON a.model_id=m.model_id
-			$tagJoins
-			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview
-				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
-				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id
-				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id
-				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes}))
-			GROUP BY adb.dependency_bundle) nr ON nr.dependency_bundle=adb.dependency_bundle
-			WHERE adb.project_id=${project.id}""")
-
-		if (dependencyBundle) {
-			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))
-
-			if(dependencyBundle == 'onePlus'){
-				depGroups = depGroups-[0]
-			}
-
-			if (depGroups.size() == 0) {
-				depGroups = [-1]
-			}
-
-			if(dependencyBundle.isNumber()) {
-				depSql.append(" AND adb.dependency_bundle = $dependencyBundle")
-			}else if (dependencyBundle in ['all' , 'onePlus'] ) {
-				depSql.append(" AND adb.dependency_bundle IN (${WebUtil.listAsMultiValueString(depGroups)})")
-			}
+		if (tagIds) {
+			String tagsQuery = dependencyConsoleQuery(project, tagIds, dependencyBundle, true)
+			dependListTags = jdbcTemplate.queryForList(tagsQuery)
 		}
-
-		depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
-
-		def dependList = jdbcTemplate.queryForList(depSql.toString())
-
 
 		if (moveBundleId || tagIds) {
 			List<Long> groupTags = []
+			Integer index = 0
 
 			dependList = dependList.findResults { result ->
-				if (result.tags) {
-					groupTags = result.tags.split(',').collect { id ->
+
+				if (dependListTags && dependListTags[index].tags) {
+					groupTags = dependListTags[index].tags.split(',').collect { id ->
 						Long.parseLong(id)
 					}
-				} else {
-					groupTags = []
 				}
+
+				index++
 
 				if ((moveBundleId && result.moveBundles.contains(moveBundleId as String)) ||
 					(tagIds && tagMatch == 'ALL' && groupTags.containsAll(tagIds)) ||
@@ -436,6 +395,83 @@ class MoveBundleService implements ServiceMethods {
 		log.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
 
 		return map
+	}
+
+	/**
+	 * Creates one of two queries for the dependency console and returns them as a string. The two queries are one for the groups themselves
+	 * and another one for the tags. The reason for this is I could either get the counts right or the tags right in one query because the
+	 * query is quite complicated, and trying to do everything is one just wasn't working.
+	 *
+	 * @param project The project used to filter the query.
+	 * @param tagIds The tag Ids used to filter the query for the tasks when includeTags is true.
+	 * @param dependencyBundle The dependency  bundle used to filter the query which can be 'all', 'onePlus' or a number.
+	 * @param includeTags if the tag query should be generated rather than the count query using the same filtering. This defaults to false.
+	 *
+	 * @return A string that contains the dependency console query for counts, or tags.
+	 */
+	String dependencyConsoleQuery(Project project, List<Long> tagIds, dependencyBundle, boolean includeTags = false) {
+		String physicalTypes = AssetType.physicalServerTypesAsString
+		String virtualTypes = AssetType.virtualServerTypesAsString
+		String storageTypes = AssetType.storageTypesAsString
+		String reviewCodes = AssetDependencyStatus.reviewCodesAsString
+		String tagJoins = tagService.getTagsJoin(tagIds, 'ANY') //passing in any because we want the join regardless of the tag matching.
+		String tagsSelect = tagService.getTagSelect(tagIds)
+
+		String counts = """
+			COUNT(distinct adb.asset_id) AS assetCnt,
+			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
+			SUM(if(a.plan_status='$AssetEntityPlanStatus.UNASSIGNED',1,0)) AS statusUnassigned,
+			SUM(if(a.validation<>'${ValidationType.PLAN_READY}',1,0)) AS notBundleReady,
+			SUM(if(a.asset_class = '$AssetClass.DEVICE'
+				AND if(m.model_id > -1, m.asset_type in ($physicalTypes), a.asset_type in ($physicalTypes)), 1, 0)) AS serverCount,
+			SUM(if(a.asset_class = '$AssetClass.DEVICE'
+				AND if(m.model_id > -1, m.asset_type in ($virtualTypes), a.asset_type in ($virtualTypes)), 1, 0)) AS vmCount,
+			SUM(if((a.asset_class = '$AssetClass.STORAGE')
+				OR (a.asset_class = '$AssetClass.DEVICE'
+				AND if(m.model_id > -1, m.asset_type in ($storageTypes), a.asset_type in ($storageTypes))), 1, 0)) AS storageCount,
+			SUM(if(a.asset_class = '$AssetClass.DATABASE', 1, 0)) AS dbCount,
+			SUM(if(a.asset_class = '$AssetClass.APPLICATION', 1, 0)) AS appCount,
+			COALESCE(nr.needsReview, 0) AS needsReview
+		"""
+
+		StringBuilder depSql = new StringBuilder("""SELECT
+			adb.dependency_bundle AS dependencyBundle,
+			${includeTags ? '': counts}
+			${includeTags ? tagsSelect: ''}
+
+			FROM asset_dependency_bundle adb
+			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
+			LEFT OUTER JOIN model m ON a.model_id=m.model_id
+			${includeTags ? tagJoins : ''}
+			LEFT OUTER JOIN (SELECT adb.dependency_bundle, 1 AS needsReview
+				FROM asset_entity ae INNER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
+				LEFT JOIN asset_dependency ad1 ON ad1.asset_id=ae.asset_entity_id
+				LEFT JOIN asset_dependency ad2 ON ad2.dependent_id=ae.asset_entity_id
+				WHERE adb.project_id=${project.id} AND (ad1.status IN (${reviewCodes}) OR ad2.status IN (${reviewCodes}))
+			GROUP BY adb.dependency_bundle) nr ON nr.dependency_bundle=adb.dependency_bundle
+			WHERE adb.project_id=${project.id}""")
+
+		if (dependencyBundle) {
+			List depGroups = JSON.parse((String) session.getAttribute('Dep_Groups'))
+
+			if (dependencyBundle == 'onePlus') {
+				depGroups = depGroups - [0]
+			}
+
+			if (depGroups.size() == 0) {
+				depGroups = [-1]
+			}
+
+			if (dependencyBundle.isNumber()) {
+				depSql.append(" AND adb.dependency_bundle = $dependencyBundle")
+			} else if (dependencyBundle in ['all', 'onePlus']) {
+				depSql.append(" AND adb.dependency_bundle IN (${WebUtil.listAsMultiValueString(depGroups)})")
+			}
+		}
+
+		depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
+
+		depSql.toString()
 	}
 
 	/**
