@@ -23,7 +23,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PreferenceService } from '../../../../shared/services/preference.service';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 import { HeaderActionButtonData } from 'tds-component-library';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {
@@ -111,6 +111,7 @@ export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentIni
 	}
 
 	ngOnInit() {
+		fixContentWrapper();
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
