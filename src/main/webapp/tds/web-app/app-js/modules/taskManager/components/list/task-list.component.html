@@ -355,9 +355,6 @@
 									name="{{ column.property }}"
 									[value]="column.filter || ''"
 									[columnType]="column.type"
-									placeholder="{{
-									'GLOBAL.FILTER' | translate
-								}}"
 									(filter)="
 									onFilterChangeHandler($event, column)
 								"

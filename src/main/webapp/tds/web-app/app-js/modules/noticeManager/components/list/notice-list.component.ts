@@ -89,9 +89,9 @@ export class NoticeListComponent implements OnInit {
 
 		this.headerActions = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translateService.transform('NOTICE.CREATE_NOTICE'),
+				title: this.translateService.transform('GLOBAL.CREATE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateNotice,

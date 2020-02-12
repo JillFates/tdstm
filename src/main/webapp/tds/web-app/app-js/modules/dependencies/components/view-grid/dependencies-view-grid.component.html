@@ -146,7 +146,7 @@
 						(valueChange)="
 							onTagFilterChange(column.property, $event)
 						"
-						[placeholder]="'Filter ' + column.label"
+						[placeholder]="'Filter'"
 					>
 					</tds-asset-tag-selector>
 					<div
@@ -159,7 +159,7 @@
 							(keyup)="onFilter(column)"
 							name="{{ column.property }}"
 							[(ngModel)]="column.filter"
-							placeholder="Filter {{ column.label }}"
+							placeholder="Filter"
 							value=""
 						/>
 						<tds-button

@@ -46,7 +46,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 	{
 		label: 'Due Date',
 		property: 'dueDate',
-		type: 'text',
+		type: 'date',
 		width: 180,
 		locked: false,
 		filterable: true
