@@ -1,14 +1,15 @@
-import { INTERVAL } from '../../../shared/model/constants';
+import {INTERVAL} from '../../../shared/model/constants';
 import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
 import {AgentMethodModel} from './agent.model';
+import {FilterType} from 'tds-component-library';
 
 export enum EventReactions {
 	Status,
 	Success,
-	Default ,
-	Error   ,
+	Default,
+	Error,
 	Failed,
-	Lapsed  ,
+	Lapsed,
 	Stalled,
 	BeforeInvocation,
 	PostInvocation,
@@ -21,70 +22,53 @@ export class APIActionColumnModel {
 
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 70,
-				locked: true
-			}, {
 				label: 'Name',
 				property: 'name',
-				type: 'text',
-				width: 186,
-				locked: true,
-				filterable: true,
-				isActionable: true,
+				filterType: FilterType.text,
+				width: 186
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
-				type: 'text',
-				filterable: true,
+				filterType: FilterType.text,
 				width: 180
 			}, {
 				label: 'Description',
 				property: 'description',
-				type: 'text',
-				filterable: true,
+				filterType: FilterType.text,
 				width: 300
 			},
 			{
 				label: 'Type',
 				property: 'actionType',
-				type: 'text',
-				filterable: true,
+				filterType: FilterType.text,
 				width: 125
 			},
 			{
 				label: 'Method',
 				property: 'dictionaryMethodName',
-				type: 'text',
-				filterable: true,
+				filterType: FilterType.text,
 				width: 125
 			}, {
 				label: 'Data',
 				property: 'producesData',
-				type: 'boolean',
-				filterable: true,
+				type: FilterType.boolean,
 				width: 100
 			}, {
 				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
-				type: 'text',
-				filterable: true,
+				filterType: FilterType.text,
 				width: 180
 			}, {
 				label: 'Created',
 				property: 'dateCreated',
-				type: 'date',
 				format: dateFormat,
-				filterable: true,
+				filterType: FilterType.date,
 				width: 150
 			}, {
 				label: 'Last Updated',
 				property: 'lastUpdated',
-				type: 'date',
 				format: dateFormat,
-				filterable: true,
+				filterType: FilterType.date,
 				width: 150
 			}
 		];
@@ -158,7 +142,7 @@ export const EVENT_DEFAULT_TEXT_WEB_API = `// Put the task on hold and add a com
 //and use the commented out:
 //task.error(response.stderr)
 `;
-export const EVENT_BEFORE_CALL_TEXT  = `// Setting Content Type, default 'application/json'
+export const EVENT_BEFORE_CALL_TEXT = `// Setting Content Type, default 'application/json'
 // request.config.setProperty('Content-Type', 'text/csv')
 
 // Setting content type Accepted, default 'application/json'
@@ -170,6 +154,7 @@ export const EVENT_DEFAULT_ERROR_WEB_API = `// Put the task on hold and add a co
 //If you are using TMD to run the web API use this reaction script instead, of the default above.
 //task.error( response.stderr )
 `;
+
 export enum APIActionType {
 	HTTP_API = 1,
 	SCRIPT
@@ -333,9 +318,9 @@ export class APIActionParameterModel {
 }
 
 export const Languages = {
-	GROOVY_SCRIPT : 'Groovy',
-	POWER_SHELL : 'PowerShell',
-	UNIX_SHELL : 'Shell'
+	GROOVY_SCRIPT: 'Groovy',
+	POWER_SHELL: 'PowerShell',
+	UNIX_SHELL: 'Shell'
 };
 
 export enum EventReactionType {
