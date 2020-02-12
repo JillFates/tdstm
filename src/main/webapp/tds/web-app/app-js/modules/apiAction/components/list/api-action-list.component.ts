@@ -24,20 +24,10 @@ import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'api-action-list',
-	templateUrl: 'api-action-list.component.html',
-	styles: [`
-        #btnCreate {
-            margin-left: 16px;
-        }
-
-        .action-header {
-            width: 100%;
-            text-align: center;
-        }
-	`]
+	templateUrl: 'api-action-list.component.html'
 })
 export class APIActionListComponent implements OnInit {
-	// -------------------------------------
+
 	private gridRowActions: GridRowAction[];
 
 	private headerActions: HeaderActionButtonData[];

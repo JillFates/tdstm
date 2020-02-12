@@ -1,5 +1,5 @@
 // Angular
-import {Component, ElementRef, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
 import {AUTH_METHODS, CredentialModel, REQUEST_MODE} from '../../model/credential.model';
@@ -9,7 +9,6 @@ import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 // Component
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 // Service
 import {CredentialService} from '../../service/credential.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -74,11 +73,6 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 	})
 	apiActionCredential: DropDownListComponent;
 
-	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
-	@ViewChild('credentialsContainer', {static: false})
-	credentialsContainer: ElementRef;
-
-	public codeMirrorComponent: CodeMirrorComponent;
 	public credentialModel: CredentialModel;
 	public providerList = new Array<ProviderModel>();
 	public statusList = new Array<any>();
@@ -409,7 +403,14 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		)
 			.subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
-					this.onCancelClose();
+					this.credentialService
+						.deleteCredential(this.credentialModel.id)
+						.subscribe(
+							result => {
+								this.onCancelClose(result);
+							},
+							err => console.log(err)
+						);
 				}
 			});
 	}
