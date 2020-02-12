@@ -59,7 +59,7 @@
             <tds-button-custom 
                         class="pull-right no-action-button"
                         isIconButton="true"
-                        style ="color: {{currentOverrideState.color}}"
+                        [ngStyle]="{color: currentOverrideState.color}"
                         [icon]="currentOverrideState.icon"
                         [tooltip]="currentOverrideState.offLabel"
                         (click)="toggleAssetView()"

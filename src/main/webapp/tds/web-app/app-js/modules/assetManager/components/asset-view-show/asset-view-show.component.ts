@@ -29,7 +29,6 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
 
 declare var jQuery: any;
 
-//TODO: take out color of the state
 interface OverrideState {
 	icon?: string;
 	isOverride?: boolean;
@@ -66,18 +65,19 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		sort: []
 	};
 	private queryParams: any = {};
+	// TODO: Rebase it to use the proper icons instead of refresh
 	private readonly overrideAssetViewStates: any = {
 		IS_OVERRIDE_CHILD: {
 			// icon: 'layer-minus',
-			icon: 'cog',
-			color: 'black',
+			icon: 'refresh',
+			color: 'green',
 			isOverriden: true,
 			label: 'Revert to Project View',
 		},
 		IS_OVERRIDE_PARENT: {
-			icon: 'cog',
-			color: 'red',
-			// icon: 'layer-group',
+			// icon: 'layer-plus',
+			icon: 'refresh',
+			color: 'blue',
 			isOverriden: false,
 			label: 'Display Personal System View'
 		},
