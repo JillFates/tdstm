@@ -269,7 +269,6 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 					this.getCommonFieldSpecs(result[2]);
 				},
 				complete: () => {
-					this.setCurrentTab(this.tabsEnum.Info);
 					this.prepareFormListener();
 				},
 			});

@@ -118,8 +118,10 @@ export class APIActionListComponent implements OnInit {
 	 */
 	private onEdit = async (dataItem: APIActionModel): Promise<void> => {
 		try {
-			let apiAction: APIActionModel = await this.apiActionService.getAPIAction(dataItem.id).toPromise();
-			await this.openAPIActionDialogViewEdit(apiAction, ActionType.EDIT, true);
+			if (this.isEditAvailable()) {
+				let apiAction: APIActionModel = await this.apiActionService.getAPIAction(dataItem.id).toPromise();
+				await this.openAPIActionDialogViewEdit(apiAction, ActionType.EDIT, true);
+			}
 		} catch (error) {
 			console.error(error);
 		}
@@ -151,7 +153,8 @@ export class APIActionListComponent implements OnInit {
 	 */
 	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0 && this.isEditAvailable()) {
-			await this.openAPIActionDialogViewEdit(event.dataItem, ActionType.VIEW);
+			let apiAction: APIActionModel = await this.apiActionService.getAPIAction(event.dataItem.id).toPromise();
+			await this.openAPIActionDialogViewEdit(apiAction, ActionType.VIEW);
 		}
 	}
 
