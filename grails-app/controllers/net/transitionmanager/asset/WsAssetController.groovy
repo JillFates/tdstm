@@ -19,6 +19,7 @@ import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
@@ -46,6 +47,7 @@ class WsAssetController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	AssetService assetService
 	CommentService commentService
+	CustomDomainService customDomainService
 	ControllerService controllerService
 	DatabaseService databaseService
 	DeviceService deviceService
@@ -369,7 +371,11 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def getDefaultCreateModel(String assetClass) {
-		renderAsJson( assetService.getCreateModel(getProjectForWs(), assetClass) )
+		Project project = projectForWs
+		Map model = assetService.getCreateModel(getProjectForWs(), assetClass)
+		model.put('standardFieldSpecs', customDomainService.standardFieldSpecsByField(project, assetClass) )
+		model.put('customFields', assetEntityService.getCustomFieldsSettings(project, assetClass, true) )
+		renderAsJson( model )
 	}
 
 	/**

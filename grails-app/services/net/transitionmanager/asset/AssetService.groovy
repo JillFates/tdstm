@@ -62,7 +62,7 @@ class AssetService {
 
         model << commonModelOptions(project)
 
-        return model
+		return model
     }
 
     /**
