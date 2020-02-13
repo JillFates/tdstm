@@ -142,6 +142,7 @@ class ControlAngularTagLib {
 	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
 	 */
 	def inputControl = { Map attrs ->
+		String customIndex = attrs.customIndex
 
 		// The field Specifications
 		Map fieldSpec = attrs.field ?: [:]
@@ -170,7 +171,7 @@ class ControlAngularTagLib {
 			case ControlType.IN_LIST.toString():
 			case ControlType.OPTIONS_ENVIRONMENT.toString():
 			case ControlType.OPTIONS_PRIORITY.toString():
-				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
+				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, customIndex, tabIndex, tabOffset, size, null, blankOptionListText)
 				break
 			case ControlType.YES_NO.toString():
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, null, blankOptionListText)
@@ -306,9 +307,17 @@ class ControlAngularTagLib {
 	 * @param blankOptionListText - Text used to represent a blank text (optional)
 	 * @return the SELECT Component HTML
 	 */
-	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String blankOptionListText) {
-		List options = fieldSpec.constraints?.values.collect { StringEscapeUtils.escapeXml(it) } ?: []
-
+	private String renderSelectListInput(
+			Map fieldSpec,
+			String value,
+			String ngmodel,
+			String customIndex,
+			String tabIndex,
+			String tabOffset,
+			Integer size,
+			String tooltipDataPlacement,
+			String blankOptionListText)
+	{
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append('#' + 'field' + fieldSpec.field + '="ngModel"')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
@@ -316,17 +325,17 @@ class ControlAngularTagLib {
 		sb.append(' [valuePrimitive]="true" ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 
-		List<Object> stringList = new ArrayList<Object>();
-
-		// Add a Select... option at top if the field is required
-		// <option value="" selected>Select...</option>
-		boolean isRequiredField = fieldSpec.constraints?.required
-		if (isRequiredField) {
-			stringList.add(selectOption('', value, SELECT_REQUIRED_PROMPT))
-		} else {
-			// Add a blank option so users can unset a value
-			stringList.add(selectOption('', value, StringUtil.isBlank(blankOptionListText) ? null : blankOptionListText))
-		}
+//		List options = fieldSpec.constraints?.values.collect { StringEscapeUtils.escapeXml(it) } ?: []
+//		List<Object> stringList = new ArrayList<Object>();
+//		// Add a Select... option at top if the field is required
+//		// <option value="" selected>Select...</option>
+//		boolean isRequiredField = fieldSpec.constraints?.required
+//		if (isRequiredField) {
+//			stringList.add(selectOption('', value, SELECT_REQUIRED_PROMPT))
+//		} else {
+//			// Add a blank option so users can unset a value
+//			stringList.add(selectOption('', value, StringUtil.isBlank(blankOptionListText) ? null : blankOptionListText))
+//		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
 		// If there no match then it will render the option with a warning. This will give the
@@ -334,20 +343,24 @@ class ControlAngularTagLib {
 		// not allowing the user to save until the proper value is selected.
 		//
 		// <option value="BadData" selected>BadData (INVALID)</option>
-		boolean isBlankValue = StringUtil.isBlank(value);
-		if (( ! isBlankValue && options && !options.contains(value)) ) {
-			String warning = "$value ($MISSING_OPTION_WARNING)"
-			stringList.add(selectOption(value, value, warning))
-		}
+//		boolean isBlankValue = StringUtil.isBlank(value);
+//		if (( ! isBlankValue && options && !options.contains(value)) ) {
+//			String warning = "$value ($MISSING_OPTION_WARNING)"
+//			stringList.add(selectOption(value, value, warning))
+//		}
 
 		// Iterate over the fieldSpec option values to create each of the options
-		for (option in options) {
-		    if( ! StringUtil.isBlank(option) ) {
-				stringList.add(selectOption(option, value))
-		    }
-		}
+//		for (option in options) {
+//		    if( ! StringUtil.isBlank(option) ) {
+//				stringList.add(selectOption(option, value))
+//		    }
+//		}
 
-		sb.append(" [data]=' " + JsonOutput.toJson(stringList) + "' ")
+		if (fieldSpec.udf == 0) {
+			sb.append(" [data]='model.standardFieldSpecs.${fieldSpec.field}.constraints.values' ")
+		} else {
+			sb.append(" [data]='model.customs[${customIndex}].constraints.values' ")
+		}
 
 		sb.append('>')
 
