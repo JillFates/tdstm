@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="${resource(dir: 'dist/js/vendors/bootstrap/dist/css', file: 'bootstrap.min.css')}">
 <!-- Font Awesome -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/fontawesome/v5.11.2', file: 'all.min.css')}">
+<link rel="stylesheet" href="${resource(dir: 'dist/css/fontawesome', file: 'font-awesome.min.css')}">
 <!-- Ionicons -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/ionicons/2.0.1/css', file: 'ionicons.min.css')}">
 <!-- Theme style -->
