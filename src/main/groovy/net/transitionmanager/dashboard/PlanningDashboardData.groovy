@@ -673,7 +673,7 @@ class PlanningDashboardData {
 			confirmedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.confirmedApplicationCount)
 			movedDatabasePerc = NumberUtil.percentage(basicMetrics.databaseCount, movedDbCount)
 			doneAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
-			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.applicationCount)
+			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
 			movedOtherPerc = NumberUtil.percentage(deviceMetrics.otherAssetCount, movedOtherCount)
 			physicalServerPerc = NumberUtil.percentage(deviceMetrics.totalPhysicalServerCount, movedPhysicalServerCount)
 			physicalStoragePerc = NumberUtil.percentage(deviceMetrics.phyStorageCount, movedPhyStorageCount)
