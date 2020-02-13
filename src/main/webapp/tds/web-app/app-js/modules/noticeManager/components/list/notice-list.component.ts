@@ -3,7 +3,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 // Components
 import { NoticeViewEditComponent } from '../view-edit/notice-view-edit.component';
 import { GridComponent } from 'tds-component-library';
-
 // Service
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -57,6 +56,7 @@ export class NoticeListComponent implements OnInit {
 	protected dateFormat = '';
 
 	@ViewChild(GridComponent, { static: false }) gridComponent: GridComponent;
+
 	constructor(
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
@@ -77,13 +77,13 @@ export class NoticeListComponent implements OnInit {
 				name: 'Edit',
 				show: true,
 				disabled: !this.isEditAvailable(),
-				onClick: this.openEdit,
+				onClick: this.onEdit,
 			},
 			{
 				name: 'Delete',
 				show: true,
 				disabled: !this.isEditAvailable(),
-				onClick: this.openDelete,
+				onClick: this.onDelete,
 			},
 		];
 
@@ -103,7 +103,6 @@ export class NoticeListComponent implements OnInit {
 			gridRowActions: this.gridRowActions,
 			gridSettings: this.gridSettings,
 			headerActionButtons: this.headerActions,
-			showDataReloadButton: false,
 			loadData: this.loadData,
 		};
 
@@ -154,7 +153,7 @@ export class NoticeListComponent implements OnInit {
 		}
 	};
 
-	public openEdit = async (dataItem: NoticeModel): Promise<void> => {
+	public onEdit = async (dataItem: NoticeModel): Promise<void> => {
 		try {
 			if (this.isEditAvailable()) {
 				await this.openNotice(dataItem.id, ActionType.Edit);
@@ -165,7 +164,7 @@ export class NoticeListComponent implements OnInit {
 		}
 	};
 
-	public openDelete = async (dataItem: NoticeModel): Promise<void> => {
+	public onDelete = async (dataItem: NoticeModel): Promise<void> => {
 		try {
 			const confirmation = await this.prompt.open(
 				'Confirmation Required',

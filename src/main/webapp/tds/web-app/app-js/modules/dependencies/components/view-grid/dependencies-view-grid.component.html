@@ -24,19 +24,17 @@
 				<div class="clr-col-12">
 					<div class="pull-right">
 						<tds-bulk-change-button
-								#tdsBulkChangeButton
-								[enabled]="bulkCheckboxService.hasSelectedItems()"
-								[showDelete]="true"
-								[showEdit]="false"
-								[bulkChangeType]="bulkChangeType"
-								(clickBulk)="onClickBulkButton()"
-								(operationResult)="onBulkOperationResult($event)">
+							#tdsBulkChangeButton
+							[enabled]="bulkCheckboxService.hasSelectedItems()"
+							[showDelete]="true"
+							[showEdit]="false"
+							[bulkChangeType]="bulkChangeType"
+							(clickBulk)="onClickBulkButton()"
+							(operationResult)="onBulkOperationResult($event)">
 						</tds-bulk-change-button>
 						<tds-grid-header-action-buttons
-								(refresh)="reloadData()"
-								[actionButtons]="headerActionButtons"
-								(clearFilters)="onClearFilters()"
-								[disableClearFilters]="disableClearFilters">
+							(refresh)="reloadData()"
+							[actionButtons]="headerActionButtons">
 						</tds-grid-header-action-buttons>
 					</div>
 
@@ -53,12 +51,12 @@
 		>
 			<ng-template kendoGridHeaderTemplate>
 				<div class="row text-center">
-                    <tds-indeterminate-checkbox checkbox name="assetsSelector"
-								  [hasThirdState]="true"
-								  [disabled]="!isBulkSelectAvailable()"
-                                  (changeState)="bulkCheckboxService.changeState(($event))"
-                                  id="assetSelector"
-                                  [setStateSubject]="bulkCheckboxService.setStateSubject">
+					<tds-indeterminate-checkbox checkbox name="assetsSelector"
+																			[hasThirdState]="true"
+																			[disabled]="!isBulkSelectAvailable()"
+																			(changeState)="bulkCheckboxService.changeState(($event))"
+																			id="assetSelector"
+																			[setStateSubject]="bulkCheckboxService.setStateSubject">
 					</tds-indeterminate-checkbox>
 				</div>
 			</ng-template>
@@ -90,29 +88,24 @@
 
 		<!-- Show Filters / Actions column -->
 		<kendo-grid-column
-				[locked]="true"
-				[width]="50"
-				[class]="{ 'k-custom-command-column': true }"
-				[minResizableWidth]="50"
-		>
-			<ng-template
-					kendoGridHeaderTemplate
-					let-column
-					let-columnIndex="columnIndex"
-			>
-				<tds-button [flat]="true" (click)="toggleFilter()">
-					<clr-icon
-							shape="filter"
-							class="grid-filter-button is-solid"
-					>
-						<span
-								*ngIf="hasFilterApplied()"
-								class="badge badge-warning"
-						>
-							{{ filterCount() }}
-						</span>
-					</clr-icon>
-				</tds-button>
+			[field]="'_showFilters'"
+			[headerClass]="'text-center'"
+			[sortable]="false"
+			[locked]="true"
+			[class]="{ 'k-custom-command-column': true }"
+			[width]="50"
+			[minResizableWidth]="50">
+			<!-- Toggle Filters button -->
+			<ng-template kendoGridHeaderTemplate>
+				<tds-grid-show-hide-filters-button [filterCount]="filterCount()"
+																					 (toggleFilters)="toggleFilter()">
+				</tds-grid-show-hide-filters-button>
+			</ng-template>
+			<!-- Clear all Filters button -->
+			<ng-template kendoGridFilterCellTemplate let-filter>
+				<tds-grid-clear-all-filters-button [show]="filterCount()"
+																					 (clearFilters)="onClearFilters()">
+				</tds-grid-clear-all-filters-button>
 			</ng-template>
 		</kendo-grid-column>
 
@@ -131,46 +124,36 @@
 						[ngClass]="{
 							'action-header': column.type === 'action'
 						}"
-						>{{ column.label }}</label
+					>{{ column.label }}</label
 					>
 				</div>
 			</ng-template>
 
-			<!-- Default Generic Filter Template -->
-			<!-- Asset Tags Filter Template -->
+			<!-- Filter Template -->
 			<ng-template kendoGridFilterCellTemplate let-filter>
 				<div class="has-feedback" style="margin-bottom:0px;">
+					<!-- Asset Tags Filter Template -->
 					<tds-asset-tag-selector
 						*ngIf="column.property === 'tagsAsset' || column.property === 'tagsDependent'"
 						[tagList]="state.tagList"
 						(valueChange)="
 							onTagFilterChange(column.property, $event)
 						"
-						[placeholder]="'Filter ' + column.label"
+						[placeholder]="'Filter'"
 					>
 					</tds-asset-tag-selector>
 					<div
 						*ngIf="column.property !== 'tagsAsset' && column.property !== 'tagsDependent'"
-						class="filter-input"
-					>
-						<input
-							clrInput
-							type="text"
-							(keyup)="onFilter(column)"
-							name="{{ column.property }}"
-							[(ngModel)]="column.filter"
-							placeholder="Filter {{ column.label }}"
-							value=""
-						/>
-						<tds-button
-							*ngIf="column.filter"
-							(click)="onClearValue(column)"
-							[title]="'Clear Filter'"
-							icon="times-circle"
-							[small]="true"
-							[flat]="true"
-						>
-						</tds-button>
+						class="filter-input">
+						<div class="filter-input">
+							<tds-grid-filter-input
+								[name]="column.property"
+								[value]="column.filter || ''"
+								[columnType]="column.type || 'text'"
+								[placeholder]="'GLOBAL.FILTER' | translate"
+								(filter)="onFilter(column, $event)">
+							</tds-grid-filter-input>
+						</div>
 					</div>
 				</div>
 			</ng-template>
@@ -212,7 +195,7 @@
 			let-currentPage="currentPage"
 		>
 			<div class="clr-col-4 selected-assets-counter">
-				<clr-icon class="icon" shape="check"> </clr-icon>
+				<clr-icon class="icon" shape="check"></clr-icon>
 				<h6 class="inline">{{ getSelectedItemsCount() }}</h6>
 			</div>
 			<div class="clr-col-8">

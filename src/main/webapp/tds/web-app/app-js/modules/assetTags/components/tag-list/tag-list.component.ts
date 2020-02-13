@@ -63,9 +63,9 @@ export class TagListComponent implements OnInit, OnDestroy {
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translatePipe.transform('ASSET_TAGS.CREATE_TAG'),
+				title: this.translatePipe.transform('GLOBAL.CREATE'),
 				disabled: !this.canCreate(),
 				show: true,
 				onClick: this.onAddButton.bind(this),
@@ -371,7 +371,6 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.showFilters = false;
 		this.gridSettings.clearAllFilters(this.gridColumns.columns);
 		this.reloadTagList();
 	}

@@ -1,3 +1,5 @@
+import {FilterType} from 'tds-component-library';
+
 export class EventColumnModel {
 	columns: any[];
 
@@ -5,41 +7,35 @@ export class EventColumnModel {
 		this.columns = [
 			{
 				label: 'Name',
-				filterable: true,
 				property: 'name',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 'auto'
 			}, {
 				label: 'Estimated Start',
-				filterable: true,
 				property: 'estStartTime',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
 				width: 'auto',
 			}, {
 				label: 'Estimated Completion',
-				filterable: true,
 				property: 'estCompletionTime',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
 				width: 'auto',
 			}, {
 				label: 'Description',
-				filterable: true,
 				property: 'description',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 'auto',
 			}, {
 				label: 'Runbook Status',
-				filterable: true,
 				property: 'runbookStatus',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 'auto'
 			}, {
 				label: 'Bundles',
-				filterable: true,
 				property: 'moveBundlesString',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 'auto'
 			}
 		];

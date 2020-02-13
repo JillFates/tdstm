@@ -40,7 +40,7 @@
 									<span *ngIf="column.filter" (click)="clearValue(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 								</div>
 								<div *ngIf="column.type === 'text'">
-									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" value="">
 									<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 								</div>
 								<div *ngIf="column.type === 'boolean'">

@@ -2,201 +2,192 @@
 import {
 	Component,
 	ComponentFactoryResolver,
-	ElementRef,
-	HostListener,
-	OnDestroy,
 	OnInit,
-	Renderer2,
+	ViewChild,
 } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
 // Services
 import {ProviderService} from '../../service/provider.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
 import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
 // Models
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 import {ProviderColumnModel, ProviderModel} from '../../model/provider.model';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../auth/model/user-context.model';
 import {Permission} from '../../../../shared/model/permission.model';
-import {DialogConfirmAction, DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
-// Kendo
-import {SelectableSettings} from '@progress/kendo-angular-grid';
-import {ReplaySubject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {
+	ColumnHeaderData,
+	DialogConfirmAction,
+	DialogService, GridComponent,
+	GridModel, GridRowAction, GridSettings,
+	HeaderActionButtonData,
+	ModalSize
+} from 'tds-component-library';
+import {CellClickEvent} from '@progress/kendo-angular-grid';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'provider-list',
 	templateUrl: 'provider-list.component.html'
 })
-export class ProviderListComponent implements OnInit, OnDestroy {
-	public headerActionButtons: HeaderActionButtonData[];
+export class ProviderListComponent implements OnInit {
+	private gridRowActions: GridRowAction[];
 
-	protected gridColumns: any[];
-	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: true};
-	public dataGridOperationsHelper: DataGridOperationsHelper;
-	private initialSort: any = [{
-		dir: 'asc',
-		field: 'name'
-	}];
-	private checkboxSelectionConfig = null;
+	private headerActions: HeaderActionButtonData[];
 
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
-	public providerColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public selectedRows = [];
-	public dateFormat = '';
-	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
-	protected showFilters = false;
-	public disabledClearFilters: any;
+	private gridSettings: GridSettings = {
+		defaultSort: [{field: 'name', dir: 'asc'}],
+		sortSettings: {mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
+	};
+
+	private columnModel: ColumnHeaderData[];
+	public gridModel: GridModel;
+	private dateFormat = '';
+
+	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private providerService: ProviderService,
-		private prompt: UIPromptService,
-		private route: ActivatedRoute,
-		private elementRef: ElementRef,
-		private renderer: Renderer2,
-		private userContext: UserContextService,
+		private preferenceService: PreferenceService,
 		private translateService: TranslatePipe
 	) {
-
-		this.dataGridOperationsHelper = new DataGridOperationsHelper(
-			this.route.snapshot.data['providers'],
-			this.initialSort,
-			this.selectableSettings,
-			this.checkboxSelectionConfig,
-			this.pageSize);
 	}
 
-	ngOnInit() {
-		this.disabledClearFilters = this.onDisableClearFilter.bind(this);
+	async ngOnInit() {
+		this.gridRowActions = [
+			{
+				name: 'Edit',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onDelete,
+			},
+		];
 
-		this.headerActionButtons = [
+		this.headerActions = [
 			{
 				icon: 'plus',
 				iconClass: 'is-solid',
 				title: this.translateService.transform('GLOBAL.CREATE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
-				onClick: this.onCreateProvider.bind(this),
+				onClick: this.onCreateProvider,
 			},
 		];
 
-		this.userContext
-			.getUserContext()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe((userContext: UserContextModel) => {
-				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(
-					userContext.dateFormat
-				);
-				this.providerColumnModel = new ProviderColumnModel(
-					`{0:${this.dateFormat}}`
-				);
-				this.gridColumns = this.providerColumnModel.columns.filter(
-					column => column.type !== 'action'
-				);
-			});
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
+
+		this.dateFormat = await this.preferenceService.getUserDatePreferenceAsKendoFormat().toPromise();
+
+		this.columnModel = new ProviderColumnModel(this.dateFormat).columns;
+
+		this.gridModel.columnModel = this.columnModel;
 	}
 
-	protected onCreateProvider(): void {
-		let providerModel: ProviderModel = {
-			name: '',
-			description: '',
-			comment: '',
-		};
-		this.openProviderDialogViewEdit(providerModel, ActionType.CREATE);
+	public async cellClick(event: CellClickEvent): Promise<void> {
+		if (event.columnIndex > 0 && this.isEditAvailable()) {
+			await this.openProvider(event.dataItem, ActionType.VIEW);
+		}
+	}
+
+	private onCreateProvider = async (): Promise<void> => {
+		try {
+			let providerModel: ProviderModel = {
+				name: '',
+				description: '',
+				comment: '',
+			};
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: ProviderViewEditComponent,
+				data: {
+					providerModel: providerModel,
+					actionType: ActionType.CREATE,
+					openFromList: false
+				},
+				modalConfiguration: {
+					title: 'Provider',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Select the current element and open the Edit Dialog
 	 * @param dataItem
 	 */
-	protected onEdit(dataItem: any): void {
-		this.openProviderDialogViewEdit(dataItem, ActionType.EDIT);
+	private onEdit = async (dataItem: ProviderModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				await this.openProvider(dataItem, ActionType.EDIT, true);
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Delete the selected Provider
 	 * @param dataItem
 	 */
-	protected onDelete(dataItem: any): void {
-		this.providerService
-			.deleteContext(dataItem.id)
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe((result: any) => {
-				this.dialogService.open({
+	private onDelete = async (dataItem: ProviderModel): Promise<void> => {
+		try {
+			if (this.isDeleteAvailable()) {
+				const context = await this.providerService.deleteContext(dataItem.id).toPromise();
+
+				const confirmation = await this.dialogService.open({
 					componentFactoryResolver: this.componentFactoryResolver,
 					component: ProviderAssociatedComponent,
 					data: {
-						providerAssociatedModel: result,
+						providerAssociatedModel: context,
 					},
 					modalConfiguration: {
 						title: 'Confirmation Required',
 						draggable: true,
 						modalSize: ModalSize.MD
 					}
-				}).subscribe((data: any) => {
-					if (data.confirm === DialogConfirmAction.CONFIRM) {
-						this.providerService
-							.deleteProvider(dataItem.id)
-							.subscribe(
-								result => {
-									this.reloadData();
-								},
-								err => console.log(err)
-							);
+				}).toPromise();
+				if (confirmation) {
+					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+						await this.providerService.deleteProvider(dataItem.id).toPromise();
+						await this.gridComponent.reloadData();
 					}
-				});
-			});
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
-	/**
-	 * Catch the Selected Row
-	 * @param {any} dataItem
-	 */
-	protected cellClick(dataItem: any): void {
-		this.selectRow(dataItem.id);
-		this.openProviderDialogViewEdit(dataItem, ActionType.VIEW);
-	}
-
-	protected reloadData(): void {
-		this.providerService
-			.getProviders()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(
-				result => {
-					this.dataGridOperationsHelper.reloadData(result);
-					setTimeout(
-						() => this.forceDisplayLastRowAddedToGrid(),
-						100
-					);
-				},
-				err => console.log(err)
-			);
-	}
-
-	/**
-	 * This work as a temporary fix.
-	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
-	 */
-	private forceDisplayLastRowAddedToGrid(): void {
-		const lastIndex = this.dataGridOperationsHelper.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(
-			`tr[data-kendo-grid-item-index="${lastIndex}"]`
-		);
-		this.renderer.setStyle(target, 'height', '36px');
+	private loadData = async (): Promise<ProviderModel[]> => {
+		try {
+			return await this.providerService.getProviders().toPromise();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
@@ -204,86 +195,38 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param {ProviderModel} providerModel
 	 * @param {number} actionType
 	 */
-	private openProviderDialogViewEdit(providerModel: ProviderModel, actionType: number): void {
-		this.dialogService.open({
-			componentFactoryResolver: this.componentFactoryResolver,
-			component: ProviderViewEditComponent,
-			data: {
-				providerModel: providerModel,
-				actionType: actionType
-			},
-			modalConfiguration: {
-				title: 'Provider Detail',
-				draggable: true,
-				modalSize: ModalSize.MD
-			}
-		}).subscribe((result: any) => {
-			this.reloadData();
-		});
-	}
-
-	private selectRow(dataItemId: number): void {
-		this.selectedRows = [];
-		this.selectedRows.push(dataItemId);
-	}
-
-	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
-	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
+	private async openProvider(providerModel: ProviderModel, actionType: ActionType, openFromList = false): Promise<void> {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: ProviderViewEditComponent,
+				data: {
+					providerModel: providerModel,
+					actionType: actionType,
+					openFromList: openFromList
+				},
+				modalConfiguration: {
+					title: 'Provider',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
-	/**
-	 * unsubscribe from all subscriptions on destroy hook.
-	 * @HostListener decorator ensures the OnDestroy hook is called on events like
-	 * Page refresh, Tab close, Browser close, navigation to another view.
-	 */
-	@HostListener('window:beforeunload')
-	ngOnDestroy(): void {
-		this.unsubscribeOnDestroy$.next();
-		this.unsubscribeOnDestroy$.complete();
-	}
-
-	protected isCreateAvailable(): boolean {
+	private isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderCreate);
 	}
 
-	protected isDeleteAvailable(): boolean {
+	private isDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderDelete);
 	}
 
-	protected isUpdateAvailable(): boolean {
+	private isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
-	}
-
-	protected toggleFilter(): void {
-		this.showFilters = !this.showFilters;
-	}
-
-	/**
-	 * Returns the number of current selected filters
-	 */
-	protected filterCount(): number {
-		return this.dataGridOperationsHelper.getFilterCounter();
-	}
-
-	/**
-	 * Clear all filters
-	 */
-	protected clearAllFilters(): void {
-		this.showFilters = false;
-		this.dataGridOperationsHelper.clearAllFilters(this.gridColumns);
-	}
-
-	/**
-	 * Disable clear filters
-	 */
-	protected onDisableClearFilter(): boolean {
-		return this.filterCount() === 0;
 	}
 
 }

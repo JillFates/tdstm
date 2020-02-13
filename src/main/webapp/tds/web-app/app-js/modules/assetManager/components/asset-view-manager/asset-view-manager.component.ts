@@ -16,7 +16,7 @@ import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { AssetViewManagerColumnsHelper } from './asset-view-manager-columns.helper';
 import { HeaderActionButtonData } from 'tds-component-library';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 import { SortDescriptor } from '@progress/kendo-data-query';
 
 @Component({
@@ -52,9 +52,9 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: 'Create View',
+				title: this.translateService.transform('GLOBAL.CREATE'),
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateReport.bind(this),
@@ -70,13 +70,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		// remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
-		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
-		if (contentWrapper) {
-			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
-			// 45px is the header height, 31px is the footer height
-			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
-		}
+		fixContentWrapper();
 	}
 
 	/**

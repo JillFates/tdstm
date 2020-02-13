@@ -1,6 +1,6 @@
 import { ActivatedRoute } from '@angular/router';
 import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
@@ -124,12 +124,7 @@ export class TaskListComponent implements OnInit {
 	 * On Init: remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
 	 */
 	ngOnInit(): void {
-		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
-		if (contentWrapper) {
-			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
-			// 45px is the header height, 31px is the footer height
-			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
-		}
+		fixContentWrapper();
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
@@ -890,7 +885,6 @@ export class TaskListComponent implements OnInit {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.isFiltering = false;
 		this.grid.clearAllFilters(this.columnsModel);
 		this.onFiltersChange();
 	}

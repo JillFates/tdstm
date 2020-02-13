@@ -11,6 +11,7 @@ import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
 import {IGraphNode, IGraphTask, IMoveEventTask} from '../model/graph-task.model';
 import {IMoveEvent} from '../model/move-event.model';
+import {DateUtils} from '../../../shared/utils/date.utils';
 
 export interface IGrapTaskResponseBody {
 	status: string;
@@ -422,6 +423,10 @@ export class TaskService {
 				if (!response.rows || response.rows === null) {
 					return {rows: [], totalCount: 0};
 				}
+				response.rows.forEach((row) => {
+					row.dueDate = row.dueDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(row.dueDate), DateUtils.SERVER_FORMAT_DATE) : '';
+				})
 				return response;
 			}),
 			catchError(error => {

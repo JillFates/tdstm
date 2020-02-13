@@ -404,7 +404,7 @@ export class TaskCommentComponent implements OnInit {
 							} else if (result.commentInstance) {
 								this.openTaskDetail(result);
 							} else {
-								this.reloadTasksGrid();
+								this.createDataGrids();
 							}
 						}
 					})
