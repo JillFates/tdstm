@@ -46,7 +46,7 @@ export class TDSCheckboxComponent implements OnChanges {
 	 * @param {SimpleChanges} changes
 	 */
 	ngOnChanges(changes: SimpleChanges) {
-		console.log('on changes');
+		// console.log('on changes');
 	}
 
 	onChange(event): void {
