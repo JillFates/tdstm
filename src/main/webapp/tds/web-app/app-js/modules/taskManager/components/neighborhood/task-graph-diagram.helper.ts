@@ -181,12 +181,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		treeLayout.treeStyle = go.TreeLayout.StyleLayered;
 		treeLayout.layerStyle = go.TreeLayout.LayerIndividual;
 		treeLayout.angle = 0;
-		treeLayout.nodeSpacing = 20;
-		treeLayout.sorting = go.TreeLayout.SortingForwards;
-		treeLayout.compaction = go.TreeLayout.CompactionBlock;
-		treeLayout.rowSpacing = 25;
-		treeLayout.rowIndent = 10;
 		treeLayout.layerSpacing = 50;
+		treeLayout.nodeSpacing = 50;
 
 		return treeLayout;
 	}
@@ -198,7 +194,7 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		linkTemplate.curve = Link.Bezier;
 
 		const linkShape = new go.Shape();
-		linkShape.strokeWidth = 3;
+		linkShape.strokeWidth = 2;
 		linkShape.stroke = '#ddd';
 		const arrowHead = new Shape();
 		arrowHead.strokeWidth = 2;
@@ -419,10 +415,24 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.textAlign = 'center';
 		assetIconShape.verticalAlignment = go.Spot.Center;
 		assetIconShape.margin = new go.Margin(0, 0, 0, 5);
-		assetIconShape.desiredSize = new go.Size(35, 35);
-		assetIconShape.font = '25px FontAwesome';
 		assetIconShape.mouseOver = (e, o) => o.cursor = 'pointer';
 		assetIconShape.mouseLeave = (e, o) => o.cursor = 'none';
+
+		assetIconShape.bind(new Binding('desiredSize', 'asset',
+			(val: any) => {
+				if (val) {
+					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return type === 'application' ? new go.Size(50, 50) : new go.Size(35, 35);
+				}
+			}));
+
+		assetIconShape.bind(new Binding('font', 'asset',
+			(val: any) => {
+				if (val) {
+					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return type === 'application' ? '40px FontAwesome' : '25px FontAwesome';
+				}
+			}));
 
 		assetIconShape.bind(new Binding('text', 'asset',
 			(val: any) => {
