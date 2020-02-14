@@ -1393,10 +1393,9 @@ class AssetEntityService implements ServiceMethods {
 	@Transactional(readOnly = true)
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
 		String domain = asset.assetClass.toString()
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
-		Map map = [
+		Map model = [
 			assetId: 			asset.id,
 			project: 			project,
 
@@ -1422,15 +1421,31 @@ class AssetEntityService implements ServiceMethods {
 
 			// Field Specifications
 			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs,
 		]
+
+		//Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
+		Map standard = customDomainService.standardFieldSpecsByField(project, domain)
+		standard.environment.constraints.values = model.environmentOptions
+		standard.planStatus.constraints.values = model.planStatusOptions
+		standard.validation.constraints.values = model.validationOptions
+		if (domain == 'DEVICE') {
+			standard.priority.constraints.values = model.priorityOption
+			standard.railType.constraints.values = model.railTypeOption
+			standard.roomSource.constraints.values = model.sourceRoomSelect
+			standard.roomTarget.constraints.values = model.targetRoomSelect
+			standard.rackSource.constraints.values = model.sourceRackSelect
+			standard.rackTarget.constraints.values = model.targetRackSelect
+			standard.sourceChassis.constraints.values = model.sourceChassisSelect
+			standard.targetChassis.constraints.values = model.targetChassisSelect
+		}
+		model.standardFieldSpecs = standard
 
 		// Additional Select Option lists for Device type
 		if (asset.assetClass == AssetClass.DEVICE) {
-			map << DeviceUtils.deviceModelOptions(project, asset)
+			model << DeviceUtils.deviceModelOptions(project, asset)
 		}
 
-		map
+		return model
 	}
 
 	/**

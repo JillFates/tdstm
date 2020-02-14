@@ -373,8 +373,25 @@ class WsAssetController implements ControllerMethods {
 	def getDefaultCreateModel(String assetClass) {
 		Project project = projectForWs
 		Map model = assetService.getCreateModel(getProjectForWs(), assetClass)
-		model.put('standardFieldSpecs', customDomainService.standardFieldSpecsByField(project, assetClass) )
-		model.put('customFields', assetEntityService.getCustomFieldsSettings(project, assetClass, true) )
+
+		// Populate all of the various sets of Select Controls Options Lists in the field spect constraints
+		Map standard = customDomainService.standardFieldSpecsByField(project, assetClass)
+		standard.environment.constraints.values = model.environmentOptions
+		standard.planStatus.constraints.values = model.planStatusOptions
+		standard.validation.constraints.values = model.validationOptions
+		if (assetClass == 'DEVICE') {
+			standard.priority.constraints.values = model.priorityOption
+			standard.railType.constraints.values = model.railTypeOption
+			standard.roomSource.constraints.values = model.sourceRoomSelect
+			standard.roomTarget.constraints.values = model.targetRoomSelect
+			standard.rackSource.constraints.values = model.sourceRackSelect
+			standard.rackTarget.constraints.values = model.targetRackSelect
+			standard.sourceChassis.constraints.values = model.sourceChassisSelect
+			standard.targetChassis.constraints.values = model.targetChassisSelect
+		}
+		model.put('standardFieldSpecs', standard )
+
+		model.put('customs', assetEntityService.getCustomFieldsSettings(project, assetClass, true) )
 		renderAsJson( model )
 	}
 

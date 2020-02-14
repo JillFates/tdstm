@@ -119,12 +119,12 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			delete modelRequest.asset.moveBundle;
 
 			// Custom Fields
-			this.model.customs.forEach((custom: any) => {
-				let customValue = modelRequest.asset[custom.field.toString()];
-				if (customValue && customValue.value) {
-					modelRequest.asset[custom.field.toString()] = customValue.value;
-				}
-			});
+			// this.model.customs.forEach((custom: any) => {
+			// 	let customValue = modelRequest.asset[custom.field.toString()];
+			// 	if (customValue && customValue.value) {
+			// 		modelRequest.asset[custom.field.toString()] = customValue.value;
+			// 	}
+			// });
 
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({
