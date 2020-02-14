@@ -21,7 +21,6 @@ import { HeaderActionButtonData } from 'tds-component-library';
                     </tds-button-custom>
                     <tds-grid-header-action-buttons
                             (refresh)="onReload()"
-                            [hasClearAllFilters]="false"
                             [actionButtons]="headerActionButtons">
                     </tds-grid-header-action-buttons>
 				</div>
