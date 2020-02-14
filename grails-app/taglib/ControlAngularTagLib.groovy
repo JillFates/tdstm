@@ -320,42 +320,17 @@ class ControlAngularTagLib {
 	{
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append('#' + 'field' + fieldSpec.field + '="ngModel"')
-		sb.append(' [defaultItem]="\'Select...\'" ')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
 		sb.append(' [valuePrimitive]="true" ')
+
+		boolean isRequiredField = fieldSpec.constraints?.required || fieldSpec.field == 'environment'
+		if (! isRequiredField) {
+			sb.append(' [defaultItem]="\'\'" ')
+		}
+
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 
-//		List options = fieldSpec.constraints?.values.collect { StringEscapeUtils.escapeXml(it) } ?: []
-//		List<Object> stringList = new ArrayList<Object>();
-//		// Add a Select... option at top if the field is required
-//		// <option value="" selected>Select...</option>
-//		boolean isRequiredField = fieldSpec.constraints?.required
-//		if (isRequiredField) {
-//			stringList.add(selectOption('', value, SELECT_REQUIRED_PROMPT))
-//		} else {
-//			// Add a blank option so users can unset a value
-//			stringList.add(selectOption('', value, StringUtil.isBlank(blankOptionListText) ? null : blankOptionListText))
-//		}
-
-		// Check to see if there is some legacy value that doesn't match the select option values.
-		// If there no match then it will render the option with a warning. This will give the
-		// user a visual indicator that there is an issue. The form submission should error thereby
-		// not allowing the user to save until the proper value is selected.
-		//
-		// <option value="BadData" selected>BadData (INVALID)</option>
-//		boolean isBlankValue = StringUtil.isBlank(value);
-//		if (( ! isBlankValue && options && !options.contains(value)) ) {
-//			String warning = "$value ($MISSING_OPTION_WARNING)"
-//			stringList.add(selectOption(value, value, warning))
-//		}
-
-		// Iterate over the fieldSpec option values to create each of the options
-//		for (option in options) {
-//		    if( ! StringUtil.isBlank(option) ) {
-//				stringList.add(selectOption(option, value))
-//		    }
-//		}
-
+		// StandardFieldSpecs are by propertyName and customs are ordinal position
 		if (fieldSpec.udf == 0) {
 			sb.append(" [data]='model.standardFieldSpecs.${fieldSpec.field}.constraints.values' ")
 		} else {

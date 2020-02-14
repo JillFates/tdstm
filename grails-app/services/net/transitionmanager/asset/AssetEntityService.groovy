@@ -1420,25 +1420,12 @@ class AssetEntityService implements ServiceMethods {
 			redirectTo: params.redirectTo,
 
 			// Field Specifications
+			// TODO : JPM 2/2020 : rename property customs to customFieldSpecs
 			customs: customFields,
 		]
 
-		//Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
-		Map standard = customDomainService.standardFieldSpecsByField(project, domain)
-		standard.environment.constraints.values = model.environmentOptions
-		standard.planStatus.constraints.values = model.planStatusOptions
-		standard.validation.constraints.values = model.validationOptions
-		if (domain == 'DEVICE') {
-			standard.priority.constraints.values = model.priorityOption
-			standard.railType.constraints.values = model.railTypeOption
-			standard.roomSource.constraints.values = model.sourceRoomSelect
-			standard.roomTarget.constraints.values = model.targetRoomSelect
-			standard.rackSource.constraints.values = model.sourceRackSelect
-			standard.rackTarget.constraints.values = model.targetRackSelect
-			standard.sourceChassis.constraints.values = model.sourceChassisSelect
-			standard.targetChassis.constraints.values = model.targetChassisSelect
-		}
-		model.standardFieldSpecs = standard
+		// Add the standardFieldSpecs attribute to the model
+		assetService.addFieldSpecsToCrudModel(project, domain, model)
 
 		// Additional Select Option lists for Device type
 		if (asset.assetClass == AssetClass.DEVICE) {
