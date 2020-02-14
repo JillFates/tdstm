@@ -1393,10 +1393,9 @@ class AssetEntityService implements ServiceMethods {
 	@Transactional(readOnly = true)
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
 		String domain = asset.assetClass.toString()
-		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
-		Map map = [
+		Map model = [
 			assetId: 			asset.id,
 			project: 			project,
 
@@ -1421,16 +1420,19 @@ class AssetEntityService implements ServiceMethods {
 			redirectTo: params.redirectTo,
 
 			// Field Specifications
+			// TODO : JPM 2/2020 : rename property customs to customFieldSpecs
 			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs,
 		]
+
+		// Add the standardFieldSpecs attribute to the model
+		assetService.addFieldSpecsToCrudModel(project, domain, model)
 
 		// Additional Select Option lists for Device type
 		if (asset.assetClass == AssetClass.DEVICE) {
-			map << DeviceUtils.deviceModelOptions(project, asset)
+			model << DeviceUtils.deviceModelOptions(project, asset)
 		}
 
-		map
+		return model
 	}
 
 	/**
