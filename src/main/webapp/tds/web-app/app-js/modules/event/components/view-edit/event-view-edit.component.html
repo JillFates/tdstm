@@ -46,11 +46,12 @@
 								<td valign="top" class="name">Tags:</td>
 
 								<td valign="top" class="value">
-									<span
-										*ngFor="let tag of savedModel?.tagIds"
-										class="assetTag {{ tag.css }}"
-										>{{ tag.name }}</span
-									>
+									<div class="event-view-tags">
+										<span
+											*ngFor="let tag of savedModel?.tagIds"
+											class="assetTag {{ tag.css }}"
+											>{{ tag.name }}</span>
+									</div>
 								</td>
 							</tr>
 
@@ -70,8 +71,7 @@
 												[queryParams]="{
 													show: bundle.id
 												}"
-												>{{ bundle.name }}</a
-											>
+												>{{ bundle.name }}</a>
 										</li>
 									</ul>
 								</td>
