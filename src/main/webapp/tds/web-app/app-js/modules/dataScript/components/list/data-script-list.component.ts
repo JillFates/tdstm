@@ -259,6 +259,7 @@ export class DataScriptListComponent implements OnInit {
 				modalConfiguration: {
 					title: 'ETL Script',
 					draggable: true,
+					resizable: true,
 					modalSize: ModalSize.XL
 				}
 			}).toPromise();

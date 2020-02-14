@@ -1,53 +1,54 @@
-import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import 'rxjs/add/operator/finally';
-
+// Angular
+import {Component, AfterViewInit, ViewChild, ElementRef, OnInit, Input} from '@angular/core';
+// Component
+import {DataScriptSampleDataComponent} from '../sample-data/data-script-sample-data.component';
+import {DataScriptConsoleComponent} from '../console/data-script-console.component';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+import {FieldInfoType} from '../../../importBatch/components/record/import-batch-record-fields.component';
+// Model
+import {DataScriptModel, SampleDataModel} from '../../model/data-script.model';
 import {
-	UIExtraDialog,
+	ScriptConsoleSettingsModel,
+	ScriptTestResultModel,
+	ScriptValidSyntaxResultModel
+} from '../../model/script-result.models';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {
+	CHECK_ACTION,
+	OperationStatusModel,
+} from '../../../../shared/components/check-action/model/check-action.model';
+import {Dialog, DialogButtonType} from 'tds-component-library';
+import {Permission} from '../../../../shared/model/permission.model';
+import {isNullOrEmptyString} from '@progress/kendo-angular-grid/dist/es2015/utils';
+// Service
+import {
 	UIDialogService,
 } from '../../../../shared/services/ui-dialog.service';
-import { DataScriptSampleDataComponent } from '../sample-data/data-script-sample-data.component';
-import { DataScriptConsoleComponent } from '../console/data-script-console.component';
-import {
-	DataScriptModel,
-	SampleDataModel,
-} from '../../model/data-script.model';
 import {
 	DataScriptService,
 	PROGRESSBAR_COMPLETED_STATUS,
 	PROGRESSBAR_FAIL_STATUS,
 } from '../../service/data-script.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import {
-	ScriptConsoleSettingsModel,
-	ScriptTestResultModel,
-	ScriptValidSyntaxResultModel,
-} from '../../model/script-result.models';
-import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
-import {
-	CHECK_ACTION,
-	OperationStatusModel,
-} from '../../../../shared/components/check-action/model/check-action.model';
-import { ApiResponseModel } from '../../../../shared/model/ApiResponseModel';
-import { ImportAssetsService } from '../../../importBatch/service/import-assets.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { OBJECT_OR_LIST_PIPE } from '../../../../shared/pipes/utils.pipe';
-import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
-import { FieldInfoType } from '../../../importBatch/components/record/import-batch-record-fields.component';
-import { FieldReferencePopupHelper } from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
-import { FieldReferencePopupComponent } from '../../../../shared/components/field-reference-popup/field-reference-popup.component';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
+// Other
+import 'rxjs/add/operator/finally';
 
 @Component({
 	selector: 'data-script-etl-builder',
 	templateUrl: 'data-script-etl-builder.component.html',
 })
-export class DataScriptEtlBuilderComponent extends UIExtraDialog
-	implements AfterViewInit {
-	@ViewChild('codeMirror', { static: false })
+export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, AfterViewInit {
+	@Input() data: any;
+
+	@ViewChild('codeMirror', {static: false})
 	codeMirrorComponent: CodeMirrorComponent;
-	@ViewChild('resizableForm', { static: false }) resizableForm: ElementRef;
+	@ViewChild('resizableForm', {static: false}) resizableForm: ElementRef;
 	public collapsed = {
 		code: true,
 		sample: false,
@@ -76,17 +77,37 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 	protected OBJECT_OR_LIST_PIPE = OBJECT_OR_LIST_PIPE;
 	protected FieldInfoType = FieldInfoType;
 	protected fieldReferencePopupHelper: FieldReferencePopupHelper;
+	public dataScriptModel: DataScriptModel;
 
 	constructor(
 		private translatePipe: TranslatePipe,
 		private dialogService: UIDialogService,
-		public dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataScriptService,
 		private importAssetsService: ImportAssetsService,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService
 	) {
-		super('#etlBuilder');
+		super();
+	}
+
+	ngOnInit(): void {
+		this.dataScriptModel = Object.assign({}, this.data.dataScriptModel);
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			disabled: () => !this.isUpdateAvailable() || !this.isScriptDirty() || (this.operationStatus.save && this.operationStatus.save !== 'success'),
+			type: DialogButtonType.ACTION,
+			action: this.onSave.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
 		this.script = '';
 		this.loadETLScript();
 		this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
@@ -212,7 +233,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 									(domain, index) => {
 										this.transformedDataGrids[
 											index
-										] = new DataGridOperationsHelper(
+											] = new DataGridOperationsHelper(
 											domain.data
 										);
 										// console.log(`${domain.domain}-${index.toString()}`);
@@ -263,16 +284,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 			});
 	}
 
-	public cancelCloseDialog($event): void {
-		if (
-			$event &&
-			$event.target &&
-			$event.target.classList.contains(
-				FieldReferencePopupComponent.POPUP_ESC_TRIGGER_CLASS
-			)
-		) {
-			return;
-		}
+	public cancelCloseDialog(): void {
 		if (this.isScriptDirty()) {
 			this.promptService
 				.open(
@@ -287,7 +299,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 				)
 				.then(result => {
 					if (result) {
-						this.dismiss();
+						this.onCancelClose(result);
 					}
 				});
 		} else {
@@ -296,7 +308,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 				newEtlScriptCode: this.script,
 			};
 
-			this.close(result);
+			this.onCancelClose(result);
 		}
 	}
 
@@ -341,7 +353,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 	public onLoadSampleData(): void {
 		this.dialogService
 			.extra(DataScriptSampleDataComponent, [
-				{ provide: 'etlScript', useValue: this.dataScriptModel },
+				{provide: 'etlScript', useValue: this.dataScriptModel},
 			])
 			.then(
 				(filename: {
@@ -558,5 +570,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ETLScriptUpdate);
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

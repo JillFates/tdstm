@@ -1,11 +1,11 @@
 // Angular
 import {
 	Component,
-	HostListener,
 	OnInit,
 	ViewChild,
 	ElementRef, Input, ComponentFactoryResolver
 } from '@angular/core';
+import {NgForm} from '@angular/forms';
 // Component
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DataScriptEtlBuilderComponent} from '../etl-builder/data-script-etl-builder.component';
@@ -30,7 +30,6 @@ import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
-import {NgForm} from '@angular/forms';
 
 const DEBOUNCE_MILLISECONDS = 800;
 
@@ -94,6 +93,14 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 			active: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.changeToEditDataScript.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'etlScript',
+			icon: 'code',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
+			type: DialogButtonType.ACTION,
+			action: this.onDataScriptDesigner.bind(this)
 		});
 
 		this.buttons.push({
@@ -215,18 +222,6 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 	}
 
 	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(
-		event: KeyboardEvent
-	) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
-	}
-
-	/**
 	 * Verify the Object has not changed
 	 * - Ignore etl-script changes
 	 * @returns {boolean}
@@ -236,10 +231,6 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 		this.etlScriptCode.code = copy.etlSourceCode;
 		delete copy.etlSourceCode;
 		return this.dataSignature !== JSON.stringify(copy);
-	}
-
-	private focusForm() {
-		this.dataScriptContainer.nativeElement.focus();
 	}
 
 	/**
@@ -350,6 +341,7 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 			modalConfiguration: {
 				title: 'ETL Script',
 				draggable: true,
+				resizable: true,
 				modalSize: ModalSize.XL
 			}
 		}).subscribe((result: any) => {
