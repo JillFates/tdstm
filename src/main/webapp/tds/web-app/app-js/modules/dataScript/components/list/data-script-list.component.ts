@@ -253,8 +253,7 @@ export class DataScriptListComponent implements OnInit {
 				componentFactoryResolver: this.componentFactoryResolver,
 				component: DataScriptEtlBuilderComponent,
 				data: {
-					dataScriptModel: script.data.dataScript,
-					openFromList: true
+					dataScriptModel: script.data.dataScript
 				},
 				modalConfiguration: {
 					title: 'ETL Script',

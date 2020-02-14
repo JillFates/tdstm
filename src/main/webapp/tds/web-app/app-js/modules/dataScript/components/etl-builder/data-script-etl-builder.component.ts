@@ -1,5 +1,5 @@
 // Angular
-import {Component, AfterViewInit, ViewChild, ElementRef, OnInit, Input} from '@angular/core';
+import {Component, AfterViewInit, ViewChild, ElementRef, OnInit, Input, ComponentFactoryResolver} from '@angular/core';
 // Component
 import {DataScriptSampleDataComponent} from '../sample-data/data-script-sample-data.component';
 import {DataScriptConsoleComponent} from '../console/data-script-console.component';
@@ -17,19 +17,15 @@ import {
 	CHECK_ACTION,
 	OperationStatusModel,
 } from '../../../../shared/components/check-action/model/check-action.model';
-import {Dialog, DialogButtonType} from 'tds-component-library';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
 import {Permission} from '../../../../shared/model/permission.model';
 import {isNullOrEmptyString} from '@progress/kendo-angular-grid/dist/es2015/utils';
 // Service
-import {
-	UIDialogService,
-} from '../../../../shared/services/ui-dialog.service';
 import {
 	DataScriptService,
 	PROGRESSBAR_COMPLETED_STATUS,
 	PROGRESSBAR_FAIL_STATUS,
 } from '../../service/data-script.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -80,11 +76,11 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 	public dataScriptModel: DataScriptModel;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private translatePipe: TranslatePipe,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private dataIngestionService: DataScriptService,
 		private importAssetsService: ImportAssetsService,
-		private promptService: UIPromptService,
 		private permissionService: PermissionService
 	) {
 		super();
@@ -111,6 +107,10 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		this.script = '';
 		this.loadETLScript();
 		this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
 	}
 
 	ngAfterViewInit(): void {
@@ -286,22 +286,16 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 
 	public cancelCloseDialog(): void {
 		if (this.isScriptDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
-				)
-				.then(result => {
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM) {
 					if (result) {
 						this.onCancelClose(result);
 					}
-				});
+				}
+			});
 		} else {
 			const result = {
 				updated: this.operationStatus.save === 'success',
@@ -351,24 +345,24 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 	}
 
 	public onLoadSampleData(): void {
-		this.dialogService
-			.extra(DataScriptSampleDataComponent, [
-				{provide: 'etlScript', useValue: this.dataScriptModel},
-			])
-			.then(
-				(filename: {
-					temporaryFileName: string;
-					originalFileName: string;
-				}) => {
-					this.filename = filename.temporaryFileName;
-					this.extractSampleDataFromFile(filename.originalFileName);
-				}
-			)
-			.catch(err => {
-				console.log('SampleDataDialog error occurred..');
-				if (err) {
-					console.log(err);
-				}
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: DataScriptSampleDataComponent,
+			data: {
+				etlScript: this.dataScriptModel
+			},
+			modalConfiguration: {
+				title: 'Sample Data',
+				draggable: true,
+				modalSize: ModalSize.XL
+			}
+		}).subscribe(
+			(filename: {
+				temporaryFileName: string;
+				originalFileName: string;
+			}) => {
+				this.filename = filename.temporaryFileName;
+				this.extractSampleDataFromFile(filename.originalFileName);
 			});
 	}
 
@@ -440,24 +434,20 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 	 * On View Console button open the console dialog.
 	 */
 	public onViewConsole(): void {
-		this.dialogService
-			.extra(
-				DataScriptConsoleComponent,
-				[
-					{
-						provide: ScriptConsoleSettingsModel,
-						useValue: this.consoleSettings,
-					},
-				],
-				false,
-				true
-			)
-			.then(result => {
-				/* on ok */
-			})
-			.catch(result => {
-				/* on close/cancel */
-			});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: DataScriptConsoleComponent,
+			data: {
+				consoleSettingsModel: this.consoleSettings
+			},
+			modalConfiguration: {
+				title: 'View console?',
+				draggable: true,
+				modalSize: ModalSize.XL
+			}
+		}).subscribe((result: any) => {
+			//
+		});
 	}
 
 	public testHasErrors(): boolean {
@@ -570,6 +560,13 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ETLScriptUpdate);
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 */
+	private getModalTitle(): string {
+		return `ETL Script Edit - ${this.dataScriptModel.provider.name} / ${this.dataScriptModel.name} `;
 	}
 
 	/**
