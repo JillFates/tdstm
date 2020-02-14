@@ -210,7 +210,7 @@ export class DataScriptListComponent implements OnInit {
 				modalConfiguration: {
 					title: 'ETL Script',
 					draggable: true,
-					modalSize: ModalSize.LG
+					modalSize: ModalSize.MD
 				}
 			}).toPromise();
 			await this.gridComponent.reloadData();
@@ -230,7 +230,7 @@ export class DataScriptListComponent implements OnInit {
 				data: {
 					dataScriptModel: script.data.dataScript,
 					actionType: action,
-					openFromList: false
+					openFromList: openFromList
 				},
 				modalConfiguration: {
 					title: 'ETL Script',

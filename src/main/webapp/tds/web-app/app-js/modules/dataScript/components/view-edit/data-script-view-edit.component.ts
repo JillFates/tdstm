@@ -4,11 +4,10 @@ import {
 	HostListener,
 	OnInit,
 	ViewChild,
-	ElementRef, Input
+	ElementRef, Input, ComponentFactoryResolver
 } from '@angular/core';
 // Component
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DataScriptEtlBuilderComponent} from '../etl-builder/data-script-etl-builder.component';
 // Model
 import {
@@ -19,13 +18,9 @@ import {
 import {ProviderModel} from '../../../provider/model/provider.model';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {Permission} from '../../../../shared/model/permission.model';
-import {Dialog, DialogButtonType} from 'tds-component-library';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
 // Service
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {
-	UIActiveDialogService,
-	UIDialogService,
-} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DataScriptService} from '../../service/data-script.service';
 // Other
@@ -78,11 +73,9 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 	public modalType = ActionType.VIEW;
 
 	constructor(
-		public promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService,
-		private prompt: UIPromptService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private dataIngestionService: DataScriptService,
-		private dialogService: UIDialogService,
 		private translatePipe: TranslatePipe,
 		private permissionService: PermissionService
 	) {
@@ -211,7 +204,7 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 			.saveDataScript(this.dataScriptModel)
 			.subscribe(
 				(result: any) => {
-					this.activeDialog.close(result);
+					this.onAcceptSuccess(result);
 				},
 				err => err)
 		;
@@ -254,64 +247,44 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
-				)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.dismiss();
-					} else {
-						this.focusForm();
-					}
-				})
-				.catch(error => console.log(error));
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM) {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			if (this.etlScriptCode.updated) {
-				this.activeDialog.close();
-			} else {
-				this.activeDialog.dismiss();
-			}
+			this.onCancelClose();
 		}
 	}
 
 	protected cancelEditDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
-				)
-				.then(confirm => {
-					if (confirm) {
-						this.dataScriptModel = Object.assign({}, this.data.dataScriptModel);
-						this.changeToViewDataScript();
-					} else {
-						this.focusForm();
-					}
-				})
-				.catch(error => console.log(error));
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
+					this.dataScriptModel = Object.assign({}, this.data.dataScriptModel);
+					this.changeToViewDataScript();
+				} else {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			this.changeToViewDataScript();
+			if (!this.data.openFromList) {
+				this.changeToViewDataScript();
+			} else {
+				this.onCancelClose();
+			}
 		}
 	}
 
 	protected changeToViewDataScript(): void {
 		this.modalType = this.actionTypes.VIEW;
-		this.modalTitle = 'ETL Script Detail';
+		this.setTitle(this.getModalTitle(this.modalType));
 	}
 
 	/**
@@ -324,40 +297,27 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 
 	/**
 	 * Delete the selected DataScript
-	 * @param dataItem
 	 */
 	protected onDeleteDataScript(): void {
 		this.dataIngestionService
 			.validateDeleteScript(this.dataScriptModel.id)
 			.subscribe(
 				result => {
+					let confirmMessage = '';
 					if (result && result['canDelete']) {
-						this.prompt
-							.open(
-								'Confirmation Required',
-								'Do you want to proceed?',
-								'Yes',
-								'No'
-							)
-							.then(res => {
-								if (res) {
-									this.deleteDataScript();
-								}
-							});
+						confirmMessage = this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION');
 					} else {
-						this.prompt
-							.open(
-								'Confirmation Required',
-								'There are Ingestion Batches that have used this DataScript. Deleting this will not delete the batches but will no longer reference a DataScript. Do you want to proceed?',
-								'Yes',
-								'No'
-							)
-							.then(res => {
-								if (res) {
-									this.deleteDataScript();
-								}
-							});
+						confirmMessage = 'There are Ingestion Batches that have used this DataScript. Deleting this will not delete the batches but will no longer reference a DataScript. Do you want to proceed?';
 					}
+					this.dialogService.confirm(
+						this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+						confirmMessage
+					)
+						.subscribe((data: any) => {
+							if (data.confirm === DialogConfirmAction.CONFIRM) {
+								this.deleteDataScript();
+							}
+						});
 				},
 				err => console.log(err)
 			);
@@ -371,7 +331,7 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 			.deleteDataScript(this.dataScriptModel.id)
 			.subscribe(
 				result => {
-					this.activeDialog.close(result);
+					this.onCancelClose(result);
 				},
 				err => console.log(err)
 			);
@@ -381,26 +341,23 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 	 * Open the DataScript Designer
 	 */
 	protected onDataScriptDesigner(): void {
-		this.dialogService
-			.extra(
-				DataScriptEtlBuilderComponent,
-				[
-					UIDialogService,
-					{
-						provide: DataScriptModel,
-						useValue: this.dataScriptModel,
-					},
-				],
-				false,
-				false
-			)
-			.then(result => {
-				if (result.updated) {
-					this.etlScriptCode.updated = result.updated;
-					this.etlScriptCode.code = result.newEtlScriptCode;
-				}
-			})
-			.catch(error => console.log('Cancel datascript designer'));
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: DataScriptEtlBuilderComponent,
+			data: {
+				dataScriptModel: this.dataScriptModel
+			},
+			modalConfiguration: {
+				title: 'ETL Script',
+				draggable: true,
+				modalSize: ModalSize.XL
+			}
+		}).subscribe((result: any) => {
+			if (result.updated) {
+				this.etlScriptCode.updated = result.updated;
+				this.etlScriptCode.code = result.newEtlScriptCode;
+			}
+		});
 	}
 
 	protected isDeleteAvailable(): boolean {
@@ -417,6 +374,14 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getModalTitle(modalType: ActionType): string {
+		// Every time we change the title, it means we switched to View, Edit or Create
+		setTimeout(() => {
+			// This ensure the UI has loaded since Kendo can change the signature of an object
+			let copy = {...this.dataScriptModel};
+			this.etlScriptCode.code = copy.etlSourceCode;
+			delete copy.etlSourceCode;
+			this.dataSignature = JSON.stringify(copy);
+		}, 800);
 		if (modalType === ActionType.CREATE) {
 			return 'ETL Script Create';
 		}
