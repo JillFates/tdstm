@@ -245,6 +245,14 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					timeout(15000)
 				)
 				.subscribe(res => {
+					if (res.body.status === 'error') {
+						if (this.isNeighbor) {
+							this.isFullView = true;
+							this.isNeighbor = false;
+							this.graph.showFullGraphBtn = false;
+						}
+						return;
+					}
 					const data = res.body.data;
 					if (data && data.length > 0) {
 						this.rootId = taskId;
@@ -254,6 +262,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 								this.diagramLayoutService.clearFullGraphCache();
 								this.requestId = taskId;
 								this.isMoveEventReq = false;
+							} else {
+								this.graph.cleanUpDiagram();
+								this.graph.showFullGraphBtn = true;
+								this.neighborId = taskId;
 							}
 							this.generateModel();
 						}
@@ -817,12 +829,9 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Open the neighborhood window
 	 */
 	onNeighborhood(data?: IGraphTask): void {
-		this.graph.cleanUpDiagram();
 		this.isFullView = false;
 		this.isNeighbor = true;
-		this.graph.showFullGraphBtn = true;
 		this.loadTasks(Number(data.id));
-		this.neighborId = data && data.id;
 	}
 
 	/**
