@@ -1,34 +1,32 @@
 // Angular
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 // Services
-import { DataScriptService } from '../../service/data-script.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-
+import {DataScriptService} from '../../service/data-script.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 // Components
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { DataScriptViewEditComponent } from '../view-edit/data-script-view-edit.component';
+import {DataScriptViewEditComponent} from '../view-edit/data-script-view-edit.component';
 import {
-	ColumnHeaderData,
+	ColumnHeaderData, DialogConfirmAction, DialogService,
 	GridComponent,
 	GridModel,
 	GridRowAction,
 	GridSettings,
-	HeaderActionButtonData
+	HeaderActionButtonData, ModalSize
 } from 'tds-component-library';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DataScriptEtlBuilderComponent} from '../etl-builder/data-script-etl-builder.component';
 // Models
 import {
 	DataScriptColumnModel,
 	DataScriptModel,
 	ActionType,
 } from '../../model/data-script.model';
-import { Permission } from '../../../../shared/model/permission.model';
+import {Permission} from '../../../../shared/model/permission.model';
+// Others
 import {
 	CellClickEvent,
 } from '@progress/kendo-angular-grid';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {DataScriptEtlBuilderComponent} from '../etl-builder/data-script-etl-builder.component';
 
 @Component({
 	selector: 'data-script-list',
@@ -40,8 +38,8 @@ export class DataScriptListComponent implements OnInit {
 	public headerActions: HeaderActionButtonData[];
 
 	public gridSettings: GridSettings = {
-		defaultSort: [{ field: 'title', dir: 'asc' }],
-		sortSettings: { mode: 'single' },
+		defaultSort: [{field: 'title', dir: 'asc'}],
+		sortSettings: {mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,
@@ -53,13 +51,14 @@ export class DataScriptListComponent implements OnInit {
 	protected actionType = ActionType;
 	protected dateFormat = '';
 
-	@ViewChild(GridComponent, { static: false }) gridComponent: GridComponent;
+	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
+
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
-		private preferenceService: PreferenceService,
 		private dataScriptService: DataScriptService,
-		private prompt: UIPromptService,
+		private preferenceService: PreferenceService,
 		private translateService: TranslatePipe
 	) {
 	}
@@ -145,7 +144,7 @@ export class DataScriptListComponent implements OnInit {
 	public openEdit = async (dataItem: DataScriptModel): Promise<void> => {
 		try {
 			if (this.isEditAvailable()) {
-				await this.openScript(dataItem.id, ActionType.EDIT);
+				await this.openScript(dataItem.id, ActionType.EDIT, true);
 				await this.gridComponent.reloadData();
 			}
 		} catch (error) {
@@ -170,17 +169,15 @@ export class DataScriptListComponent implements OnInit {
 
 	public openDelete = async (dataItem: DataScriptModel): Promise<void> => {
 		try {
-			const confirmation = await this.prompt.open(
+			const confirmation = await this.dialogService.confirm(
 				'Confirmation Required',
-				'You are about to delete the selected data script. Do you want to proceed?',
-				'Yes',
-				'No'
-			);
+				'You are about to delete the selected data script. Do you want to proceed?'
+			).toPromise();
 			if (confirmation) {
-				await this.dataScriptService
-					.deleteDataScript(dataItem.id)
-					.toPromise();
-				await this.gridComponent.reloadData();
+				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+					await this.dataScriptService.deleteDataScript(dataItem.id).toPromise();
+					await this.gridComponent.reloadData();
+				}
 			}
 		} catch (error) {
 			if (error) {
@@ -202,10 +199,20 @@ export class DataScriptListComponent implements OnInit {
 
 	public onCreateScript = async (): Promise<void> => {
 		try {
-			await this.dialogService.open(DataScriptViewEditComponent, [
-				{ provide: DataScriptModel, useValue: new DataScriptModel() },
-				{ provide: Number, useValue: ActionType.CREATE },
-			]);
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: DataScriptViewEditComponent,
+				data: {
+					dataScriptModel: new DataScriptModel(),
+					actionType: ActionType.CREATE,
+					openFromList: false
+				},
+				modalConfiguration: {
+					title: 'ETL Script',
+					draggable: true,
+					modalSize: ModalSize.LG
+				}
+			}).toPromise();
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			if (error) {
@@ -214,16 +221,23 @@ export class DataScriptListComponent implements OnInit {
 		}
 	};
 
-	public async openScript(id: number, action: ActionType): Promise<void> {
+	public async openScript(id: number, action: ActionType, openFromList = false): Promise<void> {
 		try {
 			const script = await this.dataScriptService.getETLScript(id).toPromise();
-			await this.dialogService.open(DataScriptViewEditComponent, [
-				{
-					provide: DataScriptModel,
-					useValue: script.data.dataScript as DataScriptModel,
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: DataScriptViewEditComponent,
+				data: {
+					dataScriptModel: script.data.dataScript,
+					actionType: action,
+					openFromList: false
 				},
-				{ provide: Number, useValue: action },
-			]);
+				modalConfiguration: {
+					title: 'ETL Script',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			if (error) {
@@ -235,12 +249,19 @@ export class DataScriptListComponent implements OnInit {
 	public async openETLBuilder(id: number): Promise<void> {
 		try {
 			const script = await this.dataScriptService.getETLScript(id).toPromise();
-			await this.dialogService.extra(DataScriptEtlBuilderComponent, [
-				{
-					provide: DataScriptModel,
-					useValue: script.data.dataScript as DataScriptModel,
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: DataScriptEtlBuilderComponent,
+				data: {
+					dataScriptModel: script.data.dataScript,
+					openFromList: true
+				},
+				modalConfiguration: {
+					title: 'ETL Script',
+					draggable: true,
+					modalSize: ModalSize.XL
 				}
-			]);
+			}).toPromise();
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			if (error) {

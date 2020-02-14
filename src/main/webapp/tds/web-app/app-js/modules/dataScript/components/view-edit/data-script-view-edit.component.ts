@@ -1,56 +1,67 @@
+// Angular
 import {
 	Component,
 	HostListener,
 	OnInit,
 	ViewChild,
-	ElementRef,
-	Inject,
+	ElementRef, Input
 } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/mergeMap';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
-import {
-	UIActiveDialogService,
-	UIDialogService,
-} from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
+// Component
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {DataScriptEtlBuilderComponent} from '../etl-builder/data-script-etl-builder.component';
+// Model
 import {
 	DataScriptModel,
 	ActionType,
 	DataScriptMode,
 } from '../../model/data-script.model';
-import { ProviderModel } from '../../../provider/model/provider.model';
-import { DataScriptService } from '../../service/data-script.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { DataScriptEtlBuilderComponent } from '../etl-builder/data-script-etl-builder.component';
-import { KEYSTROKE } from '../../../../shared/model/constants';
-import { Permission } from '../../../../shared/model/permission.model';
+import {ProviderModel} from '../../../provider/model/provider.model';
+import {KEYSTROKE} from '../../../../shared/model/constants';
+import {Permission} from '../../../../shared/model/permission.model';
+import {Dialog, DialogButtonType} from 'tds-component-library';
+// Service
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {
+	UIActiveDialogService,
+	UIDialogService,
+} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {DataScriptService} from '../../service/data-script.service';
+// Other
+import {Subject} from 'rxjs/Subject';
+import {Observable} from 'rxjs';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/mergeMap';
+import {NgForm} from '@angular/forms';
 
 const DEBOUNCE_MILLISECONDS = 800;
+
 @Component({
 	selector: 'data-script-view-edit',
 	templateUrl: 'data-script-view-edit.component.html',
 	styles: [
-		`
-			.has-error,
-			.has-error:focus {
-				border: 1px #f00 solid;
-			}
+			`
+            .has-error,
+            .has-error:focus {
+                border: 1px #f00 solid;
+            }
 		`,
 	],
 })
-export class DataScriptViewEditComponent implements OnInit {
+export class DataScriptViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
+	@ViewChild('dataScriptForm', {read: NgForm, static: true}) dataScriptForm: NgForm;
+
 	@ViewChild('dataScriptProvider', {
 		read: DropDownListComponent,
 		static: true,
 	})
 	dataScriptProvider: DropDownListComponent;
-	@ViewChild('dataScriptContainer', { static: false })
+	@ViewChild('dataScriptContainer', {static: false})
 	dataScriptContainer: ElementRef;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();
@@ -64,10 +75,9 @@ export class DataScriptViewEditComponent implements OnInit {
 		updated: false,
 		code: null,
 	};
+	public modalType = ActionType.VIEW;
 
 	constructor(
-		public originalModel: DataScriptModel,
-		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
@@ -76,7 +86,57 @@ export class DataScriptViewEditComponent implements OnInit {
 		private translatePipe: TranslatePipe,
 		private permissionService: PermissionService
 	) {
-		this.dataScriptModel = Object.assign({}, this.originalModel);
+		super();
+	}
+
+	ngOnInit(): void {
+		this.dataScriptModel = Object.assign({}, this.data.dataScriptModel);
+		this.modalType = this.data.actionType;
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
+			disabled: () => !this.permissionService.hasPermission(Permission.ProviderUpdate),
+			active: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.changeToEditDataScript.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
+			disabled: () => !this.dataScriptForm.form.valid || !this.isUnique || (this.dataScriptModel.provider && !this.dataScriptModel.provider.id) || !this.isDirty(),
+			type: DialogButtonType.ACTION,
+			action: this.onSaveDataScript.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.modalType !== this.actionTypes.CREATE,
+			disabled: () => !this.isDeleteAvailable,
+			type: DialogButtonType.ACTION,
+			action: this.onDeleteDataScript.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEditDialog.bind(this)
+		});
+
 		this.getProviders();
 		this.modalTitle =
 			this.modalType === ActionType.CREATE
@@ -85,11 +145,31 @@ export class DataScriptViewEditComponent implements OnInit {
 				? 'ETL Script Edit'
 				: 'ETL Script Detail';
 		// ignore etl script from this context
-		let copy = { ...this.dataScriptModel };
+		let copy = {...this.dataScriptModel};
 		this.etlScriptCode.code = copy.etlSourceCode;
 		delete copy.etlSourceCode;
 		this.dataSignature = JSON.stringify(copy);
 		this.datasourceName.next(this.dataScriptModel.name);
+
+		const notEmptyViewName$: Observable<String> = this.datasourceName
+			.debounceTime(DEBOUNCE_MILLISECONDS)
+			.distinctUntilChanged()
+			.filter((name: string) => Boolean(name && name.trim()));
+
+		notEmptyViewName$
+			.flatMap(() =>
+				this.dataIngestionService.validateUniquenessDataScriptByName(
+					this.dataScriptModel
+				)
+			)
+			.subscribe(
+				(isUnique: boolean) => (this.isUnique = isUnique),
+				(error: Error) => console.log(error.message)
+			);
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle(this.modalType));
+		});
 	}
 
 	/**
@@ -107,7 +187,7 @@ export class DataScriptViewEditComponent implements OnInit {
 					};
 				}
 				this.providerList.push(...result);
-				let copy = { ...this.dataScriptModel };
+				let copy = {...this.dataScriptModel};
 				this.etlScriptCode.code = copy.etlSourceCode;
 				delete copy.etlSourceCode;
 				this.dataSignature = JSON.stringify(copy);
@@ -134,25 +214,7 @@ export class DataScriptViewEditComponent implements OnInit {
 					this.activeDialog.close(result);
 				},
 				err => err)
-			;
-	}
-
-	ngOnInit(): void {
-		const notEmptyViewName$: Observable<String> = this.datasourceName
-			.debounceTime(DEBOUNCE_MILLISECONDS)
-			.distinctUntilChanged()
-			.filter((name: string) => Boolean(name && name.trim()));
-
-		notEmptyViewName$
-			.flatMap(() =>
-				this.dataIngestionService.validateUniquenessDataScriptByName(
-					this.dataScriptModel
-				)
-			)
-			.subscribe(
-				(isUnique: boolean) => (this.isUnique = isUnique),
-				(error: Error) => console.log(error.message)
-			);
+		;
 	}
 
 	protected onValidateUniqueness(): void {
@@ -177,7 +239,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		let copy = { ...this.dataScriptModel };
+		let copy = {...this.dataScriptModel};
 		this.etlScriptCode.code = copy.etlSourceCode;
 		delete copy.etlSourceCode;
 		return this.dataSignature !== JSON.stringify(copy);
@@ -235,7 +297,7 @@ export class DataScriptViewEditComponent implements OnInit {
 				)
 				.then(confirm => {
 					if (confirm) {
-						this.dataScriptModel = Object.assign({}, this.originalModel);
+						this.dataScriptModel = Object.assign({}, this.data.dataScriptModel);
 						this.changeToViewDataScript();
 					} else {
 						this.focusForm();
@@ -257,8 +319,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 */
 	protected changeToEditDataScript(): void {
 		this.modalType = this.actionTypes.EDIT;
-		this.modalTitle = 'ETL Script Edit';
-		this.focusForm();
+		this.setTitle(this.getModalTitle(this.modalType));
 	}
 
 	/**
@@ -348,5 +409,26 @@ export class DataScriptViewEditComponent implements OnInit {
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ActionType} modalType
+	 * @returns {string}
+	 */
+	private getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.CREATE) {
+			return 'ETL Script Create';
+		}
+		return modalType === ActionType.EDIT
+			? 'ETL Script Edit'
+			: 'ETL Script Detail';
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }
