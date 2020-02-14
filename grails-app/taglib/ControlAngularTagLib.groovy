@@ -320,6 +320,7 @@ class ControlAngularTagLib {
 	{
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append('#' + 'field' + fieldSpec.field + '="ngModel"')
+		sb.append(' [defaultItem]="\'Select...\'" ')
 		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
 		sb.append(' [valuePrimitive]="true" ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
