@@ -1,7 +1,6 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {
-	FileRestrictions,
 	RemoveEvent,
 	SuccessEvent,
 	UploadComponent,
@@ -18,16 +17,18 @@ import {
 	REMOVE_FILENAME_PARAM
 } from '../../../../shared/model/constants';
 import {DataScriptModel} from '../../model/data-script.model';
+import {Dialog} from 'tds-component-library';
 
 @Component({
 	selector: 'data-script-sample-data',
 	templateUrl: 'data-script-sample-data.component.html',
 })
-export class DataScriptSampleDataComponent extends UIExtraDialog {
+export class DataScriptSampleDataComponent extends Dialog implements OnInit {
+	@Input() data: any;
 
 	@ViewChild('kendoUploadInstance', {static: false}) kendoUploadInstance: UploadComponent;
 	protected file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
-	protected originalFileName: any = { temporary: null, fileUploaded: null};
+	protected originalFileName: any = {temporary: null, fileUploaded: null};
 	public OPTIONS: any = {
 		FILE: 'file',
 		SERVICE: 'service',
@@ -36,13 +37,13 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		useFileFrom: undefined
 	};
 	protected csv: any = {
-		options : [
-			{ text: 'Select a format', value: -1 },
-			{ text: 'csv', value: 0 },
-			{ text: 'json', value: 3 }
+		options: [
+			{text: 'Select a format', value: -1},
+			{text: 'csv', value: 0},
+			{text: 'json', value: 3}
 		],
-		selected : undefined,
-		fileContent : '',
+		selected: undefined,
+		fileContent: '',
 		filename: null,
 		state: undefined,
 	};
@@ -55,9 +56,9 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	public autoETL = false;
 	public assetClassOptions: Array<any> = [
-		{ text: 'Select a class', value:  -1 },
-		{ text: 'Application', value: 0 },
-		{ text: 'Device', value: 1 }
+		{text: 'Select a class', value: -1},
+		{text: 'Application', value: 0},
+		{text: 'Device', value: 1}
 	];
 	public assetClassSelected = this.assetClassOptions[0];
 	private apiActionOptions = [];
@@ -67,8 +68,12 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		private dataIngestionService: DataScriptService,
 		private notifierService: NotifierService,
 		private importAssetsService: ImportAssetsService) {
-			super('#loadSampleData');
-			this.onPageLoad();
+		super();
+		this.onPageLoad();
+	}
+
+	ngOnInit(): void {
+		//
 	}
 
 	/**
@@ -81,7 +86,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		this.file.uploadedFilename = null;
 		this.csv.selected = this.csv.options[0];
 		this.OPTIONS.selected = this.OPTIONS.FILE;
-		this.importAssetsService.getManualOptions().subscribe( (result) => {
+		this.importAssetsService.getManualOptions().subscribe((result) => {
 			if (result.actions && result.actions.length > 0) {
 				this.webService.options = result.actions;
 			}
@@ -93,7 +98,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * Set the current sample data upload type and close the dialog.
 	 */
 	public onContinue(): void {
-		let filename: any = { temporaryFileName: null, originalFileName: null};
+		let filename: any = {temporaryFileName: null, originalFileName: null};
 		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV) {
 			filename.temporaryFileName = this.csv.filename;
 			filename.originalFileName = this.csv.filename;
@@ -106,7 +111,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 			filename.temporaryFileName = this.file.uploadedFilename;
 			filename.originalFileName = this.originalFileName.fileUploaded;
 		}
-		this.close(filename);
+		this.onCancelClose(filename);
 	}
 
 	/**
@@ -131,7 +136,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * On Upload button click.
 	 */
 	private onUploadFileText(): void {
-		this.dataIngestionService.uploadETLScriptFileText(this.csv.fileContent, this.csv.selected.text).subscribe( result => {
+		this.dataIngestionService.uploadETLScriptFileText(this.csv.fileContent, this.csv.selected.text).subscribe(result => {
 			if (result.status === 'success' && result.data.filename) {
 				this.csv.filename = result.data.filename;
 				this.csv.state = 'success';
@@ -147,7 +152,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * On Fetch button click.
 	 */
 	private onFetch(): void {
-		this.importAssetsService.postFetch(this.webService.selected).subscribe( (result) => {
+		this.importAssetsService.postFetch(this.webService.selected).subscribe((result) => {
 			if (result.status === 'success') {
 				this.webService.state = 'success';
 				this.webService.filename = result.data.filename;
@@ -159,7 +164,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 				});
 				this.webService.state = 'fail';
 			}
-		} );
+		});
 	}
 
 	/**
@@ -213,6 +218,13 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 * On Cancel Close Dialog Popup Component.
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss();
+		this.onCancelClose();
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }
