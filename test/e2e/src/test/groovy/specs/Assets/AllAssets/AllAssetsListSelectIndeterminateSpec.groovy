@@ -7,7 +7,7 @@ import pages.Login.MenuPage
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
@@ -20,7 +20,7 @@ class AllAssetsListSelectIndeterminateSpec extends GebReportingSpec {
     static assetsCountToBeSelected = 3
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

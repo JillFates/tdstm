@@ -14,7 +14,7 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import spock.lang.Shared
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class AssetsBulkEditSpec extends GebReportingSpec {
@@ -32,7 +32,7 @@ class AssetsBulkEditSpec extends GebReportingSpec {
     static noRecordsMessage = "No records available"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage
