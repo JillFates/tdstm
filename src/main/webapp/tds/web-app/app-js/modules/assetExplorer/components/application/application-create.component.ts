@@ -99,6 +99,8 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.persons.sme = { personId: null};
 			this.persons.sme2 = { personId: null };
 			this.persons.appOwner = { personId: null};
+
+			this.preparePersonList();
 		}
 
 		/**
@@ -162,6 +164,36 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		}
 
 		/**
+		 * Search and copy over the Person List for SME 1
+		 * @param filter
+		 */
+		public filterSME1Change(filter: any): void {
+			this.model.sme1PersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
+		 * Search and copy over the Person List for SME 2
+		 * @param filter
+		 */
+		public filterSME2Change(filter: any): void {
+			this.model.sme2PersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
+		 * Search and copy over the Person List for App Owner
+		 * @param filter
+		 */
+		public filterAppOwnerChange(filter: any): void {
+			this.model.appOwnerPersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
 		 * Open the dialog to allow create a person
 		 * @param {any}  person Contains the info related to the asset in which the person will be  created
 		 * @param {string}  fieldName Contains the field asset type
@@ -202,15 +234,16 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		}
 
 		/**
-		 * Get the current array containing the person items
-		 * It adds the default Add Person item
+		 * Prepare the Person List with the Person Create if it has the permission
 		 */
-		getPersonList(personList: any[]): any[] {
-			if (!this.personList) {
-				this.personList = personList;
-				this.personList.unshift(this.addPersonItem)
-			}
-			return this.personList;
+		preparePersonList() {
+			this.model.personList.unshift(this.addPersonItem);
+			// Save a copy of the Person List
+			this.model.sourcePersonList = R.clone(this.model.personList);
+			// Create each instance
+			this.model.appOwnerPersonList = R.clone(this.model.sourcePersonList);
+			this.model.sme1PersonList = R.clone(this.model.sourcePersonList);
+			this.model.sme2PersonList = R.clone(this.model.sourcePersonList);
 		}
 
 		/**
