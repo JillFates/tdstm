@@ -221,7 +221,7 @@ class AssetService {
 			standard.rackSource.constraints.values = addBlankToNonRequiredOptions(standard.rackSource, model.sourceRackSelect)
 			standard.rackTarget.constraints.values = addBlankToNonRequiredOptions(standard.rackTarget, model.targetRackSelect)
 			standard.sourceChassis.constraints.values = addBlankToNonRequiredOptions(standard.sourceChassis, model.sourceChassisSelect)
-			standard.targetChassis.constraints.values = addBlankToNonRequiredOptions(standard.constraints, model.targetChassisSelect)
+			standard.targetChassis.constraints.values = addBlankToNonRequiredOptions(standard.targetChassis, model.targetChassisSelect)
 		}
 		model.put('standardFieldSpecs', standard)
 
