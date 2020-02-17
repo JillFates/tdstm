@@ -134,75 +134,97 @@ class FBSProcessorResultBuilderSpec extends ETLBaseSpec {
             result.domainsLength() == 1
 
         and:
-                result.domains(0).domain() == ETLDomain.Application.name()
-                result.domains(0).fieldNamesLength() == 3
-                result.domains(0).fieldNames(0) == 'environment'
-                result.domains(0).fieldNames(1) == 'id'
-                result.domains(0).fieldNames(2) == 'Id'
+            result.domains(0).domain() == ETLDomain.Application.name()
+            result.domains(0).fieldNamesLength() == 3
+            result.domains(0).fieldNames(0) == 'environment'
+            result.domains(0).fieldNames(1) == 'id'
+            result.domains(0).fieldNames(2) == 'Id'
 
-                result.domains(0).fieldLabelMapLength() == 4
-                result.domains(0).fieldLabelMap(0).name() == 'assetName'
-                result.domains(0).fieldLabelMap(0).label() == 'Name'
-                result.domains(0).fieldLabelMap(1).name() == 'description'
-                result.domains(0).fieldLabelMap(1).label() == 'Description'
-                result.domains(0).fieldLabelMap(2).name() == 'environment'
-                result.domains(0).fieldLabelMap(2).label() == 'Environment'
-                result.domains(0).fieldLabelMap(3).name() == 'id'
-                result.domains(0).fieldLabelMap(3).label() == 'Id'
-                result.domains(0).dataLength() == 2
-
-         and:
-                // First Row
-                // Fields section
-                result.domains(0).data(0).fieldsLength() == 2
-                result.domains(0).data(0).fields(0).key() == 'environment'
-                result.domains(0).data(0).fields(0).originalValue() == 'Production'
-                result.domains(0).data(0).fields(0).value() == 'Production'
-                !result.domains(0).data(0).fields(0).init()
-                result.domains(0).data(0).fields(0).type() == 'String'
-                result.domains(0).data(0).fields(0).errorsLength() == 0
-                //find section
-                !result.domains(0).data(0).fields(0).find() // should have a value!
-                result.domains(0).data(0).fields(0).createLength() == 0 //1
-                result.domains(0).data(0).fields(0).updateLength() == 0 //1
-
-
-                result.domains(0).data(0).fields(1).key() == 'id'
-                result.domains(0).data(0).fields(1).originalValue() == '152254'
-                result.domains(0).data(0).fields(1).value() == '152254'
-                !result.domains(0).data(0).fields(1).init()
-                result.domains(0).data(0).fields(1).type() == 'Long'
-
-                result.domains(0).data(0).fields(1).createLength() == 0 //1
-                result.domains(0).data(0).fields(1).updateLength() == 0 //1
-                !result.domains(0).data(0).fields(1).find() // should have a value!
-
-                // tags section
-                result.domains(0).data(0).tags().addLength() == 2
-                result.domains(0).data(0).tags().add(0) == 'GDPR'
-                result.domains(0).data(0).tags().add(1) == 'PCI'
-                result.domains(0).data(0).tags().removeLength() == 1
-                result.domains(0).data(0).tags().remove(0) == 'HIPPA'
-                result.domains(0).data(0).tags().replaceLength() == 1
-                result.domains(0).data(0).tags().replace(0).key() == 'PCI'
-                result.domains(0).data(0).tags().replace(0).value() == 'SOX'
-                // comments section
-                result.domains(0).data(0).commentsLength() == 1
-                result.domains(0).data(0).comments(0) == 'ACME Data Center'
+            result.domains(0).fieldLabelMapLength() == 4
+            result.domains(0).fieldLabelMap(0).name() == 'assetName'
+            result.domains(0).fieldLabelMap(0).label() == 'Name'
+            result.domains(0).fieldLabelMap(1).name() == 'description'
+            result.domains(0).fieldLabelMap(1).label() == 'Description'
+            result.domains(0).fieldLabelMap(2).name() == 'environment'
+            result.domains(0).fieldLabelMap(2).label() == 'Environment'
+            result.domains(0).fieldLabelMap(3).name() == 'id'
+            result.domains(0).fieldLabelMap(3).label() == 'Id'
+            result.domains(0).dataLength() == 2
 
          and:
-                //Second Row
-                result.domains(0).data(1).commentsLength() == 1
-                result.domains(0).data(1).comments(0) == 'ACME Data Center'
-                // tags section
-                result.domains(0).data(0).tags().addLength() == 2
-                result.domains(0).data(0).tags().add(0) == 'GDPR'
-                result.domains(0).data(0).tags().add(1) == 'PCI'
-                result.domains(0).data(0).tags().removeLength() == 1
-                result.domains(0).data(0).tags().remove(0) == 'HIPPA'
-                result.domains(0).data(0).tags().replaceLength() == 1
-                result.domains(0).data(0).tags().replace(0).key() == 'PCI'
-                result.domains(0).data(0).tags().replace(0).value() == 'SOX'
+            // First Row
+            // Fields section
+            result.domains(0).data(0).fieldsLength() == 2
+            result.domains(0).data(0).fields(0).key() == 'environment'
+            result.domains(0).data(0).fields(0).originalValue() == 'Production'
+            result.domains(0).data(0).fields(0).value() == 'Production'
+            !result.domains(0).data(0).fields(0).init()
+            result.domains(0).data(0).fields(0).type() == 'String'
+            result.domains(0).data(0).fields(0).errorsLength() == 0
+            //find section
+            result.domains(0).data(0).fields(0).find().size()== 0
+            result.domains(0).data(0).fields(0).find().matchOn() == 0
+            result.domains(0).data(0).fields(0).find().resultsLength() == 0
+            result.domains(0).data(0).fields(0).find().queryLength() == 0
+            result.domains(0).data(0).fields(0).createLength() == 0
+            result.domains(0).data(0).fields(0).updateLength() == 0 //1
+
+
+            result.domains(0).data(0).fields(1).key() == 'id'
+            result.domains(0).data(0).fields(1).originalValue() == '152254'
+            result.domains(0).data(0).fields(1).value() == '152254'
+            !result.domains(0).data(0).fields(1).init()
+            result.domains(0).data(0).fields(1).type() == 'Long'
+
+            result.domains(0).data(0).fields(1).createLength() == 3
+            result.domains(0).data(0).fields(1).create(0).name() == 'assetName'
+            result.domains(0).data(0).fields(1).create(0).value() == '(xlsx updated)'
+            result.domains(0).data(0).fields(1).create(0).type() == 'String'
+            result.domains(0).data(0).fields(1).create(1).name() == 'description'
+            result.domains(0).data(0).fields(1).create(1).value() == 'Created by ETL Script'
+            result.domains(0).data(0).fields(1).create(1).type() == 'String'
+            result.domains(0).data(0).fields(1).create(2).name() == 'environment'
+            result.domains(0).data(0).fields(1).create(2).value() == 'Production'
+            result.domains(0).data(0).fields(1).create(2).type() == 'String'
+
+            result.domains(0).data(0).fields(1).updateLength() == 1
+            result.domains(0).data(0).fields(1).update(0).name() == 'description'
+            result.domains(0).data(0).fields(1).update(0).value() == 'Updated by ETL Script'
+            result.domains(0).data(0).fields(1).update(0).type() == 'String'
+
+            result.domains(0).data(0).fields(1).find().queryLength() == 1
+            result.domains(0).data(0).fields(1).find().query(0).criteriaLength() == 1
+            result.domains(0).data(0).fields(1).find().query(0).criteria(0).propertyName() == 'id'
+            result.domains(0).data(0).fields(1).find().query(0).criteria(0).operator() == 'eq'
+            result.domains(0).data(0).fields(1).find().query(0).criteria(0).value() == '152254'
+            result.domains(0).data(0).fields(1).find().query(0).criteria(0).type() == 'Long'
+
+            // tags section
+            result.domains(0).data(0).tags().addLength() == 2
+            result.domains(0).data(0).tags().add(0) == 'GDPR'
+            result.domains(0).data(0).tags().add(1) == 'PCI'
+            result.domains(0).data(0).tags().removeLength() == 1
+            result.domains(0).data(0).tags().remove(0) == 'HIPPA'
+            result.domains(0).data(0).tags().replaceLength() == 1
+            result.domains(0).data(0).tags().replace(0).key() == 'PCI'
+            result.domains(0).data(0).tags().replace(0).value() == 'SOX'
+            // comments section
+            result.domains(0).data(0).commentsLength() == 1
+            result.domains(0).data(0).comments(0) == 'ACME Data Center'
+
+         and:
+            //Second Row
+            result.domains(0).data(1).commentsLength() == 1
+            result.domains(0).data(1).comments(0) == 'ACME Data Center'
+            // tags section
+            result.domains(0).data(0).tags().addLength() == 2
+            result.domains(0).data(0).tags().add(0) == 'GDPR'
+            result.domains(0).data(0).tags().add(1) == 'PCI'
+            result.domains(0).data(0).tags().removeLength() == 1
+            result.domains(0).data(0).tags().remove(0) == 'HIPPA'
+            result.domains(0).data(0).tags().replaceLength() == 1
+            result.domains(0).data(0).tags().replace(0).key() == 'PCI'
+            result.domains(0).data(0).tags().replace(0).value() == 'SOX'
 
 		cleanup:
 			if(fileName) fileSystemService.deleteTemporaryFile(fileName)

@@ -351,3 +351,12 @@ grails.mail.default.from = "*** EMAIL ADDRESS ***"
 
 // Used to override the TO for messages - used for debugging to send all email to test account
 grails.mail.overrideAddress="*** EMAIL ADDRESS IF OVERRIDING ***"
+
+/**
+ * Defines if ETL processor results must be serialized
+ * in a temporary file using JSON format or binary format.
+ *
+ * JSON format is created using Grails GSON views library.
+ * Binary format is created using FlatBuffers librray.
+ */
+etl.results.saveBinary=false

@@ -94,4 +94,11 @@ tdstm {
 }
 grails.mail.default.from = "TDS TransitionManager <tm-prod@transitionaldata.com>"
 
-
+/**
+ * Defines if ETL processor results must be serialized
+ * in a temporary file using JSON format or binary format.
+ *
+ * JSON format is created using Grails GSON views library.
+ * Binary format is created using FlatBuffers librray.
+ */
+etl.results.saveBinary=false

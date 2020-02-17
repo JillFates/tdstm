@@ -6,3 +6,5 @@ flatc --java -o ../src/main/groovy etl_model.fbs
 # flatc --raw-binary -t <path to fbs schema file> -- <path to flatbuffer binary file>
 
 flatc --raw-binary -t etl_model.fbs -- examples/flatbuffers-Co7VCIlQ2ARVBUb4cJoGGrFI6zJPLPMh.txt
+
+flatc --raw-binary -o /tmp/ -t etl_model.fbs -- /tmp/EtlOutputData_*.binary

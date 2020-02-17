@@ -5,8 +5,11 @@ import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.FieldResult
 import com.tdsops.etl.FindResult
+import com.tdsops.etl.QueryResult
 import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
+
+import java.nio.ByteBuffer
 
 /**
  * Class to convert an instance of {@code ETLProcessorResult} and a binary serialized instance of {@code}
@@ -21,8 +24,56 @@ class FBSProcessorResultBuilder {
         this.builder = new FlatBufferBuilder(1024)
     }
 
-    FBSProcessorResult build() {
+    /**
+     * Build {@code FlatBufferBuilder} content from {@code ETLProcessorResult}.
+     * <pre>
+     *  ByteBuffer dataBuffer = new FBSProcessorResultBuilder(processorResult).buildDataBuffer()
+     *  FBSProcessorResult serialized = FBSProcessorResult.getRootAsFBSProcessorResult(dataBuffer)
+     * </pre>
+     *
+     * @return serialized instance in {@code ByteBuffer}
+     */
+    ByteBuffer buildDataBuffer() {
+        return serializeETLProcessorResult().dataBuffer()
+    }
 
+    /**
+     * Build {@code FlatBufferBuilder} content from {@code ETLProcessorResult}
+     * and returns serialized results in an {@code InputStream}
+     * <pre>
+     *  InputStream serialized = new FBSProcessorResultBuilder(processorResult).buildInputStream()
+     *  def (String filename, OutputStream fileOutputStream) = fileSystemService.createTemporaryFile('flatbuffers-', 'binary')
+     *  fileOutputStream << builder.sizedInputStream()
+     *  fileOutputStream.flush()
+     *  fileOutputStream.close()
+     * </pre>
+     * @return serialized instance in an {@code InputStream}
+     */
+    InputStream buildInputStream() {
+        return serializeETLProcessorResult().sizedInputStream()
+    }
+
+    /**
+     * Builds an instance of auto-generated model in {@code FBSProcessorResult}
+     * using a {@code FlatBufferBuilder} instance.
+     * <pre>
+     *  FBSProcessorResult serialized = new FBSProcessorResultBuilder(processorResult).build()
+     *  serialized.domains(0).domain() == ETLDomain.Application.name()
+     * </pre>
+     *
+     * @return an instance of {@code FBSProcessorResult}
+     */
+    FBSProcessorResult build() {
+        return FBSProcessorResult.getRootAsFBSProcessorResult(buildDataBuffer())
+    }
+
+    /**
+     * Private method to serialized an instance of {@code ETLProcessorResult}
+     * saved in {@code FBSProcessorResultBuilder#result} field using an instance of
+     * {@code FlatBufferBuilder} saved in {@code FBSProcessorResultBuilder#builder} field.
+     * @return {@code FBSProcessorResultBuilder#builder}
+     */
+    private FlatBufferBuilder serializeETLProcessorResult() {
         int processorResult = FBSProcessorResult.createFBSProcessorResult(
                 builder,
                 buildETLInfoOffset(result),
@@ -33,7 +84,7 @@ class FBSProcessorResultBuilder {
 
         builder.finish(processorResult)
 
-        return FBSProcessorResult.getRootAsFBSProcessorResult(builder.dataBuffer())
+        return builder
     }
 
     /**
@@ -80,7 +131,7 @@ class FBSProcessorResultBuilder {
      *     "tags": null
      * </pre>
      * @param domainResult
-     * @return @return an offset defines in FlatBuffers table for an instance of {@code FBSRowResult}
+     * @return an offset defines in FlatBuffers table for an instance of {@code FBSRowResult}
      * @see FBSProcessorResultBuilder#buildFieldResultOffset(java.util.Map)
      * @see FBSProcessorResultBuilder#buildVectorFromCollection(java.util.Collection)
      */
@@ -89,7 +140,7 @@ class FBSProcessorResultBuilder {
         int[] dataOffset = new int[domainResult.data.size()]
         for (int i = 0; i < domainResult.data.size(); i++) {
 
-            RowResult rowResult = domainResult.data[0]
+            RowResult rowResult = domainResult.data[i]
             dataOffset[i] = FBSRowResult.createFBSRowResult(builder,
                     builder.createString(rowResult.op),
                     rowResult.rowNum,
@@ -107,9 +158,29 @@ class FBSProcessorResultBuilder {
         return dataOffset
     }
     /**
-     *
+     * <p>Builds this part of the model that represents the following part
+     * in the ETLProcessorResult JSON structure:</p>
+     * <pre>
+     *     "fields": { //
+     *         "assetName": { //
+     *         "create": null,
+     *         "errors": [],
+     *         "fieldOrder": 0,
+     *         "find": { //
+     *             "matchOn": null,
+     *             "query": [],
+     *             "results": [],
+     *             "size": 0
+     *         //}, //
+     *         "init": null,
+     *         "originalValue": "Application 2",
+     *         "update": null,
+     *         "value": "Application 2",
+     *         "warn": false
+     *     //},//
+     * </pre>
      * @param fields
-     * @return
+     * @return an offset defines in FlatBuffers table for instances of {@code FieldResult}
      */
     int[] buildFieldResultOffset(Map<String, FieldResult> fields) {
 
@@ -124,29 +195,120 @@ class FBSProcessorResultBuilder {
                     fieldResult.originalValue ? builder.createString(fieldResult.originalValue.toString()) : 0,
                     fieldResult.value ? builder.createString(fieldResult.value.toString()) : 0,
                     fieldResult.init ? builder.createString(fieldResult.init.toString()) : 0,
-                    builder.createString(fieldResult.value?.class?.simpleName),
+                    builder.createString(calculateValueClass(fieldResult.value)),
                     fieldResult.fieldOrder,
                     FBSRowResult.createErrorsVector(builder, buildVectorFromCollection(fieldResult.errors)),
                     fieldResult.warn,
-                    buildFindOffset(fieldResult.find),
-                    buildCreateOffset(fieldResult.create),
-                    buildUpdateOffset(fieldResult.update)
+                    fieldResult.find ? buildFindOffset(fieldResult.find) : 0,
+                    fieldResult.create ? buildCreateOffset(fieldResult.create) : 0,
+                    fieldResult.update ? buildUpdateOffset(fieldResult.update) : 0
             )
         }
 
         return fieldResultOffset
     }
 
+    /**
+     * <p>Builds this part of the model that represents the following part
+     * in the ETLProcessorResult JSON structure:</p>
+     * <pre>
+     *    "find": { //
+     *       "query": [//
+     *                //{ //
+     *                    "domain": "Application",
+     *                    "criteria": [ //
+     *                        //{ //
+     *                            "propertyName": "assetName",
+     *                            "operator": "eq",
+     *                            "value": "Application 2"
+     *                        //}//
+     *               //]//
+     *              //}//
+     *        //],//
+     *        "matchOn": 1,
+     *        "results": [12346789],
+     *       "size": 1
+     * </pre>
+     * @param findResult
+     * @return an offset defines in FlatBuffers table for an instance of {@code FBSFindResult}
+     */
     int buildFindOffset(FindResult findResult) {
-        return 0
+
+        int[] data = new int[findResult.query.size()]
+        for (int i = 0; i < findResult.query.size(); i++) {
+            QueryResult queryResult = findResult.query[i]
+
+            int[] queryResultDataOffset = new int[queryResult.criteria.size()]
+            for (int j = 0; j < queryResult.criteria.size(); j++) {
+                Map<String, Object> criteria = queryResult.criteria[j]
+                queryResultDataOffset[j] = FBSQueryResultCriteria.createFBSQueryResultCriteria(builder,
+                        builder.createString(criteria.propertyName),
+                        builder.createString(criteria.operator),
+                        builder.createString(criteria.value?.toString()),
+                        builder.createString(calculateValueClass(criteria.value))
+                )
+
+            }
+            data[i] = FBSQueryResult.createFBSQueryResult(builder,
+                    builder.createString(queryResult.domain),
+                    FBSQueryResult.createCriteriaVector(builder, queryResultDataOffset)
+            )
+        }
+
+        return FBSFindResult.createFBSFindResult(builder,
+                FBSFindResult.createQueryVector(builder, data),
+                FBSFindResult.createResultsVector(builder, (long[]) findResult.results),
+                findResult.size ?: 0,
+                findResult.matchOn ?: 0
+        )
     }
 
+    /**
+     * Retrieves {@code Class#simpleName} from an Object.
+     * @param object
+     * @return simpleName from object param Class
+     */
+    String calculateValueClass(Object object) {
+        return object?.class?.simpleName
+    }
+    /**
+     *
+     * @param create
+     * @return
+     */
     int buildCreateOffset(Map<String, Object> create) {
-        return 0
+
+        int[] offsets = new int[create.size()]
+        int index = 0
+        for (Map.Entry<String, Object> entry in create) {
+            offsets[index++] = FBSCreate.createFBSCreate(builder,
+                    builder.createString(entry.key),
+                    builder.createString(entry.value?.toString()),
+                    builder.createString(calculateValueClass(entry.value))
+            )
+        }
+
+        return builder.createSortedVectorOfTables(new FBSCreate(), offsets)
     }
 
+    /**
+     *
+     * @param update
+     * @return
+     */
     int buildUpdateOffset(Map<String, Object> update) {
-        return 0
+
+        int[] offsets = new int[update.size()]
+        int index = 0
+        for (Map.Entry<String, Object> entry in update) {
+            offsets[index++] = FBSUpdate.createFBSUpdate(builder,
+                    builder.createString(entry.key),
+                    builder.createString(entry.value?.toString()),
+                    builder.createString(calculateValueClass(entry.value))
+            )
+        }
+
+        return builder.createSortedVectorOfTables(new FBSUpdate(), offsets)
     }
 
     /**

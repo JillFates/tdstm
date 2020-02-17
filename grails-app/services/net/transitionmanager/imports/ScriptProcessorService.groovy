@@ -2,35 +2,32 @@ package net.transitionmanager.imports
 
 import com.tdsops.ETLTagValidator
 import com.tdsops.etl.DataScriptValidateScriptCommand
-import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.ProgressCallback
-import com.tdsops.etl.dataset.CSVDataset
-import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
-import getl.data.Dataset
-import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.fbs.FBSProcessorResultBuilder
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
-import net.transitionmanager.util.JsonViewRenderService
 import net.transitionmanager.tag.TagService
+import net.transitionmanager.util.JsonViewRenderService
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.springframework.beans.factory.annotation.Value
 
 @Transactional
 class ScriptProcessorService {
@@ -42,6 +39,15 @@ class ScriptProcessorService {
 	ProgressService       progressService
 	Scheduler             quartzScheduler
 	TagService            tagService
+
+	/**
+	 * Defines if ETL results must be saved
+	 * in binary format using FlatBuffers library.
+	 * @see FBSProcessorResultBuilder
+	 */
+	@Value('${etl.results.saveBinary:false}')
+	Boolean saveResultsInBinaryFormat = false
+
 
 	private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
 	private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
@@ -67,6 +73,25 @@ class ScriptProcessorService {
     }
 
 	/**
+	 * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using format
+	 * depending {@code ScriptProcessorService#saveResultsInBinaryFormat} boolean field
+	 *
+	 * @param processorResult an instance of {@code ETLProcessorResult}
+	 * @return file name created and saved in a temporary directory
+	 * @see ScriptProcessorService#saveResultsInJSONFile(com.tdsops.etl.ETLProcessorResult)
+	 * @see ScriptProcessorService#saveResultsInBinaryFile(com.tdsops.etl.ETLProcessorResult)
+	 */
+	@CompileStatic
+	String saveResultsInFile(ETLProcessorResult processorResult) {
+
+		if(saveResultsInBinaryFormat){
+			return saveResultsInBinaryFile(processorResult)
+		} else {
+			return saveResultsInJSONFile(processorResult)
+		}
+	}
+
+	/**
 	 * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using JSON format
 	 *
 	 * @param processorResult an instance of {@code ETLProcessorResult}
@@ -74,12 +99,32 @@ class ScriptProcessorService {
 	 * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
 	 */
 	@CompileStatic
-	String saveResultsInFile(ETLProcessorResult processorResult) {
-
+	String saveResultsInJSONFile(ETLProcessorResult processorResult) {
 		List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
 		String outputFilename = tmpFile[0]
 		OutputStream os = (OutputStream) tmpFile[1]
 		jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, os)
+		return outputFilename
+	}
+
+	/**
+	 * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using Binary format
+	 * from FlatBuffers library.
+	 *
+	 * @param processorResult an instance of {@code ETLProcessorResult}
+	 * @return file name created and saved in a temporary directory
+	 * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
+	 * @see FBSProcessorResultBuilder#buildInputStream()
+	 */
+	@CompileStatic
+	String saveResultsInBinaryFile(ETLProcessorResult processorResult) {
+		InputStream serialized = new FBSProcessorResultBuilder(processorResult).buildInputStream()
+		List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'binary')
+		String outputFilename = tmpFile[0]
+		OutputStream os = (OutputStream) tmpFile[1]
+		os << serialized
+		os.flush()
+		os.close()
 
 		return outputFilename
 	}
