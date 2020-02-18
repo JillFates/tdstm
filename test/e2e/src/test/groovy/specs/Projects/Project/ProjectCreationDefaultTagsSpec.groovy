@@ -11,7 +11,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.error.RequiredPageContentNotPresent
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
@@ -34,7 +34,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     static SOX_Tag = ["name": "SOX", "description": "Sarbanes–Oxley Act Compliance", "color": "#eaf2d9"]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

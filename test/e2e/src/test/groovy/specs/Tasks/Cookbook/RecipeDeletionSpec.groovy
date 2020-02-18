@@ -7,7 +7,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class RecipeDeletionSpec extends GebReportingSpec {
@@ -19,7 +19,7 @@ class RecipeDeletionSpec extends GebReportingSpec {
     static recipesNameList = [baseName, "Geb Recipe Test"]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
