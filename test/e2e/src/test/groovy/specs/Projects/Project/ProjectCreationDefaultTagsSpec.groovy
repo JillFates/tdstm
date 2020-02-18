@@ -72,7 +72,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
         then: 'Project Details Page is displayed'
             at ProjectListPage
         and: 'Project name is listed in Project List Page'
-            projectIsListed projName
+        waitFor(30){projectIsListed projName}
     }
 
     def "3. The User navigates to Tags Page and verifies default tags created"(){

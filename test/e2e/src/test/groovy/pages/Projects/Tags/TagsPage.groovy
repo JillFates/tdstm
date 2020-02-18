@@ -22,7 +22,7 @@ class TagsPage extends Page{
         tagsGridDataRows (wait: true){tagsGrid.find(".k-grid-container .k-grid-content tr[kendogridlogicalrow]")}
         tagsGridActionsRows {tagsGrid.find(".k-grid-container .k-grid-content-locked tr[kendogridlogicalrow]")}
         tagsNoDataRecords {tagsGrid.find(".k-grid-container .k-grid-content tr.k-grid-norecords").find("td")}
-        filterButton (wait: true){$("button", class:"tds-button")[5]}
+        filterButton (wait: true){$("button", class:"tds-button")[4]}
         clearButton (required: false) {$("button", title: "Clear filters")}
         refreshButton {$("button", title: "Refresh")}
         nameFilter (required: false) {$("input.text-filter")[0]}

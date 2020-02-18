@@ -33,7 +33,7 @@ class ProjectListPage extends Page {
         projectGridRows             { projectView.find("table#projectGridIdGrid").find("tr.ui-widget-content")}
         gridSize                    { projectGridRows.size()}
         rowSize                     { projectGridHeaderCols.size()}
-        projectNameFilter (wait:true) { $("input" ,  placeholder:"Filter Name")}
+        projectNameFilter (wait:true) { $("input" ,  name:"projectName")}
         projectGridPager            { $("div#pg_projectGridIdGridPager")}
         projectNameGridField        {$("tbody", "role": "presentation")}
         projectNameColumn  {$("td", "role": "gridcell", "aria-colindex": "3")}
@@ -43,7 +43,7 @@ class ProjectListPage extends Page {
         projectsModule { module ProjectsMenuModule}
         commonsModule { module CommonsModule}
         noRecords (required: false) {$(".ui-paging-info", text:'No records to view')}
-        filterButton {$("tds-button")[5]}
+        filterButton {$("tds-button")[4]}
     }
 
     def clickFilterButton(){
