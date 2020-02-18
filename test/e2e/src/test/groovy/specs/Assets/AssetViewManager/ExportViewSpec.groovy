@@ -9,7 +9,7 @@ import pages.Assets.AssetViews.ViewPage
 import utils.CommonActions
 import pages.Downloads.HomeUserDownloadsPage
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Ignore
 class ExportViewSpec extends GebReportingSpec {
@@ -22,7 +22,7 @@ class ExportViewSpec extends GebReportingSpec {
     static fileName = "QAE2E " + randStr  + " ExportSystemAllAssets"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

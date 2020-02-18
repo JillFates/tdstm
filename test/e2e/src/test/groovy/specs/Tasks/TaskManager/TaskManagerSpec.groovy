@@ -6,7 +6,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class TaskManagerSpec extends GebReportingSpec {
@@ -16,7 +16,7 @@ class TaskManagerSpec extends GebReportingSpec {
     //Define the names of the tasks you will Create and Edit
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

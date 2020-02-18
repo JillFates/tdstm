@@ -10,7 +10,7 @@ import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class ProviderEditionSpec extends GebReportingSpec{
@@ -26,7 +26,7 @@ class ProviderEditionSpec extends GebReportingSpec{
     static edit = " edited"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
