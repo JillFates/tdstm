@@ -397,7 +397,11 @@ class DataviewService implements ServiceMethods {
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			isShared = dataviewCommand.isShared
+			if (dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW) {
+				isShared = dataviewCommand.isShared
+			} else {
+				isShared = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL
+			}
 			name = dataviewCommand.name
 			person = whom
             project = currentProject
