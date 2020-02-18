@@ -17,7 +17,14 @@ import {
 	CHECK_ACTION,
 	OperationStatusModel,
 } from '../../../../shared/components/check-action/model/check-action.model';
-import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
 import {Permission} from '../../../../shared/model/permission.model';
 import {isNullOrEmptyString} from '@progress/kendo-angular-grid/dist/es2015/utils';
 // Service
@@ -34,6 +41,7 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
 // Other
 import 'rxjs/add/operator/finally';
+import {DialogAction} from '@progress/kendo-angular-dialog';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -354,15 +362,18 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			modalConfiguration: {
 				title: 'Sample Data',
 				draggable: true,
-				modalSize: ModalSize.XL
+				modalSize: ModalSize.MD
 			}
 		}).subscribe(
 			(filename: {
 				temporaryFileName: string;
 				originalFileName: string;
+				status: string
 			}) => {
-				this.filename = filename.temporaryFileName;
-				this.extractSampleDataFromFile(filename.originalFileName);
+				if (filename.status !== DialogExit.CLOSE) {
+					this.filename = filename.temporaryFileName;
+					this.extractSampleDataFromFile(filename.originalFileName);
+				}
 			});
 	}
 
@@ -443,7 +454,7 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			modalConfiguration: {
 				title: 'View console?',
 				draggable: true,
-				modalSize: ModalSize.XL
+				modalSize: ModalSize.LG
 			}
 		}).subscribe((result: any) => {
 			//

@@ -17,7 +17,8 @@ import {
 	REMOVE_FILENAME_PARAM
 } from '../../../../shared/model/constants';
 import {DataScriptModel} from '../../model/data-script.model';
-import {Dialog} from 'tds-component-library';
+import {Dialog, DialogButtonType} from 'tds-component-library';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'data-script-sample-data',
@@ -25,6 +26,7 @@ import {Dialog} from 'tds-component-library';
 })
 export class DataScriptSampleDataComponent extends Dialog implements OnInit {
 	@Input() data: any;
+	public etlScriptModel: DataScriptModel;
 
 	@ViewChild('kendoUploadInstance', {static: false}) kendoUploadInstance: UploadComponent;
 	protected file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
@@ -61,19 +63,35 @@ export class DataScriptSampleDataComponent extends Dialog implements OnInit {
 		{text: 'Device', value: 1}
 	];
 	public assetClassSelected = this.assetClassOptions[0];
-	private apiActionOptions = [];
 
 	constructor(
-		@Inject('etlScript') public etlScriptModel: DataScriptModel,
 		private dataIngestionService: DataScriptService,
 		private notifierService: NotifierService,
-		private importAssetsService: ImportAssetsService) {
+		private importAssetsService: ImportAssetsService,
+		public translate: TranslatePipe) {
 		super();
 		this.onPageLoad();
 	}
 
 	ngOnInit(): void {
-		//
+		this.etlScriptModel = Object.assign({}, this.data.dataScriptModel);
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'upload',
+			text: this.translate.transform('GLOBAL.CONTINUE'),
+			disabled: () => !this.validForm(),
+			type: DialogButtonType.CONTEXT,
+			action: this.onContinue.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			text: this.translate.transform('GLOBAL.CANCEL'),
+			type: DialogButtonType.CONTEXT,
+			action: this.cancelCloseDialog.bind(this)
+		});
 	}
 
 	/**
@@ -111,7 +129,7 @@ export class DataScriptSampleDataComponent extends Dialog implements OnInit {
 			filename.temporaryFileName = this.file.uploadedFilename;
 			filename.originalFileName = this.originalFileName.fileUploaded;
 		}
-		this.onCancelClose(filename);
+		this.onAcceptSuccess(filename);
 	}
 
 	/**
