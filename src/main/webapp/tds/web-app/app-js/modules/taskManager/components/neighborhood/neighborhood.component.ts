@@ -376,7 +376,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	generateModel(): void {
 		if (!this.tasks) { return; }
-		const taskGraphHelper = new TaskGraphDiagramHelper(this.permissionService, {currentUser: this.userContext.person});
+		const taskGraphHelper = new TaskGraphDiagramHelper(
+				this.permissionService,
+	{
+					currentUser: this.userContext.person,
+					taskCount: this.tasks.length
+				}
+			);
 		const nodeDataArray = [];
 		const linkDataArray = [];
 		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
@@ -448,9 +454,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						value: t.team
 					},
 					{
-						label: TASK_TOOLTIP_FIELDS.ASSET,
+						label: TASK_TOOLTIP_FIELDS.ASSET_CLASS,
 						value: t.asset && t.asset.assetType,
 						icon: assetIcon && assetIcon.iconName
+					},
+					{
+						label: TASK_TOOLTIP_FIELDS.ASSET_NAME,
+						value: t.asset && t.asset.assetName
 					}
 			]
 		}
