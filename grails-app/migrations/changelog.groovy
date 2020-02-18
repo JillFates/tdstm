@@ -86,4 +86,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_2/20200103-making-from-address-nullable.groovy'
 	include file: 'version/v4_7_2/20200129-remove-null-fields.groovy'
 	include file: 'version/v4_7_2/20200127-fix-empty-shared-field-specs.groovy'
+	include file: 'version/v4_7_2/20200218-drop-dataview-unique-index.groovy'
 }
