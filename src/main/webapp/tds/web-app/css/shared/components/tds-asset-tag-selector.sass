@@ -191,7 +191,7 @@ $asset-tag-selector-default-label-color: #656565
 
 .tds-angular-component-content, asset-explorer-view-grid
   .single-line-tags
-    overflow-y: hidden
+    //overflow-y: hidden
     max-height: 30px
     .label.tag, .dots-for-tags
       display: inline-block
@@ -206,11 +206,7 @@ $asset-tag-selector-default-label-color: #656565
       padding-right: 200px
     &:hover
       max-height: unset
-      overflow-y: auto
-      .label.tag
-        height: 15px
-      .dots-for-tags
-        visibility: hidden
+      display: inline-block
 
 kendo-popup .k-popup
   border-color: #ccc !important
