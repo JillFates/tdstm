@@ -49,7 +49,6 @@ class WsAssetController implements ControllerMethods {
 	CommentService      commentService
 	CustomDomainService customDomainService
 	TaskService         taskService
-	ControllerService   controllerService
 	DatabaseService     databaseService
 	DeviceService       deviceService
 	MoveBundleService   moveBundleService
@@ -57,6 +56,7 @@ class WsAssetController implements ControllerMethods {
 	ProgressService     progressService
 	Scheduler           quartzScheduler
 	StorageService      storageService
+	ControllerService   controllerService
 	UserPreferenceService userPreferenceService
 
 	/**
