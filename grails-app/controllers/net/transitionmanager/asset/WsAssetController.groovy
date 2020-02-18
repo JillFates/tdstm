@@ -4,7 +4,6 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
@@ -19,22 +18,22 @@ import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 import net.transitionmanager.utils.Profiler
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -43,19 +42,21 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 
-	ApplicationService applicationService
-	AssetEntityService assetEntityService
-	AssetService assetService
-	CommentService commentService
+
+	ApplicationService  applicationService
+	AssetEntityService  assetEntityService
+	AssetService        assetService
+	CommentService      commentService
 	CustomDomainService customDomainService
-	ControllerService controllerService
-	DatabaseService databaseService
-	DeviceService deviceService
-	MoveBundleService moveBundleService
-	PageRenderer groovyPageRenderer
-	ProgressService progressService
-	Scheduler quartzScheduler
-	StorageService storageService
+	TaskService         taskService
+	ControllerService   controllerService
+	DatabaseService     databaseService
+	DeviceService       deviceService
+	MoveBundleService   moveBundleService
+	PageRenderer        groovyPageRenderer
+	ProgressService     progressService
+	Scheduler           quartzScheduler
+	StorageService      storageService
 	UserPreferenceService userPreferenceService
 
 	/**
