@@ -43,20 +43,21 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 class WsAssetController implements ControllerMethods {
 
 
-	ApplicationService  applicationService
-	AssetEntityService  assetEntityService
-	AssetService        assetService
-	CommentService      commentService
+	ApplicationService applicationService
+	AssetEntityService assetEntityService
+	AssetService       assetService
+	CommentService     commentService
+	TaskService        taskService
+	ControllerService  controllerService
+	DatabaseService    databaseService
+	DeviceService      deviceService
+	MoveBundleService  moveBundleService
+	PageRenderer       groovyPageRenderer
+	ProgressService    progressService
+	Scheduler          quartzScheduler
+	StorageService     storageService
+
 	CustomDomainService customDomainService
-	TaskService         taskService
-	DatabaseService     databaseService
-	DeviceService       deviceService
-	MoveBundleService   moveBundleService
-	PageRenderer        groovyPageRenderer
-	ProgressService     progressService
-	Scheduler           quartzScheduler
-	StorageService      storageService
-	ControllerService   controllerService
 	UserPreferenceService userPreferenceService
 
 	/**
