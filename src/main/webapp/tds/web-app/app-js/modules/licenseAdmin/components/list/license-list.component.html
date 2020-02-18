@@ -29,8 +29,8 @@
 						<div class="clr-row">
 							<div class="clr-col-12 pull-right">
 								<tds-grid-header-action-buttons
-										(refresh)="reloadData()"
-										[actionButtons]="headerActionButtons">
+									(refresh)="reloadData()"
+									[actionButtons]="headerActionButtons">
 								</tds-grid-header-action-buttons>
 							</div>
 						</div>
@@ -99,21 +99,13 @@
 						[locked]="column.locked"
 						[width]="
 							!column.width ? COLUMN_MIN_WIDTH : column.width
-						"
-					>
+						">
 						<ng-template kendoGridHeaderTemplate>
-							<div
-								class="sortable-column"
-								(click)="onClickTemplate($event)"
-							>
-								<label
-									[ngClass]="{
-										'action-header':
-											column.type === 'action'
-									}"
-								>
-									{{ column.label }}</label
-								>
+							<div class="sortable-column"
+									 (click)="onClickTemplate($event)">
+								<label>
+									{{ column.label }}
+								</label>
 							</div>
 						</ng-template>
 
@@ -123,7 +115,8 @@
 								<tds-grid-filter-input
 									[name]="column.property"
 									[value]="column.filter || ''"
-									[columnType]="column.type"
+									[filterType]="column.filterType"
+									[dropdownData]="column.dropdownData || []"
 									[dateFormat]="dateFormat"
 									[placeholder]="'GLOBAL.FILTER' | translate"
 									(filter)="onFilter(column, $event)">
@@ -140,13 +133,13 @@
 								*ngIf="
 									dataItem.type === licenseType.MULTI_PROJECT
 								"
-								>{{ 'LICENSE.GLOBAL' | translate }}</span
+							>{{ 'LICENSE.GLOBAL' | translate }}</span
 							>
 							<span
 								*ngIf="
 									dataItem.type === licenseType.SINGLE_PROJECT
 								"
-								>{{ 'LICENSE.SINGLE' | translate }}</span
+							>{{ 'LICENSE.SINGLE' | translate }}</span
 							>
 						</ng-template>
 
@@ -159,11 +152,11 @@
 								*ngIf="
 									dataItem.status === licenseStatus.PENDING
 								"
-								>{{ 'GLOBAL.PENDING' | translate }}</span
+							>{{ 'GLOBAL.PENDING' | translate }}</span
 							>
 							<span
 								*ngIf="dataItem.status === licenseStatus.ACTIVE"
-								>{{ 'GLOBAL.ACTIVE' | translate }}</span
+							>{{ 'GLOBAL.ACTIVE' | translate }}</span
 							>
 						</ng-template>
 
@@ -177,28 +170,28 @@
 									dataItem.environment ===
 									licenseEnvironment.ENGINEERING
 								"
-								>{{ 'LICENSE.ENGINEERING' | translate }}</span
+							>{{ 'LICENSE.ENGINEERING' | translate }}</span
 							>
 							<span
 								*ngIf="
 									dataItem.environment ===
 									licenseEnvironment.TRAINING
 								"
-								>{{ 'LICENSE.TRAINING' | translate }}</span
+							>{{ 'LICENSE.TRAINING' | translate }}</span
 							>
 							<span
 								*ngIf="
 									dataItem.environment ===
 									licenseEnvironment.DEMO
 								"
-								>{{ 'LICENSE.DEMO' | translate }}</span
+							>{{ 'LICENSE.DEMO' | translate }}</span
 							>
 							<span
 								*ngIf="
 									dataItem.environment ===
 									licenseEnvironment.PRODUCTION
 								"
-								>{{ 'LICENSE.PRODUCTION' | translate }}</span
+							>{{ 'LICENSE.PRODUCTION' | translate }}</span
 							>
 							<span *ngIf="dataItem.status === licenseStatus.CORRUPT">{{ 'GLOBAL.CORRUPT' | translate }}</span>
 						</ng-template>

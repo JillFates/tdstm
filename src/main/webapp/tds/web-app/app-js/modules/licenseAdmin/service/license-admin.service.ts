@@ -5,6 +5,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
+import { FilterType } from 'tds-component-library';
 
 @Injectable()
 export class LicenseAdminService {
@@ -142,7 +143,7 @@ export class LicenseAdminService {
 			column.filter = '';
 		}
 
-		if (column.type === 'text') {
+		if (column.filterType === 'text' || column.filterType === FilterType.dropdown) {
 			if (!filter) {
 				root.filters.push({
 					field: column.property,
@@ -158,7 +159,7 @@ export class LicenseAdminService {
 			}
 		}
 
-		if (column.type === 'date') {
+		if (column.filterType === 'date') {
 			const {init, end} = DateUtils.getInitEndFromDate(column.filter);
 
 			if (filter) {
