@@ -4,6 +4,7 @@ import com.tdsops.etl.Column
 import groovy.transform.CompileStatic
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.LineIterator
+import org.apache.commons.lang.text.StrTokenizer
 
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -48,10 +49,6 @@ import java.util.stream.Stream
 @CompileStatic
 class CSVDataset implements ETLDataset {
 
-    /**
-     * Fixed defined splitter character for CSV dataset
-     */
-    private static final String CSV_DELIMITER = ','
     /**
      * Original filename with the full path to open it using an instance of {@code File}
      */
@@ -109,7 +106,7 @@ class CSVDataset implements ETLDataset {
      */
     @Override
     List<Column> readColumns() {
-        columnNames = lineIterator.nextLine().split(CSV_DELIMITER) as List
+        columnNames = split(lineIterator.nextLine())
         skippedRows++
         return this.columnNames.withIndex().collect { String columnName, Integer index ->
             new Column(columnName.trim(), index)
@@ -162,6 +159,29 @@ class CSVDataset implements ETLDataset {
         return row
     }
 
+    /**
+     * Splits String content using an instance of {@code StrTokenizer}
+     * Given this line:
+     * <pre>
+     *  123,Foo,"This, That, and the other","Jim Beam"
+     * </pre>
+     * It returns a List:
+     * <pre>
+     *  ['123','Foo','This, That, and the other', 'Jim Beam]
+     * </pre>
+     * @param content
+     * @param delimeter
+     * @param quote
+     * @return
+     */
+    static List<String> split(String content, char delimeter = ',', char quote = '"') {
+        StrTokenizer tokenizer = new StrTokenizer(content)
+        tokenizer.setDelimiterChar(delimeter)
+        tokenizer.setQuoteChar(quote)
+        tokenizer.setIgnoreEmptyTokens(false)
+        return tokenizer.getTokenArray() as List
+    }
+
     class CSVStreamingIterator implements ETLIterator {
 
         LineIterator iterator
@@ -183,8 +203,7 @@ class CSVDataset implements ETLDataset {
          */
         @Override
         List<String> next() {
-            List<String> rowValues = iterator.next()?.split(CSV_DELIMITER, -1) as List
-            return rowValues
+            return split(iterator.next())
         }
 
         @Override

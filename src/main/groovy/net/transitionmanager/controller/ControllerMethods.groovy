@@ -448,10 +448,25 @@ trait ControllerMethods {
 
 	// void validateCommand(net.transitionmanager.command.CredentialCommand co) {
 	void validateCommandObject(Object co) {
+		if (co?.hasProperty('project') && co.project){
+			validateProject(co.project)
+		}
+
 		if (! co.validate()) {
 			String msg = GormUtil.allErrorsString(co)
 			// Call the invalidParamExceptionHandler
 			throw new InvalidParamException(msg)
+		}
+	}
+
+	/**
+	 * Validates if a project parameter is accessible for the current userLogin.
+	 *
+	 * @param project an instance of {@code Project}
+	 */
+	void validateProject(Project project){
+		if (!securityService.hasAccessToProject(project, securityService.userLogin)){
+			throw new InvalidParamException('Invalid project')
 		}
 	}
 	/**

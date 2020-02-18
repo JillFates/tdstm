@@ -62,7 +62,7 @@ class AssetService {
 
         model << commonModelOptions(project)
 
-        return model
+		return model
     }
 
     /**
@@ -191,6 +191,56 @@ class AssetService {
             }
         }
     }
+
+	/**
+	 * Used to add the Standard and Custom Field Specs to a CRUD Model which relies on the model having
+	 * a number of other properties preloaded. This will inject the select options into the field spec constraints
+	 * values appropriately.
+	 *
+	 * The end result of this method is that the standardFieldSpecs properties will be added to the model Map.
+	 *
+	 * @param project - the project that the field specs are for
+	 * @param assetClass - the Asset Class to get the field specs for
+	 * @param model
+	 */
+	void addFieldSpecsToCrudModel(Project project, String assetClass, Map model) {
+		// Populate all of the various sets of Select Controls Options Lists in the field spect constraints
+		Map standard = customDomainService.standardFieldSpecsByField(project, assetClass)
+		standard.environment.constraints.values = addBlankToNonRequiredOptions(standard.environment, model.environmentOptions)
+		standard.planStatus.constraints.values = addBlankToNonRequiredOptions(standard.planStatus, model.planStatusOptions)
+		standard.validation.constraints.values = addBlankToNonRequiredOptions(standard.validation, ValidationType.list)
+
+		if (assetClass == 'APPLICATION') {
+			standard.criticality.constraints.values = addBlankToNonRequiredOptions(standard.criticality, Application.CRITICALITY)
+		} else if (assetClass == 'DEVICE') {
+			standard.priority.constraints.values = addBlankToNonRequiredOptions(standard.priority, model.priorityOption)
+			// TODO : JPM 2/2020 : Double-check to see if the following are even used for the select dropdowns in the UI
+			standard.railType.constraints.values = addBlankToNonRequiredOptions(standard.railType, model.railTypeOption)
+			standard.roomSource.constraints.values = addBlankToNonRequiredOptions(standard.roomSource, model.sourceRoomSelect)
+			standard.roomTarget.constraints.values = addBlankToNonRequiredOptions(standard.roomTarget, model.targetRoomSelect)
+			standard.rackSource.constraints.values = addBlankToNonRequiredOptions(standard.rackSource, model.sourceRackSelect)
+			standard.rackTarget.constraints.values = addBlankToNonRequiredOptions(standard.rackTarget, model.targetRackSelect)
+			standard.sourceChassis.constraints.values = addBlankToNonRequiredOptions(standard.sourceChassis, model.sourceChassisSelect)
+			standard.targetChassis.constraints.values = addBlankToNonRequiredOptions(standard.targetChassis, model.targetChassisSelect)
+		}
+		model.put('standardFieldSpecs', standard)
+
+	}
+
+	/**
+	 * Used by addFieldSpecsToCrudModel to prepend a blank option if it doesn't exist in the option list of
+	 * non-required fields. This will return the list of options from the
+	 * @param spec - The individual field spec
+	 * @return the array of options from the model options attributes appropriately
+	 */
+	private List<String> addBlankToNonRequiredOptions(Map spec, List<String> options) {
+		if (! spec.constraints?.required && options) {
+			if (! options.contains('')) {
+				return [''] + options
+			}
+		}
+		return options
+	}
 
    /**
     * Used to delete asset dependencies in bulk with a list of dependency ids for a specific project

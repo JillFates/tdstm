@@ -459,10 +459,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 					data[2].fields.externalRefId.value == 'vm-44956'
 					data[2].fields.serialNumber.value == '422ea90a-b80a-81de-0d4c-6f111142c4f7'
 					data[2].fields.os.value == 'Microsoft Windows Server 2012 (64-bit)'
-					data[2].fields.custom1.value == 'No match'
-					data[3].fields.custom1.value == 'No match'
-					data[4].fields.custom1.value == 'No match'
-					data[5].fields.custom1.value == 'No match'
+					!data[2].fields.custom1
+					!data[3].fields.custom1
+					!data[4].fields.custom1
+					!data[5].fields.custom1
 				}
 			}
 
