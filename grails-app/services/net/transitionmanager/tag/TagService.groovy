@@ -5,7 +5,6 @@ import grails.gorm.transactions.Transactional
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
-
 /**
  * A service for dealing with tags
  */
@@ -286,6 +285,21 @@ class TagService implements ServiceMethods {
 	}
 
 	/**
+	 * Gets the select for tags ids, as a list if filtering on tag Ids.
+	 *
+	 * @param tagIds the tag ids being filtered on.
+	 *
+	 * @return the select for tag ids in a list.
+	 */
+	String getTagSelect(List<Long> tagIds) {
+		if (tagIds) {
+			return "group_concat(distinct COALESCE(ta.tag_id, 0)) as tags"
+		}
+
+		return ''
+	}
+
+	/**
 	 * Generates up the query for filtering by tags, if there are any. To use this the asset_entity table must be joined with the alias a.
 	 *
 	 * @param tagIds The tag ids to filter by.
@@ -301,7 +315,7 @@ class TagService implements ServiceMethods {
 
 		if (tagMatch == 'ANY') {
 			queryParams.tagIds = tagIds
-			return "AND t.tag_id in (:tagIds)"
+			return "AND ta.tag_id in (:tagIds)"
 
 		} else {
 			queryParams.tagIds = tagIds
@@ -324,7 +338,6 @@ class TagService implements ServiceMethods {
 		if (tagIds && tagMatch == 'ANY') {
 			return """
 					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-					LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
 				"""
 		}
 

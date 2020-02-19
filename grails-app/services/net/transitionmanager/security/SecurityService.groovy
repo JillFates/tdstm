@@ -572,7 +572,7 @@ class SecurityService implements InitializingBean {
 	@Transactional
 	void unlockAccount(UserLogin account) {
 		requirePermission Permission.UserUnlock
-
+		account.failedLoginAttempts = 0
 		account.lockedOutUntil = null
 		account.lastLogin = TimeUtil.nowGMT()
 		auditService.saveUserAudit UserAuditBuilder.userAccountWasUnlockedBy(getCurrentUsername(), account)

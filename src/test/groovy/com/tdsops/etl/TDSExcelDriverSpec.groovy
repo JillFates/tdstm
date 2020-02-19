@@ -25,7 +25,7 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 
 	void 'test can read fields using the default sheet with 0 ordinal position'() {
 		given:
-			def (String fileName, DataSetFacade dataSetFacade) = buildSpreadSheetDataSet(
+			def (String fileName, DataSetFacade dataSetFacade) = buildSpreadSheetXLSXDataSet(
 				'Applications',
 				ApplicationDataSet
 			)
@@ -58,7 +58,7 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 
 	void 'test can read fields using a particular sheet defined by a sheet name'() {
 		given:
-			def (String fileName, DataSetFacade dataSetFacade) = buildSpreadSheetDataSet(
+			def (String fileName, DataSetFacade dataSetFacade) = buildSpreadSheetXLSXDataSet(
 				'Applications',
 				ApplicationDataSet
 			)

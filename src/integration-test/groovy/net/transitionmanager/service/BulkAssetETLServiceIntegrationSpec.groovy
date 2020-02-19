@@ -114,33 +114,39 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 		personHelper = new PersonTestHelper()
 		providerTestHelper = new ProviderTestHelper()
 		dataviewTestHelper = new DataviewTestHelper()
+		JSONObject fieldSpec
+		Provider provider
+		Dataview dataView
 
-		project = projectTestHelper.createProject()
+		Project.withNewTransaction {
+			project = projectTestHelper.createProject()
 
-		Provider provider = providerTestHelper.createProvider(project)
+			provider = providerTestHelper.createProvider(project)
 
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
+			moveBundle = moveBundleTestHelper.createBundle(project, null)
 
-		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 
-		now = TimeUtil.nowGMT().clearTime()
+			now = TimeUtil.nowGMT().clearTime()
 
-		dataviewUserParamsCommand = new DataviewUserParamsCommand([filters: [domains: []], sortDomain: 'device', sortProperty: 'id'])
+			dataviewUserParamsCommand = new DataviewUserParamsCommand([filters: [domains: []], sortDomain: 'device', sortProperty: 'id'])
 
 
-		person = personHelper.createPerson(null, project.client, project)
-		userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
-		securityService.assumeUserIdentity(userLogin.username, false)
-		userPreferenceService.setCurrentProjectId(project.id)
+			person = personHelper.createPerson(null, project.client, project)
+			userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
+			securityService.assumeUserIdentity(userLogin.username, false)
+			userPreferenceService.setCurrentProjectId(project.id)
 
-		Dataview dataView = dataviewTestHelper.createDataview(project)
-		dataView.reportSchema = Dataview.get(1).reportSchema
-		dataView.save(flush:true, failOnError:true)
+			dataView = dataviewTestHelper.createDataview(project)
+			dataView.reportSchema = Dataview.get(1).reportSchema
+			dataView.save(flush:true, failOnError:true)
 
-		JSONObject fieldSpec = loadFieldSpecJson()
+			fieldSpec = loadFieldSpecJson()
 
-		Setting.findAllByProject(project)*.delete(flush: true)
+			Setting.findAllByProject(project)*.delete(flush: true)
+		}
+
 		customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 		DataScript dataScript = new DataScript(
@@ -156,9 +162,9 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 					read labels
 					domain Device
 					iterate {
-						extract 'id' load 'id' set id
-						extract 'assetName' transform with uppercase() load 'description'
-						find Application by 'id' eq id into 'id'
+						extract 'Id' load 'Id' set Id
+						extract 'Name' transform with uppercase() load 'description'
+						find Application by 'Id' eq Id into 'Id'
 					}
 				'''
 		).save(flush: true, failOnError: true)
@@ -211,7 +217,7 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 
 
 				println progress
-				if (progress && progress.status == progressService.COMPLETED.toUpperCase()) {
+				if (progress && progress.status.toUpperCase() == progressService.COMPLETED.toUpperCase()) {
 					checkProgress = false
 					//TODO I wanted to check based on the progress but if I don't put a delay in even after the progress is complete, then the values haven't updated yet...
 					sleep(3000)
@@ -219,7 +225,7 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 				}
 
 
-				if (progress && progress.status == progressService.FAILED.toUpperCase()) {
+				if (progress && progress.status.toUpperCase() == progressService.FAILED.toUpperCase()) {
 					throw new RuntimeException("$progress.status, $progress.detail, $progress.data")
 				}
 
@@ -254,7 +260,7 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 			while (checkProgress) {
 				Map progress = progressService.get(progressKey)
 
-				if (progress && progress.status == progressService.COMPLETED.toUpperCase()) {
+				if (progress && progress.status.toUpperCase() == progressService.COMPLETED.toUpperCase()) {
 					//TODO I wanted to check based on the progress but if I don't put a delay in even after the progress is complete, then the values haven't updated yet...
 					sleep(3000)
 					break //ETL done
@@ -264,7 +270,7 @@ class BulkAssetETLServiceIntegrationSpec extends Specification {
 					throw new RuntimeException('ETL failed to start and have progress.')
 				}
 
-				if (progress && progress.status == progressService.FAILED.toUpperCase()) {
+				if (progress && progress.status.toUpperCase() == progressService.FAILED.toUpperCase()) {
 					throw new RuntimeException("$progress.status, $progress.detail, $progress.data")
 				}
 

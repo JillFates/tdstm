@@ -1627,6 +1627,7 @@ class UrlMappings {
 		"/ws/${controller}/$id/$action(.$format)?"(version: "1.0", namespace:"v1", method: "GET")
 
 		// REST API
+		// API version 1
 		"/api/projects/heartbeat"(controller: 'project', action: 'heartbeat', namespace:"v1", method: "GET")
 
 		"/api/${controller}"(version: "1.0", namespace: "v1", method: "GET")
@@ -1641,6 +1642,9 @@ class UrlMappings {
 		"/api/${controller}/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")
 		"/api/${controller}(.$format)?"(action: "save", version: "1.0", namespace:"v1", method: "POST")
 
+		"/api/$controller/$action(.$format)?"(version: "1.0", namespace: "v1", method: "POST")
+
+		// API version 2
 		"/api/${controller}"(version: "2.0", namespace: "v2", method: "GET")
 		"/api/${controller}/$id(.$format)?"(version: "2.0", action: "show", namespace: "v2", method: "GET")
 		"/api/${controller}/$id(.$format)?"(action: "delete", version: "2.0", namespace: "v2", method: "DELETE")

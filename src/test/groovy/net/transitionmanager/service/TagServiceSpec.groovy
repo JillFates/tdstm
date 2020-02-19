@@ -5,11 +5,11 @@ import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.validation.ValidationException
+import net.transitionmanager.common.Setting
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyType
 import net.transitionmanager.project.Project
-import net.transitionmanager.common.Setting
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagService
@@ -288,7 +288,7 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 		when:
 			String query = service.getTagsQuery([1, 2, 3], 'ANY', queryParams)
 		then:
-			query == "AND t.tag_id in (:tagIds)"
+			query == "AND ta.tag_id in (:tagIds)"
 			queryParams == ['tagIds': [1, 2, 3]]
 	}
 
@@ -324,12 +324,13 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 
 
 	void 'Test getTagsJoin with ids, tagMatch: ANY'() {
+		setup:
+			def tagIds = [1,2,3]
 			when:
-				String query = service.getTagsJoin([1,2,3], 'ANY')
+				String query = service.getTagsJoin(tagIds, 'ANY')
 			then:
 				query.stripIndent() == """
-					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-					LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
+		            LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
 				""".stripIndent()
 	}
 

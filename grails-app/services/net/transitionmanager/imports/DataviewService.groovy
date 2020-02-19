@@ -159,7 +159,7 @@ class DataviewService implements ServiceMethods {
 					throwException(ConfigurationException, 'dataview.validate.multipleDefintionsDefined',
 							[overrideDataviewList*.id],
 							"Multiple dataview definitions were encountered with ids (${overrideDataviewList*.id})" )
-				} else if (overrideDataviewList.size() > 1) {
+				} else if (overrideDataviewList.size() == 1) {
 					dataview = overrideDataviewList[0]
 				}
 			}
@@ -239,6 +239,7 @@ class DataviewService implements ServiceMethods {
 		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
 
 		// Determine the saveAsOptions
+
 		if ( project && ! isDefaultProject ) {
 			// User can always save as My View in projects other than the DEFAULT project
 			if (hasPermission(Permission.AssetExplorerSaveAs)){
@@ -275,7 +276,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		// See about if the user can Save As OVERRIDE_FOR_ALL globally across all projects
-		if (dataview && isOverrideable && project?.isDefaultProject() && hasGlobalOverridePerm) {
+		if (dataview && isOverrideable && isDefaultProject && hasGlobalOverridePerm) {
 			if (Dataview.where {
 				project.id == project.id
 				// Make sure we're querying on the root system view id
@@ -292,7 +293,7 @@ class DataviewService implements ServiceMethods {
 			if (dataview.personId == whom.id) {
 				canSaveCurrentView = (dataview.projectId == project.id)
 			} else {
-				boolean hasPerm = (dataview.project.isDefaultProject() ? hasGlobalOverridePerm : hasProjectOverridePerm)
+				boolean hasPerm = (isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm)
 				canSaveCurrentView = (hasPerm &&
 						dataview.isShared &&
 						dataview.overridesView &&
@@ -397,7 +398,11 @@ class DataviewService implements ServiceMethods {
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			isShared = dataviewCommand.isShared
+			if (dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW) {
+				isShared = dataviewCommand.isShared
+			} else {
+				isShared = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL
+			}
 			name = dataviewCommand.name
 			person = whom
             project = currentProject

@@ -114,7 +114,7 @@ class PlanningDashboardData {
 		return [
 			assignedAppPerc: percentageMetrics.assignedAppPerc,
 			confirmedAppPerc: percentageMetrics.confirmedAppPerc,
-			validated: basicMetrics.applicationCount - validateMetrics.unknownAppToValidate,
+			validated: validateMetrics.validated,
 			planReady: validateMetrics.planReady,
 			appDependenciesCount: dependencyMetrics.appDependenciesCount,
 			serverDependenciesCount: dependencyMetrics.serverDependenciesCount,
@@ -477,9 +477,9 @@ class PlanningDashboardData {
 		long fileToValidate
 		long otherToValidate
 		long planReady
+		long validated
 		long phyStorageToValidate
 		long psToValidate
-		long unknownAppToValidate
 		long vsToValidate
 
 		void calculate() {
@@ -490,13 +490,14 @@ class PlanningDashboardData {
 			Map validateArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.UNKNOWN]
 			Map deviceValidateArgs = validateArgs + [assetClass:AssetClass.DEVICE]
 			Map planReadyArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.PLAN_READY]
+			Map validatedArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.VALIDATED]
 
 			appToValidate = getAssetCount('Application', validateArgs, basicValidateClauses)
-			unknownAppToValidate = getAssetCount('Application', validateArgs, basicValidateClauses)
 			dbToValidate = getAssetCount('Database', validateArgs, basicValidateClauses)
 			fileToValidate = getAssetCount('Files', validateArgs, basicValidateClauses)
 			otherToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.nonOtherTypes], otherValidateClauses)
 			planReady = getAssetCount('Application', planReadyArgs, basicValidateClauses)
+			validated = getAssetCount('Application', validatedArgs, basicValidateClauses)
 			phyStorageToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.storageTypes], deviceValidateClauses)
 			psToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.physicalServerTypes], deviceValidateClauses)
 			vsToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.virtualServerTypes], deviceValidateClauses)
@@ -672,7 +673,7 @@ class PlanningDashboardData {
 			confirmedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.confirmedApplicationCount)
 			movedDatabasePerc = NumberUtil.percentage(basicMetrics.databaseCount, movedDbCount)
 			doneAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
-			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.applicationCount)
+			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
 			movedOtherPerc = NumberUtil.percentage(deviceMetrics.otherAssetCount, movedOtherCount)
 			physicalServerPerc = NumberUtil.percentage(deviceMetrics.totalPhysicalServerCount, movedPhysicalServerCount)
 			physicalStoragePerc = NumberUtil.percentage(deviceMetrics.phyStorageCount, movedPhyStorageCount)

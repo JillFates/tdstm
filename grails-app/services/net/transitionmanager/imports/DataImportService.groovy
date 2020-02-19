@@ -647,6 +647,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 */
 	@NotTransactional()
 	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
+		Long projectId = project.id
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
 		Map context
 
@@ -696,7 +697,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				List records = ImportBatchRecord.where {
 					id in recordSetIds
 				}.list(sortBy: 'id')
-
 				ImportBatchRecord.withNewTransaction { DefaultTransactionStatus status ->
 					for (record in records) {
 						context.record = record
@@ -712,7 +712,9 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 					log.debug 'processBatch({}) clearing Hibernate Session', batchId
 					GormUtil.flushAndClearSession()
-					project.refresh()
+
+					//TM-17058 to fix the slow project.refresh() from TM-16534 The refresh was taking 10 to 20 seconds.
+					project = Project.get(projectId)
 				}
 				batch.refresh()
 				aborted = ! updateBatchProgress( batchId, rowsProcessed, totalRowCount)
@@ -2037,7 +2039,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				securityService.currentUsername, dataScriptId, filename)
 
 		// return progress key
-		return ['progressKey': key]
+		return ['progressKey': key, 'jobTriggerName': jobTriggerName]
 	}
 
 	/**

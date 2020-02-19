@@ -25,7 +25,7 @@ class Dataview {
 	Dataview overridesView
 
 	static constraints = {
-		name size: 1..255, unique: ['project','person', 'isShared'], validator: uniqueNameValidator()
+		name size: 1..255
 		person nullable: true
 		lastModified nullable: true
 		overridesView nullable: true
@@ -79,8 +79,9 @@ class Dataview {
 	 * @return
 	 */
 	boolean isFavorite(Long currentPersonId) {
+		Long dvId = this.id
 		int favCount = FavoriteDataview.where {
-			dataview == this
+			dataview.id == dvId
 			person.id == currentPersonId
 		}.count()
 		return favCount > 0
@@ -140,23 +141,4 @@ class Dataview {
 		lastModified = TimeUtil.nowGMT()
 	}
 
-	/**
-	 * Used to validate that name is unique within the project
-	 */
-	static Closure uniqueNameValidator() {
-		// TODO: Insert constraints: isShared and person
-		return { value, target ->
-			int count = Dataview.where {
-				project == target.project
-				name == value
-				if (id) {
-					id != target.id
-				}
-			}.count()
-
-			if (count > 0) {
-				return 'default.not.unique.message'
-			}
-		}
-	}
 }

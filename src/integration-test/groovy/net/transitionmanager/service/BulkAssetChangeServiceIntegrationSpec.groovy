@@ -156,54 +156,58 @@ class BulkAssetChangeServiceIntegrationSpec extends Specification {
 			moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
 			projectTestHelper = new test.helper.ProjectTestHelper()
 			personHelper = new PersonTestHelper()
+			JSONObject fieldSpec
 
-			project = projectTestHelper.createProject()
-			otherProject = projectTestHelper.createProject()
+			Project.withNewTransaction {
+				project = projectTestHelper.createProject()
+				otherProject = projectTestHelper.createProject()
 
-			params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
-			query = """
-			SELECT AE.id
-			FROM AssetEntity AE
-			WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
-		"""
+				params = [project: project, assetClasses: [AssetClass.APPLICATION, AssetClass.DEVICE]]
+				query = """
+					SELECT AE.id
+					FROM AssetEntity AE
+					WHERE AE.project = :project AND AE.assetClass in (:assetClasses)
+				"""
 
-			bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
-			bulkAssetChangeService.dataviewService = [
-				getAssetIdsHql: { Project project, Long dataViewId, DataviewUserParamsCommand userParams -> [query: query, params: params] }
-			] as DataviewService
+				bulkAssetChangeService.tagAssetService = Mock(TagAssetService)
+				bulkAssetChangeService.dataviewService = [
+						getAssetIdsHql: { Project project, Long dataViewId, DataviewUserParamsCommand userParams -> [query: query, params: params] }
+				] as DataviewService
 
-			moveBundle = moveBundleTestHelper.createBundle(project, null)
-			moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
+				moveBundle = moveBundleTestHelper.createBundle(project, null)
+				moveBundle2 = moveBundleTestHelper.createBundle(otherProject, null)
 
-			device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-			device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-			device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
+				device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+				device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+				device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject, moveBundle2)
 
-			tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
-			tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
-			tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
+				tag1 = new Tag(name: 'grouping assets', description: 'This is a description', color: Color.Green, project: project).save(flush: true)
+				tag2 = new Tag(name: 'some assets', description: 'Another description', color: Color.Blue, project: project).save(flush: true)
+				tag3 = new Tag(name: 'other', description: 'Yet another description', color: Color.Red, project: otherProject).save(flush: true)
 
-			tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true)
-			tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true)
-			tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true)
-			tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true)
+				tagAsset1 = new TagAsset(tag: tag1, asset: device).save(flush: true)
+				tagAsset2 = new TagAsset(tag: tag1, asset: device2).save(flush: true)
+				tagAsset3 = new TagAsset(tag: tag2, asset: device2).save(flush: true)
+				tagAsset4 = new TagAsset(tag: tag3, asset: device3).save(flush: true)
 
-			now = TimeUtil.nowGMT().clearTime()
+				now = TimeUtil.nowGMT().clearTime()
 
-			dataviewUserParamsCommand = new DataviewUserParamsCommand([filters: [ domains: [] ], sortDomain: 'device', sortProperty: 'id'])
-			bulkChangeCommand = new BulkChangeCommand(
-				userParams: dataviewUserParamsCommand,
-				dataViewId: 1,
-				ids: [device.id, device2.id],
-				type: 'APPLICATION'
-			)
+				dataviewUserParamsCommand = new DataviewUserParamsCommand([filters: [ domains: [] ], sortDomain: 'device', sortProperty: 'id'])
+				bulkChangeCommand = new BulkChangeCommand(
+						userParams: dataviewUserParamsCommand,
+						dataViewId: 1,
+						ids: [device.id, device2.id],
+						type: 'APPLICATION'
+				)
 
-			person = personHelper.createPerson(null, project.client, project)
-			personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
+				person = personHelper.createPerson(null, project.client, project)
+				personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"], project, true)
 
-			JSONObject fieldSpec = loadFieldSpecJson()
+				fieldSpec = loadFieldSpecJson()
 
-			Setting.findAllByProject(project)*.delete(flush:true)
+				Setting.findAllByProject(project)*.delete(flush:true)
+			}
+
 			customDomainService.saveFieldSpecs(project, CustomDomainService.ALL_ASSET_CLASSES, fieldSpec)
 
 			initialized = true
