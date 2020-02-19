@@ -36,7 +36,7 @@ class ProjectCreationPage extends Page{
 
     def fillInFields(projInfoMap){
         waitFor(30){pcClientSelector.click()}
-        waitFor {pcClientItem.click()}
+        waitFor (1){pcClientItem.click()}
         pcProjectCode = projInfoMap.projName
         pcProjectName = projInfoMap.projName
         pcDescription = projInfoMap.projDesc
