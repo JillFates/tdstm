@@ -19,7 +19,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     static testCount
     static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
-    static projName = baseName +" "+ randStr
+    static projName = randStr +" "+ baseName
     static licensedProjectName = "TM-Demo"
     static projectInfo = [
             "projName": projName,
@@ -71,8 +71,12 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
             clickOnSaveButton()
         then: 'Project Details Page is displayed'
             at ProjectListPage
-        and: 'Project name is listed in Project List Page'
-        waitFor(30){projectIsListed projName}
+        when: 'The user set project filter name'
+        clickFilterButton()
+        waitFor { projectNameFilter.click() }
+        projectNameFilter = projName
+        then: 'Project created should be displayed in the grid'
+        projectIsListed randStr
     }
 
     def "3. The User navigates to Tags Page and verifies default tags created"(){

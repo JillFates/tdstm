@@ -97,7 +97,6 @@ class ProjectCreationSpec extends GebReportingSpec {
             waitFor { projectNameFilter.click() }
             projectNameFilter = projName
         then: 'Project created should be displayed in the grid'
-           // waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
             projectIsListed randStr
     }
 }

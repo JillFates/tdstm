@@ -25,7 +25,7 @@ class ProjectEditionSpec extends GebReportingSpec {
 
     //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"
-    static projName = baseName +" "+ randStr
+    static projName =  randStr +" "+ baseName
     static projCode = projName
     static projDesc = "Description of the project "+ projName +" created by QA E2E Geb Scripts"
     static projComment = "Comment for project "+ projName +" created by QA E2E Geb Scripts"
