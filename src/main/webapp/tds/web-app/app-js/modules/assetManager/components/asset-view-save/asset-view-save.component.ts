@@ -5,8 +5,8 @@ import {ViewModel, ViewGroupModel} from '../../../assetExplorer/model/view.model
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {Permission} from '../../../../shared/model/permission.model';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -130,10 +130,13 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		saveOptions: SaveOptions,
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
-		private permissionService: PermissionService,
+		private activatedRoute: ActivatedRoute,
 		private notifier: NotifierService) {
 		this.preModel = model;
 		this.saveOptions = saveOptions;
+		this.activatedRoute.queryParams.subscribe( (params) => {
+			this.preModel.queryParams = params;
+		})
 		this.startModel();
 		this.setMyView();
 		this.setDisabling();
