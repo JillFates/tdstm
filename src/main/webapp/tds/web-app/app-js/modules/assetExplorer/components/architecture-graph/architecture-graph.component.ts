@@ -447,6 +447,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
+		this.graph.showFullGraphBtn = false;
 		this.loadData();
 	}
 
@@ -477,6 +478,10 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	goBackToNormalGraph() {
 		console.log('go back to normal');
+	}
+
+	onDiagramAnimationFinished() {
+		this.graph.showFullGraphBtn = false;
 	}
 
 }
