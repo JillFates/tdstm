@@ -67,13 +67,13 @@ class ProjectCreationSpec extends GebReportingSpec {
         given: 'The User is on the Project Create Page'
             at ProjectCreationPage
         when: 'The user fill all required fields'
-            waitFor(30){pcClientSelector.click()}
-            waitFor (1) {pcClientItem.click()}
             pcProjectCode = projName
             pcProjectName = projName
             pcDescription = projDesc
             pcComment     = projComment
             pcCompletionDate  = projCompDate
+            waitFor(30){pcClientSelector.click()}
+            waitFor (1) {pcClientItem.click()}
         and: 'The user clicks on Save button'
             waitFor {pcSaveBtn.click()}
         then: 'Project List Page is displayed'
