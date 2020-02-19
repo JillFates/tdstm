@@ -50,7 +50,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 
 	private previousSearch = '';
 	private typingTimeout = null;
-	private readonly NOT_ALLOWED_CHAR_REGEX = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
+	private readonly NOT_ALLOWED_CHAR_REGEX = /ALT|ARROW|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 
 	constructor(private zone: NgZone) {
 	}
