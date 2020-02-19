@@ -108,6 +108,6 @@ class ProjectListPage extends Page {
     }
 
     def projectIsListed(name){
-        waitFor (1){projectNameGridField.find("a", text: contains(name)).first().displayed }
+        waitFor (5){projectNameGridField.find("a", text: contains(name)).first().displayed }
     }
 }
