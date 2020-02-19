@@ -106,7 +106,7 @@
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
-				class="page-height task-grid fixed-context-menu row-actions-2-children"
+				class="page-height task-grid"
 				[ngClass]="{'hide-filter': !isFiltering}"
 				[data]="grid.gridData"
 				[skip]="grid.state.skip"
@@ -246,11 +246,11 @@
 						let-rowIndex="rowIndex"
 					>
 						<div class="action-button btn-link">
-							<clr-dropdown>
-								<tds-button
-									icon="ellipsis-vertical"
-									clrDropdownTrigger
-									class="contextual-menu"
+							<clr-dropdown #dropdown>
+								<tds-button icon="ellipsis-vertical"
+														clrDropdownTrigger
+														tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"
+														class="contextual-menu"
 								></tds-button>
 								<clr-dropdown-menu *clrIfOpen>
 									<a

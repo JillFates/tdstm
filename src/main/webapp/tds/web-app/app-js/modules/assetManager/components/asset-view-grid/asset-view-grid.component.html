@@ -14,7 +14,7 @@
 		(columnResize)="onWidthChange($event)"
 		(cellClick)="cellClick($event)"
 		[ngClass]="{ 'hide-filter': !showAssetsFilter }"
-		class="row-actions-6-children fixed-context-menu">
+		class="">
 		<!-- Select all -->
 		<kendo-grid-column
 			*ngIf="model && model.columns && model.columns.length > 0"
@@ -87,10 +87,11 @@
 				let-hasTasks="dataItem.common_taskCount > 0"
 			>
 				<div class="action-button btn-link">
-					<clr-dropdown>
-						<tds-button
-							icon="ellipsis-vertical"
-							clrDropdownTrigger></tds-button>
+					<clr-dropdown #dropdown>
+						<tds-button icon="ellipsis-vertical"
+												clrDropdownTrigger
+												tdsGridContextMenuFixedPosition [clrDropdown]="dropdown">
+						</tds-button>
 						<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
 							<a
 								clrDropdownItem
