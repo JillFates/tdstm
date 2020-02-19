@@ -340,6 +340,7 @@ class DataviewService implements ServiceMethods {
 		Dataview dataview = dataviewCommand.id
 
 		validateDataviewUpdateAccessOrException(project, whom, dataviewCommand, dataview)
+		removeQueryStringFromFilters(dataviewCommand)
 		validateOverrideViewFiltersMatch(dataviewCommand)
 		validateViewNameUniqueness(project, whom, dataviewCommand)
 
@@ -383,6 +384,7 @@ class DataviewService implements ServiceMethods {
 	@Transactional
 	Dataview create(Project currentProject, Person whom, DataviewCrudCommand dataviewCommand) {
 		validateDataviewCreateAccessOrException(dataviewCommand, currentProject, whom)
+		removeQueryStringFromFilters(dataviewCommand)
 		validateOverrideViewFiltersMatch(dataviewCommand)
 
 		// If the user is overriding a System View, they may be overriding their own override or
@@ -454,6 +456,29 @@ class DataviewService implements ServiceMethods {
 					'There is an unexpected amount of nested overridden system views')
 		}
 		return getRootSystemView(dataview.overridesView, --depth)
+	}
+
+	/**
+	 * Dataview specifications coming from the frontend may have filters that were applied to columns that were from
+	 * querystring parameters of the URL request. These parameters should not be saved with the dataview specification.
+	 * Therefore, this method will iterate over the list of parameters passed and clear out the filter for any of the
+	 * specified columns.
+	 * @param dataviewCommand
+	 */
+	void removeQueryStringFromFilters(DataviewCrudCommand dataviewCommand) {
+		if (dataviewCommand.querystring) {
+			dataviewCommand.querystring.keySet().each { param ->
+				List<String> match = param.split('_')
+				if (match.size() == 2 && match[0] ) {
+					DataviewSchemaColumnCommand column = dataviewCommand.schema.columns.find {
+						it.domain == match[0] && it.property == match[1]
+					}
+					if (column) {
+						column.filter = ''
+					}
+				}
+			}
+		}
 	}
 
 	/**

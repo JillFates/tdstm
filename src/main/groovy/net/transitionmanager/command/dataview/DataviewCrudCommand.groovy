@@ -37,11 +37,18 @@ class DataviewCrudCommand implements CommandObject {
 	 * the indicator of how the view should be saved
 	 */
 	ViewSaveAsOptionEnum saveAsOption
+	/*
+	 * The querystring passed to the dataview controller becomes a Hash object in Angular, that is used to supplement the
+	 * filtering of the dataview. The parameters in the querystring get injected into the dataview columm.filter
+	 * property however when saving the views, filter on those columns should be cleared out when saving the view.
+	 * Therefore, the querystring is used in the save/update process to clear out the appropriate column filters.
+	 */
+	Map querystring = [:]
 
 	static constraints = {
 		id nullable: true
 		overridesView nullable: true
 		saveAsOption nullable: true
-		// TODO : JPM 1/2020 : add validation logic to the saveAsOption or does the binding error is enum is not resolved?
+		querystring nullable: true
 	}
 }
