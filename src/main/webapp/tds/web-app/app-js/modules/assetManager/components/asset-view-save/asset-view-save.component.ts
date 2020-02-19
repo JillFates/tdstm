@@ -23,7 +23,7 @@ import { ActivatedRoute } from '@angular/router';
                       #noticeForm='ngForm'>
                     <div class="box-body">
                         <div class="form-group save-views-container">
-                            <div *ngIf="hasMyView">
+                            <div>
                                 <div class="radio">
                                     <div>
                                         <label>
@@ -117,7 +117,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	public saveOptions: SaveOptions;
 	private preModel: ViewModel;
 	public isUnique = true;
-	public hasMyView = false;
 	public saveAsOptions = {
 		MY_VIEW: {value: E_SAVE_AS_OPTIONS.MY_VIEW, disabled: false, isOverride: false},
 		OVERRIDE_FOR_ME: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ME, disabled: false, isOverride: true },
@@ -135,10 +134,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		this.preModel = model;
 		this.saveOptions = saveOptions;
 		this.activatedRoute.queryParams.subscribe( (params) => {
-			this.preModel.queryParams = params;
+			this.preModel.querystring = params;
 		})
 		this.startModel();
-		this.setMyView();
 		this.setDisabling();
 	}
 
@@ -188,14 +186,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		} else {
 			this.model.saveAsOption = this.saveAsOptions.MY_VIEW.value;
 		}
-	}
-
-	/**
-	 * Validate if user can maintain asset lists
-	 * @returns {boolean}
-	 */
-	public setMyView(): void {
-		this.hasMyView = this.saveOptions.saveAsOptions.some(opt => opt === E_SAVE_AS_OPTIONS.MY_VIEW);
 	}
 
 	public isThereOnlySaveMyView(): boolean {
