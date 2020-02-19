@@ -8,7 +8,18 @@
 	</div>
 	<div class="graph-main-container">
         <div class="left-container">
+
 			<div class="graph-control-panel graphPanel" id="controlPanelId" *ngIf="showControlPanel">
+				<p>{{'ARCHITECTURE.FILTER_LABELS' | translate}}</p>
+				<kendo-dropdownlist
+						[defaultItem]="'Filter: All Classes'"
+						[data]="dataForSelect"
+						[textField]="'value'"
+						[valueField]="'id'"
+						(valueChange)="onAssetFilterChange($event)"
+						style="width: 100%;"
+				>
+				</kendo-dropdownlist>
 				<p>{{'ARCHITECTURE.SELECT_AN_ASSET' | translate}}</p>
 				<kendo-combobox #innerComboBox
 								[data]="datasource"
@@ -32,17 +43,6 @@
 						<span #dropdownFooter></span>
 					</ng-template>
 				</kendo-combobox>
-
-				<p>{{'ARCHITECTURE.FILTER_LABELS' | translate}}</p>
-				<kendo-dropdownlist
-						[defaultItem]="'Filter: All Classes'"
-						[data]="dataForSelect"
-						[textField]="'value'"
-						[valueField]="'id'"
-						(valueChange)="onAssetFilterChange($event)"
-						style="width: 100%;"
-				>
-				</kendo-dropdownlist>
 				<div class="tiers-above">
 					<tds-button icon="minus-circle" (click)="extractLevelsUp()"></tds-button>
 					<label>{{levelsUp}}</label>
