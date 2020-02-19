@@ -447,25 +447,29 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
-		this.loadData();
+		if (this.assetId) {
+			this.loadData();
+		}
 	}
 
 	/**
 	 * Save the preferences changed on the control panel
 	*/
 	savePreferences() {
-		const valueData = {
-			assetClass: 'ALL',
-			levelsUp: this.levelsUp,
-			levelsDown: this.levelsDown,
-			showCycles: this.showCycles,
-			appLbl: this.categories.length > 0
-		};
-		this.preferenceService.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
-			if (res.status === 'success') {
-				console.log('Preferences saved correctly');
-			}
-		})
+		if (this.categories) {
+			const valueData = {
+				assetClass: 'ALL',
+				levelsUp: this.levelsUp,
+				levelsDown: this.levelsDown,
+				showCycles: this.showCycles,
+				appLbl: this.categories.length > 0
+			};
+			this.preferenceService.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
+				if (res.status === 'success') {
+					console.log('Preferences saved correctly');
+				}
+			})
+		}
 	}
 
 	/**
