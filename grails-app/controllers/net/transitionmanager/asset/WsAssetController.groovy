@@ -379,7 +379,6 @@ class WsAssetController implements ControllerMethods {
 
 		// Add the custom field specs to the model
 		model.put('customs', assetEntityService.getCustomFieldsSettings(project, assetClass, true) )
-		model.put('personList', partyRelationshipService.getProjectApplicationStaff(project))
 
 		// Add the standardFieldASpecs to the model
 		assetService.addFieldSpecsToCrudModel(project, assetClass, model)
