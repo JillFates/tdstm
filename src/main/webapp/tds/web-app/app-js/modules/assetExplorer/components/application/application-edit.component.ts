@@ -77,6 +77,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				};
 			}
 			this.updatePersonReferences();
+			this.preparePersonList();
 		}
 
 		/**
@@ -134,6 +135,37 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				}
 			});
 		}
+
+		/**
+		 * Search and copy over the Person List for SME 1
+		 * @param filter
+		 */
+		public filterSME1Change(filter: any): void {
+			this.model.sme1PersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
+		 * Search and copy over the Person List for SME 2
+		 * @param filter
+		 */
+		public filterSME2Change(filter: any): void {
+			this.model.sme2PersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
+		 * Search and copy over the Person List for App Owner
+		 * @param filter
+		 */
+		public filterAppOwnerChange(filter: any): void {
+			this.model.appOwnerPersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
 		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
@@ -164,15 +196,22 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
 				});
 		}
-		getPersonList(personList: any[]) {
-			if (!this.personList) {
-				this.personList = personList;
-				if (this.permissionService.hasPermission('PersonCreate')) {
-					this.personList.unshift(this.addPersonItem)
-				}
+
+		/**
+		 * Prepare the Person List with the Person Create if it has the permission
+		 */
+		preparePersonList() {
+			if (this.permissionService.hasPermission('PersonCreate')) {
+				this.model.personList.unshift(this.addPersonItem);
 			}
-			return this.personList;
+			// Save a copy of the Person List
+			this.model.sourcePersonList = R.clone(this.model.personList);
+			// Create each instance
+			this.model.appOwnerPersonList = R.clone(this.model.sourcePersonList);
+			this.model.sme1PersonList = R.clone(this.model.sourcePersonList);
+			this.model.sme2PersonList = R.clone(this.model.sourcePersonList);
 		}
+
 		updatePersonReferences(): void {
 			this.persons.sme = { personId: this.model.asset.sme.id};
 			this.persons.sme2 = { personId: this.model.asset.sme2.id};

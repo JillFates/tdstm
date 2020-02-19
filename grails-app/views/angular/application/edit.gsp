@@ -44,6 +44,8 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 											<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
 												<kendo-dropdownlist #controlSme
+														[filterable]="true"
+														(filterChange)="filterSME1Change($event)"
 														[tabIndex]="11"
 														class="tm-input-control person-list"
 														name="modelAssetSme"
@@ -52,7 +54,7 @@
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="getPersonList(${personList as JSON})">
+														[data]="model.sme1PersonList">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="19" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
@@ -65,6 +67,8 @@
 											<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 												<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
 												<kendo-dropdownlist  #controlSme2
+												    [filterable]="true"
+												    (filterChange)="filterSME2Change($event)"
 													[tabIndex]="12"
 													class="tm-input-control person-list"
 													name="modelAssetSme2"
@@ -73,7 +77,7 @@
 													[defaultItem]="defaultItem"
 													[textField]="'fullName'"
 													[valueField]="'personId'"
-													[data]="getPersonList(${personList as JSON})">
+													[data]="model.sme2PersonList">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${asset.criticality}" tabindex="20"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
@@ -85,6 +89,8 @@
 											<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 												<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
 												<kendo-dropdownlist
+														[filterable]="true"
+														(filterChange)="filterAppOwnerChange($event)"
 														[tabIndex]="13"
 														class="tm-input-control"
 														name="modelAssetappOwner"
@@ -93,7 +99,7 @@
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="getPersonList(${personList as JSON})">
+														[data]="model.appOwnerPersonList">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
