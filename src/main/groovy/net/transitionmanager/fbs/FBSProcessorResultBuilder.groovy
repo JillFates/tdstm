@@ -8,12 +8,14 @@ import com.tdsops.etl.FindResult
 import com.tdsops.etl.QueryResult
 import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
+import groovy.transform.CompileStatic
 
 import java.nio.ByteBuffer
 
 /**
  * Class to convert an instance of {@code ETLProcessorResult} and a binary serialized instance of {@code}
  */
+@CompileStatic
 class FBSProcessorResultBuilder {
 
     ETLProcessorResult result
@@ -35,6 +37,10 @@ class FBSProcessorResultBuilder {
      */
     ByteBuffer buildDataBuffer() {
         return serializeETLProcessorResult().dataBuffer()
+    }
+
+    FlatBufferBuilder buildFlatBufferBuilder() {
+        return serializeETLProcessorResult()
     }
 
     /**
@@ -142,7 +148,7 @@ class FBSProcessorResultBuilder {
 
             RowResult rowResult = domainResult.data[i]
             dataOffset[i] = FBSRowResult.createFBSRowResult(builder,
-                    builder.createString(rowResult.op),
+                    builder.createString(rowResult.op.toString()),
                     rowResult.rowNum,
                     rowResult.errorCount,
                     rowResult.warn,
@@ -199,7 +205,7 @@ class FBSProcessorResultBuilder {
                     fieldResult.fieldOrder,
                     FBSRowResult.createErrorsVector(builder, buildVectorFromCollection(fieldResult.errors)),
                     fieldResult.warn,
-                    fieldResult.find ? buildFindOffset(fieldResult.find) : 0,
+                    (fieldResult.find && fieldResult.find.query) ? buildFindOffset(fieldResult.find) : 0,
                     fieldResult.create ? buildCreateOffset(fieldResult.create) : 0,
                     fieldResult.update ? buildUpdateOffset(fieldResult.update) : 0
             )
@@ -242,8 +248,8 @@ class FBSProcessorResultBuilder {
             for (int j = 0; j < queryResult.criteria.size(); j++) {
                 Map<String, Object> criteria = queryResult.criteria[j]
                 queryResultDataOffset[j] = FBSQueryResultCriteria.createFBSQueryResultCriteria(builder,
-                        builder.createString(criteria.propertyName),
-                        builder.createString(criteria.operator),
+                        builder.createString(criteria.propertyName.toString()),
+                        builder.createString(criteria.operator.toString()),
                         builder.createString(criteria.value?.toString()),
                         builder.createString(calculateValueClass(criteria.value))
                 )
@@ -257,7 +263,7 @@ class FBSProcessorResultBuilder {
 
         return FBSFindResult.createFBSFindResult(builder,
                 FBSFindResult.createQueryVector(builder, data),
-                FBSFindResult.createResultsVector(builder, (long[]) findResult.results),
+                FBSFindResult.createResultsVector(builder, findResult.results as long[]),
                 findResult.size ?: 0,
                 findResult.matchOn ?: 0
         )
@@ -332,12 +338,12 @@ class FBSProcessorResultBuilder {
         int addOffset = tagResults.add ? FBSTagResults.createAddVector(builder, buildVectorFromCollection(tagResults.add)) : 0
         int removeOffset = tagResults.remove ? FBSTagResults.createAddVector(builder, buildVectorFromCollection(tagResults.remove)) : 0
         int replaceOffset = tagResults.replace ? builder.createSortedVectorOfTables(new FBSTagResults(),
-                (int[]) tagResults.replace.collect { Map.Entry<String, String> entry ->
+                tagResults.replace.collect { Map.Entry<String, String> entry ->
                     FBSTagReplace.createFBSTagReplace(builder,
-                            builder.createString(entry.key),
-                            builder.createString(entry.value)
+                            builder.createString(entry.key.toString()),
+                            builder.createString(entry.value.toString())
                     )
-                }
+                } as int[]
         ) : 0
 
         return FBSTagResults.createFBSTagResults(builder,
@@ -355,7 +361,7 @@ class FBSProcessorResultBuilder {
      * @return an offset defines in FlatBuffers for a Vector of Strings
      */
     int[] buildVectorFromCollection(Collection<String> values) {
-        return values.collect { builder.createString(it) }
+        return values.collect { builder.createString(it) } as int[]
     }
 
     /**
@@ -371,7 +377,7 @@ class FBSProcessorResultBuilder {
         int[] fieldNamesVector = new int[domainResult.fieldNames.size()]
 
         for (int i = 0; i < domainResult.fieldNames.size(); i++) {
-            fieldNamesVector[i] = builder.createString(domainResult.fieldNames[i])
+            fieldNamesVector[i] = builder.createString(domainResult.fieldNames[i].toString())
         }
 
         return FBSDomainResult.createFieldNamesVector(builder, fieldNamesVector)
@@ -407,7 +413,7 @@ class FBSProcessorResultBuilder {
      * @return an offset defines in FlatBuffers table
      */
     int buildETLInfoOffset(ETLProcessorResult result) {
-        return FBSInfo.createFBSInfo(builder, builder.createString(result.ETLInfo.originalFilename))
+        return FBSInfo.createFBSInfo(builder, builder.createString(result.ETLInfo.originalFilename.toString()))
     }
 
     /**

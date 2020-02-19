@@ -1,11 +1,14 @@
 package com.tdsops.etl
 
+import com.google.flatbuffers.FlatBufferBuilder
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.etl.marshall.ConfigureMarshalling
 import com.tdsops.etl.marshall.DoNotMarshall
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.converters.JSON
 import groovy.transform.CompileStatic
+import net.transitionmanager.fbs.FBSProcessorResult
+import net.transitionmanager.fbs.FBSRowResult
 
 /**
  * Results collected from an ETL Processor instance processing an ETL script.
@@ -48,11 +51,19 @@ class ETLProcessorResult {
 	 */
 	String consoleLog = ''
 
+	FBSProcessorResult  fbsProcessorResult
+	FlatBufferBuilder flatBufferBuilder
+
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
 			originalFilename: processor.getFilename()
 		]
+
+		flatBufferBuilder =  new  FlatBufferBuilder(2048)
+		fbsProcessorResult =  new FBSProcessorResult()
+
+
 	}
 
 	/**

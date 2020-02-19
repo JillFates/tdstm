@@ -4,6 +4,7 @@ package net.transitionmanager.fbs;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.google.flatbuffers.Table;
+import groovy.transform.CompileStatic;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,6 +26,7 @@ import java.nio.ByteOrder;
  *  ),
  * </pre>
  */
+@CompileStatic
 public final class FBSCreate extends Table {
     public static FBSCreate getRootAsFBSCreate(ByteBuffer _bb) {
         return getRootAsFBSCreate(_bb, new FBSCreate());

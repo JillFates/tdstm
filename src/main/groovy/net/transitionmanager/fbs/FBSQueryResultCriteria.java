@@ -4,6 +4,7 @@ package net.transitionmanager.fbs;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.google.flatbuffers.Table;
+import groovy.transform.CompileStatic;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -29,6 +30,7 @@ import java.nio.ByteOrder;
  * )
  * </pre>
  */
+@CompileStatic
 public final class FBSQueryResultCriteria extends Table {
     public static FBSQueryResultCriteria getRootAsFBSQueryResultCriteria(ByteBuffer _bb) {
         return getRootAsFBSQueryResultCriteria(_bb, new FBSQueryResultCriteria());

@@ -4,6 +4,7 @@ package net.transitionmanager.fbs;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.google.flatbuffers.Table;
+import groovy.transform.CompileStatic;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -21,6 +22,7 @@ import java.nio.ByteOrder;
  *     FBSInfo.createFBSInfo(builder, builder.createString(etlProcessorResultInstance.ETLInfo.filename)),
  * </pre>
  */
+@CompileStatic
 public final class FBSInfo extends Table {
     public static FBSInfo getRootAsFBSInfo(ByteBuffer _bb) {
         return getRootAsFBSInfo(_bb, new FBSInfo());

@@ -4,6 +4,7 @@ package net.transitionmanager.fbs;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.google.flatbuffers.Table;
+import groovy.transform.CompileStatic;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -46,6 +47,7 @@ import java.nio.ByteOrder;
  *  )
  * </pre>
  */
+@CompileStatic
 public final class FBSFieldResult extends Table {
     public static FBSFieldResult getRootAsFBSFieldResult(ByteBuffer _bb) {
         return getRootAsFBSFieldResult(_bb, new FBSFieldResult());

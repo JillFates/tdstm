@@ -1,5 +1,6 @@
 package net.transitionmanager.imports
 
+import com.google.flatbuffers.FlatBufferBuilder
 import com.tdsops.ETLTagValidator
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdsops.etl.DebugConsole
@@ -28,6 +29,8 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.beans.factory.annotation.Value
+
+import java.nio.ByteBuffer
 
 @Transactional
 class ScriptProcessorService {
@@ -85,7 +88,9 @@ class ScriptProcessorService {
 	String saveResultsInFile(ETLProcessorResult processorResult) {
 
 		if(saveResultsInBinaryFormat){
-			return saveResultsInBinaryFile(processorResult)
+			FlatBufferBuilder flatBufferBuilder = new FBSProcessorResultBuilder(processorResult).buildFlatBufferBuilder()
+			ByteBuffer serialized = flatBufferBuilder.dataBuffer()
+			return saveResultsInBinaryFile(serialized)
 		} else {
 			return saveResultsInJSONFile(processorResult)
 		}
@@ -117,8 +122,8 @@ class ScriptProcessorService {
 	 * @see FBSProcessorResultBuilder#buildInputStream()
 	 */
 	@CompileStatic
-	String saveResultsInBinaryFile(ETLProcessorResult processorResult) {
-		InputStream serialized = new FBSProcessorResultBuilder(processorResult).buildInputStream()
+	String saveResultsInBinaryFile(ByteBuffer serialized) {
+
 		List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'binary')
 		String outputFilename = tmpFile[0]
 		OutputStream os = (OutputStream) tmpFile[1]

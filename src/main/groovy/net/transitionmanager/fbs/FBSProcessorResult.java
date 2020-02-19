@@ -4,6 +4,7 @@ package net.transitionmanager.fbs;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.google.flatbuffers.Table;
+import groovy.transform.CompileStatic;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -32,6 +33,7 @@ import java.nio.ByteOrder;
  * @see FBSInfo
  * @see FBSDomainResult#createDataVector
  */
+@CompileStatic
 public final class FBSProcessorResult extends Table {
     public static FBSProcessorResult getRootAsFBSProcessorResult(ByteBuffer _bb) {
         return getRootAsFBSProcessorResult(_bb, new FBSProcessorResult());

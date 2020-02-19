@@ -4,6 +4,7 @@ package net.transitionmanager.fbs;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.google.flatbuffers.Table;
+import groovy.transform.CompileStatic;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,6 +23,7 @@ import java.nio.ByteOrder;
  *  ),
  * </pre>
  */
+@CompileStatic
 public final class FBSTagReplace extends Table {
     public static FBSTagReplace getRootAsFBSTagReplace(ByteBuffer _bb) {
         return getRootAsFBSTagReplace(_bb, new FBSTagReplace());
