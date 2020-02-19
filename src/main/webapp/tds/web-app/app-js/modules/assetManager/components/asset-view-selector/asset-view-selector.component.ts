@@ -17,6 +17,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {Router} from '@angular/router';
+import { ReportResolveService } from '../../resolve/report-resolve.service';
 
 @Component({
 	selector: 'tds-asset-view-selector',
@@ -68,7 +69,7 @@ import {Router} from '@angular/router';
                         </li>
                         <li>
                             <ul style="padding-left:10px;margin-top:5px;word-wrap:break-word" *ngFor="let value of dataItem.items">
-                                <a [routerLink]="['/asset','views',value.id,'show']" (click)="onFocusOut()">
+                                <a [routerLink]="['/asset','views',(value.overrideId? value.overrideId :value.id),'show']" [queryParams] ="value.queryParams" (click)="onFocusOut()">
                                     <i class="fa fa-file-text-o"></i> {{value.name}}</a>
                             </ul>
                         </li>
@@ -107,9 +108,10 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	constructor(
 		private router: Router,
 		private service: AssetExplorerService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private reportResolveService: ReportResolveService) {
 		service.getReports().subscribe((result) => {
-			this.data = result;
+			this.data = this.reportResolveService.populateReport(result)
 			this.reports = result.slice();
 		});
 	}
@@ -192,7 +194,7 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	public loadData() {
 		this.service.getReports()
 			.subscribe(result => {
-				this.data = result as ViewGroupModel[];
+				this.data = this.reportResolveService.populateReport(result) as ViewGroupModel[];
 			});
 	}
 

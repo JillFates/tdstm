@@ -12,6 +12,7 @@ export class ViewModel {
 	saveAsOption?: string;
 	schema?: ViewSpec;
 	overridesView?: any;
+	queryParams?: any;
 	constructor() {
 		this.schema = new ViewSpec();
 		this.isOwner = true;

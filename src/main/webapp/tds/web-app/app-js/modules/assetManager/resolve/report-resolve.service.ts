@@ -39,4 +39,20 @@ export class ReportResolveService implements Resolve<any> {
 			});
 		}
 	}
+
+	public populateReport(reports) {
+		if (Array.isArray(reports)) {
+			reports.map( rep => {
+				if (Array.isArray(rep.items)) {
+					rep.items.map( (item) => {
+						const _override: string = item.hasOverride ? 'false' : null;
+						const overrideId = item.overridesView && item.overridesView.id;
+						item.queryParams = {_override};
+						item.overrideId = overrideId
+					})
+				}
+			})
+		}
+		return reports;
+	}
 }

@@ -23,9 +23,9 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                       #noticeForm='ngForm'>
                     <div class="box-body">
                         <div class="form-group save-views-container">
-                            <div *ngIf="hasMaintainAssetList()">
+                            <div *ngIf="hasMyView">
                                 <div class="radio">
-                                    <div *ngIf="!isThereOnlySaveMyView()">
+                                    <div>
                                         <label>
                                             <input type="radio"
                                                    name="radio-mode"
@@ -117,6 +117,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	public saveOptions: SaveOptions;
 	private preModel: ViewModel;
 	public isUnique = true;
+	public hasMyView = false;
 	public saveAsOptions = {
 		MY_VIEW: {value: E_SAVE_AS_OPTIONS.MY_VIEW, disabled: false, isOverride: false},
 		OVERRIDE_FOR_ME: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ME, disabled: false, isOverride: true },
@@ -134,10 +135,12 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		this.preModel = model;
 		this.saveOptions = saveOptions;
 		this.startModel();
+		this.setMyView();
 		this.setDisabling();
 	}
 
 	ngAfterViewInit(): void {
+
 		if (this.model.name) {
 			this.validateUniquenessDataViewByName(this.model.name);
 		}
@@ -185,19 +188,11 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	/**
-	 * Disable the System View checkbox if the user does not have the proper permission
-	 * @returns {boolean}
-	 */
-	public isSystemCreatePermitted(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate);
-	}
-
-	/**
 	 * Validate if user can maintain asset lists
 	 * @returns {boolean}
 	 */
-	public hasMaintainAssetList(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+	public setMyView(): void {
+		this.hasMyView = this.saveOptions.saveAsOptions.some(opt => opt === E_SAVE_AS_OPTIONS.MY_VIEW);
 	}
 
 	public isThereOnlySaveMyView(): boolean {
@@ -251,7 +246,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 
 	private validateUniquenessDataViewByName(dataViewName = '') {
 		if (!dataViewName.trim()) {
-			// handle empty string
 			this.isUnique = false;
 		} else {
 			this.assetExpService.validateUniquenessDataViewByName(dataViewName)

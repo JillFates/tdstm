@@ -178,6 +178,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			title: this.model.name
 		});
 
+		this.onQuery();
 		this.gridState = Object.assign({}, this.gridState, {sort: [
 				{
 					field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
@@ -230,7 +231,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		let dataViewId;
 		const _override = !this.queryParams._override;
 
-		if (this.model.overridesView){
+		if (this.model.overridesView) {
 			dataViewId = this.model.overridesView.id
 		} else {
 			dataViewId = this.model.id;
@@ -258,6 +259,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			this.dataSignature = this.stringifyCopyOfModel(this.model);
 			const mode = this.model.overridesView ? 'show' : 'edit';
 			setTimeout(() => {
+				this.select.loadData();
 				this.router.navigate(['asset', 'views', this.model.id, mode]);
 			});
 		}).catch(result => {

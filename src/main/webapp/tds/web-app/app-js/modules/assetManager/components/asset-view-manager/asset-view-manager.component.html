@@ -10,7 +10,7 @@
 					<div class="box-body no-padding">
 						<ul class="nav nav-pills nav-stacked">
 							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
-								<a (click)="selectFolder(folder)" href="javascript:void(0)">
+								<a (click)="selectFolder(folder)" href="javascript:void(0)" style="font-size: 18px;">
 									<i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder?.name}}
 									<span class="label label-primary pull-right">{{folder.items.length}}</span>
 								</a>
@@ -60,7 +60,7 @@
 								<tbody *ngIf="selectedFolder">
 									<tr *ngFor="let report of selectedFolder.items | filter:{ name: searchText}">
 										<td class="asset-explorer-td-actions k-custom-command-column">
-											<div class="tds-action-button-set">
+											<div class="tds-action-button-set" style="font-size: 18px;">
 												<tds-button-edit [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
 												    tooltip="Edit View"
 											        (click)="onEditReport(report)">
@@ -83,7 +83,7 @@
 											</tds-button-custom>
 										</td>
 										<td>
-											<a [routerLink]="['/asset','views',report.id,'show']">{{report.name}}</a>
+											<a [routerLink]="['/asset','views',(report.overrideId? report.overrideId :report.id),'show']" [queryParams]="report.queryParams">{{report.name}}</a>
 										</td>
 										<td>
 											{{report.createdBy}}
@@ -100,6 +100,10 @@
 
 										<td class="text-center">
 											<span class="glyphicon glyphicon-ok" *ngIf="report.isSystem"></span>
+										</td>
+
+										<td class="text-center">
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isOverride"></span>
 										</td>
 										<!-- <td class="text-center"><span class="glyphicon glyphicon-ok" *ngIf="report.subscribe"></span></td> -->
 									</tr>

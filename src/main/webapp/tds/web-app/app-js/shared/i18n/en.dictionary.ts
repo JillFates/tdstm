@@ -131,6 +131,7 @@ export const en_DICTIONARY: Object = {
 			'UPDATED_ON': 'Updated On',
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
+			'OVERRIDE': 'Override',
 		},
 		'SYSTEM_VIEW': 'System View',
 		'SAVE_LIST_VIEW': 'Save List View',

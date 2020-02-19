@@ -46,6 +46,7 @@ export const AssetViewManagerColumnsHelper = {
 		addColumn({ property: 'updatedOn', label: 'ASSET_EXPLORER.INDEX.UPDATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 100 });
 		addColumn({ property: 'isShared', label: 'ASSET_EXPLORER.INDEX.SHARED',  sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
 		addColumn({ property: 'isSystem', label: 'ASSET_EXPLORER.INDEX.SYSTEM', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
+		addColumn({ property: 'isOverride', label: 'ASSET_EXPLORER.INDEX.OVERRIDE', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
 
 		return columns;
 	},
