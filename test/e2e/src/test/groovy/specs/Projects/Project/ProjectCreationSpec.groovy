@@ -21,7 +21,7 @@ class ProjectCreationSpec extends GebReportingSpec {
 
     //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"
-    static projName = baseName +" "+ randStr
+    static projName = randStr + " " + baseName
     static projDesc = "Description of the project "+ projName +" created by QA E2E Geb Scripts"
     static projComment = "Comment for project "+ projName +" created by QA E2E Geb Scripts"
     static projCompDate =  ((new Date()) + 3).format("MM/dd/yyyy")
@@ -98,6 +98,6 @@ class ProjectCreationSpec extends GebReportingSpec {
             projectNameFilter = projName
         then: 'Project created should be displayed in the grid'
            // waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
-            projectIsListed projName
+            projectIsListed randStr
     }
 }
