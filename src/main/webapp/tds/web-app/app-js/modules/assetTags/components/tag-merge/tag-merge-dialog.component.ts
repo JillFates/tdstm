@@ -37,16 +37,18 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 
 		this.buttons.push({
 			name: 'save',
-			icon: 'floppy',
+			icon: 'check',
+			text: 'Merge',
 			disabled: () => !this.mergeToTag || !this.mergeToTag.id,
-			type: DialogButtonType.ACTION,
+			type: DialogButtonType.CONTEXT,
 			action: this.onMerge.bind(this)
 		});
 
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
-			type: DialogButtonType.ACTION,
+			text: 'Cancel',
+			type: DialogButtonType.CONTEXT,
 			action: this.cancelCloseDialog.bind(this)
 		});
 
