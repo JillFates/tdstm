@@ -33,8 +33,6 @@ export class ArchitectureGraphComponent implements OnInit {
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 	private searchOnScroll = true;
-	private reloadOnOpen = false;
-	private firstChange = true;
 	private currentAssetFilterText: string;
 	public datasource: any[] = [{id: '', text: ''}];
 	public showControlPanel = false;
@@ -46,6 +44,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	public urlParams: IArchitectureGraphParams;
 	private currentNodesData;
 	public categories;
+	public assetClass: any = {id: '', value: ''};
+	public asset: any = {id: '', text: ''};
+	protected getAssetList: Function;
 
 	public assetList;
 	public graphPreferences;
@@ -125,6 +126,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		private preferenceService: PreferenceService
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
+		this.getAssetList = this.architectureGraphService.getAssetsForArchitectureGraph.bind(this.architectureGraphService);
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
 
@@ -160,13 +162,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	loadAssetsForDropDown() {
 		const queryId = this.comboBoxSearchModel.query && this.comboBoxSearchModel.query['id'] || 'ALL';
 		this.architectureGraphService
-			.getAssetsForArchitectureGraph(
-				// this.comboBoxSearchModel.query,
-				this.currentAssetFilterText,
-				this.comboBoxSearchModel.value,
-				this.comboBoxSearchModel.maxPage,
-				this.comboBoxSearchModel.currentPage,
-				queryId)
+			.getAssetsForArchitectureGraph(this.comboBoxSearchModel)
 			.subscribe((res: any) => {
 				this.comboBoxSearchResultModel = res;
 				const result = (this.comboBoxSearchResultModel.results || []);
@@ -272,41 +268,6 @@ export class ArchitectureGraphComponent implements OnInit {
 		return dataItem.text;
 	}
 
-	public onSelectionChange(value: any): void {
-		console.log('selection changed: ', value);
-	}
-
-	/**
-	 * Filter is being executed on Server and Client Side
-	 * @param filter
-	 */
-	public onFilterChange(filter: any): void {
-		this.currentAssetFilterText = '';
-
-		if (filter !== '') {
-			this.initSearchModel();
-			this.comboBoxSearchModel.currentPage = 1;
-			this.comboBoxSearchModel.query = filter;
-			this.getNewResultSet();
-		} else if (!filter) {
-			this.initSearchModel();
-			this.loadAssetsForDropDown();
-		}
-	}
-
-	/**
-	 * Populate the Datasource with a new Complete Set
-	 */
-	private getNewResultSet(): void {
-		this.architectureGraphService.getAssetsForArchitectureGraphWithSearch(this.comboBoxSearchModel.query).subscribe((res: ComboBoxSearchResultModel) => {
-			this.comboBoxSearchResultModel = res;
-			this.datasource = this.comboBoxSearchResultModel.results;
-			if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
-				this.calculateLastElementShow();
-			}
-		});
-	}
-
 	/**
 	 * Keep listening if the element show is the last one
 	 * @returns {any}
@@ -370,26 +331,6 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	/**
-	 * On Open we emit the value if the parents needs to implements something
-	 * but we call the resource on the Rest to get the list of values.
-	 */
-	public onOpen(): void {
-		// At open the first time, we need to get the list of items to show based on the selected element
-		if (this.reloadOnOpen || this.firstChange || !this.comboBoxSearchModel) {
-			this.firstChange = false;
-			this.datasource = [];
-			const queryId = this.comboBoxSearchModel.query && this.comboBoxSearchModel.query['id'] || null;
-			if (!queryId) {
-				this.initSearchModel();
-			}
-			this.loadAssetsForDropDown();
-		} else {
-			this.loadAssetsForDropDown();
-			this.calculateLastElementShow();
-		}
-	}
-
-	/**
 	 * Add the item to the datasource if this parameter doesn't exists on collection
 	 * @param model Item to add
 	 */
@@ -408,11 +349,6 @@ export class ArchitectureGraphComponent implements OnInit {
 			this.showControlPanel = !this.showControlPanel;
 		}
 		this.showLegend = !this.showLegend;
-	}
-
-	onAssetFilterChange(value: string) {
-		this.currentAssetFilterText = value;
-		this.loadAssetsForDropDown();
 	}
 
 	/**

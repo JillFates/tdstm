@@ -3,6 +3,8 @@ import {Observable} from 'rxjs';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {IArchitectureGraphAsset, IAssetType} from '../../assetExplorer/model/architecture-graph-asset.model';
 import {ArchitectreGraphAssetPreference} from '../../assetExplorer/model/architectre-graph-asset-preference.model';
+import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
+import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 
 @Injectable({
 	providedIn: 'root'
@@ -90,32 +92,20 @@ export class ArchitectureGraphService {
 			.catch((error: any) => error);
 	}
 
-	getAssetsForArchitectureGraph(q: string, value, max: number, 	page: number, assetClassOption = 'ALL') {
-		let params;
-		params = new HttpParams()
-			.set('q', q)
-			.set('value', value)
-			.set('max', String(max))
-			.set('page', String(page))
-			.set('assetClassOption', assetClassOption);
-		return this.http.get(`${this.ARCHITECTURE_ASSET_SELECT}`, {params})
+	// todo promote to share
+	getAssetsForArchitectureGraph(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`${ this.ARCHITECTURE_ASSET_SELECT}?q=${ searchParams.query }
+		&value=${ searchParams.value || '' }
+		&max=${ searchParams.maxPage }
+		&page=${ searchParams.currentPage }
+		&assetClassOption=${ searchParams.metaParam }`)
 			.map((response: any) => {
-				return response;
-			})
-			.catch((error: any) => error);
-	}
-
-	getAssetsForArchitectureGraphWithSearch(q) {
-		let params;
-		params = new HttpParams()
-			.set('q', '')
-			.set('value', '')
-			.set('max', '25')
-			.set('page', '1')
-			.set('assetClassOption', q.id || 'ALL');
-		return this.http.get(`${this.ARCHITECTURE_ASSET_SELECT}`, {params})
-			.map((response: any) => {
-				return response;
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.results,
+					total: response.total,
+					page: response.page
+				};
+				return comboBoxSearchResultModel;
 			})
 			.catch((error: any) => error);
 	}
