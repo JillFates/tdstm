@@ -106,7 +106,7 @@
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
-				class="page-height task-grid"
+				class="page-height narrow-rows"
 				[ngClass]="{'hide-filter': !isFiltering}"
 				[data]="grid.gridData"
 				[skip]="grid.state.skip"
@@ -297,11 +297,9 @@
 						*ngIf="column.property === 'taskNumber'"
 						let-dataItem
 					>
-						<span
-							class="is-grid-link"
-							(click)="onOpenTaskDetailHandler(dataItem)"
-						>{{ dataItem.taskNumber }}</span
-						>
+						<span (click)="onOpenTaskDetailHandler(dataItem)">
+							{{ dataItem.taskNumber }}
+						</span>
 					</ng-template>
 
 					<!-- asset name -->
