@@ -19,6 +19,7 @@ import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
 import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
@@ -41,19 +42,22 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 
-	ApplicationService    applicationService
-	AssetEntityService    assetEntityService
-	AssetService          assetService
-	CommentService        commentService
-	TaskService           taskService
-	ControllerService     controllerService
-	DatabaseService       databaseService
-	DeviceService         deviceService
-	MoveBundleService     moveBundleService
-	PageRenderer          groovyPageRenderer
-	ProgressService       progressService
-	Scheduler             quartzScheduler
-	StorageService        storageService
+
+	ApplicationService applicationService
+	AssetEntityService assetEntityService
+	AssetService       assetService
+	CommentService     commentService
+	TaskService        taskService
+	ControllerService  controllerService
+	DatabaseService    databaseService
+	DeviceService      deviceService
+	MoveBundleService  moveBundleService
+	PageRenderer       groovyPageRenderer
+	ProgressService    progressService
+	Scheduler          quartzScheduler
+	StorageService     storageService
+
+	CustomDomainService customDomainService
 	UserPreferenceService userPreferenceService
 
 	/**
@@ -379,7 +383,16 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def getDefaultCreateModel(String assetClass) {
-		renderAsJson( assetService.getCreateModel(getProjectForWs(), assetClass) )
+		Project project = projectForWs
+		Map model = assetService.getCreateModel(getProjectForWs(), assetClass)
+
+		// Add the custom field specs to the model
+		model.put('customs', assetEntityService.getCustomFieldsSettings(project, assetClass, true) )
+
+		// Add the standardFieldASpecs to the model
+		assetService.addFieldSpecsToCrudModel(project, assetClass, model)
+
+		renderAsJson( model )
 	}
 
 	/**
