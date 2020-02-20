@@ -18,6 +18,7 @@ import {
 } from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 
 declare var jQuery: any;
 
@@ -122,11 +123,12 @@ export class ArchitectureGraphComponent implements OnInit {
 		private userContextService: UserContextService,
 		private activatedRoute: ActivatedRoute,
 		private architectureGraphService: ArchitectureGraphService,
+		private assetExplorerService: AssetExplorerService,
 		private sanitized: DomSanitizer,
 		private preferenceService: PreferenceService
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
-		this.getAssetList = this.architectureGraphService.getAssetsForArchitectureGraph.bind(this.architectureGraphService);
+		this.getAssetList = this.assetExplorerService.getAssetListForComboBox.bind(this.assetExplorerService);
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
 
@@ -160,9 +162,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Loads assets for dropdown when you are scrolling on the list
 	 */
 	loadAssetsForDropDown() {
-		const queryId = this.comboBoxSearchModel.query && this.comboBoxSearchModel.query['id'] || 'ALL';
-		this.architectureGraphService
-			.getAssetsForArchitectureGraph(this.comboBoxSearchModel)
+		this.assetExplorerService.getAssetListForComboBox(this.comboBoxSearchModel)
 			.subscribe((res: any) => {
 				this.comboBoxSearchResultModel = res;
 				const result = (this.comboBoxSearchResultModel.results || []);

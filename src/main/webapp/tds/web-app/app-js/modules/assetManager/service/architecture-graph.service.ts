@@ -3,8 +3,6 @@ import {Observable} from 'rxjs';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {IArchitectureGraphAsset, IAssetType} from '../../assetExplorer/model/architecture-graph-asset.model';
 import {ArchitectreGraphAssetPreference} from '../../assetExplorer/model/architectre-graph-asset-preference.model';
-import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
-import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 
 @Injectable({
 	providedIn: 'root'
@@ -14,8 +12,6 @@ export class ArchitectureGraphService {
 	private readonly ASSET_DETAILS = `${ this.baseURL }/`;
 	private readonly GRAPH_PREFERENCES = `${this.baseURL}/preferences/`;
 	private readonly ARCHITECTURE_GRAPH_DATA = `${this.baseURL}`;
-	private readonly ARCHITECTURE_GRAPH_LEGEND = `${this.baseURL}/legend/`;
-	private readonly  ARCHITECTURE_ASSET_SELECT = '/tdstm/assetEntity/assetListForSelect2';
 
 	constructor(
 		private http: HttpClient
@@ -88,24 +84,6 @@ export class ArchitectureGraphService {
 		return this.http.get(`${this.ARCHITECTURE_GRAPH_DATA}`, {params})
 			.map((response: any) => {
 				return response;
-			})
-			.catch((error: any) => error);
-	}
-
-	// todo promote to share
-	getAssetsForArchitectureGraph(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
-		return this.http.get(`${ this.ARCHITECTURE_ASSET_SELECT}?q=${ searchParams.query }
-		&value=${ searchParams.value || '' }
-		&max=${ searchParams.maxPage }
-		&page=${ searchParams.currentPage }
-		&assetClassOption=${ searchParams.metaParam }`)
-			.map((response: any) => {
-				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
-					result: response.results,
-					total: response.total,
-					page: response.page
-				};
-				return comboBoxSearchResultModel;
 			})
 			.catch((error: any) => error);
 	}
