@@ -14,15 +14,13 @@ import modules.PlanningMenuModule
 class MenuPage extends Page {
 
     static at = {
-        waitFor(5){menuModule.displayed}
+        waitFor(30){menuModule.displayed}
     }
 
     static content = {
-        waitFor{adminModule.displayed}
-        menuModule { module MenuModule}
-        adminModule { module AdminModule}
-        waitFor{projectsModule.displayed}
-        projectsModule { module ProjectsMenuModule}
+        menuModule (wait: true){ module MenuModule}
+        adminModule (wait: true) { module AdminModule}
+        projectsModule (wait: true){ module ProjectsMenuModule}
         assetsModule { module AssetsMenuModule}
         tasksModule { module TasksMenuModule}
         planningModule { module PlanningMenuModule}

@@ -11,7 +11,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 /**
  * This class sweeps over the Projects Menu.
@@ -25,7 +25,7 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
     static testCount
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

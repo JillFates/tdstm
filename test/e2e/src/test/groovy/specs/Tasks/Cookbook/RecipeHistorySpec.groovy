@@ -17,7 +17,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class RecipeHistorySpec extends GebReportingSpec {
@@ -66,7 +66,7 @@ class RecipeHistorySpec extends GebReportingSpec {
     ]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

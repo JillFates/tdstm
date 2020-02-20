@@ -384,7 +384,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	goFullScreen() {
-		console.log('go full screen');
+		this.graph.showFullGraph();
 	}
 
 	toggleLegend() {
@@ -447,6 +447,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
+		this.graph.showFullGraphBtn = false;
 		this.loadData();
 	}
 
@@ -475,8 +476,11 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.getArchitectureGraphPreferences();
 	}
 
-	goBackToNormalGraph() {
-		console.log('go back to normal');
+	onDiagramAnimationFinished() {
+		this.graph.showFullGraphBtn = false;
 	}
 
+	viewFullGraphFromCache() {
+		this.graph.showFullGraphBtn = false;
+	}
 }

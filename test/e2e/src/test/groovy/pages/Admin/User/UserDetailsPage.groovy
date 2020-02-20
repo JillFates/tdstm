@@ -26,8 +26,8 @@ class UserDetailsPage extends Page {
         userCompany {$(".value")[0].text()}
         userName {$(".value")[2].text()}
         email {$(".value")[3].text()}
-        createdDate {$(".value")[18].text()}
-        lastModified {$(".value")[19].text()}
+        createdDate {$(".value")[19].text()}
+        lastModified {$(".value")[20].text()}
         lockedOutUntil {$("div", class:"ng-scope").find("tbody").find("tr")[9].find("td", "nowrap":"nowrap")}
         unlockUserLoginUsername {$("#unlockUserDialog").find("ul").find("li")[0]}
         unlockUserLoginConfirmBtn {$(class:"ui-dialog-buttonset").find("button")[0]}
@@ -54,7 +54,7 @@ class UserDetailsPage extends Page {
             }
             assert success, "$data was not found in the details page."
         }
-        assert createdDate== lastModified, "Created and Last Modified date did not match"
+        assert createdDate == lastModified, "Created and Last Modified date did not match"
         true
     }
 

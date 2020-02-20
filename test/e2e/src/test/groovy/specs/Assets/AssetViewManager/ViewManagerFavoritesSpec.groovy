@@ -9,7 +9,7 @@ import pages.Assets.AssetViews.ViewPage
 import pages.Assets.AssetViewManager.SaveViewPage
 import utils.CommonActions
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Ignore
 class ViewManagerFavoritesSpec extends GebReportingSpec {
@@ -25,7 +25,7 @@ class ViewManagerFavoritesSpec extends GebReportingSpec {
 
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

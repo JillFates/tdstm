@@ -10,7 +10,7 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import pages.Projects.Providers.ProvidersPage
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class ProviderCreationSpec extends GebReportingSpec{
@@ -26,7 +26,7 @@ class ProviderCreationSpec extends GebReportingSpec{
 
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
