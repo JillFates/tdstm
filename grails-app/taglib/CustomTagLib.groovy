@@ -367,13 +367,15 @@ class CustomTagLib implements InitializingBean {
 
 		Map licenseInfo = licenseAdminService.licenseInfo(securityService.getUserCurrentProject())
 
+
+		out <<	'<div class="clr-col-4 clr-align-content-center legacy-licensing-banner-message-container">'
 		if(licenseInfo.banner) {
 			out << """
-				<div class="clr-col-4 clr-align-content-center legacy-licensing-banner-message-container">
 				<div class="legacy-licensing-banner-message breadcrumb-${crumbs.size}">
 					<div class="callout">${licenseInfo.banner}</div>
-				</div></div>"""
+				</div>"""
 		}
+        out << '</div>'
 
 		out << '<div class="clr-col-4 clr-align-content-center legacy-breadcrumb-container"><ol class="legacy-breadcrumb">'
 			crumbs.each {
