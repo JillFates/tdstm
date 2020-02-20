@@ -14,7 +14,7 @@ import { Component, Input } from '@angular/core';
 				</span>
 				{{ displayLabel ? value : '' }}
 			</span>
-			<span *ngSwitchDefault>{{ value }}</span>
+			<span *ngSwitchDefault [title]="value">{{ value }}</span>
 		</span>
 	`,
 })

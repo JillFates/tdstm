@@ -290,7 +290,6 @@
 							<label>{{ column.label }}</label>
 						</div>
 					</ng-template>
-
 					<!-- task Number -->
 					<ng-template
 						kendoGridCellTemplate
@@ -301,7 +300,6 @@
 							{{ dataItem.taskNumber }}
 						</span>
 					</ng-template>
-
 					<!-- asset name -->
 					<ng-template
 						kendoGridCellTemplate
@@ -312,6 +310,7 @@
 						let-dataItem
 					>
 						<span
+							[title]="dataItem[column.property]"
 							class="is-grid-link"
 							(click)="onOpenAssetDetailHandler(dataItem)"
 						>{{ dataItem[column.property] }}</span
@@ -329,12 +328,11 @@
 							</div>
 						</div>
 					</ng-template>
-
+					<!-- default -->
 					<ng-template
 						kendoGridCellTemplate
 						*ngIf="column.type !== 'action'"
-						let-dataItem
-					>
+						let-dataItem>
 						<tds-task-status-indicator
 							[propertyName]="column.property"
 							[value]="dataItem[column.property]"
