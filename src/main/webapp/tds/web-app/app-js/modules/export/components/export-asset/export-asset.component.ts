@@ -1,56 +1,58 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 // Services
-import {ExportAssetService} from '../../service/export-asset.service';
-import {NotifierService} from '../../../../shared/services/notifier.service';
+import { ExportAssetService } from '../../service/export-asset.service';
+import { NotifierService } from '../../../../shared/services/notifier.service';
 // Models
-import {ExportAssetModel} from '../../model/export-asset.model';
-import {UserContextModel} from '../../../auth/model/user-context.model';
+import { ExportAssetModel } from '../../model/export-asset.model';
+import { UserContextModel } from '../../../auth/model/user-context.model';
 // Pipes
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 // Others
-import {Store} from '@ngxs/store';
-import {saveAs} from 'file-saver';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import { Store } from '@ngxs/store';
+import { saveAs } from 'file-saver';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'tds-asset-export',
 	templateUrl: 'export-asset.component.html',
-	styles: []
+	styles: [],
 })
 export class ExportAssetComponent implements OnInit {
 	protected gridColumns: any[];
 	public selectedAll = false;
-	private userPreferences = [];
-	private selectedBundles = ['useForPlanning'];
-	private errorMessage = '';
-	private opened = false;
-	private title = '';
-	private progress_value = 0;
+	protected userPreferences = [];
+	protected selectedBundles = ['useForPlanning'];
+	protected errorMessage = '';
+	protected opened = false;
+	protected title = '';
+	protected progress_value = 0;
 	private userContext: UserContextModel;
 	public exportAssetsData: ExportAssetModel = new ExportAssetModel();
 
 	constructor(
 		private exportService: ExportAssetService,
-		private translatePipe: TranslatePipe,
+		protected translatePipe: TranslatePipe,
 		private store: Store,
 		protected dialogService: UIDialogService,
-		private notifierService: NotifierService) {
-	}
+		private notifierService: NotifierService
+	) {}
 
 	/**
 	 * onInit retrieve the information for displaying all the bundles and filling up
 	 * the users preference to item to export
 	 */
 	ngOnInit() {
-		this.exportService.getExportAssetsData().subscribe( (res: any) => {
+		this.exportService.getExportAssetsData().subscribe((res: any) => {
 			this.exportAssetsData = res;
 			this.updateUserPreferencesModel();
 		});
 
-		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-			this.userContext = userContext;
-		});
+		this.store
+			.select(state => state.TDSApp.userContext)
+			.subscribe((userContext: UserContextModel) => {
+				this.userContext = userContext;
+			});
 	}
 
 	/**
@@ -58,21 +60,68 @@ export class ExportAssetComponent implements OnInit {
 	 */
 	updateUserPreferencesModel(): void {
 		this.userPreferences = [
-			{preference: 'ImportApplication', selected: this.exportAssetsData.userPreferences['ImportApplication'] === 'true'},
-			{preference: 'ImportServer', selected: this.exportAssetsData.userPreferences['ImportServer'] === 'true'},
-			{preference: 'ImportDatabase', selected: this.exportAssetsData.userPreferences['ImportDatabase'] === 'true'},
-			{preference: 'ImportStorage', selected: this.exportAssetsData.userPreferences['ImportStorage'] === 'true'},
-			{preference: 'ImportRoom', selected: this.exportAssetsData.userPreferences['ImportRoom'] === 'true'},
-			{preference: 'ImportRack', selected: this.exportAssetsData.userPreferences['ImportRack'] === 'true'},
-			{preference: 'ImportDependency', selected: this.exportAssetsData.userPreferences['ImportDependency'] === 'true'},
-			{preference: 'ImportCabling', selected: this.exportAssetsData.userPreferences['ImportCabling'] === 'true'},
-			{preference: 'ImportComment', selected: this.exportAssetsData.userPreferences['ImportComment'] === 'true'}
+			{
+				preference: 'ImportApplication',
+				selected:
+					this.exportAssetsData.userPreferences[
+						'ImportApplication'
+					] === 'true',
+			},
+			{
+				preference: 'ImportServer',
+				selected:
+					this.exportAssetsData.userPreferences['ImportServer'] ===
+					'true',
+			},
+			{
+				preference: 'ImportDatabase',
+				selected:
+					this.exportAssetsData.userPreferences['ImportDatabase'] ===
+					'true',
+			},
+			{
+				preference: 'ImportStorage',
+				selected:
+					this.exportAssetsData.userPreferences['ImportStorage'] ===
+					'true',
+			},
+			{
+				preference: 'ImportRoom',
+				selected:
+					this.exportAssetsData.userPreferences['ImportRoom'] ===
+					'true',
+			},
+			{
+				preference: 'ImportRack',
+				selected:
+					this.exportAssetsData.userPreferences['ImportRack'] ===
+					'true',
+			},
+			{
+				preference: 'ImportDependency',
+				selected:
+					this.exportAssetsData.userPreferences[
+						'ImportDependency'
+					] === 'true',
+			},
+			{
+				preference: 'ImportCabling',
+				selected:
+					this.exportAssetsData.userPreferences['ImportCabling'] ===
+					'true',
+			},
+			{
+				preference: 'ImportComment',
+				selected:
+					this.exportAssetsData.userPreferences['ImportComment'] ===
+					'true',
+			},
 		];
 	}
 
 	/**
 	 * Used for select/deselect all items on checkbox list
-	*/
+	 */
 	selectAll(): void {
 		this.selectedAll = !this.selectedAll;
 		this.userPreferences.forEach((el, index) => {
@@ -83,9 +132,9 @@ export class ExportAssetComponent implements OnInit {
 	/**
 	 * If the user selects all checkboxes this function checks if all
 	 * are marked to activate All Items checkbox
-	*/
+	 */
 	checkIfAllSelected(): boolean {
-		let totalSelected =  0;
+		let totalSelected = 0;
 		this.userPreferences.forEach((el, index) => {
 			if (this.userPreferences[index].selected) {
 				totalSelected++;
@@ -100,30 +149,41 @@ export class ExportAssetComponent implements OnInit {
 	 * Added validation to make sure at least one bundle is selected
 	 */
 	exportData(): void {
+		this.progress_value = 0;
 		if (this.selectedBundles.length === 0) {
-			this.errorMessage = this.translatePipe.transform('ASSET_EXPORT.BUNDLE_ERROR');
+			this.errorMessage = this.translatePipe.transform(
+				'ASSET_EXPORT.BUNDLE_ERROR'
+			);
 		} else {
 			let data = {
 				projectIdExport: this.userContext.project.id,
 				dataTransferSet: 1,
 				application: 'application',
 				asset: 'asset',
-				exportFormat: 'xlsx'
+				exportFormat: 'xlsx',
 			};
 			this.userPreferences.reduce((map, obj) => {
 				data[obj.preference] = obj.selected;
 				return map;
 			}, {});
 
-			if (this.selectedBundles.find(el => {return el === 'All'})) {
+			if (
+				this.selectedBundles.find(el => {
+					return el === 'All';
+				})
+			) {
 				data['bundle'] = 'All';
-			} else if (this.selectedBundles.find(el => {return el === 'useForPlanning'})) {
+			} else if (
+				this.selectedBundles.find(el => {
+					return el === 'useForPlanning';
+				})
+			) {
 				data['bundle'] = 'useForPlanning';
 			} else {
 				data['bundle'] = this.selectedBundles;
 			}
 			this.disableGlobalAnimation(true);
-			this.exportService.downloadBundleFile(data).subscribe( res => {
+			this.exportService.downloadBundleFile(data).subscribe(res => {
 				this.opened = true;
 				if (res['key']) {
 					this.pollUntilTaskFinished(res['key']);
@@ -138,20 +198,27 @@ export class ExportAssetComponent implements OnInit {
 	 * to 100 % ready
 	 */
 	async pollUntilTaskFinished(taskId) {
-		this.exportService.getProgress(taskId).subscribe(( progress) => {
-			this.progress_value = progress['percentComp'];
-			this.title = progress['status'];
-			if ( this.progress_value < 100) {
-				setTimeout(() => this.pollUntilTaskFinished(taskId), 1000);
-			} else {
-				saveAs(this.exportService.getBundleFile(taskId), progress['data'].header.split('=')[1]);
-				this.opened = false;
+		this.exportService.getProgress(taskId).subscribe(
+			progress => {
+				console.log(progress);
+				this.progress_value = progress['percentComp'];
+				this.title = progress['status'];
+				if (this.progress_value < 100) {
+					setTimeout(() => this.pollUntilTaskFinished(taskId), 1000);
+				} else {
+					saveAs(
+						this.exportService.getBundleFile(taskId),
+						progress['data'].header.split('=')[1]
+					);
+					this.opened = false;
+					this.disableGlobalAnimation(false);
+				}
+			},
+			error => {
+				console.log(error);
 				this.disableGlobalAnimation(false);
 			}
-		}, error => {
-			console.log(error);
-			this.disableGlobalAnimation(false);
-		});
+		);
 	}
 
 	/**
@@ -168,7 +235,7 @@ export class ExportAssetComponent implements OnInit {
 	private disableGlobalAnimation(disabled: boolean): void {
 		this.notifierService.broadcast({
 			name: 'notificationDisableProgress',
-			disabled: disabled
+			disabled: disabled,
 		});
 	}
 }

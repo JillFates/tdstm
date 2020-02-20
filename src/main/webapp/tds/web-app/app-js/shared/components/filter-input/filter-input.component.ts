@@ -5,7 +5,6 @@
  * just until the bounce time has expired or the user press the ENTER key.
  * The goal is to improve the performance of grids with a low of rows
  */
-
 import {
 	Component,
 	ElementRef,
@@ -13,41 +12,101 @@ import {
 	Input,
 	NgZone,
 	OnDestroy,
-	OnInit,
+	AfterViewInit,
 	Output,
 	SimpleChanges,
 	ViewChild,
 } from '@angular/core';
-
-import {KEYSTROKE, SEARCH_QUITE_PERIOD} from '../../model/constants';
+import { KEYSTROKE, SEARCH_QUITE_PERIOD } from '../../model/constants';
+import { BooleanFilterData, GridColumnModel } from '../../model/data-list-grid.model';
 
 @Component({
 	selector: 'tds-filter-input',
 	template: `
-		<div class="tds-filter-input">
-			<input type="text"
-				#filterInput
-				[name]="name"
-				[value]="value"
-				[placeholder]="placeholder"
-				input-paste (onPaste)="onPaste($event)"
-				class="form-control">
-			<span *ngIf="filterInput.value"
+		<div class="tds-filter-input" [ngSwitch]="columnType">
+			<!-- number -->
+			<input *ngSwitchCase="'number'"
+						 clrInput
+						 #filterInput
+						 type="number"
+						 class="text-filter"
+						 [name]="name"
+						 [value]="value"
+						 (change)="onFilter($event.target.value)"
+						 [placeholder]="placeholder ? placeholder : 'GLOBAL.FILTER' | translate"
+						 input-paste
+						 (onPaste)="onPaste($event)"/>
+
+			<!-- date -->
+			<kendo-datepicker *ngSwitchCase="'date'"
+												#filterInput
+												[format]="dateFormat"
+												[ngClass]="{'is-filtered': value}"
+												[value]="value"
+												(valueChange)="onFilter($event)"
+												[style.width.%]="value ? 80 : 100">
+			</kendo-datepicker>
+
+			<!-- datetime -->
+			<kendo-datepicker *ngSwitchCase="'datetime'"
+												#filterInput
+												[format]="dateFormat"
+												[ngClass]="{'is-filtered': value}"
+												[value]="value"
+												(valueChange)="onFilter($event)"
+												[style.width.%]="value ? 80 : 100">
+			</kendo-datepicker>
+
+			<!-- boolean -->
+			<kendo-dropdownlist *ngSwitchCase="'boolean'"
+													#filterInput
+													[data]="booleanFilterData"
+													[value]="value"
+													(valueChange)="onFilter($event)"
+													[style.width.%]="value ? 70 : 100">
+			</kendo-dropdownlist>
+
+			<!-- Text as well the default if not provided -->
+			<input *ngSwitchDefault
+						 clrInput
+						 #filterInput
+						 type="text"
+						 class="text-filter"
+						 [name]="name"
+						 [value]="value"
+						 [placeholder]="placeholder ? placeholder : 'GLOBAL.FILTER' | translate"
+						 input-paste
+						 (onPaste)="onPaste($event)"/>
+
+			<!-- Clear filter button -->
+			<tds-button
+				*ngIf="value || value === false"
 				(click)="onClearFilter()"
-				[title]="'GLOBAL.CLEAR_FILTER' | translate"
-				class="clear-filter fa fa-times form-control-feedback component-action-clear-filter"
-				aria-hidden="true">
-			</span>
+				[title]="'Clear Filter'"
+				icon="times-circle"
+				[small]="true"
+				[flat]="true"
+			>
+			</tds-button>
 		</div>
-	`
+
+	`,
 })
-export class TDSFilterInputComponent implements OnInit, OnDestroy {
+/**
+ * TODO: dontiveros - This was already implemented on the component library as "<tds-grid-filter-input/>". We can remove this component later.
+ * @Deprecated: This was already implemented on the component library as "<tds-grid-filter-input/>". We can remove this component later.
+ */
+export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	@Input() name = '';
 	@Input() placeholder = '';
-	@Input() value = ' ';
-	@Output() filter: EventEmitter<string> = new EventEmitter<string>();
-	@ViewChild('filterInput') filterInput: ElementRef;
-
+	@Input() value: String | Date | boolean = '';
+	@Input() columnType: string;
+	@Input() dateFormat = '';
+	@Input() column: GridColumnModel;
+	@Output() filter: EventEmitter<string | Date | boolean> = new EventEmitter<string | Date | boolean>();
+	@ViewChild('filterInput', { read: ElementRef, static: false })
+	filterInput: ElementRef;
+	public booleanFilterData = BooleanFilterData;
 	private previousSearch = '';
 	private typingTimeout = null;
 	private readonly NOT_ALLOWED_CHAR_REGEX = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -55,49 +114,111 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	constructor(private zone: NgZone) {
 	}
 
-	ngOnInit() {
+	ngAfterViewInit(): void {
 		/* The handler to react on keyup event for the search input
-		 * is running outside of the angular zone in order to don't trigger
-		 * the angular change detection process on every key stroked
-		*/
-		this.zone.runOutsideAngular(() => {
-			this.filterInput.nativeElement
-				.addEventListener('keyup', this.keyPressedListener.bind(this));
-		});
+	 	* is running outside of the angular zone in order to don't trigger
+	 	* the angular change detection process on every key stroked
+	 	*/
+		if (this.isFilterInputAvailable()) {
+			this.zone.runOutsideAngular(() => {
+				this.filterInput.nativeElement.addEventListener(
+					'keyup',
+					this.keyPressedListener.bind(this)
+				);
+			});
+		}
 	}
 
-	/**
-	 * Event handler to be attached to the listener input keypress event of the search input
-	 * @param {KeyboardEvent} keyEvent - Key press event info
-	*/
-	private keyPressedListener(keyEvent: KeyboardEvent): void {
-		this.onFilterKeyUp(keyEvent, this.filterInput.nativeElement.value);
+	ngOnInit() {
+		if (this.value === undefined) {
+			this.value = '';
+		}
 	}
 
 	/**
 	 * On input changes update the value of the input control
 	 * @param {SimpleChanges} changes - Object with the input properties updated bye the host component
-	*/
+	 */
 	ngOnChanges(changes: SimpleChanges) {
 		if (changes.value) {
-			this.filterInput.nativeElement.value = changes.value.currentValue;
+			if (this.isFilterInputAvailable()) {
+				this.filterInput.nativeElement.value = changes.value.currentValue;
+			}
+			// if (changes.value.currentValue.columnType) {
+			// 	console.log(`Current: ${this.columnType}  New: ${changes.value.currentValue.columnType}`);
+			// }
 		}
 	}
 
 	/**
 	 * On destroying the component remove the event listener associated
-	*/
+	 */
 	ngOnDestroy() {
-		this.filterInput.nativeElement.removeEventListener('keyup', this.keyPressedListener.bind(this));
+		if (this.isFilterInputAvailable()) {
+			this.filterInput.nativeElement.removeEventListener(
+				'keyup',
+				this.keyPressedListener.bind(this)
+			);
+		}
 	}
 
 	/**
 	 * Clear the entered search string and notify to the host component
-	*/
+	 */
 	public onClearFilter(): void {
-		this.filterInput.nativeElement.value = '';
+		if (this.isFilterInputAvailable()) {
+			this.filterInput.nativeElement.value = null;
+		}
 		this.previousSearch = '';
-		this.onFilter('');
+		this.onFilter(null);
+	}
+
+	/**
+	 * Notify to the host component about a new search entered
+	 * @param {string} search - Current search value
+	 */
+	public onFilter(search: string | Date | boolean): void {
+		/* Here the search is done so the notification to the host component is made
+			within the angular zone in order to update the UI
+		*/
+		this.zone.run(() => this.filter.emit(search));
+	}
+
+	/**
+	 * Handle the onPaste event of the input-paste directive
+	 * Notify to the host component about a new search, validate previousSearch is different
+	 * from new one
+	 * @param {string} search - Current search value
+	 */
+	public onPaste(search: string): void {
+		if (this.isFilterInputAvailable()) {
+			this.filterInput.nativeElement.value = search;
+			if (this.preventFilterSearch(search)) {
+				return; // prevent search
+			}
+			clearTimeout(this.typingTimeout);
+			this.typingTimeout = setTimeout(
+				() => this.onFilter(search),
+				SEARCH_QUITE_PERIOD
+			);
+		}
+	}
+
+	/**
+	 * Determines if the current filter is available
+	 */
+	private isFilterInputAvailable(): boolean {
+		return !!this.filterInput;
+	}
+
+	/**
+	 * Event handler to be attached to the listener input keypress event of the search input
+	 * @param {KeyboardEvent} keyEvent - Key press event info
+	 */
+	private keyPressedListener(keyEvent: KeyboardEvent): void {
+		if (this.isFilterInputAvailable()) {
+			this.onFilterKeyUp(keyEvent, this.filterInput.nativeElement.value);
+		}
 	}
 
 	/**
@@ -105,25 +226,13 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * Otherwise point the previous search to the new one search string
 	 * @param {string} search - Current search value
 	 * @return {boolean}  Boolean indicating if search is cancelled
-	*/
+	 */
 	private preventFilterSearch(search: string): boolean {
 		if (this.previousSearch === search) {
 			return true;
 		}
-
 		this.previousSearch = search;
 		return false;
-	}
-
-	/**
-	 * Notify to the host component about a new search entered
-	 * @param {string} search - Current search value
-	*/
-	private onFilter(search: string): void {
-		/* Here the search is done so the notification to the host component is made
-			within the angular zone in order to update the UI
-		*/
-		this.zone.run(() => this.filter.emit(search));
 	}
 
 	/**
@@ -133,35 +242,21 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * it ignores the input of special characters
 	 * @param {KeyboardEvent} keyEvent - Key press event info
 	 * @param {string} search - Current search value
-	*/
+	 */
 	private onFilterKeyUp(keyEvent: KeyboardEvent, search: string): void {
-		if (this.preventFilterSearch(search)) {
-			return; // prevent search
+		if (this.isFilterInputAvailable()) {
+			if (this.preventFilterSearch(search)) {
+				return; // prevent search
+			}
+			if (keyEvent.code === KEYSTROKE.ENTER) {
+				this.onFilter(search);
+			} else if (!this.NOT_ALLOWED_CHAR_REGEX.test(keyEvent.code)) {
+				clearTimeout(this.typingTimeout);
+				this.typingTimeout = setTimeout(
+					() => this.onFilter(search),
+					SEARCH_QUITE_PERIOD
+				);
+			}
 		}
-
-		if (keyEvent.code === KEYSTROKE.ENTER) {
-			this.onFilter(search);
-		} else if (!this.NOT_ALLOWED_CHAR_REGEX.test(keyEvent.code)) {
-			clearTimeout(this.typingTimeout);
-			this.typingTimeout = setTimeout(
-				() => this.onFilter(search), SEARCH_QUITE_PERIOD
-			);
-		}
-	}
-
-	/**
-	 * Handle the onPaste event of the input-paste directive
-	 * Notify to the host component about a new search, validate previousSearch is different
-	 * from new one
-	 * @param {string} search - Current search value
-	*/
-	public onPaste(search: string): void {
-		this.filterInput.nativeElement.value = search;
-
-		if ( this.preventFilterSearch(search)) {
-			return; // prevent search
-		}
-		clearTimeout(this.typingTimeout);
-		this.typingTimeout = setTimeout(() => this.onFilter(search), SEARCH_QUITE_PERIOD);
 	}
 }

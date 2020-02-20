@@ -646,7 +646,7 @@ class CommentService implements ServiceMethods {
 			a long. */
 		taskDepId = NumberUtil.toLong(taskDepId)
 		def taskDependency = TaskDependency.get(taskDepId)
-		if (taskDependency && taskDependency.predecessor.id != Long.parseLong(depId)) {
+		if (taskDependency && taskDependency.predecessor.id != NumberUtil.toLong(depId)) {
 			taskDependency.predecessor = dependent
 			taskDependency.assetComment = task
         } else if( !taskDependency ) {
@@ -903,5 +903,17 @@ class CommentService implements ServiceMethods {
 				isPublished == true
 			}
 		}.list()
+	}
+
+	/**
+	 *
+	 *  Counts All tasks by an assetEntity.
+	 *
+	 *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.COMMENT
+	 *
+	 * @param assetEntity The asset to look up the count of tasks for.
+	 */
+	def countByAssetEntity(AssetEntity assetEntity) {
+		AssetComment.countByAssetEntityAndCommentType(assetEntity, AssetCommentType.COMMENT)
 	}
 }

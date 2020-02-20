@@ -10,13 +10,14 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.imports.ImportBatchService
 import spock.lang.Specification
+import test.helper.ImportBatchTestHelper
 
 @Integration
 @Rollback
 class ImportBatchServiceIntegrationTests extends Specification {
 
 	ImportBatchTestHelper importBatchTestHelper
-	ProjectTestHelper projectTestHelper
+	ProjectTestHelper     projectTestHelper
 
 	ImportBatchService importBatchService
 

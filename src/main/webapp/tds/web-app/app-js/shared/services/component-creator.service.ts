@@ -2,7 +2,7 @@
  * Component Creator allow you to create component dynamically and/or add to a specific view.
  */
 import {Injectable, Injector, ComponentRef, ComponentFactoryResolver, ReflectiveInjector, ViewContainerRef} from '@angular/core';
-import {ComponentFactory} from '@angular/core/src/linker/component_factory';
+import {ComponentFactory} from '@angular/core';
 
 @Injectable()
 export class ComponentCreatorService {

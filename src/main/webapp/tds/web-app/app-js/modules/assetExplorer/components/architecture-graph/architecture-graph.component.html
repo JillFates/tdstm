@@ -1,0 +1,132 @@
+<div class="graphContainer">
+	<div id="toolsContainerId">
+		<div id="graphToolbarId">
+			<tds-button (click)="toggleControlPanel()">{{'ARCHITECTURE.CONTROL_PANEL' | translate}}</tds-button>
+			<tds-button (click)="toggleLegend()">{{'ARCHITECTURE.LEGEND' | translate}}</tds-button>
+			<tds-button (click)="goFullScreen()">{{'ARCHITECTURE.FULLSCREEN' | translate}}</tds-button>
+		</div>
+	</div>
+	<div class="graph-control-panel graphPanel" id="controlPanelId" *ngIf="showControlPanel">
+		<p>{{'ARCHITECTURE.SELECT_AN_ASSET' | translate}}</p>
+		<kendo-combobox #innerComboBox
+						[data]="datasource"
+						[(ngModel)]="assetItem"
+						[textField]="'text'"
+						[valueField]="'id'"
+						[placeholder]="'Please Select'"
+						[filterable]="true"
+						[title]="'title empty'"
+						(valueChange)="onAssetSelected($event)"
+						(selectionChange)="onSelectionChange($event)"
+						(filterChange)="onFilterChange($event)"
+						(open)="onOpen()"
+						[suggest]="true"
+						name="assetSelectionDropdown"
+						style="width: 100%;">
+			<ng-template kendoComboBoxItemTemplate let-dataItem>
+				<span [innerHTML]="comboBoxInnerSearch(dataItem)"></span>
+			</ng-template>
+			<ng-template kendoComboBoxFooterTemplate>
+				<span #dropdownFooter></span>
+			</ng-template>
+		</kendo-combobox>
+
+		<p>{{'ARCHITECTURE.FILTER_LABELS' | translate}}</p>
+		<kendo-dropdownlist
+			[defaultItem]="'Filter: All Classes'"
+			[data]="dataForSelect"
+			[textField]="'value'"
+			[valueField]="'id'"
+			(valueChange)="onAssetFilterChange($event)"
+			style="width: 100%;"
+		>
+		</kendo-dropdownlist>
+		<div class="tiers-above">
+			<tds-button icon="minus-circle" (click)="extractLevelsUp()"></tds-button>
+			<label>{{levelsUp}}</label>
+			<tds-button icon="plus-circle" (click)="addLevelsUp()" class="add-level-up-graph"></tds-button>
+			<label>{{'ARCHITECTURE.TIERS_ABOVE' | translate}}</label>
+		</div>
+		<div class="tiers-below">
+			<tds-button icon="minus-circle" (click)="extractLevelsDown()"></tds-button>
+			<label>{{levelsDown}}</label>
+			<tds-button icon="plus-circle" (click)="addLevelsDown()" class="add-level-up-graph"></tds-button>
+			<label>{{'ARCHITECTURE.TIERS_BELOW' | translate}}</label>
+		</div>
+		<div class="graph-checkbox">
+			<clr-checkbox-wrapper>
+				<input
+					clrCheckbox
+					type="checkbox"
+					name="showCyclesOnGraph"
+					id="showCyclesOnGraph"
+					class="k-checkbox"
+					[checked]="showCycles"
+					(change)="toggleShowCycles()">
+				<label for="showCyclesOnGraph" class="k-checkbox-label">{{'ARCHITECTURE.SHOW_CYCLICAL_REFERENCE' | translate}}</label>
+			</clr-checkbox-wrapper>
+		</div>
+
+		<div class="labels">
+			<label>{{'ARCHITECTURE.SHOW_LABELS' | translate}}</label>
+			<tds-button icon="{{showLabels ? 'minus' : 'plus'}}" title="{{showLabels ? 'Hide Labels' : 'Show Labels'}}" (click)="toggleShowLabels()" class="add-level-up-graph"></tds-button>
+			<div class="label-items" *ngIf="showLabels">
+				<div class="graph-checkbox" *ngFor="let label of graphLabels; let i = index">
+					<clr-checkbox-wrapper>
+						<input
+							clrCheckbox
+							type="checkbox"
+							class="k-checkbox"
+							[id]="label.value"
+							[name]="label.value"
+							[checked]="label.checked"
+							(change)="updateGraphLabels(i)"
+						>
+						<label class="k-checkbox-label" [for]="label.value">
+							<img height="16px" src="/tdstm/assets/icons/svg/{{label.icon}}_menu.svg" width="16px">
+							{{label.label}}
+						</label>
+					</clr-checkbox-wrapper>
+				</div>
+			</div>
+		</div>
+<!--		<div class="graph-spacing">-->
+<!--			<label>{{'ARCHITECTURE.SPACING' | translate}}</label>-->
+<!--			<tds-button icon="zoom-out" title="Zoom Out" (click)="zoomGraphOut()" class="add-level-up-graph"></tds-button>-->
+<!--			<tds-button icon="zoom-in" title="Zoom In" (click)="zoomGraphIn()"></tds-button>-->
+<!--		</div>-->
+		<div class="graph-commands">
+			<div class="graph-command">
+				<tds-button [className]="'btn-block'" (click)="regenerateGraph()">{{'ARCHITECTURE.REGENERATE_GRAPH' | translate}}</tds-button>
+			</div>
+			<div class="graph-command">
+				<tds-button [className]="'btn-block'" (click)="savePreferences()">{{'ARCHITECTURE.SAVE_PREFERENCES' | translate}}</tds-button>
+			</div>
+			<div class="graph-command">
+				<tds-button [className]="'btn-block'" (click)="resetDefaults()">{{'ARCHITECTURE.RESET_DEFAULTS' | translate}}</tds-button>
+			</div>
+		</div>
+	</div>
+
+	<div class="graph-control-panel graphPanel legendPanel" id="legendPanelId" *ngIf="showLegend">
+		<p>{{'ARCHITECTURE.ASSET_CLASSES' | translate}}</p>
+		<div class="graph-checkbox" *ngFor="let label of graphLabels; let i = index">
+			<label class="k-checkbox-label" [for]="label.value">
+				<img height="16px" src="/tdstm/assets/icons/svg/{{label.icon}}_menu.svg" width="16px">
+				{{label.label}}
+			</label>
+		</div>
+<!--		<p>Dependencies: </p>-->
+
+	</div>
+
+	<div class="container architecture-graph-container">
+		<tds-lib-diagram-layout
+			[data]="data$ | async"
+			[layout]="diagramLayout$ | async"
+			[contextMenuOptions]="ctxOpts"
+			[hideExpand]="true"
+            #graph
+		></tds-lib-diagram-layout>
+	</div>
+</div>

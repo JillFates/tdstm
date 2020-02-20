@@ -198,6 +198,14 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/task/saveTask" {
+			controller = "wsTask"
+			action = [
+			        PUT: 'saveTask',
+					POST: 'saveTask'
+			]
+		}
+
 
 		'/ws/bulkChange' {
 			controller = 'wsBulkAssetChange'
@@ -326,6 +334,10 @@ class UrlMappings {
 		"/ws/dashboard/getPlanningStats" {
 			controller = "wsDashboard"
 			action = [GET:"getDataForPlanningDashboard"]
+		}
+
+		"/ws/dashboard/insight/$action" {
+			controller = "WsInsight"
 		}
 
 		"/ws/cookbook/recipe/list" {
@@ -1590,6 +1602,28 @@ class UrlMappings {
                     POST: "generateProjectMetrics"
             ]
         }
+
+		"/ws/architectureGraph/" {
+			controller = "wsArchitectureGraph"
+			action = [
+				GET: "architectureGraph"
+			]
+		}
+
+		"/ws/architectureGraph/$action" {
+			controller = "wsArchitectureGraph"
+		}
+
+		"/ws/dependencyConsole/" {
+			controller = "wsDependencyConsole"
+			action = [
+				GET: "dependencyConsole"
+			]
+		}
+
+		"/ws/dependencyConsole/$action" {
+			controller = "wsDependencyConsole"
+		}
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

@@ -9,10 +9,10 @@ import {Permission} from '../../../../shared/model/permission.model';
 @Component({
 	selector: 'asset-explorer-view-save',
 	template: `
-        <div class="modal-content asset-explorer-view-save-component">
+        <div class="tds-modal-content asset-explorer-view-save-component has-side-nav">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
+                    <clr-icon aria-hidden="true" shape="close"></clr-icon>
                 </button>
                 <h4 class="modal-title">Save List View</h4>
             </div>
@@ -29,39 +29,62 @@ import {Permission} from '../../../../shared/model/permission.model';
                             </div>
                         </div>
                         <div class="form-group">
-                            <div *ngIf="isSystemCreatePermitted()" class="checkbox" style="padding-left:160px;">
-                                <label>
-                                    <input type="checkbox" name="isSystem" [(ngModel)]="model.isSystem" (change)="onIsSystemChange()"> {{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}
-                                </label>
-                            </div>
-                            <div class="checkbox" style="padding-left:160px;">
-                                <label [ngClass]="{'disabled-input' : model.isSystem}">
-                                    <input type="checkbox" [disabled]="model.isSystem" name="shared" [(ngModel)]="model.isShared">
-                                    <span>{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}</span>
-                                </label>
-                            </div>
+													<div class="col-sm-9 col-sm-offset-3">
+														<div *ngIf="isSystemCreatePermitted()" class="checkbox">
+															<clr-checkbox-wrapper class="inline">
+																<input clrCheckbox type="checkbox"
+																			 [name]="'isSystem'"
+																			 (change)="onIsSystemChange()"
+																			 [(ngModel)]="model.isSystem">
+																<label class="clr-control-label inline">
+																	{{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}
+																</label>
+															</clr-checkbox-wrapper>
+														</div>
+														<div class="checkbox" >
+															<clr-checkbox-wrapper class="inline">
+																<input clrCheckbox type="checkbox"
+																			 [name]="'shared'"
+																			 [disabled]="model.isSystem"
+																			 [(ngModel)]="model.isShared">
+																<label class="clr-control-label inline" [ngClass]="{'disabled-input' : model.isSystem}">
+																	{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}
+																</label>
+															</clr-checkbox-wrapper>
+														</div>
+													</div>
                         </div>
                         <div class="form-group">
-                            <div class="checkbox" style="padding-left:160px;" (click)="onFavorite()">
-                                <i class="fa fa-star-o text-yellow" style="margin-left: -43px;padding:0 10px 10px 10px;font-size: 20px;top:2px;left:28px;position:relative"
-                                   [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
-                                <label style="margin-left:5px">
-                                    <input type="checkbox" name="favorite" style="visibility:hidden"> {{ 'GLOBAL.ADD_FAVORITES' | translate }}</label>
-                            </div>
+													<div class="col-sm-9 col-sm-offset-3">
+														<div class="checkbox favorite inline"
+																 (click)="onFavorite()">
+															<i class="fa fa-star-o text-yellow"
+																 [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
+															<label (click)="onFavorite()">
+																<input type="checkbox"
+																			 name="favorite"
+																			 style="visibility:hidden"
+																			 (click)="onFavorite()">
+																{{ 'GLOBAL.ADD_FAVORITES' | translate }}
+															</label>
+														</div>
+													</div>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer form-group-center">
-                <tds-button-save
-                        class="btn-primary pull-left"
+            <div class="modal-sidenav btn-link">
+				<tds-button
+					icon="floppy"
                         (click)="confirmCloseDialog()"
-                        [disabled]="!isValid()">
-                </tds-button-save>
-                <tds-button-cancel
-                        (click)="cancelCloseDialog()"
-                        class="pull-right">
-                </tds-button-cancel>
+                        [disabled]="!isValid()" title="Save">Save
+                </tds-button>
+                <tds-button
+					icon="ban"
+						(click)="cancelCloseDialog()"
+						title="Cancel"
+                        >Cancel
+                </tds-button>
             </div>
         </div>
 	`
@@ -130,13 +153,13 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.model.isFavorite) {
 			this.model.isFavorite = false;
 			if (this.model.id) {
-				const reportIndex = this.favorites.items.findIndex(x => x.id === this.model.id);
+				const reportIndex = this.favorites.views.findIndex(x => x.id === this.model.id);
 				if (reportIndex !== -1) {
-					this.favorites.items.splice(reportIndex, 1);
+					this.favorites.views.splice(reportIndex, 1);
 				}
 			}
 		} else {
-			if (this.assetExpService.hasMaximumFavorites(this.favorites.items.length + 1)) {
+			if (this.assetExpService.hasMaximumFavorites(this.favorites.views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'

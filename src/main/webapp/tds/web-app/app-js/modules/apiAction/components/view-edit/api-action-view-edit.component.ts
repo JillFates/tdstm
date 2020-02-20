@@ -1,3 +1,4 @@
+// Angular
 import {
 	Component,
 	ElementRef,
@@ -8,7 +9,8 @@ import {
 	ViewChild,
 	ViewChildren
 } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import {NgForm} from '@angular/forms';
+// Model
 import {
 	APIActionModel,
 	APIActionParameterColumnModel,
@@ -17,27 +19,31 @@ import {
 	EventReaction,
 	Languages
 } from '../../model/api-action.model';
-import { ProviderModel } from '../../../provider/model/provider.model';
-import { Permission } from '../../../../shared/model/permission.model';
-import { APIActionService } from '../../service/api-action.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { ActionType, COLUMN_MIN_WIDTH } from '../../../../shared/model/data-list-grid.model';
-import { INTERVAL, INTERVALS, KEYSTROKE } from '../../../../shared/model/constants';
-import { AgentMethodModel, CredentialModel, DictionaryModel } from '../../model/agent.model';
-import { DataScriptModel } from '../../../dataScript/model/data-script.model';
-import { NgForm } from '@angular/forms';
-import { CustomDomainService } from '../../../fieldSettings/service/custom-domain.service';
-import { ObjectUtils } from '../../../../shared/utils/object.utils';
-import { SortUtils } from '../../../../shared/utils/sort.utils';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
+import {ProviderModel} from '../../../provider/model/provider.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
+import {INTERVAL, INTERVALS, KEYSTROKE} from '../../../../shared/model/constants';
+import {AgentMethodModel, CredentialModel, DictionaryModel} from '../../model/agent.model';
+import {DataScriptModel} from '../../../dataScript/model/data-script.model';
+import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+// Component
+import {ApiActionViewEditReactionsComponent} from './api-action-view-edit-reactions.component';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+// Service
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {APIActionService} from '../../service/api-action.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
 import * as R from 'ramda';
-import { forkJoin, Observable, ReplaySubject } from 'rxjs';
-import { CHECK_ACTION } from '../../../../shared/components/check-action/model/check-action.model';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { takeUntil } from 'rxjs/operators';
-import { ApiActionViewEditReactionsComponent } from './api-action-view-edit-reactions.component';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 
@@ -53,38 +59,41 @@ enum NavigationTab {
 	selector: 'api-action-view-edit',
 	templateUrl: 'api-action-view-edit.component.html',
 	styles: [`
-      .has-error, .has-error:focus {
-          border: 1px #f00 solid;
-      }
+        .has-error, .has-error:focus {
+            border: 1px #f00 solid;
+        }
 
-      .invalid-form {
-          color: red;
-          font-weight: bold;
-      }
+        .invalid-form {
+            color: red;
+            font-weight: bold;
+        }
 
-      .script-error {
-          margin-bottom: 18px;
-      }
+        .script-error {
+            margin-bottom: 18px;
+        }
 
-      label.url-label {
-          width: 146px;
-      }
+        label.url-label {
+            width: 146px;
+        }
 
-      .url-input {
-          width: 82%;
-      }
+        .url-input {
+            width: 82%;
+        }
 	`]
 })
-export class APIActionViewEditComponent implements OnInit, OnDestroy {
+export class APIActionViewEditComponent extends Dialog implements OnInit, OnDestroy {
+	@Input() data: any;
+
 	// Forms
-	@ViewChild('apiActionForm') apiActionForm: NgForm;
-	@ViewChild('scriptForm') scriptForm: NgForm;
-	@ViewChild('simpleInfoForm') simpleInfoForm: NgForm;
-	@ViewChild('httpAPIForm') httpAPIForm: NgForm;
-	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
+	@ViewChild('apiActionForm', {static: false}) apiActionForm: NgForm;
+	@ViewChild('scriptForm', {static: false}) scriptForm: NgForm;
+	@ViewChild('simpleInfoForm', {static: false}) simpleInfoForm: NgForm;
+	@ViewChild('httpAPIForm', {static: false}) httpAPIForm: NgForm;
+	@ViewChild('apiActionParametersForm', {static: false}) apiActionParametersForm: NgForm;
+	@ViewChild('apiActionReactionForm', {static: false}) apiActionReactionForm: NgForm;
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
-	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
-	@ViewChild('apiActionViewEditReactionsComponent') apiActionViewEditReactionsComponent: ApiActionViewEditReactionsComponent;
+	@ViewChild('apiActionContainer', {static: false}) apiActionContainer: ElementRef;
+	@ViewChild('apiActionViewEditReactionsComponent', {static: false}) apiActionViewEditReactionsComponent: ApiActionViewEditReactionsComponent;
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';
@@ -99,7 +108,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	public providerDatascriptList = new Array<DataScriptModel>();
 	public parameterList: Array<any>;
 	public apiActionParameterColumnModel = new APIActionParameterColumnModel();
-	public modalTitle: string;
 	public editModeFromView = false;
 	public dataScriptMode = APIActionModel;
 	public actionTypes = ActionType;
@@ -108,16 +116,17 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	private requiredFields = ['name', 'provider', 'actionType'];
 	private intervals = INTERVALS;
 	public interval = INTERVAL;
-	public selectedInterval = { value: 0, interval: '' };
-	public selectedLapsed = { value: 0, interval: '' };
-	public selectedStalled = { value: 0, interval: '' };
+	public selectedInterval = {value: 0, interval: ''};
+	public selectedLapsed = {value: 0, interval: ''};
+	public selectedStalled = {value: 0, interval: ''};
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public PLEASE_SELECT = null;
 	public commonFieldSpecs;
 	protected actionTypesList = [];
-	protected  remoteCredentials = [];
+	protected remoteCredentials = [];
 	protected defaultItem = {id: '', value: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')};
 	public SUPPLIED_CREDENTIAL = 'SUPPLIED';
+	public modalType = ActionType.VIEW;
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -161,13 +170,14 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		uId: '0',
 		dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
+	disableRemoteInvocationCbx = true;
 	private savedApiAction = false;
-	private defaultDictionaryModel = { name: '', id: 0 };
+	private defaultDictionaryModel = {name: '', id: 0};
 	protected EnumAPIActionType = APIActionType;
 	protected formValidStates = {
-		simpleInfoForm: { isConfiguredValidators: false },
-		httpAPIForm: { isConfiguredValidators: false },
-		scriptForm: { isConfiguredValidators: false },
+		simpleInfoForm: {isConfiguredValidators: false},
+		httpAPIForm: {isConfiguredValidators: false},
+		scriptForm: {isConfiguredValidators: false},
 	};
 	protected hasEarlyAccessTMRPermission = false;
 	loadingLists = true;
@@ -175,29 +185,68 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	isApiActionParametersFormValid = true;
 
 	constructor(
-		public originalModel: APIActionModel,
-		public modalType: ActionType,
-		public promptService: UIPromptService,
+		public dialogService: DialogService,
 		public permissionService: PermissionService,
-		public activeDialog: UIActiveDialogService,
-		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
 		private customDomainService: CustomDomainService,
 		private translatePipe: TranslatePipe) {
-		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
-		this.getModalTitle();
+		super();
 	}
 
 	ngOnInit(): void {
-		// Sub Objects are not being created, just copy
-		this.apiActionModel = R.clone(this.originalModel);
+		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
+		this.apiActionModel = R.clone(this.data.apiActionModel);
+		this.modalType = this.data.actionType;
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
+			active: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.changeToEditApiAction.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
+			disabled: () => !this.canSave(),
+			type: DialogButtonType.ACTION,
+			action: this.onSaveApiAction.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.modalType !== this.actionTypes.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.onDeleteApiAction.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEditDialog.bind(this)
+		});
+
 		// set the default empty values for dictionary in case it is not defined
 		if (!this.apiActionModel.dictionary) {
 			this.apiActionModel.dictionary = this.defaultDictionaryModel;
 		}
-		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
-		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
-		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
+		this.selectedInterval = R.clone(this.data.apiActionModel.polling.frequency);
+		this.selectedLapsed = R.clone(this.data.apiActionModel.polling.lapsedAfter);
+		this.selectedStalled = R.clone(this.data.apiActionModel.polling.stalledAfter);
 		this.apiActionModel.script = this.apiActionModel.script || '';
 		this.apiActionModel.isRemote = this.isRemote();
 
@@ -212,14 +261,20 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			this.apiActionService.getAPIActionEnums(),
 			this.customDomainService.getCommonFieldSpecsWithShared()
 		)
-		.pipe(takeUntil(this.unsubscribeOnDestroy$))
-		.subscribe({
-			next: result => {
-				this.getProviders(result[0]);
-				this.getAgents(result[1]);
-				this.getCommonFieldSpecs(result[2]);
-			},
-			complete: () => this.prepareFormListener(),
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe({
+				next: result => {
+					this.getProviders(result[0]);
+					this.getAgents(result[1]);
+					this.getCommonFieldSpecs(result[2]);
+				},
+				complete: () => {
+					this.prepareFormListener();
+				},
+			});
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle(this.modalType));
 		});
 	}
 
@@ -234,8 +289,25 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		this.unsubscribeOnDestroy$.complete();
 	}
 
-	private getModalTitle(): void {
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Action Create' : (this.modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail');
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ActionType} modalType
+	 * @returns {string}
+	 */
+	private getModalTitle(modalType: ActionType): string {
+		// Every time we change the title, it means we switched to View, Edit or Create
+		setTimeout(() => {
+			// This ensure the UI has loaded since Kendo can change the signature of an object
+			this.dataSignature = JSON.stringify(this.apiActionModel);
+		}, 800);
+
+		let modalTitle = '';
+		if (modalType === ActionType.CREATE) {
+			modalTitle = 'Action Create';
+		} else {
+			modalTitle = modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail';
+		}
+		return modalTitle + ((this.apiActionModel && this.apiActionModel.name) ? ' ' + this.apiActionModel.name : '');
 	}
 
 	/**
@@ -252,8 +324,8 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 				this.apiActionForm.valueChanges
 					.pipe(takeUntil(this.unsubscribeOnDestroy$))
 					.subscribe(val => {
-					this.verifyIsValidForm();
-				});
+						this.verifyIsValidForm();
+					});
 			}
 			this.verifyIsValidForm();
 			this.dataSignature = JSON.stringify(this.apiActionModel);
@@ -265,7 +337,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	getProviders(result): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.providerList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+			this.providerList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 			this.apiActionModel.provider = this.providerList[0];
 			this.modifySignatureByProperty('provider');
 		}
@@ -278,7 +350,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	getAgents(result: any): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.dictionaryList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+			this.dictionaryList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 			this.apiActionModel.dictionary = this.dictionaryList[0];
 			this.modifySignatureByProperty('dictionary');
 		}
@@ -286,7 +358,10 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.uId) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
-			this.agentMethodList.push({ uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+			this.agentMethodList.push({
+				uId: '0',
+				dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
+			});
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 			this.modifySignatureByProperty('agentMethod');
 		}
@@ -299,17 +374,17 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			this.actionTypesList = [];
 			const keys = Object.keys(result.data.actionTypes);
 			keys.forEach((key: string) => {
-				this.actionTypesList.push({ id: key, name: result.data.actionTypes[key] });
+				this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
 			});
 			if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
-				this.apiActionModel.actionType = { id: this.WEB_API };
+				this.apiActionModel.actionType = {id: this.WEB_API};
 			}
 		}
 		if (result && result.data.remoteCredentialMethods) {
 			this.remoteCredentials = [];
 			const keys = Object.keys(result.data.remoteCredentialMethods);
 			keys.forEach((key: string) => {
-				this.remoteCredentials.push({ id: key, value: result.data.remoteCredentialMethods[key] });
+				this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
 			});
 		}
 	}
@@ -321,17 +396,20 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		this.apiActionService.getCredentials()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
-			(result: any) => {
-				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
-					this.agentCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
-					this.apiActionModel.credential = this.agentCredentialList[0];
-					this.modifySignatureByProperty('credential');
-				}
-				this.agentCredentialList.push(...result);
-				// Important this should be at this point the last call of ALL loading lists since now we forkJoin all.
-				this.getDataScripts();
-			},
-			(err) => console.log(err));
+				(result: any) => {
+					if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
+						this.agentCredentialList.push({
+							id: 0,
+							name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
+						});
+						this.apiActionModel.credential = this.agentCredentialList[0];
+						this.modifySignatureByProperty('credential');
+					}
+					this.agentCredentialList.push(...result);
+					// Important this should be at this point the last call of ALL loading lists since now we forkJoin all.
+					this.getDataScripts();
+				},
+				(err) => console.log(err));
 	}
 
 	/**
@@ -341,22 +419,25 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		this.apiActionService.getDataScripts()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
-			(result) => {
-				if (this.modalType === ActionType.CREATE) {
-					this.datascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
-					this.apiActionModel.defaultDataScript = this.datascriptList[0];
-					this.modifySignatureByProperty('defaultDataScript');
-				}
-				if (result.length > 0) {
-					result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
-					this.datascriptList.push(...result);
-					if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
-						this.onProviderValueChange(this.apiActionModel.provider, true);
+				(result) => {
+					if (this.modalType === ActionType.CREATE) {
+						this.datascriptList.push({
+							id: 0,
+							name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
+						});
+						this.apiActionModel.defaultDataScript = this.datascriptList[0];
+						this.modifySignatureByProperty('defaultDataScript');
 					}
-				}
-				this.loadingLists = false;
-			},
-			(err) => console.log(err));
+					if (result.length > 0) {
+						result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
+						this.datascriptList.push(...result);
+						if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
+							this.onProviderValueChange(this.apiActionModel.provider, true);
+						}
+					}
+					this.loadingLists = false;
+				},
+				(err) => console.log(err));
 	}
 
 	/**
@@ -394,15 +475,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 				(result: any) => {
 					if (result) {
-						this.savedApiAction = true;
-						this.modalType = this.actionTypes.VIEW;
-						this.getModalTitle();
-						this.apiActionModel.id = result.id;
-						this.apiActionModel.version = result.version;
-						this.apiActionModel.actionType = result.actionType;
-						this.apiActionModel.dictionaryMethodName = result.dictionaryMethodName;
-						this.dataSignature = JSON.stringify(this.apiActionModel);
-						this.dataParameterListSignature = JSON.stringify(this.parameterList);
+						super.onAcceptSuccess(result);
 					}
 				},
 				(err) => console.log(err));
@@ -448,26 +521,56 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	public cancelCloseDialog(): void {
+	public cancelEditDialog(): void {
 		// Prevent exit if everything hasn't been loaded yet.
 		if (this.loadingLists) {
 			return;
 		}
 		if ((this.isDirty() || this.isParameterListDirty()) && this.modalType !== this.actionTypes.VIEW) {
-			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.close(this.savedApiAction ? this.apiActionModel : null);
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
+						// Put back original model
+						this.apiActionModel = JSON.parse(this.dataSignature);
+						this.dataSignature = JSON.stringify(this.apiActionModel);
+						this.modalType = this.actionTypes.VIEW;
+						this.setTitle(this.getModalTitle(this.modalType));
 					} else {
-						this.focusForm();
+						this.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.activeDialog.close(this.savedApiAction ? this.apiActionModel : null);
+			if (!this.data.openFromList) {
+				this.modalType = this.actionTypes.VIEW;
+				this.setTitle(this.getModalTitle(this.modalType));
+			} else {
+				this.onCancelClose();
+			}
+		}
+	}
+
+	/**
+	 * Close the Dialog but first it verify is not Dirty
+	 */
+	public cancelCloseDialog(): void {
+		if (this.isDirty()) {
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
+				)
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
+					}
+				});
+		} else {
+			super.onCancelClose();
 		}
 	}
 
@@ -487,9 +590,8 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
-		this.getModalTitle();
+		this.setTitle(this.getModalTitle(this.modalType));
 		this.verifyIsValidForm();
-		this.focusForm();
 	}
 
 	/**
@@ -497,16 +599,24 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onDeleteApiAction(): void {
-		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.apiActionService.deleteAPIAction(this.apiActionModel.id)
-						.pipe(takeUntil(this.unsubscribeOnDestroy$))
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'
+			),
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION'
+			)
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.apiActionService
+						.deleteAPIAction(this.apiActionModel.id)
 						.subscribe(
-						(result) => {
-							this.activeDialog.dismiss(result);
-						},
-						(err) => console.log(err));
+							result => {
+								this.onCancelClose(result);
+							},
+							err => console.log(err)
+						);
 				}
 			});
 	}
@@ -561,18 +671,19 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	/**
 	 * Disables codemirrors on the current tab if not in edit state
 	 */
-	private disableCodeMirrors () {
+	private disableCodeMirrors() {
 		this.codeMirrorComponents.changes
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((comps: QueryList<CodeMirrorComponent>) => {
-			comps.forEach((child) => {
-				this.codeMirrorComponent = child;
-				setTimeout(() => {
-					child.setDisabled(this.modalType === ActionType.VIEW);
-				}, 100);
+				comps.forEach((child) => {
+					this.codeMirrorComponent = child;
+					setTimeout(() => {
+						child.setDisabled(this.modalType === ActionType.VIEW);
+					}, 100);
+				});
 			});
-		});
 	}
+
 	/**
 	 * Determine if the tab is enabled
 	 * @param num
@@ -608,13 +719,15 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 * @param dictionaryModel
 	 */
 	onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
-		dictionaryModel = dictionaryModel ?  dictionaryModel : this.defaultDictionaryModel;
+		dictionaryModel = dictionaryModel ? dictionaryModel : this.defaultDictionaryModel;
 		this.apiActionModel.dictionary = dictionaryModel;
 
 		if (this.modalType === this.actionTypes.EDIT && this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
-			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
-				.then((res) => {
-					this.loadDictionaryModel(dictionaryModel, res);
+			this.dialogService.confirm(
+				'Confirmation Required',
+				'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?')
+				.subscribe((data: any) => {
+					this.loadDictionaryModel(dictionaryModel, data.confirm === DialogConfirmAction.CONFIRM);
 				});
 		} else {
 			this.loadDictionaryModel(dictionaryModel, true);
@@ -627,26 +740,32 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 				this.apiActionService.getActionMethodById(dictionaryModel.id)
 					.pipe(takeUntil(this.unsubscribeOnDestroy$))
 					.subscribe(
-					(result: any) => {
-						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
-						if (this.apiActionModel.agentMethod) {
-							this.apiActionModel.agentMethod = result.find((agent) => {
-								return (agent.id + agent.name) === this.apiActionModel.agentMethod.uId;
+						(result: any) => {
+							this.agentMethodList = new Array<AgentMethodModel>();
+							this.agentMethodList.push({
+								uId: '0',
+								dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 							});
-						}
+							if (this.apiActionModel.agentMethod) {
+								this.apiActionModel.agentMethod = result.find((agent) => {
+									return (agent.id + agent.name) === this.apiActionModel.agentMethod.uId;
+								});
+							}
 
-						if (!this.apiActionModel.agentMethod) {
-							this.apiActionModel.agentMethod = this.agentMethodList[0];
-						}
+							if (!this.apiActionModel.agentMethod) {
+								this.apiActionModel.agentMethod = this.agentMethodList[0];
+							}
 
-						this.modifySignatureByProperty('agentMethod');
-						this.agentMethodList = result;
-					},
-					(err) => console.log(err));
+							this.modifySignatureByProperty('agentMethod');
+							this.agentMethodList = result;
+						},
+						(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+				this.agentMethodList.push({
+					uId: '0',
+					dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
+				});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedDictionaryModel) {
@@ -668,9 +787,12 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	onMethodValueChange(event: any): void {
 		if (this.modalType === this.actionTypes.EDIT && this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
-			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
-				.then((res) => {
-					this.loadAgentMethodModel(res);
+			this.dialogService.confirm(
+				'Confirmation Required',
+				'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?'
+			)
+				.subscribe((data: any) => {
+					this.loadAgentMethodModel(data.confirm === DialogConfirmAction.CONFIRM);
 				});
 		} else {
 			this.loadAgentMethodModel(true);
@@ -790,11 +912,11 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected onProviderValueChange(providerModel: ProviderModel, previousValue: boolean): void {
 		// Populate only the Credentials that are related to the provider
 		this.providerCredentialList = new Array<CredentialModel>();
-		this.providerCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+		this.providerCredentialList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 		this.providerCredentialList = this.providerCredentialList.concat(this.agentCredentialList.filter((credential) => (credential.provider) && credential.provider.id === providerModel.id));
 		// Populate only the DataScripts that are related to the provider
 		this.providerDatascriptList = new Array<DataScriptModel>();
-		this.providerDatascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+		this.providerDatascriptList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
 		if (previousValue) {
 			this.apiActionModel.defaultDataScript = this.providerDatascriptList.find((datascript) => datascript.id === this.apiActionModel.defaultDataScript.id);
@@ -880,10 +1002,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		return this.modalType === this.actionTypes.VIEW;
 	}
 
-	private focusForm() {
-		this.apiActionContainer.nativeElement.focus();
-	}
-
 	canSave(): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
 		if (this.hasEarlyAccessTMRPermission && actionTypeId === this.WEB_API) {
@@ -911,7 +1029,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		this.apiActionModel.isRemote = this.isRemote();
 
 		// on create api action, set the default value for is remote action
-		if (this.modalType === ActionType.CREATE ) {
+		if (this.modalType === ActionType.CREATE) {
 			APIActionModel.createBasicReactions(this.apiActionModel, type.id === this.WEB_API);
 			if (this.apiActionModel.isRemote) {
 				this.setSelectEventReaction('ERROR', true);
@@ -921,20 +1039,20 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	getClonedCodeMirrorSettings(properties: any): any {
-		const cloned =  Object.assign({}, this.codeMirror, properties);
+		const cloned = Object.assign({}, this.codeMirror, properties);
 		return cloned;
 	}
 
 	/**
 	 * Based on the action type determines if the invocation is remote
-	*/
+	 */
 	isRemote(): boolean {
 		return Boolean(this.apiActionModel.actionType && this.apiActionModel.actionType.id !== this.WEB_API);
 	}
 
 	/**
 	 * Determine if the current credential type selected is Supplied by Transition Manager
-	*/
+	 */
 	isSuppliedCredential(): boolean {
 		const id = R.pathOr('', ['remoteCredentialMethod', 'id'], this.apiActionModel);
 
@@ -943,7 +1061,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Get a specific event reaction searching by type and set its selected property
-	*/
+	 */
 	setSelectEventReaction(type: string, selected: boolean): void {
 		const evenReaction = this.apiActionModel.eventReactions.find((item: EventReaction) => item.type === type);
 		if (evenReaction) {
@@ -958,9 +1076,16 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		return (this.apiActionModel && this.apiActionModel.defaultDataScript && this.apiActionModel.defaultDataScript.name) || '';
 	}
 
-	onParametersFormChange(event: {parameterList: Array<any>, isFormValid: boolean}): void {
+	onParametersFormChange(event: { parameterList: Array<any>, isFormValid: boolean }): void {
 		this.isApiActionParametersFormValid = event.isFormValid;
 		this.parameterList = this.parameterList;
 		this.verifyIsValidForm();
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

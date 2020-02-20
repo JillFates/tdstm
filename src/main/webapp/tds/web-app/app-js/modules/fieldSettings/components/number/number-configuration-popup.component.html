@@ -3,9 +3,9 @@
         margin-top: 10px;
     }
 </style>
-<div class="modal-content selectlist-configuration-popup" tds-handle-escape (escPressed)="cancelCloseDialog()">
+<div class="tds-modal-content selectlist-configuration-popup" tds-handle-escape (escPressed)="cancelCloseDialog()">
     <div class="modal-header">
-        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><clr-icon aria-hidden="true" shape="close"></clr-icon></button>
         <h4 class="modal-title">Number Configuration - {{field.field}}</h4>
     </div>
     <div class="modal-body">

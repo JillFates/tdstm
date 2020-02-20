@@ -1,0 +1,551 @@
+$side-nav-icon-size: 18px;
+
+tds-ui-dialog {
+  #tdsUiDialog {
+    padding: 0 !important;
+    margin: 0;
+
+    .modal-header {
+      .minimized-arch-thumbnail {
+        border: 1px solid #ddd;
+        float: right;
+        width: 100%;
+        max-width: 350px;
+        height: 125px;
+      }
+    }
+
+    .modal-dialog {
+      &.modal-xxl {
+        background: $color-text-inverse;
+        position: fixed !important;
+        top: 56px !important;
+        left: 35px !important;
+        right: 35px !important;
+        bottom: 48px !important;
+        overflow: hidden !important;
+        width: unset !important;
+
+        .modal-body {
+          &.asset-crud {
+            margin-right: 20px;
+            padding: 15px 20px 0 22px;
+          }
+
+          &.has-description {
+            max-height: calc(100vh - 300px);
+          }
+
+          &.no-description {
+            max-height: calc(100vh - 255px);
+          }
+
+          .show-hide-link {
+            float: right;
+            font-size: 12px;
+            font-weight: 500;
+          }
+
+          .source-target-wrapper {
+            flex-grow: 1;
+            margin: 5px 0;
+
+            .header-label {
+              width: 100%;
+              margin-bottom: 5px;
+              padding: 0 8px;
+              font-size: 14px;
+            }
+          }
+
+          .grid-form {
+            display: grid;
+            grid-template-columns: 49% 49%;
+            column-gap: 2%;
+
+            .k-input {
+              font-size: 14px;
+            }
+
+            .clr-form-control {
+              display: flex;
+              flex-direction: unset;
+              -webkit-box-orient: unset;
+              margin-top: unset;
+              align-items: unset;
+              -webkit-box-align: unset;
+              -webkit-box-direction: unset;
+
+              label {
+                max-width: unset;
+                margin-bottom: unset;
+                min-width: 150px;
+                width: 150px;
+                padding: 0 8px;
+                font-size: 14px;
+              }
+
+              .clr-checkbox-wrapper {
+                .clr-control-label {
+                  min-width: unset;
+                  width: unset;
+                }
+              }
+
+              .clr-input {
+                font-size: 14px;
+                flex-grow: 1;
+              }
+
+              .clr-input-wrapper {
+                max-height: unset;
+              }
+
+              clr-input-container {
+                &.clr-form-control {
+                  display: block;
+                  flex-grow: 1;
+                  margin-top: unset;
+
+                  .clr-control-container {
+                    width: 100%;
+
+                    .clr-input {
+                      width: 100%;
+                    }
+                  }
+                }
+              }
+
+              .ng-star-inserted,
+              tds-combobox,
+              tds-combobox-group {
+                flex-grow: 1;
+              }
+
+              tds-date-control,
+              tds-number-control {
+                display: block;
+                flex-grow: 1;
+
+                .k-datepicker {
+                  width: unset;
+                }
+              }
+
+              .combo-group .k-widget.k-combobox,
+              .k-combobox {
+                width: unset;
+              }
+
+              kendo-dropdownlist.k-dropdown {
+                flex-grow: 1;
+                align-self: flex-end;
+              }
+            }
+
+            .truck-input-container {
+              display: flex;
+              flex-grow: 1;
+
+              .clr-form-control {
+                + .clr-form-control {
+                  margin-left: 10px;
+                }
+              }
+            }
+
+            &.three-column {
+              grid-template-columns: 32% 32% 32%;
+            }
+          }
+
+          .tdr-detail-list {
+            tbody {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: space-between;
+
+              &.one-column {
+                width: 100%;
+
+                tr,
+                .source-target-wrapper {
+                  width: 100%;
+                }
+              }
+
+              &.two-column {
+                width: 100%;
+
+                tr,
+                .source-target-wrapper {
+                  width: 49%;
+
+                  tr {
+                    width: 100%;
+                  }
+                }
+
+                .source-target-wrapper {
+                  + .source-target-wrapper {
+                    margin-left: 2%;
+                  }
+                }
+              }
+
+              &.three-column {
+                width: 100%;
+
+                tr,
+                .source-target-wrapper {
+                  width: 32%;
+
+                  tr {
+                    width: 100%;
+                  }
+                }
+
+                .source-target-wrapper {
+                  + .source-target-wrapper {
+                    margin-left: 2%;
+                  }
+                }
+              }
+            }
+
+            tr {
+              display: flex;
+
+              th,
+              td {
+                display: block;
+                font-size: 14px;
+                padding: 0 8px;
+              }
+
+              th {
+                background-color: transparent;
+                color: $color-active-dark3;
+                width: 150px;
+                min-width: 150px;
+                text-overflow: ellipsis;
+              }
+
+              td {
+                color: $color--black;
+                border-bottom: 1px solid $color-border;
+                flex: 1;
+                word-break: break-all;
+              }
+            }
+
+            &:not(.all-details) {
+              tr {
+                display: none;
+              }
+
+              tr:not(.nodata):nth-child(-n + 16) {
+                display: flex;
+              }
+            }
+
+            &.device-grid.all-details {
+              .static-width {
+                width: 49%;
+              }
+            }
+
+            .header-label {
+              margin-top: 5px;
+              margin-bottom: 5px;
+              td {
+                border-bottom: 0;
+              }
+            }
+          }
+
+          .fit-tags-to-view {
+              height: 30px;
+            .tags-container {
+              height: 25px;
+              overflow: hidden;
+            }
+            .dots-for-tags {
+              display: inline-block;
+              margin: 2px;
+              vertical-align: baseline;
+              text-align: center;
+              width: auto;
+              font-weight: 600;
+              font-size: 11px;
+              padding-right: 30px;
+            }
+            &:hover {
+            .tags-container {
+              height: auto;
+              overflow: unset;
+            }
+            .label.tag {
+              margin-bottom: 3px;
+              width: auto;
+              display: inline-block;
+            }
+            .dots-for-tags {
+              display: none;
+              padding-right: 10px;
+            }
+            }
+          }
+
+          // tds-diagram-layout styling in body
+          .modal-body-graph {
+            min-height: 300px;
+            border: 1px solid #ddd;
+          }
+
+          .tag + .tag {
+            margin-left: 5px;
+          }
+
+          .label.tag {
+            border-radius: 2px;
+            border: 0;
+            font-weight: 500;
+            margin-bottom: 3px;
+            width: auto;
+            display: inline-block;
+          }
+        }
+      }
+
+      // This is necessary to fix a bug with the clarity tabs classes.
+      // @include modalSideNav();
+
+      &.modal-xxl,
+      &.modal-xlg {
+        .nav-link.active {
+          box-shadow: 0 -3px 0 #0077b8 inset;
+          background: transparent;
+        }
+
+        .tab-disabled {
+          color: lightgray;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  .close {
+    opacity: 1;
+
+    .btn {
+      color: $color-icon;
+    }
+
+    .button-label {
+      display: none;
+    }
+  }
+}
+
+.tds-modal-content {
+  background: $color-text-inverse;
+  min-width: 340px;
+
+  &.modal-xxl {
+    background: $color-text-inverse;
+    position: fixed !important;
+    top: 56px !important;
+    left: 35px !important;
+    right: 35px !important;
+    bottom: 48px !important;
+    overflow: hidden !important;
+    width: unset !important;
+
+    .modal-body {
+      max-height: calc(100vh - 195px);
+    }
+  }
+
+  &.with-box-shadow {
+    box-shadow: 0 5px 15px $color-border;
+  }
+
+  &.has-side-nav {
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      margin-left: 40px;
+    }
+  }
+
+  &:focus {
+    outline: unset;
+  }
+
+  .modal-body {
+    padding: 0 0 24px 24px;
+    // use margin-right instead of padding so that scrollbar will be positioned correctly.
+    margin-right: 24px;
+
+    .clr-form {
+      padding: unset;
+    }
+
+    code-mirror {
+      textarea {
+        width: 100%;
+      }
+    }
+  }
+
+  .modal-footer {
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+
+    &.content-end {
+      justify-content: flex-end;
+    }
+  }
+
+  .modal-header-height {
+    height: 182px;
+  }
+
+  .modal-header {
+    padding: 24px;
+
+    .modal-title-container {
+      display: flex;
+      align-items: center;
+
+      .badge {
+        a {
+          color: white;
+
+          &:hover {
+            color: #0077b8;
+          }
+        }
+      }
+
+      .modal-badge {
+        width: 23px;
+        height: 23px;
+        border-radius: 100%;
+        font-size: 14px;
+      }
+
+      .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px;
+      }
+
+      .modal-subtitle {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 16px;
+        color: $color-icon;
+        margin-right: 10px;
+      }
+
+      .modal-subbadge {
+        background-color: #f38b00;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .modal-description {
+      width: 100%;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      color: black;
+      word-break: break-all;
+
+      .readMore {
+        display: flex;
+        margin-top: 1rem;
+        line-height: 1rem;
+        font-size: 0.583333rem;
+      }
+
+      .truncated-description {
+        color: #575757;
+      }
+    }
+
+    .modal-description-height {
+      min-height: 48px;
+    }
+
+    .modal-description-sized {
+      width: calc(100% - 250px);
+    }
+
+    .modal-nav-margin-top {
+      display: block;
+      margin-top: 70px;
+    }
+  }
+
+  .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px $color-border;
+    border-width: 0 1px 0 0;
+
+    .btn {
+      color: $color--black;
+      height: 40px !important;
+      width: 40px;
+      margin: 0;
+      border: unset;
+      padding: unset;
+    }
+
+    .button-label {
+      display: none;
+    }
+
+    &.btn-link {
+      .tds-generic-button {
+        tds-button.action-button {
+          button.tds-button {
+            span {
+              clr-icon {
+                height: $side-nav-icon-size;
+                width: $side-nav-icon-size;
+              }
+            }
+          }
+        }
+      }
+
+      .selected-button {
+        .btn {
+          border: unset;
+          color: white;
+          border-radius: unset;
+          background: #0077b8;
+          cursor: default;
+        }
+      }
+    }
+  }
+}

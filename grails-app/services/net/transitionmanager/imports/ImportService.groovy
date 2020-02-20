@@ -194,8 +194,8 @@ class ImportService implements ServiceMethods {
 
 		Map data = [:]
 
-		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
-		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? group by rowId", [dtb])
+		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?0", [dtb])[0]
+		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=?0 group by rowId", [dtb])
 
 		List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(companies)
@@ -301,7 +301,7 @@ class ImportService implements ServiceMethods {
 
 		if (performance) now = new Date()
 		List<DataTransferValue> dataTransferValueRowList = DataTransferValue.findAll(
-			"From DataTransferValue d where d.dataTransferBatch=? " +
+			"From DataTransferValue d where d.dataTransferBatch=?0 " +
 			"and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtb])
 		if (performance) {
 			log.debug("Fetching DataTransferValue ROWS took {}", TimeUtil.elapsed(now))

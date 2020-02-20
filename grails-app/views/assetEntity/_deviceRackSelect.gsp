@@ -2,6 +2,6 @@
 	from="${options}" value="${rackId}" 
 	optionKey="id" optionValue="value"
 	noSelection="${[0:' Please Select...']}" 
-	class="${clazz} assetSelect"  
+	class="clr-select"  
 	onchange="EntityCrud.updateOnRackSelection(this, '${sourceTarget}', '${forWhom}')"
 />

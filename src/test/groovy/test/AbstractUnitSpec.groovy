@@ -3,13 +3,13 @@ package test
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.TdsUserDetails
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.testing.gorm.DataTest
 import net.transitionmanager.person.Person
-import net.transitionmanager.security.UserLogin
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.SecurityService
-import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.UserLogin
 import org.grails.plugins.testing.AbstractGrailsMockHttpServletResponse
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import org.springframework.security.authentication.TestingAuthenticationToken
@@ -21,7 +21,7 @@ import spock.lang.Specification
 
 import static org.junit.Assert.fail
 
-abstract class AbstractUnitSpec extends Specification {
+abstract class AbstractUnitSpec extends Specification implements DataTest{
 	protected static final String USERNAME = '__test_user__'
 	protected static final Map<String, String> PERSON_DATA = [firstName: 'Hunter', middleName: 'S', lastName: 'Thompson']
 
@@ -36,6 +36,25 @@ abstract class AbstractUnitSpec extends Specification {
 		Permission.RackMenuView,
 		Permission.TaskGraphView ]
 
+	Closure doWithSpring() {
+		{ ->
+			authenticationTrustResolver(AuthenticationTrustResolverImpl)
+
+			springSecurityService(SpringSecurityService) {
+				authenticationTrustResolver = ref('authenticationTrustResolver')
+			}
+
+			securityService(SecurityService) {
+				grailsApplication = ref('grailsApplication')
+				springSecurityService = ref('springSecurityService')
+			}
+
+			userPreferenceService(UserPreferenceService) {
+				springSecurityService = ref('springSecurityService')
+			}
+		}
+	}
+
 	void setup() {
 		// it's assumed here that the test class is annotated with @TestFor or mixes in
 		// a test helper class directly (e.g. with @TestMixin(ControllerUnitTestMixin))
@@ -46,28 +65,11 @@ abstract class AbstractUnitSpec extends Specification {
 		ApplicationContextHolder.instance.applicationContext = applicationContext
 
 
-		session.setAttribute('CURR_DT_FORMAT', TimeUtil.MIDDLE_ENDIAN)
-		session.setAttribute('CURR_TZ', 'GMT')
+//		session.setAttribute('CURR_DT_FORMAT', TimeUtil.MIDDLE_ENDIAN)
+//		session.setAttribute('CURR_TZ', 'GMT')
 
-		defineBeans {
 
-			authenticationTrustResolver(AuthenticationTrustResolverImpl)
-
-			springSecurityService(SpringSecurityService) {
-				authenticationTrustResolver = ref('authenticationTrustResolver')
-			}
-
-			securityService(SecurityService) {
-				grailsApplication = grailsApplication
-				springSecurityService = ref('springSecurityService')
-			}
-
-			userPreferenceService(UserPreferenceService) {
-				springSecurityService = ref('springSecurityService')
-			}
-		}
-
-		RequestContextHolder.setRequestAttributes webRequest
+		//RequestContextHolder.setRequestAttributes webRequest
 
 		initAssociationIds()
 	}
@@ -108,7 +110,7 @@ abstract class AbstractUnitSpec extends Specification {
 		List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority('USER'))
 		// Setup a user with a set of Permissions
 		TdsUserDetails principal = new TdsUserDetails(USERNAME, 'password', true, true, true, true,
-			authorities, userLogin.id, userLogin.personId, 'salt', ROLE_USER_PERMISSIONS)
+			authorities, userLogin.id, userLogin.personId, ROLE_USER_PERMISSIONS)
 		SecurityContextHolder.context.authentication = new TestingAuthenticationToken(principal, null, authorities)
 
 		return userLogin

@@ -1,13 +1,19 @@
 package com.tdsops.common.sql
 
+import com.tdsops.tm.enums.domain.SizeScale
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
-import com.tdsops.tm.enums.domain.SizeScale
+import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class SqlUtilTests extends Specification {
+class SqlUtilTests extends Specification implements DataTest {
+
+	void setupSpec() {
+		mockDomains Application, AssetEntity
+	}
 
 	void testAppendToWhere() {
 		expect:
@@ -72,7 +78,11 @@ class SqlUtilTests extends Specification {
 			FieldSearchData fsd = new FieldSearchData([
 				domain: Application,
 				column: "id",
-				filter: filter
+				filter: filter,
+				fieldSpec: new FieldSpec([
+					control    : 'String',
+					constraints: [:]
+				])
 			])
 			SqlUtil.parseParameter(fsd)
 			fsd.sqlSearchExpression == expression
@@ -94,7 +104,11 @@ class SqlUtilTests extends Specification {
 			FieldSearchData fsd = new FieldSearchData([
 				domain: Application,
 				column: "assetName",
-				filter: filter
+				filter   : filter,
+				fieldSpec: new FieldSpec([
+					control    : 'String',
+					constraints: [:]
+				])
 			])
 			SqlUtil.parseParameter(fsd)
 			fsd.sqlSearchExpression == expression
@@ -152,7 +166,11 @@ class SqlUtilTests extends Specification {
 			FieldSearchData fsd = new FieldSearchData([
 				domain: Application,
 				column: "assetName",
-				filter: filter
+				filter   : filter,
+				fieldSpec: new FieldSpec([
+					control    : 'String',
+					constraints: [:]
+				])
 			])
 			SqlUtil.parseParameter(fsd)
 			fsd.sqlSearchExpression == expression
@@ -169,13 +187,38 @@ class SqlUtilTests extends Specification {
 
 	}
 
+	void 'Test parseParameter for a number field with custom wildcards'() {
+		expect: "a direct comparison expression is generated"
+			FieldSearchData fsd = new FieldSearchData([
+				domain   : Application,
+				column   : "dependencyGroup",
+				filter   : filter,
+				fieldSpec: new FieldSpec([
+					control    : 'Number',
+					constraints: [:]
+				])
+			])
+			SqlUtil.parseParameter(fsd)
+			fsd.sqlSearchExpression == expression
+			fsd.sqlSearchParameters.size() == 1
+			fsd.sqlSearchParameters["dependencyGroup"] == parameter
+		where:
+			filter | expression                           | parameter
+			"=2"   | "dependencyGroup = :dependencyGroup" | 2
+
+	}
+
 	void 'Test parseParameter using column alias'() {
 		when: "creating a FieldSearchData using column alias"
 			FieldSearchData fsd = new FieldSearchData([
 				domain     : Application,
 				column     : "assetName",
 				filter     : "!alpha",
-				columnAlias: "appName"
+				columnAlias: "appName",
+				fieldSpec: new FieldSpec([
+					control    : 'String',
+					constraints: [:]
+				])
 			])
 			SqlUtil.parseParameter(fsd)
 		then: "the alias is used for creating the parameters"

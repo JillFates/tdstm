@@ -11,6 +11,13 @@ import {EventListComponent} from './components/list/event-list.component';
 import {EventDashboardComponent} from './components/dashboard/event-dashboard.component';
 import {UserRoute} from '../user/user-routing.states';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_SECTION = 'menu-parent-dashboard';
+const TOP_MENU_PARENT_PLANNING_SECTION = 'menu-parent-planning';
+
 export class EventStates {
 	public static readonly EVENT_LIST = {
 		url: 'list'
@@ -28,7 +35,8 @@ export const EventRoute: Routes = [
 			page: {
 				title: 'EVENT.LIST',
 				instruction: '',
-				menu: ['PLANNING.PLANNING', 'EVENT.LIST']
+				menu: ['PLANNING.PLANNING', 'EVENT.LIST'],
+				topMenu: { parent: TOP_MENU_PARENT_PLANNING_SECTION, child: 'menu-parent-planning-event-list', subMenu: true}
 			},
 			requiresAuth: true,
 		},
@@ -45,7 +53,8 @@ export const EventRoute: Routes = [
 			page: {
 				title: 'EVENT.TITLE_DASHBOARD',
 				instruction: '',
-				menu: ['EVENT.DASHBOARD', 'EVENT.EVENT']
+				menu: ['EVENT.DASHBOARD', 'EVENT.EVENT'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-dashboard-event-dashboard', subMenu: true}
 			},
 			requiresAuth: true,
 			requiresLicense: true

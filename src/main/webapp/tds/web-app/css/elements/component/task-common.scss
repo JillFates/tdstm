@@ -1,0 +1,340 @@
+.task-common {
+  .modal-header {
+    padding-bottom: 15px;
+  }
+
+  .just-task-create-view,
+  .just-task-edit-view {
+    display: none;
+  }
+
+  .task-create-view {
+    .just-task-create-view {
+      display: initial;
+    }
+  }
+
+  .task-edit-view {
+    .just-task-edit-view {
+      display: initial;
+    }
+    tr.just-task-edit-view {
+      display: table-row;
+    }
+  }
+
+  .task-detail-container {
+    display: flex;
+    height: 81%;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .modal-body {
+      flex: 1;
+      max-height: unset;
+      padding-right: 8px;
+
+      .deps.no-grow-container {
+        td:first-child {
+          padding-right: 15px;
+        }
+      }
+
+      form {
+        input {
+          width: 100%;
+          padding-left: 5px;
+        }
+
+        .dependency-error-section {
+          table {
+            width: 100%;
+
+            td {
+              text-align: center;
+              color: $color-message-error--red;
+            }
+          }
+        }
+
+        .error-message {
+          display: none;
+        }
+
+        .status.status-undefined {
+          display: none;
+        }
+
+        table.has-duplicated-predecessors {
+          .dependency-error-section.has-duplicated {
+            .has-duplicated-predecessors {
+              visibility: visible;
+            }
+          }
+        }
+
+        table.has-duplicated-successors {
+          .dependency-error-section.has-duplicated {
+            .has-duplicated-successors {
+              visibility: visible;
+            }
+          }
+        }
+
+        .dependency-error-section.has-duplicated {
+          .has-duplicated-predecessors,
+          .has-duplicated-successors {
+            visibility: hidden;
+          }
+        }
+
+        table.has-double-assignment {
+          .dependency-error-section .has-double-assignment {
+            display: block;
+          }
+        }
+
+        .dependency-error-section .has-double-assignment {
+          display: none;
+        }
+
+        .ng-touched.ng-invalid,
+        .ng-dirty.ng-invalid {
+          border: 1px solid $color-message-error--red;
+        }
+
+        .ng-touched.ng-invalid + .error-message {
+          .ng-dirty.ng-invalid + .error-message {
+            color: $color-message-error--red;
+            display: block;
+          }
+
+        }
+
+
+        .full-height {
+          padding-left: 24px;
+          padding-right: 24px;
+
+          .successor-predecessor-table {
+            input {
+              padding-right: 10px;
+              padding-left: 2px;
+            }
+          }
+
+
+          .description-container {
+            input {
+              //width: 100%;
+            }
+          }
+
+          .duration-container {
+            vertical-align: top;
+            width: 160px;
+            max-width: 160px;
+
+            .duration-controls {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+
+              label.lock {
+                margin-bottom: 15px;
+              }
+
+              .duration-value {
+                flex: 32%;
+                display: flex;
+                flex-direction: column;
+
+                label {
+                  font-weight: unset;
+                  margin: unset;
+                }
+
+                input {
+                  width: 95%;
+                  text-align: center;
+                }
+              }
+            }
+          }
+
+          .dates-info-container {
+            table {
+              width: 100%;
+
+              tr {
+                width: 100%;
+              }
+
+              .date-created, .last-updated {
+                width: 50%;
+              }
+
+              .last-updated {
+                text-align: right;
+              }
+            }
+          }
+
+          .btn-collapsed-fixed-right {
+            position: absolute;
+            right: 20px;
+          }
+
+          table.task-details {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 3px;
+            padding: 0;
+
+            tds-task-status-indicator {
+              span {
+                font-weight: bold;
+              }
+            }
+
+            .k-widget.k-dropdown,
+            .k-widget.k-dateinput,
+            .k-widget.k-datepicker {
+              width: 100%;
+            }
+
+            .expanded-button {
+              display: none;
+            }
+
+            .collapsed-table {
+              .comment {
+                width: 75%;
+              }
+
+              .expanded-button {
+                display: block;
+              }
+
+              .collapsed-button {
+                display: none;
+              }
+            }
+
+            .task-status {
+              display: flex;
+
+              .k-widget {
+                margin-left: 5px;
+              }
+            }
+
+            .estimated-date-container {
+              display: flex;
+              align-items: center;
+
+              span {
+                margin-left: 5px;
+                cursor: pointer;
+              }
+
+              span.disabled-delete-estimated {
+                color: transparent;
+              }
+            }
+
+            .progress.completion {
+              max-height: unset;
+              display: flex;
+
+              .progress-bar {
+                line-height: unset;
+              }
+            }
+
+            .task-number {
+              min-width: 104px;
+            }
+
+            .task-comment {
+              max-width: 400px;
+              font-weight: bold;
+            }
+
+            td {
+              display: table-cell;
+              text-align: initial;
+              vertical-align: inherit;
+              color: inherit;
+              font-weight: inherit;
+              font-size: 13px;
+              border-radius: .25em;
+              padding: 4px 6px;
+              border-width: unset;
+              border-style: unset;
+              border-color: unset;
+              cursor: default;
+            }
+
+            td.valueNW {
+              max-width: 180px;
+            }
+
+            td.N {
+              width: 15%;
+
+              label {
+                margin-bottom: unset;
+                font-weight: unset;
+              }
+            }
+          }
+        }
+
+        .k-grid-toolbar {
+          padding-bottom: 0;
+          // TODO this section is located over the grid toolbar, so we need to take into account when the
+          // task manager is going to be refactored to use the new grid
+          .table-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+          }
+        }
+
+        .k-grid-content {
+          label {
+            font-weight: normal;
+          }
+          label.pointer {
+            font-weight: bold;
+          }
+        }
+
+        .api-action-combobox {
+          width: 100%;
+        }
+      }
+    }
+
+    .modal-footer {
+      padding-left: 25px;
+      padding-right: 25px;
+      padding-top: 5px;
+      display: block;
+      position: absolute;
+      bottom: 20px;
+      background-color: #fff;
+
+      .options-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+        .options {
+          display: flex;
+        }
+      }
+    }
+  }
+}
+

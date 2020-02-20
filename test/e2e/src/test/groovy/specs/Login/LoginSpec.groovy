@@ -25,8 +25,8 @@ class LoginSpec extends GebReportingSpec {
     }
 
     def "2. Login to Transition Manager with a wrong password twice - Negative Scenario"(){
-        given: "The User goes to Login page"
-            to LoginPage
+        given: "The User is at Login page"
+            at LoginPage
         and: "Tries to Login twice with a valid username and a wrong random password"
             loginWrongPass(2)
         when: "The user tries to login with the valid username from above and the correct password"
@@ -39,8 +39,8 @@ class LoginSpec extends GebReportingSpec {
     }
 
     def "3. Login to Transition Manager with an invalid username a random number of times - Negative Scenario"(){
-        given: "The User goes to Login page"
-            to LoginPage
+        given: "The User is at Login page"
+            at LoginPage
         and: "Tries to Login with an invalid username a random number of times"
             loginWrongUser(randomAttemptNumber)
         when: "The user tries to login with the valid username from above and the correct password"
@@ -53,8 +53,8 @@ class LoginSpec extends GebReportingSpec {
     }
 
     def "4. Lock the login_e2e_test_user@tdsi.com user"(){
-        given: "The User goes to Login page"
-            to LoginPage
+        given: "The User is at Login page"
+            at LoginPage
         when: "The login_e2e_test_user@tdsi.com username is locked"
             /*
                 This means that we will use that username and try to login as many times as necessary until we lock it.
@@ -66,8 +66,8 @@ class LoginSpec extends GebReportingSpec {
     }
 
     def "5. Verify with an admin that the login_e2e_test_user@tdsi.com user is locked"(){
-        given: "The User goes to Login page"
-            to LoginPage
+        given: "The User is at Login page"
+            at LoginPage
         and: "An admin logs in (we assume the e2e_test_user is being used)"
             login()
         and: "The Admin user goes to the List Users page (e2e_test_user by default)"

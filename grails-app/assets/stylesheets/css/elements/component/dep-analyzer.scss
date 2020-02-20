@@ -1,0 +1,10 @@
+.dep-list {
+  max-height: calc(100vh - 460px);
+  overflow-y: auto;
+
+  thead,
+  th {
+    position: sticky;
+    top: 0px;
+  }
+}

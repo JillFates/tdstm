@@ -1,35 +1,57 @@
-import {Component, HostListener, OnInit, ViewChild, ElementRef, Inject} from '@angular/core';
+import {
+	Component,
+	HostListener,
+	OnInit,
+	ViewChild,
+	ElementRef,
+	Inject,
+} from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
-import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
+import {
+	UIActiveDialogService,
+	UIDialogService,
+} from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import {
+	DataScriptModel,
+	ActionType,
+	DataScriptMode,
+} from '../../model/data-script.model';
 import { ProviderModel } from '../../../provider/model/provider.model';
 import { DataScriptService } from '../../service/data-script.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DataScriptEtlBuilderComponent } from '../etl-builder/data-script-etl-builder.component';
-import {KEYSTROKE} from '../../../../shared/model/constants';
-import {Permission} from '../../../../shared/model/permission.model';
+import { KEYSTROKE } from '../../../../shared/model/constants';
+import { Permission } from '../../../../shared/model/permission.model';
 
 const DEBOUNCE_MILLISECONDS = 800;
 @Component({
 	selector: 'data-script-view-edit',
 	templateUrl: 'data-script-view-edit.component.html',
-	styles: [`
-        .has-error, .has-error:focus {
-            border: 1px #f00 solid;
-        }
-	`]
+	styles: [
+		`
+			.has-error,
+			.has-error:focus {
+				border: 1px #f00 solid;
+			}
+		`,
+	],
 })
 export class DataScriptViewEditComponent implements OnInit {
-	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
-	@ViewChild('dataScriptContainer') dataScriptContainer: ElementRef;
+	@ViewChild('dataScriptProvider', {
+		read: DropDownListComponent,
+		static: true,
+	})
+	dataScriptProvider: DropDownListComponent;
+	@ViewChild('dataScriptContainer', { static: false })
+	dataScriptContainer: ElementRef;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();
 	public modalTitle: string;
@@ -40,7 +62,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	private datasourceName = new Subject<String>();
 	private etlScriptCode = {
 		updated: false,
-		code: null
+		code: null,
 	};
 
 	constructor(
@@ -52,13 +74,18 @@ export class DataScriptViewEditComponent implements OnInit {
 		private dataIngestionService: DataScriptService,
 		private dialogService: UIDialogService,
 		private translatePipe: TranslatePipe,
-		private permissionService: PermissionService) {
-
+		private permissionService: PermissionService
+	) {
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'ETL Script Create' : (this.modalType === ActionType.EDIT ? 'ETL Script Edit' : 'ETL Script Detail');
+		this.modalTitle =
+			this.modalType === ActionType.CREATE
+				? 'ETL Script Create'
+				: this.modalType === ActionType.EDIT
+				? 'ETL Script Edit'
+				: 'ETL Script Detail';
 		// ignore etl script from this context
-		let copy = {...this.dataScriptModel};
+		let copy = { ...this.dataScriptModel };
 		this.etlScriptCode.code = copy.etlSourceCode;
 		delete copy.etlSourceCode;
 		this.dataSignature = JSON.stringify(copy);
@@ -72,21 +99,27 @@ export class DataScriptViewEditComponent implements OnInit {
 		this.dataIngestionService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.dataScriptModel.provider = { id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')};
+					this.dataScriptModel.provider = {
+						id: 0,
+						name: this.translatePipe.transform(
+							'GLOBAL.SELECT_PLACEHOLDER'
+						),
+					};
 				}
 				this.providerList.push(...result);
-				let copy = {...this.dataScriptModel};
+				let copy = { ...this.dataScriptModel };
 				this.etlScriptCode.code = copy.etlSourceCode;
 				delete copy.etlSourceCode;
 				this.dataSignature = JSON.stringify(copy);
-				setTimeout(() => { // Delay issues on Auto Focus
+				setTimeout(() => {
+					// Delay issues on Auto Focus
 					if (this.dataScriptProvider) {
 						this.dataScriptProvider.focus();
 					}
 				}, 500);
-
 			},
-			(err) => console.log(err));
+			err => console.log(err)
+		);
 	}
 
 	/**
@@ -94,11 +127,14 @@ export class DataScriptViewEditComponent implements OnInit {
 	 */
 	protected onSaveDataScript(): void {
 		this.dataScriptModel.etlSourceCode = this.etlScriptCode.code;
-		this.dataIngestionService.saveDataScript(this.dataScriptModel).subscribe(
-			(result: any) => {
-				this.activeDialog.close(result);
-			},
-			(err) => err);
+		this.dataIngestionService
+			.saveDataScript(this.dataScriptModel)
+			.subscribe(
+				(result: any) => {
+					this.activeDialog.close(result);
+				},
+				err => err)
+			;
 	}
 
 	ngOnInit(): void {
@@ -108,9 +144,15 @@ export class DataScriptViewEditComponent implements OnInit {
 			.filter((name: string) => Boolean(name && name.trim()));
 
 		notEmptyViewName$
-			.flatMap(() => this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel))
-			.subscribe( (isUnique: boolean) => this.isUnique = isUnique,
-				(error: Error) => console.log(error.message));
+			.flatMap(() =>
+				this.dataIngestionService.validateUniquenessDataScriptByName(
+					this.dataScriptModel
+				)
+			)
+			.subscribe(
+				(isUnique: boolean) => (this.isUnique = isUnique),
+				(error: Error) => console.log(error.message)
+			);
 	}
 
 	protected onValidateUniqueness(): void {
@@ -121,7 +163,9 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(
+		event: KeyboardEvent
+	) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -133,7 +177,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		let copy = {...this.dataScriptModel};
+		let copy = { ...this.dataScriptModel };
 		this.etlScriptCode.code = copy.etlSourceCode;
 		delete copy.etlSourceCode;
 		return this.dataSignature !== JSON.stringify(copy);
@@ -148,12 +192,17 @@ export class DataScriptViewEditComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
-			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
-			)
+			this.promptService
+				.open(
+					this.translatePipe.transform(
+						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+					),
+					this.translatePipe.transform(
+						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
+					),
+					this.translatePipe.transform('GLOBAL.CONFIRM'),
+					this.translatePipe.transform('GLOBAL.CANCEL')
+				)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();
@@ -161,7 +210,7 @@ export class DataScriptViewEditComponent implements OnInit {
 						this.focusForm();
 					}
 				})
-				.catch((error) => console.log(error));
+				.catch(error => console.log(error));
 		} else {
 			if (this.etlScriptCode.updated) {
 				this.activeDialog.close();
@@ -169,6 +218,38 @@ export class DataScriptViewEditComponent implements OnInit {
 				this.activeDialog.dismiss();
 			}
 		}
+	}
+
+	protected cancelEditDialog(): void {
+		if (this.isDirty()) {
+			this.promptService
+				.open(
+					this.translatePipe.transform(
+						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+					),
+					this.translatePipe.transform(
+						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
+					),
+					this.translatePipe.transform('GLOBAL.CONFIRM'),
+					this.translatePipe.transform('GLOBAL.CANCEL')
+				)
+				.then(confirm => {
+					if (confirm) {
+						this.dataScriptModel = Object.assign({}, this.originalModel);
+						this.changeToViewDataScript();
+					} else {
+						this.focusForm();
+					}
+				})
+				.catch(error => console.log(error));
+		} else {
+			this.changeToViewDataScript();
+		}
+	}
+
+	protected changeToViewDataScript(): void {
+		this.modalType = this.actionTypes.VIEW;
+		this.modalTitle = 'ETL Script Detail';
 	}
 
 	/**
@@ -185,49 +266,74 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(): void {
-		this.dataIngestionService.validateDeleteScript(this.dataScriptModel.id).subscribe(
-			(result) => {
-				if (result && result['canDelete']) {
-					this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
-						.then((res) => {
-							if (res) {
-								this.deleteDataScript();
-							}
-						});
-				} else {
-					this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this DataScript. Deleting this will not delete the batches but will no longer reference a DataScript. Do you want to proceed?', 'Yes', 'No')
-						.then((res) => {
-							if (res) {
-								this.deleteDataScript();
-							}
-						});
-				}
-			},
-			(err) => console.log(err));
+		this.dataIngestionService
+			.validateDeleteScript(this.dataScriptModel.id)
+			.subscribe(
+				result => {
+					if (result && result['canDelete']) {
+						this.prompt
+							.open(
+								'Confirmation Required',
+								'Do you want to proceed?',
+								'Yes',
+								'No'
+							)
+							.then(res => {
+								if (res) {
+									this.deleteDataScript();
+								}
+							});
+					} else {
+						this.prompt
+							.open(
+								'Confirmation Required',
+								'There are Ingestion Batches that have used this DataScript. Deleting this will not delete the batches but will no longer reference a DataScript. Do you want to proceed?',
+								'Yes',
+								'No'
+							)
+							.then(res => {
+								if (res) {
+									this.deleteDataScript();
+								}
+							});
+					}
+				},
+				err => console.log(err)
+			);
 	}
 
 	/**
 	 * Execute the Service to delete the DataScript
 	 */
 	private deleteDataScript(): void {
-		this.dataIngestionService.deleteDataScript(this.dataScriptModel.id).subscribe(
-			(result) => {
-				this.activeDialog.close(result);
-			},
-			(err) => console.log(err));
+		this.dataIngestionService
+			.deleteDataScript(this.dataScriptModel.id)
+			.subscribe(
+				result => {
+					this.activeDialog.close(result);
+				},
+				err => console.log(err)
+			);
 	}
 
 	/**
 	 * Open the DataScript Designer
 	 */
 	protected onDataScriptDesigner(): void {
-		this.dialogService.extra(DataScriptEtlBuilderComponent,
-			[UIDialogService,
-				{
-					provide: DataScriptModel,
-					useValue: this.dataScriptModel}
-					], false, false)
-			.then((result) => {
+		this.dialogService
+			.extra(
+				DataScriptEtlBuilderComponent,
+				[
+					UIDialogService,
+					{
+						provide: DataScriptModel,
+						useValue: this.dataScriptModel,
+					},
+				],
+				false,
+				false
+			)
+			.then(result => {
 				if (result.updated) {
 					this.etlScriptCode.updated = result.updated;
 					this.etlScriptCode.code = result.newEtlScriptCode;

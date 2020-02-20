@@ -14,14 +14,12 @@ class PermissionsService {
 	 * Retrieves a list of current available {@code Permissions} from Database
 	 * @return a list of {@code Permissions}
 	 */
-	List<Permissions> findAll(){
-		return Permissions.list(
-			sort: 'permissionItem',
-			order: 'asc',
-			fetch: [
-				rolePermissions: 'join'
-			]
-		)
+	List<Permissions> findAll() {
+		return Permissions.executeQuery('''
+			SELECT distinct(p) FROM Permissions p
+			LEFT JOIN p.rolePermissions
+			ORDER BY p.permissionItem ASC
+		''')
 	}
 
 	/**

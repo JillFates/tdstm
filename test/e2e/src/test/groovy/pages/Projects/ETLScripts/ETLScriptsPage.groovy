@@ -8,12 +8,14 @@ class ETLScriptsPage extends Page {
     static at = {
         title == "ETL Scripts"
         pageHeaderName.text() == "ETL Scripts"
-        createBtn.text() == "Create ETL Script"
+        pageBreadcrumbs[0].text() == "Project"
+        pageBreadcrumbs[1].text() == "ETL Scripts"
     }
 
     static content = {
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
         createBtn(wait:true) { $('button#btnCreateDataScript')}
+        pageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         nameFilter(wait:true) { $("input" ,  placeholder:"Filter Name")}
         dateCreateFilter { $("input", class:"k-input")[0]}
         descriptionFilter { $("input", placeholder:"Filter Description")}

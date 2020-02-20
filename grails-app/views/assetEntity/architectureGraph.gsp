@@ -22,7 +22,7 @@
 	<asset:stylesheet href="css/force.css" />
 </head>
 <body>
-	<tds:subHeader title="Architecture Graph" crumbs="['Assets','Architecture']"/>
+<tds:subHeader title="Architecture Graph" crumbs="['Assets','Architecture']"/>
 <div id="body" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
@@ -31,12 +31,14 @@
 	<div id="item1" class="graphContainer">
 		<div id="toolsContainerId">
 			<div id="graphToolbarId">
-				<div id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
-				--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)"><h4>Legend</h4></div><!--
-			--><div id="fullscreenButtonId" class="showMenu graphButton graphTabButton hasMargin hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+				<div class="btn-group">
+					<button id="controlPanelTabId" class="btn activeTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)">Control Panel</button>
+					<button id="legendTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)">Legend</button>
+				</div>
+				<button id="fullscreenButtonId" class="btn btn-outline"  onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Fullscreen</button>
 			</div>
 
-			<div id="controlPanelId" class="graphPanel openPanel">
+			<div id="controlPanelId" class="graphPanel ">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
 						<td class="controlPanelControl" colspan="3">
@@ -53,34 +55,42 @@
 						</tr>
 						<tr title="Sets the max number of links to follow up">
 							<td class="controlPanelControl" colspan="3">
-								<asset:image src="images/minus.gif" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"/><!--
-							--><input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" /><!--
-							--><asset:image src="images/plus.gif" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/><!--
-							--><label for="levelsUpId">&nbsp;Tiers Above</label>
+								<span style="font-size: 14px; cursor: pointer;" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"><i class="fas fa-minus-circle"></i></span>
+								<input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" />
+								<span style="font-size: 14px; cursor: pointer;" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"><i class="fas fa-plus-circle"></i></span>
+								<label for="levelsUpId">&nbsp;Tiers Above</label>
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow down">
 							<td class="controlPanelControl" colspan="3">
-								<asset:image src="images/minus.gif" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub', 'levelsDownId')"/><!--
-							--><input name="levelsDown" id="levelsDownId" class="controlPanelprop" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" /><!--
-							--><asset:image src="images/plus.gif" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/><!--
-							--><label for="assetSelectId">&nbsp;Tiers Below</label>
+								<span style="font-size: 14px;" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsDownId')"><i class="fas fa-minus-circle"></i></span>
+								<input name="levelsDown" id="levelsDownId" class="controlPanelprop" class="pointer plusMinusIcon disabled plus" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" />
+								<span style="font-size: 14px;" onclick="modifyParameter('add', 'levelsDownId')"><i class="fas fa-plus-circle"></i></span>
+								<label for="assetSelectId">&nbsp;Tiers Below</label>
 							</td>
 						</tr>
 						<tr title="Highlights cyclical structures in the dependency tree">
 							<td class="controlPanelControl" colspan="3">
-								<span class="checkboxContainer">
-									<input type="checkbox" id="highlightCyclicalCheckBoxId" name="showCycles" class="pointer" value="true" ${(graphPrefs.showCycles) ? 'checked' : ''} /><!--
-								--><label for="highlightCyclicalCheckBoxId" class="pointer">&nbsp;Show Cyclical References</label>
-								</span>
+								<div class="clr-form-control" style="margin-top:unset;">
+									<div class="clr-control-container">
+										<div class="clr-checkbox-wrapper">
+											<input type="checkbox" id="highlightCyclicalCheckBoxId" name="showCycles" value="true" ${(graphPrefs.showCycles) ? 'checked' : ''} />
+											<label class="clr-control-label" for="highlightCyclicalCheckBoxId">Show Cyclical References</label>
+										</div>
+									</div>
+								</div>
 							</td>
 						</tr>
 						<tr title="Sets the color of the background to black">
 							<td class="controlPanelControl" colspan="3">
-								<span class="checkboxContainer">
-									<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)"><!--
-								--><label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
-								</span>
+								<div class="clr-form-control" style="margin-top:unset;">
+									<div class="clr-control-container">
+										<div class="clr-checkbox-wrapper">
+											<input type="checkbox" id="blackBackgroundId" name="blackBackground" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)">
+											<label class="clr-control-label" for="blackBackgroundId" class="pointer">Black Background</label>
+										</div>
+									</div>
+								</div>
 							</td>
 						</tr>
 						<tr>
@@ -110,11 +120,17 @@
 										<td colspan="3" class="labelToggleCol">
 											<div style="padding:0px;">
 												<div class="checkboxContainer">
-													<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
-												--><label for="${type}CheckboxId" class="pointer">
-													<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
-													${names.labelText ?: names.frontEndName}
-												</label>
+													<div class="clr-form-control" style="margin-top:unset;">
+														<div class="clr-control-container">
+															<div class="clr-checkbox-wrapper">
+																<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" />
+																<label for="${type}CheckboxId" class="clr-control-label">
+																	<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+																	${names.labelText ?: names.frontEndName}
+																</label>
+															</div>
+														</div>
+													</div>
 												</div>
 											</div>
 										</td>
@@ -133,9 +149,11 @@
 
 						<tr title="Sets the distance between nodes">
 							<td class="controlPanelControl" colspan="3">
-								<asset:image src="icons/arrow_in.png" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
-							--><asset:image src="icons/arrow_out.png" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
-							-->Spacing
+								<div style="display: flex;">
+									<div style="font-size: 18px; color: #0092d1; margin-right: 10px; cursor: pointer;" id="spacingDecreaseId"><i class="fas fa-expand-arrows-alt"></i></div>
+									<div style="font-size: 18px; color: #0092d1; margin-right: 10px; cursor: pointer;" id="spacingIncreaseId"><i class="fas fa-compress-arrows-alt"></i></div>
+									<div>Spacing</div>
+								</div>
 							</td>
 						</tr>
 
@@ -153,17 +171,17 @@
 
 					<tr title="Reloads the graph">
 						<td colspan="3" class="noPadding">
-							<input type="button" name="Submit Button" id="graphSubmitButtonId" class="pointer fullButton" value="Regenerate Graph">
+							<input type="button" name="Submit Button" id="graphSubmitButtonId" class="btn btn-sm btn-outline btn-block" value="Regenerate Graph">
 						</td>
 					</tr>
 					<tr>
 						<td colspan="3" class="noPadding">
-							<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton" onclick="GraphUtil.updateUserPrefs('${com.tdsops.tm.enums.domain.UserPreferenceEnum.ARCH_GRAPH.name()}')">
+							<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="btn btn-sm btn-outline btn-block" onclick="GraphUtil.updateUserPrefs('${com.tdsops.tm.enums.domain.UserPreferenceEnum.ARCH_GRAPH.name()}')">
 						</td>
 					</tr>
 					<tr>
 						<td colspan="3" class="noPadding">
-							<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton" onclick="GraphUtil.resetToDefaults('${com.tdsops.tm.enums.domain.UserPreferenceEnum.ARCH_GRAPH.name()}')">
+							<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="btn btn-sm btn-outline btn-block" onclick="GraphUtil.resetToDefaults('${com.tdsops.tm.enums.domain.UserPreferenceEnum.ARCH_GRAPH.name()}')">
 						</td>
 					</tr>
 				</table>
@@ -191,7 +209,7 @@
 	var initialAssetId = ${assetId ?: 'null'};
 	var parameterRanges = {'levelsUp':[0, 10], 'levelsDown':[0, 10]};
 	var defaultPrefs = ${raw(defaultPrefs)};
-	var assetSelectWidth = 172;
+	// var assetSelectWidth = 172;
 
 	// Used to track ajax requests and abort them when needed
 	var ajaxRequest;
@@ -245,7 +263,7 @@
 		}
 
 		// set the width for the asset select2
-		$('#s2id_assetSelectId').css('width', assetSelectWidth + 'px');
+		$('#s2id_assetSelectId').css('width', '100%');
 
 		generateGraph();
 	});
@@ -261,7 +279,7 @@
 
 		// get the params to use for the request
 		var params = {};
-		if ($('#assetSelectId').val() != '') {
+		if ($('#assetSelectId').val() !== '') {
 			params.assetId = $('#assetSelectId').val();
 		} else if (initialAssetId) {
 			params.assetId = initialAssetId;
@@ -282,7 +300,7 @@
 		});
 
 		var svgElement = d3.select('#graphSvgId');
-		if (svgElement.size() == 0) {
+		if (svgElement.size() === 0) {
 			var spinnerDiv = $('#spinnerDivId').clone().css('display','block');
 			$('#svgContainerId').html(spinnerDiv);
 		} else {
@@ -293,6 +311,7 @@
 	// loads the graph code into the DOM
 	function loadGraph (response) {
 		ajaxRequest = null;
+		// $('#svgContainerId').html($.parseHTML(response.responseText, '', true));
 		$('#svgContainerId').html(response.responseText);
 	}
 
@@ -304,22 +323,22 @@
 		var minusButton = input.parent().children('.minus');
 
 
-		if (action == 'add') {
+		if (action === 'add') {
 			if (plusButton.hasClass('disabled'))
 				return;
-			if (ids.indexOf(input.attr('id')) != -1)
+			if (ids.indexOf(input.attr('id')) !== -1)
 				input.val(Math.min(oldValue + 1, parameterRanges[input.attr('name')][1]));
-		} else if (action == 'sub') {
+		} else if (action === 'sub') {
 			if (minusButton.hasClass('disabled'))
 				return;
-			if (ids.indexOf(input.attr('id')) != -1)
+			if (ids.indexOf(input.attr('id')) !== -1)
 				input.val(Math.max(oldValue - 1, parameterRanges[input.attr('name')][0]));
 		}
-		if (input.val() == parameterRanges[input.attr('name')][0])
+		if (input.val() === parameterRanges[input.attr('name')][0])
 			minusButton.addClass('disabled');
 		else
 			minusButton.removeClass('disabled');
-		if (input.val() == parameterRanges[input.attr('name')][1])
+		if (input.val() === parameterRanges[input.attr('name')][1])
 			plusButton.addClass('disabled');
 		else
 			plusButton.removeClass('disabled');
@@ -330,8 +349,7 @@
 	function filterSelect2(element, data) {
 		element.select2( {
 			minimumInputLength: 0,
-			width: assetSelectWidth,
-
+			width: '100%',
 			placeholder: "Filter: All Classes",
 			data: data
 		} );

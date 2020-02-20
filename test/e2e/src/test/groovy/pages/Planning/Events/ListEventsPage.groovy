@@ -14,14 +14,13 @@ class ListEventsPage extends Page {
     static at = {
         listEventsPageTitle.text() == "Event List"
         listEventsPageBreadcrumbs[0].text()   == "Planning"
-        listEventsPageBreadcrumbs[1].text()   == "Event"
-        listEventsPageBreadcrumbs[2].text()   == "List"
+        listEventsPageBreadcrumbs[1].text()   == "Event List"
     }
 
     static content = {
-        listEventsPageTitle { $("section", class:"content-header").find("h1")}
+        listEventsPageTitle { $("section", class:"content-header").find("h2")}
         planningModule { module PlanningMenuModule}
-        listEventsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        listEventsPageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         createEventBtn {$("input", value:"Create Event")}
         eventList {$("table#moveEventListIdGrid")}
         rows {eventList.find("tr", role:"row")}

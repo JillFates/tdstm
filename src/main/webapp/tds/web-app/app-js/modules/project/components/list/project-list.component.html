@@ -1,71 +1,176 @@
 <!-- Main content -->
 <div class="content body tds-kendo-grid project-list-component">
-    <section>
-        <div *ngIf="projectColumnModel">
-            <div class="box-body box-with-empty-header">
-                <kendo-grid
-                        [data]="gridData"
-                        [filter]="state.filter"
-                        [filterable]="true"
-                        (filterChange)="filterChange($event)"
-                        [sort]="state.sort"
-                        [skip]="skip"
-                        [sortable]="{mode:'single'}"
-                        [pageSize]="pageSize"
-                        [resizable]="true"
-                        (sortChange)="sortChange($event)"
-                        [pageable]="{pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
-                        (pageChange)="pageChange($event)"
-                        [selectable]="true">
-                    <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <a *ngIf="canEditProject" (click)="openCreateProject()"><button type="button" class="btn btn-default action-toolbar-btn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</button></a>
-                        <button class="btn btn-default action-toolbar-btn" (click)="toggleShowActive()">{{showActive ? 'Show Completed Projects' : 'Show Active Projects'}}</button>
-                        <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
-                    </ng-template>
-                    <kendo-grid-column *ngFor="let column of projectColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [locked]="column.locked" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-                        <ng-template kendoGridHeaderTemplate>
-                            <div class="sortable-column" (click)="onClickTemplate($event)">
-                                <label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
-                            </div>
-                        </ng-template>
+	<section>
+		<div *ngIf="projectColumnModel">
+			<div class="box-body box-with-empty-header">
+				<kendo-grid
+					*ngIf="dataGridOperationsHelper"
+					[data]="dataGridOperationsHelper.gridData"
+					[filter]="dataGridOperationsHelper.state.filter"
+					[filterable]="true"
+					(filterChange)="dataGridOperationsHelper.filterChange($event)"
+					[sort]="dataGridOperationsHelper.state.sort"
+					[skip]="skip"
+					[sortable]="{ mode: 'single' }"
+					[pageSize]="pageSize"
+					[resizable]="true"
+					(sortChange)="sortChange($event)"
+					[pageable]="{
+						pageSizes: defaultPageOptions,
+						pageSize: pageSize,
+						info: true
+					}"
+					(pageChange)="dataGridOperationsHelper.pageChange($event)"
+					[selectable]="true"
+					[ngClass]="{ 'hide-filter': !showFilters }"
+					class="page-height"
+				>
+					<ng-template kendoGridToolbarTemplate [position]="'top'">
+						<div class="clr-row">
+							<div class="clr-col-4 grid-actions project-active-completed-options">
+								<clr-radio-wrapper>
+									<input
+										type="radio"
+										clrRadio
+										name="active"
+										required
+										[checked]="showActive"
+										(click)="setShowActive(true)"
+									/>
+									<label>Show Active Projects</label>
+								</clr-radio-wrapper>
+								<clr-radio-wrapper>
+									<input
+										type="radio"
+										clrRadio
+										name="complete"
+										required
+										[checked]="!showActive"
+										(click)="setShowActive(false)"
+									/>
+									<label>Show Completed Projects</label>
+								</clr-radio-wrapper>
+							</div>
+							<div class="clr-col-8 grid-actions">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons">
+								</tds-grid-header-action-buttons>
+							</div>
+						</div>
+					</ng-template>
 
-                        <ng-template kendoGridCellTemplate *ngIf="column.property=='projectCode'" let-dataItem>
-                            <a style="color:#2C61AA;font-weight:bold" (click)="showProject(dataItem.id)">{{dataItem[column.property]}}</a>
-                        </ng-template>
-                        <ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
-                            <input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
-                        </ng-template>
-                        <ng-template kendoGridFilterCellTemplate let-filter>
-                            <div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
-                                <div *ngIf="column.type === 'date'">
-                                    <kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
-                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-                                </div>
-                                <div *ngIf="column.type === 'text'">
-                                    <input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-                                </div>
-                                <div *ngIf="column.type === 'number'">
-                                    <kendo-numerictextbox
-                                            (valueChange)="onFilter(column)"
-                                            [decimals]="0"
-                                            style="width:100%"
-                                            format="\#"
-                                            placeholder="Filter {{column.label}}"
-                                            name="{{column.property}}"
-                                            [(ngModel)]="column.filter" >
-                                    </kendo-numerictextbox>
-                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;width:80%;top:-2px" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-                                </div>
-                                <div *ngIf="column.type === 'boolean'">
-                                    <kendo-dropdownlist [data]="booleanFilterData" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-dropdownlist>
-                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all; margin-right: 10px; line-height: 30px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-                                </div>
-                            </div>
-                        </ng-template>
-                    </kendo-grid-column>
-                </kendo-grid>
-            </div>
-        </div>
-    </section>
+					<!-- Show Filters / Actions column -->
+					<kendo-grid-column
+						[width]="60"
+						[class]="{ 'k-custom-command-column': true }"
+						[minResizableWidth]="60"
+					>
+						<ng-template
+							kendoGridHeaderTemplate
+							let-column
+							let-columnIndex="columnIndex"
+						>
+							<tds-button [flat]="true" (click)="toggleFilter()">
+								<clr-icon
+									shape="filter"
+									class="grid-filter-button is-solid"
+								>
+									<span
+										*ngIf="filterCount(); let filterCounter"
+										class="badge badge-warning"
+									>
+										{{ filterCounter }}
+									</span>
+								</clr-icon>
+							</tds-button>
+						</ng-template>
+					</kendo-grid-column>
+
+					<kendo-grid-column
+						*ngFor="let column of projectColumnModel.columns"
+						field="{{ column.property }}"
+						format="{{ column.format }}"
+						[locked]="column.locked"
+						[width]="
+							!column.width ? COLUMN_MIN_WIDTH : column.width
+						"
+					>
+						<ng-template kendoGridHeaderTemplate>
+							<div
+								class="sortable-column"
+								(click)="onClickTemplate($event)"
+							>
+								<label
+									[ngClass]="{
+										'action-header':
+											column.type === 'action'
+									}"
+								>
+									{{ column.label }}</label
+								>
+							</div>
+						</ng-template>
+
+						<ng-template
+							kendoGridCellTemplate
+							*ngIf="column.property == 'projectCode'"
+							let-dataItem
+						>
+							<a
+								style="color:#2C61AA;font-weight:bold"
+								(click)="showProject(dataItem.id)"
+								>{{ dataItem[column.property] }}</a
+							>
+						</ng-template>
+						<ng-template
+							kendoGridCellTemplate
+							*ngIf="column.type === 'boolean'"
+							let-dataItem
+						>
+							<input
+								type="checkbox"
+								[(ngModel)]="dataItem[column.property]"
+								style="margin-left: 35%;"
+								disabled
+							/>
+						</ng-template>
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<div
+									class="filter-input"
+									*ngIf="column.property && column.type !== 'action'"
+									style="margin-bottom:0px;"
+							>
+								<tds-filter-input
+										name="{{column.property}}"
+										[value]="column.filter || ''"
+										[columnType]="column.type"
+										(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
+								</tds-filter-input>
+							</div>
+						</ng-template>
+					</kendo-grid-column>
+
+					<!-- PAGER COMPONENT -->
+					<ng-template
+						kendoPagerTemplate
+						let-total="total"
+						let-totalPages="totalPages"
+						let-currentPage="currentPage"
+					>
+						<div class="clr-col-12">
+							<tds-grid-pager
+								[total]="total"
+								[totalPages]="totalPages"
+								[currentPage]="currentPage"
+								[pageSizes]="defaultPageOptions"
+								(pageChange)="dataGridOperationsHelper.pageChange($event)"
+							>
+							</tds-grid-pager>
+						</div>
+					</ng-template>
+				</kendo-grid>
+			</div>
+		</div>
+	</section>
 </div>

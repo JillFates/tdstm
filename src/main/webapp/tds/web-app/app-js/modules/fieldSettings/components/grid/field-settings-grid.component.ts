@@ -4,19 +4,21 @@ import { DomainModel } from '../../model/domain.model';
 
 import { UILoaderService } from '../../../../shared/services/ui-loader.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import {
+	GridDataResult,
+	DataStateChangeEvent,
+} from '@progress/kendo-angular-grid';
 import { process, State } from '@progress/kendo-data-query';
 
 import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configuration-popup.component';
 import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {FIELD_COLORS} from '../../model/field-settings.model';
-import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
-import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
-import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
-
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { FIELD_COLORS } from '../../model/field-settings.model';
+import { NumberConfigurationPopupComponent } from '../number/number-configuration-popup.component';
+import { NumberControlHelper } from '../../../../shared/components/custom-control/number/number-control.helper';
+import { NumberConfigurationConstraintsModel } from '../number/number-configuration-constraints.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {DOMAIN} from '../../../../shared/model/constants';
 import {ProjectService} from '../../../project/service/project.service';
 import {Observable, Subject} from 'rxjs';
@@ -31,11 +33,17 @@ declare var jQuery: any;
 	encapsulation: ViewEncapsulation.None,
 	exportAs: 'fieldSettingsGrid',
 	templateUrl: 'field-settings-grid.component.html',
-	styles: [`
-		.k-grid { height:calc(100vh - 225px); }
-		tr .text-center { text-align: center; }
-		.has-error,.has-error:focus { border: 1px #f00 solid;}
-	`]
+	styles: [
+		`
+			tr .text-center {
+				text-align: center;
+			}
+			.has-error,
+			.has-error:focus {
+				border: 1px #f00 solid;
+			}
+		`,
+	],
 })
 export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 
@@ -57,8 +65,10 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	@Input('domains') domainsList: DomainModel[];
 	@Input('isEditable') isEditable: boolean;
 	@Input('gridFilter') gridFilter: any;
-	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
-	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
+	@ViewChild('minMax', { static: false })
+	minMax: MinMaxConfigurationPopupComponent;
+	@ViewChild('selectList', { static: false })
+	selectList: SelectListConfigurationPopupComponent;
 	public domains: DomainModel[] = [];
 	private fieldsSettings: FieldSettingsModel[];
 	public gridData: GridDataResult;
@@ -66,27 +76,33 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	public formHasError: boolean = null;
 	public isDirty = false;
 	public state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'order'
-		}],
+		sort: [
+			{
+				dir: 'asc',
+				field: 'order',
+			},
+		],
 		filter: {
-			filters: [{
-				field: 'field',
-				operator: 'contains',
-				value: ''
-			}],
-			logic: 'or'
-		}
+			filters: [
+				{
+					field: 'field',
+					operator: 'contains',
+					value: '',
+				},
+			],
+			logic: 'or',
+		},
 	};
 
 	public isEditing = false;
-	private isFilterDisabled = false;
+	public isFilterDisabled = false;
 	public sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
 	protected resettingChanges = false;
 	protected lastEditedControl = null;
 	public availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
+	public showFilters = false;
+	public columns: Array<string> = ['Field', 'Order', 'Label', 'Shared', 'Highlighting', 'Required', 'Display', 'Default Value', 'Control', 'Tooltip Help'];
 
 	// Only APPLICATION asset types has the plan methodology feature.
 	private planMethodology = null;
@@ -133,23 +149,40 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		if (this.gridFilter.search !== '') {
 			let search = new RegExp(this.gridFilter.search, 'i');
 			this.fieldsSettings = this.data.fields.filter(
-				item => search.test(item.field) ||
+				item =>
+					search.test(item.field) ||
 					search.test(item.label) ||
-					item['isNew']);
+					item['isNew']
+			);
 		}
 		if (this.gridFilter.fieldType !== 'All') {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.gridFilter.fieldType === 'Custom Fields' ? 1 : 0
+				value: this.gridFilter.fieldType === 'Custom Fields' ? 1 : 0,
 			});
 			this.state.filter.filters.push({
 				field: 'isNew',
 				operator: 'eq',
-				value: true
+				value: true,
 			});
 		}
 		this.refresh();
+	}
+
+	public toggleFilter(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	// TODO: Wire this up.
+	public filterCount(): number {
+		// return this.model.columns.filter((c: ViewColumn) => c.filter).length
+		return 0;
+	}
+
+	hasFilterApplied(): boolean {
+		// return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0 || this.hiddenFilters;
+		return false;
 	}
 
 	protected onEdit(): void {
@@ -170,13 +203,14 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 */
 	protected onSaveAll(): void {
 		if (!(!this.isEditable || !this.isDirty || this.formHasError)) {
-			this.askForDeleteUnderlayingData()
-				.then((deleteUnderLaying: boolean) => {
+			this.askForDeleteUnderlayingData().then(
+				(deleteUnderLaying: boolean) => {
 					if (deleteUnderLaying) {
-						this.notifySaveAll(deleteUnderLaying)
+						this.notifySaveAll(deleteUnderLaying);
 					}
-				});
-			}
+				}
+			);
+		}
 	}
 
 	/**
@@ -188,11 +222,16 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 
 		if (countFieldsToDelete) {
 			return this.prompt.open(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_MESSAGE'),
+				this.translate.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'
+				),
+				this.translate.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_MESSAGE'
+				),
 				this.translate.transform('GLOBAL.YES'),
 				this.translate.transform('GLOBAL.NO'),
-				true);
+				true
+			);
 		}
 
 		return Promise.resolve(true);
@@ -206,8 +245,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	private notifySaveAll(deleteUnderLaying: boolean): void {
 		const savingInfo = {
 			deleteUnderLaying,
-			callback: () => this.reset()
-		}
+			callback: () => this.reset(),
+		};
 		this.saveEmitter.emit(savingInfo);
 	}
 
@@ -229,7 +268,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 					this.resettingChanges = false;
 					event.target.focus();
 				}
-			}});
+			},
+		});
 	}
 
 	/**
@@ -238,7 +278,9 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
-		const targetField = this.data.fields.find((item) => item.field === dataItem.field);
+		const targetField = this.data.fields.find(
+			item => item.field === dataItem.field
+		);
 		if (targetField) {
 			targetField.errorMessage = '';
 		}
@@ -247,12 +289,12 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		this.setIsDirty(true);
 		this.fieldsToDelete.push(dataItem.field);
 		if (dataItem.shared) {
-			this.domains.forEach((domain) => {
+			this.domains.forEach(domain => {
 				this.deleteEmitter.emit({
 					domain: domain.domain,
 					fieldsToDelete: [dataItem.field],
 					isSharedField: true,
-					addToDeleteCollection: true
+					addToDeleteCollection: true,
 				});
 			});
 		} else {
@@ -260,7 +302,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 				domain: this.data.domain,
 				fieldsToDelete: this.fieldsToDelete,
 				isSharedField: false,
-				addToDeleteCollection: true
+				addToDeleteCollection: true,
 			});
 		}
 	}
@@ -276,21 +318,20 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		this.fieldsToDelete.splice(index, 1);
 
 		if (dataItem.shared) {
-			this.domains.forEach((domain) => {
+			this.domains.forEach(domain => {
 				this.deleteEmitter.emit({
 					domain: domain.domain,
 					fieldsToDelete: [dataItem.field],
 					isSharedField: true,
-					addToDeleteCollection: false
+					addToDeleteCollection: false,
 				});
 			});
 		} else {
 			this.deleteEmitter.emit({
 				domain: this.data.domain,
-				fieldsToDelete: this.fieldsToDelete
+				fieldsToDelete: this.fieldsToDelete,
 			});
 		}
-
 	}
 
 	/**
@@ -306,32 +347,36 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		this.setIsDirty(true);
 		this.formHasError = true;
 
-		this.addEmitter.emit((custom) => {
+		this.addEmitter.emit(custom => {
 			this.state.sort = [
 				{
 					dir: 'desc',
-					field: 'isNew'
-				}, {
+					field: 'isNew',
+				},
+				{
 					dir: 'desc',
-					field: 'count'
-				}
+					field: 'count',
+				},
 			];
 			let model = new FieldSettingsModel();
 			model.field = custom;
 			model.constraints = {
-				required: false
+				required: false,
 			};
 			model.label = '';
 			model['isNew'] = true;
 			model['count'] = this.data.fields.length;
 			model.control = CUSTOM_FIELD_CONTROL_TYPE.String;
 			model.show = true;
-			let availableOrder = this.data.fields.map(f => f.order).sort((a, b) => a - b).filter(item => !isNaN(item));
+			let availableOrder = this.data.fields
+				.map(f => f.order)
+				.sort((a, b) => a - b)
+				.filter(item => !isNaN(item));
 			model.order = availableOrder[availableOrder.length - 1] + 1;
 			this.data.fields.push(model);
 			this.onFilter();
 
-			setTimeout(function () {
+			setTimeout(function() {
 				jQuery('#' + model.field).focus();
 			});
 		});
@@ -340,15 +385,21 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	protected onShare(field: FieldSettingsModel) {
 		this.shareEmitter.emit({
 			field: field,
-			domain: this.data.domain
+			domain: this.data.domain,
 		});
 	}
 
 	protected onRequired(field: FieldSettingsModel) {
-		if (field.constraints.values &&
-			(field.control === CUSTOM_FIELD_CONTROL_TYPE.List || field.control === CUSTOM_FIELD_CONTROL_TYPE.YesNo)) {
+		if (
+			field.constraints.values &&
+			(field.control === CUSTOM_FIELD_CONTROL_TYPE.List ||
+				field.control === CUSTOM_FIELD_CONTROL_TYPE.YesNo)
+		) {
 			if (field.constraints.required) {
-				field.constraints.values.splice(field.constraints.values.indexOf(''), 1);
+				field.constraints.values.splice(
+					field.constraints.values.indexOf(''),
+					1
+				);
 			} else if (field.constraints.values.indexOf('') === -1) {
 				field.constraints.values.splice(0, 0, '');
 			}
@@ -367,10 +418,12 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		this.isEditing = false;
 		this.sortable = { mode: 'single' };
 		this.isFilterDisabled = false;
-		this.state.sort = [{
-			dir: 'asc',
-			field: 'order'
-		}];
+		this.state.sort = [
+			{
+				dir: 'asc',
+				field: 'order',
+			},
+		];
 		this.resetValidationFlags();
 		this.applyFilter();
 	}
@@ -390,28 +443,41 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * TODO dontiveros: Just like has been done on the Number Field Type.
 	 * @param dataItem
 	 */
-	protected onControlChange(previousControl: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel): void {
+	protected onControlChange(
+		previousControl: CUSTOM_FIELD_CONTROL_TYPE,
+		dataItem: FieldSettingsModel
+	): void {
 		switch (dataItem.control) {
 			case CUSTOM_FIELD_CONTROL_TYPE.List:
-				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
+				NumberControlHelper.cleanNumberConstraints(
+					dataItem.constraints as any
+				);
 				// Removes String constraints
-				delete dataItem.constraints.maxSize
-				delete dataItem.constraints.minSize
-				if (dataItem.constraints.values &&
+				delete dataItem.constraints.maxSize;
+				delete dataItem.constraints.minSize;
+				if (
+					dataItem.constraints.values &&
 					dataItem.constraints.values.indexOf('Yes') !== -1 &&
-					dataItem.constraints.values.indexOf('No') !== -1) {
+					dataItem.constraints.values.indexOf('No') !== -1
+				) {
 					dataItem.constraints.values = [];
 				}
 				break;
 			case CUSTOM_FIELD_CONTROL_TYPE.String:
-				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
+				NumberControlHelper.cleanNumberConstraints(
+					dataItem.constraints as any
+				);
 				// Remove List & YesNo constraints
 				delete dataItem.constraints.values;
 				break;
 			case CUSTOM_FIELD_CONTROL_TYPE.YesNo:
-				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
+				NumberControlHelper.cleanNumberConstraints(
+					dataItem.constraints as any
+				);
 				dataItem.constraints.values = ['Yes', 'No'];
-				if (dataItem.constraints.values.indexOf(dataItem.default) === -1) {
+				if (
+					dataItem.constraints.values.indexOf(dataItem.default) === -1
+				) {
 					dataItem.default = null;
 				}
 				if (!dataItem.constraints.required) {
@@ -422,17 +488,21 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 				// Remove List & YesNo constraints
 				delete dataItem.constraints.values;
 				// Removes String constraints
-				delete dataItem.constraints.maxSize
-				delete dataItem.constraints.minSize
-				NumberControlHelper.initConfiguration(dataItem.constraints as NumberConfigurationConstraintsModel);
+				delete dataItem.constraints.maxSize;
+				delete dataItem.constraints.minSize;
+				NumberControlHelper.initConfiguration(
+					dataItem.constraints as NumberConfigurationConstraintsModel
+				);
 				break;
 			default:
-				NumberControlHelper.cleanNumberConstraints(dataItem.constraints as any);
+				NumberControlHelper.cleanNumberConstraints(
+					dataItem.constraints as any
+				);
 				// Remove List & YesNo constraints
 				delete dataItem.constraints.values;
 				// Removes String constraints
-				delete dataItem.constraints.maxSize
-				delete dataItem.constraints.minSize
+				delete dataItem.constraints.maxSize;
+				delete dataItem.constraints.minSize;
 				break;
 		}
 	}
@@ -442,7 +512,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param dataItem  Current grid cell item
 	 * @param conversion Contains the information of this conversion
 	 */
-	protected  onFieldTypeChangeSave(dataItem: any, conversion: any): void {
+	protected onFieldTypeChangeSave(dataItem: any, conversion: any): void {
 		dataItem.control = conversion.to;
 		this.onControlChange(conversion.from, dataItem);
 	}
@@ -453,33 +523,44 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param dataItem Current grid cell item
 	 * @param fieldTypeChange contains the info about the conversion, save and reset events
 	 */
-	protected  onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
+	protected onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
 		if (dataItem && !dataItem.isNew && fieldTypeChange) {
-			this.prompt.open(
-				'Confirmation Required',
-				fieldTypeChange.conversion.getWarningMessage(),
-				'Ok', 'Cancel').then(result => {
-				if (result) {
-					this.setIsDirty(true);
-					fieldTypeChange.save();
-				} else {
-					fieldTypeChange.reset();
-				}
-			});
+			this.prompt
+				.open(
+					'Confirmation Required',
+					fieldTypeChange.conversion.getWarningMessage(),
+					'Ok',
+					'Cancel'
+				)
+				.then(result => {
+					if (result) {
+						this.setIsDirty(true);
+						fieldTypeChange.save();
+					} else {
+						fieldTypeChange.reset();
+					}
+				});
 		} else {
 			this.setIsDirty(true);
 			fieldTypeChange.save();
 		}
 	}
 
-	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
+	protected onControlModelChange(
+		newValue: CUSTOM_FIELD_CONTROL_TYPE,
+		dataItem: FieldSettingsModel
+	) {
 		this.setIsDirty(true);
 		const previousControl = dataItem.control;
 		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
-			this.prompt.open(
-				'Confirmation Required',
-				'Changing the control will lose all List options. Click Ok to continue otherwise Cancel',
-				'Ok', 'Cancel').then(result => {
+			this.prompt
+				.open(
+					'Confirmation Required',
+					'Changing the control will lose all List options. Click Ok to continue otherwise Cancel',
+					'Ok',
+					'Cancel'
+				)
+				.then(result => {
 					if (result) {
 						dataItem.control = newValue;
 						this.onControlChange(previousControl, dataItem);
@@ -516,11 +597,23 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	protected hasError(dataItem: FieldSettingsModel) {
 		const fields = this.getFieldsExcludingDeleted();
 
-		return dataItem.label.trim() === '' ||
-			fields.some((field) => field.errorMessage) ||
-			this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields) ||
-			this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields) ||
-			this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0]);
+		return (
+			dataItem.label.trim() === '' ||
+			fields.some(field => field.errorMessage) ||
+			this.fieldSettingsService.conflictsWithAnotherLabel(
+				dataItem.label,
+				fields
+			) ||
+			this.fieldSettingsService.conflictsWithAnotherFieldName(
+				dataItem.label,
+				fields
+			) ||
+			this.fieldSettingsService.conflictsWithAnotherDomain(
+				dataItem,
+				this.domains,
+				this.domains[0]
+			)
+		);
 	}
 
 	/**
@@ -529,7 +622,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	private atLeastOneInvalidField(): boolean {
 		const fields = this.getFieldsExcludingDeleted() || [];
 
-		return fields.some((field) => field.errorMessage || !field.label);
+		return fields.some(field => field.errorMessage || !field.label);
 	}
 
 	/**
@@ -539,16 +632,18 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 */
 	protected onLabelBlur(dataItem: FieldSettingsModel, event: any) {
 		// if the data item has an error, mark the whole form as having an error
-		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
+		this.formHasError = Boolean(
+			dataItem.errorMessage || this.atLeastOneInvalidField()
+		);
 
-		if (dataItem.errorMessage)  {
+		if (dataItem.errorMessage) {
 			if (!this.resettingChanges) {
 				this.lastEditedControl = this.lastEditedControl || event;
 				setTimeout(() => this.lastEditedControl.target.focus(), 0.1);
 			}
 		} else {
 			if (this.lastEditedControl) {
-				if (this.lastEditedControl.target.id === event.target.id)  {
+				if (this.lastEditedControl.target.id === event.target.id) {
 					this.lastEditedControl = null;
 				}
 			}
@@ -560,8 +655,9 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @returns {any[]}
 	 */
 	protected getFieldsExcludingDeleted(): any {
-		return this.data.fields
-			.filter((item) => !((this.fieldsToDelete || []).includes(item.field)));
+		return this.data.fields.filter(
+			item => !(this.fieldsToDelete || []).includes(item.field)
+		);
 	}
 
 	/**
@@ -585,8 +681,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	private openFieldSettingsPopup(dataItem: FieldSettingsModel): void {
 		let component: any;
 		const services = [
-				{ provide: FieldSettingsModel, useValue: dataItem },
-				{ provide: 'domain', useValue: this.data.domain }
+			{ provide: FieldSettingsModel, useValue: dataItem },
+			{ provide: 'domain', useValue: this.data.domain },
 		];
 
 		switch (dataItem.control) {
@@ -602,26 +698,33 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 				component = NumberConfigurationPopupComponent;
 				break;
 		}
-		this.dialogService.open(component, services).then(result => {
-			if (result) {
-				this.setIsDirty(true);
-			}
+		this.dialogService
+			.open(component, services)
+			.then(result => {
+				if (result) {
+					this.setIsDirty(true);
+				}
 				// when popup closes ..
-		}).catch(error => {
-			console.log(error);
+			})
+			.catch(error => {
+				console.log(error);
 				// when popup is Cancelled.
 			});
-		}
+	}
 
 	/**
 	 * Check if selected field control has configuration available.
 	 * @param {CUSTOM_FIELD_CONTROL_TYPE} control
 	 * @returns {boolean}
 	 */
-	protected isAllowedConfigurationForField(control: CUSTOM_FIELD_CONTROL_TYPE): boolean {
-		if (control === CUSTOM_FIELD_CONTROL_TYPE.List
-			|| control === CUSTOM_FIELD_CONTROL_TYPE.String
-			|| control === CUSTOM_FIELD_CONTROL_TYPE.Number) {
+	protected isAllowedConfigurationForField(
+		control: CUSTOM_FIELD_CONTROL_TYPE
+	): boolean {
+		if (
+			control === CUSTOM_FIELD_CONTROL_TYPE.List ||
+			control === CUSTOM_FIELD_CONTROL_TYPE.String ||
+			control === CUSTOM_FIELD_CONTROL_TYPE.Number
+		) {
 			return true;
 		}
 		return false;
@@ -632,10 +735,15 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param {CUSTOM_FIELD_CONTROL_TYPE} control
 	 * @returns {boolean}
 	 */
-	protected isAllowedDefaultValueForField(control: CUSTOM_FIELD_CONTROL_TYPE): boolean {
-		if (control && (control === CUSTOM_FIELD_CONTROL_TYPE.String
-		||	control === CUSTOM_FIELD_CONTROL_TYPE.YesNo
-		||	control === CUSTOM_FIELD_CONTROL_TYPE.List)) {
+	protected isAllowedDefaultValueForField(
+		control: CUSTOM_FIELD_CONTROL_TYPE
+	): boolean {
+		if (
+			control &&
+			(control === CUSTOM_FIELD_CONTROL_TYPE.String ||
+				control === CUSTOM_FIELD_CONTROL_TYPE.YesNo ||
+				control === CUSTOM_FIELD_CONTROL_TYPE.List)
+		) {
 			return true;
 		}
 		return false;
@@ -647,7 +755,10 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param {FieldSettingsModel} dataItem - The model of the asset field control which launched the event
 	 * @param {KeyboardEvent} event - Context event from the input that launched the change
 	 */
-	protected onKeyPressed(dataItem: FieldSettingsModel, event: KeyboardEvent): void {
+	protected onKeyPressed(
+		dataItem: FieldSettingsModel,
+		event: KeyboardEvent
+	): void {
 		// Mark form as dirty
 		this.setIsDirty(true);
 		// On esc key pressed, open confirmation dialog
@@ -657,20 +768,39 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		// Validate conflicts between label names and field names
 		dataItem.errorMessage = '';
 		const fields = this.getFieldsExcludingDeleted();
-		const message = 'The label must be different from all other field names and labels';
+		const message =
+			'The label must be different from all other field names and labels';
 
-		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
+		if (
+			this.fieldSettingsService.conflictsWithAnotherLabel(
+				dataItem.label,
+				fields
+			)
+		) {
 			dataItem.errorMessage = message;
 		} else {
-			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields)) {
+			if (
+				this.fieldSettingsService.conflictsWithAnotherFieldName(
+					dataItem.label,
+					fields
+				)
+			) {
 				dataItem.errorMessage = message;
 			} else {
-				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
+				if (
+					this.fieldSettingsService.conflictsWithAnotherDomain(
+						dataItem,
+						this.domains,
+						this.domains[0]
+					)
+				) {
 					dataItem.errorMessage = message;
 				}
 			}
 		}
-		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
+		this.formHasError = Boolean(
+			dataItem.errorMessage || this.atLeastOneInvalidField()
+		);
 	}
 
 	/**

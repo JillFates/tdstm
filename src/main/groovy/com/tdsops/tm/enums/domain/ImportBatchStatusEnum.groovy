@@ -1,4 +1,6 @@
 package com.tdsops.tm.enums.domain
+
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 /**
@@ -32,6 +34,7 @@ enum ImportBatchStatusEnum {
 	 * @param value
 	 * @return
 	 */
+	@CompileDynamic
 	static ImportBatchStatusEnum lookup(String value) {
 		return ImportBatchStatusEnum.enumConstantDirectory().get(value)
 	}

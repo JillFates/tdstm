@@ -1,10 +1,12 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.command.cookbook.GroupCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.project.Project
 import net.transitionmanager.task.Recipe
 import net.transitionmanager.task.RecipeVersion
 import net.transitionmanager.security.Permission
@@ -42,7 +44,8 @@ class WsCookbookController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RecipeDelete)
 	def deleteRecipeOrVersion(Long id) {
-		def version = params.version
+		Project project = getProjectForWs()
+		Integer version = NumberUtil.toInteger(params.version)
 		// Intentionally deleting a recipe
 		if (version == null) {
 			cookbookService.deleteRecipe(id)
@@ -51,7 +54,7 @@ class WsCookbookController implements ControllerMethods {
 			throw new InvalidRequestException('Discarding WIP is not allowed when there is no released version.')
 		} else {
 			// Discard WIP.
-			cookbookService.deleteRecipeVersion(params.id, version)
+			cookbookService.deleteRecipeVersion(project, params.id, version)
 		}
 		renderSuccessJson()
 	}
@@ -168,7 +171,6 @@ class WsCookbookController implements ControllerMethods {
 	@HasPermission(Permission.RecipeView)
 	def groups() {
 		GroupCommand group = populateCommandObject(GroupCommand)
-		validateCommandObject(group)
 		def groups = cookbookService.getGroups(group.recipeVersionId, group.context, group.sourceCode)
 		renderSuccessJson(groups: groups)
 	}

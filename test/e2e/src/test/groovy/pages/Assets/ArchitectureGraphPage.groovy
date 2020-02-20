@@ -14,8 +14,8 @@ class ArchitectureGraphPage extends Page {
     }
 
     static content = {
-        architecturePageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        architecturePageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        architecturePageTitle (wait:true) { $("section", 	class:"content-header").find("h2")}
+        architecturePageBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }

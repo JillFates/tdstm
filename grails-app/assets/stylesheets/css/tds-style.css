@@ -1,10 +1,89 @@
+@import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-icons.min.css);
+@import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-ui.min.css);
+@import url(/tdstm/tds/web-app/assets/modules/roboto-fontface/css/roboto/roboto-fontface.css);
 /*KENDO MATERIAL BASE COLORS */
 /*KENDO DATE */
 /* Alert MSG */
 /* LOGIN */
 /* Prelogin Message */
+/* Clarity */
+.dropdown-menu > li > a {
+  padding: 0 20px;
+  line-height: 35px;
+  color: #333; }
+
+.alert.alert-info,
+.alert.alert-danger,
+.alert.alert-warning,
+.alert.alert-success {
+  padding: 0;
+  margin: 6px 0 0 0;
+  line-height: 18px;
+  font-size: 13px;
+  color: #333 !important; }
+  .alert.alert-info p,
+  .alert.alert-danger p,
+  .alert.alert-warning p,
+  .alert.alert-success p {
+    line-height: 18px;
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+    color: #333 !important; }
+
+.alert.alert-info {
+  background-color: #e1f1f6 !important; }
+
+.alert.alert-danger {
+  background-color: #f5dbd9 !important; }
+
+.alert.alert-warning {
+  background-color: #feecb5 !important; }
+
+.alert.alert-success {
+  background-color: #dff0d0 !important; }
+
+.modal {
+  display: none; }
+
+.modal-dialog .modal-content {
+  padding: 0; }
+  .modal-dialog .modal-content .modal-header,
+  .modal-dialog .modal-content .modal-body {
+    padding: 16px; }
+  .modal-dialog .modal-content .modal-footer {
+    padding: 15px;
+    margin: 0; }
+    .modal-dialog .modal-content .modal-footer .btn {
+      margin: 0.25rem 0.5rem 0.25rem 0; }
+
+.content-header > h1 {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 24px;
+  color: #18394B; }
+
+.clr-form.is-fullwidth {
+  width: 100%; }
+  .clr-form.is-fullwidth .clr-control-container,
+  .clr-form.is-fullwidth .clr-input-wrapper,
+  .clr-form.is-fullwidth .clr-input-group,
+  .clr-form.is-fullwidth .clr-input {
+    width: 100%; }
+  .clr-form.is-fullwidth .clr-form-control.row .clr-input-wrapper,
+  .clr-form.is-fullwidth .clr-input-group {
+    max-width: 100%; }
+  .clr-form.is-fullwidth clr-password-container .clr-error .clr-form-control.row .clr-input-wrapper,
+  .clr-form.is-fullwidth clr-password-container .clr-error .clr-input-group {
+    max-width: calc(100% - 1rem); }
+  .clr-form.is-fullwidth clr-password-container .clr-error .clr-validate-icon {
+    margin-left: 20px; }
+  .clr-form.is-fullwidth .btn {
+    width: 100%; }
+
 /* General Elements */
 div.cookbook_recipes_editor div.alert {
+  font-size: 14px;
   position: fixed;
   width: 300px;
   left: 50%;
@@ -13,6 +92,13 @@ div.cookbook_recipes_editor div.alert {
   z-index: 100;
   padding: 5px 15px;
   text-align: center; }
+  div.cookbook_recipes_editor div.alert button.close {
+    position: absolute;
+    right: 8px;
+    top: 4px;
+    font-size: 25px;
+    color: #000;
+    height: 10px; }
 
 div.cookbook_recipes_editor div.alert {
   -webkit-transition: all ease 0.5s;
@@ -36,22 +122,6 @@ div.body div.alert.animateShow {
 
 div.body div.alert-message-icon {
   float: left; }
-
-div.body div.alert.alert-success {
-  min-width: 450px;
-  z-index: 1060;
-  padding: 13px;
-  background-color: #dff0d8 !important;
-  color: #3c763d !important;
-  text-align: left; }
-
-div.body div.alert.alert-danger {
-  min-width: 450px;
-  z-index: 1060;
-  padding: 13px;
-  background-color: #f2dede !important;
-  color: #a94442 !important;
-  text-align: left; }
 
 .tooltip .tooltip-inner {
   background-color: #ebebeb;
@@ -159,7 +229,12 @@ svg {
   border: none !important; }
 
 div.modal-dialog {
-  padding: 0px; }
+  padding: 0px;
+  visibility: visible; }
+  div.modal-dialog.modal-xlg {
+    width: 1065px; }
+  div.modal-dialog.modal-xxl {
+    width: 1350px; }
   div.modal-dialog div.modal-content {
     border-radius: 0px;
     border: 0px; }
@@ -183,18 +258,62 @@ div.modal-dialog {
         opacity: 1;
         color: #fff; }
       div.modal-dialog div.modal-content div.modal-header button.close:hover {
-        opacity: .5;
+        opacity: 0.5;
         color: #fff; }
-      div.modal-dialog div.modal-content div.modal-header h3, div.modal-dialog div.modal-content div.modal-header h4 {
+      div.modal-dialog div.modal-content div.modal-header h3,
+      div.modal-dialog div.modal-content div.modal-header h4 {
         font-size: 16px !important;
         font-weight: bold !important;
         line-height: inherit !important;
         font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif !important; }
+      div.modal-dialog div.modal-content div.modal-header .tool-box {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center; }
+        div.modal-dialog div.modal-content div.modal-header .tool-box .full-screen,
+        div.modal-dialog div.modal-content div.modal-header .tool-box .restore-screen,
+        div.modal-dialog div.modal-content div.modal-header .tool-box .close-screen {
+          background: transparent;
+          margin-left: 10px;
+          border: 0;
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-pack: center;
+          -ms-flex-pack: center;
+          justify-content: center;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
+          align-items: center; }
+          div.modal-dialog div.modal-content div.modal-header .tool-box .full-screen span,
+          div.modal-dialog div.modal-content div.modal-header .tool-box .restore-screen span,
+          div.modal-dialog div.modal-content div.modal-header .tool-box .close-screen span {
+            color: #fff; }
     div.modal-dialog div.modal-content div.modal-footer.form-group-center {
       text-align: center; }
 
 div.ui-front {
   z-index: 1050; }
+
+div.modal.no-background {
+  background: transparent !important; }
+
+div.modal.dialog-draggable-no-background {
+  background: transparent !important; }
+
+.legacy-modal-header-s,
+.legacy-modal-body-s {
+  margin-left: 36px; }
+
+.modal-sidenav button i.fas,
+.modal-sidenav button i.far {
+  font-size: 15.4px; }
 
 /* This will be only used to override buttons elements in certain dialogs */
 div.ui-dialog-content div.buttons .btn.btn-default {
@@ -407,8 +526,6 @@ div.progress-bar-container {
       font-size: 12px; }
   div.progress-bar-container div.select-timer {
     width: 69px; }
-    div.progress-bar-container div.select-timer select {
-      border: none; }
   div.progress-bar-container div.progress-bar-wrapper {
     margin-left: 10px;
     width: 26px;
@@ -524,7 +641,7 @@ div.graphContainer {
         user-select: none;
         font-size: 12px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab {
-        border: 1px solid green;
+        border: 1px solid #0077b8;
         border-bottom: 0px;
         margin-bottom: 0px;
         padding-left: 8px;
@@ -542,7 +659,7 @@ div.graphContainer {
           z-index: 2; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab:not(.activeTab) {
           background-color: #dddddd;
-          border-bottom: 1px solid green; }
+          border-bottom: 1px solid #0077b8; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab#dependenciesPanelTabId {
           border-left-width: 0px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab#dependenciesPanelTabId {
@@ -550,7 +667,7 @@ div.graphContainer {
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab h4 {
           margin: 0px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId > div.hasBorders {
-        border: 1px solid green;
+        border: 1px solid #0077b8;
         display: inline-block; }
       div.graphContainer div#toolsContainerId div#graphToolbarId > div.spacer {
         background-color: transparent !important; }
@@ -558,9 +675,6 @@ div.graphContainer {
         text-align: center;
         width: auto;
         cursor: pointer; }
-      div.graphContainer div#toolsContainerId div#graphToolbarId > div:not(.spacer).hasBorders {
-        border-left: 1px solid green;
-        border-right: 1px solid green; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.graphTabButton {
         background-position: 5px 50%;
         background-repeat: no-repeat;
@@ -596,11 +710,9 @@ div.graphContainer {
         width: 22px !important;
         height: 22px !important;
         background-position: 2px 2px !important;
-        padding: 0px !important; }
-        div.graphContainer div#toolsContainerId div#graphToolbarId div.zoomButton#zoomOutButtonId {
-          background-image: url(../icons/magifier_zoom_out.png); }
-        div.graphContainer div#toolsContainerId div#graphToolbarId div.zoomButton#zoomInButtonId {
-          background-image: url(../icons/magnifier_zoom_in.png); }
+        padding: 0px !important;
+        color: black;
+        font-size: 16px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.toolButton {
         width: 22px !important;
         height: 22px !important;
@@ -624,13 +736,11 @@ div.graphContainer {
         z-index: 2;
         display: inline-block;
         position: relative;
-        border: 1px solid green;
         height: 22px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId #highlightFormId.newHighlightForm input#searchBoxId {
           width: 193px;
           height: 20px;
           margin: 0px !important;
-          border: 0px;
           vertical-align: top; }
           div.graphContainer div#toolsContainerId div#graphToolbarId #highlightFormId.newHighlightForm input#searchBoxId::-ms-clear {
             display: none; }
@@ -650,9 +760,8 @@ div.graphContainer {
           display: inline-block;
           height: 20px;
           width: 20px;
-          background-image: url(../icons/find.png);
-          background-position: 2px 2px !important;
-          background-repeat: no-repeat; }
+          color: black;
+          font-size: 16px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId span.controlSpan {
         margin-left: 10px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId span.controlSpan input, div.graphContainer div#toolsContainerId div#graphToolbarId span.controlSpan select {
@@ -668,16 +777,22 @@ div.graphContainer {
           height: 22px; }
     div.graphContainer div#toolsContainerId div.graphPanel {
       float: left;
-      border: 1px solid #008000;
-      margin-left: 0px;
-      margin-top: 0px;
-      padding: 5px;
+      border: 1px solid #0077b8;
+      margin-left: 15px;
+      margin-top: 15px;
+      padding: 10px 5px 5px 5px;
       background-color: white;
       position: absolute;
-      padding-top: 10px;
-      z-index: 1; }
+      z-index: 1;
+      overflow-y: scroll;
+      min-height: 90px;
+      max-height: 430px;
+      top: 50px; }
+      div.graphContainer div#toolsContainerId div.graphPanel::-webkit-scrollbar {
+        width: 0; }
       div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
-        display: block; }
+        display: block;
+        z-index: 75; }
       div.graphContainer div#toolsContainerId div.graphPanel:not(.openPanel) {
         display: none; }
       div.graphContainer div#toolsContainerId div.graphPanel .hasChanges {
@@ -714,7 +829,12 @@ div.graphContainer {
         div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon:active {
           -webkit-filter: saturate(10);
           filter: saturate(10); }
+        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.plus {
+          color: green; }
+        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.minus {
+          color: red; }
         div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.disabled {
+          color: grey;
           -webkit-filter: saturate(0);
           filter: saturate(0);
           opacity: 0.5;
@@ -784,10 +904,9 @@ div.graphContainer {
         text-align: center;
         width: 40px; }
   div.graphContainer div#svgContainerId {
-    border: 1px solid green;
-    border-width: 1px;
-    padding: 0px !important;
-    margin: 0px !important;
+    border: 1px solid #0077b8;
+    padding: 0 !important;
+    margin: 0 !important;
     overflow: hidden;
     font-size: 0;
     position: relative;
@@ -797,6 +916,51 @@ div.graphContainer {
   div.graphContainer button.baseline-btn {
     margin: 0 10px; }
 
+@media screen and (min-height: 601px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 400px !important; } }
+
+@media screen and (max-height: 600px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 250px !important; } }
+
+@media screen and (max-height: 445px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 142px !important; } }
+
+@media screen and (max-height: 344px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 90px !important; } }
+
+@media screen and (min-height: 825px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 385px !important; } }
+
+@media screen and (max-height: 824px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 300px !important; } }
+
+@media screen and (max-height: 731px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 200px !important; } }
+
+@media screen and (max-height: 640px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 150px !important; } }
+
+@media screen and (max-height: 590px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 100px !important; } }
+
+div.content-wrapper {
+  z-index: 70 !important;
+  overflow: auto; }
+  div.content-wrapper div.container {
+    z-index: 75 !important; }
+
+div.main-footer {
+  position: relative; }
+
 div.graphContainer.fullscreen {
   background-color: #ffffff;
   width: 0px;
@@ -804,26 +968,32 @@ div.graphContainer.fullscreen {
   z-index: 95; }
   div.graphContainer.fullscreen div#toolsContainerId {
     position: fixed;
+    top: 5px;
+    left: 5px;
     z-index: 96; }
     div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId {
       top: 0px;
       left: 0px; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > div, div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > span {
         vertical-align: top; }
+      div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .btn {
+        margin-top: 0px; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId div.graphPanelTab {
         border-top-width: 0px; }
         div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId div.graphPanelTab:not(.activeTab) {
-          border-bottom: 1px solid green; }
+          border-bottom: 1px solid #0077b8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > *:not(.graphPanelTab) {
         opacity: 0.8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .graphTabButton {
         border-top-width: 0px !important; }
-      div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId #fullscreenButtonId {
-        background-image: url(../icons/layout_content.png); }
     div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
       margin-top: -1px;
-      top: 25px;
-      left: 0px; }
+      top: 50px;
+      left: 0px;
+      height: 400px; }
+      @media screen and (max-width: 440px) {
+        div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
+          height: 280px !important; } }
     div.graphContainer.fullscreen div#toolsContainerId div#controlPanelId .controlPanelLabel {
       padding: 0px;
       text-align: right;
@@ -845,7 +1015,7 @@ div.graphContainer.fullscreen {
 #spinnerDivId {
   width: 800px;
   height: 300px;
-  border: 1px solid green;
+  border: 1px solid #0077b8;
   padding: 5px;
   margin: 5px; }
   #spinnerDivId.graph {
@@ -863,7 +1033,7 @@ div.graphContainer.fullscreen {
 
 .customMenu {
   display: none;
-  z-index: 1000;
+  z-index: 75;
   position: fixed;
   overflow: hidden;
   border: 1px solid #CCC;
@@ -906,6 +1076,41 @@ div.graphContainer.fullscreen {
 
 .nav-tabs-custom > .nav-tabs > li.active {
   border-top-color: #3c8dbc; }
+
+/* Cookbook Tabs  to Clarity */
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a,
+.create-recipe-form div.tabbable ul.nav-tabs li a {
+  cursor: pointer;
+  border: 0px;
+  background: none;
+  color: #444;
+  margin-left: 10px;
+  margin-right: 10px; }
+
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:first-child,
+.create-recipe-form div.tabbable ul.nav-tabs li a:first-child {
+  margin-left: 0px; }
+
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:hover,
+.create-recipe-form div.tabbable ul.nav-tabs li a:hover {
+  -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
+  box-shadow: 0 -3px 0 #0077b8 inset;
+  -webkit-transition: -webkit-box-shadow .2s ease-in;
+  transition: -webkit-box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
+
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li.active a,
+.create-recipe-form div.tabbable ul.nav-tabs li.active a {
+  -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
+  box-shadow: 0 -3px 0 #0077b8 inset;
+  -webkit-transition: -webkit-box-shadow .2s ease-in;
+  transition: -webkit-box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
+
+.create-recipe-form .tab-content {
+  border: none !important; }
 
 form.left-alignment div.form-group input[type="text"] {
   height: 34px;
@@ -972,7 +1177,416 @@ form .btn-with-close-icon .fa-close {
 div.dates-info-container {
   padding: 4px 0 !important; }
 
-/* Exclusive for AngularJS*/
+.legacy-modal-dialog {
+  padding: 0 !important;
+  margin: 0; }
+  .legacy-modal-dialog .legacy-modal-content {
+    margin-left: 40px; }
+    .legacy-modal-dialog .legacy-modal-content .legacy-modal-header {
+      padding: 24px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .close-button {
+        color: #737373;
+        height: 40px;
+        margin: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        border: unset; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .close-button:hover {
+          background: unset; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container a {
+          color: white; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container a:hover {
+            color: #0077b8; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-badge {
+        height: 23px;
+        border-radius: 100%;
+        font-size: 14px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-subtitle {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 16px;
+        color: #808080;
+        margin-right: 10px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-subbadge {
+        min-width: unset;
+        width: 8px;
+        background-color: #f38b00; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        color: black;
+        word-break: break-all; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description a {
+          color: #3c8dbc;
+          cursor: pointer; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description .readMore {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          margin-top: 1rem;
+          line-height: 1rem;
+          font-size: 0.583333rem; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description .truncated-description {
+          color: #575757; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description-height {
+        min-height: 48px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description-sized {
+        width: calc(100% - 250px); }
+    .legacy-modal-dialog .legacy-modal-content .legacy-modal-body {
+      margin-left: 24px;
+      width: calc(100vw - 172px);
+      overflow-y: scroll;
+      overflow-x: hidden; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.has-description {
+        max-height: calc(100vh - 300px); }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.no-description {
+        max-height: calc(100vh - 255px); }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content {
+        padding-right: 20px; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content table {
+          border: unset;
+          word-break: break-word;
+          border-spacing: unset; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
+          float: right;
+          font-size: 12px;
+          font-weight: 500;
+          color: #3c8dbc;
+          cursor: pointer; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form {
+          grid-template-columns: 49% 49%;
+          display: grid;
+          -webkit-column-gap: 2%;
+          -moz-column-gap: 2%;
+          column-gap: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper {
+            margin: 5px 0; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper .header-label {
+              width: 100%;
+              margin-bottom: 5px;
+              padding-left: 8px;
+              font-size: 14px;
+              color: #454545;
+              font-weight: 600; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form.three-column {
+            grid-template-columns: 32% 32% 32%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control {
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            margin-top: unset; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper {
+              -webkit-box-flex: 1;
+              -ms-flex-positive: 1;
+              flex-grow: 1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container + .clr-input-wrapper,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper + .clr-input-wrapper {
+                margin-left: 20px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper {
+                width: 100%; }
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper .clr-select,
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper .clr-select {
+                  width: 100%;
+                  padding: unset;
+                  padding-left: 0.25rem;
+                  font-size: 14px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-input,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-input {
+                width: 100%;
+                padding: unset;
+                padding-left: 0.25rem;
+                font-size: 14px; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-label {
+              min-width: 150px;
+              max-width: 150px;
+              line-height: unset;
+              padding: 0 8px;
+              font-size: 14px;
+              margin-bottom: unset; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox {
+              padding-left: 12px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox .clr-control-container {
+                -webkit-box-flex: unset;
+                -ms-flex: unset;
+                flex: unset; }
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox .clr-control-container .clr-control-label {
+                  padding: 0 0 0 24px;
+                  min-width: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-header,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-widget {
+            background: unset;
+            border: unset;
+            color: unset;
+            border-radius: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-picker-wrap.k-state-default {
+            background: unset;
+            border: unset;
+            border-radius: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker {
+            -webkit-box-flex: 1;
+            -ms-flex-positive: 1;
+            flex-grow: 1; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker:hover .k-select {
+              border: unset;
+              background-color: unset;
+              background-image: unset;
+              color: #0092d1; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap {
+              border: unset;
+              border-bottom: 1px solid #999; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap:before {
+                height: unset; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap.k-state-hover, .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap.k-state-focused {
+                box-shadow: unset;
+                -webkit-box-shadow: unset;
+                border-bottom: 1px solid #0092d1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap .k-input {
+                background: unset;
+                border-radius: unset;
+                height: 1rem;
+                max-height: 1rem;
+                font-size: 14px;
+                padding: 0 0.25rem;
+                text-indent: unset; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap .k-select {
+                line-height: unset;
+                width: unset;
+                min-height: unset;
+                height: unset;
+                padding-top: 2px; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+          -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
+          justify-content: space-between; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column {
+            width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column .source-target-wrapper {
+              width: 100%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column {
+            width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper {
+              width: 49%; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr tr,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper tr {
+                width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper + .source-target-wrapper {
+              margin-left: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.three-column {
+            width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.three-column tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.three-column .source-target-wrapper {
+              width: 32%; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.three-column tr tr,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.three-column .source-target-wrapper tr {
+                width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.three-column .source-target-wrapper + .source-target-wrapper {
+              margin-left: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+              display: block;
+              font-size: 14px;
+              padding: 4px 8px; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th {
+              background-color: transparent;
+              color: #18394b;
+              width: 150px;
+              min-width: 150px;
+              text-overflow: ellipsis; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+              color: #000;
+              border-bottom: 1px solid #ccc;
+              -webkit-box-flex: 1;
+              -ms-flex: 1;
+              flex: 1; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr {
+          display: none; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex; }
+  .legacy-modal-dialog .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px #ccc;
+    border-width: 0 1px 0 0;
+    overflow: hidden; }
+    .legacy-modal-dialog .modal-sidenav .btn {
+      color: #000;
+      height: 40px;
+      margin: 0; }
+    .legacy-modal-dialog .modal-sidenav .button-label {
+      display: none; }
+    .legacy-modal-dialog .modal-sidenav.btn-link .selected-button.btn {
+      border: unset;
+      color: white;
+      border-radius: unset;
+      background: #0077b8;
+      cursor: default; }
+
+.tds-modal-content {
+  background: #fff; }
+  .tds-modal-content.has-side-nav .modal-header,
+  .tds-modal-content.has-side-nav .modal-body {
+    margin-left: 40px; }
+  .tds-modal-content:focus {
+    outline: unset; }
+  .tds-modal-content .modal-section-header {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px; }
+  .tds-modal-content .modal-header-height {
+    height: 182px; }
+  .tds-modal-content .modal-header {
+    padding: 24px;
+    border: unset; }
+    .tds-modal-content .modal-header .close-button {
+      color: #737373;
+      height: 40px;
+      margin: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      border: unset; }
+      .tds-modal-content .modal-header .close-button:hover {
+        background: unset; }
+    .tds-modal-content .modal-header .modal-title-container {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center; }
+      .tds-modal-content .modal-header .modal-title-container .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px; }
+    .tds-modal-content .modal-header .modal-description-height {
+      min-height: 48px; }
+  .tds-modal-content .modal-body {
+    padding: 0 24px 24px 24px; }
+    .tds-modal-content .modal-body .modal-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      -webkit-column-gap: 10px;
+      -moz-column-gap: 10px;
+      column-gap: 10px; }
+  .tds-modal-content .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px #ccc;
+    border-width: 0 1px 0 0; }
+    .tds-modal-content .modal-sidenav .btn {
+      color: #000;
+      height: 40px !important;
+      margin: 0; }
+    .tds-modal-content .modal-sidenav .button-label {
+      display: none; }
+    .tds-modal-content .modal-sidenav.btn-link .selected-button.btn {
+      border: unset;
+      color: white;
+      border-radius: unset;
+      background: #0077b8;
+      cursor: default; }
+
+.tds-table .grid-label {
+  font-size: 18px;
+  line-height: 48px; }
+
+.tds-table table {
+  width: 100%;
+  border-collapse: collapse; }
+  .tds-table table thead th {
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 12px;
+    padding: 5px 0 5px 12px;
+    color: #3c8dbc;
+    text-align: left;
+    background: #d9e4ea; }
+  .tds-table table tbody tr {
+    cursor: pointer; }
+    .tds-table table tbody tr td {
+      font-size: 13px;
+      color: #333333;
+      border-style: solid;
+      border-color: #d9e4ea;
+      padding: 5px 0 5px 12px; }
+      .tds-table table tbody tr td:first-child {
+        border-width: 1px 0 1px 1px; }
+      .tds-table table tbody tr td:not(:first-child):not(:last-child) {
+        border-width: 1px 0; }
+      .tds-table table tbody tr td:last-child {
+        border-width: 1px 1px 1px 0; }
+    .tds-table table tbody tr td .status {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      line-height: 13px;
+      border: 1px solid #808080;
+      border-radius: 3px;
+      background: #ccc; }
+      .tds-table table tbody tr td .status i {
+        color: #fff;
+        width: 12px;
+        height: 12px;
+        margin-top: 2px; }
+      .tds-table table tbody tr td .status.status-Ready {
+        background: #01ab08; }
+      .tds-table table tbody tr td .status.status-Started {
+        color: #0092d1; }
+      .tds-table table tbody tr td .status.status-Hold {
+        background: #F27113; }
+      .tds-table table tbody tr td .status.status-Completed {
+        background: #3c8dbc; }
+      .tds-table table tbody tr td .status.status-Pending {
+        color: #808080; }
+      .tds-table table tbody tr td .status.status-Warning {
+        background: #f6c440; }
+
+/* Exclusive for AngularJS */
 .asset-tag-selector-component {
   margin: 0 5% 0 0;
   position: relative;
@@ -1000,12 +1614,13 @@ div.dates-info-container {
         background-image: unset;
         padding-top: 10px !important; }
       .asset-tag-selector-component .k-widget li .k-i-close:before {
-        font-family: FontAwesome;
-        color: black;
-        font-size: 14px;
-        content: "\f00d"; }
+        content: "\D7";
+        font-size: 22px;
+        color: black; }
       .asset-tag-selector-component .k-widget li span {
         margin-right: unset; }
+        .asset-tag-selector-component .k-widget li span div {
+          border-radius: 2px; }
       .asset-tag-selector-component .k-widget li span:not(.k-select) div {
         padding-left: 10px !important;
         padding-right: 22px !important; }
@@ -1072,7 +1687,7 @@ div.dates-info-container {
 .striked-tag-item {
   text-decoration: line-through; }
 
-/*Move into colors after merge with David Branch*/
+/*Move into colors after merge with David Branch */
 .tag-black {
   background-color: black !important; }
 
@@ -1109,166 +1724,347 @@ div.dates-info-container {
 .tag-unselected {
   background-color: unset !important; }
 
-.asset-tag-selector-component-content .label.tag {
-  display: inline-block;
-  margin-right: 2px;
-  margin-bottom: 2px;
-  vertical-align: baseline;
-  text-align: center;
-  width: inherit;
-  height: 28px;
-  font-weight: 600;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 7px;
-  font-size: 13px;
-  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
-  color: #656565 !important; }
+.asset-tag-selector-component-content {
+  line-height: 21px;
+    line-height-height: 21px;
+    line-height-font-weight: 600;
+    line-height-padding-left: 10px;
+    line-height-padding-right: 10px;
+    line-height-font-size: 11px;
+    line-height-color: #333 !important; }
+  .asset-tag-selector-component-content .label.tag {
+    border-radius: 2px;
+    border: 0;
+    width: unset;
+    font-weight: 500; }
+
+.main-header.header-component {
+  display: block;
+  height: auto;
+  white-space: normal; }
+  .main-header.header-component .branding {
+    height: 45px;
+    width: 93px;
+    overflow: hidden;
+    min-width: 0;
+    margin: 0;
+    padding: 0; }
+    .main-header.header-component .branding img {
+      width: auto;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0; }
+  .main-header.header-component .nav {
+    display: block;
+    box-shadow: none;
+    -webkit-box-shadow: 0; }
+  .main-header.header-component .nav-icon-text {
+    font-size: 14px;
+    line-height: 14px; }
+    .main-header.header-component .nav-icon-text clr-icon {
+      margin: 0; }
+  .main-header.header-component .user-account clr-icon {
+    margin-top: -2px;
+    color: #000;
+    background: #ccc;
+    border: #ccc solid 4px;
+    border-radius: 50%; }
+
+.asset-dependency-component .modal-header {
+  border: unset; }
+
+.asset-dependency-component .modal-body {
+  padding: 0 24px 24px 24px; }
+
+.asset-dependency-component.dependency-show .dependency-row {
+  border-bottom: 1px solid lightgray; }
+
+.asset-dependency-component.uni-directional .dependency-row {
+  grid-template-columns: 1fr 4fr; }
+  .asset-dependency-component.uni-directional .dependency-row .dependency-b {
+    display: none; }
+
+.asset-dependency-component.bi-directional .dependency-row {
+  grid-template-columns: 1fr 2fr 2fr; }
+  .asset-dependency-component.bi-directional .dependency-row .dependency-b {
+    display: block; }
+
+.asset-dependency-component .error {
+  color: red; }
+
+.asset-dependency-component .dependencies {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-top: 10px; }
+  .asset-dependency-component .dependencies:last-child {
+    padding-bottom: 10px; }
+
+.asset-dependency-component .dependency-row {
+  font-weight: normal;
+  display: grid;
+  -webkit-column-gap: 10px;
+  -moz-column-gap: 10px;
+  column-gap: 10px; }
+  .asset-dependency-component .dependency-row:last-child {
+    border: unset; }
+  .asset-dependency-component .dependency-row .dependency-row-legend {
+    font-weight: bold;
+    text-transform: capitalize; }
+  .asset-dependency-component .dependency-row .dependency-row-data label {
+    max-width: 200px;
+    overflow: hidden;
+    font-weight: normal; }
+
+.asset-dependency-component .clr-control-container {
+  width: 100%; }
+  .asset-dependency-component .clr-control-container .clr-textarea {
+    max-width: unset;
+    width: 100%;
+    resize: none; }
+
+.asset-dependency-component .clr-input {
+  width: 100%; }
+
+.asset-dependency-component .clr-select-wrapper {
+  width: 100%; }
+  .asset-dependency-component .clr-select-wrapper .clr-select {
+    padding-left: 0.25rem !important;
+    width: 100%; }
+
+.asset-dependency-component .dependency-label {
+  overflow: auto;
+  font-weight: normal;
+  margin: unset;
+  display: inline; }
+
+.asset-dependency-component .dependency-comment {
+  max-height: 70px;
+  overflow: auto; }
+
+.asset-dependency-component .has-both-dependencies {
+  padding: 10px;
+  color: green; }
+  .asset-dependency-component .has-both-dependencies .depends-on {
+    color: #d1b9ee; }
+  .asset-dependency-component .has-both-dependencies i {
+    margin-left: -6px; }
+
+.asset-dependency-component .delete-button-dependency-show-modal div.tds-action-button-container {
+  margin-left: 30%; }
+
+.dep-list {
+  max-height: calc(100vh - 460px);
+  overflow-y: auto; }
+  .dep-list thead,
+  .dep-list th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px; }
+
+body > .wrapper {
+  padding-top: 45px; }
 
 .main-header {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif !important;
-  font-weight: 400 !important;
+  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-weight: 500;
   font-size: 14px !important;
   z-index: 80 !important;
-  /* CLEAR AND ADAPT CSS TEMPLATE TO TDS */ }
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0; }
   .main-header .navbar {
-    background-color: #3c8dbc !important; }
-  .main-header .navbar-ul-container .navbar-nav a.dropdown-toggle {
-    font-weight: 400 !important; }
-  @media (max-width: 1200px) {
-    .main-header .navbar-ul-container-full-menu {
-      position: absolute;
-      top: 34px; }
-      .main-header .navbar-ul-container-full-menu .navbar-nav a.dropdown-toggle {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        margin-top: 10px; }
-    .main-header .menu-top-container-full-menu {
-      height: 84px; } }
-  @media (max-width: 768px) {
-    .main-header .navbar-ul-container {
-      position: inherit;
-      top: inherit; }
-      .main-header .navbar-ul-container .navbar-nav a.dropdown-toggle {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        margin-top: 10px; }
-    .main-header .menu-top-container {
-      height: auto; } }
-  .main-header .navbar-header .navbar-toggle {
-    float: left !important; }
-  @media (min-width: 1200px) {
-    .main-header .container {
-      width: 100% !important; } }
-  @media (min-width: 992px) {
-    .main-header .container {
-      width: 100% !important; } }
-  @media (max-width: 991px) {
-    .main-header .navbar-collapse.pull-left + .navbar-custom-menu {
-      right: 6px; } }
-  @media (max-width: 1260px) {
-    .main-header .navbar-toggle {
-      margin-left: -15px; } }
-  @media (min-width: 1260px) {
-    .main-header .navbar > .container .navbar-brand, .main-header .navbar > .container-fluid .navbar-brand {
-      margin-left: -15px; } }
-  @media (min-width: 768px) {
-    .main-header .navbar > .container .navbar-brand, .main-header .navbar > .container-fluid .navbar-brand {
-      margin-left: 0px !important; } }
-  @media (min-width: 768px) {
-    .main-header .container-fluid > .navbar-collapse, .main-header .container-fluid > .navbar-header, .main-header .container > .navbar-collapse, .main-header .container > .navbar-header {
-      margin-left: 0px; } }
-  @media (max-width: 467px) {
-    .main-header #logo-header {
-      display: none !important; } }
-  .main-header .container-fluid > .navbar-collapse, .main-header .container-fluid > .navbar-header, .main-header .container > .navbar-collapse, .main-header .container > .navbar-header {
+    background-color: #18394b !important;
+    min-height: 45px; }
+  .main-header .navbar-header {
+    float: left; }
+    .main-header .navbar-header .navbar-toggle {
+      float: left !important; }
+  .main-header .dropdown-menu {
+    left: -1px; }
+  .main-header .dropdown-menu .active > a,
+  .main-header .dropdown-menu .active > a:focus,
+  .main-header .dropdown-menu .active > a:hover {
+    position: relative;
+    color: #333;
+    background-color: transparent; }
+  .main-header .dropdown-menu .active > a:after {
+    content: "";
+    background-color: #3c8dbc;
+    display: block;
+    position: absolute;
+    bottom: 5px;
+    left: 15px;
+    right: 15px;
+    height: 3px; }
+  .main-header .dropdown-menu .active > a:hover:after {
+    background-color: #fff; }
+  .main-header .container-fluid > .navbar-collapse,
+  .main-header .container-fluid > .navbar-header,
+  .main-header .container > .navbar-collapse,
+  .main-header .container > .navbar-header {
     margin-left: 0px !important; }
   .main-header .menu-top-container {
-    padding-right: 15px;
-    margin-left: 8px; }
+    padding: 0 15px 0 0;
+    margin: 0;
+    width: 100%; }
     .main-header .menu-top-container .navbar-brand {
       padding: 0px !important; }
-    .main-header .menu-top-container #logo-header {
-      height: 34px;
-      margin-top: 9px;
-      margin-right: 14px; }
-    .main-header .menu-top-container .nav > li > a {
-      padding: 15px 11px; }
+    .main-header .menu-top-container #nav-project-name {
+      font-size: 75%;
+      padding: 0 10px; }
+    .main-header .menu-top-container .nav > li > a,
+    .main-header .menu-top-container .nav > li > .tds-nav-item {
+      color: #fff;
+      background: #18394b;
+      padding: 0 20px;
+      line-height: 45px;
+      display: inline-block; }
+    .main-header .menu-top-container .nav > li > a:hover {
+      background: #163344; }
+    .main-header .menu-top-container .navbar-toggle {
+      padding: 0 10px;
+      line-height: 45px; }
+    .main-header .menu-top-container .user-navarea {
+      position: absolute;
+      right: 0;
+      top: 0; }
+      .main-header .menu-top-container .user-navarea i.licensing-error-warning {
+        color: #ffcc00;
+        font-size: 18px; }
+    .main-header .menu-top-container .tranman-menu-component {
+      display: inline-block; }
+      .main-header .menu-top-container .tranman-menu-component .nav > li > a:hover:after {
+        content: "";
+        height: 3px;
+        display: block;
+        background-color: #3c8dbc;
+        position: absolute;
+        bottom: 5px;
+        left: 10px;
+        right: 10px; }
+    .main-header .menu-top-container .user-menu .user-menu-text {
+      display: none; }
+    .main-header .menu-top-container .dropdown-menu > li > a:hover {
+      color: #fff;
+      background: #649bc4; }
+    .main-header .menu-top-container li.user-menu {
+      height: 45px; }
+      .main-header .menu-top-container li.user-menu a {
+        display: block;
+        overflow: hidden;
+        text-align: left;
+        padding: 0 10px; }
+        .main-header .menu-top-container li.user-menu a .user-name {
+          display: inline-block;
+          border-radius: 50%;
+          height: 30px;
+          width: 30px;
+          line-height: 32px;
+          white-space: nowrap;
+          background: #fff;
+          color: #3c8dbc;
+          text-align: center; }
+      .main-header .menu-top-container li.user-menu a:hover .user-name {
+        color: #307197; }
+    .main-header .menu-top-container li.open > a {
+      background: #3c8dbc;
+      color: #fff; }
+    .main-header .menu-top-container .notifications-menu > a {
+      padding: inherit 10px; }
+    .main-header .menu-top-container .search-dialog-dropdown-menu {
+      width: 400px; }
     .main-header .menu-top-container .navbar-collapse li.dropdown div.menu-context-wrapper {
       margin-left: 5px;
       margin-right: 5px; }
-  .main-header nav ul.menu-item-expand {
-    border: 1px solid #d2d6de; }
-    .main-header nav ul.menu-item-expand li a {
-      line-height: 13px; }
-    .main-header nav ul.menu-item-expand li.menu-parent-item {
-      display: block;
-      padding: 1px 13px;
-      clear: both;
-      font-weight: 700;
-      line-height: 1.42857143;
-      color: #333;
-      white-space: nowrap; }
-      .main-header nav ul.menu-item-expand li.menu-parent-item a {
-        display: block;
-        padding: 1px 13px;
-        clear: both;
-        font-weight: 700;
-        line-height: 1.42857143;
-        color: #333;
-        white-space: nowrap; }
-    @media (max-width: 767px) {
-      .main-header nav ul.menu-item-expand li.menu-parent-item {
-        color: #fff; } }
-    .main-header nav ul.menu-item-expand li.menu-child-item.active a {
-      background-color: #e1e3e9 !important;
-      color: #333; }
-    .main-header nav ul.menu-item-expand li.menu-child-warn {
-      color: red;
-      padding-left: 28px;
-      font-weight: 600; }
-  .main-header nav ul.nav {
-    background: inherit;
-    border: inherit;
-    margin: inherit;
-    padding: inherit; }
-  .main-header nav li #nav-project-name {
-    background: none !important;
-    color: white !important;
-    cursor: default;
-    font-weight: initial; }
-  .main-header nav .dropdown.user.user-menu span.user-name {
-    font-weight: 700; }
-  .main-header nav .dropdown.user.user-menu ul.dropdown-menu {
-    width: 207px; }
-    .main-header nav .dropdown.user.user-menu ul.dropdown-menu li.user-header {
-      height: 102px !important;
-      padding: 6px !important; }
-      .main-header nav .dropdown.user.user-menu ul.dropdown-menu li.user-header div.user-info-container {
-        display: initial;
-        margin: 48px;
-        color: white;
-        font-weight: 700; }
-  .main-header nav .dropdown.user.user-menu .user-body {
-    border-top: 0px !important;
-    padding: 0px !important; }
-    .main-header nav .dropdown.user.user-menu .user-body .list-group-item:first-child {
-      border-top-left-radius: 0px;
-      border-top-right-radius: 0px; }
-    .main-header nav .dropdown.user.user-menu .user-body .list-group-item:last-child {
-      border-bottom-right-radius: 0px;
-      border-bottom-left-radius: 0px; }
-    .main-header nav .dropdown.user.user-menu .user-body .list-group {
-      margin-bottom: 0px !important; }
-    .main-header nav .dropdown.user.user-menu .user-body .list-group-item {
-      border: 0px;
-      border-top: 1px solid #ddd !important;
-      border-bottom: 1px solid #ddd !important;
-      margin-top: -2px !important; }
-  .main-header nav .dropdown.user.user-menu span.user-menu-icon-badge {
-    padding-right: 10px; }
+    .main-header .menu-top-container #mobile-nav {
+      display: block; }
+    @media (max-width: 1150px) {
+      .main-header .menu-top-container .nav > li > a {
+        padding: 0 15px; } }
+    @media (max-width: 1020px) {
+      .main-header .menu-top-container .nav > li > a {
+        font-size: 90%; } }
+    @media (max-width: 991px) {
+      .main-header .menu-top-container .navbar-toggle {
+        display: block; }
+      .main-header .menu-top-container #mobile-nav {
+        display: none;
+        position: fixed;
+        width: 30%;
+        min-width: 300px;
+        bottom: 0;
+        top: 45px;
+        right: 0;
+        text-align: right;
+        overflow: auto;
+        background-color: #18394b;
+        font-weight: 400; }
+        .main-header .menu-top-container #mobile-nav .dropdown-menu {
+          width: 100%;
+          font-size: 85%;
+          border: 0;
+          border-radius: 0;
+          padding: 0 0 10px 0;
+          margin: 0;
+          left: 0;
+          right: 0;
+          background: #fff; }
+          .main-header .menu-top-container #mobile-nav .dropdown-menu .divider {
+            height: 1px;
+            margin: 4px 0;
+            background-color: #eee; }
+        .main-header .menu-top-container #mobile-nav .navbar-nav {
+          margin: 0; }
+        .main-header .menu-top-container #mobile-nav .user-navarea,
+        .main-header .menu-top-container #mobile-nav .navbar-ul-container {
+          position: relative;
+          float: none;
+          display: block; }
+        .main-header .menu-top-container #mobile-nav .user-navarea > ul {
+          height: auto;
+          text-align: right;
+          padding: 0;
+          float: none; }
+          .main-header .menu-top-container #mobile-nav .user-navarea > ul li {
+            height: auto;
+            display: block;
+            float: none; }
+            .main-header .menu-top-container #mobile-nav .user-navarea > ul li a {
+              text-align: right; }
+              .main-header .menu-top-container #mobile-nav .user-navarea > ul li a .user-menu-text {
+                display: inline; }
+              .main-header .menu-top-container #mobile-nav .user-navarea > ul li a .user-name {
+                display: none; }
+          .main-header .menu-top-container #mobile-nav .user-navarea > ul li.notifications-menu {
+            display: none; }
+          .main-header .menu-top-container #mobile-nav .user-navarea > ul .dropdown-menu {
+            position: relative; }
+        .main-header .menu-top-container #mobile-nav li.dropdown {
+          float: none; }
+          .main-header .menu-top-container #mobile-nav li.dropdown a {
+            display: block;
+            padding: 0 30px;
+            line-height: 35px; }
+          .main-header .menu-top-container #mobile-nav li.dropdown > .dropdown-menu {
+            display: none;
+            position: relative;
+            float: none;
+            text-align: right; }
+            .main-header .menu-top-container #mobile-nav li.dropdown > .dropdown-menu a {
+              line-height: 30px; }
+        .main-header .menu-top-container #mobile-nav li.dropdown.open > .dropdown-menu {
+          display: block; }
+      .main-header .menu-top-container #mobile-nav.collapse.in {
+        display: block; } }
 
 aside.main-sidebar {
   padding-top: 0px; }
@@ -1280,12 +2076,6 @@ aside.main-sidebar {
     padding: 0;
     float: right; }
 
-section.content-header h1 {
-  color: #333333 !important;
-  font-weight: 500 !important;
-  font-size: 24px !important;
-  margin: 0px !important; }
-
 div.message-wrapper {
   top: 8%;
   margin: auto;
@@ -1294,15 +2084,18 @@ div.message-wrapper {
   right: 0;
   width: 43%;
   z-index: 1100; }
-  div.message-wrapper div.message-wrapper-container div.alert.fadeIn {
-    -webkit-transition: all linear 0.25s;
-    transition: all linear 0.25s; }
-  div.message-wrapper div.message-wrapper-container div.alert.fadeIn.ng-hide {
-    opacity: 0; }
-  div.message-wrapper div.message-wrapper-container div.alert.fadeIn.ng-show {
-    opacity: 1; }
 
-div.k-animation-container div.k-notification {
+div.message-wrapper-container.fadeIn {
+  -webkit-transition: all linear 0.25s;
+  transition: all linear 0.25s; }
+
+div.message-wrapper-container.fadeIn.ng-hide {
+  opacity: 0; }
+
+div.message-wrapper-container.fadeIn.ng-show {
+  opacity: 1; }
+
+div.k-notification {
   top: 8% !important;
   margin: auto !important;
   position: fixed !important;
@@ -1312,7 +2105,7 @@ div.k-animation-container div.k-notification {
   z-index: 1100 !important;
   background-color: inherit !important;
   border: inherit !important; }
-  div.k-animation-container div.k-notification div.alert {
+  div.k-notification div.alert {
     border: inherit !important; }
 
 div.content-wrapper {
@@ -1324,9 +2117,9 @@ div.content-wrapper {
     div.content-wrapper .container section.content-header {
       padding: 8px 15px 0px 15px;
       margin-bottom: 8px; }
-      div.content-wrapper .container section.content-header > .breadcrumb {
+      div.content-wrapper .container section.content-header > .breadcrumb-container {
         padding: 0px 5px; }
-        div.content-wrapper .container section.content-header > .breadcrumb a {
+        div.content-wrapper .container section.content-header > .breadcrumb-container a {
           cursor: default; }
       div.content-wrapper .container section.content-header > .licensing-banner-message.breadcumb-1 {
         right: 7%; }
@@ -1490,6 +2283,14 @@ div.ui-dialog {
     padding-right: 18px;
     padding-top: 6px;
     padding-bottom: 1px; }
+    div.ui-dialog div.ui-dialog-content#showEntityView, div.ui-dialog div.ui-dialog-content#cloneEntityView, div.ui-dialog div.ui-dialog-content#editEntityView, div.ui-dialog div.ui-dialog-content#showEntityView, div.ui-dialog div.ui-dialog-content#cablingDialogId {
+      padding: unset;
+      background: #fff;
+      position: fixed !important;
+      top: 56px !important;
+      left: 35px !important;
+      right: 35px !important;
+      bottom: 48px !important; }
   div.ui-dialog div.dialog {
     background-color: #fff;
     border: 0px !important; }
@@ -1557,9 +2358,6 @@ div.ui-dialog {
       background-color: #f3f4f6 !important; }
   div.ui-dialog div#createEntityView, div.ui-dialog div#checkBoxDiv, div.ui-dialog div#createStaffDialog, div.ui-dialog div#personGeneralViewId, div.ui-dialog div#personDialog {
     background-color: #fff; }
-  div.ui-dialog div#checkBoxDiv div.checkboxdiv_control {
-    margin-left: 12px;
-    margin-top: 5px; }
   div.ui-dialog div#checkBoxDiv div.checkboxdiv_default {
     margin-top: 25px;
     font-weight: 600; }
@@ -1581,9 +2379,6 @@ div.ui-widget-overlay {
   filter: Alpha(Opacity=50);
   background: rgba(0, 0, 0, 0.3);
   /*z-index: 1050*/ }
-
-div.select2-container span.select2-chosen {
-  font-size: 12px !important; }
 
 .buttons input.clone-asset {
   background: transparent url(../icons/database_copy.png) 5px 50% no-repeat;
@@ -1610,32 +2405,76 @@ div.license-warning-message-button {
   text-align: center;
   margin-top: 10px; }
 
-.licensing-banner-message {
-  text-align: center; }
-  .licensing-banner-message .callout {
-    color: #DB8700;
-    background: none;
-    padding: 4px 12px 4px 12px;
-    font-size: 14px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: auto; }
+.legacy-licensing-banner-message {
+  text-align: center;
+  width: 100%; }
+  .legacy-licensing-banner-message .callout {
+    line-height: 25px;
+    font-size: 12px;
+    color: #333;
+    background: #c4d0dc;
+    border: 1px solid #a4bdd4;
+    padding: 2px;
+    position: relative;
+    margin: 0; }
 
 @media (min-width: 992px) {
-  .licensing-banner-message {
+  .legacy-licensing-banner-message {
     float: initial !important;
     max-width: 400px;
     margin: 0 auto;
-    position: relative !important;
-    top: -25px !important; } }
+    position: relative !important; } }
 
 @media (max-width: 991px) {
-  .content-header > .breadcrumb.licensing-banner-message {
+  .content-header > .legacy-breadcrumb.legacy-licensing-banner-message {
     background: none; }
-    .content-header > .breadcrumb.licensing-banner-message .callout {
+    .content-header > .legacy-breadcrumb.legacy-licensing-banner-message .callout {
       margin-right: 0px;
       position: initial !important; } }
+
+.legacy-content-middle {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center; }
+  .legacy-content-middle h2 {
+    margin-top: 0; }
+
+.legacy-breadcrumb {
+  cursor: default;
+  padding: 0 5px;
+  list-style: none;
+  border-radius: 4px;
+  float: right; }
+  .legacy-breadcrumb li {
+    display: inline-block;
+    color: #444;
+    font-weight: bold; }
+  .legacy-breadcrumb li + li:before {
+    padding: 0 5px;
+    color: #ccc;
+    content: "\003E"; }
+  .legacy-breadcrumb > .legacy-licensing-banner-message.breadcumb-1 {
+    right: 7%; }
+  .legacy-breadcrumb > .legacy-licensing-banner-message.breadcumb-2 {
+    right: 9%; }
+  .legacy-breadcrumb > .legacy-licensing-banner-message.breadcumb-3 {
+    right: 10%; }
+  .legacy-breadcrumb > .legacy-licensing-banner-message.breadcumb-4 {
+    right: 12%; }
+
+.legacy-breadcrumb.licensing-banner-message {
+  background: none !important; }
+
+.legacy-licensing-banner-message-container {
+  display: grid;
+  width: 100%; }
+
+.legacy-breadcrumb-container {
+  text-align: right;
+  display: grid; }
 
 /* Migration CSS, after migrate one entire module, delete their css */
 div.content-wrapper div.container .body table.asset-summary-table {
@@ -1681,7 +2520,7 @@ div.content-wrapper div.container div#DependencyGroupsTableId div#dependencyDivI
 
 div.content-wrapper div.container div#item1.fullscreen div#filterOptionsMenuId.open {
   left: 366px;
-  top: 20px; }
+  top: 50px; }
 
 div.content-wrapper div.container div#item1:not(.fullscreen) div#toolsContainerId {
   z-index: auto; }
@@ -1699,14 +2538,13 @@ div.content-wrapper div.container div#item1 div#graphToolbarId {
 div.content-wrapper div.container div#item1 div#filterOptionsMenuId {
   z-index: 1;
   display: none !important;
-  border-top: 0px;
   margin-top: -1px;
   width: 235px; }
   div.content-wrapper div.container div#item1 div#filterOptionsMenuId.open {
     display: block !important;
     position: absolute;
-    left: 354px;
-    top: 21px;
+    left: 518px;
+    top: 38px;
     background-color: #ffffff;
     cursor: auto !important; }
   div.content-wrapper div.container div#item1 div#filterOptionsMenuId table {
@@ -1863,8 +2701,10 @@ div.content-wrapper div.container .dependencyConsoleForm {
   cursor: pointer; }
 
 div #dependecy-control {
-  height: calc(100% - 30px);
+  height: calc(100% - 50px);
   overflow: auto; }
+  div #dependecy-control::-webkit-scrollbar {
+    width: 0px; }
 
 #levelsUpId, #levelsDownId {
   width: 20px;
@@ -2079,7 +2919,7 @@ div.content-wrapper div.container div.task-timeline-container svg#timelineSVGId 
 
 div.content-wrapper div.container div.body {
   position: static; }
-  div.content-wrapper div.container div.body div#taskGraphId div.progress-bar-container div.refresh-button {
+  div.content-wrapper div.container div.body div#taskGraphId div.progress-bar-container {
     margin-top: 5px; }
   div.content-wrapper div.container div.body div#taskGraphId div#graphToolbarId {
     font-size: 0px; }
@@ -2163,6 +3003,35 @@ div.content-wrapper div.execution-phase-wrapper {
       flex-basis: 49%; } }
 
 /* Cookbook */
+.code-diff-modal .modal-dialog {
+  width: 1060px; }
+
+.modal-dialog-fullscreen .tds-modal-content {
+  height: 100%; }
+  .modal-dialog-fullscreen .tds-modal-content .modal-body {
+    max-height: 100%; }
+    .modal-dialog-fullscreen .tds-modal-content .modal-body .CodeMirror {
+      height: 100% !important; }
+      .modal-dialog-fullscreen .tds-modal-content .modal-body .CodeMirror .CodeMirror-linenumber {
+        margin-top: -4px; }
+
+.code-editor-modal .modal-body {
+  padding: 15px !important; }
+
+.cookbook_recipes_editor .clr-select-wrapper,
+.recipeDetail .clr-select-wrapper {
+  display: block; }
+  .cookbook_recipes_editor .clr-select-wrapper select,
+  .recipeDetail .clr-select-wrapper select {
+    display: inherit; }
+
+.cookbook_recipes_editor .recipe-add {
+  width: 40px; }
+  .cookbook_recipes_editor .recipe-add button {
+    max-height: 30px;
+    line-height: 30px;
+    min-width: 44px; }
+
 .taskGeneration .container-fluid {
   padding-left: 0px; }
 
@@ -2184,3 +3053,129 @@ div.content-wrapper div.execution-phase-wrapper {
 .taskGeneration .settings-container.recipe-editor {
   height: 82px;
   padding-top: 23px; }
+
+.layout-top-nav .main-header > .navbar {
+  margin: 0;
+  width: 100%; }
+
+/* Clarity */
+.cookbook_recipes_editor .gridStyle,
+.cookbook_recipes_editor .gridStyleTasks,
+.cookbook_recipes_editor .gridStyleGroups,
+.recipeDetail .gridStyle,
+.recipeDetail .gridStyleTasks,
+.recipeDetail .gridStyleGroups,
+.cloneSelectors .gridStyle,
+.cloneSelectors .gridStyleTasks,
+.cloneSelectors .gridStyleGroups {
+  border: none;
+  background: none; }
+  .cookbook_recipes_editor .gridStyle .ngTopPanel,
+  .cookbook_recipes_editor .gridStyleTasks .ngTopPanel,
+  .cookbook_recipes_editor .gridStyleGroups .ngTopPanel,
+  .recipeDetail .gridStyle .ngTopPanel,
+  .recipeDetail .gridStyleTasks .ngTopPanel,
+  .recipeDetail .gridStyleGroups .ngTopPanel,
+  .cloneSelectors .gridStyle .ngTopPanel,
+  .cloneSelectors .gridStyleTasks .ngTopPanel,
+  .cloneSelectors .gridStyleGroups .ngTopPanel {
+    background-color: #d9e4ea; }
+    .cookbook_recipes_editor .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar {
+      margin-top: 10px;
+      height: 13px !important;
+      background-color: #656565; }
+    .cookbook_recipes_editor .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cookbook_recipes_editor .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText {
+      text-align: center;
+      font-weight: 500;
+      font-size: 11px;
+      color: #3c8dbc; }
+  .cookbook_recipes_editor .gridStyle .ngRow,
+  .cookbook_recipes_editor .gridStyleTasks .ngRow,
+  .cookbook_recipes_editor .gridStyleGroups .ngRow,
+  .recipeDetail .gridStyle .ngRow,
+  .recipeDetail .gridStyleTasks .ngRow,
+  .recipeDetail .gridStyleGroups .ngRow,
+  .cloneSelectors .gridStyle .ngRow,
+  .cloneSelectors .gridStyleTasks .ngRow,
+  .cloneSelectors .gridStyleGroups .ngRow {
+    border: 1px solid #d9e4ea;
+    background: none; }
+    .cookbook_recipes_editor .gridStyle .ngRow.selected,
+    .cookbook_recipes_editor .gridStyleTasks .ngRow.selected,
+    .cookbook_recipes_editor .gridStyleGroups .ngRow.selected,
+    .recipeDetail .gridStyle .ngRow.selected,
+    .recipeDetail .gridStyleTasks .ngRow.selected,
+    .recipeDetail .gridStyleGroups .ngRow.selected,
+    .cloneSelectors .gridStyle .ngRow.selected,
+    .cloneSelectors .gridStyleTasks .ngRow.selected,
+    .cloneSelectors .gridStyleGroups .ngRow.selected {
+      background-color: #c9dde1; }
+    .cookbook_recipes_editor .gridStyle .ngRow .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleTasks .ngRow .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleGroups .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyle .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyleTasks .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyleGroups .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyle .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyleTasks .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyleGroups .ngRow .ngVerticalBar {
+      width: 0px !important; }
+
+.cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderSortColumn {
+  padding-top: 4px; }
+
+div.clr-select-wrapper {
+  max-height: 1rem;
+  display: inline-block;
+  position: relative;
+  white-space: nowrap; }
+  div.clr-select-wrapper select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: 0 0;
+    height: 1rem;
+    color: #000;
+    display: inline-block;
+    border-bottom: 1px solid #999;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(95%, transparent), color-stop(95%, #0092d1)) no-repeat;
+    background: linear-gradient(to bottom, transparent 95%, #0092d1 95%) no-repeat;
+    background-size: 0 100%;
+    -webkit-transition: background-size .2s ease;
+    transition: background-size .2s ease;
+    position: relative;
+    padding: 0 .916667rem 0 .25rem;
+    cursor: pointer;
+    font-size: .541667rem;
+    z-index: 2;
+    /**/
+    font-size: 13px;
+    padding-left: 0;
+    font-weight: 500;
+    line-height: 18px; }
+    div.clr-select-wrapper select:hover {
+      border-color: rgba(222, 222, 222, 0.5);
+      background: rgba(222, 222, 222, 0.5); }

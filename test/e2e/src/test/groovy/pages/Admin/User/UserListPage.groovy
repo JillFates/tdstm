@@ -14,7 +14,7 @@ class UserListPage extends Page{
 
     static content = {
         adminModule { module AdminModule}
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
         usernameFilter { $("#gs_username")}
         personFilter {$("#gs_fullname")}
         usernames { $("[aria-describedby=userLoginIdGrid_username] a")}

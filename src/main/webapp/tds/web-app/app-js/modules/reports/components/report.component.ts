@@ -47,7 +47,7 @@ export abstract class ReportComponent {
 				{ provide: 'ID', useValue: assetId },
 				{ provide: 'ASSET', useValue: assetClass },
 				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.LG).then(result => {
+			], DIALOG_SIZE.XXL).then(result => {
 			// Do nothing
 		}).catch(result => {
 			// Do nothing

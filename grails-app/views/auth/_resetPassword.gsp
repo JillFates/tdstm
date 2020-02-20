@@ -15,10 +15,12 @@
 	<link rel="stylesheet" href="${resource(dir:'dist/css/ionicons/2.0.1/css',file:'ionicons.min.css')}">
 	<!-- Theme style -->
 	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
+	<!-- Clarity CSS -->
+	<link rel="stylesheet" href="https://unpkg.com/@clr/ui/clr-ui.min.css" />
+
 	<!-- General Template Style -->
 	<asset:stylesheet href="css/tds-style.css" />
 	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
-
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
 
 	<asset:stylesheet href="css/spinner.css" />
@@ -32,11 +34,12 @@
 			<div class="login-box-body">
 				<div class="login-logo">
 					<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-						<asset:image src="images/TMLoginLogo.gif" border="0" alt="Learn more about TransitionManager" />
+						<asset:image src="images/TMLoginLogo_v4.7.png" border="0" alt="Learn more about TransitionManager" />
 					</a>
 				</div>
-
-				<p class="login-box-msg">Password Assistant - Enter New Password</p>
+				<div>
+					<h1>Password Assistant - Enter New Password</h1>
+				</div>
 
 				<div id="spinner" class="spinner" style="display: none;"><img
 						src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
@@ -47,54 +50,56 @@
 					<input type="hidden" name="token" id="token" value="${token}" />
 					<p>The final step is to enter your email address associated with your account and a new password.
 					</p>
-					<div class="checkbox">
-						<label>
-							<input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="showPasswordEditId" checked/> Hide password
-						</label>
+					<div class="clr-row">
+							<form clrForm clrLayout="vertical">
+								<clr-input-container class="clr-col-12">
+									<input clrInput class="clr-input" type="email"
+										   name="email" id="email" placeholder="Enter your email address"
+										   value="${email}" autocorrect="off" autocapitalize="off" required autofocus style="width: 100%"/>
+								</clr-input-container>
+								<clr-password-container class="clr-col-12">
+									<input clrPassword type="password"
+										   class="clr-input" id="passwordId" name="password" autocorrect="off"
+										   autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)" style="width: 100%"/>
+								</clr-password-container>
+								<div class="clr-col-12">
+									<em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
+									<em id="lengthRequirementId" size="${minPasswordLength}">Password must be at least ${minPasswordLength} characters long<b class="ok"></b></em><br/>
+									<em id="passwordRequirementsId">Password must contain at least 3 of these requirements:</em><br/>
+									<ul>
+										<li><em id="uppercaseRequirementId">Uppercase characters<b class="ok"></b></em></li>
+										<li><em id="lowercaseRequirementId">Lowercase characters<b class="ok"></b></em></li>
+										<li><em id="numericRequirementId">Numeric characters<b class="ok"></b></em></li>
+										<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
+									</ul>
+								</div>
+								<clr-password-container class="clr-col-12">
+									<input clrPassword class="clr-input" type="password" id="confirmPasswordId"
+										   name="confirmPassword" autocorrect="off" autocapitalize="off"
+										   placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)" style="width: 100%"
+										   required/>
+									<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
+								</clr-password-container>
+								<div class="clr-col-12 buttons-container">
+									<div class="clr-row">
+										<div class="clr-col-xl-4 clr-col-lg-5 clr-col-md-5 clr-col-sm-12">
+											<a href="javascript:void(0)" (click)="backToLogin()"
+											   class="light back-to-login">Back to login</a>
+										</div>
+										<div class="clr-col-xl-8 clr-col-lg-7 clr-col-md-7 clr-col-sm-12">
+											<g:if test="${validToken}">
+												<g:actionSubmit id="resetPasswordSubmitButton" class="btn btn-primary btn-block btn-flat" value="Update Password" action="applyNewPassword"/>
+											</g:if>
+										</div>
+									</div>
+								</div>
+							</form>
 					</div>
-
-					<div class="form-group has-feedback">
-						<input type="email" class="form-control" name="email" id="email" placeholder="Enter your email address" title="Enter your email address" value="${email}" autocorrect="off" autocapitalize="off" required autofocus>
-						<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-					</div>
-
-					<div class="form-group has-feedback">
-						<input type="password" id="passwordId" class="form-control passwordField" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)"/>
-					</div>
-
-					<em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
-					<em id="lengthRequirementId" size="${minPasswordLength}">Password must be at least ${minPasswordLength} characters long<b class="ok"></b></em><br/>
-					<em id="passwordRequirementsId">Password must contain at least 3 of these requirements:</em><br/>
-					<ul>
-						<li><em id="uppercaseRequirementId">Uppercase characters<b class="ok"></b></em></li>
-						<li><em id="lowercaseRequirementId">Lowercase characters<b class="ok"></b></em></li>
-						<li><em id="numericRequirementId">Numeric characters<b class="ok"></b></em></li>
-						<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
-					</ul>
-
-					<div class="form-group has-feedback">
-						<input type="password" id="confirmPasswordId" class="form-control passwordField" name="confirmPassword" autocorrect="off" autocapitalize="off" placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)"/>
-					</div>
-					<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
-
 					<g:if test="${flash.message}">
 						<div class="message">${flash.message}</div>
 					</g:if>
 
-					<g:if test="${validToken}">
-						<div class="row change-password-submit">
-							<div class="col-xs-3">
-							</div>
-							<!-- /.col -->
-							<div class="col-xs-9">
-								<g:actionSubmit id="resetPasswordSubmitButton" class="btn btn-primary btn-block btn-flat" value="Update Password" action="applyNewPassword"/>
-							</div>
-							<!-- /.col -->
-						</div>
-					</g:if>
 				</g:form>
-				<a href="/tdstm/auth/login" class="light">Back to Login</a>
-
 				</div>
 			</div>
 		</div>

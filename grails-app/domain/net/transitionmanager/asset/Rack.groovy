@@ -77,8 +77,8 @@ class Rack {
 	 */
 	def beforeDelete = {
 		withNewSession {
-			executeUpdate('update AssetEntity set rackSource=null where rackSource=?', [this])
-			executeUpdate('update AssetEntity set rackTarget=null where rackTarget=?', [this])
+			executeUpdate('update AssetEntity set rackSource=null where rackSource=?0', [this])
+			executeUpdate('update AssetEntity set rackTarget=null where rackTarget=?0', [this])
 		}
 	}
 

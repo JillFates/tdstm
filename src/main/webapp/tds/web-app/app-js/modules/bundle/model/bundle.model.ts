@@ -1,4 +1,5 @@
 import {ModalType} from '../../../shared/model/constants';
+import {FilterType} from 'tds-component-library';
 
 export class BundleModel {
 	public id?: any;
@@ -21,38 +22,51 @@ export class BundleColumnModel {
 			{
 				label: 'Name',
 				property: 'name',
-				type: 'text',
+				filterType: FilterType.text,
 				width: '*'
 			},
 			{
 				label: 'Description',
 				property: 'description',
-				type: 'text',
+				filterType: FilterType.text,
 				width: '*'
 			},
 			{
 				label: 'Planning',
 				property: 'planning',
-				type: 'boolean',
-				width: 100
+				filterType: FilterType.boolean,
+				filterInputData: {
+					data: [
+						{
+							text: 'True',
+							value: true,
+						},
+						{
+							text: 'False',
+							value: false,
+						},
+					],
+					defaultItem: { text: '', value: null },
+				},
+				width: 110
 			},
 			{
 				label: 'Asset Quantity',
 				property: 'assetqty',
-				type: 'number',
+				filterType: FilterType.number,
 				width: 225
 			},
 			{
 				label: 'Start Time',
 				property: 'startDate',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
 				width: 'auto'
 			},
 			{
 				label: 'Completion Time',
 				property: 'completion',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
 				width: 'auto'
 			}

@@ -11,7 +11,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.error.RequiredPageContentNotPresent
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
@@ -19,7 +19,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     static testCount
     static randStr = CommonActions.getRandomString()
     static baseName = "QAE2E"
-    static projName = baseName +" "+ randStr
+    static projName = randStr +" "+ baseName
     static licensedProjectName = "TM-Demo"
     static projectInfo = [
             "projName": projName,
@@ -34,13 +34,13 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     static SOX_Tag = ["name": "SOX", "description": "Sarbanes–Oxley Act Compliance", "color": "#eaf2d9"]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
         login(4,5) // test needs to be done by e2e_projects_user
         at MenuPage
-        projectsModule.goToProjectsActive()
+        waitFor (40) { projectsModule.goToProjectsActive() }
         at ProjectListPage
     }
 
@@ -70,11 +70,13 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
         and: 'The user clicks on Save button'
             clickOnSaveButton()
         then: 'Project Details Page is displayed'
-            at ProjectDetailsPage
-        and: 'Message saying project created is displayed'
-            waitForProjectCreatedMessage projName
-        and: 'Project name is displayed in menu bar'
-            projectsModule.assertProjectName projName
+            at ProjectListPage
+        when: 'The user set project filter name'
+        clickFilterButton()
+        waitFor { projectNameFilter.click() }
+        projectNameFilter = projName
+        then: 'Project created should be displayed in the grid'
+        projectIsListed randStr
     }
 
     def "3. The User navigates to Tags Page and verifies default tags created"(){
@@ -91,7 +93,9 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     def "4. The User verifies default tags info displayed"(){
         given: 'The User is in Manage Tags page'
             at TagsPage
-        when: 'The User filters by GDPR'
+        when: 'The user clicks on Filter button'
+            clickOnFilterButton()
+        and: 'The User filters by GDPR'
             filterByName GDPR_Tag.name
         then: 'User verifies row info displayed is correct'
             getTagNameText() == GDPR_Tag.name
@@ -100,19 +104,19 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
         when: 'The User filters by HIPPA'
             filterByName HIPPA_Tag.name
         then: 'The User verifies row info displayed is correct'
-            getTagNameText() == HIPPA_Tag.name
+            waitFor{getTagNameText() == HIPPA_Tag.name}
             getTagDescriptionText() == HIPPA_Tag.description
             getTagColorHexText() == HIPPA_Tag.color
         when: 'User filters by PCI'
             filterByName PCI_Tag.name
         then: 'The User verifies row info displayed is correct'
-            getTagNameText() == PCI_Tag.name
+            waitFor{getTagNameText() == PCI_Tag.name}
             getTagDescriptionText() == PCI_Tag.description
             getTagColorHexText() == PCI_Tag.color
         when: 'The User filters by SOX'
             filterByName SOX_Tag.name
         then: 'The User verifies row info displayed is correct'
-            getTagNameText() == SOX_Tag.name
+            waitFor{ getTagNameText() == SOX_Tag.name}
             getTagDescriptionText() == SOX_Tag.description
             getTagColorHexText() == SOX_Tag.color
     }

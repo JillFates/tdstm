@@ -34,7 +34,6 @@ class WsCredentialController implements ControllerMethods {
 	def create() {
 		CredentialCommand command = populateCommandObject(CredentialCommand)
 
-		validateCommandObject(command)
 		def result = credentialService.create(command)
 		renderSuccessJson(result.toMap())
 	}
@@ -42,7 +41,6 @@ class WsCredentialController implements ControllerMethods {
 	@HasPermission(Permission.CredentialEdit)
 	def update(Long id) {
 		CredentialCommand command = populateCommandObject(CredentialCommand)
-		validateCommandObject(command)
 		renderSuccessJson(credentialService.update(id, command, domainVersion).toMap())
 	}
 
