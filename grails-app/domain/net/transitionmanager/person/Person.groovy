@@ -278,7 +278,7 @@ class Person extends Party {
 	}
 
 	String toString() {
-		HtmlUtil.escape(firstName+ (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : ''))
+		HtmlUtil.escapePersonFullName(firstName, middleName, lastName)
 	}
 
 	def beforeValidate() {
