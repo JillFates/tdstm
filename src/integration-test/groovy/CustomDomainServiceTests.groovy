@@ -362,7 +362,23 @@ class CustomDomainServiceTests extends Specification {
             Project.withNewTransaction {
                 project = projectHelper.createProjectWithDefaultBundle()
                 Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
-                projectService.cloneDefaultSettings(project)
+
+                personHelper = new PersonTestHelper()
+
+                project = projectHelper.createProject()
+
+                Person adminPerson = personHelper.createStaff(projectService.getOwner(project))
+                assert adminPerson
+
+                // projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
+                UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
+                assert adminUser
+                assert adminUser.username
+
+                // logs the admin user into the system
+                securityService.assumeUserIdentity(adminUser.username, false)
+                // println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
+                assert securityService.isLoggedIn()
                 createAssets(project)
             }
 
