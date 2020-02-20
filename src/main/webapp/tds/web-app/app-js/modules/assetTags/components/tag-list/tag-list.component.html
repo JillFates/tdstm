@@ -4,7 +4,7 @@
 		<div class="box-body box-with-empty-header">
 			<form novalidate #myForm="ngForm">
 				<kendo-grid
-					class="page-height row-actions-3-children fixed-context-menu"
+					class="page-height"
 					[ngClass]="{'hide-filter': !showFilters}"
 					*ngIf="gridSettings"
 					[data]="gridSettings.gridData"
@@ -75,11 +75,10 @@
 							let-rowIndex="rowIndex"
 						>
 							<div class="action-button btn-link">
-								<clr-dropdown>
-									<tds-button
-										icon="ellipsis-vertical"
-										clrDropdownTrigger
-									></tds-button>
+								<clr-dropdown #dropdown>
+									<tds-button icon="ellipsis-vertical"
+															clrDropdownTrigger
+															tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"></tds-button>
 									<clr-dropdown-menu
 										*clrIfOpen
 										clrPosition="bottom-left"
@@ -256,7 +255,7 @@
 								<tds-grid-filter-input
 									[name]="column.property"
 									[value]="column.filter || ''"
-									[columnType]="column.type"
+									[filterType]="column.type"
 									[placeholder]="'GLOBAL.FILTER' | translate"
 									(filter)="gridSettings.onFilterWithValue($event, column)">
 								</tds-grid-filter-input>
