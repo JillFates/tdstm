@@ -62,7 +62,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * @param id - the id of the dataview to return
 	 * @param _override - when present for the request for a system view that has an overridden version, this flag is
 	 * used to indicate to return the underlying system view instead of the overridden version.
-	 * @return the dataView specification and the saveOptions based on the user's permissions and the view being accessed
+	 * @return the dataView specification and the saveOptions based on the user's permissions and the view being accessedhom
 	 */
 	def getDataview(Integer id) {
 		Person whom = currentPerson()
@@ -117,7 +117,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
 		validateCommandObject(command)
 		Person whom = currentPerson()
-		Map dataviewMap = dataviewService.update(projectForWs, whom, id, command).toMap(whom.id)
+		Map dataviewMap = dataviewService.update(projectForWs, whom, id, command).toMap(projectForWs, whom)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -131,13 +131,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	def createDataview() {
 		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
 		validateCommandObject(command)
-		Person person = currentPerson()
-
-		// TODO : JPM 1/2020 - Should we trust the parameter for a system view???
-		Project project = projectForWs
-				//dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
-
-		Map dataviewMap = dataviewService.create(project, person, command).toMap(project, person)
+		Map dataviewMap = dataviewService.create(project, person, command).toMap(projectForWs, currentPerson())
 		renderSuccessJson([dataView: dataviewMap])
 	}
 

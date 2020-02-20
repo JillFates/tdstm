@@ -239,13 +239,12 @@ class DataviewService implements ServiceMethods {
 		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
 
 		// Determine the saveAsOptions
+		// User can always save as My View
+		if (hasPermission(Permission.AssetExplorerSaveAs)){
+			saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
+		}
 
 		if ( project && ! isDefaultProject ) {
-			// User can always save as My View in projects other than the DEFAULT project
-			if (hasPermission(Permission.AssetExplorerSaveAs)){
-				saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
-			}
-			
 			// Check to see if user already has an overridden version of a system view for themselves and if not
 			// then they get the OVERRIDE_FOR_ME option
 			if ( dataview?.overridesView || dataview?.isSystem) {
@@ -569,9 +568,12 @@ class DataviewService implements ServiceMethods {
 	void validateDataviewUpdateAccessOrException(Project project, Person whom, DataviewCrudCommand dataviewCommand, Dataview dataview) {
 		validateDataviewViewAccessOrException(project, whom, dataview)
 
+		if (dataview.isSystem) {
+			throwException(InvalidParamException.class, 'dataview.validate.modifySystemView', 'System views can not be modified. Please perform Save As and choose an Override options as an alternative.')
+		}
+
 		// Make sure that the name is unique across the all cases
 		validateViewNameUniqueness(project, whom, dataviewCommand)
-
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemEdit : Permission.AssetExplorerEdit
 		if (! securityService.hasPermission(requiredPerm)) {
 			securityService.reportViolation("attempted to modify Dataview ($dataview.id) without required permission $requiredPerm")
@@ -587,6 +589,10 @@ class DataviewService implements ServiceMethods {
 	 * @throws UnauthorizedException
 	 */
 	void validateDataviewCreateAccessOrException(DataviewCrudCommand dataviewCommand, Project project, Person whom) {
+		if (dataview.isSystem) {
+			throwException(InvalidParamException.class, 'dataview.validate.createSystemView', 'Creation of System views is not permitted.')
+		}
+
 		/*
 		 * Users in the Default project
 		 */
@@ -721,6 +727,7 @@ class DataviewService implements ServiceMethods {
 		// Only have to check views that are not overridden because there are other controls in place for that
 		if (dataviewCommand.overridesView == null) {
 			boolean isNotDefaultProject = ! project.isDefaultProject()
+			Long dataviewId = dataviewCommand.id?.id
 
 			// Check for a system view or the user's own
 			List<Long> projectIds = [project.id]
@@ -733,8 +740,8 @@ class DataviewService implements ServiceMethods {
 			boolean foundDuplicateName = Dataview.where {
 				project.id == Project.DEFAULT_PROJECT_ID
 				name == dataviewCommand.name
-				if (dataviewCommand.id) {
-					id != dataviewCommand.id
+				if (dataviewId) {
+					id != dataviewId
 				}
 			}.count() > 0
 
@@ -744,8 +751,8 @@ class DataviewService implements ServiceMethods {
 				foundDuplicateName = Dataview.where {
 					project.id == project.id
 					name == dataviewCommand.name
-					if (dataviewCommand.id) {
-						id != dataviewCommand.id
+					if (dataviewId) {
+						id != dataviewId
 					}
 					( 	person.id == whom.id || (person.id != whom.id && dataviewCommand.isShared) )
 				}.count() > 0

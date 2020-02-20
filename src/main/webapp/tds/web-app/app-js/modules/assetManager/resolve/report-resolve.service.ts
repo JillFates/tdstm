@@ -40,15 +40,18 @@ export class ReportResolveService implements Resolve<any> {
 		}
 	}
 
+	/**
+	 * Used to populate the dataview list of reports with the proper URL querystring argument
+	 * when the view is an override so that the it results
+	 * @param reports
+	 */
 	public populateReport(reports) {
 		if (Array.isArray(reports)) {
 			reports.map( rep => {
 				if (Array.isArray(rep.items)) {
 					rep.items.map( (item) => {
 						const _override: string = item.hasOverride ? 'false' : null;
-						const overrideId = item.overridesView && item.overridesView.id;
 						item.queryParams = {_override};
-						item.overrideId = overrideId
 					})
 				}
 			})
