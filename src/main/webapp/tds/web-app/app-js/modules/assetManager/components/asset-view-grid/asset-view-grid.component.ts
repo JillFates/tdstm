@@ -212,8 +212,10 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 		if (dataChange && dataChange.currentValue !== dataChange.previousValue) {
 			this.applyData(dataChange.currentValue);
+			setTimeout(() => {
+				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+			}, 500);
 		}
-
 	}
 
 	private getPreferences(): Observable<any> {
@@ -768,7 +770,13 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.preferenceService.setPreference(PREFERENCE_WRAP_TAGS_COLUMN, this.showFullTags.toString())
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(() => {
-				// nothing to do here
+				if (!this.showFullTags) {
+					let refreshItem = document.getElementsByClassName('single-line-tags')[0].parentElement;
+					refreshItem.style.paddingTop = '2px';
+					setTimeout( () => {
+						this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+					}, 500);
+				}
 				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 			});
 	}

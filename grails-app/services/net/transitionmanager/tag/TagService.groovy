@@ -1,12 +1,10 @@
 package net.transitionmanager.tag
 
 import com.tdsops.tm.enums.domain.Color
-import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
-
 /**
  * A service for dealing with tags
  */
@@ -295,7 +293,7 @@ class TagService implements ServiceMethods {
 	 */
 	String getTagSelect(List<Long> tagIds) {
 		if (tagIds) {
-			return ", group_concat(distinct COALESCE(ta.tag_id, 0)) as tags"
+			return "group_concat(distinct COALESCE(ta.tag_id, 0)) as tags"
 		}
 
 		return ''
@@ -339,7 +337,7 @@ class TagService implements ServiceMethods {
 
 		if (tagIds && tagMatch == 'ANY') {
 			return """
-					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id and ta.tag_id in (${GormUtil.asCommaDelimitedString(tagIds)})
+					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
 				"""
 		}
 

@@ -13,7 +13,7 @@ import {
 	Placeholder,
 	Shape,
 	Size,
-	TextBlock
+	TextBlock, TreeLayout
 } from 'gojs';
 import {IGraphTask, TASK_OPTION_LABEL} from '../../model/graph-task.model';
 import {ContainerComp} from '../../../../shared/components/diagram-layout/model/legacy-diagram-context-menu.model';
@@ -24,11 +24,12 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../common/constants/task-icon-path';
 import {ITaskGraphIcon} from '../../model/task-graph-icon.model';
 
+const MAX_TASK_COUNT = 600;
 export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 	tasksData: any;
 	currentUser: any;
 
-	constructor(private permissionService: PermissionService, props?: any) {
+	constructor(private permissionService: PermissionService, private props?: any) {
 		this.currentUser = (props && props.currentUser) && props.currentUser.fullName;
 	}
 
@@ -178,15 +179,9 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 
 	layout(): Layout {
 		const treeLayout = new go.TreeLayout();
-		treeLayout.treeStyle = go.TreeLayout.StyleLayered;
-		treeLayout.layerStyle = go.TreeLayout.LayerIndividual;
 		treeLayout.angle = 0;
-		treeLayout.nodeSpacing = 20;
-		treeLayout.sorting = go.TreeLayout.SortingForwards;
-		treeLayout.compaction = go.TreeLayout.CompactionBlock;
-		treeLayout.rowSpacing = 25;
-		treeLayout.rowIndent = 10;
 		treeLayout.layerSpacing = 50;
+		treeLayout.nodeSpacing = 50;
 
 		return treeLayout;
 	}
@@ -194,11 +189,11 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 	linkTemplate(): Link {
 
 		const linkTemplate = new go.Link();
-		linkTemplate.routing = go.Link.AvoidsNodes;
-		linkTemplate.curve = Link.Bezier;
+		linkTemplate.routing = this.props.taskCount > MAX_TASK_COUNT ? Link.Normal : go.Link.AvoidsNodes;
+		linkTemplate.curve = this.props.taskCount > MAX_TASK_COUNT ? Link.None : Link.Bezier;
 
 		const linkShape = new go.Shape();
-		linkShape.strokeWidth = 3;
+		linkShape.strokeWidth = 2;
 		linkShape.stroke = '#ddd';
 		const arrowHead = new Shape();
 		arrowHead.strokeWidth = 2;
@@ -419,10 +414,24 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.textAlign = 'center';
 		assetIconShape.verticalAlignment = go.Spot.Center;
 		assetIconShape.margin = new go.Margin(0, 0, 0, 5);
-		assetIconShape.desiredSize = new go.Size(35, 35);
-		assetIconShape.font = '25px FontAwesome';
 		assetIconShape.mouseOver = (e, o) => o.cursor = 'pointer';
 		assetIconShape.mouseLeave = (e, o) => o.cursor = 'none';
+
+		assetIconShape.bind(new Binding('desiredSize', 'asset',
+			(val: any) => {
+				if (val) {
+					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return type === 'application' ? new go.Size(50, 50) : new go.Size(35, 35);
+				}
+			}));
+
+		assetIconShape.bind(new Binding('font', 'asset',
+			(val: any) => {
+				if (val) {
+					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return type === 'application' ? '40px FontAwesome' : '25px FontAwesome';
+				}
+			}));
 
 		assetIconShape.bind(new Binding('text', 'asset',
 			(val: any) => {
