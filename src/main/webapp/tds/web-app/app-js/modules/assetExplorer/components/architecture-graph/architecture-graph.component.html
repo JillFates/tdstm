@@ -16,7 +16,7 @@
 						[data]="dataForSelect"
 						[textField]="'value'"
 						[valueField]="'id'"
-						(valueChange)="onAssetFilterChange($event)"
+						(valueChange)="onFilterChange($event)"
 						style="width: 100%;"
 				>
 				</kendo-dropdownlist>
@@ -31,7 +31,7 @@
 								[title]="'title empty'"
 								(valueChange)="onAssetSelected($event)"
 								(selectionChange)="onSelectionChange($event)"
-								(filterChange)="onFilterChange($event)"
+								(filterChange)="onAssetFilterChange($event)"
 								(open)="onOpen()"
 								[suggest]="true"
 								name="assetSelectionDropdown"

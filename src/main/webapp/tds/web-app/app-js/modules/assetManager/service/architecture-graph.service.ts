@@ -90,14 +90,14 @@ export class ArchitectureGraphService {
 			.catch((error: any) => error);
 	}
 
-	getAssetsForArchitectureGraph(q: string, value, max: number, 	page: number, assetClassOption: 'ALL') {
+	getAssetsForArchitectureGraph(q: string, value, max: number, 	page: number, assetClassOption = 'ALL') {
 		let params;
 		params = new HttpParams()
 			.set('q', q)
 			.set('value', value)
 			.set('max', String(max))
 			.set('page', String(page))
-			.set('assetClassOption', 'ALL');
+			.set('assetClassOption', assetClassOption);
 		return this.http.get(`${this.ARCHITECTURE_ASSET_SELECT}`, {params})
 			.map((response: any) => {
 				return response;
@@ -108,11 +108,11 @@ export class ArchitectureGraphService {
 	getAssetsForArchitectureGraphWithSearch(q) {
 		let params;
 		params = new HttpParams()
-			.set('q', q)
+			.set('q', '')
 			.set('value', '')
 			.set('max', '25')
 			.set('page', '1')
-			.set('assetClassOption', 'ALL');
+			.set('assetClassOption', q.id || 'ALL');
 		return this.http.get(`${this.ARCHITECTURE_ASSET_SELECT}`, {params})
 			.map((response: any) => {
 				return response;

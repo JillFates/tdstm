@@ -35,6 +35,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	private searchOnScroll = true;
 	private reloadOnOpen = false;
 	private firstChange = true;
+	private currentAssetFilterText: string;
 	public datasource: any[] = [{id: '', text: ''}];
 	public showControlPanel = false;
 	public data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
@@ -157,13 +158,22 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Loads assets for dropdown when you are scrolling on the list
 	 */
 	loadAssetsForDropDown() {
-		this.architectureGraphService.getAssetsForArchitectureGraph(this.comboBoxSearchModel.query, this.comboBoxSearchModel.value, this.comboBoxSearchModel.maxPage, this.comboBoxSearchModel.currentPage, 'ALL').subscribe((res: any) => {
-			this.comboBoxSearchResultModel = res;
-			const result = (this.comboBoxSearchResultModel.results || []);
-			result.forEach((item: any) => this.addToDataSource(item));
-			if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
-				this.calculateLastElementShow();
-			}
+		const queryId = this.comboBoxSearchModel.query && this.comboBoxSearchModel.query['id'] || 'ALL';
+		this.architectureGraphService
+			.getAssetsForArchitectureGraph(
+				// this.comboBoxSearchModel.query,
+				this.currentAssetFilterText,
+				this.comboBoxSearchModel.value,
+				this.comboBoxSearchModel.maxPage,
+				this.comboBoxSearchModel.currentPage,
+				queryId)
+			.subscribe((res: any) => {
+				this.comboBoxSearchResultModel = res;
+				const result = (this.comboBoxSearchResultModel.results || []);
+				result.forEach((item: any) => this.addToDataSource(item));
+				if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
+					this.calculateLastElementShow();
+				}
 		});
 	}
 
@@ -271,6 +281,8 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param filter
 	 */
 	public onFilterChange(filter: any): void {
+		this.currentAssetFilterText = '';
+
 		if (filter !== '') {
 			this.initSearchModel();
 			this.comboBoxSearchModel.currentPage = 1;
@@ -366,9 +378,13 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (this.reloadOnOpen || this.firstChange || !this.comboBoxSearchModel) {
 			this.firstChange = false;
 			this.datasource = [];
-			this.initSearchModel();
+			const queryId = this.comboBoxSearchModel.query && this.comboBoxSearchModel.query['id'] || null;
+			if (!queryId) {
+				this.initSearchModel();
+			}
 			this.loadAssetsForDropDown();
 		} else {
+			this.loadAssetsForDropDown();
 			this.calculateLastElementShow();
 		}
 	}
@@ -394,9 +410,9 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.showLegend = !this.showLegend;
 	}
 
-	onAssetFilterChange(event) {
-		console.log('asset type filter change', event);
-		// do crazy logic here
+	onAssetFilterChange(value: string) {
+		this.currentAssetFilterText = value;
+		this.loadAssetsForDropDown();
 	}
 
 	/**
