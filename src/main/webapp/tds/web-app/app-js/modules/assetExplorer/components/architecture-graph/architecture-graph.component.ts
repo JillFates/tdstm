@@ -11,7 +11,6 @@ import {IArchitectureGraphParams} from '../../model/url-params.model';
 import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
 import {
 	ComboBoxSearchResultModel,
 	RESULT_PER_PAGE
@@ -28,13 +27,9 @@ declare var jQuery: any;
 })
 export class ArchitectureGraphComponent implements OnInit {
 	// References
-	@ViewChild('dropdownFooter', {static: false}) dropdownFooter: ElementRef;
-	@ViewChild('innerComboBox', {static: false}) innerComboBox: ComboBoxComponent;
 	@ViewChild('graph', {static: false}) graph: any;
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
-	private searchOnScroll = true;
-	private currentAssetFilterText: string;
 	public datasource: any[] = [{id: '', text: ''}];
 	public showControlPanel = false;
 	public data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
@@ -45,7 +40,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	public urlParams: IArchitectureGraphParams;
 	private currentNodesData;
 	public categories;
-	public assetClass: any = {id: '', value: ''};
+	public assetClass: any = {id: 'ALL', value: 'All Classes'};
 	public asset: any = {id: '', text: ''};
 	protected getAssetList: Function;
 
@@ -167,9 +162,6 @@ export class ArchitectureGraphComponent implements OnInit {
 				this.comboBoxSearchResultModel = res;
 				const result = (this.comboBoxSearchResultModel.results || []);
 				result.forEach((item: any) => this.addToDataSource(item));
-				if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
-					this.calculateLastElementShow();
-				}
 		});
 	}
 
@@ -191,11 +183,12 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Loads the asset data once an item has been clicked
 	 * */
 	loadData() {
-		this.architectureGraphService.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
-			.subscribe( (res: any) => {
-				this.currentNodesData = res;
-				this.updateNodeData(this.currentNodesData, true);
-			});
+		this.architectureGraphService
+			.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
+				.subscribe( (res: any) => {
+					this.currentNodesData = res;
+					this.updateNodeData(this.currentNodesData, true);
+				});
 	}
 
 	/**
@@ -269,38 +262,6 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	/**
-	 * Keep listening if the element show is the last one
-	 * @returns {any}
-	 */
-	private calculateLastElementShow(): any {
-		setTimeout(() => {
-			if (this.dropdownFooter && this.dropdownFooter.nativeElement) {
-				let nativeElement = this.dropdownFooter.nativeElement;
-				let scrollContainer = jQuery(nativeElement.parentNode).find('.k-list-scroller');
-				jQuery(scrollContainer).off('scroll');
-				jQuery(scrollContainer).on('scroll', (element) => {
-					this.onLastElementShow(element.target);
-				});
-			}
-		}, 800);
-	}
-
-	/**
-	 * Calculate the visible height + pixel scrolled = total height
-	 * If Result Set Per Page is less than the max total of result found, continue scrolling
-	 * @param element
-	 */
-	private onLastElementShow(element: any): void {
-		if (element.offsetHeight + element.scrollTop === element.scrollHeight) {
-			if ((RESULT_PER_PAGE * this.comboBoxSearchResultModel.page) <= this.comboBoxSearchResultModel.total) {
-				this.comboBoxSearchModel.currentPage++;
-				console.log('this.comboBoxSearchModel', this.comboBoxSearchModel);
-				this.loadAssetsForDropDown();
-			}
-		}
-	}
-
-	/**
 	 * The Search model is being separated from the model attached to the comboBox
 	 */
 	private initSearchModel(): void {
@@ -311,23 +272,6 @@ export class ArchitectureGraphComponent implements OnInit {
 			value: '',
 			maxPage: 25
 		};
-	}
-
-	/**
-	 * Search for matching text of current comboBox filter
-	 * @param {any} dataItem
-	 * @returns {SafeHtml}
-	 */
-	public comboBoxInnerSearch(dataItem: any): SafeHtml {
-		if (!dataItem.text) {
-			dataItem.text = '';
-		}
-		const regex = new RegExp(this.innerComboBox.text, 'i');
-		const text =  (this.innerTemplateTaskItem) ? this.innerTemplateTaskItem(dataItem) : dataItem.text;
-
-		const transformedText = text.replace(regex, `<b>$&</b>`);
-
-		return this.sanitized.bypassSecurityTrustHtml(transformedText);
 	}
 
 	/**
@@ -430,5 +374,4 @@ export class ArchitectureGraphComponent implements OnInit {
 	goBackToNormalGraph() {
 		console.log('go back to normal');
 	}
-
 }
