@@ -617,6 +617,11 @@ class UrlMappings {
 			controller = "wsTimeLine"
 			action = [GET:"timeline"]
 		}
+
+		"/ws/taskGraph/taskHighlightOptions" {
+			controller = "wsTaskGraph"
+			action = [GET: taskHighlightOptions]
+		}
 		
 		/*"/ws/timeline/$id/updateStatus" {
 			controller = "wsTask"
