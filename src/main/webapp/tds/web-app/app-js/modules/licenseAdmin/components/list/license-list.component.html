@@ -22,8 +22,8 @@
 					(pageChange)="pageChange($event)"
 					(cellClick)="cellClick($event)"
 					[selectable]="true"
-					[ngClass]="{ 'hide-filter': !showFilters }"
-					class="page-height row-actions-2-children"
+					[ngClass]="{ 'h	ide-filter': !showFilters }"
+					class="page-height clickable-rows"
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
@@ -62,12 +62,13 @@
 							let-dataItem
 							let-rowIndex="rowIndex"
 						>
-							<div class="action-button btn-link">
-								<clr-dropdown>
+							<div class="action-button btn-link k-grid-ignore-click">
+								<clr-dropdown #dropdown>
 									<tds-button
 										icon="ellipsis-vertical"
 										clrDropdownTrigger
-									></tds-button>
+										tdsGridContextMenuFixedPosition [clrDropdown]="dropdown">
+									</tds-button>
 									<clr-dropdown-menu
 										*clrIfOpen
 										clrPosition="bottom-left"
