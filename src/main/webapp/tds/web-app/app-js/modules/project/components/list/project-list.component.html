@@ -10,11 +10,11 @@
 					[filterable]="true"
 					(filterChange)="dataGridOperationsHelper.filterChange($event)"
 					[sort]="dataGridOperationsHelper.state.sort"
-					[skip]="skip"
+					[skip]="dataGridOperationsHelper.state.skip"
 					[sortable]="{ mode: 'single' }"
 					[pageSize]="pageSize"
 					[resizable]="true"
-					(sortChange)="sortChange($event)"
+					(sortChange)="dataGridOperationsHelper.sortChange($event)"
 					[pageable]="{
 						pageSizes: defaultPageOptions,
 						pageSize: pageSize,
