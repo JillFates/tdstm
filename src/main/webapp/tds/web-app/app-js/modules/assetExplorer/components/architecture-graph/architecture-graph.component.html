@@ -109,7 +109,9 @@
 						[data]="data$ | async"
 						[layout]="diagramLayout$ | async"
 						[contextMenuOptions]="ctxOpts"
-						[hideExpand]="false"
+						[hideExpand]="true"
+						(diagramAnimationFinished)="onDiagramAnimationFinished()"
+						(backToFullGraph)="viewFullGraphFromCache()"
 						#graph
 				></tds-lib-diagram-layout>
 			</div>

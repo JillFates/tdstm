@@ -245,6 +245,14 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					timeout(15000)
 				)
 				.subscribe(res => {
+					if (res.body.status === 'error') {
+						if (this.isNeighbor) {
+							this.isFullView = true;
+							this.isNeighbor = false;
+							this.graph.showFullGraphBtn = false;
+						}
+						return;
+					}
 					const data = res.body.data;
 					if (data && data.length > 0) {
 						this.rootId = taskId;
@@ -254,6 +262,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 								this.diagramLayoutService.clearFullGraphCache();
 								this.requestId = taskId;
 								this.isMoveEventReq = false;
+							} else {
+								this.graph.cleanUpDiagram();
+								this.graph.showFullGraphBtn = true;
+								this.neighborId = taskId;
 							}
 							this.generateModel();
 						}
@@ -364,7 +376,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	generateModel(): void {
 		if (!this.tasks) { return; }
-		const taskGraphHelper = new TaskGraphDiagramHelper(this.permissionService, {currentUser: this.userContext.person});
+		const taskGraphHelper = new TaskGraphDiagramHelper(
+				this.permissionService,
+	{
+					currentUser: this.userContext.person,
+					taskCount: this.tasks.length
+				}
+			);
 		const nodeDataArray = [];
 		const linkDataArray = [];
 		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
@@ -436,9 +454,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						value: t.team
 					},
 					{
-						label: TASK_TOOLTIP_FIELDS.ASSET,
+						label: TASK_TOOLTIP_FIELDS.ASSET_CLASS,
 						value: t.asset && t.asset.assetType,
 						icon: assetIcon && assetIcon.iconName
+					},
+					{
+						label: TASK_TOOLTIP_FIELDS.ASSET_NAME,
+						value: t.asset && t.asset.assetName
 					}
 			]
 		}
@@ -817,12 +839,9 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Open the neighborhood window
 	 */
 	onNeighborhood(data?: IGraphTask): void {
-		this.graph.cleanUpDiagram();
 		this.isFullView = false;
 		this.isNeighbor = true;
-		this.graph.showFullGraphBtn = true;
 		this.loadTasks(Number(data.id));
-		this.neighborId = data && data.id;
 	}
 
 	/**

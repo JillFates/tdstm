@@ -2148,22 +2148,6 @@
         "constraints": {
           "required": 0
         },
-        "control": "Location.S",
-        "default": "",
-        "field": "locationSource",
-        "imp": "Y",
-        "label": "Source Location",
-        "order": 31,
-        "shared": 0,
-        "show": 1,
-        "tip": "",
-        "udf": 0
-      },
-      {
-        "bulkChangeActions": [],
-        "constraints": {
-          "required": 0
-        },
         "control": "Rack.S",
         "default": "",
         "field": "rackSource",
@@ -2259,22 +2243,6 @@
         "imp": "N",
         "label": "Target Chassis",
         "order": 42,
-        "shared": 0,
-        "show": 1,
-        "tip": "",
-        "udf": 0
-      },
-      {
-        "bulkChangeActions": [],
-        "constraints": {
-          "required": 0
-        },
-        "control": "Location.T",
-        "default": "",
-        "field": "locationTarget",
-        "imp": "G",
-        "label": "Target Location",
-        "order": 36,
         "shared": 0,
         "show": 1,
         "tip": "",

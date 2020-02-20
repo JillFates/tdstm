@@ -1,44 +1,11 @@
-<div
-	class="modal fade in dialog-draggable-no-background data-script-console-component tds-ui-modal-decorator"
-	id="viewConsole"
-	data-backdrop="static"
-	tabindex="-1"
-	role="dialog"
->
-	<div
-		id="console-modal-dialog"
-		class="modal-dialog tds-modal-content modal-xxl"
-		role="document"
+<div class="data-script-console-component">
+	<textarea
+			id="textAreaLog"
+			class="form-control console"
+			[(ngModel)]="consoleSettings.scriptTestResult.consoleLog"
+			disabled
+			cols="30"
+			rows="10"
 	>
-		<div class="tds-modal-content">
-			<div class="modal-header">
-				<tds-button-custom
-					class="close"
-					[icon]="'close'"
-					(click)="cancelCloseDialog($event)"
-					[displayLabel]="false"
-					[flat]="true"
-				></tds-button-custom>
-				<div class="modal-title-container">
-					<div class="modal-title">
-						{{
-							'DATA_INGESTION.DATASCRIPT.DESIGNER.CONSOLE_TITLE'
-								| translate
-						}}
-					</div>
-				</div>
-			</div>
-			<div class="modal-body">
-				<textarea
-					id="textAreaLog"
-					class="form-control console"
-					[(ngModel)]="consoleSettings.scriptTestResult.consoleLog"
-					disabled
-					cols="30"
-					rows="10"
-				>
-				</textarea>
-			</div>
-		</div>
-	</div>
+	</textarea>
 </div>

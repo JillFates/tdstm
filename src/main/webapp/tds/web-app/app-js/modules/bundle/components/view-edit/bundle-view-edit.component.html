@@ -149,7 +149,9 @@
 						[(ngModel)]="bundleModel.name"
 						id="name"
 						name="name"
+                        maxlength="255"
 					/>
+                    <clr-control-helper>{{bundleModel.name?.length}}/255</clr-control-helper>
 				</clr-input-container>
 
 				<!-- Description -->
@@ -170,15 +172,18 @@
 				<clr-select-container>
 					<label>From</label>
 					<select
+                        title="{{fromControlTT}}"
+                        class="select-fixed-width"
 						clrSelect
 						name="sourceRoom"
 						id="sourceRoomId"
 						[(ngModel)]="bundleModel.fromId"
+                        (change)="onFromChange()"
 					>
 						<option
 							*ngFor="let room of rooms"
 							[ngValue]="room.id"
-							>{{ room.roomName }}</option
+							>{{ (room.roomName.length > 25) ? (room.roomName | slice:0:25) + '...' : room.roomName}}</option
 						>
 					</select>
 				</clr-select-container>
@@ -187,15 +192,18 @@
 				<clr-select-container>
 					<label>To</label>
 					<select
+                        title="{{toControlTT}}"
+                        class="select-fixed-width"
 						clrSelect
 						name="targetRoom"
 						id="targetRoomId"
 						[(ngModel)]="bundleModel.toId"
+                        (change)="onToChange()"
 					>
 						<option
 							*ngFor="let room of rooms"
 							[ngValue]="room.id"
-							>{{ room.roomName }}</option
+                        >{{ (room.roomName.length > 25) ? (room.roomName | slice:0:25) + '...' : room.roomName}}</option
 						>
 					</select>
 				</clr-select-container>
@@ -232,6 +240,7 @@
 				<clr-select-container>
 					<label>Event</label>
 					<select
+                        class="select-fixed-width"
 						clrSelect
 						name="moveEvent"
 						id="moveEventId"
