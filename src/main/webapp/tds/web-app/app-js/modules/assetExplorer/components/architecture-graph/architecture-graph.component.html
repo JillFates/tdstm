@@ -125,8 +125,10 @@
 			[data]="data$ | async"
 			[layout]="diagramLayout$ | async"
 			[contextMenuOptions]="ctxOpts"
-			[hideExpand]="false"
-            #graph
+			[hideExpand]="true"
+			(diagramAnimationFinished)="onDiagramAnimationFinished()"
+			(backToFullGraph)="viewFullGraphFromCache()"
+			#graph
 		></tds-lib-diagram-layout>
 	</div>
 </div>

@@ -25,7 +25,7 @@ class ProjectEditionSpec extends GebReportingSpec {
 
     //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"
-    static projName = baseName +" "+ randStr
+    static projName =  randStr +" "+ baseName
     static projCode = projName
     static projDesc = "Description of the project "+ projName +" created by QA E2E Geb Scripts"
     static projComment = "Comment for project "+ projName +" created by QA E2E Geb Scripts"
@@ -39,9 +39,10 @@ class ProjectEditionSpec extends GebReportingSpec {
         to LoginPage
         login(4,5) // test needs to be done by e2e_projects_user
         at MenuPage
-        waitFor{projectsModule}
+        waitFor(30){projectsModule}
         waitFor{projectsModule.goToProjectsActive()}
         at ProjectListPage
+        clickFilterButton()
         filterByName "QAE2E"
         if( noRecrdsAreDisplayed() ){
             createProjectBtn.click()
@@ -55,6 +56,7 @@ class ProjectEditionSpec extends GebReportingSpec {
             pcCompletionDate  = projCompDate
             waitFor {pcSaveBtn.click()}
             projectsModule.goToProjectsActive()
+            clickFilterButton()
             filterByName "QAE2E"
         }else{
             projName = getFirstProjectName()
@@ -91,12 +93,9 @@ class ProjectEditionSpec extends GebReportingSpec {
             at ProjectEditPage
             editProjectName()
             editProjectDescription()
-            editCompletionDate(projCompDate)
             clickUpdate()
         then: 'User is led to Project Details Page'
             at ProjectDetailsPage
-        and: 'Corresponding update message is displayed'
-            waitFor {pdPageMessage.text().contains(projCode + " updated")}
         and: 'Changes are saved'
             waitFor{pdProjectName.text() == projName + " Edited"}
 
@@ -105,14 +104,16 @@ class ProjectEditionSpec extends GebReportingSpec {
     //Verifications are done, the following lines set the project back to TM-Demo
     def "3. User goes back to TM-Demo"(){
         given: 'The user goes to Project List'
+            closeDetails()
             projectsModule.goToProjectsActive()
             at ProjectListPage
         when : 'The user selects TM-Demo'
             waitFor{projectNameGridField}
+           // clickFilterButton()
             filterByName "TM-Demo"
             clickOnFirstListedProject()
         then:   'The user is led to Project Details Page'
-        at ProjectDetailsPage
+            at ProjectDetailsPage
 
     }
 
