@@ -40,7 +40,7 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 			name: 'save',
 			icon: 'check',
 			text: 'Ok',
-			disabled: () => !this.templateForm.valid,
+			disabled: () => !this.templateForm.valid || !this.isDirty(),
 			type: DialogButtonType.CONTEXT,
 			action: this.onSave.bind(this)
 		});
