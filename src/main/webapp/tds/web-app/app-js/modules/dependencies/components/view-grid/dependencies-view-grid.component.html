@@ -149,7 +149,7 @@
 							<tds-grid-filter-input
 								[name]="column.property"
 								[value]="column.filter || ''"
-								[columnType]="column.type || 'text'"
+								[filterType]="column.type || 'text'"
 								[placeholder]="'GLOBAL.FILTER' | translate"
 								(filter)="onFilter(column, $event)">
 							</tds-grid-filter-input>

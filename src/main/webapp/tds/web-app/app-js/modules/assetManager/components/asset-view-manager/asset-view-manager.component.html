@@ -31,7 +31,7 @@
 							<!-- Grid -->
 							<kendo-grid
 								*ngIf="gridHelper"
-								class="page-height narrow-rows fixed-context-menu row-actions-2-children"
+								class="page-height narrow-rows"
 								[ngClass]="{ 'hide-filter': !showFilters }"
 								[data]="gridHelper.gridData"
 								[filterable]="true"
@@ -81,8 +81,10 @@
 									</ng-template>
 									<ng-template kendoGridCellTemplate let-dataItem>
 										<div class="action-button btn-link">
-											<clr-dropdown>
-												<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+											<clr-dropdown #dropdown>
+												<tds-button icon="ellipsis-vertical"
+																		clrDropdownTrigger
+																		tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"></tds-button>
 												<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
 													<a clrDropdownItem *ngIf="isEditAvailable(dataItem)"
 														 title="Edit View"
@@ -151,7 +153,7 @@
 											<tds-grid-filter-input
 												[name]="column.property"
 												[value]="column.filter || ''"
-												[columnType]="column.type"
+												[filterType]="column.type"
 												[placeholder]="'GLOBAL.FILTER' | translate"
 												(filter)="gridHelper.onFilterWithValue($event, column)">
 											</tds-grid-filter-input>
