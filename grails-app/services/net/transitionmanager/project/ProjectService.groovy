@@ -4,7 +4,7 @@ import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.ApiCatalogService
 import net.transitionmanager.asset.ApplicationAssetMap
 import net.transitionmanager.asset.AssetCableMap
-import net.transitionmanager.command.ProjectCommand
+import net.transitionmanager.command.ProjectCreateOrUpdateCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SequenceService
@@ -78,7 +78,6 @@ import org.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 class ProjectService implements ServiceMethods {
@@ -1905,7 +1904,7 @@ class ProjectService implements ServiceMethods {
 	 * @param projectCommand
 	 * @return
 	 */
-	Project createOrUpdateProject(ProjectCommand projectCommand) {
+	Project createOrUpdateProject(ProjectCreateOrUpdateCommand projectCommand) {
 		Project project
 		if (projectCommand.id > 0) {
 			if (securityService.hasAccessToProject(projectCommand.id)) {
