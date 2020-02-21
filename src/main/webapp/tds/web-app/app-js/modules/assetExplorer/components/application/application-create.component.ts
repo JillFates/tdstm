@@ -202,7 +202,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * @param {any[]}  staffTypes List of staffs types to display
 		 * @returns {void}
 		 */
-		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
 				return;
@@ -223,7 +223,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 					PersonService
 				], false, true)
 				.then((result) => {
-					this.personList.push({personId: result.id, fullName: result.name})
+					if (this.model.sourcePersonList && this.model[modelListParameter]) {
+						this.model.sourcePersonList.push({personId: result.id, fullName: result.name});
+						this.model[modelListParameter].push({personId: result.id, fullName: result.name});
+					}
 					this.model.asset[fieldName].id = result.id;
 					this.updatePersonReferences();
 				})
