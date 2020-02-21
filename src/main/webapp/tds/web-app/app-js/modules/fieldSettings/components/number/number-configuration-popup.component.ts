@@ -1,18 +1,22 @@
-import {Component, Inject, ViewChild} from '@angular/core';
-import { FieldSettingsModel } from '../../model/field-settings.model';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
+// Model
+import {FieldSettingsModel} from '../../model/field-settings.model';
 import {NumberConfigurationConstraintsModel} from './number-configuration-constraints.model';
+import {DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+// Component
+import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
+// Service
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
-import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: 'number-configuration-popup',
 	templateUrl: 'number-configuration-popup.component.html',
 })
-export class NumberConfigurationPopupComponent extends ConfigurationCommonComponent {
+export class NumberConfigurationPopupComponent extends ConfigurationCommonComponent implements OnInit {
 	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
 	private readonly MIN_EXAMPLE_VALUE = -10000;
 	private readonly MAX_EXAMPLE_VALUE = 10000;
@@ -21,18 +25,49 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 	public exampleValue: number;
 	public minRange: number;
 
+	public field: FieldSettingsModel;
+	public domain: string;
+
 	constructor(
-		public field: FieldSettingsModel,
-		@Inject('domain') public domain: string,
 		public activeDialog: UIActiveDialogService,
-		public prompt: UIPromptService,
+		public dialogService: DialogService,
 		public translate: TranslatePipe) {
-			super(field, activeDialog, prompt, translate);
-			this.model = { ...this.field.constraints } as NumberConfigurationConstraintsModel;
-			this.localMinRange = this.model.isDefaultConfig ? null : this.model.minRange;
-			this.minRange = this.localMinRange;
-			this.buildExampleValue();
+		super(dialogService, translate);
 	}
+
+	ngOnInit(): void {
+		this.buttons.push({
+			name: 'save',
+			icon: 'confirm',
+			text: 'Ok',
+			disabled: () => !this.templateForm.valid,
+			type: DialogButtonType.CONTEXT,
+			action: this.onSave.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			text: 'Cancel',
+			type: DialogButtonType.CONTEXT,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.field = Object.assign({}, this.data.fieldSettingsModel);
+		this.domain = this.data.domain;
+
+		this.setField(this.field);
+
+		setTimeout(() => {
+			this.setTitle(`Number Configuration - ${this.field.field}`);
+		});
+
+		this.model = {...this.field.constraints} as NumberConfigurationConstraintsModel;
+		this.localMinRange = this.model.isDefaultConfig ? null : this.model.minRange;
+		this.minRange = this.localMinRange;
+		this.buildExampleValue();
+	}
+
 	/**
 	 * Check Validity of the inputs. The sett
 	 */
@@ -92,15 +127,14 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 	 * On button save click
 	 */
 	public onSave(): void {
-		this.displayWarningMessage()
-			.then((confirm: boolean) => {
-				if (confirm) {
-					delete this.model.isDefaultConfig;
-					this.field.constraints = { ...this.model } as any;
-					this.activeDialog.close(this.isDirty());
-				}
-			});
-		}
+		this.displayWarningMessage(this.translate.transform('FIELD_SETTINGS.WARNING_VALIDATION_CHANGE_RANGE')).subscribe((data: any) => {
+			if (data.confirm === DialogConfirmAction.CONFIRM) {
+				delete this.model.isDefaultConfig;
+				this.field.constraints = {...this.model} as any;
+				this.onCancelClose(this.isDirty());
+			}
+		});
+	}
 
 	/**
 	 * Determine if the form has a dirty state
