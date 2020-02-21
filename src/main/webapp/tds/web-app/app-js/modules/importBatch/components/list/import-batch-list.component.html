@@ -172,7 +172,7 @@
 							<tds-grid-filter-input
 								[name]="column.property"
 								[value]="column.filter || ''"
-								[columnType]="column.type"
+								[filterType]="column.type"
 								[dateFormat]="column.format"
 								[placeholder]="'GLOBAL.FILTER' | translate"
 								(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">

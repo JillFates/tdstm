@@ -177,12 +177,16 @@
 								</label>
 							</td>
 							<td class="value">
-                                <input
-                                    clrInput
-									type="text"
-									id="name"
-									[(ngModel)]="eventModel.name"
-								/>
+                                <clr-input-container>
+                                    <input
+                                        clrInput
+                                        type="text"
+                                        id="name"
+                                        [(ngModel)]="eventModel.name"
+                                        maxlength="255"
+                                    />
+                                    <clr-control-helper>{{eventModel.name?.length}}/255</clr-control-helper>
+                                </clr-input-container>
 							</td>
 						</tr>
 

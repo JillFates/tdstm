@@ -106,7 +106,7 @@
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
-				class="page-height task-grid fixed-context-menu row-actions-2-children"
+				class="page-height narrow-rows"
 				[ngClass]="{'hide-filter': !isFiltering}"
 				[data]="grid.gridData"
 				[skip]="grid.state.skip"
@@ -246,11 +246,11 @@
 						let-rowIndex="rowIndex"
 					>
 						<div class="action-button btn-link">
-							<clr-dropdown>
-								<tds-button
-									icon="ellipsis-vertical"
-									clrDropdownTrigger
-									class="contextual-menu"
+							<clr-dropdown #dropdown>
+								<tds-button icon="ellipsis-vertical"
+														clrDropdownTrigger
+														tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"
+														class="contextual-menu"
 								></tds-button>
 								<clr-dropdown-menu *clrIfOpen>
 									<a
@@ -290,20 +290,16 @@
 							<label>{{ column.label }}</label>
 						</div>
 					</ng-template>
-
 					<!-- task Number -->
 					<ng-template
 						kendoGridCellTemplate
 						*ngIf="column.property === 'taskNumber'"
 						let-dataItem
 					>
-						<span
-							class="is-grid-link"
-							(click)="onOpenTaskDetailHandler(dataItem)"
-						>{{ dataItem.taskNumber }}</span
-						>
+						<span (click)="onOpenTaskDetailHandler(dataItem)">
+							{{ dataItem.taskNumber }}
+						</span>
 					</ng-template>
-
 					<!-- asset name -->
 					<ng-template
 						kendoGridCellTemplate
@@ -314,6 +310,7 @@
 						let-dataItem
 					>
 						<span
+							[title]="dataItem[column.property]"
 							class="is-grid-link"
 							(click)="onOpenAssetDetailHandler(dataItem)"
 						>{{ dataItem[column.property] }}</span
@@ -331,12 +328,11 @@
 							</div>
 						</div>
 					</ng-template>
-
+					<!-- default -->
 					<ng-template
 						kendoGridCellTemplate
 						*ngIf="column.type !== 'action'"
-						let-dataItem
-					>
+						let-dataItem>
 						<tds-task-status-indicator
 							[propertyName]="column.property"
 							[value]="dataItem[column.property]"
@@ -349,7 +345,7 @@
 							<tds-grid-filter-input
 								[name]="column.property"
 								[value]="column.filter || ''"
-								[columnType]="column.type"
+								[filterType]="column.type"
 								[placeholder]="'GLOBAL.FILTER' | translate"
 								(filter)="onFilterChangeHandler($event, column)">
 							</tds-grid-filter-input>
