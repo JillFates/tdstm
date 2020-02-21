@@ -50,11 +50,11 @@
 														class="tm-input-control person-list"
 														name="modelAssetSme"
 														[(ngModel)]="persons.sme"
-														(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+														(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'sme1PersonList')"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-																	[data]="model.sme1PersonList">
+														[data]="model.sme1PersonList">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="29" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
@@ -73,7 +73,7 @@
 																		 class="tm-input-control person-list"
 																		 name="modelAssetSme2"
 																		 [(ngModel)]="persons.sme2"
-																		 (selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+																		 (selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'sme2PersonList')"
 																		 [defaultItem]="defaultItem"
 																		 [textField]="'fullName'"
 																		 [valueField]="'personId'"
@@ -96,7 +96,7 @@
 														class="tm-input-control"
 														name="modelAssetappOwner"
 														[(ngModel)]="persons.appOwner"
-														(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+														(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'appOwnerPersonList')"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
