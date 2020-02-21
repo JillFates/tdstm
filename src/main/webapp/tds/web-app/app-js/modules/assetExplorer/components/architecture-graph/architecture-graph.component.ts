@@ -408,7 +408,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		// TODO: filter nodes for removing labels on graph
 		this.categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
 		if (this.categories.length > 0 && this.assetId) {
-			let tempNodesData = Object.assign({}, this.currentNodesData);
+			let tempNodesData = JSON.parse(JSON.stringify(this.currentNodesData));
 			tempNodesData.nodes.forEach( node => {
 				if (!this.categories.includes(node.assetClass)) {
 					node.name = '';
@@ -474,6 +474,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * */
 	resetDefaults() {
 		this.getArchitectureGraphPreferences();
+		this.resetLabels();
 	}
 
 	onDiagramAnimationFinished() {
@@ -483,4 +484,12 @@ export class ArchitectureGraphComponent implements OnInit {
 	viewFullGraphFromCache() {
 		this.graph.showFullGraphBtn = false;
 	}
+
+	resetLabels() {
+		this.graphLabels.forEach( el => {
+			el.checked = false;
+		});
+		this.updateNodeData(this.currentNodesData, true);
+	}
+
 }
