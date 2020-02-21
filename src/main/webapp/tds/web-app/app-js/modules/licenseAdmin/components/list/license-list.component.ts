@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RequestLicenseComponent } from '../request/request-license.component';
 import { CreatedLicenseComponent } from '../created-license/created-license.component';
 import { LicenseDetailComponent } from '../detail/license-detail.component';
-import { HeaderActionButtonData } from 'tds-component-library';
+import { ColumnHeaderData, HeaderActionButtonData } from 'tds-component-library';
 // Service
 import { LicenseAdminService } from '../../service/license-admin.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -50,7 +50,7 @@ declare var jQuery: any;
 	templateUrl: 'license-list.component.html',
 })
 export class LicenseListComponent implements OnInit {
-	protected gridColumns: any[];
+	protected gridColumns: Array<ColumnHeaderData>;
 	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
 

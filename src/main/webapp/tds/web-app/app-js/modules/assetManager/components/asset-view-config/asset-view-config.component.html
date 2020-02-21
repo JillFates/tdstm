@@ -109,11 +109,11 @@
 					<ng-template kendoTabContent>
 						<div class="fields-section">
 							<div class="filters-bar">
-								<tds-filter-input
+								<tds-grid-filter-input
 									[value]="filterModel.search || ''"
 									(filter)="filterModel.search = $event; applyFilters()"
 									placeholder="Filter on field name">
-								</tds-filter-input>
+								</tds-grid-filter-input>
 								<clr-select-container class="inline">
 									<select clrSelect
 													name="selected"
