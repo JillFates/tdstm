@@ -36,7 +36,7 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 	ngOnInit(): void {
 		this.buttons.push({
 			name: 'save',
-			icon: 'confirm',
+			icon: 'check',
 			text: 'Ok',
 			disabled: () => !this.isDirty() || (!this.templateForm.valid && !this.minIsValid),
 			type: DialogButtonType.CONTEXT,
@@ -51,7 +51,7 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 			action: this.cancelCloseDialog.bind(this)
 		});
 
-		this.field = Object.assign({}, this.data.fieldSettingsModel);
+		this.field = this.data.fieldSettingsModel;
 		this.domain = this.data.domain;
 
 		this.setField(this.field);
@@ -84,7 +84,7 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 		this.displayWarningMessage(this.translate.transform('FIELD_SETTINGS.WARNING_VALIDATION_CHANGE_RANGE')).subscribe((data: any) => {
 			if (data.confirm === DialogConfirmAction.CONFIRM) {
 				this.field.constraints = {...this.model};
-				this.onCancelClose(this.isDirty());
+				this.onAcceptSuccess({isDirty: this.isDirty()});
 			}
 		});
 	}

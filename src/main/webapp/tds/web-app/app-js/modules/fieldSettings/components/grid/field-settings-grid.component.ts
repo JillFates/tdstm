@@ -16,7 +16,7 @@ import {DomainModel} from '../../model/domain.model';
 import {FIELD_COLORS} from '../../model/field-settings.model';
 import {DOMAIN} from '../../../../shared/model/constants';
 import {UserContextModel} from '../../../auth/model/user-context.model';
-import {DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {DialogConfirmAction, DialogExit, DialogService, ModalSize} from 'tds-component-library';
 // Component
 import {MinMaxConfigurationPopupComponent} from '../min-max/min-max-configuration-popup.component';
 import {SelectListConfigurationPopupComponent} from '../select-list/selectlist-configuration-popup.component';
@@ -706,7 +706,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 			}
 		}).subscribe((confirmation: any) => {
 			if (confirmation) {
-				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+				if (confirmation.status === DialogExit.ACCEPT) {
 					this.setIsDirty(true);
 				}
 			}

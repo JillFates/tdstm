@@ -69,7 +69,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 			action: this.cancelCloseDialog.bind(this)
 		});
 
-		this.field = Object.assign({}, this.data.fieldSettingsModel);
+		this.field = this.data.fieldSettingsModel;
 		this.domain = this.data.domain;
 
 		this.setField(this.field);
@@ -191,7 +191,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 							if (this.defaultValue != null) {
 								this.field.default = this.defaultValue;
 							}
-							this.onCancelClose(this.isDirty());
+							this.onAcceptSuccess({isDirty: this.isDirty()});
 						}
 					});
 			}

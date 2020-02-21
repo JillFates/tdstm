@@ -38,7 +38,7 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 	ngOnInit(): void {
 		this.buttons.push({
 			name: 'save',
-			icon: 'confirm',
+			icon: 'check',
 			text: 'Ok',
 			disabled: () => !this.templateForm.valid,
 			type: DialogButtonType.CONTEXT,
@@ -53,7 +53,7 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 			action: this.cancelCloseDialog.bind(this)
 		});
 
-		this.field = Object.assign({}, this.data.fieldSettingsModel);
+		this.field = this.data.fieldSettingsModel;
 		this.domain = this.data.domain;
 
 		this.setField(this.field);
@@ -131,7 +131,7 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 			if (data.confirm === DialogConfirmAction.CONFIRM) {
 				delete this.model.isDefaultConfig;
 				this.field.constraints = {...this.model} as any;
-				this.onCancelClose(this.isDirty());
+				this.onAcceptSuccess({isDirty: this.isDirty()});
 			}
 		});
 	}

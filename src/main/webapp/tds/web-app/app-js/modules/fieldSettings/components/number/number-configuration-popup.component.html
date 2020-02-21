@@ -1,10 +1,12 @@
 <div class="selectlist-configuration-popup">
     <form #templateForm="ngForm" name="templateForm">
-        <div class="modal-container">
+        <div class="modal-container number-configuration">
             <div class="text-right">
                 <div class="row">
-                    <label class="col-sm-5">Defined Range</label>
-                    <div class="col-sm-5 text-left">
+                    <div class="col-sm-5">
+                        <label>Defined Range</label>
+                    </div>
+                    <div class="col-sm-2 text-left">
                         <kendo-numerictextbox style="width: 100px;"
                                               name="minRange"
                                               [format]="'n'"
@@ -13,7 +15,11 @@
                                               [max]="model.maxRange"
                                               (ngModelChange)="onMinRangeChange($event)">
                         </kendo-numerictextbox>
-                        To
+                    </div>
+                    <div class="col-sm-1 centered label-to-range">
+                        <label>To</label>
+                    </div>
+                    <div class="col-sm-2 text-left">
                         <kendo-numerictextbox style="width: 100px;"
                                               name="maxRange"
                                               [format]="'n'"
