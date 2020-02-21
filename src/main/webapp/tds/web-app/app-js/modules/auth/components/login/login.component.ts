@@ -157,6 +157,9 @@ export class LoginComponent implements OnInit {
 	 * Dispatch Action Login
 	 */
 	public onLogin(): void {
+		if (this.onLoginProgress) {
+			return;
+		}
 		this.errMessage = '';
 		if (this.loginModel.username === '' || this.loginModel.password === '') {
 			this.errMessage = 'Username and password are required';
