@@ -238,7 +238,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 			);
 		}
 
-		return Observable.of({confirm: ''});
+		return Observable.of({confirm: DialogConfirmAction.CONFIRM});
 	}
 
 	/**
