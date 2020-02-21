@@ -95,6 +95,10 @@ body > .wrapper {
       right: 0;
       top: 0;
 
+      a.licensing-error-warning {
+        line-height: 40px;
+      }
+
       i.licensing-error-warning {
         color: $color-warning-license--yellow;
         font-size: 18px;

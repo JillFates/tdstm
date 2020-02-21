@@ -27,6 +27,8 @@ export class BundleViewEditComponent implements OnInit {
 	public canEditBundle;
 	public bundleId;
 	public editing = false;
+	public fromControlTT = '';
+	public toControlTT = '';
 	protected userTimeZone: string;
 	private requiredFields = ['name'];
 	@ViewChild('startTimePicker', {static: false}) startTimePicker;
@@ -277,5 +279,13 @@ export class BundleViewEditComponent implements OnInit {
 		} else {
 			this.editing = false;
 		}
+	}
+
+	public onFromChange(): void {
+		this.fromControlTT = this.rooms.find(r => r.id === this.bundleModel.fromId).roomName;
+	}
+
+	public onToChange(): void {
+		this.toControlTT = this.rooms.find(r => r.id === this.bundleModel.toId).roomName;
 	}
 }
