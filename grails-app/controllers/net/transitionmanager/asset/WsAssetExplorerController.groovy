@@ -116,8 +116,9 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	def updateDataview(Integer id) {
 		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
 		validateCommandObject(command)
+		Project project = projectForWs
 		Person whom = currentPerson()
-		Map dataviewMap = dataviewService.update(projectForWs, whom, id, command).toMap(projectForWs, whom)
+		Map dataviewMap = dataviewService.update(project, whom, id, command).toMap(project, whom)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -131,7 +132,9 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	def createDataview() {
 		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
 		validateCommandObject(command)
-		Map dataviewMap = dataviewService.create(project, person, command).toMap(projectForWs, currentPerson())
+		Project project = projectForWs
+		Person whom = currentPerson()
+		Map dataviewMap = dataviewService.create(project, whom, command).toMap(project, whom)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -202,13 +205,15 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
      */
     @Secured('isAuthenticated()')
     def query(Long id, DataviewUserParamsCommand userParams) {
-        Project project = securityService.userCurrentProject
 
 		if (userParams.hasErrors()) {
 			renderErrorJson('User filtering was invalid')
 			return
 		}
 
+		Project project = projectForWs
+
+		// TODO : JPM 02/20202 : The query logic should validate the user is accessing a vaild dataview (what about overrides too?)
 		Dataview dataview = Dataview.get(id)
 		if (!dataview) {
 			renderErrorJson('Dataview invalid')

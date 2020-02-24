@@ -589,7 +589,7 @@ class DataviewService implements ServiceMethods {
 	 * @throws UnauthorizedException
 	 */
 	void validateDataviewCreateAccessOrException(DataviewCrudCommand dataviewCommand, Project project, Person whom) {
-		if (dataview.isSystem) {
+		if (dataviewCommand.id?.isSystem) {
 			throwException(InvalidParamException.class, 'dataview.validate.createSystemView', 'Creation of System views is not permitted.')
 		}
 
