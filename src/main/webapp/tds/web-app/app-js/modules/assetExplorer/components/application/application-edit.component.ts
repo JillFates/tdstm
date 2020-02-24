@@ -195,6 +195,17 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			event.preventDefault();
 		}
 
+		/**
+		 * Add the person to the Asset Model, if the Person is "Add Person" it invokes the Dialog to add a new one
+		 * @param person
+		 * @param asset
+		 * @param fieldName
+		 * @param companies
+		 * @param teams
+		 * @param staffTypes
+		 * @param modelListParameter
+		 * @param dropdown
+		 */
 		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string, dropdown: any): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
