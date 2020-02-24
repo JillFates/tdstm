@@ -45,7 +45,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             '    id: 1100,',
             '    description: \'Startup ALL applications\',',
             '    title: \'Startup app ${it.assetName}\',',
-            '    workflow: \'AppStartup\',',
             '    team: \'APP_COORD\',',
             '    category: \'startup\',',
             '    duration: 10,',
@@ -63,7 +62,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        tasksModule.goToTasksCookbook()
+        waitFor{tasksModule.goToTasksCookbook()}
         /* CREATE Recipe */
         at CookbookPage
         commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
@@ -95,9 +94,9 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the Recipe with Task on It'
-            waitFor { getRecipeByName(recipeName).click()}
+            waitFor{getRecipeByName(recipeName).click()}
         then: 'Information should be populated'
-            getRecipeByName(recipeName) != null
+            waitFor{getRecipeByName(recipeName) != null}
     }
 
     def "2. Going to The Task Generation tab"() {
@@ -199,7 +198,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     def "12. Validating the error message"() {
         when: 'The Error is displayed'
             at ErrorMessagePage
-
         then: 'The Error should be visible and certified'
             errorModalText == "There is no released version of the recipe to generate tasks with"
     }
@@ -236,8 +234,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         given: 'The User is in the Task Generation Section'
             at TabTaskGenPage
         when: 'The User Clicks on Generate'
-            waitFor {tskGTabGenerateTasksBtn.click()}
-            waitForProgressBar()
+            waitFor{tskGTabGenerateTasksBtn.click()}
         then: 'The Task should be generated showing up the Summary Section'
             at TabTaskGenTabSummaryPage
     }
@@ -247,7 +244,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             at TabTaskGenTabSummaryPage
 
         then: 'Different values should be displayed'
-            waitFor {tskGTabSummaryList.find("li", 0).text().contains("Status: Complete")}
+            waitFor {tskGTabSummaryList.find("li", 0).text().contains("Status: Completed")}
             tskGTabSummaryList.find("li", 1).text().contains("Tasks Created:")
             tskGTabSummaryList.find("li", 2).text().contains("Number of Exceptions:")
 
