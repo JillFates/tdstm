@@ -12,8 +12,6 @@ export class ArchitectureGraphService {
 	private readonly ASSET_DETAILS = `${ this.baseURL }/`;
 	private readonly GRAPH_PREFERENCES = `${this.baseURL}/preferences/`;
 	private readonly ARCHITECTURE_GRAPH_DATA = `${this.baseURL}`;
-	private readonly ARCHITECTURE_GRAPH_LEGEND = `${this.baseURL}/legend/`;
-	private readonly  ARCHITECTURE_ASSET_SELECT = '/tdstm/assetEntity/assetListForSelect2';
 
 	constructor(
 		private http: HttpClient
@@ -84,36 +82,6 @@ export class ArchitectureGraphService {
 			.set('levelsDown', String(levelsDown))
 			.set('mode', mode);
 		return this.http.get(`${this.ARCHITECTURE_GRAPH_DATA}`, {params})
-			.map((response: any) => {
-				return response;
-			})
-			.catch((error: any) => error);
-	}
-
-	getAssetsForArchitectureGraph(q: string, value, max: number, 	page: number, assetClassOption: 'ALL') {
-		let params;
-		params = new HttpParams()
-			.set('q', q)
-			.set('value', value)
-			.set('max', String(max))
-			.set('page', String(page))
-			.set('assetClassOption', 'ALL');
-		return this.http.get(`${this.ARCHITECTURE_ASSET_SELECT}`, {params})
-			.map((response: any) => {
-				return response;
-			})
-			.catch((error: any) => error);
-	}
-
-	getAssetsForArchitectureGraphWithSearch(q) {
-		let params;
-		params = new HttpParams()
-			.set('q', q)
-			.set('value', '')
-			.set('max', '25')
-			.set('page', '1')
-			.set('assetClassOption', 'ALL');
-		return this.http.get(`${this.ARCHITECTURE_ASSET_SELECT}`, {params})
 			.map((response: any) => {
 				return response;
 			})
