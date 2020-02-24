@@ -155,6 +155,8 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 */
 		public focusSME1(): void {
 			this.controlSME1.toggle(true);
+			this.controlSME2.toggle(false);
+			this.controlAppOwner.toggle(false);
 		}
 
 		/**
@@ -171,7 +173,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 * On focus open the dropdown
 		 */
 		public focusSME2(): void {
+			this.controlSME1.toggle(false);
 			this.controlSME2.toggle(true);
+			this.controlAppOwner.toggle(false);
 		}
 
 		/**
@@ -188,6 +192,8 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 * On focus open the dropdown
 		 */
 		public focusAppOwner(): void {
+			this.controlSME1.toggle(false);
+			this.controlSME2.toggle(false);
 			this.controlAppOwner.toggle(true);
 		}
 
