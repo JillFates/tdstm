@@ -1019,9 +1019,6 @@ class AssetEntityService implements ServiceMethods {
 		AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application.id in :assetIds',
 			[assetIds:assetIds] )
 
-
-		println("*** ${new Date().time -time}  ***")
-		time = new Date().time
 		// Last but not least, delete the asset itself. Note that GORM/Hibernate is smart
 		// enough to know when a subclass of AssetEntity is being references so deleting AssetEntity will
 		// delete Application, Database or other domains that extend it. Pretty cool - huh!
