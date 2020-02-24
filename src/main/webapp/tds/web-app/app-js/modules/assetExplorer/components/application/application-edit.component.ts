@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit } from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
@@ -38,6 +38,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			sme2: null,
 			appOwner: null
 		};
+
+		@ViewChild('controlSME1') public controlSME1: any;
+		@ViewChild('controlSME2') public controlSME2: any;
+		@ViewChild('controlAppOwner') public controlAppOwner: any;
 
 		constructor(
 			@Inject('model') model: any,
@@ -147,6 +151,13 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		}
 
 		/**
+		 * On focus open the dropdown
+		 */
+		public focusSME1(): void {
+			this.controlSME1.toggle(true);
+		}
+
+		/**
 		 * Search and copy over the Person List for SME 2
 		 * @param filter
 		 */
@@ -157,6 +168,13 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		}
 
 		/**
+		 * On focus open the dropdown
+		 */
+		public focusSME2(): void {
+			this.controlSME2.toggle(true);
+		}
+
+		/**
 		 * Search and copy over the Person List for App Owner
 		 * @param filter
 		 */
@@ -164,6 +182,13 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			this.model.appOwnerPersonList = this.model.sourcePersonList.filter((s) => {
 				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
 			});
+		}
+
+		/**
+		 * On focus open the dropdown
+		 */
+		public focusAppOwner(): void {
+			this.controlAppOwner.toggle(true);
 		}
 
 		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string): void {

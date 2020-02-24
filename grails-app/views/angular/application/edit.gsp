@@ -43,9 +43,10 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${asset.appVersion}" ngmodel="model.asset.appVersion" tabindex="4"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 											<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
-												<kendo-dropdownlist #controlSme
+												<kendo-dropdownlist #controlSME1
 														[filterable]="true"
 														(filterChange)="filterSME1Change($event)"
+														(focus)="focusSME1()"
 														[tabIndex]="11"
 														class="tm-input-control person-list"
 														name="modelAssetSme"
@@ -66,9 +67,10 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 											<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 												<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
-												<kendo-dropdownlist  #controlSme2
+												<kendo-dropdownlist  #controlSME2
 												    [filterable]="true"
 												    (filterChange)="filterSME2Change($event)"
+													(focus)="focusSME2()"
 													[tabIndex]="12"
 													class="tm-input-control person-list"
 													name="modelAssetSme2"
@@ -88,9 +90,10 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 											<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 												<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
-												<kendo-dropdownlist
+												<kendo-dropdownlist #controlAppOwner
 														[filterable]="true"
 														(filterChange)="filterAppOwnerChange($event)"
+														(focus)="focusAppOwner()"
 														[tabIndex]="13"
 														class="tm-input-control"
 														name="modelAssetappOwner"
