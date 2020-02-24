@@ -246,7 +246,7 @@
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/serverPhysical_menu.svg"/></td>
                                 <td>
-                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{common_planStatus:'moved', _assetType: 'physicalServer', _ufp: 'true'}" >Physical Server</a>
+                                    <a [routerLink]="['/asset','views',4,'show']" [queryParams]="{_assetType: 'physicalServer', _ufp: 'true'}" >Physical Server</a>
                                 </td>
                                 <td class="execution-data-column"><a [routerLink]="['/asset','views',4,'show']" [queryParams]="{common_planStatus:'Unassigned', _assetType: 'physicalServer', _ufp: 'true'}">{{planningDashboardModel.execution.unassignedPhyServerCount}} ({{planningDashboardModel.execution.unassignedPhyServerPerc}}%)</a></td>
                                 <td *ngFor="let server of planningDashboardModel.execution.phyServerList" class="execution-data-column">
@@ -262,7 +262,7 @@
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/serverVirtual_menu.svg"/></td>
                                 <td>
-                                    <a [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{common_planStatus:'Moved', _assetType: 'virtualServer', _ufp: 'true'}">Virtual Server</a>
+                                    <a [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{_assetType: 'virtualServer', _ufp: 'true'}">Virtual Server</a>
                                 </td>
                                 <td class="execution-data-column"><a [routerLink]="['/asset', 'views', 4, 'show']" [queryParams]="{common_planStatus:'Unassigned', _assetType: 'virtualServer', _ufp: 'true'}">{{planningDashboardModel.execution.unassignedVirtServerCount}} ({{planningDashboardModel.execution.unassignedVirtServerPerc}}%)</a></td>
                                 <td *ngFor="let server of planningDashboardModel.execution.virtServerList" class="execution-data-column">
