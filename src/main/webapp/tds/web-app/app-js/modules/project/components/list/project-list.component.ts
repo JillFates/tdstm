@@ -12,14 +12,7 @@ import {
 	NavigationEnd,
 } from '@angular/router';
 // Model
-import {
-	GRID_DEFAULT_PAGE_SIZE,
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-} from '../../../../shared/model/constants';
-import {
-	ActionType,
-	COLUMN_MIN_WIDTH,
-} from '../../../dataScript/model/data-script.model';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 import {
 	ColumnHeaderData, DialogConfirmAction, DialogService,
 	GridComponent,
@@ -29,9 +22,6 @@ import {
 	HeaderActionButtonData, ModalSize
 } from 'tds-component-library';
 import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
-import {
-	BooleanFilterData,
-} from '../../../../shared/model/data-list-grid.model';
 import {Permission} from '../../../../shared/model/permission.model';
 // Component
 import {ProjectCreateComponent} from '../create/project-create.component';
@@ -67,23 +57,11 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	private dateFormat = '';
 
 	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
-	// -----------------
-	protected gridColumns: any[];
-	public disableClearFilters: Function;
-	public headerActionButtons: HeaderActionButtonData[];
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public projectColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public resultSet: ProjectModel[];
-	protected navigationSubscription;
-	public canEditProject;
-	public booleanFilterData = BooleanFilterData;
+
 	public showActive: boolean;
 	private projectToOpen: string;
 	private projectOpen = false;
-	protected showFilters = false;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -97,7 +75,6 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		private translateService: TranslatePipe,
 	) {
 		this.showActive = this.route.snapshot.queryParams['active'] !== 'completed';
-		this.resultSet = this.showActive ? this.route.snapshot.data['projects'].activeProjects : this.route.snapshot.data['projects'].completedProjects;
 	}
 
 	async ngOnInit() {
@@ -148,7 +125,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	ngAfterContentInit() {
 		this.projectToOpen = this.route.snapshot.queryParams['show'];
 		// The following code Listen to any change made on the route to reload the page
-		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+		this.router.events.subscribe((event: any) => {
 			if (event && event.state && event.state && event.state.url.indexOf('/project/list') !== -1) {
 				this.projectToOpen = event.state.root.queryParams.show;
 			}
