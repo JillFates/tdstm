@@ -1,22 +1,28 @@
 div.graph-control-panel
-  float: left
   border: 1px solid #0077b8
-  margin-left: 22px
-  margin-top: 15px
   padding: 10px 5px 5px 5px
   background-color: white
-  position: absolute
   z-index: 50
   overflow-y: auto
   overflow-x: hidden
   min-height: 125px
-  max-height: 530px
-  top: 190px
+  max-height: 100%
   width: 250px
 
 div.graphContainer
+  height: 80vh
+  display: flex
+  flex-direction: column
   background-color: unset
   position: relative
+  .graph-main-container
+    flex: 1
+    display: flex
+    .left-container
+      max-height: 75vh
+      padding-top: 10px
+    .right-container
+      flex: 1
   label
     user-select: none
   div#toolsContainerId

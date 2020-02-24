@@ -11,13 +11,13 @@ import {IArchitectureGraphParams} from '../../model/url-params.model';
 import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
 import {
 	ComboBoxSearchResultModel,
 	RESULT_PER_PAGE
 } from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 
 declare var jQuery: any;
 
@@ -27,14 +27,9 @@ declare var jQuery: any;
 })
 export class ArchitectureGraphComponent implements OnInit {
 	// References
-	@ViewChild('dropdownFooter', {static: false}) dropdownFooter: ElementRef;
-	@ViewChild('innerComboBox', {static: false}) innerComboBox: ComboBoxComponent;
 	@ViewChild('graph', {static: false}) graph: any;
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
-	private searchOnScroll = true;
-	private reloadOnOpen = false;
-	private firstChange = true;
 	public datasource: any[] = [{id: '', text: ''}];
 	public showControlPanel = false;
 	public data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
@@ -45,6 +40,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	public urlParams: IArchitectureGraphParams;
 	private currentNodesData;
 	public categories;
+	public assetClass: any = {id: 'ALL', value: 'All Classes'};
+	public asset: any = {id: '', text: ''};
+	protected getAssetList: Function;
 
 	public assetList;
 	public graphPreferences;
@@ -120,10 +118,12 @@ export class ArchitectureGraphComponent implements OnInit {
 		private userContextService: UserContextService,
 		private activatedRoute: ActivatedRoute,
 		private architectureGraphService: ArchitectureGraphService,
+		private assetExplorerService: AssetExplorerService,
 		private sanitized: DomSanitizer,
 		private preferenceService: PreferenceService
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
+		this.getAssetList = this.assetExplorerService.getAssetListForComboBox.bind(this.assetExplorerService);
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
 
@@ -157,13 +157,11 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Loads assets for dropdown when you are scrolling on the list
 	 */
 	loadAssetsForDropDown() {
-		this.architectureGraphService.getAssetsForArchitectureGraph(this.comboBoxSearchModel.query, this.comboBoxSearchModel.value, this.comboBoxSearchModel.maxPage, this.comboBoxSearchModel.currentPage, 'ALL').subscribe((res: any) => {
-			this.comboBoxSearchResultModel = res;
-			const result = (this.comboBoxSearchResultModel.results || []);
-			result.forEach((item: any) => this.addToDataSource(item));
-			if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
-				this.calculateLastElementShow();
-			}
+		this.assetExplorerService.getAssetListForComboBox(this.comboBoxSearchModel)
+			.subscribe((res: any) => {
+				this.comboBoxSearchResultModel = res;
+				const result = (this.comboBoxSearchResultModel.results || []);
+				result.forEach((item: any) => this.addToDataSource(item));
 		});
 	}
 
@@ -185,11 +183,12 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Loads the asset data once an item has been clicked
 	 * */
 	loadData() {
-		this.architectureGraphService.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
-			.subscribe( (res: any) => {
-				this.currentNodesData = res;
-				this.updateNodeData(this.currentNodesData, true);
-			});
+		this.architectureGraphService
+			.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
+				.subscribe( (res: any) => {
+					this.currentNodesData = res;
+					this.updateNodeData(this.currentNodesData, true);
+				});
 	}
 
 	/**
@@ -262,71 +261,6 @@ export class ArchitectureGraphComponent implements OnInit {
 		return dataItem.text;
 	}
 
-	public onSelectionChange(value: any): void {
-		console.log('selection changed: ', value);
-	}
-
-	/**
-	 * Filter is being executed on Server and Client Side
-	 * @param filter
-	 */
-	public onFilterChange(filter: any): void {
-		if (filter !== '') {
-			this.initSearchModel();
-			this.comboBoxSearchModel.currentPage = 1;
-			this.comboBoxSearchModel.query = filter;
-			this.getNewResultSet();
-		} else if (!filter) {
-			this.initSearchModel();
-			this.loadAssetsForDropDown();
-		}
-	}
-
-	/**
-	 * Populate the Datasource with a new Complete Set
-	 */
-	private getNewResultSet(): void {
-		this.architectureGraphService.getAssetsForArchitectureGraphWithSearch(this.comboBoxSearchModel.query).subscribe((res: ComboBoxSearchResultModel) => {
-			this.comboBoxSearchResultModel = res;
-			this.datasource = this.comboBoxSearchResultModel.results;
-			if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
-				this.calculateLastElementShow();
-			}
-		});
-	}
-
-	/**
-	 * Keep listening if the element show is the last one
-	 * @returns {any}
-	 */
-	private calculateLastElementShow(): any {
-		setTimeout(() => {
-			if (this.dropdownFooter && this.dropdownFooter.nativeElement) {
-				let nativeElement = this.dropdownFooter.nativeElement;
-				let scrollContainer = jQuery(nativeElement.parentNode).find('.k-list-scroller');
-				jQuery(scrollContainer).off('scroll');
-				jQuery(scrollContainer).on('scroll', (element) => {
-					this.onLastElementShow(element.target);
-				});
-			}
-		}, 800);
-	}
-
-	/**
-	 * Calculate the visible height + pixel scrolled = total height
-	 * If Result Set Per Page is less than the max total of result found, continue scrolling
-	 * @param element
-	 */
-	private onLastElementShow(element: any): void {
-		if (element.offsetHeight + element.scrollTop === element.scrollHeight) {
-			if ((RESULT_PER_PAGE * this.comboBoxSearchResultModel.page) <= this.comboBoxSearchResultModel.total) {
-				this.comboBoxSearchModel.currentPage++;
-				console.log('this.comboBoxSearchModel', this.comboBoxSearchModel);
-				this.loadAssetsForDropDown();
-			}
-		}
-	}
-
 	/**
 	 * The Search model is being separated from the model attached to the comboBox
 	 */
@@ -338,39 +272,6 @@ export class ArchitectureGraphComponent implements OnInit {
 			value: '',
 			maxPage: 25
 		};
-	}
-
-	/**
-	 * Search for matching text of current comboBox filter
-	 * @param {any} dataItem
-	 * @returns {SafeHtml}
-	 */
-	public comboBoxInnerSearch(dataItem: any): SafeHtml {
-		if (!dataItem.text) {
-			dataItem.text = '';
-		}
-		const regex = new RegExp(this.innerComboBox.text, 'i');
-		const text =  (this.innerTemplateTaskItem) ? this.innerTemplateTaskItem(dataItem) : dataItem.text;
-
-		const transformedText = text.replace(regex, `<b>$&</b>`);
-
-		return this.sanitized.bypassSecurityTrustHtml(transformedText);
-	}
-
-	/**
-	 * On Open we emit the value if the parents needs to implements something
-	 * but we call the resource on the Rest to get the list of values.
-	 */
-	public onOpen(): void {
-		// At open the first time, we need to get the list of items to show based on the selected element
-		if (this.reloadOnOpen || this.firstChange || !this.comboBoxSearchModel) {
-			this.firstChange = false;
-			this.datasource = [];
-			this.initSearchModel();
-			this.loadAssetsForDropDown();
-		} else {
-			this.calculateLastElementShow();
-		}
 	}
 
 	/**
@@ -392,11 +293,6 @@ export class ArchitectureGraphComponent implements OnInit {
 			this.showControlPanel = !this.showControlPanel;
 		}
 		this.showLegend = !this.showLegend;
-	}
-
-	onAssetFilterChange(event) {
-		console.log('asset type filter change', event);
-		// do crazy logic here
 	}
 
 	/**
