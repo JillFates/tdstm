@@ -39,8 +39,12 @@ export class AssetCommonDiagramHelper {
 				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
 				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
 			linkTemplate: this.linkTemplate(),
-			lowScaleTemplate: this.lowScaleNodeTemplate(),
-			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
+			lowScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.lowScaleNodeTemplate(),
+			mediumScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
 			rootNode: params.rootNode,
 			// extras: params.extras && params.extras
