@@ -92,7 +92,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeWithTasksDataMap.recipeText+'"');
         waitFor {editorModalCloseBtn.click()}
         at TabEditorPage
-        waitFor {edTabSaveWipBtn.click()}
+        waitFor (5) {edTabSaveWipBtn.click()}
         at CookbookPage
         waitFor {taskGenerationTab.click()}
         at TabTaskGenPage
