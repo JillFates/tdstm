@@ -224,8 +224,14 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.controlAppOwner.toggle(true);
 		}
 
-		public onClose(event: any): void {
+		public onClose(event: any, dropdownlist: any): void {
 			event.preventDefault();
+			// Close the list if the component is no longer focused
+			setTimeout(() => {
+				if (!dropdownlist.wrapper.nativeElement.contains(document.activeElement)) {
+					dropdownlist.toggle(false);
+				}
+			});
 		}
 
 		/**
