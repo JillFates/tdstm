@@ -182,6 +182,8 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 */
 		public focusSME1(): void {
 			this.controlSME1.toggle(true);
+			this.controlSME2.toggle(false);
+			this.controlAppOwner.toggle(false);
 		}
 
 		/**
@@ -198,7 +200,9 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * On focus open the dropdown
 		 */
 		public focusSME2(): void {
+			this.controlSME1.toggle(false);
 			this.controlSME2.toggle(true);
+			this.controlAppOwner.toggle(false);
 		}
 
 		/**
@@ -215,11 +219,19 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * On focus open the dropdown
 		 */
 		public focusAppOwner(): void {
+			this.controlSME1.toggle(false);
+			this.controlSME2.toggle(false);
 			this.controlAppOwner.toggle(true);
 		}
 
-		public onClose(event: any): void {
+		public onClose(event: any, dropdownlist: any): void {
 			event.preventDefault();
+			// Close the list if the component is no longer focused
+			setTimeout(() => {
+				if (!dropdownlist.wrapper.nativeElement.contains(document.activeElement)) {
+					dropdownlist.toggle(false);
+				}
+			});
 		}
 
 		/**
