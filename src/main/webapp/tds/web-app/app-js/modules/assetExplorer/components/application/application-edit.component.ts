@@ -191,12 +191,29 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			this.controlAppOwner.toggle(true);
 		}
 
-		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string): void {
+		public onClose(event: any): void {
+			event.preventDefault();
+		}
+
+		/**
+		 * Add the person to the Asset Model, if the Person is "Add Person" it invokes the Dialog to add a new one
+		 * @param person
+		 * @param asset
+		 * @param fieldName
+		 * @param companies
+		 * @param teams
+		 * @param staffTypes
+		 * @param modelListParameter
+		 * @param dropdown
+		 */
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string, dropdown: any): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
+				dropdown.toggle(false);
 				return;
 			}
 
+			dropdown.toggle(false);
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;

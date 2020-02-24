@@ -218,21 +218,29 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.controlAppOwner.toggle(true);
 		}
 
+		public onClose(event: any): void {
+			event.preventDefault();
+		}
+
 		/**
-		 * Open the dialog to allow create a person
-		 * @param {any}  person Contains the info related to the asset in which the person will be  created
-		 * @param {string}  fieldName Contains the field asset type
-		 * @param {any[]}  companies List of companies to display
-		 * @param {any[]}  teams List of teams to display
-		 * @param {any[]}  staffTypes List of staffs types to display
-		 * @returns {void}
+		 * Add the person to the Asset Model, if the Person is "Add Person" it invokes the Dialog to add a new one
+		 * @param person
+		 * @param asset
+		 * @param fieldName
+		 * @param companies
+		 * @param teams
+		 * @param staffTypes
+		 * @param modelListParameter
+		 * @param dropdown
 		 */
-		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string): void {
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string, dropdown: any): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
+				dropdown.toggle(false);
 				return;
 			}
 
+			dropdown.toggle(false);
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;
