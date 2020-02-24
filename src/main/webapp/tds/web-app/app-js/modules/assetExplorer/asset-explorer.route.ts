@@ -17,6 +17,9 @@ export class AssetExplorerStates {
 	public static readonly ARCHITECTURE_GRAPH = {
 		url: 'architecture-graph'
 	};
+	public static readonly DEPENDENCY_ANALYZER = {
+		url: 'dependency-analyzer'
+	};
 }
 
 /**
@@ -25,13 +28,25 @@ export class AssetExplorerStates {
  */
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
-export const AssetExplorerrRoute: Routes = [
+export const AssetExplorerRoute: Routes = [
 	{
 		path: AssetExplorerStates.ARCHITECTURE_GRAPH.url,
 		data: {
 			page: {
-				title: 'Architecture Graph', instruction: '',
-				menu: ['ASSETS.ASSETS', 'Go JS Architecture Graph'],
+				title: 'ARCHITECTURE.ARCHITECTURE_GRAPH', instruction: '',
+				menu: ['ASSETS.ASSETS', 'ARCHITECTURE.GOJSARCHITECTUREGRAPH'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-architecture-graph-gojs', subMenu: false }
+			}
+		},
+		component: ArchitectureGraphComponent,
+		canActivate: [AuthGuardService, ModuleResolveService]
+	},
+	{
+		path: AssetExplorerStates.DEPENDENCY_ANALYZER.url,
+		data: {
+			page: {
+				title: 'DEPENDENCY_ANALYZER.DEPENDENCY_ANALYZER', instruction: '',
+				menu: ['ASSETS.ASSETS', 'DEPENDENCY_ANALYZER.DEPENDENCY_ANALYZER'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-architecture-graph-gojs', subMenu: false }
 			}
 		},
@@ -42,7 +57,7 @@ export const AssetExplorerrRoute: Routes = [
 
 @NgModule({
 	exports: [RouterModule],
-	imports: [RouterModule.forChild(AssetExplorerrRoute)]
+	imports: [RouterModule.forChild(AssetExplorerRoute)]
 })
 
 export class AssetExplorerrRouteModule {

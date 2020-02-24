@@ -272,6 +272,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'ARCHITECTURE': {
 		'ARCHITECTURE_GRAPH': 'Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
@@ -286,6 +287,9 @@ export const en_DICTIONARY: Object = {
 		'SAVE_PREFERENCES': 'Save Preferences',
 		'RESET_DEFAULTS': 'Reset Default',
 		'ASSET_CLASSES': 'Asset Classes: '
+	},
+	'DEPENDENCY_ANALYZER': {
+		'DEPENDENCY_ANALYZER': 'Dependency Analyzer'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',

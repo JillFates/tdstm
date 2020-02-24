@@ -42,6 +42,7 @@ import {ModelDeviceEditComponent} from './components/device/model-device/compone
 import { TaskActionSummaryComponent } from '../taskManager/components/task-actions/task-action-summary.component';
 import {AssetExplorerrRouteModule} from './asset-explorer.route';
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
+import {DependencyAnalyzerComponent} from './components/dependency-analyzer/dependency-analyzer.component';
 
 @NgModule({
 	imports: [
@@ -80,7 +81,8 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		TaskActionsComponent,
 		TaskNotesComponent,
 		TaskActionSummaryComponent,
-		ArchitectureGraphComponent
+		ArchitectureGraphComponent,
+		DependencyAnalyzerComponent
 	],
 	providers: [
 		// Services
