@@ -218,6 +218,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.controlAppOwner.toggle(true);
 		}
 
+		public onClose(event: any): void {
+			event.preventDefault();
+		}
+
 		/**
 		 * Open the dialog to allow create a person
 		 * @param {any}  person Contains the info related to the asset in which the person will be  created
@@ -227,12 +231,14 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * @param {any[]}  staffTypes List of staffs types to display
 		 * @returns {void}
 		 */
-		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string): void {
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string, dropdown: any): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
+				dropdown.toggle(false);
 				return;
 			}
 
+			dropdown.toggle(false);
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;

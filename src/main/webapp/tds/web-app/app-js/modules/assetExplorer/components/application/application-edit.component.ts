@@ -191,12 +191,18 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			this.controlAppOwner.toggle(true);
 		}
 
-		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string): void {
+		public onClose(event: any): void {
+			event.preventDefault();
+		}
+
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string, dropdown: any): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
+				dropdown.toggle(false);
 				return;
 			}
 
+			dropdown.toggle(false);
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;
