@@ -18,7 +18,6 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
-import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.command.CloneAssetCommand
@@ -34,12 +33,9 @@ import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
-import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectAssetMap
-import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.search.AssetDependencyQueryBuilder
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
@@ -51,7 +47,6 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.transaction.annotation.Propagation
 
 import javax.servlet.http.HttpSession
 import java.text.DateFormat
@@ -964,60 +959,35 @@ class AssetEntityService implements ServiceMethods {
 			return 0
 		}
 
-		ProjectAssetMap.executeUpdate('DELETE ProjectAssetMap WHERE asset.id in (:assets)', [assets: assetIds])
-		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
+		namedParameterJdbcTemplate.update('delete from project_asset_map where (asset_id) IN (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE project_team SET latest_asset_id = null where (latest_asset_id)  IN (:assetIds)', [assetIds: assetIds])
 
 		// Delete asset comments
-		AssetComment.executeUpdate('''
-			DELETE AssetComment c
-			WHERE c.assetEntity.id IN (:assets)
-			AND c.commentType != :taskType
-		''', [assets: assetIds, taskType: AssetCommentType.TASK])
-
+		namedParameterJdbcTemplate.update('delete from asset_comment where (asset_entity_id) IN (:assetIds) AND comment_type != :taskType', [assetIds: assetIds, taskType: AssetCommentType.TASK])
 		// Null out asset references in Tasks
-		AssetComment.executeUpdate('''
-			UPDATE AssetComment c SET c.assetEntity=null
-			WHERE c.assetEntity.id IN (:assets)
-		''', [assets: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE asset_comment SET asset_entity_id = null where (asset_entity_id)  IN (:assetIds)', [assetIds: assetIds])
+
 
 		// Delete cabling where asset is the From in the relationship
-		AssetCableMap.executeUpdate('DELETE AssetCableMap WHERE assetFrom.id in (:assets)', [assets: assetIds])
-
+		namedParameterJdbcTemplate.update('delete from asset_cable_map where (asset_from_id) IN (:assetIds)', [assetIds: assetIds, taskType: AssetCommentType.TASK])
 		// Null out cable references where the asset is the To in the relationship
-		AssetCableMap.executeUpdate('''
-			UPDATE AssetCableMap
-			SET cableStatus=:status, assetTo=null, assetToPort=null
-			WHERE assetTo.id in (:assets)
-		''', [assets: assetIds, status: AssetCableStatus.UNKNOWN])
+		namedParameterJdbcTemplate.update('UPDATE asset_cable_map SET cable_status = :status, asset_to_id = null, asset_to_port_id = null where (asset_to_id)  IN (:assetIds)', [assetIds: assetIds, status: AssetCableStatus.UNKNOWN])
 
-		AssetDependency.executeUpdate(
-			'DELETE AssetDependency WHERE asset.id in (:assets) or dependent.id in (:assets) ',
-			[assets: assetIds])
 
-		AssetDependencyBundle.executeUpdate('DELETE AssetDependencyBundle WHERE asset.id in (:assets)', [assets: assetIds])
+		namedParameterJdbcTemplate.update('delete from asset_dependency where (asset_id) IN (:assetIds) OR dependent_id IN (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('delete from asset_dependency_bundle where (asset_id) IN (:assetIds)', [assetIds: assetIds])
+
 
 		// Clear any possible Chassis references
-		AssetEntity.executeUpdate('''
-			UPDATE AssetEntity SET sourceChassis=NULL, sourceBladePosition=NULL
-			WHERE sourceChassis.id in (:assets)
-			''',
-			[assets: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE asset_entity SET source_chassis_id = NULL, source_blade_position=NULL where (source_chassis_id)  IN (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE asset_entity SET target_chassis_id = NULL, target_blade_position=NULL where (target_chassis_id)  IN (:assetIds)', [assetIds: assetIds])
 
-		AssetEntity.executeUpdate('''
-			UPDATE AssetEntity SET targetChassis=NULL, targetBladePosition=NULL
-			WHERE targetChassis.id in (:assets)
-			''',
-			[assets: assetIds])
 
 		// Delete a few Application related domains for those where the id matches an Application. This
 		// shouldn't be an issue when deleting other asset classes because nothing will be found.
-		ApplicationAssetMap.executeUpdate('''
-			DELETE ApplicationAssetMap
-			WHERE application.id in :assetIds OR asset.id in :assetIds''',
-			[assetIds:assetIds])
+		namedParameterJdbcTemplate.update('delete from application_asset_map where (application_id) IN (:assetIds) OR (asset_id) In (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('delete from app_move_event where (application_id) IN (:assetIds)', [assetIds: assetIds])
 
-		AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application.id in :assetIds',
-			[assetIds:assetIds] )
 
 		// Last but not least, delete the asset itself. Note that GORM/Hibernate is smart
 		// enough to know when a subclass of AssetEntity is being references so deleting AssetEntity will
@@ -1030,7 +1000,7 @@ class AssetEntityService implements ServiceMethods {
 		int countFiles = namedParameterJdbcTemplate.update('delete from files where (files_id) IN (:assetIds)', [assetIds: assetIds])
 		int countDbs = namedParameterJdbcTemplate.update('delete from data_base where (db_id) IN (:assetIds)', [assetIds: assetIds])
 		int count = namedParameterJdbcTemplate.update('delete from asset_entity where (asset_entity_id) IN (:assetIds)', [assetIds: assetIds])
-		println("*** ${new Date().time -time}  ***")
+
 		return count + countApps + countFiles + countDbs
 	}
 
