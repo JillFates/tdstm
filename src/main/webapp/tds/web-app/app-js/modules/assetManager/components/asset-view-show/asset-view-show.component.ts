@@ -200,6 +200,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 			this.assetExplorerService.query(this.model.id, params).subscribe(result => {
 				this.data = result;
+				this.data.assets.forEach(asset => {
+					if (asset.common_lastUpdated) {
+						asset.common_lastUpdated = new Date(asset.common_lastUpdated);
+					}
+				});
 				jQuery('[data-toggle="popover"]').popover();
 			}, err => console.log(err));
 		}, 2000);
