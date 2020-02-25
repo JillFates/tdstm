@@ -78,7 +78,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	async ngOnInit() {
-		// -----------------------------------
+
 		this.gridRowActions = [
 			{
 				name: 'Edit',
@@ -246,7 +246,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 
 	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0 && this.isEditAvailable()) {
-			await this.openProject(event.dataItem, ActionType.VIEW);
+			await this.openProject(event.dataItem.id, ActionType.VIEW);
 		}
 	}
 
