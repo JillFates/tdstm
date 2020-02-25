@@ -7,6 +7,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
+import {DependencyAnalyzerComponent} from './components/dependency-analyzer/dependency-analyzer.component';
 
 /**
  * Asset Manager Route States
@@ -47,10 +48,10 @@ export const AssetExplorerRoute: Routes = [
 			page: {
 				title: 'DEPENDENCY_ANALYZER.DEPENDENCY_ANALYZER', instruction: '',
 				menu: ['ASSETS.ASSETS', 'DEPENDENCY_ANALYZER.DEPENDENCY_ANALYZER'],
-				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-architecture-graph-gojs', subMenu: false }
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependency-analyzer-clr', subMenu: false }
 			}
 		},
-		component: ArchitectureGraphComponent,
+		component: DependencyAnalyzerComponent,
 		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];

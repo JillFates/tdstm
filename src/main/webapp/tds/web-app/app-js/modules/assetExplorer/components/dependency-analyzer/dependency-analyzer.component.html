@@ -1,0 +1,49 @@
+<div class="content-container">
+	<div class="content-area">
+		<div class="inline-content-da">
+			<h5><strong>Dependency Groups</strong></h5>
+			<button class="btn btn-outline">Regenerate</button>
+			<h6>Bundle</h6>
+			<div class="clr-select-wrapper">
+				<select id="select-basic" class="clr-select">
+					<option value="1">One</option>
+					<option value="2">Two</option>
+					<option value="3">Three</option>
+				</select>
+			</div>
+			<h6>Tags</h6>
+			<!-- Show only wip checkbox -->
+			<clr-checkbox-wrapper class="inline">
+				<input
+					clrCheckbox
+					id="showWIPonly"
+					type="checkbox"
+					name="showWIPonly"
+					class="component-action-just-planning"
+					[(ngModel)]="showOnlyWIP"
+					(change)="onShowOnlyWIPChange($event)"/>
+				<label
+					class="clr-control-label clr-control-label-sm inline"
+					for="showWIPonly"
+				>
+					Show ONLY Work In Progress
+				</label>
+			</clr-checkbox-wrapper>
+			<!-- Refresh button -->
+			<tds-button-custom
+				[flat]="true"
+				[icon]="'refresh'"
+				[iconClass]="'is-solid'"
+				[tooltip]="'Refresh'"
+				class="favorite-button text-yellow"
+				(click)="onRefeshData()"
+			>
+			</tds-button-custom>
+		</div>
+
+	</div>
+	<tds-grid
+		[gridModel]="gridModel"
+		(cellClick)="cellClick($event)">
+	</tds-grid>
+</div>

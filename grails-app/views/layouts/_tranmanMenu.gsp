@@ -188,6 +188,11 @@
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
+                            <tds:hasPermission permission="${Permission.DepAnalyzerView}">
+                                <li class="menu-child-item menu-parent-assets-dependency-analyzer-clr">
+                                    <g:link controller="module" action="taskManager" id="dependency-analyzer">Dependency Analyzer Clr</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">
                                 <li class="menu-child-item menu-parent-assets-architecture-graph">
                                     <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
