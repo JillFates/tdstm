@@ -114,13 +114,13 @@
 							<!-- Filter -->
 							<ng-template kendoGridFilterCellTemplate let-filter>
 								<div class="filter-input">
-									<tds-filter-input
+									<tds-grid-filter-input
 										name="{{column.property}}"
 										[value]="column.filter || ''"
-										[columnType]="column.type"
+										[filterType]="column.type"
 										placeholder="{{'GLOBAL.FILTER' | translate}}"
 										(filter)="preProcessFilter($event, column)">
-									</tds-filter-input>
+									</tds-grid-filter-input>
 								</div>
 							</ng-template>
 

@@ -7,7 +7,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 180,
 		locked: false,
-		filterable: true
+		filterable: true,
+		cellClass: 'is-grid-link'
 	},
 	{
 		label: 'Description',

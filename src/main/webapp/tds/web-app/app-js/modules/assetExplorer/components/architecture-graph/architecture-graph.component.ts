@@ -384,7 +384,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	goFullScreen() {
-		console.log('go full screen');
+		this.graph.showFullGraph();
 	}
 
 	toggleLegend() {
@@ -408,7 +408,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		// TODO: filter nodes for removing labels on graph
 		this.categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
 		if (this.categories.length > 0 && this.assetId) {
-			let tempNodesData = Object.assign({}, this.currentNodesData);
+			let tempNodesData = JSON.parse(JSON.stringify(this.currentNodesData));
 			tempNodesData.nodes.forEach( node => {
 				if (!this.categories.includes(node.assetClass)) {
 					node.name = '';
@@ -447,6 +447,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
+		this.graph.showFullGraphBtn = false;
 		this.loadData();
 	}
 
@@ -473,10 +474,22 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * */
 	resetDefaults() {
 		this.getArchitectureGraphPreferences();
+		this.resetLabels();
 	}
 
-	goBackToNormalGraph() {
-		console.log('go back to normal');
+	onDiagramAnimationFinished() {
+		this.graph.showFullGraphBtn = false;
+	}
+
+	viewFullGraphFromCache() {
+		this.graph.showFullGraphBtn = false;
+	}
+
+	resetLabels() {
+		this.graphLabels.forEach( el => {
+			el.checked = false;
+		});
+		this.updateNodeData(this.currentNodesData, true);
 	}
 
 }

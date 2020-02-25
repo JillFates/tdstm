@@ -919,7 +919,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * View full graph from cache
 	 */
 	viewFullGraphFromCache(): void {
-		const taskGraphHelper = new TaskGraphDiagramHelper(this.permissionService);
 		this.isFullView = true;
 		this.isNeighbor = false;
 		this.graph.showFullGraphBtn = false;
@@ -927,6 +926,9 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		const nodeDataArray = cache && cache.data;
 		const linkDataArray = cache && cache.linksPath;
 		this.extractTeams(nodeDataArray);
+		const taskGraphHelper = new TaskGraphDiagramHelper(this.permissionService, {
+			taskCount: nodeDataArray.length
+		});
 		this.diagramData$.next(taskGraphHelper.diagramData({
 			rootNode: this.rootId,
 			currentUserId: this.userContext.user.id,
