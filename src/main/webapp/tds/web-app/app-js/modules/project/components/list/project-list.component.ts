@@ -47,6 +47,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 	private gridSettings: GridSettings = {
 		defaultSort: [{field: 'name', dir: 'asc'}],
 		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,

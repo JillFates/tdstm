@@ -49,6 +49,7 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 	public gridSettings: GridSettings = {
 		defaultSort: [{field: 'title', dir: 'asc'}],
 		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,
