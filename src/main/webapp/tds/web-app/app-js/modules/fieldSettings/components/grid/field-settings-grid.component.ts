@@ -1,30 +1,42 @@
-import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, OnDestroy} from '@angular/core';
+// Angular
+import {
+	Component,
+	Input,
+	Output,
+	EventEmitter,
+	OnInit,
+	ViewEncapsulation,
+	ViewChild,
+	OnDestroy,
+	ComponentFactoryResolver
+} from '@angular/core';
+// Model
 import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../../model/field-settings.model';
-import { DomainModel } from '../../model/domain.model';
-
-import { UILoaderService } from '../../../../shared/services/ui-loader.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import {DomainModel} from '../../model/domain.model';
+import {FIELD_COLORS} from '../../model/field-settings.model';
+import {DOMAIN} from '../../../../shared/model/constants';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {DialogConfirmAction, DialogExit, DialogService, ModalSize} from 'tds-component-library';
+// Component
+import {MinMaxConfigurationPopupComponent} from '../min-max/min-max-configuration-popup.component';
+import {SelectListConfigurationPopupComponent} from '../select-list/selectlist-configuration-popup.component';
+import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
+import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
+// Service
+import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
+import {FieldSettingsService} from '../../service/field-settings.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ProjectService} from '../../../project/service/project.service';
+// Other
 import {
 	GridDataResult,
 	DataStateChangeEvent,
 } from '@progress/kendo-angular-grid';
-import { process, State } from '@progress/kendo-data-query';
-
-import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configuration-popup.component';
-import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { FIELD_COLORS } from '../../model/field-settings.model';
-import { NumberConfigurationPopupComponent } from '../number/number-configuration-popup.component';
-import { NumberControlHelper } from '../../../../shared/components/custom-control/number/number-control.helper';
-import { NumberConfigurationConstraintsModel } from '../number/number-configuration-constraints.model';
-import { FieldSettingsService } from '../../service/field-settings.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import {DOMAIN} from '../../../../shared/model/constants';
-import {ProjectService} from '../../../project/service/project.service';
+import {process, State} from '@progress/kendo-data-query';
 import {Observable, Subject} from 'rxjs';
 import {Select} from '@ngxs/store';
 import {takeUntil} from 'rxjs/operators';
-import {UserContextModel} from '../../../auth/model/user-context.model';
 
 declare var jQuery: any;
 
@@ -34,14 +46,15 @@ declare var jQuery: any;
 	exportAs: 'fieldSettingsGrid',
 	templateUrl: 'field-settings-grid.component.html',
 	styles: [
-		`
-			tr .text-center {
-				text-align: center;
-			}
-			.has-error,
-			.has-error:focus {
-				border: 1px #f00 solid;
-			}
+			`
+            tr .text-center {
+                text-align: center;
+            }
+
+            .has-error,
+            .has-error:focus {
+                border: 1px #f00 solid;
+            }
 		`,
 	],
 })
@@ -65,9 +78,9 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	@Input('domains') domainsList: DomainModel[];
 	@Input('isEditable') isEditable: boolean;
 	@Input('gridFilter') gridFilter: any;
-	@ViewChild('minMax', { static: false })
+	@ViewChild('minMax', {static: false})
 	minMax: MinMaxConfigurationPopupComponent;
-	@ViewChild('selectList', { static: false })
+	@ViewChild('selectList', {static: false})
 	selectList: SelectListConfigurationPopupComponent;
 	public domains: DomainModel[] = [];
 	private fieldsSettings: FieldSettingsModel[];
@@ -96,7 +109,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 
 	public isEditing = false;
 	public isFilterDisabled = false;
-	public sortable: boolean | object = { mode: 'single' };
+	public sortable: boolean | object = {mode: 'single'};
 	private fieldsToDelete = [];
 	protected resettingChanges = false;
 	protected lastEditedControl = null;
@@ -108,9 +121,9 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	private planMethodology = null;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private loaderService: UILoaderService,
-		private prompt: UIPromptService,
-		private dialogService: UIDialogService,
 		private projectService: ProjectService,
 		private translate: TranslatePipe,
 		private fieldSettingsService: FieldSettingsService) {
@@ -190,7 +203,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		setTimeout(() => {
 			this.isEditing = true;
 			this.resetValidationFlags();
-			this.sortable = { mode: 'single' };
+			this.sortable = {mode: 'single'};
 			this.isFilterDisabled = false;
 			this.onFilter();
 			this.loaderService.hide();
@@ -203,13 +216,11 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 */
 	protected onSaveAll(): void {
 		if (!(!this.isEditable || !this.isDirty || this.formHasError)) {
-			this.askForDeleteUnderlayingData().then(
-				(deleteUnderLaying: boolean) => {
-					if (deleteUnderLaying) {
-						this.notifySaveAll(deleteUnderLaying);
-					}
+			this.askForDeleteUnderlayingData().subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.notifySaveAll(true);
 				}
-			);
+			});
 		}
 	}
 
@@ -217,24 +228,17 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * If there is records to be deleted, show the confirmation propmpt dialog asking
 	 * if those fields should be deleted in the back end as well
 	 */
-	private askForDeleteUnderlayingData(): Promise<boolean> {
+	private askForDeleteUnderlayingData(): Observable<any> {
 		const countFieldsToDelete = this.fieldsToDelete.length;
 
 		if (countFieldsToDelete) {
-			return this.prompt.open(
-				this.translate.transform(
-					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'
-				),
-				this.translate.transform(
-					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_MESSAGE'
-				),
-				this.translate.transform('GLOBAL.YES'),
-				this.translate.transform('GLOBAL.NO'),
-				true
+			return this.dialogService.confirm(
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_MESSAGE'),
 			);
 		}
 
-		return Promise.resolve(true);
+		return Observable.of({confirm: DialogConfirmAction.CONFIRM});
 	}
 
 	/**
@@ -376,7 +380,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 			this.data.fields.push(model);
 			this.onFilter();
 
-			setTimeout(function() {
+			setTimeout(function () {
 				jQuery('#' + model.field).focus();
 			});
 		});
@@ -416,7 +420,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 
 	protected reset(): void {
 		this.isEditing = false;
-		this.sortable = { mode: 'single' };
+		this.sortable = {mode: 'single'};
 		this.isFilterDisabled = false;
 		this.state.sort = [
 			{
@@ -525,21 +529,17 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 */
 	protected onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
 		if (dataItem && !dataItem.isNew && fieldTypeChange) {
-			this.prompt
-				.open(
-					'Confirmation Required',
-					fieldTypeChange.conversion.getWarningMessage(),
-					'Ok',
-					'Cancel'
-				)
-				.then(result => {
-					if (result) {
-						this.setIsDirty(true);
-						fieldTypeChange.save();
-					} else {
-						fieldTypeChange.reset();
-					}
-				});
+			this.dialogService.confirm(
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				fieldTypeChange.conversion.getWarningMessage()
+			).subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.setIsDirty(true);
+					fieldTypeChange.save();
+				} else {
+					fieldTypeChange.reset();
+				}
+			});
 		} else {
 			this.setIsDirty(true);
 			fieldTypeChange.save();
@@ -553,23 +553,19 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		this.setIsDirty(true);
 		const previousControl = dataItem.control;
 		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
-			this.prompt
-				.open(
-					'Confirmation Required',
-					'Changing the control will lose all List options. Click Ok to continue otherwise Cancel',
-					'Ok',
-					'Cancel'
-				)
-				.then(result => {
-					if (result) {
-						dataItem.control = newValue;
-						this.onControlChange(previousControl, dataItem);
-					} else {
-						setTimeout(() => {
-							jQuery('#control' + dataItem.field).val('List');
-						});
-					}
-				});
+			this.dialogService.confirm(
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				'Changing the control will lose all List options. Click Ok to continue otherwise Cancel'
+			).subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					dataItem.control = newValue;
+					this.onControlChange(previousControl, dataItem);
+				} else {
+					setTimeout(() => {
+						jQuery('#control' + dataItem.field).val('List');
+					});
+				}
+			});
 		} else {
 			dataItem.control = newValue;
 			this.onControlChange(previousControl, dataItem);
@@ -679,11 +675,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param {number} actionType
 	 */
 	private openFieldSettingsPopup(dataItem: FieldSettingsModel): void {
+
 		let component: any;
-		const services = [
-			{ provide: FieldSettingsModel, useValue: dataItem },
-			{ provide: 'domain', useValue: this.data.domain },
-		];
 
 		switch (dataItem.control) {
 			case CUSTOM_FIELD_CONTROL_TYPE.String:
@@ -698,18 +691,26 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 				component = NumberConfigurationPopupComponent;
 				break;
 		}
-		this.dialogService
-			.open(component, services)
-			.then(result => {
-				if (result) {
+
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: component,
+			data: {
+				fieldSettingsModel: dataItem,
+				domain: this.data.domain
+			},
+			modalConfiguration: {
+				title: 'Confirmation Required',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((confirmation: any) => {
+			if (confirmation) {
+				if (confirmation.status === DialogExit.ACCEPT) {
 					this.setIsDirty(true);
 				}
-				// when popup closes ..
-			})
-			.catch(error => {
-				console.log(error);
-				// when popup is Cancelled.
-			});
+			}
+		});
 	}
 
 	/**
@@ -717,9 +718,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param {CUSTOM_FIELD_CONTROL_TYPE} control
 	 * @returns {boolean}
 	 */
-	protected isAllowedConfigurationForField(
-		control: CUSTOM_FIELD_CONTROL_TYPE
-	): boolean {
+	protected isAllowedConfigurationForField(control: CUSTOM_FIELD_CONTROL_TYPE): boolean {
 		if (
 			control === CUSTOM_FIELD_CONTROL_TYPE.List ||
 			control === CUSTOM_FIELD_CONTROL_TYPE.String ||
@@ -735,11 +734,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param {CUSTOM_FIELD_CONTROL_TYPE} control
 	 * @returns {boolean}
 	 */
-	protected isAllowedDefaultValueForField(
-		control: CUSTOM_FIELD_CONTROL_TYPE
-	): boolean {
-		if (
-			control &&
+	protected isAllowedDefaultValueForField(control: CUSTOM_FIELD_CONTROL_TYPE): boolean {
+		if (control &&
 			(control === CUSTOM_FIELD_CONTROL_TYPE.String ||
 				control === CUSTOM_FIELD_CONTROL_TYPE.YesNo ||
 				control === CUSTOM_FIELD_CONTROL_TYPE.List)
@@ -755,10 +751,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * @param {FieldSettingsModel} dataItem - The model of the asset field control which launched the event
 	 * @param {KeyboardEvent} event - Context event from the input that launched the change
 	 */
-	protected onKeyPressed(
-		dataItem: FieldSettingsModel,
-		event: KeyboardEvent
-	): void {
+	protected onKeyPressed(dataItem: FieldSettingsModel, event: KeyboardEvent): void {
 		// Mark form as dirty
 		this.setIsDirty(true);
 		// On esc key pressed, open confirmation dialog
@@ -771,29 +764,13 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		const message =
 			'The label must be different from all other field names and labels';
 
-		if (
-			this.fieldSettingsService.conflictsWithAnotherLabel(
-				dataItem.label,
-				fields
-			)
-		) {
+		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
 			dataItem.errorMessage = message;
 		} else {
-			if (
-				this.fieldSettingsService.conflictsWithAnotherFieldName(
-					dataItem.label,
-					fields
-				)
-			) {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields)) {
 				dataItem.errorMessage = message;
 			} else {
-				if (
-					this.fieldSettingsService.conflictsWithAnotherDomain(
-						dataItem,
-						this.domains,
-						this.domains[0]
-					)
-				) {
+				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
 					dataItem.errorMessage = message;
 				}
 			}
@@ -806,7 +783,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	/**
 	 * Set the flag to indicate the form is dirty
 	 */
-	protected setIsDirty(value: boolean): void {
+	protected setIsDirty(value: boolean):
+		void {
 		this.isDirty = value;
 	}
 
