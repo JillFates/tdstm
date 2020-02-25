@@ -1,10 +1,11 @@
 // Angular
 import {
-	Component, ComponentFactoryResolver,
+	AfterContentInit,
+	Component, ComponentFactoryResolver, OnDestroy,
 	OnInit,
 	ViewChild
 } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 // Store
 import {Store} from '@ngxs/store';
 // Model
@@ -40,7 +41,7 @@ import {
 	selector: 'event-list',
 	templateUrl: 'event-list.component.html',
 })
-export class EventListComponent implements OnInit {
+export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 	public gridRowActions: GridRowAction[];
 
 	public headerActions: HeaderActionButtonData[];
@@ -57,7 +58,10 @@ export class EventListComponent implements OnInit {
 
 	protected gridModel: GridModel;
 	protected dateFormat = '';
-	protected eventDetailsShown = false;
+
+	private navigationSubscription;
+	private eventToOpen: string;
+	private eventOpen = false;
 
 	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
 
@@ -70,6 +74,7 @@ export class EventListComponent implements OnInit {
 		private eventService: EventsService,
 		private translateService: TranslatePipe,
 		private store: Store,
+		private router: Router,
 		private route: ActivatedRoute
 	) {
 	}
@@ -123,6 +128,27 @@ export class EventListComponent implements OnInit {
 		this.gridModel.columnModel = this.columnModel;
 	}
 
+	ngAfterContentInit() {
+		this.eventToOpen = this.route.snapshot.queryParams['show'];
+		// The following code Listen to any change made on the route to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event && event.state && event.state && event.state.url.indexOf('/event/list') !== -1) {
+				this.eventToOpen = event.state.root.queryParams.show;
+			}
+			if (event instanceof NavigationEnd && this.eventToOpen && this.eventToOpen.length && !this.eventOpen) {
+				this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+			}
+		});
+
+		this.route.queryParams.subscribe(params => {
+			if (this.eventToOpen && !this.eventOpen) {
+				setTimeout(() => {
+					this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+				});
+			}
+		});
+	}
+
 	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0 && this.isEditAvailable()) {
 			await this.openEvent(event.dataItem, ActionType.EDIT, false);
@@ -132,17 +158,6 @@ export class EventListComponent implements OnInit {
 	public loadData = async (): Promise<EventModel[]> => {
 		try {
 			let data = await this.eventService.getEventsForList().toPromise();
-			if (this.route.snapshot.queryParams['show']) {
-				let {id, name} = data.find((bundle: any) => {
-					return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0)
-				});
-				if (!this.eventDetailsShown) {
-					setTimeout(() => {
-						this.openEvent({id, name}, ActionType.EDIT, false);
-						this.eventDetailsShown = true;
-					});
-				}
-			}
 			return data;
 		} catch (error) {
 			if (error) {
@@ -164,6 +179,9 @@ export class EventListComponent implements OnInit {
 				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 					this.eventsService.deleteEvent(dataItem.id).toPromise();
 					await this.gridComponent.reloadData();
+					setTimeout(() => {
+						this.store.dispatch(new SetEvent(null));
+					});
 				}
 			}
 		} catch (error) {
@@ -207,7 +225,9 @@ export class EventListComponent implements OnInit {
 
 	public async openEvent(event: any, actionType: ActionType, openFromList = false): Promise<void> {
 		try {
-			this.store.dispatch(new SetEvent({id: event.id, name: event.name}));
+			if (event.name) {
+				this.store.dispatch(new SetEvent({id: event.id, name: event.name}));
+			}
 			await this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
 				component: EventViewEditComponent,
@@ -242,5 +262,14 @@ export class EventListComponent implements OnInit {
 	 */
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.EventCreate);
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 }

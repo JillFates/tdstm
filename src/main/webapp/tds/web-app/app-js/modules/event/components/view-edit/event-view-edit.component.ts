@@ -132,8 +132,10 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 		this.eventsService.deleteEvent(this.eventId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.store.dispatch(new SetEvent(null));
-					this.onCancelClose();
+					setTimeout(() => {
+						this.store.dispatch(new SetEvent(null));
+						this.onCancelClose();
+					});
 				}
 			});
 	}
