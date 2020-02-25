@@ -47,6 +47,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 	private gridSettings: GridSettings = {
 		defaultSort: [{field: 'name', dir: 'asc'}],
 		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,
@@ -131,16 +132,22 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 			if (event && event.state && event.state && event.state.url.indexOf('/project/list') !== -1) {
 				this.projectToOpen = event.state.root.queryParams.show;
 			}
-			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length && !this.projectOpen) {
-				this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length) {
+				setTimeout(() => {
+					if (!this.projectOpen) {
+						this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+					}
+				}, 500);
 			}
 		});
 
 		this.route.queryParams.subscribe(params => {
 			if (this.projectToOpen && !this.projectOpen) {
 				setTimeout(() => {
-					this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
-				});
+					if (!this.projectOpen) {
+						this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+					}
+				}, 500);
 			}
 		});
 	}
@@ -193,6 +200,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 	 */
 	private async openProject(projectModelId: number, actionType: ActionType, openFromList = false): Promise<void> {
 		try {
+			this.projectOpen = true;
 			await this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
 				component: ProjectViewEditComponent,
@@ -207,6 +215,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 					modalSize: ModalSize.MD
 				}
 			}).toPromise();
+			this.projectOpen = false;
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			console.error(error);

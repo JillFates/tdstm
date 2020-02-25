@@ -10,6 +10,12 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {DataScriptListComponent} from './components/list/data-script-list.component';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_PROJECT = 'menu-parent-project';
+
 export class DataScriptStates {
 	public static readonly DATA_SCRIPT_LIST = {
 		url: 'list'
@@ -24,7 +30,8 @@ export const DataScriptRoute: Routes = [
 			page: {
 				title: 'DATA_INGESTION.ETL_SCRIPTS',
 				instruction: '',
-				menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.ETL_SCRIPTS']
+				menu: ['DATA_INGESTION.PROJECT', 'DATA_INGESTION.ETL_SCRIPTS'],
+				topMenu: { parent: TOP_MENU_PARENT_PROJECT, child: 'menu-parent-projects-etl-scripts', subMenu: true}
 			},
 			requiresAuth: true,
 		},
