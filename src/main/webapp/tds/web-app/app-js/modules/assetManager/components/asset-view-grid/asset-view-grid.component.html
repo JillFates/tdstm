@@ -198,7 +198,7 @@
 					<tds-grid-filter-input
 						name="{{ column.domain }}.{{ column.property }}"
 						[value]="column.filter"
-						[filterType]="column.type || 'text'"
+						[filterType]="column.property === 'lastUpdated' ? 'datetime' : column.type || 'text'"
 						[placeholder]="'GLOBAL.FILTER' | translate"
 						(filter)="setFilter($event, column)">
 					</tds-grid-filter-input>

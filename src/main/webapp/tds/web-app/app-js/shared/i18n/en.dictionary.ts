@@ -276,7 +276,7 @@ export const en_DICTIONARY: Object = {
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
 		'SELECT_AN_ASSET': 'Select an Asset',
-		'FILTER_LABELS': 'Filter Labels',
+		'FILTER_LABELS': 'Class filter',
 		'TIERS_ABOVE': 'Tiers above',
 		'TIERS_BELOW': 'Tiers below',
 		'SHOW_CYCLICAL_REFERENCE': 'Show Cyclical Reference',
