@@ -1,227 +1,491 @@
-<style>
-    i.field-info-icon {
-        cursor: pointer;
-        font-size: 17px;
-    }
-</style>
-<div class="modal fade in data-script-etl-builder-component tds-ui-modal-decorator" id="etlBuilder" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog($event)" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
-		<div #resizableForm class="modal-content resizable"
-             tds-ui-modal-decorator=""
-             [isWindowMaximized]="isWindowMaximized"
-             [options]="modalOptions">
-
-            <div class="modal-header">
-                <h4 class="modal-title">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_BUILDER_TITLE' | translate}} - {{ dataScriptModel.provider.name }} / {{ dataScriptModel.name }}</h4>
-                <div class="tool-box">
-                    <button id="btnMaximizeModal" *ngIf="!isWindowMaximized" (click)="maximizeWindow()" type="button"  class="full-screen" aria-label="Full screen">
-                        <span class="glyphicon glyphicon-fullscreen" title="Full screen"></span>
-                    </button>
-
-                    <button id="btnRestoreModal" *ngIf="isWindowMaximized" (click)="restoreWindow()" type="button"  class="restore-screen" aria-label="Restore window size">
-                        <span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
-                    </button>
-
-                    <button id="btnCloseDialog" (click)="cancelCloseDialog($event)" type="button" class="close-screen" aria-label="Close" title="Close">
-                        <span class="glyphicon glyphicon-remove" title="Close"></span>
-                    </button>
-                </div>
+<div class="data-script-etl-builder-component">
+	<!-- Action buttons bar -->
+	<div class="row">
+		<div class="col-md-12">
+			<tds-check-action
+					[disabled]="isTestDisabled()"
+					[name]="'Test'"
+					(onClick)="onTestScript()"
+					[(model)]="operationStatus.test">
+			</tds-check-action>
+			<tds-check-action
+					[disabled]="isCheckSyntaxDisabled()"
+					[name]="'Check Syntax'"
+					(onClick)="onCheckScriptSyntax()"
+					[(model)]="operationStatus.syntax">
+			</tds-check-action>
+			<button
+					type="button"
+					(click)="onLoadSampleData()"
+					[disabled]="!canLoadSampleData()"
+					class="btn btn-default">
+				{{'DATA_INGESTION.DATASCRIPT.DESIGNER.LOAD_SAMPLE_DATA'| translate}}
+			</button>
+			<button
+					type="button"
+					[disabled]="!scriptTestResult.consoleLog"
+					(click)="onViewConsole()"
+					class="btn btn-default">
+				{{'DATA_INGESTION.DATASCRIPT.DESIGNER.VIEW_CONSOLE'| translate}}
+			</button>
+			<button class="pull-right btn btn-default" (click)="toggleSection('code')">
+				<i class="fa " [ngClass]="{ 'fa-angle-double-down': !collapsed.code, 'fa-angle-double-right': collapsed.code }" style="padding-right:0px"></i>
+			</button>
+		</div>
+	</div>
+	<!-- Progress bar-->
+	<div class="row progressBar-row">
+		<div class="col-md-12 progressBar-container">
+			<div
+				*ngIf="
+					operationStatus.test.state ===
+					CHECK_ACTION.IN_PROGRESS
+				"
+				class="progress"
+			>
+				<div
+					class="progress-bar progress-bar-striped active"
+					[style.width.%]="
+						testScriptProgress.currentProgress
+					"
+				></div>
 			</div>
+		</div>
+	</div>
+	<!-- Textarea code -->
+	<div class="row" *ngIf="!collapsed.code">
+		<div class="col-md-12">
+			<code-mirror
+				#codeMirror
+				[mode]="'groovy'"
+				[(model)]="script"
+				(change)="onScriptChange($event)"
+			></code-mirror>
+		</div>
+	</div>
 
-            <div class="modal-body">
-                <div class="modal-body-container">
-                    <!-- Action buttons bar -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <tds-check-action
-                                [disabled]="isTestDisabled()"
-                                [name]="'Test'"
-                                (onClick)="onTestScript()"
-                                [(model)]="operationStatus.test">
-                            </tds-check-action>
-                            <tds-check-action
-                                    [disabled]="isCheckSyntaxDisabled()"
-                                    [name]="'Check Syntax'"
-                                    (onClick)="onCheckScriptSyntax()"
-                                    [(model)]="operationStatus.syntax">
-                            </tds-check-action>
-                            <button type="button" (click)="onLoadSampleData()" [disabled]="!canLoadSampleData()" class="btn btn-default">
-                                {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.LOAD_SAMPLE_DATA' | translate}}
-                            </button>
-                            <button type="button" [disabled]="!scriptTestResult.consoleLog" (click)="onViewConsole()" class="btn btn-default">
-                                {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.VIEW_CONSOLE' | translate}}
-                            </button>
-                            <button class="pull-right btn btn-default" (click)="toggleSection('code')">
-                                <i class="fa " [ngClass]="{'fa-angle-double-down':!collapsed.code,'fa-angle-double-right':collapsed.code}" style="padding-right:0px"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Progress bar-->
-                    <div class="row progressBar-row">
-                        <div class="col-md-12 progressBar-container">
-                            <div *ngIf="operationStatus.test.state === CHECK_ACTION.IN_PROGRESS"
-                                 class="progress">
-                                <div class="progress-bar progress-bar-striped active"
-                                     [style.width.%]="testScriptProgress.currentProgress"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Textarea code -->
-                    <div class="row" *ngIf="!collapsed.code">
-                        <div class="col-md-12">
-                            <code-mirror #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
-                        </div>
-                    </div>
-                    <!-- Save / Cancel buttons -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <button [disabled]="(!isUpdateAvailable() || (!isScriptDirty()) || (operationStatus.save && operationStatus.save !== 'success'))" (click)="onSave()"
-                                    type="button" class="btn btn-primary btn-resize pull-left">
-                                <span class="fa fa-fw fa-floppy-o"></span>
-                                {{'GLOBAL.SAVE' | translate }}
-                                <i *ngIf="operationStatus.save === 'fail'" class="glyphicon glyphicon-remove" style="margin-left: 3px;"></i>
-                            </button>
-                            <button (click)="cancelCloseDialog($event)"
-                                    type="button" class="btn btn-default btn-resize pull-right">
-                                <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
-                        </div>
-                    </div>
-                    <!-- Errors Panel -->
-                    <div *ngIf="(sampleDataHasErrors() || testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
-                        <div class="col-md-12">
-                            <span class="pull-left" style="color: #a94442;"><b>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS' | translate }}</b></span>
-                            <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">
-                                <button aria-label="Close" class="close" type="button" style="margin-right: 5px; opacity: unset;">
-					                <span aria-hidden="true">×</span>
-				                </button>
-                            </span>
-                            <textarea *ngIf="testHasErrors()" class="form-control console"
-                                      [(ngModel)]="scriptTestResult.error"
-                                      cols="30" rows="3" readonly
-                                      style="cursor: default; resize: vertical;"></textarea>
-                            <textarea *ngIf="syntaxHasErrors()"
-                                      class="form-control console"
-                                      cols="30" rows="3" readonly
-                                      style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
-                            <textarea *ngIf="sampleDataHasErrors()"
-                                      [(ngModel)]="sampleDataModel.errors"
-                                      class="form-control console"
-                                      cols="30" rows="3" readonly
-                                      style="cursor: default; resize: vertical;"></textarea>
-                        </div>
-                    </div>
-                    <hr>
-                    <!-- Sample Preview Panels -->
-                    <div class="data-preview">
-                        <!-- Sample Data -->
-                        <div class="row">
-                            <div class="col-md-12 sample-preview" >
-                                <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
-                                <span
-                                    *ngIf="showSampleDataRefresh()"
-                                    class="glyphicon glyphicon-refresh"
-                                    style="margin-left: 5px; margin-top: 3px; cursor: pointer; color: #5e9fcf; font-weight: bold;"
-                                    (click)="reloadSampleData()"
-                                ></span>
-                                <button class="pull-right btn btn-default" (click)="toggleSection('sample')">
-                                    <i class="fa" [ngClass]="collapsed.sample ? 'fa-angle-double-right' : 'fa-angle-double-down'"></i>
-                                </button>
-                            </div>
-                            <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data">
-                                <kendo-grid *ngIf="sampleDataGridHelper"
-                                            [data]="sampleDataGridHelper.gridData"
-                                            [height]="sampleDataModel.gridHeight"
-                                            [resizable]="true"
-                                            [pageSize]="sampleDataGridHelper.state.take"
-                                            [skip]="sampleDataGridHelper.state.skip"
-                                            [pageable]="true"
-                                            (pageChange)="sampleDataGridHelper.pageChange($event)">
-                                    <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
-                                        <ng-template kendoGridHeaderTemplate>
-                                            <label>{{column.label}}</label>
-                                        </ng-template>
-                                        <ng-template kendoGridCellTemplate let-dataItem>
-                                            <div class="sample-data-cell-max-line-height" title="{{dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE}}">
-                                                {{ dataItem[column.property] | utils: OBJECT_OR_LIST_PIPE }}
-                                            </div>
-                                        </ng-template>
-                                    </kendo-grid-column>
-                                </kendo-grid>
-                            </div>
-                        </div>
-                        <hr>
-                        <!-- Transformed Test Data -->
-                        <div class="row" *ngIf="scriptTestResult.domains && scriptTestResult.domains.length > 0">
-                            <label class="col-md-12">
-                                <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
-                                <button data-toggle="collapse" data-target=".collapsible"
-                                        (click)="toggleSection('transform')"
-                                        class="btn btn-default pull-right">
-                                    <i [ngClass]="collapsed.transform ? 'fa-angle-double-right' : 'fa-angle-double-down'"
-                                       class="fa"></i>
-                                </button>
-                            </label>
-                            <div class="col-md-12 collapse in collapsible">
-                                <kendo-tabstrip>
-                                    <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
-                                        <ng-template kendoTabContent>
-                                            <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
-                                                <!-- Fields Info Popup -->
-                                                <field-reference-popup *ngIf="fieldReferencePopupHelper.popup.show"
-                                                                       [mouseEvent]="fieldReferencePopupHelper.popup.mouseEvent"
-                                                                       [type]="fieldReferencePopupHelper.popup.type"
-                                                                       [domain]="fieldReferencePopupHelper.popup.domain"
-                                                                       [results]="fieldReferencePopupHelper.popup.results"
-                                                                       [gridData]="fieldReferencePopupHelper.popup.gridData"
-                                                                       [gridGroups]="fieldReferencePopupHelper.popup.gridGroups"
-                                                                       [offset]="fieldReferencePopupHelper.popup.offset"
-                                                                       (onClose)="fieldReferencePopupHelper.closePopup($event)">
-                                                </field-reference-popup>
-                                               <kendo-grid *ngIf="transformedDataGrids[i]"
-                                                           [data]="transformedDataGrids[i].gridData"
-                                                           [height]="'300'"
-                                                           [resizable]="true"
-                                                           [pageSize]="transformedDataGrids[i].state.take"
-                                                           [skip]="transformedDataGrids[i].state.skip"
-                                                           [pageable]="true"
-                                                           (pageChange)="transformedDataGrids[i].pageChange($event)">
+	<!-- Errors Panel -->
+	<div
+		*ngIf="
+			(sampleDataHasErrors() ||
+				testHasErrors() ||
+				syntaxHasErrors()) &&
+			!closeErrorsSection
+		"
+		class="row"
+		style="margin-top: 10px;"
+	>
+		<div class="col-md-12">
+			<span class="pull-left" style="color: #a94442;"
+				><b>{{
+					'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS'
+						| translate
+				}}</b></span
+			>
+			<span
+				class="pull-right"
+				style="cursor: pointer;"
+				(click)="closeErrors()"
+			>
+				<button
+					aria-label="Close"
+					class="close"
+					type="button"
+					style="margin-right: 5px; opacity: unset;"
+				>
+					<clr-icon
+						aria-hidden="true"
+						shape="close"
+					></clr-icon>
+				</button>
+			</span>
+			<textarea
+				*ngIf="testHasErrors()"
+				class="form-control console"
+				[(ngModel)]="scriptTestResult.error"
+				cols="30"
+				rows="3"
+				readonly
+				style="cursor: default; resize: vertical;"
+			></textarea>
+			<textarea
+				*ngIf="syntaxHasErrors()"
+				class="form-control console"
+				cols="30"
+				rows="3"
+				readonly
+				style="cursor: default; resize: vertical;"
+				>{{ getSyntaxErrors() }}</textarea
+			>
+			<textarea
+				*ngIf="sampleDataHasErrors()"
+				[(ngModel)]="sampleDataModel.errors"
+				class="form-control console"
+				cols="30"
+				rows="3"
+				readonly
+				style="cursor: default; resize: vertical;"
+			></textarea>
+		</div>
+	</div>
+	<hr />
+	<!-- Sample Preview Panels -->
+	<div class="data-preview">
+		<!-- Sample Data -->
+		<div class="row">
+			<div class="col-md-12 sample-preview">
+				<h4 class="pull-left">
+					{{
+						'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW'
+							| translate
+					}}
+				</h4>
+				<span
+					*ngIf="showSampleDataRefresh()"
+					class="glyphicon glyphicon-refresh"
+					style="margin-left: 5px; margin-top: 3px; cursor: pointer; color: #5e9fcf; font-weight: bold;"
+					(click)="reloadSampleData()"
+				></span>
+				<button
+					class="pull-right btn btn-default"
+					(click)="toggleSection('sample')"
+				>
+					<i
+						class="fa"
+						[ngClass]="
+							collapsed.sample
+								? 'fa-angle-double-right'
+								: 'fa-angle-double-down'
+						"
+					></i>
+				</button>
+			</div>
+			<div
+				class="col-md-12"
+				*ngIf="
+					!collapsed.sample &&
+					sampleDataModel &&
+					sampleDataModel.data
+				"
+			>
+				<kendo-grid
+					*ngIf="sampleDataGridHelper"
+					[data]="sampleDataGridHelper.gridData"
+					[height]="sampleDataModel.gridHeight"
+					[resizable]="true"
+					[pageSize]="sampleDataGridHelper.state.take"
+					[skip]="sampleDataGridHelper.state.skip"
+					[pageable]="true"
+					(pageChange)="
+						sampleDataGridHelper.pageChange($event)
+					"
+				>
+					<kendo-grid-column
+						*ngFor="
+							let column of sampleDataModel.columns
+						"
+						field="{{ column.property }}"
+						title="{{ column.label }}"
+						[width]="column.width"
+					>
+						<ng-template kendoGridHeaderTemplate>
+							<label>{{ column.label }}</label>
+						</ng-template>
+						<ng-template
+							kendoGridCellTemplate
+							let-dataItem
+						>
+							<div
+								class="sample-data-cell-max-line-height"
+								title="{{
+									dataItem[column.property]
+										| utils
+											: OBJECT_OR_LIST_PIPE
+								}}"
+							>
+								{{
+									dataItem[column.property]
+										| utils
+											: OBJECT_OR_LIST_PIPE
+								}}
+							</div>
+						</ng-template>
+					</kendo-grid-column>
+				</kendo-grid>
+			</div>
+		</div>
+		<hr />
+		<!-- Transformed Test Data -->
+		<div class="row" *ngIf="scriptTestResult.domains && scriptTestResult.domains.length > 0">
+			<label class="col-md-12">
+				<h4 class="pull-left">
+					{{
+						'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW'
+							| translate
+					}}
+				</h4>
+				<button
+					data-toggle="collapse"
+					data-target=".collapsible"
+					(click)="toggleSection('transform')"
+					class="btn btn-default pull-right"
+				>
+					<i
+						[ngClass]="
+							collapsed.transform
+								? 'fa-angle-double-right'
+								: 'fa-angle-double-down'
+						"
+						class="fa"
+					></i>
+				</button>
+			</label>
+			<div class="col-md-12 collapse in collapsible">
+				<kendo-tabstrip>
+					<kendo-tabstrip-tab
+						[title]="domain.domain"
+						[selected]="i === 0"
+						*ngFor="
+							let domain of scriptTestResult.domains;
+							let i = index
+						"
+					>
+						<ng-template kendoTabContent>
+							<div
+								*ngIf="
+									scriptTestResult.domains &&
+									(!testHasErrors() ||
+										!syntaxHasErrors())
+								"
+							>
+								<!-- Fields Info Popup -->
+								<field-reference-popup
+									*ngIf="
+										fieldReferencePopupHelper
+											.popup.show
+									"
+									[mouseEvent]="
+										fieldReferencePopupHelper
+											.popup.mouseEvent
+									"
+									[type]="
+										fieldReferencePopupHelper
+											.popup.type
+									"
+									[domain]="
+										fieldReferencePopupHelper
+											.popup.domain
+									"
+									[results]="
+										fieldReferencePopupHelper
+											.popup.results
+									"
+									[gridData]="
+										fieldReferencePopupHelper
+											.popup.gridData
+									"
+									[gridGroups]="
+										fieldReferencePopupHelper
+											.popup.gridGroups
+									"
+									[offset]="
+										fieldReferencePopupHelper
+											.popup.offset
+									"
+									(onClose)="
+										fieldReferencePopupHelper.closePopup(
+											$event
+										)
+									"
+								>
+								</field-reference-popup>
+								<kendo-grid
+									*ngIf="
+										transformedDataGrids[i]
+									"
+									[data]="
+										transformedDataGrids[i]
+											.gridData
+									"
+									[height]="'300'"
+									[resizable]="true"
+									[pageSize]="
+										transformedDataGrids[i]
+											.state.take
+									"
+									[skip]="
+										transformedDataGrids[i]
+											.state.skip
+									"
+									[pageable]="true"
+									(pageChange)="
+										transformedDataGrids[
+											i
+										].pageChange($event)
+									"
+								>
+									<!-- Field Columns -->
+									<kendo-grid-column
+										class="test-results-row"
+										*ngFor="
+											let column of domain.fieldNames
+										"
+										title="{{
+											(domain.fieldLabelMap &&
+												domain
+													.fieldLabelMap[
+													column
+												]) ||
+												column
+										}}"
+									>
+										<ng-template
+											kendoGridCellTemplate
+											let-dataItem
+										>
+											<div
+												*ngIf="
+													dataItem.fields &&
+													dataItem
+														.fields[
+														column
+													]
+												"
+												[ngClass]="{
+													'has-init':
+														!dataItem
+															.fields[
+															column
+														]
+															.value &&
+														dataItem
+															.fields[
+															column
+														].init
+												}"
+											>
+												<div
+													class=""
+													style="width: 100%;"
+												>
+													{{
+														getInitOrValue(
+															dataItem
+																.fields[
+																column
+															]
+														)
+													}}
+													<i
+														*ngIf="
+															!dataItem
+																.fields[
+																column
+															]
+																.value &&
+															dataItem
+																.fields[
+																column
+															]
+																.init
+														"
+														[title]="
+															MESSAGE_FIELD_WILL_BE_INITIALIZED
+														"
+														class="fa fa-w fa-info"
+													></i>
+												</div>
 
-                                                   <!-- Field Columns -->
-                                                   <kendo-grid-column class="test-results-row" *ngFor="let column of domain.fieldNames"
-                                                                      title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}">
-                                                       <ng-template kendoGridCellTemplate let-dataItem>
-                                                           <div *ngIf="dataItem.fields && dataItem.fields[column]"
-                                                                [ngClass]="{'has-init': !dataItem.fields[column].value && dataItem.fields[column].init}">
-                                                               <div class="" style="width: 100%;">
-                                                                   {{getInitOrValue(dataItem.fields[column])}}
-                                                                   <i *ngIf="!dataItem.fields[column].value && dataItem.fields[column].init"
-                                                                      [title]="MESSAGE_FIELD_WILL_BE_INITIALIZED" class="fa fa-w fa-info"></i>
-                                                               </div>
-
-                                                               <!-- Popup Reference Icons -->
-                                                               <div class="" style="width: 100%;">
-                                                                   <i *ngIf="dataItem.fields[column].create" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.CREATE, dataItem.fields[column], domain.fieldLabelMap)"
-                                                                      title="View Create Reference Detail" class="field-info-icon fa fa-plus-square"></i>
-                                                                   <i *ngIf="dataItem.fields[column].update" (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.UPDATE, dataItem.fields[column], domain.fieldLabelMap)"
-                                                                      title="View Update Reference Detail" class="field-info-icon fa fa-pencil-square"></i>
-                                                                   <i *ngIf="dataItem.fields[column].find && dataItem.fields[column].find.query.length > 0"
-                                                                      (click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem.fields[column], domain.fieldLabelMap)"
-                                                                      title="View Find Results" class="field-info-icon fa fa-search"></i>
-                                                               </div>
-
-                                                           </div>
-                                                       </ng-template>
-                                                   </kendo-grid-column>
-                                                </kendo-grid>
-                                            </div>
-                                        </ng-template>
-                                    </kendo-tabstrip-tab>
-                                </kendo-tabstrip>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+												<!-- Popup Reference Icons -->
+												<div
+													class=""
+													style="width: 100%;"
+												>
+													<i
+														*ngIf="
+															dataItem
+																.fields[
+																column
+															]
+																.create
+														"
+														(click)="
+															fieldReferencePopupHelper.onShowPopup(
+																$event,
+																FieldInfoType.CREATE,
+																dataItem
+																	.fields[
+																	column
+																],
+																domain.fieldLabelMap
+															)
+														"
+														title="View Create Reference Detail"
+														class="field-info-icon fa fa-plus-square"
+													></i>
+													<i
+														*ngIf="
+															dataItem
+																.fields[
+																column
+															]
+																.update
+														"
+														(click)="
+															fieldReferencePopupHelper.onShowPopup(
+																$event,
+																FieldInfoType.UPDATE,
+																dataItem
+																	.fields[
+																	column
+																],
+																domain.fieldLabelMap
+															)
+														"
+														title="View Update Reference Detail"
+														class="field-info-icon fa fa-pencil-square"
+													></i>
+													<i
+														*ngIf="
+															dataItem
+																.fields[
+																column
+															]
+																.find &&
+															dataItem
+																.fields[
+																column
+															]
+																.find
+																.query
+																.length >
+																0
+														"
+														(click)="
+															fieldReferencePopupHelper.onShowPopup(
+																$event,
+																FieldInfoType.FIND,
+																dataItem
+																	.fields[
+																	column
+																],
+																domain.fieldLabelMap
+															)
+														"
+														title="View Find Results"
+														class="field-info-icon fa fa-search"
+													></i>
+												</div>
+											</div>
+										</ng-template>
+									</kendo-grid-column>
+								</kendo-grid>
+							</div>
+						</ng-template>
+					</kendo-tabstrip-tab>
+				</kendo-tabstrip>
 			</div>
 		</div>
 	</div>
 </div>
+

@@ -4,29 +4,27 @@ import geb.Page
 import modules.CommonsModule
 import modules.ProjectsMenuModule
 import geb.waiting.WaitTimeoutException
+import org.openqa.selenium.Keys
 
 class ProjectListPage extends Page {
 
     static at = {
-        projectPageTitle.text().trim() == "Project List - Active Projects"
-        pageBreadcrumbs[0].text() == "Project"
+        waitFor{projectPageTitle.text() == "Projects - Active"}
+        pageBreadcrumbs[0].text() == "Projects"
         pageBreadcrumbs[1].text() == "Active"
 
         // TODO following item have the elements inside the label and cannot be reached
         // headerBarTitle == "Projects:"
-        createProjectBtn.value() == "Create Project"
-        showCompletedBtn.value() == "Show Completed Projects"
     }
 
     static content = {
-        projectPageTitle (wait:true){ $("section", 	class:"content-header").find("h1")}
-        pageBreadcrumbs             { $("ol", class:"breadcrumb").find("li a")}
-        projectView                 { $("div#gview_projectGridIdGrid")}
-        // TODO following item have the elements inside label
-
+        projectPageTitle (wait:true){ $("section", 	class:"content-header").find("h2")}
+        pageBreadcrumbs             { $("ol", class:"breadcrumb-container").find("li")}
+        // TODO: We have to refactor the whole projectView thing because everything changed
+        //projectView                 { $("div#gview_projectGridIdGrid")}
         //headerBarTitle          { $("span", class:"ui-jqgrid-title") }
-        createProjectBtn(wait:true) { projectView.find("input", type: "button", class: "create", value: "Create Project")}
-        showCompletedBtn            { projectView.find("input", type: "button", value: "Show Completed Projects")}
+        createProjectBtn(wait:true) {$(type: "button", title: "Create")}
+        showCompletedBtn            {$("label.clr-control-label")[1]}
         toggleListBtn               { projectView.find("a", class:"ui-jqgrid-titlebar-close HeaderButton")}
         projectGridHeader           { projectView.find("div#ui-jqgrid-hbox")}
         columnsHeader               { projectGridHeader.find("tr", class: "ui-jqgrid-labels ui-sortable")}
@@ -35,19 +33,25 @@ class ProjectListPage extends Page {
         projectGridRows             { projectView.find("table#projectGridIdGrid").find("tr.ui-widget-content")}
         gridSize                    { projectGridRows.size()}
         rowSize                     { projectGridHeaderCols.size()}
-        projectNameFilter           { $("input#gs_projectCode")}
+        projectNameFilter (wait:true) { $("input" ,  name:"projectName")}
         projectGridPager            { $("div#pg_projectGridIdGridPager")}
-        projectNameGridField        {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode")}
-        projectNameColumn  {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_name")}
+        projectNameGridField        {$("tbody", "role": "presentation")}
+        projectNameColumn  {$("td", "role": "gridcell", "aria-colindex": "3")}
+        projectCodeColumn  {$("td", "role": "gridcell", "aria-colindex": "2")}
         projectDeletedMessage { $("#messageDivId")}
-        showActiveBtn { projectView.find("input", type: "button", value: "Show Active Projects")}
+        showActiveBtn {$("clr-radio-wrapper.clr-radio-wrapper")[0]}
         projectsModule { module ProjectsMenuModule}
         commonsModule { module CommonsModule}
         noRecords (required: false) {$(".ui-paging-info", text:'No records to view')}
+        filterButton {$("tds-button")[4]}
+    }
+
+    def clickFilterButton(){
+        waitFor{filterButton.click()}
     }
 
     def clickOnCreateButton(){
-        waitFor {createProjectBtn.click()}
+        waitFor (30){createProjectBtn.click()}
     }
 
     def filterByName(name){
@@ -93,7 +97,7 @@ class ProjectListPage extends Page {
     }
 
     def clickOnFirstListedProject(){
-        waitFor {projectNameGridField[0].find("a").click()}
+        waitFor {projectCodeColumn[0].find("a").click()}
     }
 
     def getFirstProjectName(){
@@ -101,5 +105,9 @@ class ProjectListPage extends Page {
     }
     def getFirstProjectCode(){
         projectNameGridField[0].text()
+    }
+
+    def projectIsListed(name){
+        waitFor (5){projectNameGridField.find("a", text: contains(name)).first().displayed }
     }
 }

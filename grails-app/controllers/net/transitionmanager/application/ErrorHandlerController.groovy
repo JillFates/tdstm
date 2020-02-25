@@ -1,22 +1,20 @@
 package net.transitionmanager.application
 
-import net.transitionmanager.exception.InvalidLicenseException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.common.CoreService
+import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidConfigurationException
+import net.transitionmanager.exception.InvalidLicenseException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.InvalidSyntaxException
-import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.exception.LogicException
 import net.transitionmanager.exception.UnauthorizedException
-
+import net.transitionmanager.license.LicenseAdminService
 /**
  * The ErrorHandlerController controller is used by the system to handle response to various non-success responses such
  * as the 404 Not Found, 403 Forbidden, 500 Runtime errors, or the like. The controller must recogonize page, Ajax/web
@@ -142,8 +140,9 @@ class ErrorHandlerController implements ControllerMethods {
 		// arecordon: adds validation for handling AJAX requests and display an error message back to the user.
 		if (WebUtil.isAjax(request)){
 			response.status = 403
-			String message = response.getHeader("errorMessage")
-			ServiceResults.respondWithError(response, message)
+			String message = response.getHeader("errorMessage") ?: fetchModel()
+			response.setHeader("errorMessage", message)
+			render('')
 		} else {
 			response.status = 200
 			Map model = fetchModel()

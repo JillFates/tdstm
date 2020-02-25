@@ -6,7 +6,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Ignore
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Ignore
 class ImportAccountsSpec extends GebReportingSpec {
@@ -15,7 +15,7 @@ class ImportAccountsSpec extends GebReportingSpec {
     static projName = "TM-Demo"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

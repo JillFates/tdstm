@@ -17,7 +17,7 @@ class AssetExportPage extends Page{
     static content = {
         commonsModule { module CommonsModule }
         assetsModule { module AssetsMenuModule}
-        sectionTitle (wait:true){$("section.content-header h1")}
+        sectionTitle (wait:true){$("section.content-header h2")}
         exportButton {$("button", id:"exportButton")}
         bundleOptions {$("select#bundleId option")}
         assetOptions {$('li.list-group-item input[type=checkbox]')}

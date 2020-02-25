@@ -1,12 +1,16 @@
 package net.transitionmanager.asset
 
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.converters.JSON
 import grails.util.Environment
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TailRecursive
 import net.transitionmanager.model.Model
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.criterion.CriteriaSpecification
@@ -16,7 +20,9 @@ import org.hibernate.criterion.CriteriaSpecification
  */
 @CompileStatic
 class ArchitectureGraphService implements ServiceMethods {
-	DeviceService deviceService
+	DeviceService         deviceService
+	AssetEntityService    assetEntityService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * The asset properties to use in projections of queries.
@@ -43,6 +49,98 @@ class ArchitectureGraphService implements ServiceMethods {
 	]
 
 	/**
+	 * Gets the preferences for the Architecture graph.
+	 *
+	 * @param assetId The asset id, which is nullable
+	 * @param levelsUp the number of levels up from an asset, which defaults to zero.
+	 * @param levelsDown The number of levels down from an asset with defaults to three.
+	 * @param currentProject The current project used to look up the asset.
+	 *
+	 * @return A map of preferences for the architecture graph.
+	 */
+	Map getPreferences(Long assetId, Integer levelsUp, Integer levelsDown, Project currentProject) {
+		String assetName
+
+		if (assetId) {
+			assetName = get(AssetEntity, assetId, currentProject).assetName
+		}
+
+		Map defaultPrefs = [
+			levelsUp    : '0',
+			levelsDown  : '3',
+			showCycles  : true,
+			appLbl      : true,
+			labelOffset : '2',
+			assetClasses: 'ALL'
+
+		]
+
+		String graphPrefs = userPreferenceService.getPreference(UserPreferenceEnum.ARCH_GRAPH)
+		Map prefsObject = graphPrefs ? (Map) JSON.parse(graphPrefs) : defaultPrefs
+		List assetClassesForSelect = [[id: 'ALL', value: 'All Classes']]
+		assetClassesForSelect.addAll(AssetClass.classOptions.collect {
+			[id: it.key, value: it.value]
+		})
+
+		return [
+			assetId               : assetId,
+			assetName             : assetName,
+			levelsUp              : levelsUp,
+			levelsDown            : levelsDown,
+			assetClassesForSelect : assetClassesForSelect,
+			dependencyStatus      : assetEntityService.getDependencyStatuses(),
+			dependencyType        : assetEntityService.getDependencyTypes(),
+			assetTypes            : AssetEntityService.ASSET_TYPE_NAME_MAP,
+			defaultPrefs          : defaultPrefs as JSON,
+			graphPrefs            : prefsObject,
+			assetClassesForSelect2: AssetClass.classOptionsDefinitions
+		]
+	}
+
+	/**
+	 * Build the architecture model map to be rendered to the view.
+	 *
+	 * @param rootAsset The root asset node of the graph
+	 * @param assetId The id of the asset, that is the root of the graph.
+	 * @param levelsUp The numbers of levels up, for the graph.
+	 * @param levelsDown The number of levels down for the graph.
+	 * @param mode the mode of the graph if 'assetId' then buildArchitectureGraph is called
+	 *
+	 * @return A map representing the architecture graph to be rendered in the view.
+	 */
+	Map architectureGraphModel(AssetEntity rootAsset, Integer levelsUp, Integer levelsDown, String mode) {
+
+		Set assetsList = [] as Set
+		Set dependencyList = [] as Set
+
+		if (rootAsset && mode == "assetId") {
+			buildArchitectureGraph([rootAsset.id], levelsDown + 1, assetsList, dependencyList)
+			buildArchitectureGraph([rootAsset.id], levelsUp, assetsList, dependencyList, false)
+		}
+
+		dependencyList.addAll extraDependencies(assetsList, dependencyList)
+
+		List<Map> graphNodes = createGraphNodes(assetsList, rootAsset)
+		List<Map> graphLinks = createGraphLinks(dependencyList, graphNodes)
+
+		addLinksToNodes(graphLinks, graphNodes)
+
+		// maps asset type names to simpler versions
+		Map assetTypes = AssetEntityService.ASSET_TYPE_NAME_MAP
+
+		return [
+			nodes         : graphNodes,
+			links         : graphLinks,
+			assetId       : rootAsset?.id,
+			levelsUp      : levelsUp,
+			levelsDown    : levelsDown,
+			assetTypes    : assetTypes,
+			assetTypesJson: assetTypes,
+			environment   : Environment.current.name
+		]
+	}
+
+	/**
 	 * Build the architecture model map to be rendered to the view.
 	 *
 	 * @param graphNodes The nodes of the architecture graph.
@@ -53,7 +151,7 @@ class ArchitectureGraphService implements ServiceMethods {
 	 *
 	 * @return A map representing the architecture graph to be rendered in the view.
 	 */
-	Map architectureGraphModel(List<Map> graphNodes = [], List<Map> graphLinks = [], Integer assetId, Integer levelsUp, Integer levelsDown) {
+	Map architectureGraphModelLegacy(List<Map> graphNodes = [], List<Map> graphLinks = [], Long assetId, Integer levelsUp, Integer levelsDown) {
 		// maps asset type names to simpler versions
 		Map assetTypes = AssetEntityService.ASSET_TYPE_NAME_MAP
 
@@ -143,9 +241,11 @@ class ArchitectureGraphService implements ServiceMethods {
 		return AssetDependency.createCriteria().list {
 			resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
 
-			and {
-				'in'('asset.id', assetList*.id)
-				'in'('dependent.id', assetList*.id)
+			if (assetList) {
+				and {
+					'in'('asset.id', assetList*.id)
+					'in'('dependent.id', assetList*.id)
+				}
 			}
 
 			projections {
@@ -169,7 +269,7 @@ class ArchitectureGraphService implements ServiceMethods {
 	 *
 	 * @return A list of graph nodes.
 	 */
-	List<LinkedHashMap> createGraphNodes(Set<Map> assetsList, AssetEntity rootAsset) {
+	List<Map> createGraphNodes(Set<Map> assetsList, AssetEntity rootAsset) {
 		String shape = 'circle'
 		Integer size = 150
 		String type = ''
@@ -200,13 +300,13 @@ class ArchitectureGraphService implements ServiceMethods {
 				shape     : shape,
 				size      : size,
 				title     : StringEscapeUtils.escapeHtml(StringEscapeUtils.escapeJava(assetName)),
-				color     : asset.id == rootAsset.id ? 'red' : 'grey',
+				color     : asset.id == rootAsset?.id ? 'red' : 'grey',
 				parents   : [],
 				children  : [],
 				checked   : false,
 				siblings  : []
 			]
-		}
+		} as List<Map>
 	}
 
 	/**
@@ -217,7 +317,7 @@ class ArchitectureGraphService implements ServiceMethods {
 	 *
 	 * @return A list of graph links.
 	 */
-	List<LinkedHashMap> createGraphLinks(Set<Map> dependencyList, List<Map> graphNodes) {
+	List<Map> createGraphLinks(Set<Map> dependencyList, List<Map> graphNodes) {
 		// Create a separate list of just the node ids to use while creating the links (this makes it much faster)
 		List<Object> nodeIds = graphNodes*.id
 
@@ -250,7 +350,7 @@ class ArchitectureGraphService implements ServiceMethods {
 					unresolved   : unresolved
 				]
 			}
-		} as List<LinkedHashMap>
+		} as List<Map>
 	}
 
 	/**
@@ -259,9 +359,9 @@ class ArchitectureGraphService implements ServiceMethods {
 	 * @param graphLinks The links used to add parents/children to the nodes.
 	 * @param graphNodes The nodes which get the parents/children added to based on the links.
 	 */
-	void addLinksToNodes(List<LinkedHashMap> graphLinks, List<LinkedHashMap> graphNodes) {
+	void addLinksToNodes(List<Map> graphLinks, List<Map> graphNodes) {
 		//
-		graphLinks.each { LinkedHashMap link ->
+		graphLinks.each { Map link ->
 			if (!link.cyclical) {
 				List parents = (List) graphNodes[(Integer) link.child].parents
 				parents.add(link.id)

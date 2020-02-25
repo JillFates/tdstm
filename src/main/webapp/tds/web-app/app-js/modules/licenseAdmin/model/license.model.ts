@@ -1,65 +1,73 @@
+import { ColumnHeaderData, FilterType } from 'tds-component-library';
+
 export class LicenseColumnModel {
-	columns: any[];
+	columns: Array<ColumnHeaderData>;
 
 	constructor(dateFormat: string) {
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 52,
-				locked: true
-			}, {
 				label: 'Client',
+				filterable: true,
 				property: 'client.name',
-				type: 'text',
+				filterType: 'text',
 				width: 160,
 			}, {
 				label: 'Project',
+				filterable: true,
 				property: 'project.name',
-				type: 'text',
+				filterType: 'text',
 				width: 160,
 			}, {
 				label: 'Contact Email',
+				filterable: true,
 				property: 'email',
-				type: 'text',
+				filterType: 'text',
 				width: 160,
 			}, {
 				label: 'Status',
+				filterable: true,
 				property: 'status',
-				type: 'text',
+				filterType: 'text',
 				width: 160,
 			}, {
 				label: 'Type',
+				filterable: true,
 				property: 'type',
 				type: 'text',
+				filterType: FilterType.dropdown,
+				dropdownData: [{ text: 'Single', value: 'SINGLE_PROJECT' }, { text: 'Global', value: 'MULTI_PROJECT' }],
 				width: 160,
 			}, {
 				label: 'Method',
+				filterable: true,
 				property: 'method.name',
-				type: 'text',
+				filterType: 'text',
 				width: 160,
 			}, {
 				label: 'Server/Tokens',
+				filterable: true,
 				property: 'method.max',
-				type: 'text',
+				filterType: 'text',
 				width: 160,
 			}, {
 				label: 'Inception',
+				filterable: true,
 				property: 'activationDate',
-				type: 'date',
+				filterType: 'date',
 				format: dateFormat,
 				width: 170
 			}, {
 				label: 'Expiration',
+				filterable: true,
 				property: 'expirationDate',
-				type: 'date',
+				filterType: 'date',
 				format: dateFormat,
 				width: 170
 			}, {
 				label: 'Environment',
+				filterable: true,
 				property: 'environment',
-				type: 'text',
+				filterType: 'text',
 				width: 160,
 			}
 		];

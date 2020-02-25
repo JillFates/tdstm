@@ -3,31 +3,32 @@
  */
 
 // Angular
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 // Shared
-import {SharedModule} from '../../shared/shared.module';
+import { SharedModule } from '../../shared/shared.module';
 // Route Module
-import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
-import {UserRouteModule} from './user-routing.states';
+import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
+import { UserRouteModule } from './user-routing.states';
 // Kendo Module
-import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
-import {GridModule} from '@progress/kendo-angular-grid';
-import {SortableModule} from '@progress/kendo-angular-sortable';
-import {IntlModule} from '@progress/kendo-angular-intl';
-import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
-import {PopupModule} from '@progress/kendo-angular-popup';
-import {InputsModule} from '@progress/kendo-angular-inputs'
-import {ContextMenuModule} from '@progress/kendo-angular-menu';
+import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
+import { GridModule } from '@progress/kendo-angular-grid';
+import { SortableModule } from '@progress/kendo-angular-sortable';
+import { IntlModule } from '@progress/kendo-angular-intl';
+import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { PopupModule } from '@progress/kendo-angular-popup';
+import { InputsModule } from '@progress/kendo-angular-inputs';
+import { ContextMenuModule } from '@progress/kendo-angular-menu';
+
 // Components
-import {UserListComponent} from './components/list/user-list.component';
-import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';
+import { UserListComponent } from './components/list/user-list.component';
+import { UserDashboardComponent } from './components/dashboard/user-dashboard.component';
 // Resolves
-import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {UserResolveService} from './resolve/user-resolve.service';
+import { ModuleResolveService } from '../../shared/resolves/module.resolve.service';
+import { UserResolveService } from './resolve/user-resolve.service';
 // Services
-import {UserService} from './service/user.service';
+import { UserService } from './service/user.service';
 
 @NgModule({
 	imports: [
@@ -46,12 +47,9 @@ import {UserService} from './service/user.service';
 		DateInputsModule,
 		ContextMenuModule,
 		// Route
-		UserRouteModule
+		UserRouteModule,
 	],
-	declarations: [
-		UserListComponent,
-		UserDashboardComponent
-	],
+	declarations: [UserListComponent, UserDashboardComponent],
 	providers: [
 		// Resolve
 		ModuleResolveService,
@@ -59,13 +57,7 @@ import {UserService} from './service/user.service';
 		// Service
 		UserService,
 	],
-	exports: [
-		UserListComponent
-	],
-	entryComponents: [
-	]
+	exports: [UserListComponent],
+	entryComponents: [],
 })
-
-export class UserModule {
-
-}
+export class UserModule {}

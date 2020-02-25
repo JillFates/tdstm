@@ -4,73 +4,219 @@
 		<div *ngIf="licenseColumnModel">
 			<div class="box-body box-with-empty-header">
 				<kendo-grid
-						[data]="gridData"
-						[filter]="state.filter"
-						[filterable]="true"
-						(filterChange)="filterChange($event)"
-						[sort]="state.sort"
-						[skip]="skip"
-						[sortable]="{mode:'single'}"
-						[pageSize]="pageSize"
-						[resizable]="true"
-						(sortChange)="sortChange($event)"
-						[pageable]="{pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
-						(pageChange)="pageChange($event)"
-						(cellClick)="cellClick($event)"
-						[selectable]="true">
+					[data]="gridData"
+					[filter]="state.filter"
+					[filterable]="true"
+					(filterChange)="filterChange($event)"
+					[sort]="state.sort"
+					[skip]="skip"
+					[sortable]="{ mode: 'single' }"
+					[pageSize]="pageSize"
+					[resizable]="true"
+					(sortChange)="sortChange($event)"
+					[pageable]="{
+						pageSizes: defaultPageOptions,
+						pageSize: pageSize,
+						info: true
+					}"
+					(pageChange)="pageChange($event)"
+					(cellClick)="cellClick($event)"
+					[selectable]="true"
+					[ngClass]="{ 'h	ide-filter': !showFilters }"
+					class="page-height clickable-rows"
+				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<button class="btn btn-default button-create-license" type="button" (click)="onCreateLicense()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'LICENSE.CREATE_LICENSE' | translate }}</button>
-						<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+						<div class="clr-row">
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+									(refresh)="reloadData()"
+									[actionButtons]="headerActionButtons">
+								</tds-grid-header-action-buttons>
+							</div>
+						</div>
 					</ng-template>
-					<kendo-grid-column *ngFor="let column of licenseColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [locked]="column.locked" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+					<!-- Show Filters / Actions column -->
+					<kendo-grid-column
+						[field]="'_showFilters'"
+						[headerClass]="'text-center'"
+						[sortable]="false"
+						[class]="{ 'k-custom-command-column': true }"
+						[width]="60"
+						[minResizableWidth]="60">
+						<!-- Toggle Filters button -->
 						<ng-template kendoGridHeaderTemplate>
-							<div class="sortable-column" (click)="onClickTemplate($event)">
-								<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
-							</div>
+							<tds-grid-show-hide-filters-button [filterCount]="filterCount()"
+																								 (toggleFilters)="toggleFilter()">
+							</tds-grid-show-hide-filters-button>
 						</ng-template>
-
+						<!-- Clear all Filters button -->
 						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
-								<div *ngIf="column.type === 'date'">
-									<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
-									<span *ngIf="column.filter" (click)="clearValue(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-								</div>
-								<div *ngIf="column.type === 'text'">
-									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-									<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-								</div>
+							<tds-grid-clear-all-filters-button [show]="filterCount()"
+																								 (clearFilters)="clearAllFilters()">
+							</tds-grid-clear-all-filters-button>
+						</ng-template>
+
+						<ng-template
+							kendoGridCellTemplate
+							let-dataItem
+							let-rowIndex="rowIndex"
+						>
+							<div class="action-button btn-link k-grid-ignore-click">
+								<clr-dropdown #dropdown>
+									<tds-button
+										icon="ellipsis-vertical"
+										clrDropdownTrigger
+										tdsGridContextMenuFixedPosition [clrDropdown]="dropdown">
+									</tds-button>
+									<clr-dropdown-menu
+										*clrIfOpen
+										clrPosition="bottom-left"
+									>
+										<a
+											clrDropdownItem
+											(click)="
+												openLicenseViewEdit(dataItem)
+											"
+										>
+											Edit
+										</a>
+										<a
+											clrDropdownItem
+											(click)="onDelete(dataItem)"
+										>
+											Delete
+										</a>
+									</clr-dropdown-menu>
+								</clr-dropdown>
+							</div>
+						</ng-template>
+					</kendo-grid-column>
+
+					<kendo-grid-column
+						*ngFor="let column of gridColumns"
+						field="{{ column.property }}"
+						format="{{ column.format }}"
+						[locked]="column.locked"
+						[width]="
+							!column.width ? COLUMN_MIN_WIDTH : column.width
+						">
+						<ng-template kendoGridHeaderTemplate>
+							<div class="sortable-column"
+									 (click)="onClickTemplate($event)">
+								<label>
+									{{ column.label }}
+								</label>
 							</div>
 						</ng-template>
 
-						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-							<div class="tds-action-button-set">
-								<tds-button-edit  (click)="openLicenseViewEdit(dataItem)"></tds-button-edit>
-								<tds-button-delete (click)="onDelete(dataItem)"></tds-button-delete>
+						<!-- Filter Inputs -->
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<div class="filter-input">
+								<tds-grid-filter-input
+									[name]="column.property"
+									[value]="column.filter || ''"
+									[filterType]="column.filterType"
+									[dropdownData]="column.dropdownData || []"
+									[dateFormat]="dateFormat"
+									[placeholder]="'GLOBAL.FILTER' | translate"
+									(filter)="onFilter(column, $event)">
+								</tds-grid-filter-input>
 							</div>
 						</ng-template>
 
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem>
-							<span *ngIf="dataItem.type === licenseType.MULTI_PROJECT">{{ 'LICENSE.GLOBAL' | translate }}</span>
-							<span *ngIf="dataItem.type === licenseType.SINGLE_PROJECT">{{ 'LICENSE.SINGLE' | translate }}</span>
+						<ng-template
+							kendoGridCellTemplate
+							*ngIf="column.property === 'type'"
+							let-dataItem
+						>
+							<span
+								*ngIf="
+									dataItem.type === licenseType.MULTI_PROJECT
+								"
+							>{{ 'LICENSE.GLOBAL' | translate }}</span
+							>
+							<span
+								*ngIf="
+									dataItem.type === licenseType.SINGLE_PROJECT
+								"
+							>{{ 'LICENSE.SINGLE' | translate }}</span
+							>
 						</ng-template>
 
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-							<span *ngIf="dataItem.status === licenseStatus.PENDING">{{ 'GLOBAL.PENDING' | translate }}</span>
-							<span *ngIf="dataItem.status === licenseStatus.ACTIVE">{{ 'GLOBAL.ACTIVE' | translate }}</span>
+						<ng-template
+							kendoGridCellTemplate
+							*ngIf="column.property === 'status'"
+							let-dataItem
+						>
+							<span
+								*ngIf="
+									dataItem.status === licenseStatus.PENDING
+								"
+							>{{ 'GLOBAL.PENDING' | translate }}</span
+							>
+							<span
+								*ngIf="dataItem.status === licenseStatus.ACTIVE"
+							>{{ 'GLOBAL.ACTIVE' | translate }}</span
+							>
+						</ng-template>
+
+						<ng-template
+							kendoGridCellTemplate
+							*ngIf="column.property === 'environment'"
+							let-dataItem
+						>
+							<span
+								*ngIf="
+									dataItem.environment ===
+									licenseEnvironment.ENGINEERING
+								"
+							>{{ 'LICENSE.ENGINEERING' | translate }}</span
+							>
+							<span
+								*ngIf="
+									dataItem.environment ===
+									licenseEnvironment.TRAINING
+								"
+							>{{ 'LICENSE.TRAINING' | translate }}</span
+							>
+							<span
+								*ngIf="
+									dataItem.environment ===
+									licenseEnvironment.DEMO
+								"
+							>{{ 'LICENSE.DEMO' | translate }}</span
+							>
+							<span
+								*ngIf="
+									dataItem.environment ===
+									licenseEnvironment.PRODUCTION
+								"
+							>{{ 'LICENSE.PRODUCTION' | translate }}</span
+							>
 							<span *ngIf="dataItem.status === licenseStatus.CORRUPT">{{ 'GLOBAL.CORRUPT' | translate }}</span>
 						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'environment'" let-dataItem>
-							<span *ngIf="dataItem.environment === licenseEnvironment.ENGINEERING">{{ 'LICENSE.ENGINEERING' | translate }}</span>
-							<span *ngIf="dataItem.environment === licenseEnvironment.TRAINING">{{ 'LICENSE.TRAINING' | translate }}</span>
-							<span *ngIf="dataItem.environment === licenseEnvironment.DEMO">{{ 'LICENSE.DEMO' | translate }}</span>
-							<span *ngIf="dataItem.environment === licenseEnvironment.PRODUCTION">{{ 'LICENSE.PRODUCTION' | translate }}</span>
-						</ng-template>
-
 					</kendo-grid-column>
+					<!-- PAGER COMPONENT -->
+					<ng-template
+						kendoPagerTemplate
+						let-total="total"
+						let-totalPages="totalPages"
+						let-currentPage="currentPage"
+					>
+						<div class="clr-col-12">
+							<tds-grid-pager
+								[total]="total"
+								[totalPages]="totalPages"
+								[currentPage]="currentPage"
+								[pageSizes]="defaultPageOptions"
+								(pageChange)="pageChange($event)"
+							>
+							</tds-grid-pager>
+						</div>
+					</ng-template>
 				</kendo-grid>
 			</div>
-			<!-- /.box-body -->
 		</div>
 	</section>
 </div>

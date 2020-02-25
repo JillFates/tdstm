@@ -1,10 +1,8 @@
 // Angular
-import {Component} from '@angular/core';
-// Service
-import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 // Model
 import {ProviderAssociatedModel} from '../../model/provider-associated.model';
-import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
+import {Dialog, DialogButtonModel, DialogButtonType, DialogConfirmAction} from 'tds-component-library';
 // Other
 import 'rxjs/add/operator/finally';
 
@@ -12,22 +10,62 @@ import 'rxjs/add/operator/finally';
 	selector: 'tds-provider-associated',
 	templateUrl: 'provider-associated.component.html'
 })
-export class ProviderAssociatedComponent extends UIExtraDialog {
+export class ProviderAssociatedComponent extends Dialog implements OnInit {
 
-	public modalOptions: DecoratorOptions;
+	@Input() data: any;
+	@Input() buttons: any;
+	@Output() successEvent: EventEmitter<any> = new EventEmitter<any>();
 
-	constructor(
-		public providerAssociated: ProviderAssociatedModel) {
-		super('#providerAssociated');
-		this.modalOptions = {isFullScreen: false, isResizable: false};
+	public providerAssociated: ProviderAssociatedModel;
+
+	ngOnInit(): void {
+		this.providerAssociated = this.data.providerAssociatedModel;
+		const confirmButton: DialogButtonModel = {
+			name: 'confirm',
+			icon: 'check',
+			text: 'Confirm',
+			type: DialogButtonType.CONTEXT,
+			action: this.onConfirm.bind(this)
+		};
+
+		const cancelButton: DialogButtonModel = {
+			name: 'cancel',
+			icon: 'ban',
+			text: 'Cancel',
+			type: DialogButtonType.CONTEXT,
+			action: this.onCancel.bind(this)
+		};
+
+		this.buttons.push(confirmButton);
+		this.buttons.push(cancelButton);
 	}
 
-	public confirm($event): void {
-		this.close(true);
+	/**
+	 * Close the Dialog by Confirm the Action
+	 * @param result
+	 */
+	public onConfirm(): void {
+		const data = {
+			confirm: DialogConfirmAction.CONFIRM
+		};
+		super.onCancelClose(data);
 	}
 
-	public cancel($event): void {
-		this.close(false);
+	/**
+	 * Close the Dialog by Cancel/Close/Dismiss
+	 * @param result
+	 */
+	public onCancel(): void {
+		const data = {
+			confirm: DialogConfirmAction.CANCEL
+		};
+		super.onCancelClose(data);
 	}
 
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		super.onCancelClose();
+	}
 }

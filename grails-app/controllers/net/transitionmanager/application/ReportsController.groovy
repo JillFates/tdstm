@@ -1010,7 +1010,6 @@ class ReportsController implements ControllerMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def saveMetricDefinitions(Integer version) {
 		MetricDefinitionsCommand definitions = populateCommandObject(MetricDefinitionsCommand.class)
-		validateCommandObject(definitions)
 
 		renderAsJson(metricReportingService.saveDefinitions(definitions, version))
 	}
@@ -1023,7 +1022,6 @@ class ReportsController implements ControllerMethods {
 		List<Map> data = []
 		String metricCodesString = request.JSON.metricCodes
 		MetricDefinitionsCommand definitions = populateCommandObject(MetricDefinitionsCommand.class)
-		validateCommandObject(definitions)
 
 		if(!metricCodesString){
 			return renderErrorJson('Metric codes can not be empty')

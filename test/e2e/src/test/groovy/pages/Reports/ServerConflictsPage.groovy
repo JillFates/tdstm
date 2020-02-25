@@ -14,8 +14,8 @@ class ServerConflictsPage extends Page {
     }
 
     static content = {
-        serverConflictsPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        serverConflictsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
+        serverConflictsPageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        serverConflictsPageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         reportsModule { module ReportsMenuModule}
         commonsModule { module CommonsModule }
     }

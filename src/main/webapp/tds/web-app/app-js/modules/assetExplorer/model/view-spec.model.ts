@@ -12,6 +12,7 @@ export class ViewColumn extends QueryColumn {
 	edit ? = false;
 	filter = '';
 	label: string;
+	tip ?: string;
 	notFound?: boolean;
 }
 

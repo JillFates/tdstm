@@ -20,6 +20,77 @@ class ControlTagLib {
 	static final String EXACTLY_MIN_MAX_VALIDATION_MESSAGE = 'Value must be exactly {min} character(s).'
 	static final String BETWEEN_MIN_MAX_VALIDATION_MESSAGE = 'Value must be between {min} and {max} characters.'
 
+	def clrRowDetail = { Map attrs -> 
+		Map fieldSpec = attrs.field ?: [:]
+		def fieldValue = attrs.value ?: ""
+        def fieldClass = attrs.class ?: ""
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tds:clrRowDetail> tag requires field=fieldSpec Map')
+		}
+
+		StringBuilder tr = new StringBuilder("\n")
+		tr.append('<tr')
+		if(fieldValue == '') {
+            if (fieldClass == '') {
+             fieldClass = 'nodata';
+            } else {
+                fieldClass << ' nodata';
+            }
+		}
+		
+		out << tr.toString()
+
+        if (fieldClass != '') {
+            out << attribute("class", fieldClass);
+        }
+	
+		// This is necessary so that we can specify the order of the fields.
+		def style = attrs.style ?: ""
+		if (style == '') {
+			out << ' style="order: 1000;"'
+		} else {
+			out << attribute("style", style);
+		}
+
+		out << " >\n"
+		clrInputLabel.call(attrs)
+		StringBuilder row = new StringBuilder("\n")
+		row.append('<td>')
+		row.append(HtmlUtil.escape(fieldValue))
+		row.append('</td>')
+		row.append('</tr>')
+		out << row.toString()
+	}
+
+	def clrInputLabel = { Map attrs ->
+		Map fieldSpec = attrs.field ?: [:]
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tds:clrInputLabel> tag requires field=fieldSpec Map')
+		}
+		StringBuilder sb = new StringBuilder("\n")
+
+		def imp = fieldSpec.imp;
+
+		sb.append('<th class="')
+		sb.append(imp);
+		if (fieldSpec.constraints.required) {
+			sb.append(' required')
+		}
+		sb.append('">')
+		sb.append("\n")
+
+		// Build the LABEL element
+		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
+
+		sb.append(HtmlUtil.escape(fieldSpec.label))
+		if (attrs.containsKey("labelSuffix")){
+            sb.append(HtmlUtil.escape(attrs.labelSuffix))
+        }
+
+		// Close out the TD
+		sb.append("\n</th>")
+		out << sb.toString()
+	}
 	/**
 	 * Used for wrapping UI elements when no other ControlTag applies.
 	 * This tag deals with adding the tooltip.
@@ -49,11 +120,12 @@ class ControlTagLib {
 		}
 		StringBuilder sb = new StringBuilder("\n")
 
-		// Build the TD element
-		// <td class="label assetName C" nowrap="nowrap">
-		sb.append('<td class="label ')
-		// TODO : Determine if the fieldName is used in the LABEL class attribute
+		// Build the LABEL element
+		sb.append('<label for="')
 		sb.append(fieldSpec.field)
+		sb.append('"')
+		sb.append(' class="clr-control-label')
+
 		if (fieldSpec.imp) {
 			String imp = fieldSpec.imp
 			sb.append(" ${imp}")
@@ -68,30 +140,14 @@ class ControlTagLib {
 				}
 			}
 		}
-		sb.append('" nowrap="nowrap">')
-		sb.append("\n")
 
-		// Build the LABEL element
-		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
-		sb.append('<label for="')
-		sb.append(fieldSpec.field)
-		sb.append('"')
-		sb.append(' >')
-		sb.append('<span ')
-		sb.append(tooltipAttrib(fieldSpec))
-		sb.append(' >')
+		sb.append('">')
 		sb.append(HtmlUtil.escape(fieldSpec.label))
-		if (attrs.containsKey("labelSuffix")){
-            sb.append(HtmlUtil.escape(attrs.labelSuffix))
-        }
-		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
 		}
 		sb.append('</label>')
 
-		// Close out the TD
-		sb.append("\n</td>")
 		out << sb.toString()
 	}
 
@@ -196,10 +252,10 @@ class ControlTagLib {
 	 * Used to render the label and the corresponding input in create/edit views.
 	 */
 	def inputLabelAndField = { Map attrs ->
+		out << '<div class="clr-form-control">'
 		out << inputLabel(attrs)
-		out << '<td>'
 		out << inputControl(attrs)
-		out << '</td>'
+		out << '</div>'
 	}
 
 	/**
@@ -214,8 +270,11 @@ class ControlTagLib {
 	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = fieldSpec.constraints?.values ?: []
 
-		StringBuilder sb = new StringBuilder('<select')
+		StringBuilder sb = new StringBuilder('<div class="clr-control-container">')
+		sb.append('<div class="clr-select-wrapper">')
+		sb.append('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
+		sb.append(attribute('class', 'clr-select'))
 		sb.append('>')
 
 		// Add a Select... option at top if the field is required
@@ -248,7 +307,8 @@ class ControlTagLib {
 		}
 
 		sb.append('</select>')
-
+		sb.append('</div>')
+		sb.append('</div>')
 		sb.toString()
 	}
 
@@ -262,10 +322,14 @@ class ControlTagLib {
 	 * @return the INPUT Component HTML
 	 */
 	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
-		'<input' +
+		StringBuilder sb = new StringBuilder('<div class="clr-input-wrapper">')
+		sb.append('<input' +
 		attribute('type', 'text') +
 		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) +
-		'/>'
+		attribute('class', 'clr-input') +
+		'/>')
+		sb.append('</div>')
+		sb.toString()
 	}
 
 	/**
@@ -280,9 +344,11 @@ class ControlTagLib {
 		List options = []
 		List valid = ['Yes', 'No']
 
-		StringBuilder sb = new StringBuilder('<select')
+		StringBuilder sb = new StringBuilder('<div class="clr-control-container">')
+		sb.append('<div class="clr-select-wrapper">')
+		sb.append('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
-		sb.append(' style="width: 80px;"')
+		sb.append(attribute('class', 'clr-select'))
 		sb.append('>')
 
 		if (fieldSpec.constraints?.required) {
@@ -315,6 +381,8 @@ class ControlTagLib {
 		}
 
 		sb.append('</select>')
+		sb.append('</div>')
+		sb.append('</div>')
 
 		sb.toString()
 	}
@@ -332,7 +400,7 @@ class ControlTagLib {
 		nameAttrib(fieldSpec) +
 		valueAttrib(fieldSpec, value) +
 		tabIndexAttrib(fieldSpec, tabIndex, tabOffset) +
-		classAttrib(fieldSpec) +
+		// classAttrib(fieldSpec) +
 		sizeAttrib(size) +
 		tooltipAttrib(fieldSpec, tooltipDataPlacement) +
 		constraintsAttrib(fieldSpec) +

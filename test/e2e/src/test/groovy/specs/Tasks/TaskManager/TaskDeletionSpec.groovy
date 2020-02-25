@@ -9,7 +9,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class TaskDeletionSpec extends GebReportingSpec {
@@ -23,7 +23,7 @@ class TaskDeletionSpec extends GebReportingSpec {
     static taskEvent = "Buildout"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

@@ -9,8 +9,9 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.error.RequiredPageContentNotPresent
+import org.openqa.selenium.Keys
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class ProjectCreationSpec extends GebReportingSpec {
@@ -20,14 +21,14 @@ class ProjectCreationSpec extends GebReportingSpec {
 
     //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"
-    static projName = baseName +" "+ randStr
+    static projName = randStr + " " + baseName
     static projDesc = "Description of the project "+ projName +" created by QA E2E Geb Scripts"
     static projComment = "Comment for project "+ projName +" created by QA E2E Geb Scripts"
     static projCompDate =  ((new Date()) + 3).format("MM/dd/yyyy")
     static licensedProjectName = "TM-Demo"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
@@ -48,7 +49,7 @@ class ProjectCreationSpec extends GebReportingSpec {
         given: 'The user navigates to Project menu'
             at MenuPage
         when: 'The user clicks on Active Projects link'
-            projectsModule.goToProjectsActive()
+            waitFor (40) { projectsModule.goToProjectsActive()}
         then: 'Project List Page should be displayed'
             at ProjectListPage
      }
@@ -66,19 +67,17 @@ class ProjectCreationSpec extends GebReportingSpec {
         given: 'The User is on the Project Create Page'
             at ProjectCreationPage
         when: 'The user fill all required fields'
-            waitFor {pcClientSelector.click()}
-            waitFor {pcClientItem.click()}
             pcProjectCode = projName
             pcProjectName = projName
             pcDescription = projDesc
             pcComment     = projComment
             pcCompletionDate  = projCompDate
+            waitFor(30){pcClientSelector.click()}
+            waitFor (1) {pcClientItem.click()}
         and: 'The user clicks on Save button'
             waitFor {pcSaveBtn.click()}
-        then: 'Project Details Page is displayed'
-            at ProjectDetailsPage
-        and: 'Message saying project created is displayed'
-            waitFor {pdPageMessage.text().contains(projName + " was created")}
+        then: 'Project List Page is displayed'
+            at ProjectListPage
     }
 
     def "4. Go to Project List to search new project"() {
@@ -94,9 +93,10 @@ class ProjectCreationSpec extends GebReportingSpec {
         given: 'The user is in Project List Page'
             at ProjectListPage
         when: 'The user set project filter name'
+            clickFilterButton()
             waitFor { projectNameFilter.click() }
             projectNameFilter = projName
         then: 'Project created should be displayed in the grid'
-            waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
+            projectIsListed randStr
     }
 }

@@ -1,50 +1,85 @@
-export class NoticeColumnModel {
-	columns: any[];
+import {
+	ColumnHeaderData,
+	FilterType,
+	DropdownFilterData,
+} from 'tds-component-library';
 
-	constructor(dateFormat: string) {
+export class NoticeColumnModel {
+	public columns: ColumnHeaderData[];
+
+	constructor(dateFormat: string, typeDropdownData: DropdownFilterData) {
 		this.columns = [
 			{
 				label: 'Title',
 				property: 'title',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 250,
-			}, {
+			},
+			{
 				label: 'Type',
 				property: 'typeId',
-				type: 'text',
+				filterType: FilterType.dropdown,
+				filterInputData: typeDropdownData,
 				width: 270,
-			}, {
+			},
+			{
 				label: 'Active',
 				property: 'active',
-				type: 'boolean',
+				filterType: FilterType.boolean,
+				filterInputData: {
+					data: [
+						{
+							text: 'Yes',
+							value: true,
+						},
+						{
+							text: 'No',
+							value: false,
+						},
+					],
+					defaultItem: { text: '', value: null },
+				},
 				width: 120,
 			},
 			{
 				label: 'Activation Date',
 				property: 'activationDate',
 				format: dateFormat,
-				type: 'date',
-				width: 140
+				filterType: FilterType.date,
+				width: 170,
 			},
 			{
 				label: 'Expiration Date',
 				property: 'expirationDate',
 				format: dateFormat,
-				type: 'date',
-				width: 140
+				filterType: FilterType.date,
+				width: 170,
 			},
 			{
 				label: 'Sequence',
 				property: 'sequence',
-				type: 'number',
-				width: 120
+				filterType: FilterType.text,
+				width: 120,
 			},
 			{
 				label: 'Locked',
 				property: 'locked',
-				type: 'boolean',
-				width: 120
-			}
+				filterType: FilterType.boolean,
+				filterInputData: {
+					data: [
+						{
+							text: 'Yes',
+							value: true,
+						},
+						{
+							text: 'No',
+							value: false,
+						},
+					],
+					defaultItem: { text: '', value: null },
+				},
+				width: 120,
+			},
 		];
 	}
 }
@@ -83,7 +118,7 @@ export const NOTICE_TYPE_POST_LOGIN = 'POST_LOGIN';
 export const NOTICE_TYPE_MANDATORY = 'MANDATORY';
 
 export const NoticeTypes = [
-	{typeId: NOTICE_TYPE_PRE_LOGIN, name: 'Prelogin'},
-	{typeId: NOTICE_TYPE_POST_LOGIN, name: 'Postlogin'},
-	{typeId: NOTICE_TYPE_MANDATORY, name: 'Mandatory Acknowledgment Message'},
+	{ typeId: NOTICE_TYPE_PRE_LOGIN, name: 'Prelogin' },
+	{ typeId: NOTICE_TYPE_POST_LOGIN, name: 'Postlogin' },
+	{ typeId: NOTICE_TYPE_MANDATORY, name: 'Mandatory Acknowledgment Message' },
 ];

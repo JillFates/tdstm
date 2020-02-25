@@ -14,6 +14,8 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
 import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -21,6 +23,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		template: template
 	})
 	class ApplicationShowComponent extends AssetCommonShow {
+
 		constructor(
 			activeDialog: UIActiveDialogService,
 			dialogService: UIDialogService,
@@ -29,10 +32,25 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
 			userContextService: UserContextService,
-			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
+			windowService: WindowService,
+			architectureGraphService: ArchitectureGraphService,
+			assetTagUIWrapperService: AssetTagUIWrapperService
+			) {
+				super(
+					activeDialog,
+					dialogService,
+					assetService,
+					prompt,
+					assetExplorerService,
+					notifierService,
+					userContextService,
+					windowService,
+					architectureGraphService,
+					assetTagUIWrapperService
+				);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
+				this.loadThumbnailData(this.mainAsset);
 		}
 
 		showAssetEditView(): Promise<any> {
@@ -42,7 +60,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			];
 
 			return this.dialogService
-				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 		}
 
 		launchManageStaff(id): void {
@@ -80,7 +98,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 					];
 
 					this.dialogService
-						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 				} else if (!result.clonedAsset && result.showView) {
 					this.showAssetDetailView(DOMAIN.APPLICATION, result.assetId);
 				}

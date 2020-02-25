@@ -43,11 +43,11 @@ export class ExportAssetComponent implements OnInit {
 
 	constructor(
 		private exportService: ExportAssetService,
-		private translatePipe: TranslatePipe,
+		protected translatePipe: TranslatePipe,
 		private store: Store,
 		protected dialogService: UIDialogService,
-		private notifierService: NotifierService) {
-	}
+		private notifierService: NotifierService
+	) {}
 
 	/**
 	 * onInit retrieve the information for displaying all the bundles and filling up
@@ -116,6 +116,7 @@ export class ExportAssetComponent implements OnInit {
 	 * Added validation to make sure at least one bundle is selected
 	 */
 	exportData(): void {
+		this.progress_value = 0;
 		if (this.selectedBundles.length === 0) {
 			this.errorMessage = this.translatePipe.transform('ASSET_EXPORT.BUNDLE_ERROR');
 		} else {

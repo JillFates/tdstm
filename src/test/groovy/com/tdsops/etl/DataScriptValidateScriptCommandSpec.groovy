@@ -1,12 +1,10 @@
 package com.tdsops.etl
 
 import grails.databinding.SimpleMapDataBindingSource
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.gorm.DataTest
 import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
-class DataScriptValidateScriptCommandSpec extends Specification{
+class DataScriptValidateScriptCommandSpec extends Specification implements DataTest{
 
 	def dataBinder
 

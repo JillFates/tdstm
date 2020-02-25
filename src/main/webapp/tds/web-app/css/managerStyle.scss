@@ -1,10 +1,10 @@
 /* Overwrites the color on the angular css for the Orange */
 /* The color base for the manager color is Burnt Orange */
-$baseOrangeColor: #BF5700;
+$baseOrangeColor: #bf5700;
 
 $grey: #ddd;
 $c_grey2: #ebebeb;
-$c_grey3: #F4F4F4;
+$c_grey3: #f4f4f4;
 $darkgray: darkgray;
 
 $white: #fff;
@@ -18,16 +18,15 @@ $c_black3: #444;
 $fontDisabledGray: #ccc;
 $c_menuSelected: #e1e3e9;
 $red: red;
-$c_red2: #CD3333;
-$urlElement: #2C61AA;
-
+$c_red2: #cd3333;
+$urlElement: #2c61aa;
 
 // KENDO MATERIAL BASE COLORS
-$border-color_orange: #BC6013;
+$border-color_orange: #bc6013;
 $material_c_blue2: $baseOrangeColor;
 $material_c_blue3: #783600; /*KENDO DATE */
 $material_c_blue1_action_toolbar_btn: #783600;
-$material_c_blue1_header_text: #4D2300;
+$material_c_blue1_header_text: #4d2300;
 
 /* Alert MSG */
 $info_c_blue: #5f9fcf;
@@ -35,14 +34,14 @@ $messageError: red;
 
 /* Prelogin Message */
 $warning: #c87f0a;
-$warningLicense: #FFCC00;
+$warningLicense: #ffcc00;
 
 // Header
-header.main-header {
-  nav.navbar {
-    background-color: $baseOrangeColor !important;
-  }
-}
+// header.main-header {
+//   nav.navbar {
+//     background-color: $baseOrangeColor !important;
+//   }
+// }
 
 // Kendo Grid Table Header
 .k-grid .k-grid-toolbar {
@@ -55,58 +54,58 @@ header.main-header {
 }
 
 div.content-wrapper {
-  div.container {
-    tds-app {
-      div.content {
-        section {
-          // Kendo Grid
-          kendo-grid {
-            kendo-grid-toolbar {
-              border-color: $border-color_orange;
-              background-color: $border-color_orange;
-            }
-          }
-          kendo-pager {
-            kendo-pager-numeric-buttons {
-              li {
-                a.k-state-selected {
-                  background-color: $border-color_orange
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+	div.container {
+		tds-app {
+			div.content {
+				section {
+					// Kendo Grid
+					kendo-grid {
+						kendo-grid-toolbar {
+							border-color: $border-color_orange;
+							background-color: $border-color_orange;
+						}
+					}
+					kendo-pager {
+						kendo-pager-numeric-buttons {
+							li {
+								a.k-state-selected {
+									background-color: $border-color_orange;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 // Dialog
 div.modal-dialog {
-  div.modal-content {
-    div.modal-header {
-      border-color: $border-color_orange !important;
-      background-color: $border-color_orange !important;
-    }
-    .nav-tabs-custom {
-      ul.nav {
-        li.active {
-          border-top-color: $border-color_orange;
-        }
-      }
-    }
-    button.btn-primary {
-      border-color: $border-color_orange;
-      background-color: $border-color_orange;
-    }
-    button {
-      .glyphicon.glyphicon-ok {
-        color: white;
-      }
-      &.btn-danger {
-        .glyphicon-remove {
-          color: white;
-        }
-      }
-    }
-  }
+	div.modal-content {
+		div.modal-header {
+			border-color: $border-color_orange !important;
+			background-color: $border-color_orange !important;
+		}
+		.nav-tabs-custom {
+			ul.nav {
+				li.active {
+					border-top-color: $border-color_orange;
+				}
+			}
+		}
+		button.btn-primary {
+			border-color: $border-color_orange;
+			background-color: $border-color_orange;
+		}
+		button {
+			.glyphicon.glyphicon-ok {
+				color: white;
+			}
+			&.btn-danger {
+				.glyphicon-remove {
+					color: white;
+				}
+			}
+		}
+	}
 }

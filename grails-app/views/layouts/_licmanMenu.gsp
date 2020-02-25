@@ -5,9 +5,8 @@
         <ul class="nav navbar-nav">
             <tds:hasPermission permission="${Permission.AdminMenuView}">
                 <li class="dropdown menu-parent-admin">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin</span></a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
-                        <li class="menu-parent-item">Administration</li>
                         <li class="menu-child-item menu-admin-portal"><g:link controller="admin" action="home">Admin Portal</g:link> </li>
                         <g:if test="${isLicenseManagerEnabled}">
                             <li class="menu-child-item menu-admin-license-manager"><a href="/tdstm/module/license/manager/list">License Manager</a></li>
@@ -24,7 +23,6 @@
                             </tds:hasPermission>
                         </li>
                         <li class="divider"></li>
-                        <li class="menu-parent-item">Manage Clients</li>
                         <li class="menu-child-item menu-list-companies"><g:link controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}">List Companies</g:link></li>
                         <li class="menu-child-item menu-list-staff"><g:link controller="person" id="${partyGroup}">List Staff</g:link></li>
                         <li class="menu-child-item menu-list-users">

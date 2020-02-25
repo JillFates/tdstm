@@ -16,7 +16,7 @@ class ListCompaniesPage extends Page{
     static content = {
         adminModule { module AdminModule}
         commonsModule { module CommonsModule}
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
         createCompanyButton { $("input", value: "Create Company")}
         nameFilter { $("input#gs_companyName")}
         companyRowContainer (required: false, wait:true){ $("tr.ui-row-ltr")}

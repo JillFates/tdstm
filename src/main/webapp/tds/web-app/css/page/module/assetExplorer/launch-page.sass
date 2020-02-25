@@ -1,19 +1,39 @@
 section.page-asset-explorer-index
+  .action-button
+    position: initial
+  padding-bottom: 0
+  tds-button-custom.favorite-button
+    margin-left: -10px
+    button
+      color: #f39c12
+      &:hover
+        color: inherit
   div.asset-explorer-index-left-menu
     padding-left: 0px
     span.glyphicon-th-list
       font-size: 15px
+    .nav
+      display: inline
+      li
+        a
+          padding: 5px 5px
+          font-size: 12px
+          .label
+            border: 0
+            padding: 9px 9px
+            height: 15px
+            font-weight: 600
+            margin-right: 0
+            top: 3px
+            position: relative
+        &.active
+          background-color: palette(tranman, action-toolbar2)
+          a
+            color: white
+
     .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover,
     .bg-light-blue, .label-primary, .modal-primary .modal-body
       background-color: palette(tranman, action-toolbar2)
-    li
-      font-size: 13px
-      span.label
-        font-size: 90%
-      &.active
-        background-color: palette(tranman, action-toolbar2)
-        a
-          color: white
   @media (min-width: 992px)
     div.asset-explorer-index-left-menu
       max-width: 184px
@@ -24,7 +44,10 @@ section.page-asset-explorer-index
     padding-left: 0px
     padding-right: 0px
     div.box
+      margin-bottom: 0
+      .box-body
       h3.box-title-grid-list
+        margin-top: 0
         padding-top: 4px
         font-size: 21px
         font-weight: 600
@@ -37,24 +60,9 @@ section.page-asset-explorer-index
         margin-bottom: 0px
         input.txt-search
           width: 500px
-      @media (max-width: 992px)
-        div.search-filter-text
-          input.txt-search
-            width: 500px
 
-      table
-        th
-          font-size: 14px
-          padding: 5px
-          font-family: inherit
-          cursor: pointer
-          span
-            color: $color-material--blue1
-        th.no-action
-          cursor: default
-        td.asset-explorer-td-actions
-          width: 125px
-          .btn
-            font-size: 11px
-        td.asset-explorer-td-favorite
-          width: 190px
+  .link-text
+    font-weight: bold
+
+  kendo-grid.k-grid.page-height .k-grid-container
+    max-height: calc( 96vh - var(--subtraction-height) - var(--filter-height))

@@ -18,6 +18,10 @@ export class FieldSettingsModel {
 	errorMessage?: string;
 	toBeDeleted?: boolean;
 	isNew?: boolean;
+	// exclusive props for asset view edition
+	selected?: boolean;
+	isTitle?: boolean;
+	domain?: string;
 
 	constructor() {
 		this.udf = true;

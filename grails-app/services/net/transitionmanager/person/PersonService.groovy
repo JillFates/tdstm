@@ -21,30 +21,38 @@ import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.party.PartyRelationshipType
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.AuditService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.StringUtils
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.security.crypto.password.PasswordEncoder
+
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */
 @Slf4j
 class PersonService implements ServiceMethods {
 
-	def auditService
-	def jdbcTemplate
-	def moveEventService
+	AuditService               auditService
+	JdbcTemplate               jdbcTemplate
+	MoveEventService           moveEventService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	def partyRelationshipService
-	def projectService
-	def userPreferenceService
+	PartyRelationshipService   partyRelationshipService
+	ProjectService             projectService
+	UserPreferenceService      userPreferenceService
+	PasswordEncoder            passwordEncoder
 
 	private static final List<String> SUFFIXES = [
 			"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -479,7 +487,7 @@ class PersonService implements ServiceMethods {
 					map.suffix = s
 					// Split the rest to be mapped out below
 					//println "b) splitting ${split[0]}"
-					split = split[0].split("\\s+").collect { it.trim() }
+					split = split[0].split(/\s+/).collect { it.trim() }
 					//println "b) split ($split) isa ${split.getClass()}"
 				}
 				else {
@@ -490,10 +498,9 @@ class PersonService implements ServiceMethods {
 				log.error 'parseName("{}") encountered multiple commas that is not handled', name
 				return null
 			}
-		}
-		else {
+		} else {
 			// Must be first [middle] last so parse and handle below
-			split = name.split("\\s+").collect { it.trim() }
+			split = name.split(/\s+/).collect { it.trim() }
 			//println "0) split ($split) isa ${split.getClass()}"
 		}
 
@@ -512,8 +519,8 @@ class PersonService implements ServiceMethods {
 			// See if last field is a suffix
 			if (size > 1 && SUFFIXES.contains(split[-1].toLowerCase())) {
 				size--
-				map.suffix = split[size]
-				split.pop()
+				map.suffix = split.removeLast()
+
 				//println "3) split ($split) isa ${split.getClass()}"
 
 			}
@@ -521,11 +528,15 @@ class PersonService implements ServiceMethods {
 			// Check to see if we have a middle name or a compound name
 			if (size >= 2) {
 				//println "4) split ($split) isa ${split.getClass()}"
-				String last = split.pop()
-				if (COMPOUND_NAMES.contains(split[-1].toLowerCase())) {
-					last = split.pop() + ' ' + last
+				String last = split[-2]
+
+				if (COMPOUND_NAMES.contains(last.toLowerCase())) {
+					map.last = last + ' ' + split.removeLast()
+					split.removeLast()
+				} else {
+					map.last = split.removeLast()
 				}
-				map.last = last
+
 				map.middle = split.join(' ')
 				size = 0
 			}
@@ -535,12 +546,11 @@ class PersonService implements ServiceMethods {
 				map.last = split.join(' ')
 			}
 
-		}
-		else {
+		} else {
 			// Deal with Last Suff, First Middle
 
 			// Parse the Last Name element
-			List<String> last = split[0].split("\\s+").collect { it.trim() }
+			List<String> last = split[0].split(/\s+/).collect { it.trim() }
 			size = last.size()
 			if (size > 1 && SUFFIXES.contains(last[-1].toLowerCase())) {
 				size--
@@ -550,7 +560,7 @@ class PersonService implements ServiceMethods {
 			map.last = last.join(' ')
 
 			// Parse the First Name element
-			List<String> first = split[1].split("\\s+").collect { it.trim() }
+			List<String> first = split[1].split(/\s+/).collect { it.trim() }
 			map.first = first[0]
 			first = first.tail()
 			if (first.size() >= 1) {
@@ -1524,7 +1534,7 @@ class PersonService implements ServiceMethods {
 			UserLogin user = person.userLogin
 			if (user) {
 				boolean hasShowAllProj = securityService.hasPermission(user, Permission.ProjectShowAll)
-				if (hasShowAllProj && (person.company.id == projectService.getOwner(project).id || person.company.id == project.client.id)) {
+				if (hasShowAllProj && (person?.company?.id == projectService.getOwner(project)?.id || person?.company?.id == project?.client?.id)) {
 					hasAccess = true
 				} else if (hasShowAllProj) {
 					// Check if person is staff for a partner on the project
@@ -1647,11 +1657,11 @@ class PersonService implements ServiceMethods {
 				if (!byAdmin) {
 					// Verify that the user entered their old password correctly
 					if (!params.oldPassword) {
-						throw new InvalidParamException('The old password is required')
+						throw new InvalidParamException('The Current password is required')
 					}
 
-					if (!userLogin.comparePassword(params.oldPassword, true)) {
-						throw new InvalidParamException('Old password entered does not match the existing password')
+					if (!passwordEncoder.matches(params.oldPassword, userLogin.password)) {
+						throw new InvalidParamException('Current password entered does not match the existing password')
 					}
 
 					// Verify that the password isn't being changed too often
@@ -1672,10 +1682,7 @@ class PersonService implements ServiceMethods {
 				userLogin.active = 'N'
 			}
 
-			save userLogin
-			if (userLogin.hasErrors()) {
-				throw new DomainUpdateException('An error occurred while attempting to update the user changes')
-			}
+			userLogin.save()
 
 			if (params.newPassword) {
 				auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged(userLogin))
@@ -1821,5 +1828,33 @@ class PersonService implements ServiceMethods {
 	Person findByUsername(String username) {
 		Person.executeQuery('select u.person from UserLogin u where u.username=:username',
 				[username: username])[0]
+	}
+
+	/**
+	 * Feth a person from the database and validate that they have access to the user's current project.
+	 * @param project
+	 * @param personId
+	 * @param reportViolation
+	 * @return
+	 */
+	Person getPerson(Project project, Long personId, boolean reportViolation = true) {
+		Person person = null
+		if (!project) {
+			project = securityService.getUserCurrentProject()
+		}
+		if (personId) {
+			person = get(Person, personId, project)
+			if (!isAssignedToProject(project, person)) {
+				if (reportViolation) {
+					String errorMsg = "Attempted to assign person $personId to a project they don't have access to."
+					securityService.reportViolation(errorMsg, securityService.userLogin.username)
+					List msgArgs = [person.id, project.id]
+					throwException(InvalidParamException, 'person.project.noPermission', errorMsg, msgArgs)
+				} else {
+					person = null
+				}
+			}
+		}
+		return person
 	}
 }

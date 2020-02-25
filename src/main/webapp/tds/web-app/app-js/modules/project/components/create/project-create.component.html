@@ -1,154 +1,296 @@
-<div tds-handle-escape (escPressed)="cancelCloseDialog()" style="width:600px" class="project-create-component modal-content" id="project-create-component">
-    <div class="modal-header">
-        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-        <h4 class="modal-title">Project Create</h4>
-    </div>
-    <div class="modal-body">
-        <div class="modal-body-container">
-            <div class="dialog">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name"><b>Client:&nbsp;<span style="color: red">*</span></b></td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist [(ngModel)]="projectModel.clientId" [data]="clients" [valueField]="'clientId'" [textField]="'clientName'" [valuePrimitive]="true" id="client" name="client"></kendo-dropdownlist>
-                            </td>
-                        </tr>
+<div class="project-create-component">
+	<table>
+		<tbody>
+			<tr>
+				<td colspan="2">
+					<div class="required">
+						Fields marked ( * ) are mandatory
+					</div>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td valign="top" class="name">
+					<b
+						>Client:&nbsp;<span style="color: red"
+							>*</span
+						></b
+					>
+				</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Code:&nbsp;<span style="color: red">*</span></td>
-                            <td valign="top" class="value">
-                                <input type="text" id="projectCode" name="projectCode" [(ngModel)]="projectModel.projectCode"/>
-                            </td>
-                        </tr>
+				<td valign="top" class="value">
+					<kendo-dropdownlist
+						[(ngModel)]="projectModel.clientId"
+						[data]="clients"
+						[valueField]="'clientId'"
+						[textField]="'clientName'"
+						[valuePrimitive]="true"
+						id="client"
+						name="client"
+					></kendo-dropdownlist>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Name:&nbsp;<span style="color: red">*</span></td>
-                            <td valign="top" class="value">
-                                <input type="text" [(ngModel)]="projectModel.projectName"  id="projectName" name="projectName"/>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">
+					Project Code:&nbsp;<span style="color: red"
+						>*</span
+					>
+				</td>
+				<td valign="top" class="value">
+					<input
+						clrInput
+						type="text"
+						id="projectCode"
+						name="projectCode"
+						[(ngModel)]="projectModel.projectCode"
+					/>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Type:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="projectType" name="projectType" [data]="projectTypes" [(ngModel)]="projectModel.projectType" ></kendo-dropdownlist>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">
+					Project Name:&nbsp;<span style="color: red"
+						>*</span
+					>
+				</td>
+				<td valign="top" class="value">
+					<input
+						clrInput
+						type="text"
+						[(ngModel)]="projectModel.projectName"
+						id="projectName"
+						name="projectName"
+					/>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Description:</td>
-                            <td valign="top" class="value">
-                                <textarea type="text" [(ngModel)]="projectModel.description"  id="description" name="description"></textarea>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">Project Type:</td>
+				<td valign="top" class="value">
+					<kendo-dropdownlist
+						id="projectType"
+						name="projectType"
+						[data]="projectTypes"
+						[(ngModel)]="projectModel.projectType"
+					></kendo-dropdownlist>
+				</td>
+			</tr>
 
-                        <tr>
-                            <td valign="top" class="name"><b>Comment:</b></td>
-                            <td valign="top" class="value">
-                                <textarea id="comment" name="comment" [(ngModel)]="projectModel.comment"></textarea>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">Description:</td>
+				<td valign="top" class="value">
+					<textarea
+						clrTextarea
+						type="text"
+						[(ngModel)]="projectModel.description"
+						id="description"
+						name="description"
+					></textarea>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Start Date:</td>
-                            <td valign="top" class="value">
-                                <kendo-datepicker #startDatePicker (open)="onOpenStartDatePicker($event)"[(ngModel)]="projectModel.startDate"></kendo-datepicker>
-                            </td>
-                        </tr>
+			<tr>
+				<td valign="top" class="name"><b>Comment:</b></td>
+				<td valign="top" class="value">
+					<textarea
+						clrTextarea
+						id="comment"
+						name="comment"
+						[(ngModel)]="projectModel.comment"
+					></textarea>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Completion Date:&nbsp;<span style="color: red">*</span></td>
-                            <td valign="top" class="value">
-                                <kendo-datepicker #completionDatePicker (open)="onOpenCompletionDatePicker($event)" [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">Start Date:</td>
+				<td valign="top" class="value">
+					<kendo-datepicker
+						#startDatePicker
+						(open)="onOpenStartDatePicker($event)"
+						[(ngModel)]="projectModel.startDate"
+					></kendo-datepicker>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Associated Partners:</td>
-                            <td valign="top" class="value">
-                                <div style="display: -webkit-box" *ngFor="let partner of projectModel.partners; let i = index">
-                                    <kendo-dropdownlist style="display: block; margin-bottom: 2px"
-                                                        [ngModel]="partner"
-                                                        (selectionChange)="onPartnerSelectionChange(partner, $event)"
-                                                        [name]="'partner_' + i"
-                                                        [data]="partners"
-                                                        [textField]="'name'"
-                                                        [valueField]="'id'"></kendo-dropdownlist>
-                                    <img style="margin: 6px; cursor: pointer" src="/tdstm/assets/icons/delete.png" (click)="projectModel.partners.splice(i,1)">
-                                </div>
-                                <button class="btn btn-secondary" (click)="projectModel.partners.push({id:0, name:''})">Add Partner</button>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">
+					Completion Date:&nbsp;<span style="color: red"
+						>*</span
+					>
+				</td>
+				<td valign="top" class="value">
+					<kendo-datepicker
+						#completionDatePicker
+						(open)="onOpenCompletionDatePicker($event)"
+						[(ngModel)]="projectModel.completionDate"
+					></kendo-datepicker>
+				</td>
+			</tr>
 
-                        <tr>
-                            <td valign="top" class="name"><b>Project Logo:</b></td>
-                            <td valign="top" class="value">
-                                <kendo-upload
-                                    #kendoUploadInstance="kendoUpload"
-                                    [restrictions]="file.uploadRestrictions"
-                                    [autoUpload]="file.autoUpload"
-                                    [saveUrl]="file.uploadSaveUrl"
-                                    [removeUrl]="file.uploadDeleteUrl"
-                                    [saveField]="file.saveField"
-                                    [removeField]="file.removeField"
-                                    [multiple]="file.multiple"
-                                    [disabled]="false"
-                                    (select)="onSelectFile($event)"
-                                    (upload)="onUploadFile($event)"
-                                    (remove)="onRemoveFile($event)"
-                                    (success)="completeEventHandler($event)"
-                                    style="margin-bottom:2px">
-                                <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
-                                </kendo-upload>
-                                <span style="font-style: italic;">Select a jpg or gif file smaller than 50KB to appear in header</span>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">
+					Associated Partners:
+				</td>
+				<td valign="top" class="value">
+					<div
+						style="display: -webkit-box"
+						*ngFor="
+							let partner of projectModel.partners;
+							let i = index
+						"
+					>
+						<kendo-dropdownlist
+							style="display: block; margin-bottom: 2px"
+							[ngModel]="partner"
+							(selectionChange)="
+								onPartnerSelectionChange(
+									partner,
+									$event
+								)
+							"
+							[name]="'partner_' + i"
+							[data]="partners"
+							[textField]="'name'"
+							[valueField]="'id'"
+						></kendo-dropdownlist>
+						<clr-icon
+							style="margin: 6px; cursor: pointer; color: red"
+							shape="trash"
+							(click)="
+								projectModel.partners.splice(i, 1)
+							"
+						></clr-icon>
+					</div>
+					<tds-button-add
+						(click)="
+							projectModel.partners.push({
+								id: 0,
+								name: ''
+							})
+						"
+						[title]="'Add Partner'"
+					>
+					</tds-button-add>
+				</td>
+			</tr>
 
-                        <tr>
-                            <td valign="top" class="name"><b>Default Bundle:</b></td>
-                            <td valign="top" class="value">
-                                <input type="text"  id="defaultBundleName" name="defaultBundleName" [(ngModel)]="projectModel.defaultBundleName"/>
-                            </td>
-                        </tr>
+			<tr>
+				<td valign="top" class="name">
+					<b>Project Logo:</b>
+				</td>
+				<td valign="top" class="value">
+					<kendo-upload
+						#kendoUploadInstance="kendoUpload"
+						[restrictions]="file.uploadRestrictions"
+						[autoUpload]="file.autoUpload"
+						[saveUrl]="file.uploadSaveUrl"
+						[removeUrl]="file.uploadDeleteUrl"
+						[saveField]="file.saveField"
+						[removeField]="file.removeField"
+						[multiple]="file.multiple"
+						[disabled]="false"
+						(select)="onSelectFile($event)"
+						(upload)="onUploadFile($event)"
+						(remove)="onRemoveFile($event)"
+						(success)="completeEventHandler($event)"
+						style="margin-bottom:2px"
+					>
+						<kendo-upload-messages
+							select="{{
+								'GLOBAL.PLEASE_SELECT' | translate
+							}}"
+						></kendo-upload-messages>
+					</kendo-upload>
+					<span style="font-style: italic;"
+						>Select a jpg or gif file smaller than 50KB
+						to appear in header</span
+					>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Manager:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="projectManagerId" name="projectManager" [data]="managers" [textField]="'name'" [valueField]="'id'" [valuePrimitive]="true" [(ngModel)]="projectModel.projectManagerId" ></kendo-dropdownlist>
-                            </td>
-                        </tr>
+			<tr>
+				<td valign="top" class="name">
+					<b>Default Bundle:</b>
+				</td>
+				<td valign="top" class="value">
+					<input
+						clrInput
+						type="text"
+						id="defaultBundleName"
+						name="defaultBundleName"
+						[(ngModel)]="projectModel.defaultBundleName"
+					/>
+				</td>
+			</tr>
 
-                        <tr>
-                            <td valign="top" class="name"><b>Time Zone:</b></td>
-                            <td valign="top" class="value">
-                                <input type="text"  id="timeZone" name="timeZone" [(ngModel)]="projectModel.timeZone"/> <button class="btn btn-secondary" style="margin-left: 2px" (click)="openTimezoneModal()">Change</button>
-                            </td>
-                        </tr>
+			<tr class="prop">
+				<td valign="top" class="name">Project Manager:</td>
+				<td valign="top" class="value">
+					<kendo-dropdownlist
+						id="projectManagerId"
+						name="projectManager"
+						[data]="managers"
+						[textField]="'name'"
+						[valueField]="'id'"
+						[valuePrimitive]="true"
+						[(ngModel)]="projectModel.projectManagerId"
+					></kendo-dropdownlist>
+				</td>
+			</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Collect Reporting Metrics:</td>
-                            <td> <input type="checkbox" name="collectMetrics" id="collectMetrics" value="true" checked="checked" style="margin-top:0px" [(ngModel)]="projectModel.collectMetrics"/></td>
-                        </tr>
+			<tr>
+				<td valign="top" class="name"><b>Time Zone:</b></td>
+				<td valign="top" class="value">
+					<input
+						clrInput
+						type="text"
+						id="timeZone"
+						name="timeZone"
+						[(ngModel)]="projectModel.timeZone"
+					/>
+					<tds-button-custom
+						(click)="openTimezoneModal()"
+						[title]="'Change'"
+					>
+					</tds-button-custom>
+				</td>
+			</tr>
 
-                        <tr>
-                            <td valign="top" class="name"><b>Plan Methodology:</b></td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="planMethodology" name="planMethodology" [(ngModel)]="projectModel.planMethodology" [data]="planMethodologies" [valueField]="'field'" [textField]="'label'" [valuePrimitive]="false"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="buttons modal-footer">
-        <tds-button-save class="btn-primary pull-left" [disabled]="!validateRequiredFields(projectModel)" (click)="saveForm()"></tds-button-save>
-        <tds-button-cancel class="btn-secondary pull-right" (click)="cancelCloseDialog()"></tds-button-cancel>
-    </div>
+			<tr class="prop">
+				<td valign="top" class="name">
+					Collect Reporting Metrics:
+				</td>
+				<td>
+					<input
+						clrCheckbox
+						type="checkbox"
+						name="collectMetrics"
+						id="collectMetrics"
+						value="true"
+						checked="checked"
+						style="margin-top:0px"
+						[(ngModel)]="projectModel.collectMetrics"
+					/>
+				</td>
+			</tr>
+
+			<tr>
+				<td valign="top" class="name">
+					<b>Plan Methodology:</b>
+				</td>
+				<td valign="top" class="value">
+					<kendo-dropdownlist
+						id="planMethodology"
+						name="planMethodology"
+						[(ngModel)]="projectModel.planMethodology"
+						[data]="planMethodologies"
+						[valueField]="'field'"
+						[textField]="'label'"
+						[valuePrimitive]="false"
+					></kendo-dropdownlist>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>
+

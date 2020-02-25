@@ -239,27 +239,27 @@ class AssetExportService {
 			}
 
 			if (doDependency) {
-				dependencySize  = AssetDependency.executeQuery("SELECT COUNT(*) FROM AssetDependency WHERE asset.project = ? ", [project])[0]
+				dependencySize  = AssetDependency.executeQuery("SELECT COUNT(*) FROM AssetDependency WHERE asset.project = ?0 ", [project])[0]
 				progressTotal += dependencySize
 			}
 
 			if (doRoom) {
-				roomSize = Room.executeQuery("SELECT COUNT(*) FROM Room WHERE project = ?", [project])[0]
+				roomSize = Room.executeQuery("SELECT COUNT(*) FROM Room WHERE project = ?0", [project])[0]
 				progressTotal += roomSize
 			}
 
 			if (doRack) {
-				rackSize = Rack.executeQuery("SELECT COUNT(*) FROM Rack WHERE project = ?", [project])[0]
+				rackSize = Rack.executeQuery("SELECT COUNT(*) FROM Rack WHERE project = ?0", [project])[0]
 				progressTotal += rackSize
 			}
 
 			if (doCabling) {
-				cablingSize = AssetCableMap.executeQuery("select count(*) from AssetCableMap acm where acm.assetFrom.project = ?", [project])[0]
+				cablingSize = AssetCableMap.executeQuery("select count(*) from AssetCableMap acm where acm.assetFrom.project = ?0", [project])[0]
 				progressTotal += cablingSize
 			}
 
 			if (doComment) {
-				commentSize = AssetComment.executeQuery("SELECT COUNT(*) FROM AssetComment WHERE project = ? AND commentType = 'comment' AND assetEntity IS NOT NULL", [project])[0]
+				commentSize = AssetComment.executeQuery("SELECT COUNT(*) FROM AssetComment WHERE project = ?0 AND commentType = 'comment' AND assetEntity IS NOT NULL", [project])[0]
 				progressTotal += commentSize
 			}
 

@@ -5,18 +5,20 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
 @Component({
 	selector: `tds-task-comment-dialog`,
 	template: `
-        <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="task-comment-dialog-component modal-content " id="task-comment-dialog-component">
+        <div tds-autofocus
+             tds-handle-escape (escPressed)="cancelCloseDialog()"
+             class="tds-modal-content has-side-nav tds-angular-component-content task-comment-dialog-component"
+             id="task-comment-dialog-component">
             <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <tds-button-close aria-label="Close" class="close" icon="close" [flat]="true"
+                                  (click)="cancelCloseDialog()">
+                </tds-button-close>
                 <h4 *ngIf="assetModalModel.modalType == 'COMMENT'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_COMMENTS' | translate}}</h4>
                 <h4 *ngIf="assetModalModel.modalType == 'TASK'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_TASKS' | translate}}</h4>
             </div>
-            <div class="modal-body tds-angular-component-content">
-                <div class="box-body">
-                    <!-- -->
-                    <td colspan="2">
+            <div class="modal-body">
+	            <div class="clr-row">
+		            <div class="clr-col-12">
                         <task-comment *ngIf="assetModalModel.modalType == 'COMMENT'"
                                       [asset-id]="assetModalModel.assetId"
                                       [has-publish-permission]="true"
@@ -27,6 +29,10 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
                                       [show-comment]="true"
                                       [user-id]="currentUserId">
                         </task-comment>
+		            </div>
+	            </div>
+	            <div class="clr-row">
+		            <div class="clr-col-12">
                         <task-comment *ngIf="assetModalModel.modalType == 'TASK'"
                                       [asset-id]="assetModalModel.assetId"
                                       [has-publish-permission]="true"
@@ -37,14 +43,13 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
                                       [show-task]="true"
                                       [user-id]="currentUserId">
                         </task-comment>
-                    </td>
+		            </div>
                 </div>
             </div>
-            <div class="modal-footer form-group-center">
-                <button (click)="cancelCloseDialog()"
-                        type="button" class="btn btn-default pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
-                </button>
+            <div class="modal-sidenav form-group-center">
+                <nav class="modal-sidenav btn-link">
+                    <tds-button-close tooltip="Close" (click)="cancelCloseDialog()"></tds-button-close>
+                </nav>
             </div>
         </div>
 

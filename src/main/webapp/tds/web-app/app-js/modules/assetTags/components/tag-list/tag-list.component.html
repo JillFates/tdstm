@@ -1,150 +1,288 @@
 <!-- Main content -->
-<div class="content body tds-kendo-grid without-selectabe-rows">
-    <section>
-        <div class="box-body box-with-empty-header">
-            <form novalidate #myForm="ngForm">
-                <kendo-grid
-                        *ngIf="gridSettings"
-                        [data]="gridSettings.gridData"
-                        [filter]="gridSettings.state.filter"
-                        [filterable]="true"
-                        (filterChange)="gridSettings.filterChange($event)"
-                        [sort]="gridSettings.state.sort"
-                        [sortable]="{mode:'single'}"
-                        [pageSize]="gridSettings.state.take"
-                        [skip]="gridSettings.state.skip"
-                        [pageable]="{pageSizes: gridSettings.defaultPageOptions, info: true}"
-                        (pageChange)="gridSettings.pageChange($event)"
-                        [resizable]="true"
-                        (sortChange)="gridSettings.sortChange($event)"
-                        (add)="addHandler($event)"
-                        (cancel)="cancelHandler($event)"
-                        (edit)="editHandler($event)"
-                        (save)="saveHandler($event)"
-                        (remove)="removeHandler($event)">
+<div class="content tag-list body tds-kendo-grid">
+	<section>
+		<div class="box-body box-with-empty-header">
+			<form novalidate #myForm="ngForm">
+				<kendo-grid
+					class="page-height"
+					[ngClass]="{'hide-filter': !showFilters}"
+					*ngIf="gridSettings"
+					[data]="gridSettings.gridData"
+					[filter]="gridSettings.state.filter"
+					[filterable]="true"
+					(filterChange)="gridSettings.filterChange($event)"
+					[sort]="gridSettings.state.sort"
+					[sortable]="{ mode: 'single' }"
+					[pageSize]="gridSettings.state.take"
+					[skip]="gridSettings.state.skip"
+					[pageable]="{
+						pageSizes: gridSettings.defaultPageOptions,
+						info: true
+					}"
+					(pageChange)="gridSettings.pageChange($event)"
+					[resizable]="true"
+					(sortChange)="gridSettings.sortChange($event)"
+					(add)="addHandler($event)"
+					(cancel)="cancelHandler($event)"
+					(edit)="editHandler($event)"
+					(save)="saveHandler($event)"
+					(remove)="removeHandler($event)"
+				>
+					<!-- Toolbar Template -->
+					<ng-template kendoGridToolbarTemplate [position]="'top'">
+						<div class="clr-row">
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+									(refresh)="reloadTagList()"
+									[actionButtons]="headerActionButtons">
+								</tds-grid-header-action-buttons>
+								<!-- Use a hidden button so that we don't have to override kendo's button styles -->
+								<button id="addButton"
+												kendoGridAddCommand
+												*ngIf="canCreate()"
+												style="display: none;"
+												type="button">
+								</button>
+							</div>
+						</div>
+					</ng-template>
 
-                    <!-- Toolbar Template -->
-                    <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <button kendoGridAddCommand *ngIf="canCreate()"
-                                class="btn btn-default" type="button">
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                            {{ 'GLOBAL.CREATE' | translate }} {{'ASSET_TAGS.TAG' | translate}}
-                        </button>
-                        <label class="reload-grid-button pull-right" title="Reload List" (click)="reloadTagList()">
-                            <span class="glyphicon glyphicon-repeat"></span>
-                        </label>
-                    </ng-template>
+					<!-- Show Filters / Actions column -->
+					<kendo-grid-column
+						[field]="'_showFilters'"
+						[headerClass]="'text-center'"
+						[sortable]="false"
+						[class]="{ 'k-custom-command-column': true }"
+						[width]="55"
+						[minResizableWidth]="55">
+						<!-- Toggle Filters button -->
+						<ng-template kendoGridHeaderTemplate>
+							<tds-grid-show-hide-filters-button [filterCount]="filterCount()"
+																								 (toggleFilters)="toggleFilters()">
+							</tds-grid-show-hide-filters-button>
+						</ng-template>
+						<!-- Clear all Filters button -->
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<tds-grid-clear-all-filters-button [show]="filterCount()"
+																								 (clearFilters)="clearAllFilters()">
+							</tds-grid-clear-all-filters-button>
+						</ng-template>
+						<ng-template
+							let-dataItem
+							let-isNew="isNew"
+							kendoGridCellTemplate
+							let-dataItem
+							let-rowIndex="rowIndex"
+						>
+							<div class="action-button btn-link">
+								<clr-dropdown #dropdown>
+									<tds-button icon="ellipsis-vertical"
+															clrDropdownTrigger
+															tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"></tds-button>
+									<clr-dropdown-menu
+										*clrIfOpen
+										clrPosition="bottom-left"
+									>
+										<a
+											clrDropdownItem
+											kendoGridEditCommand
+											*ngIf="canEdit()"
+										>
+											Edit
+										</a>
+										<a
+											clrDropdownItem
+											kendoGridRemoveCommand
+											*ngIf="canDelete()"
+										>
+											Delete
+										</a>
+										<a
+											clrDropdownItem
+											*ngIf="
+												((!isNew && !editedTag) ||
+													(editedTag &&
+														editedTag.id !==
+															dataItem.id)) &&
+												canMerge()
+											"
+											(click)="onMerge(dataItem)"
+										>
+											Merge
+										</a>
+										<a
+											clrDropdownItem
+											kendoGridSaveCommand
+											*ngIf="canCreate() || canEdit()"
+											[disabled]="
+												myForm.invalid || duplicateName
+											"
+										>
+											Save
+										</a>
 
-                    <!-- Action -->
-                    <kendo-grid-command-column  [width]="62" [minResizableWidth]="62" [class]="{'k-custom-command-column': true}" [locked]="true" >
-                        <ng-template kendoGridHeaderTemplate>
-                            <div class="text-center">
-                                <label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
-                            </div>
-                        </ng-template>
-                        <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
-                            <div class="tds-action-button-set">
-                                <tds-button-edit kendoGridEditCommand *ngIf="canEdit()" class="tds-action-button">
-                                </tds-button-edit>
-                                <tds-button-delete kendoGridRemoveCommand *ngIf="canDelete()" class="tds-action-button" >
-                                </tds-button-delete>
-                                <tds-button-save kendoGridSaveCommand *ngIf="canCreate() || canEdit()"
-                                        class="tds-action-button" [disabled]="myForm.invalid || duplicateName">
-                                </tds-button-save>
-                                <tds-button-cancel kendoGridCancelCommand class="tds-action-button">
-                                </tds-button-cancel>
-                                <tds-button-custom *ngIf="((!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)) && canMerge()"
-                                        (click)="onMerge(dataItem)" title="Merge"
-                                        class="tds-action-button" [icon]="'exchange'">
-                                </tds-button-custom>
-                            </div>
-                        </ng-template>
-                    </kendo-grid-command-column>
+										<a
+											clrDropdownItem
+											kendoGridCancelCommand
+										>Cancel</a
+										>
+									</clr-dropdown-menu>
+								</clr-dropdown>
+							</div>
+						</ng-template>
+					</kendo-grid-column>
 
-                    <!-- Columns -->
-                    <kendo-grid-column *ngFor="let column of gridColumns.columns"
-                                       field="{{column.property}}"
-                                       [locked]="column.locked"
-                                       format="{{column.format}}"
-                                       [headerClass]="column.headerClass ? column.headerClass : ''"
-                                       [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-                                       [class]="column.cellClass ? column.cellClass : ''"
-                                       [style]="column.cellStyle ? column.cellStyle : ''"
-                                       [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+					<!-- Columns -->
+					<kendo-grid-column
+						*ngFor="let column of gridColumns.columns"
+						field="{{ column.property }}"
+						[locked]="column.locked"
+						format="{{ column.format }}"
+						[headerClass]="
+							column.headerClass ? column.headerClass : ''
+						"
+						[headerStyle]="
+							column.headerStyle ? column.headerStyle : ''
+						"
+						[class]="column.cellClass ? column.cellClass : ''"
+						[style]="column.cellStyle ? column.cellStyle : ''"
+						[width]="
+							!column.width ? COLUMN_MIN_WIDTH : column.width
+						"
+					>
+						<!-- Header Template -->
+						<ng-template kendoGridHeaderTemplate>
+							<div class="sortable-column">
+								<label>{{ column.label }}</label>
+							</div>
+						</ng-template>
 
-                        <!-- Header Template -->
-                        <ng-template kendoGridHeaderTemplate>
-                            <label>{{column.label}}</label>
-                        </ng-template>
+						<!-- Cell Templates -->
+						<ng-template
+							kendoGridCellTemplate
+							*ngIf="column.property === 'name'"
+							let-dataItem
+						>
+							{{ dataItem[column.property] }}
+						</ng-template>
+						<ng-template
+							kendoGridCellTemplate
+							*ngIf="column.property === 'color'"
+							let-dataItem
+						>
+							<div class="text-center">
+								<span
+									[ngClass]="dataItem.css"
+									class="label tag"
+								></span>
+							</div>
+						</ng-template>
 
-                        <!-- Cell Templates -->
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem>
-                            {{dataItem[column.property]}}
-                        </ng-template>
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'color'" let-dataItem>
-                            <div class="text-center">
-                                <span [ngClass]="dataItem.css" class="label tag"></span>
-                            </div>
-                        </ng-template>
+						<!-- Edit Templates -->
+						<ng-template
+							kendoGridEditTemplate
+							let-dataItem="dataItem"
+							*ngIf="column.property === 'name'"
+						>
+							<input
+								clrInput
+								[(ngModel)]="dataItem.name"
+								autofocus
+								[ngClass]="{ 'ng-invalid': duplicateName }"
+								required
+								#input
+								(input)="
+									validateUniqueName(dataItem);
+									input.value = $event.target.value
+								"
+								type="text"
+								name="name"
+							/>
+						</ng-template>
+						<ng-template
+							kendoGridEditTemplate
+							let-dataItem="dataItem"
+							*ngIf="column.property === 'description'"
+						>
+							<input
+								clrInput
+								[(ngModel)]="dataItem.description"
+								type="text"
+								name="description"
+							/>
+						</ng-template>
+						<ng-template
+							kendoGridEditTemplate
+							let-dataItem="dataItem"
+							*ngIf="column.property === 'color'"
+						>
+							<kendo-dropdownlist
+								required
+								name="color"
+								class="form-control"
+								[data]="colorList"
+								[(ngModel)]="dataItem.color"
+								[textField]="'id'"
+								[valueField]="'id'"
+								[valuePrimitive]="true"
+							>
+								<ng-template
+									kendoDropDownListValueTemplate
+									let-dataItem
+								>
+									<span
+										*ngIf="dataItem"
+										[ngClass]="dataItem.css"
+										class="label tag"
+										style="margin: auto; margin-left: 10px; height: 24px;"
+									></span>
+								</ng-template>
+								<ng-template
+									kendoDropDownListItemTemplate
+									let-dataItem
+								>
+									<span
+										[ngClass]="dataItem.css"
+										class="label tag"
+									></span>
+								</ng-template>
+							</kendo-dropdownlist>
+						</ng-template>
 
-                        <!-- Edit Templates -->
-                        <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'name'">
-                                <input [(ngModel)]="dataItem.name" autofocus
-                                       [ngClass]="{'ng-invalid': duplicateName}" required
-                                       #input (input)="validateUniqueName(dataItem); input.value=$event.target.value"
-                                       type="text" name="name" class="form-control"/>
-                        </ng-template>
-                        <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'description'">
-                            <input [(ngModel)]="dataItem.description"
-                                   type="text" name="description" class="form-control"/>
-                        </ng-template>
-                        <ng-template kendoGridEditTemplate let-dataItem="dataItem" *ngIf="column.property === 'color'">
-                            <kendo-dropdownlist required name="color" class="form-control"
-                                                [data]="colorList"
-                                                [(ngModel)]="dataItem.color"
-                                                [textField]="'id'"
-                                                [valueField]="'id'"
-                                                [valuePrimitive]="true">
-                                <ng-template kendoDropDownListValueTemplate let-dataItem>
-                                        <span *ngIf="dataItem" [ngClass]="dataItem.css" class="label tag" style="margin: auto; margin-left: 10px;"></span>
-                                </ng-template>
-                                <ng-template kendoDropDownListItemTemplate let-dataItem>
-                                    <span [ngClass]="dataItem.css" class="label tag"></span>
-                                </ng-template>
-                            </kendo-dropdownlist>
-                        </ng-template>
+						<!-- Filter Template -->
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<div class="filter-input" *ngIf="column.property !== 'color'">
+								<tds-grid-filter-input
+									[name]="column.property"
+									[value]="column.filter || ''"
+									[filterType]="column.type"
+									[placeholder]="'GLOBAL.FILTER' | translate"
+									(filter)="gridSettings.onFilterWithValue($event, column)">
+								</tds-grid-filter-input>
+							</div>
+						</ng-template>
 
-                        <!-- Filter Template -->
-                        <ng-template kendoGridFilterCellTemplate let-filter>
-                            <div class="has-feedback"
-                                 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' && column.property !== 'color' )">
-                                <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
-                                <ng-template #dateFilter>
-                                    <kendo-datepicker [format]="dateFormat"
-                                                      [(ngModel)]="column.filter"
-                                                      [ngModelOptions]="{standalone: true}"
-                                                      (valueChange)="gridSettings.onFilter(column)"
-                                                      style="width: 100%;"></kendo-datepicker>
-                                    <span *ngIf="column.filter" (click)="gridSettings.clearFilter(column)"
-                                          style="margin-right: 25px" class="fa fa-times form-control-feedback"></span>
-                                    <!--<kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"-->
-                                                      <!--[ngModelOptions]="{standalone: true}"></kendo-datepicker>-->
-                                    <!--<span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"-->
-                                          <!--class="fa fa-times form-control-feedback"></span>-->
-                                </ng-template>
-                                <ng-template #stringFilter>
-                                    <input [(ngModel)]="column.filter" (keyup)="gridSettings.onFilter(column)"
-                                           [ngModelOptions]="{standalone: true}"
-                                           type="text" class="form-control" name="{{column.property}}" placeholder="Filter">
-                                    <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"
-                                          class="fa fa-times form-control-feedback"></span>
-                                </ng-template>
-                            </div>
-                        </ng-template>
+					</kendo-grid-column>
 
-                    </kendo-grid-column>
-                </kendo-grid>
-            </form>
-        </div>
-    </section>
+					<ng-template
+						kendoPagerTemplate
+						let-total="total"
+						let-totalPages="totalPages"
+						let-currentPage="currentPage"
+					>
+						<div class="clr-col-12">
+							<tds-grid-pager
+								[total]="total"
+								[totalPages]="totalPages"
+								[currentPage]="currentPage"
+								[pageSizes]="gridSettings.defaultPageOptions"
+								(pageChange)="gridSettings.pageChange($event)"
+							>
+							</tds-grid-pager>
+						</div>
+					</ng-template>
+				</kendo-grid>
+			</form>
+		</div>
+	</section>
 </div>

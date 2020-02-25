@@ -1,20 +1,23 @@
-import { Component, Inject, OnInit, OnDestroy, ViewChildren, QueryList } from '@angular/core';
+// Angular
+import {Component, OnInit, OnDestroy, ViewChildren, QueryList} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
-import { Observable } from 'rxjs';
-import {switchMap} from 'rxjs/operators';
-
-import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
-import { FieldSettingsService } from '../../service/field-settings.service';
-import { FieldSettingsModel } from '../../model/field-settings.model';
-import { DomainModel } from '../../model/domain.model';
-
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
-import { ValidationUtils } from '../../../../shared/utils/validation.utils';
-import { Permission } from '../../../../shared/model/permission.model';
+// Model
+import {FieldSettingsModel} from '../../model/field-settings.model';
+import {DomainModel} from '../../model/domain.model';
+import {AlertType} from '../../../../shared/model/alert.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {DialogConfirmAction, DialogService} from 'tds-component-library';
+// Component
+import {FieldSettingsGridComponent} from '../grid/field-settings-grid.component';
+// Service
+import {FieldSettingsService} from '../../service/field-settings.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
+import {Observable} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 @Component({
 	selector: 'field-settings-list',
@@ -41,8 +44,8 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		private route: ActivatedRoute,
 		private router: Router,
 		private fieldService: FieldSettingsService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
-		private prompt: UIPromptService,
 		private notifier: NotifierService,
 		private translatePipe: TranslatePipe,
 	) {
@@ -181,18 +184,18 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	 */
 	protected onCancel(callback) {
 		if (this.isDirty()) {
-			this.prompt.open(
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
-			).then(result => {
-					if (result) {
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((confirmation: any) => {
+				if (confirmation) {
+					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 						this.refresh();
 					} else {
 						callback.failure();
 					}
-				});
+				}
+			});
 		} else {
 			callback.success();
 		}
@@ -225,9 +228,9 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	}
 
 	protected isValid(domain: DomainModel): boolean {
-		const deletedFields  = this.fieldsToDelete && this.fieldsToDelete[domain.domain] || [];
+		const deletedFields = this.fieldsToDelete && this.fieldsToDelete[domain.domain] || [];
 
-		const fields =  domain.fields
+		const fields = domain.fields
 			.filter((item) => !(deletedFields.includes(item.field)));
 
 		let values = fields.map(x => x.label);
@@ -267,16 +270,17 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	protected onShare(value: { field: FieldSettingsModel, domain: string }): void {
 
 		if (value.field.shared) {
-			this.prompt.open(
+			this.dialogService.confirm(
 				'Confirmation Required',
-				this.translatePipe.transform('FIELD_SETTINGS.ON_SHARED', [value.field.field]),
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
+				this.translatePipe.transform('FIELD_SETTINGS.ON_SHARED', [value.field.field])).subscribe((confirmation: any) => {
+				if (confirmation) {
+					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 						this.handleSharedField(value.field, value.domain);
 					} else {
 						value.field.shared = false;
 					}
-				});
+				}
+			});
 		} else {
 			this.handleSharedField(value.field, value.domain);
 		}
@@ -343,7 +347,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 						d.fields.splice(indexOf, 1, field);
 					}
 				} else {
-					d.fields.splice(indexOf, 1, { ...field });
+					d.fields.splice(indexOf, 1, {...field});
 				}
 			});
 		this.refreshGrids(true, null);

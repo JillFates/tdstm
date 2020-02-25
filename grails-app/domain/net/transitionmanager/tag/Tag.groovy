@@ -14,7 +14,7 @@ class Tag {
 
 	static belongsTo = [project: Project]
 
-	static hasMany = [tagAssets: TagAsset]
+	static hasMany = [tagAssets: TagAsset, tagEvents: TagEvent]
 
 	static constraints = {
 		name size: 1..50, unique: 'project'

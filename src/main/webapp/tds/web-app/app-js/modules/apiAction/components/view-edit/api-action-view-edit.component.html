@@ -1,925 +1,885 @@
-<div tds-autofocus class="modal-content api-action-view-edit-component"  #apiActionContainer>
-	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button"  class="close" aria-label="Close">
-			<span aria-hidden="true">×</span>
-		</button>
-		<h4 class="modal-title">{{modalTitle}}<span *ngIf="apiActionModel.name"> - </span>{{apiActionModel.name}}</h4>
-	</div>
-	<div class="modal-body"
-	     [ngClass]="{'is-edit-mode': modalType !== actionTypes.VIEW }">
-		<div class="nav-tabs-custom">
-				<!-- Tabs within a box -->
-				<ul class="nav nav-tabs">
-					<li *ngIf="!hasEarlyAccessTMRPermission" role="presentation"
-					    [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
-                        <a href="#tab_info" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab">
-	                        <span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">Info</span>
-                        </a>
-					</li>
-					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
-					    [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}">
-						<a href="#tab_simpleInfo" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!simpleInfoForm?.valid && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">
-								Info
-							</span>
-						</a>
-					</li>
-					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
-					    [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}">
-						<a href="#tab_httpAPI" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
-						   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!httpAPIForm?.valid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">WebAPI</span>
-						</a>
-						<ng-template #labelTemplateHttpAPI>
-							<a class="tab-disabled" tabindex="6"><span>WebAPI</span></a>
-						</ng-template>
-					</li>
-					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
-					    [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}">
-						<a href="#tab_script" *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
-						   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!scriptForm?.valid && formValidStates.scriptForm.isConfiguredValidators && !isCurrentTab(tabsEnum.Script)) && modalType !== actionTypes.VIEW}">
-								Script
-							</span>
-						</a>
+<div [ngClass]="{'is-edit-mode': modalType !== actionTypes.VIEW }" class="api-action-view-edit-component">
+		<!-- Tabs within a box -->
+		<ul class="nav">
+			<li *ngIf="!hasEarlyAccessTMRPermission" role="presentation" class="nav-item">
+				<a href="#tab_info" class="btn btn-link nav-link" [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}" (click)="setCurrentTab(tabsEnum.Info)" data-toggle="tab">
+					<span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">
+						Info
+					</span>
+				</a>
+			</li>
+			<li *ngIf="hasEarlyAccessTMRPermission" role="presentation" class="nav-item">
+				<a href="#tab_simpleInfo"
+				   class="btn btn-link nav-link"
+				   [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}"
+				   (click)="setCurrentTab(tabsEnum.Info)"
+				   data-toggle="tab">
+					<span [ngClass]="{ 'invalid-form': (!simpleInfoForm?.valid && !isCurrentTab(tabsEnum.Info)) && modalType !== actionTypes.VIEW}">
+						Info
+					</span>
+				</a>
+			</li>
+			<li *ngIf="hasEarlyAccessTMRPermission" role="presentation" class="nav-item">
+				<a href="#tab_httpAPI"
+				   class="btn btn-link nav-link"
+				   [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}"
+				   *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API); else labelTemplateHttpAPI"
+				   (click)="setCurrentTab(tabsEnum.HttpAPI)" data-toggle="tab">
+					<span [ngClass]="{ 'invalid-form': (!httpAPIForm?.valid && formValidStates.httpAPIForm.isConfiguredValidators && !isCurrentTab(tabsEnum.HttpAPI)) && modalType !== actionTypes.VIEW}">WebAPI</span>
+				</a>
+				<ng-template #labelTemplateHttpAPI>
+					<a class="tab-disabled" tabindex="6"><span>WebAPI</span></a>
+				</ng-template>
+			</li>
+			<li *ngIf="hasEarlyAccessTMRPermission" role="presentation" class="nav-item">
+				<a href="#tab_script"
+				   class="btn btn-link nav-link"
+				   [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}"
+				   *ngIf="isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateScript"
+				   (click)="setCurrentTab(tabsEnum.Script)" data-toggle="tab">
+					<span [ngClass]="{ 'invalid-form': (!scriptForm?.valid && formValidStates.scriptForm.isConfiguredValidators && !isCurrentTab(tabsEnum.Script)) && modalType !== actionTypes.VIEW}">
+						Script
+					</span>
+				</a>
 
-						<ng-template #labelTemplateScript>
-							<a class="tab-disabled"><span>Script</span></a>
-						</ng-template>
-					</li>
+				<ng-template #labelTemplateScript>
+					<a class="tab-disabled"><span>Script</span></a>
+				</ng-template>
+			</li>
 
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}">
-						<a href="#tab_parameters" (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': (!validParametersForm && !isCurrentTab(tabsEnum.Parameters)) && modalType !== actionTypes.VIEW}">
-								Parameters
-							</span>
-						</a>
-					</li>
-					<li role="presentation"
-						[ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
-						<a href="#tab_reactions" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API) || isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateReactions"
-						(click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab">
-							<span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span>
-						</a>
-						<ng-template #labelTemplateReactions>
-							<a class="tab-disabled"><span>Reaction</span></a>
-						</ng-template>
-					</li>
-					<!--
-					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
-						<a href="#tab_reactions" (click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
-					</li>
-					-->
-				</ul>
-				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(tabsEnum.Parameters)}">
-					<div [ngClass]="!hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info) ? 'is-displayed': 'is-hidden'"
-					     class="tab-pane" style="padding-left:15px"
-					     [ngClass]="{'active': isCurrentTab(tabsEnum.Info)}"
-					     id="tab_info">
-						<form name="apiActionForm" role="form" data-toggle="validator" #apiActionForm='ngForm' class="form-horizontal left-alignment">
-							<div class="box-body">
-								<div class="row">
-									<div class="col-md-7">
-										<div class="form-group">
-											<label for="apiActionName" class="col-sm-3 control-label required-field">Name:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text"
-												       id="apiActionName"
-												       name="apiActionName"
-												       class="form-control"
-                                                       tabindex="1" autofocus
-                                                       [(ngModel)]="apiActionModel.name"
-													   required/>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.name}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionProvider" class="col-sm-3 control-label required-field">Provider:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist
-														#apiActionProvider
-														tabindex="2"
-														id="apiActionProvider"
-														name="apiActionProvider"
-														(valueChange)="onProviderValueChange($event, false)"
-														[data]="providerList"
+			<li role="presentation"  class="nav-item">
+				<a href="#tab_parameters"
+				   class="btn btn-link nav-link"
+				   [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}"
+				   (click)="setCurrentTab(tabsEnum.Parameters)" data-toggle="tab">
+					<span [ngClass]="{ 'invalid-form': (!validParametersForm && !isCurrentTab(tabsEnum.Parameters)) && modalType !== actionTypes.VIEW}">
+						Parameters
+					</span>
+				</a>
+			</li>
+			<li role="presentation" class="nav-item">
+				<a href="#tab_reactions"
+				   class="btn btn-link nav-link"
+				   [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}"
+				   *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API) || isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateReactions"
+				(click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab">
+					<span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span>
+				</a>
+				<ng-template #labelTemplateReactions>
+					<a class="tab-disabled"><span>Reaction</span></a>
+				</ng-template>
+			</li>
+		</ul>
+
+		<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(tabsEnum.Parameters)}">
+			<div [ngClass]="!hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info) ? 'is-displayed active': 'is-hidden'"
+				 class="tab-pane" style="padding-left:15px" id="tab_info">
+				<form name="apiActionForm" role="form" data-toggle="validator" #apiActionForm='ngForm' class="form-horizontal left-alignment">
+					<div class="box-body">
+						<div class="row">
+							<div class="col-md-7">
+								<div class="form-group">
+									<label for="apiActionName" class="col-sm-3 control-label required-field">Name:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<input type="text" clrInput
+											   id="apiActionName"
+											   name="apiActionName"
+											   class="form-control"
+											   tabindex="1" autofocus
+											   [(ngModel)]="apiActionModel.name"
+											   required/>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.name}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="apiActionProvider" class="col-sm-3 control-label required-field">Provider:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist
+												#apiActionProvider
+												tabindex="2"
+												id="apiActionProvider"
+												name="apiActionProvider"
+												(valueChange)="onProviderValueChange($event, false)"
+												[data]="providerList"
+												[textField]="'name'"
+												[valueField]="'id'"
+												requiredComplexValue
+												propertyName="id"
+												[(ngModel)]="apiActionModel.provider"
+												required
+												class="form-control">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="apiActionDescription" class="col-sm-3 control-label">Description:</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<clr-textarea-container>
+											<textarea clrTextarea
+													  [(ngModel)]="apiActionModel.description"
+													  name="apiActionDescription"
+													  id="apiActionDescription"
+													  tabindex="3"
+													  maxlength="255"></textarea>
+											<clr-control-helper>{{apiActionModel.description?.length}}/255</clr-control-helper>
+										</clr-textarea-container>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.description}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="apiActionDictionary" class="col-sm-3 control-label required-field">Dictionary:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="apiActionDictionary"
+															name="apiActionDictionary"
+															tabindex="4"
+															[data]="dictionaryList"
+															(open)="onOpenDictionary()"
+															(valueChange)="onDictionaryValueChange($event)"
+															[textField]="'name'"
+															[valueField]="'id'"
+															[(ngModel)]="apiActionModel.dictionary"
+															requiredComplexValue propertyName="id"
+															required
+															class="form-control">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.dictionary.name}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="apiActionMethod" class="col-sm-3 control-label required-field">Method:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="apiActionMethod"
+															name="apiActionMethod"
+															class="form-control"
+															tabindex="5"
+															[data]="agentMethodList"
+															[textField]="'dictionaryMethodName'"
+															[valueField]="'uId'"
+															(open)="onOpenAgentMethod()"
+															requiredComplexValue propertyName="id"
+															(valueChange)="onMethodValueChange($event)"
+															[(ngModel)]="apiActionModel.agentMethod"
+															[disabled]="!apiActionModel.dictionary.id"
+															required>
+											<ng-template kendoDropDownListItemTemplate let-dataItem>
+												<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
+											</ng-template>
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.agentMethod.dictionaryMethodName}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="apiActionCredentials" class="col-sm-3 control-label">Credentials:</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="apiActionCredentials"
+															name="apiActionCredentials"
+															class="form-control"
+															tabindex="6"
+															[data]="providerCredentialList"
+															[textField]="'name'"
+															[valueField]="'id'"
+															[disabled]="apiActionModel.provider.id === 0"
+															[(ngModel)]="apiActionModel.credential">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-5">
+								<div class="popup-section">
+									<tds-checkbox [name]="'apiActionPollingInterval'"
+												  tabindex="10"
+												  [(inputModel)]="apiActionModel.isPolling"
+												  [disabled]="modalType === actionTypes.VIEW"
+												  [title]="'Polling'">
+									</tds-checkbox>
+									<popup-polling></popup-polling>
+								</div>
+								<div class="form-group intervals-content">
+									<label class="col-sm-4 control-label">Interval:</label>
+									<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-numerictextbox
+												name="apiActionFrequencyValue"
+												tabindex="11"
+												[format]="'n'"
+												[min]="0"
+												[max]="100"
+												[(ngModel)]="apiActionModel.polling.frequency.value"
+												[disabled]="!apiActionModel.isPolling"
+												[required]="apiActionModel.isPolling">
+										</kendo-numerictextbox>
+									</div>
+									<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist
+												name="apiActionFrequencyInterval"
+												tabindex="12"
+												[data]="intervals"
+												[(ngModel)]="selectedInterval.interval"
+												[disabled]="!apiActionModel.isPolling"
+												(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
+												[required]="apiActionModel.isPolling">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.polling.frequency.value}} ({{apiActionModel.polling.frequency.interval}})</label>
+									</div>
+								</div>
+								<div class="form-group intervals-content">
+									<label class="col-sm-4 control-label">Assume Lapsed After:</label>
+									<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-numerictextbox
+												name="apiActionAssumeLapsedAfterValue"
+												tabindex="13"
+												[format]="'n'"
+												[min]="0"
+												[max]="100"
+												[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
+												[disabled]="!apiActionModel.isPolling"
+												[required]="apiActionModel.isPolling">
+										</kendo-numerictextbox>
+									</div>
+									<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist
+												name="apiActionAssumeLapsedAfterInterval"
+												tabindex="14"
+												[data]="intervals"
+												[(ngModel)]="selectedLapsed.interval"
+												[disabled]="!apiActionModel.isPolling"
+												(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
+												[required]="apiActionModel.isPolling">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.polling.lapsedAfter.value}} ({{apiActionModel.polling.lapsedAfter.interval}})</label>
+									</div>
+								</div>
+								<div class="form-group intervals-content">
+									<label class="col-sm-4 control-label">Assume Stalled After:</label>
+									<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-numerictextbox
+												name="apiActionAssmeStalledAfterValue"
+												tabindex="15"
+												[format]="'n'"
+												[min]="0"
+												[max]="100"
+												[(ngModel)]="apiActionModel.polling.stalledAfter.value"
+												[disabled]="!apiActionModel.isPolling"
+												[required]="apiActionModel.isPolling">
+										</kendo-numerictextbox>
+									</div>
+									<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist
+												name="apiActionAssmeStalledAfterInterval"
+												tabindex="16"
+												[data]="intervals"
+												[(ngModel)]="selectedStalled.interval"
+												[disabled]="!apiActionModel.isPolling"
+												(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
+												[required]="apiActionModel.isPolling">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.polling.stalledAfter.value}} ({{apiActionModel.polling.stalledAfter.interval}})</label>
+									</div>
+								</div>
+								<div class="popup-section">
+									<tds-checkbox [name]="'apiActionProduceData'"
+												  tabindex="17"
+												  [(inputModel)]="apiActionModel.producesData"
+												  [disabled]="modalType === actionTypes.VIEW"
+												  [title]="'Provides Data'">
+									</tds-checkbox>
+									<popup-provides-data></popup-provides-data>
+								</div>
+								<div class="form-group intervals-content">
+									<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
+									<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="apiActionDefaultDataScript" name="apiActionDefaultDataScript" class="form-control"
+															tabindex="18"
+															[data]="providerDatascriptList"
+															[textField]="'name'"
+															[valueField]="'id'"
+															[(ngModel)]="apiActionModel.defaultDataScript"
+															[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+									<label for="apiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
+									<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+										<input type="text" clrInput id="apiEndpointURL" name="apiEndpointURL" class="form-control"
+											   [(ngModel)]="apiActionModel.endpointUrl" tabindex="7"/>
+									</div>
+									<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="httpMethodList" class="col-sm-3 control-label url-label required-field">
+										Http Method:
+									</label>
+									<div *ngIf="modalType !== actionTypes.VIEW"
+										 class="col-sm-9" style="width: 39%;">
+										<kendo-dropdownlist id="httpMethodList"
+															name="httpMethodList"
+															class="form-control"
+															tabindex="8"
+															[data]="httpMethodList"
+															required
+															requiredCustomEmpty empty="Select..."
+															[(ngModel)]="apiActionModel.httpMethod">
+										</kendo-dropdownlist>
+									</div>
+									<div *ngIf="modalType === actionTypes.VIEW"
+										 class="col-sm-9">
+										<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== PLEASE_SELECT ? apiActionModel.httpMethod : ''}}</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+									<label for="apiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
+									<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+										<input type="text" clrInput id="apiDocURL" name="apiDocURL" class="form-control"
+											   tabindex="9"
+											   [(ngModel)]="apiActionModel.docUrl" />
+									</div>
+									<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info) ? 'is-displayed active' : 'is-hidden'"
+				 class="tab-pane"
+				 style="padding-left:15px"
+				 id="tab_simpleInfo">
+				<form name="simpleInfoForm" role="form" data-toggle="validator" #simpleInfoForm='ngForm' class="form-horizontal left-alignment" novalidate>
+					<div class="box-body">
+						<div class="row">
+							<div class="col-md-7">
+								<div class="form-group">
+									<label for="simpleApiActionName" class="col-sm-3 control-label required-field">Name:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<input type="text" clrInput
+											   id="simpleApiActionName"
+											   name="simpleApiActionName"
+											   class="form-control"
+											   tabindex="1" autofocus
+											   [(ngModel)]="apiActionModel.name"
+											   required/>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.name}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="simpleApiActionProvider" class="col-sm-3 control-label required-field">Provider:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist #simpleApiActionProvider
+															tabindex="2"
+															id="simpleApiActionProvider"
+															name="simpleApiActionProvider"
+															(valueChange)="onProviderValueChange($event, false)"
+															[data]="providerList"
+															[textField]="'name'"
+															[valueField]="'id'"
+															requiredComplexValue propertyName="id"
+															[(ngModel)]="apiActionModel.provider"
+															required class="form-control">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="simpleApiActionDescription" class="col-sm-3 control-label">Description:</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<clr-textarea-container>
+											<textarea clrTextarea
+													  [(ngModel)]="apiActionModel.description"
+													  name="simpleApiActionDescription"
+													  id="simpleApiActionDescription"
+													  tabindex="3"
+													  maxlength="255"></textarea>
+											<clr-control-helper>{{apiActionModel.description?.length}}/255</clr-control-helper>
+										</clr-textarea-container>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.description}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="simpleApiActionType"
+										   class="col-sm-3 control-label required-field">
+										Type:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist #simpleApiActionType
+															tabindex="4"
+															id="simpleApiActionType"
+															name="simpleApiActionType"
+															[data]="actionTypesList"
+															(valueChange)="onChangeType($event)"
+															required
+															requiredComplexValue propertyName="id"
+															[textField]="'name'"
+															[valueField]="'id'"
+															[(ngModel)]="apiActionModel.actionType"
+															class="form-control">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">
+											{{apiActionModel.actionType && apiActionModel.actionType.name}}
+										</label>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="simpleApiActionRemote" class="col-sm-3 control-label">Remote Invocation:
+									</label>
+									<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
+										<tds-checkbox [name]="'simpleApiActionRemote'"
+													  tabindex="5"
+													  [(inputModel)]="apiActionModel.isRemote"
+													  [disabled]="disableRemoteInvocationCbx">
+										</tds-checkbox>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">
+											{{apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API' ? 'Yes' : 'No'}}
+										</label>
+									</div>
+								</div>
+								<div class="form-group" *ngIf="apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API'">
+									<label for="debugEnabled" class="col-sm-3 control-label">Debug: </label>
+									<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
+										<tds-checkbox [name]="'debugEnabled'" style="outline: none;"
+													  tabindex="6"
+													  [(inputModel)]="apiActionModel.debugEnabled">
+										</tds-checkbox>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">
+											{{apiActionModel.debugEnabled ? 'Yes' : 'No'}}
+										</label>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.HttpAPI) ? 'is-displayed active' : 'is-hidden'"
+				 class="tab-pane" style="padding-left:15px"
+				 id="tab_httpAPI">
+				<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
+					<div class="box-body">
+						<div class="row">
+							<div class="col-md-7">
+								<div class="form-group">
+									<label for="httpTabApiActionDictionary" class="col-sm-3 control-label required-field">Dictionary:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="httpTabApiActionDictionary"
+															name="httpTabApiActionDictionary"
+															class="form-control"
+															tabindex="4"
+															[data]="dictionaryList"
+															(open)="onOpenDictionary()"
+															(valueChange)="onDictionaryValueChange($event)"
+															[textField]="'name'"
+															[valueField]="'id'"
+															[(ngModel)]="apiActionModel.dictionary"
+															requiredComplexValue propertyName="id"
+															required
+															class="form-control">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.dictionary.name}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="httpTabApiActionMethod" class="col-sm-3 control-label required-field">Method:
+									</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="httpTabApiActionMethod"
+															name="httpTabApiActionMethod"
+															class="form-control"
+															tabindex="5"
+															[data]="agentMethodList"
+															[textField]="'dictionaryMethodName'"
+															[valueField]="'uId'"
+															(open)="onOpenAgentMethod()"
+															requiredComplexValue propertyName="id"
+															(valueChange)="onMethodValueChange($event)"
+															[(ngModel)]="apiActionModel.agentMethod"
+															[disabled]="!apiActionModel.dictionary.id"
+															required>
+											<ng-template kendoDropDownListItemTemplate let-dataItem>
+												<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
+											</ng-template>
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.agentMethod.dictionaryMethodName}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="httpTabApiActionCredentials" class="col-sm-3 control-label">Credentials:</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="httpTabApiActionCredentials"
+															name="httpTabApiActionCredentials"
+															class="form-control"
+															tabindex="6"
+															[data]="providerCredentialList"
+															[textField]="'name'"
+															[valueField]="'id'"
+															[disabled]="apiActionModel.provider.id === 0"
+															[(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="httpTabApiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
+									<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+										<input type="text" clrInput
+											   id="httpTabApiEndpointURL"
+											   name="httpTabApiEndpointURL"
+											   class="form-control"
+											   [(ngModel)]="apiActionModel.endpointUrl" tabindex="7" maxlength="1024" />
+									</div>
+									<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="httpTabHttpMethodList" class="col-sm-3 control-label url-label required-field">
+										Http Method:
+									</label>
+									<div *ngIf="modalType !== actionTypes.VIEW"
+										 class="col-sm-8">
+										<kendo-dropdownlist id="httpTabHttpMethodList"
+															name="httpTabHttpMethodList"
+															class="form-control"
+															tabindex="8"
+															[data]="httpMethodList"
+															required
+															requiredCustomEmpty empty="{{ 'GLOBAL.SELECT_PLACEHOLDER' | translate }}"
+															[(ngModel)]="apiActionModel.httpMethod">
+										</kendo-dropdownlist>
+									</div>
+									<div *ngIf="modalType === actionTypes.VIEW"
+										 class="col-sm-8">
+										<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== PLEASE_SELECT ? apiActionModel.httpMethod : ''}}</label>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-5">
+								<div class="popup-section">
+									<tds-checkbox [name]="'httpTabApiActionPollingInterval'"
+												  tabindex="10"
+												  [(inputModel)]="apiActionModel.isPolling"
+												  [disabled]="modalType === actionTypes.VIEW"
+												  [title]="'Polling'">
+									</tds-checkbox>
+									<popup-polling></popup-polling>
+								</div>
+								<div class="form-group intervals-content">
+									<label class="col-sm-4 control-label">Interval:</label>
+									<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-numerictextbox
+												name="apiActionFrequencyValue"
+												tabindex="11"
+												[format]="'n'"
+												[min]="0"
+												[max]="100"
+												[(ngModel)]="apiActionModel.polling.frequency.value"
+												[disabled]="!apiActionModel.isPolling"
+												[required]="apiActionModel.isPolling">
+										</kendo-numerictextbox>
+									</div>
+									<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist
+												name="apiActionFrequencyInterval"
+												tabindex="12"
+												[data]="intervals"
+												[(ngModel)]="selectedInterval.interval"
+												[disabled]="!apiActionModel.isPolling"
+												(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
+												[required]="apiActionModel.isPolling">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.polling.frequency.value}} ({{apiActionModel.polling.frequency.interval}})</label>
+									</div>
+								</div>
+								<div class="form-group intervals-content">
+									<label class="col-sm-4 control-label">Assume Lapsed After:</label>
+									<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-numerictextbox
+												name="apiActionAssumeLapsedAfterValue"
+												tabindex="13"
+												[format]="'n'"
+												[min]="0"
+												[max]="100"
+												[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
+												[disabled]="!apiActionModel.isPolling"
+												[required]="apiActionModel.isPolling">
+										</kendo-numerictextbox>
+									</div>
+									<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist
+												name="apiActionAssumeLapsedAfterInterval"
+												tabindex="14"
+												[data]="intervals"
+												[(ngModel)]="selectedLapsed.interval"
+												[disabled]="!apiActionModel.isPolling"
+												(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
+												[required]="apiActionModel.isPolling">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.polling.lapsedAfter.value}} ({{apiActionModel.polling.lapsedAfter.interval}})</label>
+									</div>
+								</div>
+								<div class="form-group intervals-content">
+									<label class="col-sm-4 control-label">Assume Stalled After:</label>
+									<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-numerictextbox
+												name="apiActionAssmeStalledAfterValue"
+												tabindex="15"
+												[format]="'n'"
+												[min]="0"
+												[max]="100"
+												[(ngModel)]="apiActionModel.polling.stalledAfter.value"
+												[disabled]="!apiActionModel.isPolling"
+												[required]="apiActionModel.isPolling">
+										</kendo-numerictextbox>
+									</div>
+									<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist
+												name="apiActionAssmeStalledAfterInterval"
+												tabindex="16"
+												[data]="intervals"
+												[(ngModel)]="selectedStalled.interval"
+												[disabled]="!apiActionModel.isPolling"
+												(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
+												[required]="apiActionModel.isPolling">
+										</kendo-dropdownlist>
+									</div>
+									<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail">{{apiActionModel.polling.stalledAfter.value}} ({{apiActionModel.polling.stalledAfter.interval}})</label>
+									</div>
+								</div>
+								<div class="popup-section">
+									<tds-checkbox [name]="'httpTabApiActionProduceData'"
+												  tabindex="17"
+												  [(inputModel)]="apiActionModel.producesData"
+												  [disabled]="modalType === actionTypes.VIEW"
+												  [title]="'Provides Data'">
+									</tds-checkbox>
+									<popup-provides-data></popup-provides-data>
+								</div>
+								<div class="form-group intervals-content">
+									<label for="httpTabApiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
+									<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
+										<kendo-dropdownlist id="httpTabApiActionDefaultDataScript" name="httpTabApiActionDefaultDataScript" class="form-control"
+															tabindex="18"
+															[data]="providerDatascriptList"
+															[textField]="'name'"
+															[valueField]="'id'"
+															[(ngModel)]="apiActionModel.defaultDataScript"
+															[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
+									</div>
+									<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+
+
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+									<label for="httpTabApiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
+									<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+										<input type="text" clrInput  id="httpTabApiDocURL" name="httpTabApiDocURL" class="form-control"
+											   tabindex="9"
+											   [(ngModel)]="apiActionModel.docUrl" maxlength="1024" />
+									</div>
+									<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+										<label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)  ? 'is-displayed active' : 'is-hidden'"
+				 class="tab-pane"
+				 style="padding-left:15px" id="tab_script">
+				<form name="scriptForm" role="form" data-toggle="validator" #scriptForm='ngForm' class="form-horizontal left-alignment">
+					<div class="box-body">
+						<div class="row">
+							<div class="form-group">
+								<label for="scriptCommandLine" class="col-sm-2 control-label">Command Line:</label>
+								<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+									<input type="text" clrInput
+										   id="scriptCommandLine"
+										   placeholder="Enter optional command to invoke script using {scriptName} placeholder for the name of the script"
+										   name="scriptCommandLine"
+										   class="form-control"
+										   [(ngModel)]="apiActionModel.commandLine" maxlength="1024" />
+								</div>
+								<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+									<label class="control-label label-detail">{{apiActionModel.commandLine}}</label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<label for="scriptCredentials" class="col-sm-2 control-label required-field">Credentials Type:</label>
+								<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+									<kendo-dropdownlist id="scriptCredentials"
+														name="scriptCredentials"
+														[defaultItem]="defaultItem"
+														class="form-control"
+														[data]="remoteCredentials"
+														required
+														requiredComplexValue propertyName="id"
+														[textField]="'value'"
+														[valueField]="'id'"
+														[(ngModel)]="apiActionModel.remoteCredentialMethod">
+									</kendo-dropdownlist>
+								</div>
+								<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+									<label class="control-label label-detail">
+										{{apiActionModel.remoteCredentialMethod && (apiActionModel.remoteCredentialMethod.name || apiActionModel.remoteCredentialMethod.value)}}
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="row" *ngIf="isSuppliedCredential()">
+							<div class="form-group">
+								<label for="scriptCredentialsProvided" class="col-sm-2 control-label required-field">Credentials:</label>
+								<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+									<kendo-dropdownlist id="scriptCredentialsProvided"
+														name="scriptCredentialsProvided"
+														class="form-control"
+														[data]="providerCredentialList"
+														required
+														requiredComplexValue propertyName="id"
 														[textField]="'name'"
 														[valueField]="'id'"
-														requiredComplexValue
-														propertyName="id"
-														[(ngModel)]="apiActionModel.provider"
-														required
-														class="form-control">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionDescription" class="col-sm-3 control-label">Description:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<textarea type="text" id="apiActionDescription"
-												          name="apiActionDescription"
-												          class="form-control"
-                                                          tabindex="3"
-                                                          [(ngModel)]="apiActionModel.description">
-												</textarea>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.description}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionDictionary" class="col-sm-3 control-label required-field">Dictionary:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="apiActionDictionary"
-												                    name="apiActionDictionary"
-                                                                    tabindex="4"
-																	[data]="dictionaryList"
-																	(open)="onOpenDictionary()"
-																	(valueChange)="onDictionaryValueChange($event)"
-																	[textField]="'name'"
-																	[valueField]="'id'"
-																	[(ngModel)]="apiActionModel.dictionary"
-																	requiredComplexValue propertyName="id"
-																	required
-																	class="form-control">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.dictionary.name}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionMethod" class="col-sm-3 control-label required-field">Method:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="apiActionMethod"
-												                    name="apiActionMethod"
-												                    class="form-control"
-                                                                    tabindex="5"
-																	[data]="agentMethodList"
-																	[textField]="'dictionaryMethodName'"
-																	[valueField]="'uId'"
-																	(open)="onOpenAgentMethod()"
-																	requiredComplexValue propertyName="id"
-																	(valueChange)="onMethodValueChange($event)"
-																	[(ngModel)]="apiActionModel.agentMethod"
-																	[disabled]="!apiActionModel.dictionary.id"
-																	required>
-													<ng-template kendoDropDownListItemTemplate let-dataItem>
-														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
-													</ng-template>
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.agentMethod.dictionaryMethodName}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionCredentials" class="col-sm-3 control-label">Credentials:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="apiActionCredentials"
-												                    name="apiActionCredentials"
-												                    class="form-control"
-                                                                    tabindex="6"
-																	[data]="providerCredentialList"
-																	[textField]="'name'"
-																	[valueField]="'id'"
-                                                                    [disabled]="apiActionModel.provider.id === 0"
-																	[(ngModel)]="apiActionModel.credential">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-5">
-										<div class="form-check">
-											<label class="form-check-label aligned-label" for="apiActionPollingInterval">
-												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval"
-                                                       tabindex="10"
-                                                       [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
-												Polling
-											</label>
-											<popup-polling></popup-polling>
-										</div>
-										<div class="form-group intervals-content">
-											<label class="col-sm-4 control-label">Interval:</label>
-											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox
-														name="apiActionFrequencyValue"
-                                                        tabindex="11"
-														[format]="'n'"
-														[min]="0"
-														[max]="100"
-														[(ngModel)]="apiActionModel.polling.frequency.value"
-														[disabled]="!apiActionModel.isPolling"
-														[required]="apiActionModel.isPolling">
-												</kendo-numerictextbox>
-											</div>
-											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist
-														name="apiActionFrequencyInterval"
-                                                        tabindex="12"
-														[data]="intervals"
-														[(ngModel)]="selectedInterval.interval"
-														[disabled]="!apiActionModel.isPolling"
-														(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
-														[required]="apiActionModel.isPolling">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.frequency.value}} ({{apiActionModel.polling.frequency.interval}})</label>
-											</div>
-										</div>
-										<div class="form-group intervals-content">
-											<label class="col-sm-4 control-label">Assume Lapsed After:</label>
-											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox
-														name="apiActionAssumeLapsedAfterValue"
-                                                        tabindex="13"
-														[format]="'n'"
-														[min]="0"
-														[max]="100"
-														[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
-														[disabled]="!apiActionModel.isPolling"
-														[required]="apiActionModel.isPolling">
-												</kendo-numerictextbox>
-											</div>
-											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist
-														name="apiActionAssumeLapsedAfterInterval"
-                                                        tabindex="14"
-														[data]="intervals"
-														[(ngModel)]="selectedLapsed.interval"
-														[disabled]="!apiActionModel.isPolling"
-														(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
-														[required]="apiActionModel.isPolling">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.lapsedAfter.value}} ({{apiActionModel.polling.lapsedAfter.interval}})</label>
-											</div>
-										</div>
-										<div class="form-group intervals-content">
-											<label class="col-sm-4 control-label">Assume Stalled After:</label>
-											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox
-														name="apiActionAssmeStalledAfterValue"
-                                                        tabindex="15"
-														[format]="'n'"
-														[min]="0"
-														[max]="100"
-														[(ngModel)]="apiActionModel.polling.stalledAfter.value"
-														[disabled]="!apiActionModel.isPolling"
-														[required]="apiActionModel.isPolling">
-												</kendo-numerictextbox>
-											</div>
-											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist
-														name="apiActionAssmeStalledAfterInterval"
-                                                        tabindex="16"
-														[data]="intervals"
-														[(ngModel)]="selectedStalled.interval"
-														[disabled]="!apiActionModel.isPolling"
-														(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
-														[required]="apiActionModel.isPolling">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.stalledAfter.value}} ({{apiActionModel.polling.stalledAfter.interval}})</label>
-											</div>
-										</div>
-										<div class="form-check">
-											<label for="apiActionProduceData" class="form-check-label aligned-label">
-												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData"
-                                                       tabindex="17"
-                                                       [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
-												Provides Data
-											</label>
-											<popup-provides-data></popup-provides-data>
-										</div>
-										<div class="form-group intervals-content">
-											<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
-											<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="apiActionDefaultDataScript" name="apiActionDefaultDataScript" class="form-control"
-                                                                    tabindex="18"
-																	[data]="providerDatascriptList"
-																	[textField]="'name'"
-																	[valueField]="'id'"
-																	[(ngModel)]="apiActionModel.defaultDataScript"
-																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
-											</div>
-										</div>
-									</div>
+														[(ngModel)]="apiActionModel.credential">
+									</kendo-dropdownlist>
 								</div>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="form-group">
-											<label for="apiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
-											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="apiEndpointURL" name="apiEndpointURL" class="form-control"
-                                                       [(ngModel)]="apiActionModel.endpointUrl" tabindex="7"/>
-											</div>
-											<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
-											</div>
-										</div>
-                                        <div class="form-group">
-                                            <label for="httpMethodList" class="col-sm-3 control-label url-label required-field">
-                                                Http Method:
-                                            </label>
-                                            <div *ngIf="modalType !== actionTypes.VIEW"
-                                                 class="col-sm-9" style="width: 39%;">
-                                                <kendo-dropdownlist id="httpMethodList"
-                                                                    name="httpMethodList"
-                                                                    class="form-control"
-                                                                    tabindex="8"
-                                                                    [data]="httpMethodList"
-                                                                    required
-                                                                    requiredCustomEmpty empty="Select..."
-                                                                    [(ngModel)]="apiActionModel.httpMethod">
-                                                </kendo-dropdownlist>
-                                            </div>
-                                            <div *ngIf="modalType === actionTypes.VIEW"
-                                                 class="col-sm-9">
-                                                <label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== PLEASE_SELECT ? apiActionModel.httpMethod : ''}}</label>
-                                            </div>
-                                        </div>
-									</div>
-								</div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="apiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
-                                            <div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
-                                                <input type="text" id="apiDocURL" name="apiDocURL" class="form-control"
-                                                       tabindex="9"
-                                                       [(ngModel)]="apiActionModel.docUrl" />
-                                            </div>
-                                            <div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-							</div>
-						</form>
-					</div>
-					<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info) ? 'is-displayed' : 'is-hidden'"
-					     class="tab-pane"
-					     style="padding-left:15px"
-					     [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}"
-					     id="tab_simpleInfo">
-						<form name="simpleInfoForm" role="form" data-toggle="validator" #simpleInfoForm='ngForm' class="form-horizontal left-alignment">
-							<div class="box-body">
-								<div class="row">
-									<div class="col-md-7">
-										<div class="form-group">
-											<label for="simpleApiActionName" class="col-sm-3 control-label required-field">Name:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text"
-												       id="simpleApiActionName"
-												       name="simpleApiActionName"
-												       class="form-control"
-												       tabindex="1" autofocus
-												       [(ngModel)]="apiActionModel.name"
-												       required/>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.name}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="simpleApiActionProvider" class="col-sm-3 control-label required-field">Provider:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist #simpleApiActionProvider
-												                    tabindex="2"
-												                    id="simpleApiActionProvider"
-												                    name="simpleApiActionProvider"
-												                    (valueChange)="onProviderValueChange($event, false)"
-												                    [data]="providerList"
-												                    [textField]="'name'"
-												                    [valueField]="'id'"
-												                    requiredComplexValue propertyName="id"
-												                    [(ngModel)]="apiActionModel.provider"
-												                    required class="form-control">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="simpleApiActionDescription" class="col-sm-3 control-label">Description:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<textarea type="text"
-												          id="simpleApiActionDescription"
-												          name="simpleApiActionDescription"
-												          class="form-control"
-												          tabindex="3"
-												          [(ngModel)]="apiActionModel.description"></textarea>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.description}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="simpleApiActionType"
-											       class="col-sm-3 control-label required-field">
-												Type:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist #simpleApiActionType
-												                    tabindex="4"
-												                    id="simpleApiActionType"
-												                    name="simpleApiActionType"
-												                    [data]="actionTypesList"
-												                    (valueChange)="onChangeType($event)"
-												                    required
-												                    requiredComplexValue propertyName="id"
-												                    [textField]="'name'"
-												                    [valueField]="'id'"
-												                    [(ngModel)]="apiActionModel.actionType"
-												                    class="form-control">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">
-													{{apiActionModel.actionType && apiActionModel.actionType.name}}
-												</label>
-											</div>
-										</div>
-
-										<div class="form-group">
-											<label for="simpleApiActionRemote" class="col-sm-3 control-label">Remote Invocation:
-											</label>
-											<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="checkbox"
-												       id="simpleApiActionRemote"
-												       name="simpleApiActionRemote"
-												       tabindex="5"
-													   [(ngModel)]="apiActionModel.isRemote"
-												       [disabled]="true"
-												       class="form-check-input aligned-checkbox" />
-
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">
-													{{apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API' ? 'Yes' : 'No'}}
-												</label>
-											</div>
-										</div>
-										<div class="form-group" *ngIf="apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API'">
-											<label for="debugEnabled" class="col-sm-3 control-label">Debug: </label>
-											<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="checkbox"
-													   id="debugEnabled"
-													   name="debugEnabled"
-													   tabindex="6"
-													   [(ngModel)]="apiActionModel.debugEnabled"
-													   class="form-check-input aligned-checkbox debug" />
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">
-													{{apiActionModel.debugEnabled ? 'Yes' : 'No'}}
-												</label>
-											</div>
-										</div>
-
-									</div>
+								<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+									<label class="control-label label-detail">
+										{{apiActionModel.credential && (apiActionModel.credential.name || '')}}
+									</label>
 								</div>
 							</div>
-						</form>
-					</div>
-					<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.HttpAPI) ? 'is-displayed' : 'is-hidden'"
-					     class="tab-pane" style="padding-left:15px"
-					     [ngClass]="{'active':isCurrentTab(tabsEnum.HttpAPI)}" id="tab_httpAPI">
-						<form name="httpAPIForm" role="form" data-toggle="validator" #httpAPIForm='ngForm' class="form-horizontal left-alignment">
-							<div class="box-body">
-								<div class="row">
-									<div class="col-md-7">
-										<div class="form-group">
-											<label for="httpTabApiActionDictionary" class="col-sm-3 control-label required-field">Dictionary:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="httpTabApiActionDictionary"
-												                    name="httpTabApiActionDictionary"
-												                    class="form-control"
-												                    tabindex="4"
-												                    [data]="dictionaryList"
-												                    (open)="onOpenDictionary()"
-												                    (valueChange)="onDictionaryValueChange($event)"
-												                    [textField]="'name'"
-												                    [valueField]="'id'"
-												                    [(ngModel)]="apiActionModel.dictionary"
-												                    requiredComplexValue propertyName="id"
-												                    required
-												                    class="form-control">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.dictionary.name}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="httpTabApiActionMethod" class="col-sm-3 control-label required-field">Method:
-											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="httpTabApiActionMethod"
-												                    name="httpTabApiActionMethod"
-												                    class="form-control"
-												                    tabindex="5"
-												                    [data]="agentMethodList"
-												                    [textField]="'dictionaryMethodName'"
-												                    [valueField]="'uId'"
-												                    (open)="onOpenAgentMethod()"
-												                    requiredComplexValue propertyName="id"
-												                    (valueChange)="onMethodValueChange($event)"
-												                    [(ngModel)]="apiActionModel.agentMethod"
-												                    [disabled]="!apiActionModel.dictionary.id"
-												                    required>
-													<ng-template kendoDropDownListItemTemplate let-dataItem>
-														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
-													</ng-template>
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.agentMethod.dictionaryMethodName}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="httpTabApiActionCredentials" class="col-sm-3 control-label">Credentials:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="httpTabApiActionCredentials"
-												                    name="httpTabApiActionCredentials"
-												                    class="form-control"
-												                    tabindex="6"
-												                    [data]="providerCredentialList"
-												                    [textField]="'name'"
-												                    [valueField]="'id'"
-												                    [disabled]="apiActionModel.provider.id === 0"
-												                    [(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="httpTabApiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text"
-												       id="httpTabApiEndpointURL"
-												       name="httpTabApiEndpointURL"
-												       class="form-control"
-												       [(ngModel)]="apiActionModel.endpointUrl" tabindex="7" maxlength="1024" />
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="httpTabHttpMethodList" class="col-sm-3 control-label url-label required-field">
-												Http Method:
-											</label>
-											<div *ngIf="modalType !== actionTypes.VIEW"
-											     class="col-sm-8">
-												<kendo-dropdownlist id="httpTabHttpMethodList"
-												                    name="httpTabHttpMethodList"
-												                    class="form-control"
-												                    tabindex="8"
-												                    [data]="httpMethodList"
-												                    required
-												                    requiredCustomEmpty empty="{{ 'GLOBAL.SELECT_PLACEHOLDER' | translate }}"
-												                    [(ngModel)]="apiActionModel.httpMethod">
-												</kendo-dropdownlist>
-											</div>
-											<div *ngIf="modalType === actionTypes.VIEW"
-											     class="col-sm-8">
-												<label class="control-label label-detail">{{apiActionModel.httpMethod && apiActionModel.httpMethod !== PLEASE_SELECT ? apiActionModel.httpMethod : ''}}</label>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-5">
-										<div class="form-check">
-											<label class="form-check-label aligned-label" for="httpTabApiActionPollingInterval">
-												<input type="checkbox" id="httpTabApiActionPollingInterval" name="httpTabApiActionPollingInterval"
-												       tabindex="10"
-												       [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
-												Polling
-											</label>
-											<popup-polling></popup-polling>
-										</div>
-										<div class="form-group intervals-content">
-											<label class="col-sm-4 control-label">Interval:</label>
-											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox
-														name="apiActionFrequencyValue"
-														tabindex="11"
-														[format]="'n'"
-														[min]="0"
-														[max]="100"
-														[(ngModel)]="apiActionModel.polling.frequency.value"
-														[disabled]="!apiActionModel.isPolling"
-														[required]="apiActionModel.isPolling">
-												</kendo-numerictextbox>
-											</div>
-											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist
-														name="apiActionFrequencyInterval"
-														tabindex="12"
-														[data]="intervals"
-														[(ngModel)]="selectedInterval.interval"
-														[disabled]="!apiActionModel.isPolling"
-														(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
-														[required]="apiActionModel.isPolling">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.frequency.value}} ({{apiActionModel.polling.frequency.interval}})</label>
-											</div>
-										</div>
-										<div class="form-group intervals-content">
-											<label class="col-sm-4 control-label">Assume Lapsed After:</label>
-											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox
-														name="apiActionAssumeLapsedAfterValue"
-														tabindex="13"
-														[format]="'n'"
-														[min]="0"
-														[max]="100"
-														[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
-														[disabled]="!apiActionModel.isPolling"
-														[required]="apiActionModel.isPolling">
-												</kendo-numerictextbox>
-											</div>
-											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist
-														name="apiActionAssumeLapsedAfterInterval"
-														tabindex="14"
-														[data]="intervals"
-														[(ngModel)]="selectedLapsed.interval"
-														[disabled]="!apiActionModel.isPolling"
-														(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
-														[required]="apiActionModel.isPolling">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.lapsedAfter.value}} ({{apiActionModel.polling.lapsedAfter.interval}})</label>
-											</div>
-										</div>
-										<div class="form-group intervals-content">
-											<label class="col-sm-4 control-label">Assume Stalled After:</label>
-											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox
-														name="apiActionAssmeStalledAfterValue"
-														tabindex="15"
-														[format]="'n'"
-														[min]="0"
-														[max]="100"
-														[(ngModel)]="apiActionModel.polling.stalledAfter.value"
-														[disabled]="!apiActionModel.isPolling"
-														[required]="apiActionModel.isPolling">
-												</kendo-numerictextbox>
-											</div>
-											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist
-														name="apiActionAssmeStalledAfterInterval"
-														tabindex="16"
-														[data]="intervals"
-														[(ngModel)]="selectedStalled.interval"
-														[disabled]="!apiActionModel.isPolling"
-														(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
-														[required]="apiActionModel.isPolling">
-												</kendo-dropdownlist>
-											</div>
-											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.stalledAfter.value}} ({{apiActionModel.polling.stalledAfter.interval}})</label>
-											</div>
-										</div>
-										<div class="form-check">
-											<label for="httpTabApiActionProduceData" class="form-check-label aligned-label">
-												<input id="httpTabApiActionProduceData" type="checkbox" name="httpTabApiActionProduceData"
-												       tabindex="17"
-												       [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
-												Provides Data
-											</label>
-											<popup-provides-data></popup-provides-data>
-										</div>
-										<div class="form-group intervals-content">
-											<label for="httpTabApiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
-											<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist id="httpTabApiActionDefaultDataScript" name="httpTabApiActionDefaultDataScript" class="form-control"
-												                    tabindex="18"
-												                    [data]="providerDatascriptList"
-												                    [textField]="'name'"
-												                    [valueField]="'id'"
-												                    [(ngModel)]="apiActionModel.defaultDataScript"
-												                    [disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
-											</div>
-											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
-											</div>
-										</div>
-									</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<label for="scriptCode" class="col-sm-2 control-label">Script:</label>
+								<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+									<code-mirror #codeMirror
+												*ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
+												 id="scriptCode"
+												 [mode]="codeMirror.mode"
+												 [(model)]="apiActionModel.script">
+									</code-mirror>
 								</div>
-								<div class="row">
-									<div class="col-md-12">
+								<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+									<code-mirror #codeMirror
+												*ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
+												 id="scriptCodeReadOnly"
+												 [mode]="getClonedCodeMirrorSettings({readOnly: true})"
+												 [(model)]="apiActionModel.script">
+									</code-mirror>
 
-
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="form-group">
-											<label for="httpTabApiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
-											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="httpTabApiDocURL" name="httpTabApiDocURL" class="form-control"
-												       tabindex="9"
-												       [(ngModel)]="apiActionModel.docUrl" maxlength="1024" />
-											</div>
-											<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
-											</div>
-										</div>
-									</div>
+									<!--<label class="control-label label-detail">-->
+										<!--{{apiActionModel.script}}-->
+										<!--((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')-->
+									<!--</label>-->
 								</div>
 							</div>
-						</form>
+						</div>
 					</div>
-					<div [ngClass]="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)  ? 'is-displayed' : 'is-hidden'"
-					     class="tab-pane"
-					     style="padding-left:15px"
-					     [ngClass]="{'active':isCurrentTab(tabsEnum.Script)}" id="tab_script">
-						<form name="scriptForm" role="form" data-toggle="validator" #scriptForm='ngForm' class="form-horizontal left-alignment">
-							<div class="box-body">
-								<div class="row">
-									<div class="form-group">
-										<label for="scriptCommandLine" class="col-sm-2 control-label">Command Line:</label>
-										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<input type="text"
-											       id="scriptCommandLine"
-											       placeholder="Enter optional command to invoke script using {scriptName} placeholder for the name of the script"
-											       name="scriptCommandLine"
-											       class="form-control"
-											       [(ngModel)]="apiActionModel.commandLine" maxlength="1024" />
-										</div>
-										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<label class="control-label label-detail">{{apiActionModel.commandLine}}</label>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="form-group">
-										<label for="scriptCredentials" class="col-sm-2 control-label required-field">Credentials Type:</label>
-										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<kendo-dropdownlist id="scriptCredentials"
-											                    name="scriptCredentials"
-											                    [defaultItem]="defaultItem"
-											                    class="form-control"
-											                    [data]="remoteCredentials"
-											                    required
-											                    requiredComplexValue propertyName="id"
-											                    [textField]="'value'"
-											                    [valueField]="'id'"
-											                    [(ngModel)]="apiActionModel.remoteCredentialMethod">
-											</kendo-dropdownlist>
-										</div>
-										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<label class="control-label label-detail">
-												{{apiActionModel.remoteCredentialMethod && (apiActionModel.remoteCredentialMethod.name || apiActionModel.remoteCredentialMethod.value)}}
-											</label>
-										</div>
-									</div>
-								</div>
-								<div class="row" *ngIf="isSuppliedCredential()">
-									<div class="form-group">
-										<label for="scriptCredentialsProvided" class="col-sm-2 control-label required-field">Credentials:</label>
-										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<kendo-dropdownlist id="scriptCredentialsProvided"
-											                    name="scriptCredentialsProvided"
-											                    class="form-control"
-											                    [data]="providerCredentialList"
-											                    required
-											                    requiredComplexValue propertyName="id"
-											                    [textField]="'name'"
-											                    [valueField]="'id'"
-											                    [(ngModel)]="apiActionModel.credential">
-											</kendo-dropdownlist>
-										</div>
-										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<label class="control-label label-detail">
-												{{apiActionModel.credential && (apiActionModel.credential.name || '')}}
-											</label>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="form-group">
-										<label for="scriptCode" class="col-sm-2 control-label">Script:</label>
-										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<code-mirror #codeMirror
-														*ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
-											             id="scriptCode"
-											             [mode]="codeMirror.mode"
-											             [(model)]="apiActionModel.script">
-											</code-mirror>
-										</div>
-										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<code-mirror #codeMirror
-														*ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
-											             id="scriptCodeReadOnly"
-											             [mode]="getClonedCodeMirrorSettings({readOnly: true})"
-											             [(model)]="apiActionModel.script">
-											</code-mirror>
-
-											<!--<label class="control-label label-detail">-->
-												<!--{{apiActionModel.script}}-->
-												<!--((apiActionModel.credential?.name !== PLEASE_SELECT)? apiActionModel.credential?.name : '')-->
-											<!--</label>-->
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</div>
-					<!-- Parameters tab content -->
-					<div [ngClass]="isCurrentTab(tabsEnum.Parameters) ? 'is-displayed' : 'is-hidden'"
-					     class="tab-pane no-padding api-action-parameters-form"
-					     [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
-								<api-action-view-edit-parameters
-									[parameterList]="parameterList"
-									[modalType]="modalType"
-									[commonFieldSpecs]="commonFieldSpecs"
-									(onValuesChange)="onParametersFormChange($event)">
-								</api-action-view-edit-parameters>
-					</div>
-					<!-- Reactions tab content -->
-					<div *ngIf="isCurrentTab(tabsEnum.Reactions)"
-					     class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions), 'is-remote-section': isRemote()}" id="tab_reactions">
-						<api-action-view-edit-reactions
-							#apiActionViewEditReactionsComponent
-							[eventReactions]="apiActionModel.eventReactions"
-							[modalType]="modalType"
-							[isRemote]="isRemote()"
-							[actionType]="apiActionModel.actionType"
-							[isPolling]="apiActionModel.isPolling"
-							[codeMirrorMode]="codeMirror.mode"
-							[(invalidScriptSyntax)]="invalidScriptSyntax">
-						</api-action-view-edit-reactions>
-					</div>
-				</div>
+				</form>
 			</div>
-	</div>
-	<div class="modal-footer form-group-center">
-		<tds-button-save *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE"
-		                 (click)="onSaveApiAction()" [disabled]="!canSave()"
-		                 tabindex="20" class="btn-primary pull-left">
-		</tds-button-save>
-
-		<tds-button-custom
-		        tabindex="21"
-		        [icon]="'thumbs-o-up'"
-		        [title]="'Check Syntax'"
-		        *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)"
-		        (click)="onCheckAllSyntax()" class="btn-primary pull-left">
-		</tds-button-custom>
-
-		<tds-button-edit *ngIf="modalType === actionTypes.VIEW"
-		                 (click)="changeToEditApiAction()"
-		                 tabindex="22" class="btn-primary pull-left">
-		</tds-button-edit>
-
-		<tds-button-delete
-		        tabindex="23"
-		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn-danger">
-		</tds-button-delete>
-
-		<div *ngIf="loadingLists" style="display: inline" class="loading-lists pull-right text-right">
-			<i>Loading Lists...</i>
+			<!-- Parameters tab content -->
+			<div [ngClass]="isCurrentTab(tabsEnum.Parameters) ? 'is-displayed active' : 'is-hidden'"
+				 class="tab-pane no-padding api-action-parameters-form"
+				 id="tab_parameters">
+						<api-action-view-edit-parameters
+							[parameterList]="parameterList"
+							[modalType]="modalType"
+							[commonFieldSpecs]="commonFieldSpecs"
+							(onValuesChange)="onParametersFormChange($event)">
+						</api-action-view-edit-parameters>
+			</div>
+			<!-- Reactions tab content -->
+			<div *ngIf="isCurrentTab(tabsEnum.Reactions)"
+				 class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions), 'is-remote-section': isRemote()}" id="tab_reactions">
+				<api-action-view-edit-reactions
+					#apiActionViewEditReactionsComponent
+					[eventReactions]="apiActionModel.eventReactions"
+					[modalType]="modalType"
+					[isRemote]="isRemote()"
+					[actionType]="apiActionModel.actionType"
+					[isPolling]="apiActionModel.isPolling"
+					[codeMirrorMode]="codeMirror.mode"
+					[(invalidScriptSyntax)]="invalidScriptSyntax">
+				</api-action-view-edit-reactions>
+			</div>
 		</div>
-		<span *ngIf="!loadingLists">
-			<tds-button-close *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())"
-												(click)="cancelCloseDialog()" tabindex="24" class="pull-right">
-			</tds-button-close>
-
-			<tds-button-cancel *ngIf="(modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())"
-												 (click)="cancelCloseDialog()" tabindex="24" class="pull-right">
-			</tds-button-cancel>
-		</span>
-	</div>
 </div>
+
+

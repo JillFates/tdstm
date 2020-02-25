@@ -8,12 +8,14 @@ class ProvidersPage extends Page{
     static at = {
         title == "Providers"
         pageHeaderName.text() == "Providers"
-        createBtn.text() == "Create Provider"
+        pageBreadcrumbs[0].text() == "Project"
+        pageBreadcrumbs[1].text() == "Providers"
     }
 
     static content = {
         dateFilter { $("span" , class:"k-dateinput-wrap").find("input" , class:"k-input")}
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
+        pageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         createBtn(wait:true) { $('button#btnCreateProvider')}
         nameColumnHeader {$("div" , class:"sortable-column").find("label")[1]}
         nameFilter(wait:true) { $("input" ,  placeholder:"Filter Name")}

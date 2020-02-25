@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a2da9901-403f-40d1-b88f-2315aa81a3ff",
+		"_postman_id": "26b25a9e-1379-4889-8e2c-6f71510ace15",
 		"name": "StartAction",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -16,7 +16,14 @@
 							"",
 							"pm.test(\"JSESSIONID present\", function () {",
 							"    pm.expect(pm.cookies.has('JSESSIONID')).to.be.true;",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -184,6 +191,56 @@
 			"response": []
 		},
 		{
+			"name": "List Events Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "049e3830-bb5f-416f-a034-e408875b1317",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Events have been listed.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.globals.set(\"event1\", jsonData.data[0].id);",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/moveEvent/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"moveEvent",
+						"list"
+					]
+				},
+				"description": "This EP will bring a list of events. Some event ids will be saved in order to add the created tags to them."
+			},
+			"response": []
+		},
+		{
 			"name": "Create PowerShell Action",
 			"event": [
 				{
@@ -215,6 +272,11 @@
 						"key": "Content-Type",
 						"name": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
 						"type": "text"
 					}
 				],
@@ -334,11 +396,16 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"348\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}",
+					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"{{event1}}\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -379,9 +446,6 @@
 							"    ",
 							"});",
 							"",
-							"pm.test(\"Percentage complete is now 25%\", function () {",
-							"    pm.expect(jsonObject.actionRequest.task.percentageComplete).to.eql(25);",
-							"});",
 							"",
 							"//unsetting variables",
 							"",
@@ -391,7 +455,10 @@
 							"pm.environment.unset(\"apiActionId\");",
 							"pm.environment.unset(\"taskName\");",
 							"pm.environment.unset(\"taskID\");",
-							""
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");",
+							"pm.environment.unset(\"event1\");"
 						],
 						"type": "text/javascript"
 					}
@@ -410,11 +477,16 @@
 						"key": "Accept",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"publicKey\":\"{{publicKey}}\"\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"

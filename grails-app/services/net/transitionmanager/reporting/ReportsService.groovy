@@ -616,7 +616,7 @@ class ReportsService implements ServiceMethods {
         def projectStaff = PartyRelationship.executeQuery("""
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
-			  and partyIdFrom.id=?
+			  and partyIdFrom.id=?0
 			  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
 			  and roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
 		""".toString(), [currProj.toLong()])
@@ -703,9 +703,9 @@ class ReportsService implements ServiceMethods {
         Collection modelList = AssetEntity.executeQuery('''
 			select model.modelName
 			from AssetEntity
-			where model.modelStatus=?
-			  and model.usize=?
-			  and moveBundle.moveEvent=?
+			where model.modelStatus=?0
+			  and model.usize=?1
+			  and moveBundle.moveEvent=?2
 			order by model.modelName asc
 		''', ['new', 1, moveEvent])
 
@@ -1600,24 +1600,26 @@ class ReportsService implements ServiceMethods {
             def tagAssetList = tagAssetService.list(project, app.id)*.toMap()
 
 			// TODO: we'd like to flush the session
-			// GormUtil.flushAndClearSession(idx)
-			appList.add([
-				app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
-				assetComment: assetComment, assetCommentList: assetCommentList,
-				appMoveEvent: appMoveEvent,
-				moveEventList: moveEventList,
-				appMoveEvent: appMoveEventlist,
-				dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
-				project: project, prefValue: prefValue,
-				shutdownById: shutdownById,
-				startupById: startupById,
-				testingById: testingById,
-				shutdownBy: shutdownBy,
-				startupBy: startupBy,
-				testingBy: testingBy,
-                tagAssetList: tagAssetList ? tagAssetList : []
+            // GormUtil.flushAndClearSession(idx)
+            appList.add([
+                app                   : application, supportAssets: supportAssets,
+                dependentAssets       : dependentAssets,
+                assetComment          : assetComment,
+                assetCommentList      : assetCommentList,
+                appMoveEvent          : appMoveEvent,
+                moveEventList         : moveEventList,
+                appMoveEvent          : appMoveEventlist,
+                dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
+                project               : project, prefValue: prefValue,
+                shutdownById          : shutdownById,
+                startupById           : startupById,
+                testingById           : testingById,
+                shutdownBy            : shutdownBy,
+                startupBy             : startupBy,
+                testingBy             : testingBy,
+                tagAssetList          : tagAssetList ? tagAssetList : []
             ])
-		}
+        }
 
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
 		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)

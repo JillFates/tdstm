@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ee86a133-6f6d-4290-ad29-64f12e5cae1a",
+		"_postman_id": "973a1711-8f9f-41e6-b22c-0683c302150b",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -106,6 +113,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -166,6 +178,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -225,6 +242,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -343,6 +365,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -562,6 +589,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -739,6 +771,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -760,7 +797,7 @@
 			"response": []
 		},
 		{
-			"name": "List tagAssetss after bulk remove",
+			"name": "List tagAssets after bulk remove",
 			"event": [
 				{
 					"listen": "test",
@@ -908,6 +945,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1060,6 +1102,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1081,7 +1128,7 @@
 			"response": []
 		},
 		{
-			"name": "List tagAssetss after bulk replace",
+			"name": "List tagAssets after bulk replace",
 			"event": [
 				{
 					"listen": "test",
@@ -1175,6 +1222,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1230,6 +1282,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1290,6 +1347,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1442,6 +1504,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1566,162 +1633,6 @@
 			"response": []
 		},
 		{
-			"name": "Bulk change clear validation",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "5a2b9465-7a2c-43e7-8ab6-f5304ac67336",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Updating a tag\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.status).to.eql('success');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n\t\"userParams\": {\n\t\t\"sortDomain\"  : \"device\",\n\t\t\"sortProperty\": \"id\",\n\t\t\"filters\"     : {\"domains\": [\"device\"]}\n\t},\n\t\"dataViewId\": {{dataviewID}},\n\t\"ids\": [{{asset1}}, {{asset2}}],\n\t\"type\":\"DEVICE\",\n\t\"edits\":[\n\t\t{\n\t\t\t\"fieldName\": \"validation\", \n\t\t\t\"action\"   : \"clear\", \n\t\t\t\"value\"    : \"\"}\t\n\t]\n}"
-				},
-				"url": {
-					"raw": "{{host}}/tdstm/ws/bulkChange",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"ws",
-						"bulkChange"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Asset 1 Validation was changed ",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "d25dc50a-5e12-4491-9aec-866c2a05ffae",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Check asset after bulk operation\", function () {",
-							"    var json = pm.response.json();",
-							"    var record = json.data.result;",
-							"    ",
-							"    var assetID = pm.variables.get(\"asset1\"); ",
-							"    pm.expect(record.id).to.eql(assetID);",
-							"    pm.expect(record.validation).to.eql('');",
-							"",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"ws",
-						"asset",
-						"{{asset1}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Asset 2 Validation was changed ",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "ff91c841-b30c-4391-9885-94cc653c7007",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Check asset after bulk operation\", function () {",
-							"    var json = pm.response.json();",
-							"    var record = json.data.result;",
-							"    ",
-							"    var assetID = pm.variables.get(\"asset2\"); ",
-							"    pm.expect(record.id).to.eql(assetID);",
-							"    pm.expect(record.validation).to.eql('');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"ws",
-						"asset",
-						"{{asset2}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Validation reset",
 			"event": [
 				{
@@ -1752,6 +1663,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1910,6 +1826,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -2068,6 +1989,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -2089,12 +2015,12 @@
 			"response": []
 		},
 		{
-			"name": "Get Asset 1 replace size",
+			"name": "Get Asset 1 new PlanStatus",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "a01d9520-a038-4cee-86b1-87b854048e2f",
+						"id": "8db769f4-eafb-4af6-9f58-59d36fa9560f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2106,9 +2032,7 @@
 							"    ",
 							"    var assetID = pm.variables.get(\"asset1\"); ",
 							"    pm.expect(record.id).to.eql(assetID);",
-							"    pm.expect(record.size).to.eql(null);",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
-							"",
 							"});"
 						],
 						"type": "text/javascript"
@@ -2143,12 +2067,12 @@
 			"response": []
 		},
 		{
-			"name": "Get Asset 2 replace size",
+			"name": "Get Asset 2 new PlanStatus",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "dbda6db1-31b3-47d4-ab72-cf43715f26a0",
+						"id": "8db769f4-eafb-4af6-9f58-59d36fa9560f",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -2160,7 +2084,6 @@
 							"    ",
 							"    var assetID = pm.variables.get(\"asset2\"); ",
 							"    pm.expect(record.id).to.eql(assetID);",
-							"    pm.expect(record.size).to.eql(null);",
 							"    pm.expect(record.planStatus).to.eql('Unassigned');",
 							"});"
 						],
@@ -2226,6 +2149,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -2382,6 +2310,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -2538,6 +2471,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -2694,6 +2632,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -2850,6 +2793,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -3006,6 +2954,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -3162,6 +3115,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -3319,6 +3277,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -3474,6 +3437,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -3629,6 +3597,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -3785,6 +3758,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -3940,6 +3918,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -4065,7 +4048,7 @@
 			"response": []
 		},
 		{
-			"name": "Bulk change replace PlanStatus Reset Copy",
+			"name": "Bulk change replace PlanStatus Reset",
 			"event": [
 				{
 					"listen": "test",
@@ -4084,7 +4067,10 @@
 							"",
 							"pm.environment.unset(\"asset1\");",
 							"pm.environment.unset(\"asset2\");",
-							"pm.environment.unset(\"dataviewID\");"
+							"pm.environment.unset(\"dataviewID\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -4100,6 +4086,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
