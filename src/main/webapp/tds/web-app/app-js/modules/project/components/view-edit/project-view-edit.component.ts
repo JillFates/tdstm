@@ -368,13 +368,14 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: UserDateTimezoneComponent,
 			data: {
-				open: true,
-				projectTimeZone: this.projectModel.timeZone
+				shouldReturnData: true,
+				defaultTimeZone: this.projectModel.timeZone
 			},
 			modalConfiguration: {
 				title: 'Time Zone Select',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalCustomClass: 'custom-time-zone-dialog',
+				modalSize: ModalSize.CUSTOM
 			}
 		}).subscribe((data) => {
 			this.projectModel.timeZone = data.timezone;
