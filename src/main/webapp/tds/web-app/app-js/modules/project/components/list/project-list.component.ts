@@ -1,7 +1,7 @@
 // Angular
 import {
 	AfterContentInit,
-	Component, ComponentFactoryResolver,
+	Component, ComponentFactoryResolver, OnDestroy,
 	OnInit,
 	ViewChild,
 } from '@angular/core';
@@ -38,8 +38,8 @@ import {CellClickEvent} from '@progress/kendo-angular-grid';
 	selector: `project-list`,
 	templateUrl: 'project-list.component.html',
 })
-export class ProjectListComponent implements OnInit, AfterContentInit {
-	// ---------
+export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy {
+
 	private gridRowActions: GridRowAction[];
 
 	private headerActions: HeaderActionButtonData[];
@@ -62,6 +62,8 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	public showActive: boolean;
 	private projectToOpen: string;
 	private projectOpen = false;
+
+	private navigationSubscription;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -125,7 +127,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	ngAfterContentInit() {
 		this.projectToOpen = this.route.snapshot.queryParams['show'];
 		// The following code Listen to any change made on the route to reload the page
-		this.router.events.subscribe((event: any) => {
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
 			if (event && event.state && event.state && event.state.url.indexOf('/project/list') !== -1) {
 				this.projectToOpen = event.state.root.queryParams.show;
 			}
@@ -278,6 +280,15 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 			}
 		} catch (error) {
 			console.error(error);
+		}
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
 		}
 	}
 }

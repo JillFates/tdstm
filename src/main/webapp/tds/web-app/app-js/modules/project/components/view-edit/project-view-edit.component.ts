@@ -1,6 +1,6 @@
 // Angular
 import {
-	Component,
+	Component, ComponentFactoryResolver,
 	Input,
 	OnInit,
 	ViewChild
@@ -14,7 +14,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Store} from '@ngxs/store';
 import {SetProject} from '../../actions/project.actions';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
 import {ActionType} from '../../../dataScript/model/data-script.model';
 // Service
 import {ProjectService} from '../../service/project.service';
@@ -24,6 +24,7 @@ import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-fil
 // Others
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import * as R from 'ramda';
+import {Router} from '@angular/router';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -65,7 +66,9 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 	@ViewChild('completionDatePicker', {static: false}) completionDatePicker;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private dialogService: DialogService,
+		private router: Router,
 		private projectService: ProjectService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
@@ -119,6 +122,22 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 			action: this.cancelEdit.bind(this)
 		});
 
+		this.buttons.push({
+			name: 'fieldSettings',
+			text: 'Field Settings',
+			show: () => !this.editing,
+			type: DialogButtonType.CONTEXT,
+			action: this.openFieldSettings.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'planningDashboard',
+			text: 'Planning Dashboard',
+			show: () => !this.editing,
+			type: DialogButtonType.CONTEXT,
+			action: this.openPlanningDashboard.bind(this)
+		});
+
 		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.projectModel = new ProjectModel();
@@ -152,6 +171,22 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 			this.setTitle(this.getModalTitle());
 		});
 
+	}
+
+	/**
+	 * Open the Field Setting Pages
+	 */
+	public openFieldSettings(): void {
+		super.onCancelClose();
+		this.router.navigate(['/fieldsettings/list']);
+	}
+
+	/**
+	 * Open Planning Dashboard
+	 */
+	public openPlanningDashboard(): void {
+		super.onCancelClose();
+		this.router.navigate(['/planning/dashboard']);
 	}
 
 	// This is a work-around for firefox users
@@ -329,17 +364,21 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 	}
 
 	openTimezoneModal(): void {
-		// this.dialogService.extra(UserDateTimezoneComponent, [{
-		// 	provide: Boolean,
-		// 	useValue: true
-		// }, {
-		// 	provide: String,
-		// 	useValue: this.projectModel.timeZone
-		// }]).then(result => {
-		// 	this.projectModel.timeZone = result.timezone;
-		// }).catch(result => {
-		// 	console.log('Dismissed Dialog');
-		// });
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: UserDateTimezoneComponent,
+			data: {
+				open: true,
+				projectTimeZone: this.projectModel.timeZone
+			},
+			modalConfiguration: {
+				title: 'Time Zone Select',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((data) => {
+			this.projectModel.timeZone = data.timezone;
+		});
 	}
 
 	public onSelectFile(e?: any): void {
