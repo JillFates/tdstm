@@ -40,17 +40,17 @@
 
 			<div id="controlPanelId" class="graphPanel ">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
-					<tr title="Sets the asset to use as the root node">
+					<tr title="Filters which class of assets are searched Asset search above">
 						<td class="controlPanelControl" colspan="3">
-							<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" />
+							<input type="hidden" id="assetClassesId" name="assetClasses" class="filterScrollSelect" style="width:130px" />
 						</td>
 					</tr>
 				</table>
 				<form id="preferencesformId">
 					<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0" style="border: 0;" >
-						<tr title="Filters which class of assets are searched Asset search above">
+						<tr title="Sets the asset to use as the root node">
 							<td class="controlPanelControl" colspan="3">
-								<input type="hidden" id="assetClassesId" name="assetClasses" class="filterScrollSelect" style="width:130px" />
+								<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" />
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow up">
