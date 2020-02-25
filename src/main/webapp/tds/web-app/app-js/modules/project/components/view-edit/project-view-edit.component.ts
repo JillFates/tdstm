@@ -83,7 +83,7 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 		super();
 	}
 
-	async ngOnInit() {
+	ngOnInit() {
 		this.projectId = R.clone(this.data.projectModelId);
 		this.editing = (this.data.actionType === ActionType.EDIT);
 
@@ -385,7 +385,7 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 				modalSize: ModalSize.CUSTOM
 			}
 		}).subscribe((data) => {
-			if (data === DialogExit.ACCEPT) {
+			if (data.status === DialogExit.ACCEPT) {
 				this.projectModel.timeZone = data.timezone;
 			}
 		});

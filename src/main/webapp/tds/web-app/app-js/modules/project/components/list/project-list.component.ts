@@ -223,7 +223,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 				component: ProjectCreateComponent,
 				data: {},
 				modalConfiguration: {
-					title: 'Provider',
+					title: 'Project Create',
 					draggable: true,
 					modalSize: ModalSize.MD
 				}
