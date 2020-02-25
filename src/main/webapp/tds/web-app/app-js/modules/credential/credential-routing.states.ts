@@ -9,6 +9,12 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {CredentialListComponent} from './components/list/credential-list.component';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_PROJECT = 'menu-parent-project';
+
 export class CredentialStates {
 	public static readonly CREDENTIAL_LIST = {
 		url: 'list'
@@ -23,7 +29,8 @@ export const CredentialRoute: Routes = [
 			page: {
 				title: 'CREDENTIAL.CREDENTIALS',
 				instruction: '',
-				menu: ['GLOBAL.PROJECT', 'CREDENTIAL.CREDENTIALS']
+				menu: ['GLOBAL.PROJECT', 'CREDENTIAL.CREDENTIALS'],
+				topMenu: { parent: TOP_MENU_PARENT_PROJECT, child: 'menu-parent-projects-credentials', subMenu: true}
 			},
 			requiresAuth: true,
 		},
