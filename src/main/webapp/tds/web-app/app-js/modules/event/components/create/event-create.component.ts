@@ -1,17 +1,18 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {EventsService} from '../../service/events.service';
+// Angular
+import {Component, OnInit} from '@angular/core';
+// Model
 import {EventModel} from '../../model/event.model';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+// Service
+import {EventsService} from '../../service/events.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `event-create`,
 	templateUrl: 'event-create.component.html',
 })
-export class EventCreateComponent implements OnInit {
+export class EventCreateComponent extends Dialog implements OnInit {
 	public bundles: any[] = [];
 	public runbookStatuses: string[] = [];
 	public assetTags: any[] = [];
@@ -23,12 +24,29 @@ export class EventCreateComponent implements OnInit {
 
 	constructor(
 		private eventsService: EventsService,
-		private promptService: UIPromptService,
-		private translatePipe: TranslatePipe,
-		private activeDialog: UIActiveDialogService) {
+		private dialogService: DialogService,
+		private translatePipe: TranslatePipe) {
+		super();
 	}
 
 	ngOnInit() {
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => true,
+			disabled: () => !this.validateRequiredFields(this.eventModel),
+			type: DialogButtonType.ACTION,
+			action: this.saveForm.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
 		this.getModel();
 		this.eventModel = new EventModel();
 		this.defaultModel = {
@@ -45,16 +63,6 @@ export class EventCreateComponent implements OnInit {
 			apiActionBypass: false
 		};
 		this.eventModel = Object.assign({}, this.defaultModel, this.eventModel);
-	}
-
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
 	}
 
 	private getModel() {
@@ -77,7 +85,7 @@ export class EventCreateComponent implements OnInit {
 		if (DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
 			this.eventsService.saveEvent(this.eventModel).subscribe((result: any) => {
 				if (result.status === 'success') {
-					this.activeDialog.close();
+					super.onAcceptSuccess();
 				}
 			});
 		}
@@ -106,20 +114,24 @@ export class EventCreateComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.defaultModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.close();
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.activeDialog.close();
+			super.onCancelClose();
 		}
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

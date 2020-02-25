@@ -230,6 +230,7 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 
 	public switchToEdit(): void {
 		this.editing = true;
+		this.setTitle(this.getModalTitle());
 	}
 
 	private getModel(id): void {

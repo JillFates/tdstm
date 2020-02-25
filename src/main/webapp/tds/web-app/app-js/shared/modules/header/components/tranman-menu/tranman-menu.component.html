@@ -178,7 +178,9 @@
                         <a [routerLink]="['/event','list']" >List Events</a>
                     </li>
                     <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
-                        <a href="/tdstm/module/event/list?show={{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
+                        <a [routerLink]="['/event','list']" [queryParams]="{show:userContext.event.id}" class="mmlink">
+                            <span class="menu-link-event-name">Event Details</span>
+                        </a>
                     </li>
                     <li *ngIf="hasPermission(permission.NewsEdit)" class="menu-child-item menu-parent-planning-event-news">
                         <a href="/tdstm/newsEditor/newsEditorList">List Event News</a>
