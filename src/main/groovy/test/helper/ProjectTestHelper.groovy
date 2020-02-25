@@ -1,5 +1,6 @@
 package test.helper
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
@@ -12,6 +13,10 @@ import net.transitionmanager.common.Timezone
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.project.ProjectService
 import org.apache.commons.lang3.RandomStringUtils as RSU
+import org.jfree.util.Log
+
+import java.util.logging.Logger
+
 /**
  * Fetches, creates and does other helpful data preparation in the integration tests, doing the heavy lifting
  * for the ITs so that they an focus on the good stuff.
@@ -28,9 +33,31 @@ class ProjectTestHelper {
 
 	// Initialize
 	ProjectTestHelper() {
-		projectService = Holders.applicationContext.getBean('projectService')
-		partyRelationshipService = Holders.applicationContext.getBean('partyRelationshipService')
-	    bundleHelper = new MoveBundleTestHelper()
+		try {
+			projectService = Holders.applicationContext.getBean('projectService')
+			partyRelationshipService = Holders.applicationContext.getBean('partyRelationshipService')
+			bundleHelper = new MoveBundleTestHelper()
+		} catch (IllegalStateException ise) {
+			throw new IllegalStateException("""
+				** ProjectTestHelper *****
+				If you are trying to use this class to initialize a Spock @Shared instance or in the setupSpec() step
+				I've a bad notice for you: You can't do it! the Spring beans are initialized after the first run of the first integration test
+				You'll need to do it in the setup() step and add it as a singleton (We should change this to a SINGLETON!) initialization for
+				the Integration test to run by it's own (I got sick of having to run all the tests just to look for the one I actually want)
+				So feel free to copy the following code as a template when using this class in your own integration test while we change it to
+				something more straight forward (Traits, perhaps).
+				TY for reading, now we will continue failing your execution. have a nice day :)
+				
+				@Shared
+				test.helper.ProjectTestHelper projectTestHelper
+				...
+				def setup() {
+					if(!projectTestHelper) {
+						projectTestHelper = new test.helper.ProjectTestHelper()
+					}
+				...
+			""".stripIndent().trim(), ise)
+		}
 	}
 
 

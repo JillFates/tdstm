@@ -5,6 +5,7 @@ import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugins.mail.MailService
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.nicholaswilliams.java.licensing.License
 import net.nicholaswilliams.java.licensing.LicenseManager
@@ -31,6 +32,8 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.Resource
+
+import java.security.GeneralSecurityException
 
 @Slf4j
 class LicenseAdminService extends LicenseCommonService implements InitializingBean {
@@ -277,7 +280,23 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				String errorMessage = ''
 				int gracePeriodDays = 0
 
-				List<License> licenseObjs = licenses.findResults { DomainLicense lic -> getLicenseObj(lic) }
+				Date maxComplianceFutureDate = DomainLicense.complianceShiftDate()
+
+				List<License> licenseObjs = licenses.findResults { DomainLicense lic ->
+					try {
+						// Check if the las compliance Date has not been corrupted first
+						Date complianceDate = lic.getLastComplianceDate()
+						if ( maxComplianceFutureDate < complianceDate ) {
+							// the Date is above max expected compliance Date, it may be Hacked throw an Exception
+							throw new GeneralSecurityException("Compliance Date of the License seems to be compromised, contact your System Administrator")
+						}
+
+						return getLicenseObj(lic)
+					} catch (gse) {
+						lic.status = DomainLicense.Status.CORRUPT
+						lic.save()
+					}
+				}
 
 				licenseObjs = licenseObjs.findAll { License lic ->
 					Map jsonData       = JSON.parse(lic.subject)
@@ -323,6 +342,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 						return false
 					}
 
+					// last but not least all those licenses that are valid today (to check overlapped ones)
 					return (nowTime >= lic.goodAfterDate && nowTime <= lic.goodBeforeDate)
 
 				}
@@ -374,12 +394,17 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 
 				DomainLicense domLicense = DomainLicense.get(licState.domainLicId)
 				if ( numServers > licState.numberOfLicenses ) {
-					if (! domLicense.lastCompliance) {
-						domLicense.lastCompliance = now
-						domLicense.save()
+
+					// if stored last compliance is in valid future date lets set the last compliance Date to them all (in case of overlapped)
+					if ( domLicense.lastComplianceDate > now ) {
+						licenseObjs.each { lic ->
+							DomainLicense dl = DomainLicense.get( lic.productKey )
+							dl.lastComplianceDate(now)
+							dl.save()
+						}
 					}
 
-					licState.lastCompliantDate = domLicense.lastCompliance
+					licState.lastCompliantDate = now
 
 					int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
 					if( gracePeriod > 0 ) {
@@ -394,9 +419,13 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					}
 
 				} else {
-					if ( domLicense.lastCompliance ) {
-						domLicense.lastCompliance = null
-						domLicense.save()
+					if ( domLicense.lastComplianceDate < now ) {
+						Date futureDate = DomainLicense.complianceShiftDate()
+						licenseObjs.each { lic ->
+							DomainLicense dl = DomainLicense.get( lic.productKey )
+							dl.lastComplianceDate(futureDate)
+							dl.save()
+						}
 					}
 					licState.state = State.VALID
 					licState.message = ""
@@ -429,7 +458,9 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @return
 	 */
 	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate){
-		assert lastCompliantDate != null
+		if ( !lastCompliantDate ) {
+			throw new RuntimeException("Last Compliance Date Expected")
+		}
 		Date graceDate = DateUtils.addDays(lastCompliantDate, gracePeriodDays)
 		Date now = new Date()
 		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
