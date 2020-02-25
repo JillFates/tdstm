@@ -39,6 +39,7 @@ export class ProviderListComponent implements OnInit {
 	private gridSettings: GridSettings = {
 		defaultSort: [{field: 'name', dir: 'asc'}],
 		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,
