@@ -136,9 +136,11 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 			if (event && event.state && event.state && event.state.url.indexOf('/event/list') !== -1) {
 				this.eventToOpen = event.state.root.queryParams.show;
 			}
-			if (event instanceof NavigationEnd && this.eventToOpen && this.eventToOpen.length && !this.eventOpen) {
+			if (event instanceof NavigationEnd && this.eventToOpen && this.eventToOpen.length) {
 				setTimeout(() => {
-					this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+					if (!this.eventOpen) {
+						this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+					}
 				}, 500);
 			}
 		});
@@ -146,7 +148,9 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 		this.route.queryParams.subscribe(params => {
 			if (this.eventToOpen && !this.eventOpen) {
 				setTimeout(() => {
-					this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+					if (!this.eventOpen) {
+						this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+					}
 				}, 500);
 			}
 		});
@@ -231,6 +235,7 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 			if (event.name) {
 				this.store.dispatch(new SetEvent({id: event.id, name: event.name}));
 			}
+			this.eventOpen = true;
 			await this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
 				component: EventViewEditComponent,
@@ -245,6 +250,7 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 					modalSize: ModalSize.MD
 				}
 			}).toPromise();
+			this.eventOpen = false;
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			if (error) {
