@@ -137,7 +137,9 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 				this.eventToOpen = event.state.root.queryParams.show;
 			}
 			if (event instanceof NavigationEnd && this.eventToOpen && this.eventToOpen.length && !this.eventOpen) {
-				this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+				setTimeout(() => {
+					this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+				}, 500);
 			}
 		});
 
@@ -145,7 +147,7 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 			if (this.eventToOpen && !this.eventOpen) {
 				setTimeout(() => {
 					this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
-				});
+				}, 500);
 			}
 		});
 	}

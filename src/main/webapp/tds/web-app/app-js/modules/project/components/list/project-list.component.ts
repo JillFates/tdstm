@@ -133,7 +133,9 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 				this.projectToOpen = event.state.root.queryParams.show;
 			}
 			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length && !this.projectOpen) {
-				this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+				setTimeout(() => {
+					this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+				}, 500);
 			}
 		});
 
@@ -141,7 +143,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 			if (this.projectToOpen && !this.projectOpen) {
 				setTimeout(() => {
 					this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
-				});
+				}, 500);
 			}
 		});
 	}
