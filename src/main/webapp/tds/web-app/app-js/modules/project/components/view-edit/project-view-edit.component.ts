@@ -5,6 +5,7 @@ import {
 	OnInit,
 	ViewChild
 } from '@angular/core';
+import {Router} from '@angular/router';
 // Component
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
 // Model
@@ -14,7 +15,14 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Store} from '@ngxs/store';
 import {SetProject} from '../../actions/project.actions';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
 import {ActionType} from '../../../dataScript/model/data-script.model';
 // Service
 import {ProjectService} from '../../service/project.service';
@@ -24,7 +32,6 @@ import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-fil
 // Others
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import * as R from 'ramda';
-import {Router} from '@angular/router';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -378,7 +385,9 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 				modalSize: ModalSize.CUSTOM
 			}
 		}).subscribe((data) => {
-			this.projectModel.timeZone = data.timezone;
+			if (data === DialogExit.ACCEPT) {
+				this.projectModel.timeZone = data.timezone;
+			}
 		});
 	}
 

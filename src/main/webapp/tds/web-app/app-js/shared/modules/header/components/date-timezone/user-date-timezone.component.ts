@@ -1,5 +1,5 @@
 // Angular
-import {Component, HostListener, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 // Services
 import {HeaderService} from '../../services/header.service';
 import {PreferenceService} from '../../../../services/preference.service';
@@ -51,7 +51,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	// The timezone Pin is controlled by the Timezone picker, this helps to control it outside the jquery lib
 	public timezonePinShow = false;
 	// Local Data copy
-	private dateTimezoneData = '';
+	private dataSignature = '';
 
 	public defaultTimeZone: string;
 	public shouldReturnData: boolean;
@@ -91,18 +91,11 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 		this.getUserData();
 	}
 
-	@HostListener('window:keydown', ['$event'])
-	handleKeyboardEvent(event: KeyboardEvent) {
-		if (event.key === 'Escape') {
-			this.cancelCloseDialog();
-		}
-	}
-
 	/**
 	 * Close the Dialog
 	 */
 	public cancelCloseDialog(): void {
-		if (this.dateTimezoneData !== JSON.stringify({
+		if (this.dataSignature !== JSON.stringify({
 			timezone: this.selectedTimezone,
 			datetimeFormat: this.selectedTimeFormat
 		})) {
@@ -141,6 +134,10 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 					this.timezonePinShow = true;
 					setTimeout(() => {
 						jQuery(areaElement).triggerHandler('click');
+						this.dataSignature = JSON.stringify({
+							timezone: this.selectedTimezone,
+							datetimeFormat: this.selectedTimeFormat,
+						});
 					});
 				}
 			});
@@ -164,7 +161,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 						timezone: params.timezone,
 						dateFormat: params.datetimeFormat
 					})).subscribe(() => {
-						this.cancelCloseDialog();
+						this.onAcceptSuccess();
 						location.reload();
 					});
 				},
@@ -191,10 +188,6 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 				timezone =>
 					timezone.code === result[2][PREFERENCES_LIST.CURR_TZ]
 			);
-			this.dateTimezoneData = JSON.stringify({
-				timezone: this.selectedTimezone,
-				datetimeFormat: this.selectedTimeFormat,
-			});
 			let defaultTimeZone = this.timezonesList.find(
 				timezone => timezone.code === this.defaultTimeZone
 			);
@@ -233,6 +226,10 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 				this.onTimezoneSelected(this.selectedTimezone);
 			}
 			// Delay time to allow the Picker to be initialized
+			this.dataSignature = JSON.stringify({
+				timezone: this.selectedTimezone,
+				datetimeFormat: this.selectedTimeFormat,
+			});
 		});
 	}
 
