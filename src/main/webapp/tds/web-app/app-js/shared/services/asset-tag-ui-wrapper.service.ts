@@ -11,28 +11,28 @@ export class AssetTagUIWrapperService {
 	 * tags on the same cell.
 	 * */
 	updateTagsWidth(selector, toCleanSelector): void {
-		// let allTagsDivs = document.querySelectorAll(selector);
-		// document.querySelectorAll(toCleanSelector).forEach( node => {
-		// 	node.parentNode.removeChild(node);
-		// });
-		// allTagsDivs.forEach( el => {
-		// 	let castedEl = (<HTMLElement>el);
-		// 	let tags = castedEl.querySelectorAll('span');
-		// 	let allTagsWidth = 0;
-		// 	let bestFit = 0;
-		// 	if (tags.length > 1 ) {
-		// 		tags.forEach( tag => {
-		// 			allTagsWidth += tag.offsetWidth;
-		// 		});
-		// 		if (allTagsWidth > castedEl.offsetWidth) {
-		// 			bestFit = this.testBestFit(castedEl.offsetWidth, tags);
-		// 			let span = document.createElement('span');
-		// 			span.innerHTML = '...';
-		// 			span.className = 'dots-for-tags';
-		// 			castedEl.insertBefore( span, castedEl.children[bestFit]);
-		// 		}
-		// 	}
-		// });
+		let allTagsDivs = document.querySelectorAll(selector);
+		document.querySelectorAll(toCleanSelector).forEach( node => {
+			node.parentNode.removeChild(node);
+		});
+		allTagsDivs.forEach( el => {
+			let castedEl = (<HTMLElement>el);
+			let tags = castedEl.querySelectorAll('span');
+			let allTagsWidth = 0;
+			let bestFit = 0;
+			if (tags.length > 1 ) {
+				tags.forEach( tag => {
+					allTagsWidth += tag.offsetWidth;
+				});
+				if (allTagsWidth > castedEl.offsetWidth) {
+					bestFit = this.testBestFit(castedEl.offsetWidth, tags);
+					let span = document.createElement('span');
+					span.innerHTML = '...';
+					span.className = 'dots-for-tags';
+					castedEl.insertBefore( span, castedEl.children[bestFit]);
+				}
+			}
+		});
 	}
 
 	/**
