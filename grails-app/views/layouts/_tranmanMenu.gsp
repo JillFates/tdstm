@@ -292,12 +292,12 @@
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.RecipeView}">
                                     <li class="menu-child-item menu-parent-tasks-cookbook">
-                                        <g:link controller="cookbook" action="index">Cookbook</g:link>
+                                        <g:link controller="recipes" action="index">Recipes</g:link>
                                     </li>
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.RecipeGenerateTasks}">
                                     <li class="menu-child-item menu-parent-tasks-generation-history">
-                                        <a href="/tdstm/cookbook/index#/generationHistory">Generation History</a>
+                                        <a href="/tdstm/recipes/index#/generationHistory">Generation History</a>
                                     </li>
                                 </tds:hasPermission>
 
