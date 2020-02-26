@@ -163,6 +163,9 @@ tds-ui-dialog {
             }
           }
 
+          .tag-list-view {
+            display: block;
+          }
             .all-details + .tag-list-view {
               width: 100%;
             }
@@ -271,41 +274,51 @@ tds-ui-dialog {
               }
             }
           }
-
           .fit-tags-to-view {
-              height: 30px;
-            .tags-container {
-              height: 25px;
-              overflow: hidden;
-              margin-top: 2px;
-              margin-right: -15px;
-            }
-            .dots-for-tags {
-              display: inline-block;
-              margin: 2px;
-              vertical-align: baseline;
-              text-align: center;
-              width: auto;
-              font-weight: 600;
-              font-size: 11px;
-              padding-right: 30px;
-            }
+            overflow: hidden;
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             &:hover {
-            .tags-container {
-              height: auto;
               overflow: unset;
-            }
-            .label.tag {
-              margin-bottom: 3px;
-              width: auto;
-              display: inline-block;
-            }
-            .dots-for-tags {
-              display: none;
-              padding-right: 10px;
-            }
+              white-space: unset;
             }
           }
+
+          //.fit-tags-to-view {
+            //  height: 30px;
+            //.tags-container {
+            //  height: 25px;
+            //  overflow: hidden;
+            //  margin-top: 2px;
+            //  margin-right: -15px;
+            //}
+            //.dots-for-tags {
+            //  display: inline-block;
+            //  margin: 2px;
+            //  vertical-align: baseline;
+            //  text-align: center;
+            //  width: auto;
+            //  font-weight: 600;
+            //  font-size: 11px;
+            //  padding-right: 30px;
+            //}
+            //&:hover {
+            //.tags-container {
+            //  height: auto;
+            //  overflow: unset;
+            //}
+            //.label.tag {
+            //  margin-bottom: 3px;
+            //  width: auto;
+            //  display: inline-block;
+            //}
+            //.dots-for-tags {
+            //  display: none;
+            //  padding-right: 10px;
+            //}
+            //}
+          //}
 
           // tds-diagram-layout styling in body
           .modal-body-graph {
