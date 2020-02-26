@@ -158,9 +158,16 @@ tds-ui-dialog {
             &.three-column {
               grid-template-columns: 32% 32% 32%;
             }
+            &.three-column + .tag-list-edit {
+              width: 100%;
+            }
           }
 
-          .tdr-detail-list {
+            .all-details + .tag-list-view {
+              width: 100%;
+            }
+
+            .tdr-detail-list {
             tbody {
               display: flex;
               flex-wrap: wrap;

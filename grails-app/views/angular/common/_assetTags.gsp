@@ -1,5 +1,5 @@
 <!-- Asset Tags -->
-<table class="tdr-detail-list">
+<table class="tdr-detail-list tag-list-view">
     <tr>
         <th class="N">Tags</th>
         <td class="fit-tags-to-view">

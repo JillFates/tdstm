@@ -3,7 +3,7 @@
     top: 0px;
 }
 </style>
-<table class="tdr-detail-list">
+<table class="tdr-detail-list tag-list-edit">
     <tr>
         <th class="N">Tags</th>
         <td>
