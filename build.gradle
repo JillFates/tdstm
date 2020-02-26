@@ -17,7 +17,7 @@ plugins {
 	id "org.asciidoctor.convert" version "1.5.3"
 }
 
-version "4.7.2-RC3"
+version "4.7.2-RC4"
 group "tdstm"
 
 apply plugin: "eclipse"
