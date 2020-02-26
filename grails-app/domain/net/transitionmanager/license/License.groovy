@@ -46,7 +46,7 @@ class License {
 	Date 		lastUpdated
 
 	/** Last time that we saw this License in compliance (number of servers or other constraints) */
-	String 		lastComplianceHash
+	String 		lastComplianceHash = License.complianceShiftDate()
 
 	static mapping = {
 		id 			generator: 'assigned'
