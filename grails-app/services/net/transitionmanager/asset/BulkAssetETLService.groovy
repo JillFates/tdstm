@@ -82,7 +82,7 @@ class BulkAssetETLService implements ServiceMethods {
 	 * @param queryFilter The query filter to use if ther are no assetIds.
 	 * @param currentProject, the project to get assets for.
 	 *
-	 * @return A list Of assets to use in the builk ETL.
+	 * @return A list Of assets to use in the bulk ETL.
 	 */
 	List<AssetEntity> getAssets(List<Long> ids, Map queryFilter, Project currentProject) {
 		String queryForAssetIds
@@ -126,20 +126,19 @@ class BulkAssetETLService implements ServiceMethods {
 				if (asset.hasProperty(key)) {
 					def value = asset."$key"
 
-					if (value != null) {
-						switch (value) {
-							case String || Number || Date || Boolean:
-								break
-							case Enum:
-								value = value.name()
-								break
-							case { GormUtil.isDomainClass(it) }:
-								value = value.id
-								break
-						}
-
-						updatedRow[label] = value
+					switch (value) {
+						case String || Number || Date || Boolean:
+							break
+						case Enum:
+							value = value.name()
+							break
+						case { GormUtil.isDomainClass(it) }:
+							value = value.id
+							break
 					}
+
+					updatedRow[label] = value
+
 				}
 			}
 
