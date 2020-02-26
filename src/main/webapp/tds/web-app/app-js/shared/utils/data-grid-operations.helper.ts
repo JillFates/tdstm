@@ -394,8 +394,10 @@ export class DataGridOperationsHelper {
 	public onFilterWithValue(value: any, column: GridColumnModel, operator?: string): void {
 		column.filter = value;
 		let root = this.getFilter(column, operator);
-		root = this.removeEmptyFilters(root, column) ;
-		this.filterChange(root);
+		if (root) {
+			root = this.removeEmptyFilters(root, column);
+			this.filterChange(root);
+		}
 	}
 
 	/**
