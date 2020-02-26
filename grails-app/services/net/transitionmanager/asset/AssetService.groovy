@@ -37,6 +37,7 @@ class AssetService {
 			case "APPLICATION":
 				assetModel = applicationService.getModelForCreate()
                 model.criticalityOptions = Application.CRITICALITY
+				model.personList = assetModel.personList
 				break
 			case "DATABASE":
 				assetModel = databaseService.getModelForCreate()

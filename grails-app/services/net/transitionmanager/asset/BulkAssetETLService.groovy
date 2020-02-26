@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tdsops.tm.enums.domain.AssetClass
+
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
@@ -82,7 +82,7 @@ class BulkAssetETLService implements ServiceMethods {
 	 * @param queryFilter The query filter to use if ther are no assetIds.
 	 * @param currentProject, the project to get assets for.
 	 *
-	 * @return A list Of assets to use in the builk ETL.
+	 * @return A list Of assets to use in the bulk ETL.
 	 */
 	List<AssetEntity> getAssets(List<Long> ids, Map queryFilter, Project currentProject) {
 		String queryForAssetIds
@@ -123,9 +123,9 @@ class BulkAssetETLService implements ServiceMethods {
 			fieldMapping[asset.assetClass.name()].each { String key, Map mapValue ->
 				String label = mapValue?.label ?: key
 
-				def value = asset."$key"
+				if (asset.hasProperty(key)) {
+					def value = asset."$key"
 
-				if (value != null) {
 					switch (value) {
 						case String || Number || Date || Boolean:
 							break
@@ -138,6 +138,7 @@ class BulkAssetETLService implements ServiceMethods {
 					}
 
 					updatedRow[label] = value
+
 				}
 			}
 

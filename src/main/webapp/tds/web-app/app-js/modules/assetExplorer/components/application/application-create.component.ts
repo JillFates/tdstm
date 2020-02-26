@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit, AfterViewInit} from '@angular/core';
+import {Component, Inject, OnInit, AfterViewInit, ViewChild} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
@@ -41,6 +41,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			sme2: null,
 			appOwner: null
 		};
+
+		@ViewChild('controlSME1') public controlSME1: any;
+		@ViewChild('controlSME2') public controlSME2: any;
+		@ViewChild('controlAppOwner') public controlAppOwner: any;
 
 		constructor(
 			@Inject('model') model: any,
@@ -174,6 +178,15 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		}
 
 		/**
+		 * On focus open the dropdown
+		 */
+		public focusSME1(): void {
+			this.controlSME1.toggle(true);
+			this.controlSME2.toggle(false);
+			this.controlAppOwner.toggle(false);
+		}
+
+		/**
 		 * Search and copy over the Person List for SME 2
 		 * @param filter
 		 */
@@ -181,6 +194,15 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.model.sme2PersonList = this.model.sourcePersonList.filter((s) => {
 				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
 			});
+		}
+
+		/**
+		 * On focus open the dropdown
+		 */
+		public focusSME2(): void {
+			this.controlSME1.toggle(false);
+			this.controlSME2.toggle(true);
+			this.controlAppOwner.toggle(false);
 		}
 
 		/**
@@ -194,20 +216,43 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		}
 
 		/**
-		 * Open the dialog to allow create a person
-		 * @param {any}  person Contains the info related to the asset in which the person will be  created
-		 * @param {string}  fieldName Contains the field asset type
-		 * @param {any[]}  companies List of companies to display
-		 * @param {any[]}  teams List of teams to display
-		 * @param {any[]}  staffTypes List of staffs types to display
-		 * @returns {void}
+		 * On focus open the dropdown
 		 */
-		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
+		public focusAppOwner(): void {
+			this.controlSME1.toggle(false);
+			this.controlSME2.toggle(false);
+			this.controlAppOwner.toggle(true);
+		}
+
+		public onClose(event: any, dropdownlist: any): void {
+			event.preventDefault();
+			// Close the list if the component is no longer focused
+			setTimeout(() => {
+				if (!dropdownlist.wrapper.nativeElement.contains(document.activeElement)) {
+					dropdownlist.toggle(false);
+				}
+			});
+		}
+
+		/**
+		 * Add the person to the Asset Model, if the Person is "Add Person" it invokes the Dialog to add a new one
+		 * @param person
+		 * @param asset
+		 * @param fieldName
+		 * @param companies
+		 * @param teams
+		 * @param staffTypes
+		 * @param modelListParameter
+		 * @param dropdown
+		 */
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string, dropdown: any): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
+				dropdown.toggle(false);
 				return;
 			}
 
+			dropdown.toggle(false);
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;
@@ -223,7 +268,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 					PersonService
 				], false, true)
 				.then((result) => {
-					this.personList.push({personId: result.id, fullName: result.name})
+					if (this.model.sourcePersonList && this.model[modelListParameter]) {
+						this.model.sourcePersonList.push({personId: result.id, fullName: result.name});
+						this.model[modelListParameter].push({personId: result.id, fullName: result.name});
+					}
 					this.model.asset[fieldName].id = result.id;
 					this.updatePersonReferences();
 				})
