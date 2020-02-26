@@ -1,9 +1,9 @@
-import {Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {Component, HostListener, Inject, OnInit, ViewChild} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';

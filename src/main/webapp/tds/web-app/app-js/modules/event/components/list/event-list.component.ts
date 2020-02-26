@@ -8,6 +8,7 @@ import {
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 // Store
 import {Store} from '@ngxs/store';
+import {UserContextState} from '../../../auth/state/user-context.state';
 // Model
 import {EventColumnModel, EventModel} from '../../model/event.model';
 import {
@@ -164,8 +165,7 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 
 	public loadData = async (): Promise<EventModel[]> => {
 		try {
-			let data = await this.eventService.getEventsForList().toPromise();
-			return data;
+			return await this.eventService.getEventsForList().toPromise();
 		} catch (error) {
 			if (error) {
 				console.error(error);
@@ -187,7 +187,11 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 					this.eventsService.deleteEvent(dataItem.id).toPromise();
 					await this.gridComponent.reloadData();
 					setTimeout(() => {
-						this.store.dispatch(new SetEvent(null));
+						// If the Delete Item is the one selected, remove it from the Storage
+						const event = this.store.selectSnapshot(UserContextState.getUserEvent);
+						if (event.id === dataItem.id) {
+							this.store.dispatch(new SetEvent(null));
+						}
 					});
 				}
 			}
