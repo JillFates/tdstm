@@ -23,7 +23,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {EventModel} from '../../../event/model/event.model';
 import {ProviderModel} from '../../../provider/model/provider.model';
 // Component
-import {EventCreateComponent} from '../../../event/components/create/event-create.component';
+import {BundleCreateComponent} from '../create/bundle-create.component';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
@@ -169,7 +169,7 @@ export class BundleListComponent implements OnInit, AfterContentInit, OnDestroy 
 		try {
 			await this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
-				component: EventCreateComponent,
+				component: BundleCreateComponent,
 				data: {},
 				modalConfiguration: {
 					title: 'Bundle Create',

@@ -197,7 +197,9 @@
                             <a [routerLink]="['/bundle','list']">List Bundles</a>
                     </li>
                     <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
-                        <a href="/tdstm/module/bundle/list/?show={{userContext.bundle.id}}">Bundle Details - {{userContext.bundle.name}}</a>
+                        <a [routerLink]="['/bundle','list']" [queryParams]="{show:userContext.bundle.id}" class="mmlink">
+                            <span class="menu-link-bundle-name">Bundle Details - {{userContext.bundle.name}}</span>
+                        </a>
                     </li>
                 </ul>
             </li>
