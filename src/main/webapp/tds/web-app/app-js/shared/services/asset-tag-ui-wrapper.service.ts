@@ -62,7 +62,6 @@ export class AssetTagUIWrapperService {
 	 * @param {string} parentSelector in this case, used for
 	 **/
 	updateTagsWidthForAssetShowView(selector, toCleanSelector, parentSelector): void {
-		/*
 		let allTagsDivs = document.querySelectorAll(selector);
 		document.querySelectorAll(toCleanSelector).forEach( node => {
 			node.parentNode.removeChild(node);
@@ -86,6 +85,5 @@ export class AssetTagUIWrapperService {
 				}
 			}
 		});
-		 */
 	};
 }

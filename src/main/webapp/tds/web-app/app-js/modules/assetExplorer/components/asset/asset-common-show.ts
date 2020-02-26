@@ -21,7 +21,7 @@ import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui
 
 declare var jQuery: any;
 
-export class AssetCommonShow implements OnInit, AfterContentInit {
+export class AssetCommonShow implements OnInit {
 
 	protected userDateFormat: string;
 	protected userTimeZone: string;
@@ -69,16 +69,6 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 	 */
 	ngOnInit(): void {
 		jQuery('[data-toggle="popover"]').popover();
-	}
-
-	ngAfterContentInit(): void {
-		// setTimeout(() => {
-		// 	let tagsDiv = <HTMLElement>document.querySelector('.tags-container');
-		// 	let tableRow = <HTMLElement>document.querySelector('.one-column');
-		// 	let tableRowSiblingWidth = <HTMLElement>(<HTMLElement>document.querySelector('.fit-tags-to-view')).previousSibling;
-		// 	tagsDiv.style.width = (tableRow.offsetWidth - tableRowSiblingWidth.offsetWidth) + 'px';
-		// 	this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
-		// }, 500);
 	}
 
 	cancelCloseDialog(): void {
