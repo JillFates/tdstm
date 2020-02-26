@@ -1,6 +1,6 @@
 // Angular
-import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {AfterContentInit, Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 // Store
 import {Store} from '@ngxs/store';
 import {UserContextState} from '../../../auth/state/user-context.state';
@@ -36,7 +36,7 @@ import {CellClickEvent} from '@progress/kendo-angular-grid';
 	selector: `bundle-list`,
 	templateUrl: 'bundle-list.component.html',
 })
-export class BundleListComponent implements OnInit {
+export class BundleListComponent implements OnInit, AfterContentInit, OnDestroy {
 	public gridRowActions: GridRowAction[];
 
 	public headerActions: HeaderActionButtonData[];
@@ -55,6 +55,7 @@ export class BundleListComponent implements OnInit {
 	protected gridModel: GridModel;
 	protected dateFormat = '';
 
+	private navigationSubscription;
 	private bundleToOpen: string;
 	private bundleOpen = false;
 
@@ -68,6 +69,7 @@ export class BundleListComponent implements OnInit {
 		private bundleService: BundleService,
 		private translateService: TranslatePipe,
 		private store: Store,
+		private router: Router,
 		private route: ActivatedRoute
 	) {
 	}
@@ -120,9 +122,36 @@ export class BundleListComponent implements OnInit {
 		this.gridModel.columnModel = this.columnModel;
 	}
 
+	ngAfterContentInit() {
+		this.bundleToOpen = this.route.snapshot.queryParams['show'];
+		// The following code Listen to any change made on the route to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event && event.state && event.state && event.state.url.indexOf('/bundle/list') !== -1) {
+				this.bundleToOpen = event.state.root.queryParams.show;
+			}
+			if (event instanceof NavigationEnd && this.bundleToOpen && this.bundleToOpen.length) {
+				setTimeout(() => {
+					if (!this.bundleOpen) {
+						this.openBundle({id: parseInt(this.bundleToOpen, 10)}, ActionType.VIEW);
+					}
+				}, 500);
+			}
+		});
+
+		this.route.queryParams.subscribe(params => {
+			if (this.bundleToOpen) {
+				setTimeout(() => {
+					if (!this.bundleOpen) {
+						this.openBundle({id: parseInt(this.bundleToOpen, 10)}, ActionType.VIEW);
+					}
+				}, 500);
+			}
+		});
+	}
+
 	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0 && this.isEditAvailable()) {
-			await this.openBundle(event.dataItem, ActionType.EDIT, false);
+			await this.openBundle(event.dataItem, ActionType.VIEW, false);
 		}
 	}
 
@@ -207,7 +236,7 @@ export class BundleListComponent implements OnInit {
 				componentFactoryResolver: this.componentFactoryResolver,
 				component: BundleViewEditComponent,
 				data: {
-					eventId: bundle.id,
+					bundleId: bundle.id,
 					actionType: actionType,
 					openFromList: openFromList
 				},
@@ -238,5 +267,14 @@ export class BundleListComponent implements OnInit {
 	 */
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.BundleCreate);
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 }

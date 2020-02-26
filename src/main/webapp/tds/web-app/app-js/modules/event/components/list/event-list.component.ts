@@ -147,7 +147,7 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 		});
 
 		this.route.queryParams.subscribe(params => {
-			if (this.eventToOpen && !this.eventOpen) {
+			if (this.eventToOpen) {
 				setTimeout(() => {
 					if (!this.eventOpen) {
 						this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
@@ -159,7 +159,7 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 
 	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0 && this.isEditAvailable()) {
-			await this.openEvent(event.dataItem, ActionType.EDIT, false);
+			await this.openEvent(event.dataItem, ActionType.VIEW, false);
 		}
 	}
 

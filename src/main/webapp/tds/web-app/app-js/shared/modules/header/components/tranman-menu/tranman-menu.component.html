@@ -179,7 +179,7 @@
                     </li>
                     <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
                         <a [routerLink]="['/event','list']" [queryParams]="{show:userContext.event.id}" class="mmlink">
-                            <span class="menu-link-event-name">Event Details</span>
+                            <span class="menu-link-event-name">Event Details - {{userContext.event.name}}</span>
                         </a>
                     </li>
                     <li *ngIf="hasPermission(permission.NewsEdit)" class="menu-child-item menu-parent-planning-event-news">
@@ -197,7 +197,7 @@
                             <a [routerLink]="['/bundle','list']">List Bundles</a>
                     </li>
                     <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
-                        <a href="/tdstm/module/bundle/list/?show={{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
+                        <a href="/tdstm/module/bundle/list/?show={{userContext.bundle.id}}">Bundle Details - {{userContext.bundle.name}}</a>
                     </li>
                 </ul>
             </li>

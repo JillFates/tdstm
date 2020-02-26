@@ -13,6 +13,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 import * as R from 'ramda';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 
 @Component({
 	selector: `event-view-edit-component`,
@@ -50,6 +51,7 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 
 	ngOnInit() {
 		this.eventId = R.clone(this.data.eventId);
+		this.editing = this.data.actionType === ActionType.EDIT;
 
 		this.buttons.push({
 			name: 'edit',
