@@ -18,13 +18,21 @@ databaseChangeLog = {
     }
 
     changeSet(author: 'oluna', id: '20200206 TM-16920-2') {
-        comment("Add NOT NULL constraint to lastCompliance column in License table")
-
-        def licenses = License.findAllByLastComplianceHashIsNull()
-        licenses.each { lic ->
-            lic.settleCompliance()
+        comment("Initialize Date compliance in License table")
+        grailsChange {
+            change {
+                def licenses = License.findAllByLastComplianceHashIsNull()
+                licenses?.each { lic ->
+                    lic.settleCompliance()
+                    lic.save()
+                }
+            }
         }
-
-        addNotNullConstraint(tableName: "license", columnName: "last_compliance_hash")
     }
+
+    changeSet(author: 'oluna', id: '20200206 TM-16920-3') {
+        comment("Add NOT NULL constraint to last_compliance_hash column in License table")
+        addNotNullConstraint(tableName: 'license', columnName: 'last_compliance_hash', columnDataType: 'varchar(255)')
+    }
+
 }

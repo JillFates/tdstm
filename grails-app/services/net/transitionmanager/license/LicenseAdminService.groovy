@@ -285,16 +285,17 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				List<License> licenseObjs = licenses.findResults { DomainLicense lic ->
 					try {
 						// Check if the las compliance Date has not been corrupted first
-						Date complianceDate = lic.getLastComplianceDate()
+						Date complianceDate = lic.lastComplianceDate()
 						if ( maxComplianceFutureDate < complianceDate ) {
 							// the Date is above max expected compliance Date, it may be Hacked throw an Exception
 							throw new GeneralSecurityException("Compliance Date of the License seems to be compromised, contact your System Administrator")
 						}
 
 						return getLicenseObj(lic)
-					} catch (gse) {
+					} catch (GeneralSecurityException gse) {
 						lic.status = DomainLicense.Status.CORRUPT
 						lic.save()
+						return null
 					}
 				}
 
@@ -343,8 +344,14 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					}
 
 					// last but not least all those licenses that are valid today (to check overlapped ones)
-					return (nowTime >= lic.goodAfterDate && nowTime <= lic.goodBeforeDate)
-
+					if (nowTime >= lic.goodAfterDate && nowTime <= lic.goodBeforeDate) { // License is good
+						return true
+					} else { // License Expired
+						DomainLicense dl = DomainLicense.get(lic.productKey)
+						dl.status = DomainLicense.Status.EXPIRED
+						dl.save()
+						return false;
+					}
 				}
 
 				Map stackedlicense = licenseObjs.inject([
@@ -396,7 +403,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				if ( numServers > licState.numberOfLicenses ) {
 
 					// if stored last compliance is in valid future date lets set the last compliance Date to them all (in case of overlapped)
-					if ( domLicense.lastComplianceDate > now ) {
+					if ( domLicense.lastComplianceDate() > now ) {
 						licenseObjs.each { lic ->
 							DomainLicense dl = DomainLicense.get( lic.productKey )
 							dl.lastComplianceDate(now)
@@ -419,7 +426,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					}
 
 				} else {
-					if ( domLicense.lastComplianceDate < now ) {
+					if ( domLicense.lastComplianceDate() < now ) {
 						Date futureDate = DomainLicense.complianceShiftDate()
 						licenseObjs.each { lic ->
 							DomainLicense dl = DomainLicense.get( lic.productKey )

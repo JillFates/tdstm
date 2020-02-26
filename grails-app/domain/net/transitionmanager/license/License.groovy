@@ -68,7 +68,7 @@ class License {
 		lastComplianceHash	nullable:false, blank: false
 	}
 
-	static transients = [ 'projectInstance', 'lastComplianceDate' ]
+	static transients = [ 'projectInstance' ]
 
 	boolean isActive(){
 		return (hash)? true : false
@@ -79,9 +79,7 @@ class License {
 	 * @author oluna
 	 */
 	void settleCompliance() {
-		use( TimeCategory ) {
-			setLastComplianceDate( complianceShiftDate() )
-		}
+		lastComplianceDate( complianceShiftDate() )
 	}
 
 	/**
@@ -102,8 +100,8 @@ class License {
 	 * @return Date last compliance of the license
 	 * @throws GeneralSecurityException
 	 */
-	Date getLastComplianceDate() throws GeneralSecurityException {
-		String epochStr = AESCodec.getInstance().decode(lastComplianceHash, id)
+	Date lastComplianceDate() throws GeneralSecurityException {
+		String epochStr = AESCodec.getInstance().decode(lastComplianceHash ?: '', id)
 		return new Date(epochStr.toLong())
 	}
 
@@ -111,10 +109,10 @@ class License {
 	 * Establish a fix date as the last compliance date and encrypt it
 	 * @param date to set
 	 */
-	void setLastComplianceDate( Date date ) {
+	void lastComplianceDate( Date date ) {
 		long epochTime = date.time
 		String epochStr = "${epochTime}"
-		lastComplianceHash = AESCodec.getInstance().encode(epochStr, id)
+		setLastComplianceHash( AESCodec.getInstance().encode(epochStr, id) )
 	}
 
 	PartyGroup getClient(){
