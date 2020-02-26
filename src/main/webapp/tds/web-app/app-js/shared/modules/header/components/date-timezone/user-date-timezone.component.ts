@@ -1,23 +1,21 @@
 // Angular
-import { Component, HostListener, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 // Services
-import { HeaderService } from '../../services/header.service';
-import {
-	UIActiveDialogService,
-	UIExtraDialog,
-} from '../../../../services/ui-dialog.service';
-import { PreferenceService } from '../../../../services/preference.service';
-import { UIPromptService } from '../../../../directives/ui-prompt.directive';
+import {HeaderService} from '../../services/header.service';
+import {PreferenceService} from '../../../../services/preference.service';
 // Models
-import { PREFERENCES_LIST } from '../../../../services/preference.service';
+import {PREFERENCES_LIST} from '../../../../services/preference.service';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import {SetTimeZoneAndDateFormat} from '../../../../../modules/auth/action/timezone-dateformat.actions';
 // Utils
-import { DateUtils } from '../../../../utils/date.utils';
-import { SortUtils } from '../../../../utils/sort.utils';
-import { forkJoin } from 'rxjs/observable/forkJoin';
-import { Observable } from 'rxjs';
-import { TranslatePipe } from '../../../../pipes/translate.pipe';
-import { Store } from '@ngxs/store';
-import { SetTimeZoneAndDateFormat } from '../../../../../modules/auth/action/timezone-dateformat.actions';
+import {DateUtils} from '../../../../utils/date.utils';
+import {SortUtils} from '../../../../utils/sort.utils';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {Store} from '@ngxs/store';
+// Other
+import {forkJoin} from 'rxjs/observable/forkJoin';
+import {Observable} from 'rxjs';
+import * as R from 'ramda';
 
 declare var jQuery: any;
 // Work-around for deprecated jQuery functionality
@@ -35,7 +33,9 @@ jQuery.browser = {};
 	selector: 'date-timezone-modal',
 	templateUrl: 'user-date-timezone.component.html',
 })
-export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
+export class UserDateTimezoneComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	public currentUserName;
 	// List of elements to show on the Map
 	public mapAreaList = [];
@@ -46,69 +46,74 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 		DateUtils.PREFERENCE_MIDDLE_ENDIAN,
 		DateUtils.PREFERENCE_LITTLE_ENDIAN,
 	];
-	public selectedTimezone = { id: 411, code: 'GMT', label: 'GMT' };
+	public selectedTimezone = {id: 411, code: 'GMT', label: 'GMT'};
 	public selectedTimeFormat;
 	// The timezone Pin is controlled by the Timezone picker, this helps to control it outside the jquery lib
 	public timezonePinShow = false;
 	// Local Data copy
-	private dateTimezoneData = '';
+	private dataSignature = '';
+
+	public defaultTimeZone: string;
+	public shouldReturnData: boolean;
 
 	constructor(
-		public shouldReturnData: Boolean,
-		public defaultTimeZone: string,
+		private dialogService: DialogService,
 		private headerService: HeaderService,
 		private preferenceService: PreferenceService,
 		private translatePipe: TranslatePipe,
-		private promptService: UIPromptService
-		,
 		private store: Store) {
-		super('#datetime-modal');
+		super();
 	}
 
 	/**
 	 * Initialize the jQuery Time Picker
 	 */
 	ngOnInit(): void {
-		this.getUserData();
-	}
+		this.shouldReturnData = this.data.shouldReturnData;
+		this.defaultTimeZone = R.clone(this.data.defaultTimeZone);
 
-	@HostListener('window:keydown', ['$event'])
-	handleKeyboardEvent(event: KeyboardEvent) {
-		if (event.key === 'Escape') {
-			this.cancelCloseDialog();
-		}
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.onSave.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.getUserData();
 	}
 
 	/**
 	 * Close the Dialog
 	 */
 	public cancelCloseDialog(): void {
-		if (
-			this.dateTimezoneData !==
-			JSON.stringify({
-				timezone: this.selectedTimezone,
-				datetimeFormat: this.selectedTimeFormat,
-			})
-		) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
+		if (this.dataSignature !== JSON.stringify({
+			timezone: this.selectedTimezone,
+			datetimeFormat: this.selectedTimeFormat
+		})) {
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
 				)
-				.then(confirm => {
-					if (confirm) {
-						this.dismiss();
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
 					}
-				})
-				.catch(error => console.log(error));
+				});
 		} else {
-			this.dismiss();
+			super.onCancelClose();
 		}
 	}
 
@@ -124,11 +129,15 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 			.find('area')
 			.each((m, areaElement) => {
 				// Find the timezone attribute from the map itself
-				if ( areaElement.getAttribute('data-timezone') === timezone.code) {
+				if (areaElement.getAttribute('data-timezone') === timezone.code) {
 					// Emulate the click to get the PIN in place
 					this.timezonePinShow = true;
 					setTimeout(() => {
 						jQuery(areaElement).triggerHandler('click');
+						this.dataSignature = JSON.stringify({
+							timezone: this.selectedTimezone,
+							datetimeFormat: this.selectedTimeFormat,
+						});
 					});
 				}
 			});
@@ -143,7 +152,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 			datetimeFormat: this.selectedTimeFormat,
 		};
 		if (this.shouldReturnData) {
-			this.close(params);
+			this.onAcceptSuccess(params);
 		} else {
 			this.headerService.saveDateAndTimePreferences(params).subscribe(
 				(result: any) => {
@@ -152,7 +161,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 						timezone: params.timezone,
 						dateFormat: params.datetimeFormat
 					})).subscribe(() => {
-						this.cancelCloseDialog();
+						this.onAcceptSuccess();
 						location.reload();
 					});
 				},
@@ -179,10 +188,6 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 				timezone =>
 					timezone.code === result[2][PREFERENCES_LIST.CURR_TZ]
 			);
-			this.dateTimezoneData = JSON.stringify({
-				timezone: this.selectedTimezone,
-				datetimeFormat: this.selectedTimeFormat,
-			});
 			let defaultTimeZone = this.timezonesList.find(
 				timezone => timezone.code === this.defaultTimeZone
 			);
@@ -221,6 +226,10 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 				this.onTimezoneSelected(this.selectedTimezone);
 			}
 			// Delay time to allow the Picker to be initialized
+			this.dataSignature = JSON.stringify({
+				timezone: this.selectedTimezone,
+				datetimeFormat: this.selectedTimeFormat,
+			});
 		});
 	}
 
@@ -248,5 +257,12 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 				err => console.log(err)
 			);
 		});
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

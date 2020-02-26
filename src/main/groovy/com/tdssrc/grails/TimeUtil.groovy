@@ -841,7 +841,7 @@ class TimeUtil {
 	 * @return the adjusted date
 	 */
 	@CompileStatic
-	private static Date adjustDateFromGMTToTZ(Date date, String toTZ) {
+	static Date adjustDateFromGMTToTZ(Date date, String toTZ) {
 		if (toTZ == defaultTimeZone) {
 			date
 		} else {

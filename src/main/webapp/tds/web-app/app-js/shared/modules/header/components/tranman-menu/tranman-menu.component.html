@@ -77,21 +77,21 @@
                     <li *ngIf="hasPermission(permission.ProjectFieldSettingsView)" class="menu-child-item menu-projects-field-settings">
                         <a [routerLink]="['/fieldsettings','list']">Asset Field Settings</a>
                     </li>
-                    <li class="menu-child-item menu-projects-tags">
+                    <li class="menu-child-item menu-parent-projects-tags">
                         <a [routerLink]="['/tag','list']">Tags</a>
                     </li>
                     <li class="divider"></li>
 
-                    <li class="menu-child-item ">
+                    <li class="menu-child-item menu-parent-projects-providers">
                         <a [routerLink]="['/provider','list']">Providers</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.CredentialView)" class="menu-child-item ">
+                    <li *ngIf="hasPermission(permission.CredentialView)" class="menu-child-item menu-parent-projects-credentials">
                         <a [routerLink]="['/credential','list']">Credentials</a>
                     </li>
-                    <li class="menu-child-item ">
+                    <li class="menu-child-item menu-parent-projects-etl-scripts">
                         <a [routerLink]="['/datascript','list']">ETL Scripts</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.ActionEdit)" class="menu-child-item ">
+                    <li *ngIf="hasPermission(permission.ActionEdit)" class="menu-child-item menu-parent-projects-api-actions">
                         <a [routerLink]="['/action','list']">Actions</a>
                     </li>
                 </ul>
@@ -178,7 +178,9 @@
                         <a [routerLink]="['/event','list']" >List Events</a>
                     </li>
                     <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
-                        <a href="/tdstm/module/event/list?show={{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
+                        <a [routerLink]="['/event','list']" [queryParams]="{show:userContext.event.id}" class="mmlink">
+                            <span class="menu-link-event-name">Event Details</span>
+                        </a>
                     </li>
                     <li *ngIf="hasPermission(permission.NewsEdit)" class="menu-child-item menu-parent-planning-event-news">
                         <a href="/tdstm/newsEditor/newsEditorList">List Event News</a>

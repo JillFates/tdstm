@@ -9,6 +9,12 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {ProviderListComponent} from './components/list/provider-list.component';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_PROJECT = 'menu-parent-project';
+
 export class ProviderStates {
 	public static readonly PROVIDER_LIST = {
 		url: 'list'
@@ -23,7 +29,8 @@ export const ProviderRoute: Routes = [
 			page: {
 				title: 'PROVIDER.PROVIDERS',
 				instruction: '',
-				menu: ['GLOBAL.PROJECT', 'PROVIDER.PROVIDERS']
+				menu: ['GLOBAL.PROJECT', 'PROVIDER.PROVIDERS'],
+				topMenu: { parent: TOP_MENU_PARENT_PROJECT, child: 'menu-parent-projects-providers', subMenu: true}
 			},
 			requiresAuth: true,
 		},
