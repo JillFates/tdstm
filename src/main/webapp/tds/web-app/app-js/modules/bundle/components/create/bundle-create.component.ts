@@ -73,7 +73,10 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 	public saveForm() {
 		const validateDate = DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime);
 		if (!validateDate) {
-			//
+			this.dialogService.notify(
+				'Validation Required',
+				'The completion time must be later than the start time.'
+			).subscribe();
 		} else {
 			this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
 				if (result.status === 'success') {
