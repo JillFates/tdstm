@@ -1831,15 +1831,15 @@ class AssetEntityService implements ServiceMethods {
 				*/
 				switch (value) {
 					case 'sme':
-						query.append("CONCAT_WS(' ', NULLIF(p.first_name, ''), NULLIF(p.middle_name, ''), NULLIF(p.last_name, '')) AS sme,")
+						query.append("${SqlUtil.personFullNameSql('p')} AS sme,")
 						joinQuery.append("\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n")
 						break
 					case 'sme2':
-						query.append("CONCAT_WS(' ', NULLIF(p1.first_name, ''), NULLIF(p1.middle_name, ''), NULLIF(p1.last_name, '')) AS sme2,")
+						query.append("${SqlUtil.personFullNameSql('p1')} AS sme2,")
 						joinQuery.append("\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n")
 						break
 					case 'modifiedBy':
-						query.append("CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,")
+						query.append("${SqlUtil.personFullNameSql('p2')} AS modifiedBy,")
 						joinQuery.append("\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n")
 						break
 					case 'lastUpdated':
@@ -1851,7 +1851,7 @@ class AssetEntityService implements ServiceMethods {
 						joinQuery.append("\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n")
 						break
 					case 'appOwner':
-						query.append("CONCAT_WS(' ', NULLIF(p3.first_name, ''), NULLIF(p3.middle_name, ''), NULLIF(p3.last_name, '')) AS appOwner,")
+						query.append("${SqlUtil.personFullNameSql('p3')} AS appOwner,")
 						joinQuery.append("\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n")
 						break
 					case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownDuration|startupFixed|startupDuration|testingFixed|testingDuration/:
@@ -1885,8 +1885,7 @@ class AssetEntityService implements ServiceMethods {
 						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
 						String byProperty = WebUtil.splitCamelCase(value)
 						String prefix = byPrefixes[value]
-						query.append("(IF(${byProperty} REGEXP '^[0-9]{1,}\$', CONCAT_WS(' ',  NULLIF(${prefix}.first_name, ''), " +
-								"NULLIF(${prefix}.middle_name, ''), NULLIF(${prefix}.last_name, '')), a.${byProperty})) as ${value},")
+						query.append("(IF(${byProperty} REGEXP '^[0-9]{1,}\$', ${SqlUtil.personFullNameSql(prefix)}, a.${byProperty})) as ${value},")
 	      				joinQuery.append("\n LEFT OUTER JOIN person ${prefix} ON ${prefix}.person_id=a.${byProperty} \n")
 
 						break
