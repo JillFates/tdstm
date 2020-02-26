@@ -19,6 +19,9 @@ databaseChangeLog = {
 
     changeSet(author: 'oluna', id: '20200206 TM-16920-2') {
         comment("Initialize Date compliance in License table")
+        preConditions() {
+            columnExists(tableName: 'license', columnName: 'last_compliance_hash')
+        }
         grailsChange {
             change {
                 def licenses = License.findAllByLastComplianceHashIsNull()
@@ -32,6 +35,9 @@ databaseChangeLog = {
 
     changeSet(author: 'oluna', id: '20200206 TM-16920-3') {
         comment("Add NOT NULL constraint to last_compliance_hash column in License table")
+        preConditions() {
+            columnExists(tableName: 'license', columnName: 'last_compliance_hash')
+        }
         addNotNullConstraint(tableName: 'license', columnName: 'last_compliance_hash', columnDataType: 'varchar(255)')
     }
 
