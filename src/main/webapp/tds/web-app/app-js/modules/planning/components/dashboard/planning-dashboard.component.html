@@ -321,7 +321,7 @@
                             </tr>
                             <tr>
                                 <td class="dashboard-stat-icon-td"><img height="16px" width="16px" src="/tdstm/assets/icons/svg/other_menu.svg"/></td>
-                                <td><a [routerLink]="['/asset','views',3,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Unassigned', _ufp: 'true'}">Other</a>
+                                <td><a [routerLink]="['/asset','views',3,'show']" [queryParams]="{_assetType: 'other', _ufp: 'true'}">Other</a>
                                 </td>
                                 <td class="execution-data-column"><a [routerLink]="['/asset','views',3,'show']" [queryParams]="{_assetType: 'other', common_planStatus:'Unassigned', _ufp: 'true'}">{{planningDashboardModel.execution.unassignedOtherCount}} ({{planningDashboardModel.execution.unassignedOtherPerc}}%)</a></td>
                                 <td *ngFor="let other of planningDashboardModel.execution.otherList" class="execution-data-column">
