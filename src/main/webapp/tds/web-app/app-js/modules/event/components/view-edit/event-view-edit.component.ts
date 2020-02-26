@@ -199,7 +199,13 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 	}
 
 	public saveForm() {
-		if (DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
+		const validateDate = DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel);
+		if (!validateDate) {
+			this.dialogService.notify(
+				'Validation Required',
+				'The completion time must be later than the start time.'
+			).subscribe();
+		} else {
 			this.eventsService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
