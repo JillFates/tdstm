@@ -28,7 +28,7 @@ export class ProjectColumnModel {
 			{
 				label: 'Project Code',
 				property: 'projectCode',
-				filterType: FilterType.text,
+				filterType: FilterType.text
 			},
 			{
 				label: 'Name',
@@ -40,14 +40,14 @@ export class ProjectColumnModel {
 				filterable: true,
 				property: 'startDate',
 				format: dateFormat,
-				filterType: FilterType.date,
+				filterType: FilterType.date
 			},
 			{
 				label: 'Completion Date',
 				filterable: true,
 				property: 'completionDate',
 				format: dateFormat,
-				filterType: FilterType.date,
+				filterType: FilterType.date
 			},
 			{
 				label: 'Comment',
