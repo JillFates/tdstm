@@ -135,9 +135,9 @@ export const en_DICTIONARY: Object = {
 		},
 		'SYSTEM_VIEW': 'System View',
 		'SAVE_LIST_VIEW': 'Save List View',
-		'SAVE_IN_MY_VIEWS': 'Save in My Views',
-		'OVERRIDE_EXISTING_VIEW_ME': 'Override Existing View (For me)',
-		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override Existing View (All Users)',
+		'SAVE_IN_MY_VIEWS': 'Save as My Own View',
+		'OVERRIDE_EXISTING_VIEW_ME': 'Override System View (for Me)',
+		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override System View (for All Users)',
 		'BULK_CHANGE' : {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {

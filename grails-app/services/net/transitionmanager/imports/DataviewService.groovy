@@ -113,8 +113,8 @@ class DataviewService implements ServiceMethods {
 	 * 		2nd. from the same project and shared from other user
 	 * 		3rd. from the DEFAULT Project and is shared
 	 * @param id
-	 * @param override true by default, we serve those views overriding the default one, if set to false,
-	 * serve the actual requested view
+	 * @param override true by default, we serve those views overriding the default one. When set to false then the
+	 * specified dataview id will be returned.
 	 * @return
 	 */
 	@Deprecated
@@ -990,12 +990,12 @@ class DataviewService implements ServiceMethods {
 	 * @return
 	 */
 	@Transactional
-	void deleteFavoriteDataview(Person person, Project currentProject, Long dataviewId) throws EmptyResultException, DomainUpdateException{
-		Dataview dataview = fetch(dataviewId)
+	void deleteFavoriteDataview(Project currentProject, Person whom, Long dataviewId) throws EmptyResultException, DomainUpdateException{
+		Dataview dataview = fetch(currentProject, whom, dataviewId, false)
 
 		// Delete the corresponding favorite
 		int deletedFavs = FavoriteDataview.where{
-			person == person && dataview == dataview
+			person == whom && dataview == dataview
 		}.deleteAll()
 
 		// If no favs were deleted, throw an exception.
@@ -1006,15 +1006,17 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 * Add the given dataview to the current whom's favorites.
+	 * @param currentProject
+	 * @param whom
 	 * @param dataviewId
 	 */
 	@Transactional
-	void addFavoriteDataview(Person person, Project currentProject, Long dataviewId) {
-		Dataview dataview = fetch(dataviewId)
+	void addFavoriteDataview(Project currentProject, Person whom, Long dataviewId) {
+		Dataview dataview = fetch(currentProject, whom, dataviewId, false)
 
-		// Check if the favorite already exists.
+		// Check if the favorite already exists
 		FavoriteDataview favoriteDataview = FavoriteDataview.where {
-			person == person && dataview == dataview
+			person == whom && dataview == dataview
 		}.find()
 
 		// If a favorite was found, throw an exception
@@ -1022,7 +1024,7 @@ class DataviewService implements ServiceMethods {
 			throw new DomainUpdateException('View is already a favorite')
 		}
 
-		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview)
+		favoriteDataview = new FavoriteDataview(person: whom, dataview: dataview)
 		if (!favoriteDataview.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to create favorite', favoriteDataview)
 		}
