@@ -307,7 +307,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Person person = userLogin ? userLogin.person : getUserLoginPerson()
 		List<Long> projectIds = []
 		Boolean showAllProjPerm = hasPermission(Permission.ProjectShowAll)
-		Boolean hasAccessToDefaultProject = securityService.hasPermission(person, Permission.ProjectManageDefaults)
+		Boolean hasAccessToDefaultProject = hasPermission(person, Permission.ProjectManageDefaults)
 
 		if (showAllProjPerm) {
 			// Find all the projects that are available for the user's company as client or as partner or owner
@@ -532,13 +532,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			} else {
 
 				// See if the user account is properly configured to a state that they're allowed to change their password
-				securityService.validateAllowedToChangePassword(userLogin)
+				validateAllowedToChangePassword(userLogin)
 
 
 				//
 				// Made it throught the guantlet of password requirements so lets update the password
 				//
-				securityService.setUserLoginPassword(userLogin, command.password, command.confirmPassword)
+				setUserLoginPassword(userLogin, command.password, command.confirmPassword)
 
 				if (!userLogin.save(failOnError: false)) {
 					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
