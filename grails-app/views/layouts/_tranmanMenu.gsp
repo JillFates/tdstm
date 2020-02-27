@@ -190,7 +190,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.DepAnalyzerView}">
                                 <li class="menu-child-item menu-parent-assets-dependency-analyzer-clr">
-                                    <g:link controller="module" action="taskManager" id="dependency-analyzer">Dependency Analyzer Clr</g:link>
+                                    <g:link controller="module" action="taskManager" id="dependency-analyzer">Angular Dependency Analyzer</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">

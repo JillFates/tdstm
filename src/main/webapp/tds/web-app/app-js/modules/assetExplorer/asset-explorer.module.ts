@@ -19,7 +19,7 @@ import {ManufacturerService} from './service/manufacturer.service';
 import {ModelService} from './service/model.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
 import { ArchitectureGraphService} from './components/architecture-graph/service/architecture-graph.service';
-import { DependencyAnalyzerService } from './components/dependency-analyzer/service/dependency-analizer.service';
+import { DependencyAnalyzerService } from './components/dependency-analyzer/service/dependency-analyzer.service';
 // Components
 import {AssetShowComponent} from './components/asset/asset-show.component';
 import {AssetEditComponent} from './components/asset/asset-edit.component';

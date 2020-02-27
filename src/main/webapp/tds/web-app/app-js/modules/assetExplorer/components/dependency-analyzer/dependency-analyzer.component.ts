@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {GridModel} from 'tds-component-library';
+import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 declare var jQuery: any;
 
 @Component({
@@ -11,6 +12,10 @@ export class DependencyAnalyzerComponent implements OnInit {
 	private userContext: any;
 	public gridModel: GridModel;
 	public showOnlyWIP;
+	icons = FA_ICONS;
+	selectedBundle;
+	teamHighlights$;
+	selectedTags;
 
 	constructor(
 		private userContextService: UserContextService
@@ -32,5 +37,13 @@ export class DependencyAnalyzerComponent implements OnInit {
 
 	cellClick(event) {
 		console.log(' on cell clicked');
+	}
+
+	highlightByTeam(event) {
+		console.log('something');
+	}
+
+	refreshDiagram() {
+		console.log('refresh diagram');
 	}
 }

@@ -1,18 +1,40 @@
-<div class="content-container">
-	<div class="content-area">
-		<div class="inline-content-da">
-			<h5><strong>Dependency Groups</strong></h5>
-			<button class="btn btn-outline">Regenerate</button>
-			<h6>Bundle</h6>
-			<div class="clr-select-wrapper">
-				<select id="select-basic" class="clr-select">
-					<option value="1">One</option>
-					<option value="2">Two</option>
-					<option value="3">Three</option>
-				</select>
-			</div>
-			<h6>Tags</h6>
-			<!-- Show only wip checkbox -->
+<div class="dependency-analyzer-container content body">
+	<div class="row task-manager-sub-header">
+		<div class="col-md-2  ">
+			<label class="dependency-analyzer-control-label">{{'DEPENDENCY_ANALYZER.DEPENDENCY_GROUPS' | translate}}:</label>
+			<tds-button>{{ 'DEPENDENCY_ANALYZER.REGENERATE' | translate}}</tds-button>
+		</div>
+		<div class="col-md-2 ">
+			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.BUNDLE' | translate}}:</label>
+			<kendo-dropdownlist
+				id="dependency-analyzer-teams-dropdown"
+				textField="label"
+				valueField="label"
+				[ngClass]="'dependency-analyzer-custom-dropdown'"
+				[value]="selectedBundle"
+				[data]="teamHighlights$ | async"
+				(selectionChange)="highlightByTeam($event)"
+				[(ngModel)]="selectedBundle"
+                #teamHighlightDropdown>
+			</kendo-dropdownlist>
+		</div>
+
+		<div class="col-md-2 ">
+			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.TAGS' | translate}}:</label>
+			<kendo-dropdownlist
+				id="dependency-analyzer-tags-dropdown"
+				textField="label"
+				valueField="label"
+				[ngClass]="'dependency-analyzer-custom-dropdown'"
+				[value]="selectedTags"
+				[data]="teamHighlights$ | async"
+				(selectionChange)="highlightByTeam($event)"
+				[(ngModel)]="selectedTags"
+                #teamHighlightDropdown>
+			</kendo-dropdownlist>
+		</div>
+
+		<div class="col-md-4 chk-filter-container">
 			<clr-checkbox-wrapper class="inline">
 				<input
 					clrCheckbox
@@ -25,25 +47,25 @@
 				<label
 					class="clr-control-label clr-control-label-sm inline"
 					for="showWIPonly"
-				>
-					Show ONLY Work In Progress
-				</label>
+				>{{'DEPENDENCY_ANALYZER.SHOW_ONLY_WIP' | translate}}</label>
 			</clr-checkbox-wrapper>
-			<!-- Refresh button -->
-			<tds-button-custom
-				[flat]="true"
-				[icon]="'refresh'"
-				[iconClass]="'is-solid'"
-				[tooltip]="'Refresh'"
-				class="favorite-button text-yellow"
-				(click)="onRefeshData()"
-			>
-			</tds-button-custom>
 		</div>
 
+		<div class="col-md-2">
+			<button class="refresh-container-btn btn" (click)="refreshDiagram()">
+				<fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
+			</button>
+		</div>
+
+<!--			<label class="task-chk-container">-->
+<!--				<input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />-->
+<!--				<span class="checkmark"></span>-->
+<!--				Minimize Auto Tasks-->
+<!--			</label>-->
 	</div>
 	<tds-grid
 		[gridModel]="gridModel"
 		(cellClick)="cellClick($event)">
 	</tds-grid>
+
 </div>
