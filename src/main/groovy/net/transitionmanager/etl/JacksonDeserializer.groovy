@@ -40,7 +40,18 @@ class JacksonDeserializer {
      *     //}//
      *     new JacksonDeserializer(inputStream).eachRow(closure)
      * </pre>
-     *  Variable {@code rowData} contains a
+     *  Variable {@code rowData} contains a Map with teh following JSON contact:
+     * <pre>
+     * 	"data": [
+     * 		//{//
+     * 		    "op": "I",
+     * 		    "errorCount": 0,
+     * 		    "warn": true,
+     * 		    "duplicate": true,
+     * 		    "errors": [],
+     * 		    "fields": {...} //
+     * 	    //}//
+     * </pre>
      *
      * @param closure
      */
@@ -52,107 +63,6 @@ class JacksonDeserializer {
             closure(row)
         }
         parser.close()
-    }
-
-    private void startObject() {
-        if (nextToken() != JsonToken.START_OBJECT) {
-            throw new IllegalStateException("Expected content to be an Object")
-        }
-    }
-
-    private void endObject() {
-        if (nextToken() != JsonToken.END_OBJECT) {
-            throw new IllegalStateException("Unexpected end of Object")
-        }
-    }
-
-    private void startArray() {
-        if (nextToken() != JsonToken.START_ARRAY) {
-            throw new IllegalStateException("Expected content to be an Array")
-        }
-    }
-
-    private void endArray() {
-        if (nextToken() != JsonToken.END_ARRAY) {
-            throw new IllegalStateException("Unexpected end of Array")
-        }
-    }
-
-    JsonToken nextToken() {
-        JsonToken token = parser.nextToken()
-        return token
-    }
-
-    private String readStringField() {
-        nextToken()
-        return parser.getValueAsString()
-    }
-
-    private Integer readIntegerField() {
-        nextToken()
-        if (parser.currentToken() == JsonToken.VALUE_NULL) {
-            return null
-        } else {
-            return parser.getIntValue()
-        }
-
-    }
-
-    private Object readObjectField() {
-        nextToken()
-        switch (parser.currentToken()) {
-            case JsonToken.VALUE_NULL:
-                return null
-                break
-            case JsonToken.VALUE_STRING:
-                return parser.getValueAsString()
-                break
-            case JsonToken.VALUE_NUMBER_INT:
-                return parser.getIntValue()
-                break
-            case JsonToken.VALUE_NUMBER_FLOAT:
-                return parser.getFloatValue()
-                break
-            default:
-                return null
-        }
-    }
-
-    private Boolean readBooleanField() {
-        nextToken()
-        return parser.getBooleanValue()
-    }
-
-    Map<String, String> readStringMap() {
-        Map<String, String> stringMap = [:]
-        startObject()
-        while (nextToken() != JsonToken.END_OBJECT) {
-            String key = parser.currentName()
-            String value = parser.nextTextValue()
-            stringMap[key] = value
-        }
-
-        return stringMap
-    }
-
-    private List<String> readStringList() {
-        List<String> stringList = []
-        startArray()
-        while (nextToken() != JsonToken.END_ARRAY) {
-            stringList.add(parser.getValueAsString())
-        }
-
-        return stringList
-    }
-
-    private List<Long> readLongList() {
-        List<Long> stringList = []
-        startArray()
-        while (nextToken() != JsonToken.END_ARRAY) {
-            stringList.add(parser.getValueAsLong())
-        }
-
-        return stringList
     }
 
     Map<String, ?> parseRow() {
@@ -405,4 +315,108 @@ class JacksonDeserializer {
         }
         return tags
     }
+
+    JsonToken nextToken() {
+        JsonToken token = parser.nextToken()
+        return token
+    }
+
+    private String readStringField() {
+        nextToken()
+        return parser.getValueAsString()
+    }
+
+    private Integer readIntegerField() {
+        nextToken()
+        if (parser.currentToken() == JsonToken.VALUE_NULL) {
+            return null
+        } else {
+            return parser.getIntValue()
+        }
+
+    }
+
+    private Object readObjectField() {
+        nextToken()
+        switch (parser.currentToken()) {
+            case JsonToken.VALUE_NULL:
+                return null
+                break
+            case JsonToken.VALUE_STRING:
+                return parser.getValueAsString()
+                break
+            case JsonToken.VALUE_NUMBER_INT:
+                return parser.getIntValue()
+                break
+            case JsonToken.VALUE_NUMBER_FLOAT:
+                return parser.getFloatValue()
+                break
+            default:
+                return null
+        }
+    }
+
+    private Boolean readBooleanField() {
+        nextToken()
+        return parser.getBooleanValue()
+    }
+
+    private Map<String, String> readStringMap() {
+        Map<String, String> stringMap = [:]
+        startObject()
+        while (nextToken() != JsonToken.END_OBJECT) {
+            String key = parser.currentName()
+            String value = parser.nextTextValue()
+            stringMap[key] = value
+        }
+
+        return stringMap
+    }
+
+    private List<String> readStringList() {
+        List<String> stringList = []
+        startArray()
+        while (nextToken() != JsonToken.END_ARRAY) {
+            stringList.add(parser.getValueAsString())
+        }
+
+        return stringList
+    }
+
+    private List<Long> readLongList() {
+        List<Long> stringList = []
+        startArray()
+        while (nextToken() != JsonToken.END_ARRAY) {
+            stringList.add(parser.getValueAsLong())
+        }
+
+        return stringList
+    }
+
+
+    private void startObject() {
+        if (nextToken() != JsonToken.START_OBJECT) {
+            throw new IllegalStateException("Expected content to be an Object")
+        }
+    }
+
+    private void endObject() {
+        if (nextToken() != JsonToken.END_OBJECT) {
+            throw new IllegalStateException("Unexpected end of Object")
+        }
+    }
+
+    private void startArray() {
+        if (nextToken() != JsonToken.START_ARRAY) {
+            throw new IllegalStateException("Expected content to be an Array")
+        }
+    }
+
+    private void endArray() {
+        if (nextToken() != JsonToken.END_ARRAY) {
+            throw new IllegalStateException("Unexpected end of Array")
+        }
+    }
+
+
 }

@@ -177,10 +177,7 @@ dependencies {
 	 */
 	compile 'org.grails.plugins:greenmail:2.0.0.RC2'
 	compile 'com.google.flatbuffers:flatbuffers-java:1.11.0'
-
-	compile 'com.fasterxml.jackson.core:jackson-core:2.9.4'
-
-
+ 	compile 'com.fasterxml.jackson.core:jackson-core:2.9.4'
 }
 
 bootRun {
