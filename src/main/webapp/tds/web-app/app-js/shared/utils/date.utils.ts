@@ -399,7 +399,6 @@ export class DateUtils {
 		if (!startTime || !endTime) {
 			return true;
 		} else if (startTime > endTime) {
-			alert(reverseMessage);
 			return false;
 		} else {
 			return true;

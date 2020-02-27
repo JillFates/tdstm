@@ -1,6 +1,5 @@
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-icons.min.css);
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-ui.min.css);
-@import url(/tdstm/tds/web-app/assets/modules/roboto-fontface/css/roboto/roboto-fontface.css);
 /*KENDO MATERIAL BASE COLORS */
 /*KENDO DATE */
 /* Alert MSG */
@@ -1873,7 +1872,7 @@ body > .wrapper {
 .main-header {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-weight: 500;
   font-size: 14px !important;
   z-index: 80 !important;
@@ -1919,7 +1918,6 @@ body > .wrapper {
     .main-header .menu-top-container .navbar-brand {
       padding: 0px !important; }
     .main-header .menu-top-container #nav-project-name {
-      font-size: 75%;
       padding: 0 10px; }
     .main-header .menu-top-container .nav > li > a,
     .main-header .menu-top-container .nav > li > .tds-nav-item {
@@ -1937,6 +1935,8 @@ body > .wrapper {
       position: absolute;
       right: 0;
       top: 0; }
+      .main-header .menu-top-container .user-navarea a.licensing-error-warning {
+        line-height: 40px; }
       .main-header .menu-top-container .user-navarea i.licensing-error-warning {
         color: #ffcc00;
         font-size: 18px; }
@@ -2448,6 +2448,13 @@ div.license-warning-message-button {
   list-style: none;
   border-radius: 4px;
   float: right; }
+  .legacy-breadcrumb a:link,
+  .legacy-breadcrumb a:visited,
+  .legacy-breadcrumb a:hover {
+    color: #666;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: default; }
   .legacy-breadcrumb li {
     display: inline-block;
     color: #444;

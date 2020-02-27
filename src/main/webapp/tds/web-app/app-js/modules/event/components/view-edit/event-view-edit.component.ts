@@ -1,21 +1,27 @@
-import {Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+// Angular
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+// Store
+import {Store} from '@ngxs/store';
+// Model
+import {EventModel} from '../../model/event.model';
+import {SetEvent} from '../../action/event.actions';
+// Service
 import {EventsService} from '../../service/events.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {EventModel} from '../../model/event.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {KEYSTROKE} from '../../../../shared/model/constants';
-import {Store} from '@ngxs/store';
-import {SetEvent} from '../../action/event.actions';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import * as R from 'ramda';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 
 @Component({
 	selector: `event-view-edit-component`,
 	templateUrl: 'event-view-edit.component.html',
 })
-export class EventViewEditComponent implements OnInit {
+export class EventViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	public eventModel: EventModel = null;
 	public savedModel: EventModel = null;
 	public showSwitch = false;
@@ -31,20 +37,64 @@ export class EventViewEditComponent implements OnInit {
 	private requiredFields = ['name'];
 	@ViewChild('startTimePicker', {static: false}) startTimePicker;
 	@ViewChild('completionTimePicker', {static: false}) completionTimePicker;
+
 	constructor(
 		private eventsService: EventsService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
-		private promptService: UIPromptService,
-		private activeDialog: UIActiveDialogService,
 		private translatePipe: TranslatePipe,
-		private store: Store,
-		@Inject('id') private id: any) {
+		private store: Store) {
+		super();
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
-		this.eventId = this.id;
 	}
 
 	ngOnInit() {
+		this.eventId = R.clone(this.data.eventId);
+		this.editing = this.data.actionType === ActionType.EDIT;
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => true,
+			active: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.switchToEdit.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.editing,
+			disabled: () => !this.validateRequiredFields(this.eventModel) || !this.isDirty(),
+			type: DialogButtonType.ACTION,
+			action: this.saveForm.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.canEditEvent,
+			type: DialogButtonType.ACTION,
+			action: this.confirmDeleteEvent.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => !this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEdit.bind(this)
+		});
+
 		this.eventModel = new EventModel();
 		const defaultEvent = {
 			name: '',
@@ -63,37 +113,31 @@ export class EventViewEditComponent implements OnInit {
 		this.userDateTimeFormat = this.preferenceService.getUserDateTimeFormat();
 		this.eventModel = Object.assign({}, defaultEvent, this.eventModel);
 		this.getModel(this.eventId);
-	}
 
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
 	}
 
 	public confirmDeleteEvent() {
-		this.promptService.open(
+		this.dialogService.confirm(
 			'Confirmation Required',
-			'WARNING: Are you sure you want to delete this event?',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
+			'WARNING: Are you sure you want to delete this event?')
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.deleteEvent();
 				}
-			})
-			.catch((error) => console.log(error));
+			});
 	}
 
 	private deleteEvent() {
 		this.eventsService.deleteEvent(this.eventId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.store.dispatch(new SetEvent(null));
-					this.activeDialog.close();
+					setTimeout(() => {
+						this.store.dispatch(new SetEvent(null));
+						this.onCancelClose();
+					});
 				}
 			});
 	}
@@ -106,6 +150,9 @@ export class EventViewEditComponent implements OnInit {
 		if (this.eventModel.estCompletionTime) {
 			this.completionTimePicker.dateValue = this.formatForDateTimePicker(this.eventModel.estCompletionTime);
 		}
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
 	}
 
 	private getModel(id) {
@@ -148,11 +195,17 @@ export class EventViewEditComponent implements OnInit {
 	}
 
 	public clearButtonBundleChange(event) {
-		this.showClearButton =  event && event.length > 1;
+		this.showClearButton = event && event.length > 1;
 	}
 
 	public saveForm() {
-		if (DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
+		const validateDate = DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel);
+		if (!validateDate) {
+			this.dialogService.notify(
+				'Validation Required',
+				'The completion time must be later than the start time.'
+			).subscribe();
+		} else {
 			this.eventsService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
@@ -187,7 +240,7 @@ export class EventViewEditComponent implements OnInit {
 	/**
 	 *  Put date in format to be accepted in a dateTimePicker
 	 */
-	public formatForDateTimePicker (time) {
+	public formatForDateTimePicker(time) {
 		let localDateFormatted = DateUtils.convertFromGMT(time, this.userTimeZone);
 		return time ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATETIME) : null;
 	}
@@ -197,40 +250,64 @@ export class EventViewEditComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.close();
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						this.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.activeDialog.close();
+			this.onCancelClose();
 		}
 	}
 
 	public cancelEdit(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			)
-				.then(confirm => {
-					if (confirm) {
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 						this.editing = false;
 						this.eventModel = JSON.parse(JSON.stringify(this.savedModel));
+						this.setTitle(this.getModalTitle());
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
 			this.editing = false;
+			if (!this.data.openFromList) {
+				this.setTitle(this.getModalTitle());
+			} else {
+				this.onCancelClose();
+			}
 		}
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @returns {string}
+	 */
+	private getModalTitle(): string {
+		// Every time we change the title, it means we switched to View, Edit or Create
+		setTimeout(() => {
+			// This ensure the UI has loaded since Kendo can change the signature of an object
+			// this.dataSignature = JSON.stringify(this.credentialModel);
+		}, 800);
+
+		if (this.editing) {
+			return 'Event Edit';
+		}
+		return 'Event Detail';
 	}
 }

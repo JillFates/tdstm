@@ -179,9 +179,11 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 
 	layout(): Layout {
 		const treeLayout = new go.TreeLayout();
+		treeLayout.treeStyle = TreeLayout.StyleAlternating;
+		treeLayout.layerStyle = TreeLayout.LayerUniform;
 		treeLayout.angle = 0;
-		treeLayout.layerSpacing = 50;
-		treeLayout.nodeSpacing = 50;
+		treeLayout.nodeSpacing = 100;
+		treeLayout.layerSpacing = 150;
 
 		return treeLayout;
 	}
@@ -190,7 +192,7 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 
 		const linkTemplate = new go.Link();
 		linkTemplate.routing = this.props.taskCount > MAX_TASK_COUNT ? Link.Normal : go.Link.AvoidsNodes;
-		linkTemplate.curve = this.props.taskCount > MAX_TASK_COUNT ? Link.None : Link.Bezier;
+		linkTemplate.curve = Link.Bezier;
 
 		const linkShape = new go.Shape();
 		linkShape.strokeWidth = 2;

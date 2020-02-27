@@ -69,7 +69,7 @@ enum AssetClass {
 	@Deprecated
 	static final String classOptionsDefinitionsLegacy
 	static {
-		List<String> results = ["{ id: 'ALL', 'text': 'Filter: All Classes' }"]
+		List<String> results = ["{ id: 'ALL', 'text': 'Class filter' }"]
 		for (String key in classOptions.keySet()) {
 			results.push("{ id: '$key', 'text': '${classOptions[key]}' }".toString())
 		}
@@ -78,7 +78,7 @@ enum AssetClass {
 
 	@Memoized
 	static List getClassOptionsDefinitions() {
-		List classOptionsDefinitions = [[id: 'ALL', 'text': 'Filter: All Classes']]
+		List classOptionsDefinitions = [[id: 'ALL', 'text': 'Class filter']]
 
 		for (String key in classOptions.keySet()) {
 			classOptionsDefinitions << (

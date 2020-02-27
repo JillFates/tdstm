@@ -2,8 +2,6 @@
 	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
 		<kendo-grid
 			*ngIf="dataGridTaskHelper"
-			class="tds-table"
-			[ngClass]="{'row-actions-2-children': dataGridTaskHelper.canSupportColumnMenuDynamic()}"
 			[data]="dataGridTaskHelper.gridData"
 			[sort]="dataGridTaskHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -72,14 +70,14 @@
 					*ngIf="column.type === 'action'"
 					let-dataItem
 				>
-					<div class="action-button btn-group btn-link">
-						<clr-dropdown>
-							<tds-button
-								icon="ellipsis-vertical"
-								title="Actions"
-								clrDropdownTrigger
-							></tds-button>
-							<clr-dropdown-menu *clrIfOpen>
+					<div class="action-button btn-link">
+						<clr-dropdown #dropdown>
+							<tds-button icon="ellipsis-vertical"
+													title="Actions"
+													clrDropdownTrigger
+													tdsGridContextMenuFixedPosition [clrDropdown]="dropdown">
+							</tds-button>
+							<clr-dropdown-menu *clrIfOpen clr-dropdown-menu>
 								<a
 									clrDropdownItem
 									(click)="openTaskEdit(dataItem)"
@@ -129,8 +127,6 @@
 	>
 		<kendo-grid
 			*ngIf="dataGridCommentHelper"
-			class="tds-table"
-			[ngClass]="{'row-actions-2-children': dataGridCommentHelper.canSupportColumnMenuDynamic()}"
 			[data]="dataGridCommentHelper.gridData"
 			[sort]="dataGridCommentHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -189,13 +185,11 @@
 					*ngIf="column.type === 'action'"
 					let-dataItem
 				>
-					<div class="action-button btn-group btn-link">
-						<clr-dropdown>
-							<tds-button
-								icon="ellipsis-vertical"
-								title="Actions"
-								clrDropdownTrigger
-							></tds-button>
+					<div class="action-button btn-link">
+						<clr-dropdown #dropdown>
+							<tds-button icon="ellipsis-vertical"
+													clrDropdownTrigger
+													tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"></tds-button>
 							<clr-dropdown-menu *clrIfOpen>
 								<a
 									clrDropdownItem
