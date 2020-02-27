@@ -114,7 +114,7 @@ class ArchitectureGraphService implements ServiceMethods {
 		Set dependencyList = [] as Set
 
 		if (rootAsset && mode == "assetId") {
-			buildArchitectureGraph([rootAsset.id], levelsDown + 1, assetsList, dependencyList)
+			buildArchitectureGraph([rootAsset.id], levelsDown, assetsList, dependencyList)
 			buildArchitectureGraph([rootAsset.id], levelsUp, assetsList, dependencyList, false)
 		}
 
