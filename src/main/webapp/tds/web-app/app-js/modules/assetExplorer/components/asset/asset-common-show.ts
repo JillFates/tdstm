@@ -187,7 +187,6 @@ export class AssetCommonShow implements OnInit {
 					extras: {
 						diagramOpts: {
 							initialAutoScale: Diagram.Uniform,
-							autoScale: Diagram.Uniform,
 							allowZoom: false
 						},
 						isExpandable: false

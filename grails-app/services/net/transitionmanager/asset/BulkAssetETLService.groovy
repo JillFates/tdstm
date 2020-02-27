@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-import com.tdsops.tm.enums.domain.AssetClass
+
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
@@ -123,21 +123,23 @@ class BulkAssetETLService implements ServiceMethods {
 			fieldMapping[asset.assetClass.name()].each { String key, Map mapValue ->
 				String label = mapValue?.label ?: key
 
-				def value = asset."$key"
+				if (asset.hasProperty(key)) {
+					def value = asset."$key"
 
-				if (value != null) {
-					switch (value) {
-						case String || Number || Date || Boolean:
-							break
-						case Enum:
-							value = value.name()
-							break
-						case { GormUtil.isDomainClass(it) }:
-							value = value.id
-							break
+					if (value != null) {
+						switch (value) {
+							case String || Number || Date || Boolean:
+								break
+							case Enum:
+								value = value.name()
+								break
+							case { GormUtil.isDomainClass(it) }:
+								value = value.id
+								break
+						}
+
+						updatedRow[label] = value
 					}
-
-					updatedRow[label] = value
 				}
 			}
 

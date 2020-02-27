@@ -40,6 +40,7 @@ export class DataScriptListComponent implements OnInit {
 	public gridSettings: GridSettings = {
 		defaultSort: [{field: 'title', dir: 'asc'}],
 		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,

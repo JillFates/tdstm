@@ -123,7 +123,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		private preferenceService: PreferenceService
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
-		this.getAssetList = this.assetExplorerService.getAssetListForComboBox.bind(this.assetExplorerService);
+		this.getAssetList = this.listAssets.bind(this);
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
 
@@ -139,6 +139,17 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	/**
+	 *
+	 * @param searchParams Based on the model params executes the search to get the corresponding assets list
+	 * @returns {Observable<any>}
+	 */
+	listAssets(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		const params = {...searchParams};
+		params.value = '';
+		return this.assetExplorerService.getAssetListForComboBox(params);
+	}
+
+		/**
 	 * A call to the Architecture graph service for getting the default graph data for the current user
 	 */
 	getArchitectureGraphPreferences() {
@@ -344,25 +355,29 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	regenerateGraph() {
 		this.graph.showFullGraphBtn = false;
-		this.loadData();
+		if (this.assetId) {
+			this.loadData();
+		}
 	}
 
 	/**
 	 * Save the preferences changed on the control panel
 	*/
 	savePreferences() {
-		const valueData = {
-			assetClass: 'ALL',
-			levelsUp: this.levelsUp,
-			levelsDown: this.levelsDown,
-			showCycles: this.showCycles,
-			appLbl: this.categories.length > 0
-		};
-		this.preferenceService.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
-			if (res.status === 'success') {
-				console.log('Preferences saved correctly');
-			}
-		})
+		if (this.categories) {
+			const valueData = {
+				assetClass: 'ALL',
+				levelsUp: this.levelsUp,
+				levelsDown: this.levelsDown,
+				showCycles: this.showCycles,
+				appLbl: this.categories.length > 0
+			};
+			this.preferenceService.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
+				if (res.status === 'success') {
+					console.log('Preferences saved correctly');
+				}
+			})
+		}
 	}
 
 	/**

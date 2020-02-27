@@ -10,6 +10,12 @@ import {BundleListComponent} from './components/list/bundle-list.component';
 import {BundleResolveService} from './resolve/bundle-resolve.service';
 
 /**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_PROJECT = 'menu-parent-planning';
+
+/**
  * Asset Explorer Route States
  * @class
  * @classdesc To use externally to reference possible state of the Asset Explorer Module
@@ -29,6 +35,7 @@ export const BundleRoute: Routes = [
 				title: 'PLANNING.BUNDLES.LIST',
 				instruction: '',
 				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.LIST'],
+				topMenu: { parent: TOP_MENU_PARENT_PROJECT, child: 'menu-parent-planning-list-bundles', subMenu: true}
 			},
 			requiresAuth: true
 		},

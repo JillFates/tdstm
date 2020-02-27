@@ -1,30 +1,45 @@
+// Angular
 import {
-	Component,
-	Inject,
+	Component, ComponentFactoryResolver,
+	Input,
 	OnInit,
 	ViewChild
 } from '@angular/core';
-import {ProjectService} from '../../service/project.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ProjectModel} from '../../model/project.model';
-import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
+import {Router} from '@angular/router';
+// Component
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
-import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
+// Model
+import {ProjectModel} from '../../model/project.model';
 import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Store} from '@ngxs/store';
-import {UserContextModel} from '../../../auth/model/user-context.model';
 import {SetProject} from '../../actions/project.actions';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
+import {ActionType} from '../../../dataScript/model/data-script.model';
+// Service
+import {ProjectService} from '../../service/project.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
+// Others
+import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
+import * as R from 'ramda';
 
 @Component({
 	selector: `project-view-edit-component`,
 	templateUrl: 'project-view-edit.component.html',
 })
-export class ProjectViewEditComponent implements OnInit {
+export class ProjectViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	public projectModel: ProjectModel = null;
 	public savedModel: ProjectModel = null;
 	private requiredFields = ['clientId', 'projectCode', 'projectName', 'completionDate'];
@@ -56,86 +71,166 @@ export class ProjectViewEditComponent implements OnInit {
 
 	@ViewChild('startDatePicker', {static: false}) startDatePicker;
 	@ViewChild('completionDatePicker', {static: false}) completionDatePicker;
+
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
+		private router: Router,
 		private projectService: ProjectService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
-		private promptService: UIPromptService,
-		private activeDialog: UIActiveDialogService,
-		private store: Store,
-		@Inject('id') private id) {
-		this.projectId = this.id;
+		private store: Store) {
+		super();
 	}
 
 	ngOnInit() {
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe(() => {
-				this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
-				this.userTimeZone = this.preferenceService.getUserTimeZone();
-				this.projectModel = new ProjectModel();
-				let defaultProject = {
-					clientId: 0,
-					projectName: '',
-					description: '',
-					startDate: new Date(),
-					completionDate: new Date(),
-					partners: [],
-					projectLogo: '',
-					projectManagerId: 0,
-					projectCode: '',
-					projectType: 'Standard',
-					comment: '',
-					defaultBundleName: 'TBD',
-					timeZone: '',
-					collectMetrics: 1,
-					planMethodology: {field: '', label: 'Select...'}
-				};
-				this.projectModel = Object.assign({}, defaultProject, this.projectModel);
-				this.file.uploadRestrictions = {
-					allowedExtensions: ['.jpg', '.png', '.gif'],
-					maxFileSize: 50000
-				};
-				this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
-				this.getModel(this.projectId);
-				this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
-			});
+		this.projectId = R.clone(this.data.projectModelId);
+		this.editing = (this.data.actionType === ActionType.EDIT);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.canEditProject,
+			active: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.switchToEdit.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.editing,
+			disabled: () => !this.validateRequiredFields(this.projectModel),
+			type: DialogButtonType.ACTION,
+			action: this.saveForm.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.canEditProject,
+			type: DialogButtonType.ACTION,
+			action: this.confirmDeleteProject.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => !this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEdit.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'fieldSettings',
+			text: 'Field Settings',
+			show: () => !this.editing,
+			type: DialogButtonType.CONTEXT,
+			action: this.openFieldSettings.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'planningDashboard',
+			text: 'Planning Dashboard',
+			show: () => !this.editing,
+			type: DialogButtonType.CONTEXT,
+			action: this.openPlanningDashboard.bind(this)
+		});
+
+		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
+		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.projectModel = new ProjectModel();
+		let defaultProject = {
+			clientId: 0,
+			projectName: '',
+			description: '',
+			startDate: new Date(),
+			completionDate: new Date(),
+			partners: [],
+			projectLogo: '',
+			projectManagerId: 0,
+			projectCode: '',
+			projectType: 'Standard',
+			comment: '',
+			defaultBundleName: 'TBD',
+			timeZone: '',
+			collectMetrics: 1,
+			planMethodology: {field: '', label: 'Select...'}
+		};
+		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
+		this.file.uploadRestrictions = {
+			allowedExtensions: ['.jpg', '.png', '.gif'],
+			maxFileSize: 50000
+		};
+		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
+		this.getModel(this.projectId);
+		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
+
+	}
+
+	/**
+	 * Open the Field Setting Pages
+	 */
+	public openFieldSettings(): void {
+		super.onCancelClose();
+		this.router.navigate(['/fieldsettings/list']);
+	}
+
+	/**
+	 * Open Planning Dashboard
+	 */
+	public openPlanningDashboard(): void {
+		super.onCancelClose();
+		this.router.navigate(['/planning/dashboard']);
 	}
 
 	// This is a work-around for firefox users
-	onOpenStartDatePicker (event): void {
+	onOpenStartDatePicker(event): void {
 		event.preventDefault();
 		this.startDatePicker.toggle();
 	}
 
-	onOpenCompletionDatePicker (event): void {
+	onOpenCompletionDatePicker(event): void {
 		event.preventDefault();
 		this.completionDatePicker.toggle();
 	}
 
 	public confirmDeleteProject(): void {
-		this.promptService.open(
+		this.dialogService.confirm(
 			'Confirmation Required',
-			'WARNING: Are you sure you want to delete this project? This cannot be undone.', 'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
+			'WARNING: Are you sure you want to delete this project? This cannot be undone.'
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.deleteProject();
 				}
 			})
-			.catch((error) => console.log(error));
 	}
 
 	private deleteProject(): void {
 		this.projectService.deleteProject(this.projectId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.activeDialog.close(result);
+					super.onCancelClose(result);
 				}
 			});
 	}
 
 	public switchToEdit(): void {
 		this.editing = true;
+		this.setTitle(this.getModalTitle());
 	}
 
 	private getModel(id): void {
@@ -188,7 +283,11 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.timeZone = data.timezone;
 				this.projectTypes = data.projectTypes;
 
-				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
+				this.store.dispatch(new SetProject({
+					id: this.projectId,
+					name: this.projectModel.projectName,
+					logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''
+				}));
 				this.updateSavedFields();
 			});
 	}
@@ -204,8 +303,13 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	public saveForm(): void {
-		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)
-			&& this.validatePartners(this.projectModel.partners)) {
+		const validateDate = DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel) && this.validatePartners(this.projectModel.partners);
+		if (!validateDate) {
+			this.dialogService.notify(
+				'Validation Required',
+				'The completion time must be later than the start time.'
+			).subscribe();
+		} else {
 			if (this.projectModel.startDate.getHours() > 0 || this.projectModel.completionDate.getHours() > 0) {
 				this.projectModel.startDate.setHours(0, 0, 0, 0);
 				this.projectModel.completionDate.setHours(0, 0, 0, 0);
@@ -223,7 +327,11 @@ export class ProjectViewEditComponent implements OnInit {
 					this.savedProjectLogoId = this.projectLogoId;
 					this.retrieveImageTimestamp = (new Date()).getTime();
 
-					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl:  this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp : ''}));
+					this.store.dispatch(new SetProject({
+						id: this.projectId,
+						name: this.projectModel.projectName,
+						logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp : ''
+					}));
 				}
 			});
 		}
@@ -269,18 +377,26 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	openTimezoneModal(): void {
-		this.dialogService.extra(UserDateTimezoneComponent, [{
-			provide: Boolean,
-			useValue: true
-		}, {
-			provide: String,
-			useValue: this.projectModel.timeZone
-		}]).then(result => {
-			this.projectModel.timeZone = result.timezone;
-		}).catch(result => {
-			console.log('Dismissed Dialog');
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: UserDateTimezoneComponent,
+			data: {
+				shouldReturnData: true,
+				defaultTimeZone: this.projectModel.timeZone
+			},
+			modalConfiguration: {
+				title: 'Time Zone Select',
+				draggable: true,
+				modalCustomClass: 'custom-time-zone-dialog',
+				modalSize: ModalSize.CUSTOM
+			}
+		}).subscribe((data) => {
+			if (data.status === DialogExit.ACCEPT) {
+				this.projectModel.timeZone = data.timezone;
+			}
 		});
 	}
+
 	public onSelectFile(e?: any): void {
 		this.file.fileUID = e.files[0].uid;
 	}
@@ -290,7 +406,7 @@ export class ProjectViewEditComponent implements OnInit {
 			return;
 		}
 		// delete temporary server uploaded file
-		const tempServerFilesToDelete = [ this.fetchResult.filename ];
+		const tempServerFilesToDelete = [this.fetchResult.filename];
 
 		// delete temporary transformed file
 		if (this.transformResult) {
@@ -298,7 +414,7 @@ export class ProjectViewEditComponent implements OnInit {
 		}
 
 		// get the coma separated file names to delete
-		e.data = { filename: tempServerFilesToDelete.join(',') };
+		e.data = {filename: tempServerFilesToDelete.join(',')};
 
 		this.fetchResult = null;
 		this.transformResult = null;
@@ -318,13 +434,13 @@ export class ProjectViewEditComponent implements OnInit {
 			this.file.fileUID = null;
 		} else if (e.files[0]) { // file uploaded successfully
 			let filename = response.filename;
-			this.fetchResult = { status: 'success', filename: filename };
+			this.fetchResult = {status: 'success', filename: filename};
 			this.projectModel.projectLogo = response.filename;
 
 			this.logoOriginalFilename = response.originalFilename;
 		} else {
 			this.clearFilename();
-			this.fetchResult = { status: 'error' };
+			this.fetchResult = {status: 'error'};
 		}
 	}
 
@@ -352,37 +468,65 @@ export class ProjectViewEditComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.projectModel) !== JSON.stringify(this.savedModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.close();
+				'You have changes that have not been saved. Do you want to continue and lose those changes?'
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.activeDialog.close();
+			super.onCancelClose();
 		}
 	}
 
 	public cancelEdit(): void {
 		if (JSON.stringify(this.projectModel) !== JSON.stringify(this.savedModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
+				'You have changes that have not been saved. Do you want to continue and lose those changes?'
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 						this.editing = false;
 						this.projectModel = JSON.parse(JSON.stringify(this.savedModel));
 						this.projectLogoId = this.savedProjectLogoId;
+						this.setTitle(this.getModalTitle());
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
 			this.editing = false;
+			if (!this.data.openFromList) {
+				this.setTitle(this.getModalTitle());
+			} else {
+				this.onCancelClose();
+			}
 		}
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @returns {string}
+	 */
+	private getModalTitle(): string {
+		// Every time we change the title, it means we switched to View, Edit or Create
+		setTimeout(() => {
+			// This ensure the UI has loaded since Kendo can change the signature of an object
+			// this.dataSignature = JSON.stringify(this.credentialModel);
+		}, 800);
+
+		if (this.editing) {
+			return 'Project Edit';
+		}
+		return 'Project Detail';
 	}
 }

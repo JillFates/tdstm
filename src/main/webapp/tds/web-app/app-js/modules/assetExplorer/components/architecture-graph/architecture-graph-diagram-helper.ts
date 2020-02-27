@@ -40,8 +40,12 @@ export class ArchitectureGraphDiagramHelper {
 				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
 				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
 			linkTemplate: this.linkTemplate(),
-			lowScaleTemplate: this.lowScaleNodeTemplate(),
-			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
+			lowScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.lowScaleNodeTemplate(),
+			mediumScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
 			rootNode: params.rootAsset,
 			// extras: params.extras && params.extras
@@ -171,8 +175,7 @@ export class ArchitectureGraphDiagramHelper {
 
 	linkTemplate(): Link {
 		const linkTemplate = new Link();
-		linkTemplate.routing = Link.AvoidsNodes;
-		linkTemplate.corner = 5;
+		linkTemplate.layerName = 'Background';
 
 		const linkShape = new Shape();
 		linkShape.strokeWidth = 2;
@@ -191,7 +194,8 @@ export class ArchitectureGraphDiagramHelper {
 	layout(): Layout {
 		const treeLayout = new TreeLayout();
 		treeLayout.angle = 90;
-		treeLayout.layerSpacing = 35;
+		treeLayout.nodeSpacing = 200;
+		treeLayout.layerSpacing = 200;
 		return treeLayout;
 	}
 

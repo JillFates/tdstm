@@ -316,7 +316,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
-		'WARNING_VALIDATION_CHANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
+		'WARNING_VALIDATION_CHANGE': `Changing the validation will have adverse effects if existing data falls outside current values. Press confirm to proceed and change the validation`,
+		'WARNING_VALIDATION_CHANGE_RANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
