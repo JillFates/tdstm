@@ -9,6 +9,7 @@ import {PermissionService} from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {DateUtils} from '../../../shared/utils/date.utils';
 
 @Injectable()
 export class AssetExplorerService {
@@ -26,6 +27,10 @@ export class AssetExplorerService {
 		return this.http.get(`${this.assetExplorerUrl}/views`)
 			.map((response: any) => {
 				let reportGroupModel: ViewGroupModel[] = Object.keys(response.data).map(key => {
+					response.data[key].createdOn = response.data[key].createdOn ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(response.data[key].createdOn), DateUtils.SERVER_FORMAT_DATE) : '';
+					response.data[key].updatedOn = response.data[key].updatedOn ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(response.data[key].updatedOn), DateUtils.SERVER_FORMAT_DATE) : '';
 					return response.data[key];
 				});
 				let folders = [

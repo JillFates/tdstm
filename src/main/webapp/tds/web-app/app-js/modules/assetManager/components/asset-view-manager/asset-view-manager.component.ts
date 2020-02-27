@@ -18,6 +18,7 @@ import { HeaderActionButtonData } from 'tds-component-library';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 import { SortDescriptor } from '@progress/kendo-data-query';
+import {ProjectColumnModel} from '../../../project/model/project.model';
 
 @Component({
 	selector: 'tds-asset-view-manager',
@@ -29,6 +30,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	public searchText: string;
 	public selectedFolder: ViewGroupModel;
 	public gridColumns: GridColumnModel[];
+	public dateFormat: string;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	gridHelper: DataGridOperationsHelper;
 	showFilters: boolean;
@@ -60,7 +62,12 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 				onClick: this.onCreateReport.bind(this),
 			},
 		];
-		this.gridColumns = AssetViewManagerColumnsHelper.createColumns();
+		this.preferenceService
+			.getUserDatePreferenceAsKendoFormat()
+			.subscribe(dateFormat => {
+				this.dateFormat = dateFormat;
+				this.gridColumns = AssetViewManagerColumnsHelper.createColumns(`{0:${dateFormat}}`);
+			});
 		const preferencesCodes = `${ PREFERENCES_LIST.CURRENT_DATE_FORMAT },${ PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT }`;
 		this.preferenceService.getPreferences(preferencesCodes)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
