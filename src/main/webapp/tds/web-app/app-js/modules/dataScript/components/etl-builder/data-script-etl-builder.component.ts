@@ -362,7 +362,7 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			modalConfiguration: {
 				title: 'Sample Data',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.LG
 			}
 		}).subscribe(
 			(filename: {
