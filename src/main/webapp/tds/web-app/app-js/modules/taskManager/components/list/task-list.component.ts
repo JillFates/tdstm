@@ -519,28 +519,6 @@ export class TaskListComponent implements OnInit {
 	}
 
 	/**
-	 * On cell click open the task action bar except for when clicking on the assetName
-	 * @param $event: CellClickEvent
-	 */
-	onCellClickHandler($event: CellClickEvent): void {
-		if ($event.columnIndex !== 0 && $event.columnIndex !== 1
-			&& this.currentCustomColumns[$event.column.field] !== 'assetName') {
-			let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
-			expandedEvent.index = $event.rowIndex;
-			expandedEvent.dataItem = $event.dataItem;
-			// collapse
-			if (this.rowsExpandedMap[$event.rowIndex]) {
-				this.onCollapseRow(expandedEvent.index);
-				this.gridComponent.collapseRow($event.rowIndex);
-				// expand
-			} else {
-				this.onExpandRow(expandedEvent.index);
-				this.gridComponent.expandRow($event.rowIndex);
-			}
-		}
-	}
-
-	/**
 	 * Ge the task actions of the selected task and updates is model
 	 * @param taskIds
 	 */
