@@ -1,9 +1,9 @@
-<div class="graphContainer">
+<div class="graphContainer" [ngClass]="!toggleFullScreen ? 'fullscreen' : ''">
 	<div id="toolsContainerId">
 		<div id="graphToolbarId">
 			<tds-button (click)="toggleControlPanel()">{{'ARCHITECTURE.CONTROL_PANEL' | translate}}</tds-button>
 			<tds-button (click)="toggleLegend()">{{'ARCHITECTURE.LEGEND' | translate}}</tds-button>
-			<tds-button (click)="goFullScreen()">{{'ARCHITECTURE.FULLSCREEN' | translate}}</tds-button>
+			<tds-button (click)="goFullScreen()">{{ (toggleFullScreen ? 'ARCHITECTURE.FULLSCREEN' : 'ARCHITECTURE.NORMAL_SCREEN') | translate}}</tds-button>
 		</div>
 	</div>
 	<div class="graph-main-container">
@@ -106,13 +106,13 @@
         <div class="right-container">
 			<div class="container architecture-graph-container">
 				<tds-lib-diagram-layout
-						[data]="data$ | async"
-						[layout]="diagramLayout$ | async"
-						[contextMenuOptions]="ctxOpts"
-						[hideExpand]="true"
-						(diagramAnimationFinished)="onDiagramAnimationFinished()"
-						(backToFullGraph)="viewFullGraphFromCache()"
-						#graph
+					[data]="data$ | async"
+					[layout]="diagramLayout$ | async"
+					[contextMenuOptions]="ctxOpts"
+					[hideExpand]="true"
+					(diagramAnimationFinished)="onDiagramAnimationFinished()"
+					(backToFullGraph)="viewFullGraphFromCache()"
+                    #graph
 				></tds-lib-diagram-layout>
 			</div>
 		</div>
