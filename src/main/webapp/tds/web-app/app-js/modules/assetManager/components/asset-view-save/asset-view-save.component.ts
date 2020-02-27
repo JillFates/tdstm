@@ -122,6 +122,12 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		OVERRIDE_FOR_ME: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ME, disabled: false, isOverride: true },
 		OVERRIDE_FOR_ALL: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL, disabled: false, isOverride: true }
 	};
+	private readonly defaultSaveOptions = {
+		canOverride: true,
+		canShare: true,
+		save: true,
+		saveAsOptions: [ E_SAVE_AS_OPTIONS.MY_VIEW ]
+	}
 
 	constructor(
 		model: ViewModel,
@@ -132,7 +138,11 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		private activatedRoute: ActivatedRoute,
 		private notifier: NotifierService) {
 		this.preModel = model;
-		this.saveOptions = saveOptions;
+		if (!saveOptions) {
+			this.saveOptions = this.defaultSaveOptions;
+		} else {
+			this.saveOptions = saveOptions;
+		}
 		this.activatedRoute.queryParams.subscribe( (params) => {
 			this.preModel.querystring = params;
 		})
@@ -179,7 +189,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public startModel() {
-		const changes = { name: `Copy of ${this.preModel.name}`};
+		const changes = this.preModel.name ? { name: `Copy of ${this.preModel.name}`} : '';
 		this.model = {...this.preModel, ...changes};
 		if (this.saveOptions) {
 			this.model.saveAsOption = this.saveOptions.saveAsOptions[0];
