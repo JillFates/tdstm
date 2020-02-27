@@ -8,6 +8,12 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {ManufacturerListComponent} from './components/list/manufacturer-list.component';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_PROJECT = 'menu-parent-admin';
+
 export class ManufacturerState {
 	public static readonly MANUFACTURER_LIST = {
 		url: 'list'
@@ -22,7 +28,8 @@ export const ManufacturerRoutes: Routes = [
 			page: {
 				title: 'MANUFACTURER.LIST',
 				instruction: '',
-				menu: ['GLOBAL.PROJECT', 'MANUFACTURER.LIST']
+				menu: ['GLOBAL.PROJECT', 'MANUFACTURER.LIST'],
+				topMenu: {parent: TOP_MENU_PARENT_PROJECT, child: 'menu-parent-admin-manufacturers', subMenu: true}
 			},
 			requiresAuth: true,
 		},
