@@ -15,7 +15,7 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link} from 'gojs';
+import {Diagram, Layout, Link, Spot} from 'gojs';
 import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
@@ -196,7 +196,8 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 					iconsOnly: true,
 					extras: {
 						diagramOpts: {
-							initialAutoScale: Diagram.Uniform,
+							// initialAutoScale: Diagram.UniformToFill,
+							contentAlignment: Spot.Center,
 							allowZoom: false
 						},
 						isExpandable: false
