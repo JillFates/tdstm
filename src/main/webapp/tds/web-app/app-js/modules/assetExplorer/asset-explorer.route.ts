@@ -61,5 +61,5 @@ export const AssetExplorerRoute: Routes = [
 	imports: [RouterModule.forChild(AssetExplorerRoute)]
 })
 
-export class AssetExplorerrRouteModule {
+export class AssetExplorerRouteModule {
 }

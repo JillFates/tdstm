@@ -41,7 +41,7 @@ import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
 import {ModelDeviceEditComponent} from './components/device/model-device/components/model-device-edit/model-device-edit.component';
 import { TaskActionSummaryComponent } from '../taskManager/components/task-actions/task-action-summary.component';
-import {AssetExplorerrRouteModule} from './asset-explorer.route';
+import {AssetExplorerRouteModule} from './asset-explorer.route';
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 import {DependencyAnalyzerComponent} from './components/dependency-analyzer/dependency-analyzer.component';
 
@@ -59,7 +59,7 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		IntlModule,
 		DateInputsModule,
 		// Route
-		AssetExplorerrRouteModule
+		AssetExplorerRouteModule
 	],
 	declarations: [
 		AssetShowComponent,
