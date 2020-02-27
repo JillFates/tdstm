@@ -207,7 +207,23 @@ class FileSystemService implements ServiceMethods {
         return [filename, os]
     }
 
-    /**
+	/**
+	 * Used to create a temporary file where the name will consist of a originalFilename + suffix + extension
+	 * @param originalFilename
+	 * @param suffix
+	 * @return Calling the method returns both the name of the file as well as the FileOutputStream
+	 *      String filename
+	 *      OutputStream output stream
+	 */
+	List createTemporaryFileWithSuffix(String originalFilename, String suffix = '', String extension='tmp') {
+		String filename = originalFilename + suffix + '.' + extension
+		OutputStream os = new File(temporaryDirectory + filename).newOutputStream()
+		log.info 'Created temporary file {}{}', temporaryDirectory, filename
+		return [filename, os]
+	}
+
+
+	/**
      * Used to get a temporary filename where the name will consist of fully qualified path + prefix + random + extension
      * @param prefix
      * @param extension

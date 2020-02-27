@@ -119,7 +119,7 @@ class WsAssetImportController implements ControllerMethods {
 
 		inputStream.close()
 
-		Map importResults = dataImportService.loadETLJsonIntoImportBatch(project, person.userLogin, importJson)
+		Map importResults = dataImportService.loadETLJsonIntoImportBatch(project, person.userLogin, importJson, filename)
 
 		log.debug "Results of loadData() $importResults"
 

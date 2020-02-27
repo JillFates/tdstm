@@ -1,5 +1,6 @@
 package net.transitionmanager.imports
 
+
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
@@ -21,7 +22,6 @@ import grails.converters.JSON
 import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
@@ -31,6 +31,7 @@ import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
+import net.transitionmanager.etl.JacksonDeserializer
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -52,11 +53,11 @@ import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.tag.TagService
 import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.support.DefaultTransactionStatus
 
@@ -88,6 +89,14 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	ScriptProcessorService   scriptProcessorService
 	TagAssetService			 tagAssetService
 	TagService 				 tagService
+	/**
+	 * Defines if ETL results must be saved
+	 * in binary format using FlatBuffers library.
+	 * @see net.transitionmanager.fbs.FBSProcessorResultBuilder
+	 */
+	@Value('${etl.results.saveBinary:false}')
+	Boolean saveResultsInBinaryFormat = false
+
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -130,7 +139,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			ETLProcessorResult etlProcessorResult,
 			Boolean sendResultByEmail
 	) {
-		return loadETLJsonIntoImportBatch(project, userLogin, etlProcessorResult.properties, true, sendResultByEmail)
+		return loadETLJsonIntoImportBatch(project, userLogin, etlProcessorResult.properties, '', true, sendResultByEmail)
 	}
 
 	/**
@@ -141,6 +150,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 *
 	 * The method is marked NonTransactional so that each the domains in the importJsonData can be handled
 	 * as independent transactions.
+	 * //TODO: dcorrea complete documentation.
 	 *
 	 * @param userLogin
 	 * @param project
@@ -157,8 +167,10 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			Project project,
 			UserLogin userLogin,
 			Map importJsonData,
+			String datasetFileName = null,
 			Boolean isAutoProcess = false,
 			Boolean sendResultsByEmail = false
+
 	) {
 		// // TODO : JPM 2/2018 : Delete this closure declaration and the following code will just be part of the above function
 		// // This was done because it allows you to save the code repeatedly without having to restart the application every time. It appears
@@ -171,24 +183,24 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 		// A map that contains various objects used throughout the import process
 		Map importContext = [
-			project           : project,
-			userLogin         : userLogin,
-			etlInfo           : importJsonData.ETLInfo,
-			status            : isAutoProcess ? ImportBatchStatusEnum.QUEUED : ImportBatchStatusEnum.PENDING,
-			guid              : StringUtil.generateGuid(),
-			sendResultsByEmail: sendResultsByEmail,
-			// The cache will be used to hold on to domain entity references when found or a String if there
-			// was an error when looking up the domain object. The key will be the md5hex of the query element
-			// of the field.
-			cache             : new DataImportEntityCache(),
+				project           : project,
+				userLogin         : userLogin,
+				etlInfo           : importJsonData.ETLInfo,
+				status            : isAutoProcess ? ImportBatchStatusEnum.QUEUED : ImportBatchStatusEnum.PENDING,
+				guid              : StringUtil.generateGuid(),
+				sendResultsByEmail: sendResultsByEmail,
+				// The cache will be used to hold on to domain entity references when found or a String if there
+				// was an error when looking up the domain object. The key will be the md5hex of the query element
+				// of the field.
+				cache             : new DataImportEntityCache(),
 
-			// The following are reset per domain
-			domainClass       : null,
-			fieldNames        : [],
-			rowsCreated       : 0,
-			rowsSkipped       : 0,
-			rowNumber         : 0,
-			errors            : []
+				// The following are reset per domain
+				domainClass       : null,
+				fieldNames        : [],
+				rowsCreated       : 0,
+				rowsSkipped       : 0,
+				rowNumber         : 0,
+				errors            : []
 		]
 
 		// Iterate over the domains and create batches for each
@@ -196,57 +208,96 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			importContext.domainClass = domainJson.domain
 
 			log.debug "localFunction() in for loop: importContext=$importContext"
+			// TODO: JOHN
+//			List<JSONObject> importRows = domainJson.data
+//			if (!importRows) {
+//				importResults.errors << "Domain ${importContext.domainClass} contained no data"
+//				importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0]
+//			}
 
-			List<JSONObject> importRows = domainJson.data
-			if (!importRows) {
-				importResults.errors << "Domain ${importContext.domainClass} contained no data"
-				importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0]
-			} else {
 
-				// Process each batch in a separate transaction to help with performance and memory
-				ImportBatch.withNewTransaction { session ->
-					// Attach the project to the current transaction
-					// project.attach()
+			// Process each batch in a separate transaction to help with performance and memory
+			ImportBatch.withNewTransaction { session ->
+				// Attach the project to the current transaction
+				// project.attach()
 
-					// Reset the batch level context variables
-					importContext.with {
-						errors = []
-						rowsCreated = 0
-						rowsSkipped = 0
-						rowNumber = 0
-					}
-					importContext.fieldNames = domainJson.fieldNames
-					importContext.fieldLabelMap = domainJson.fieldLabelMap
+				// Reset the batch level context variables
+				importContext.with {
+					errors = []
+					rowsCreated = 0
+					rowsSkipped = 0
+					rowNumber = 0
+				}
+				importContext.fieldNames = domainJson.fieldNames
+				importContext.fieldLabelMap = domainJson.fieldLabelMap
 
-					// Create a Transfer Batch for the asset class
-					ImportBatch batch = createImportBatch(importContext)
+				// Create a Transfer Batch for the asset class
+				ImportBatch batch = createImportBatch(importContext)
 
-					// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
-					if (batch == null) {
-						// Creating the batch failed so record the error and metrics for endpoint consumer
-						importResults.errors << importContext.errors
-						importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0]
+				// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
+				if (batch == null) {
+					// Creating the batch failed so record the error and metrics for endpoint consumer
+					importResults.errors << importContext.errors
+					importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0]
 
-					} else {
-						//
-						// Process the rows for the batch
-						//
+				} else {
 
+					if (!saveResultsInBinaryFormat) {
+
+						List<JSONObject> importRows = domainJson.data
 						// Import the assets for this batch
 						importRowsIntoBatch(session, batch, importRows, importContext)
 
-						// Update the batch with information about the import results
-						batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
+					} else {
 
-						// Update the reporting
-						importResults.batchesCreated++
-						importResults.domains << [domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated]
+						String filename = datasetFileName + '_' + domainJson.domain + '.json'
+						InputStream inputStream = fileSystemService.openTemporaryFile(filename)
+						if (!inputStream) {
+							throw new InvalidParamException('Specified input file not found')
+						}
+
+						importRowsIntoBatch(session, batch, inputStream, importContext)
 					}
+
+
+					// Update the batch with information about the import results
+					batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
+
+					// Update the reporting
+					importResults.batchesCreated++
+					importResults.domains << [domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated]
 				}
 			}
 		}
 
+
 		return importResults
+	}
+
+	/**
+	 * Import all the assets for the given batch.
+	 *
+	 * @param batch - current batch
+	 * @param inputStream - list of assets in an instance of {@code InputStream}
+	 * @param importContext - additional parameters required for logging
+	 */
+	//@CompileStatic
+	private void importRowsIntoBatch(session, ImportBatch batch, InputStream inputStream, Map importContext) {
+
+		Closure closure = { Map<String, ?> rowData ->
+			log.debug "Processing row with content: ${rowData}"
+			// Keep track of the row number for reporting
+			importContext.rowNumber++
+
+			// Do some initialization of the rowData object if necessary
+			if (rowData.errors == null) {
+				rowData.errors = []
+			}
+
+			// Process the fields for this row
+			importRow(session, batch, rowData, importContext)
+		}
+		new JacksonDeserializer(inputStream).eachRow(closure)
 	}
 
 	/**

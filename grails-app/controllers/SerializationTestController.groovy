@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.core.JsonEncoding
+import com.fasterxml.jackson.core.JsonFactory
+import com.fasterxml.jackson.core.JsonGenerator
 import com.google.flatbuffers.FlatBufferBuilder
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.common.FileSystemService
@@ -50,6 +53,40 @@ class SerializationTestController implements ControllerMethods {
 
         def (String filename, OutputStream fileOutputStream) = fileSystemService.createTemporaryFile(rowsAmount + '-rows-gson-', 'json')
         jsonViewRenderService.render('/serializationTest/example', exampleResponse, fileOutputStream)
+
+        renderAsJson([filename: filename])
+    }
+
+    def jackson(){
+
+        int rowsAmount = params.rows ? params.rows.toInteger() : 10000
+        Map<String, ?> exampleResponse = buildModel(rowsAmount)
+
+        def (String filename, OutputStream fileOutputStream) = fileSystemService.createTemporaryFile(rowsAmount + '-rows-jakson-', 'json')
+
+        //ByteArrayOutputStream stream = new ByteArrayOutputStream()
+        JsonFactory jfactory = new JsonFactory()
+        JsonGenerator jGenerator = jfactory
+                .createGenerator(fileOutputStream, JsonEncoding.UTF8)
+
+        jGenerator.writeStartObject()
+        jGenerator.writeNumberField("version", exampleResponse.version)
+        jGenerator.writeFieldName('rows')
+        jGenerator.writeStartArray()
+        for (Map map in exampleResponse.rows){
+
+            jGenerator.writeStartObject()
+            jGenerator.writeStringField('domain', map.domain)
+            jGenerator.writeNumberField('errorCount', map.errorCount)
+            jGenerator.writeNumberField('rowNum', map.rowNum)
+            jGenerator.writeEndObject()
+        }
+        jGenerator.writeEndArray()
+        jGenerator.writeEndObject()
+        jGenerator.close()
+
+        fileOutputStream.flush()
+        fileOutputStream.close()
 
         renderAsJson([filename: filename])
     }

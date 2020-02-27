@@ -1,9 +1,10 @@
 package net.transitionmanager.imports
 
-import com.google.flatbuffers.FlatBufferBuilder
+
 import com.tdsops.ETLTagValidator
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdsops.etl.DebugConsole
+import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
@@ -16,6 +17,7 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
+import net.transitionmanager.etl.JacksonSerializer
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.fbs.FBSProcessorResultBuilder
 import net.transitionmanager.project.Project
@@ -30,30 +32,28 @@ import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.beans.factory.annotation.Value
 
-import java.nio.ByteBuffer
-
 @Transactional
 class ScriptProcessorService {
 
-	JsonViewRenderService jsonViewRenderService
-	CustomDomainService   customDomainService
-	FileSystemService     fileSystemService
-	SecurityService       securityService
-	ProgressService       progressService
-	Scheduler             quartzScheduler
-	TagService            tagService
+    JsonViewRenderService jsonViewRenderService
+    CustomDomainService customDomainService
+    FileSystemService fileSystemService
+    SecurityService securityService
+    ProgressService progressService
+    Scheduler quartzScheduler
+    TagService tagService
 
-	/**
-	 * Defines if ETL results must be saved
-	 * in binary format using FlatBuffers library.
-	 * @see FBSProcessorResultBuilder
-	 */
-	@Value('${etl.results.saveBinary:false}')
-	Boolean saveResultsInBinaryFormat = false
+    /**
+     * Defines if ETL results must be saved
+     * in binary format using FlatBuffers library.
+     * @see FBSProcessorResultBuilder
+     */
+    @Value('${etl.results.saveBinary:false}')
+    Boolean saveResultsInBinaryFormat = false
 
 
-	private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
-	private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
+    private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
+    private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
 
     /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
@@ -63,127 +63,133 @@ class ScriptProcessorService {
      * @param filename
      * @return and instance of ETLProcessor used to execute the scriptContent
      */
-    ETLProcessor execute (Project project, String scriptContent, String filename) {
+    ETLProcessor execute(Project project, String scriptContent, String filename) {
 
         Object dataset = fileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
-	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
-		ETLTagValidator tagValidator = createTagValidator(project)
+        ETLFieldsValidator validator = createFieldsSpecValidator(project)
+        ETLTagValidator tagValidator = createTagValidator(project)
         ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, validator, tagValidator)
-	    etlProcessor.execute(scriptContent)
+        etlProcessor.execute(scriptContent)
 
         return etlProcessor
     }
 
-	/**
-	 * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using format
-	 * depending {@code ScriptProcessorService#saveResultsInBinaryFormat} boolean field
-	 *
-	 * @param processorResult an instance of {@code ETLProcessorResult}
-	 * @return file name created and saved in a temporary directory
-	 * @see ScriptProcessorService#saveResultsInJSONFile(com.tdsops.etl.ETLProcessorResult)
-	 * @see ScriptProcessorService#saveResultsInBinaryFile(com.tdsops.etl.ETLProcessorResult)
-	 */
-	@CompileStatic
-	String saveResultsInFile(ETLProcessorResult processorResult) {
+    /**
+     * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using format
+     * depending {@code ScriptProcessorService#saveResultsInBinaryFormat} boolean field
+     *
+     * @param processorResult an instance of {@code ETLProcessorResult}
+     * @return file name created and saved in a temporary directory
+     * @see ScriptProcessorService#saveResultsInJSONFile(com.tdsops.etl.ETLProcessorResult)
+     * @see ScriptProcessorService#saveResultsInBinaryFile(com.tdsops.etl.ETLProcessorResult)
+     */
+    @CompileStatic
+    String saveResultsInFile(ETLProcessorResult processorResult) {
 
-		if(saveResultsInBinaryFormat){
-			FlatBufferBuilder flatBufferBuilder = new FBSProcessorResultBuilder(processorResult).buildFlatBufferBuilder()
-			ByteBuffer serialized = flatBufferBuilder.dataBuffer()
-			return saveResultsInBinaryFile(serialized)
-		} else {
-			return saveResultsInJSONFile(processorResult)
-		}
-	}
+        if (saveResultsInBinaryFormat) {
+            return saveResultsInBinaryFile(processorResult)
+        } else {
+            return saveResultsInJSONFile(processorResult)
+        }
+    }
 
-	/**
-	 * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using JSON format
-	 *
-	 * @param processorResult an instance of {@code ETLProcessorResult}
-	 * @return file name created and saved in a temporary directory
-	 * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
-	 */
-	@CompileStatic
-	String saveResultsInJSONFile(ETLProcessorResult processorResult) {
-		List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
-		String outputFilename = tmpFile[0]
-		OutputStream os = (OutputStream) tmpFile[1]
-		jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, os)
-		return outputFilename
-	}
+    /**
+     * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using JSON format
+     *
+     * @param processorResult an instance of {@code ETLProcessorResult}
+     * @return file name created and saved in a temporary directory
+     * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
+     */
+    @CompileStatic
+    String saveResultsInJSONFile(ETLProcessorResult processorResult) {
 
-	/**
-	 * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using Binary format
-	 * from FlatBuffers library.
-	 *
-	 * @param processorResult an instance of {@code ETLProcessorResult}
-	 * @return file name created and saved in a temporary directory
-	 * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
-	 * @see FBSProcessorResultBuilder#buildInputStream()
-	 */
-	@CompileStatic
-	String saveResultsInBinaryFile(ByteBuffer serialized) {
+        List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+        String outputFilename = tmpFile[0]
+        OutputStream os = (OutputStream) tmpFile[1]
+        jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, os)
+        return outputFilename
+    }
 
-		List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'binary')
-		String outputFilename = tmpFile[0]
-		OutputStream os = (OutputStream) tmpFile[1]
-		os << serialized
-		os.flush()
-		os.close()
+    /**
+     * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using Binary format
+     * from FlatBuffers library.
+     *
+     * @param processorResult an instance of {@code ETLProcessorResult}
+     * @return file name created and saved in a temporary directory
+     * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
+     * @see FBSProcessorResultBuilder#buildInputStream()
+     */
+    @CompileStatic
+    String saveResultsInBinaryFile(ETLProcessorResult processorResult) {
 
-		return outputFilename
-	}
+        List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+        String outputFilename = tmpFile[0]
+        OutputStream os = (OutputStream) tmpFile[1]
+        new JacksonSerializer(os).writeETLResultsHeader(processorResult)
+        os.flush()
+        os.close()
 
-	/**
-	 * Execute a DSL script using an instance of ETLProcessor using a project as a reference
-	 * and a file as an input of the ETL content data
-	 * It also uses an instance of ProgressCallback to notify progress.
-	 * After execute the scriptContent, it creates an output file with the content of the ETLProcessorResult
-	 * @param project an instance of Project to use in ETLProcessor instance execution
-	 * @param scriptContent an ETLScript content to be executed
-	 * @param filename is the input filename to be used for loading a DataSet
-	 * @param includeConsoleLog - flag to control if console log is included in the response
-	 * @return a pair result with the instance of ETLProcessor used to execute the scriptContent
-	 *         and the filename for the output ETLProcessorResult
-	 * @throws an Exception in case of error in the ETL script content or
-	 *         in case of it could save the
-	 */
-	ETLProcessorResult executeAndRetrieveResults(Project project,
-												 Long dataScriptId,
-												 String scriptContent,
-												 String filename,
-												 ProgressCallback progressCallback = null,
-												 Boolean includeConsoleLog = false) {
+        for(DomainResult domain in processorResult.domains){
+            tmpFile = fileSystemService.createTemporaryFileWithSuffix(outputFilename, "_$domain.domain", 'json')
+            OutputStream outputStream = (OutputStream) tmpFile[1]
+            new JacksonSerializer(outputStream).writeETLResultsData(domain.data)
+            outputStream.flush()
+            outputStream.close()
+        }
 
-		Object dataset = fileSystemService.buildDataset(filename)
+        return outputFilename
+    }
 
-		ETLProcessor etlProcessor = new ETLProcessor(
-				project,
-				dataset,
-				new DebugConsole(buffer: new StringBuilder()),
-				createFieldsSpecValidator(project),
-				createTagValidator(project)
-		)
+    /**
+     * Execute a DSL script using an instance of ETLProcessor using a project as a reference
+     * and a file as an input of the ETL content data
+     * It also uses an instance of ProgressCallback to notify progress.
+     * After execute the scriptContent, it creates an output file with the content of the ETLProcessorResult
+     * @param project an instance of Project to use in ETLProcessor instance execution
+     * @param scriptContent an ETLScript content to be executed
+     * @param filename is the input filename to be used for loading a DataSet
+     * @param includeConsoleLog - flag to control if console log is included in the response
+     * @return a pair result with the instance of ETLProcessor used to execute the scriptContent
+     *         and the filename for the output ETLProcessorResult
+     * @throws an Exception in case of error in the ETL script content or
+     *         in case of it could save the
+     */
+    ETLProcessorResult executeAndRetrieveResults(Project project,
+                                                 Long dataScriptId,
+                                                 String scriptContent,
+                                                 String filename,
+                                                 ProgressCallback progressCallback = null,
+                                                 Boolean includeConsoleLog = false) {
 
-		if(dataScriptId){
-			etlProcessor.result.addDataScriptIdInETLInfo(dataScriptId)
-		}
+        Object dataset = fileSystemService.buildDataset(filename)
 
-		etlProcessor.evaluate(scriptContent, progressCallback)
+        ETLProcessor etlProcessor = new ETLProcessor(
+                project,
+                dataset,
+                new DebugConsole(buffer: new StringBuilder()),
+                createFieldsSpecValidator(project),
+                createTagValidator(project)
+        )
 
-		return etlProcessor.finalResult(includeConsoleLog)
-	}
+        if (dataScriptId) {
+            etlProcessor.result.addDataScriptIdInETLInfo(dataScriptId)
+        }
 
-	/**
-	 * Base on a project it creates an instance tha implements ETLTagValidator.
-	 *
-	 * @param project a defined Project instance to be used listing tags
-	 * @see ETLTagValidator
-	 * @return an instance of ETLTagValidator.
-	 */
-	private ETLTagValidator createTagValidator(Project project) {
-		return new ETLTagValidator(tagService.tagMapByName(project))
-	}
+        etlProcessor.evaluate(scriptContent, progressCallback)
+
+        return etlProcessor.finalResult(includeConsoleLog)
+    }
+
+    /**
+     * Base on a project it creates an instance tha implements ETLTagValidator.
+     *
+     * @param project a defined Project instance to be used listing tags
+     * @see ETLTagValidator* @return an instance of ETLTagValidator.
+     */
+    private ETLTagValidator createTagValidator(Project project) {
+        return new ETLTagValidator(tagService.tagMapByName(project))
+    }
 
     /**
      * Base on a project it creates a DomainClassFieldsValidator instance tha implements ETLFieldsValidator.
@@ -191,22 +197,22 @@ class ScriptProcessorService {
      * @see com.tdsops.etl.ETLFieldsValidator interface
      * @return an instance of DomainClassFieldsValidator.
      */
-    private ETLFieldsValidator createFieldsSpecValidator (Project project) {
+    private ETLFieldsValidator createFieldsSpecValidator(Project project) {
 
-	    Map<String, ?> fieldsSpecMap = customDomainService.fieldSpecsWithCommon(project)
+        Map<String, ?> fieldsSpecMap = customDomainService.fieldSpecsWithCommon(project)
 
-	    Map<String, ?> commonFieldsSpec = fieldsSpecMap[CustomDomainService.COMMON]
-	    Map<String, ?> applicationFieldsSpec = fieldsSpecMap[AssetClass.APPLICATION.name()]
-	    Map<String, ?> deviceFieldsSpec = fieldsSpecMap[AssetClass.DEVICE.name()]
-	    Map<String, ?> storageFieldsSpec = fieldsSpecMap[AssetClass.STORAGE.name()]
-	    Map<String, ?> dataBaseFieldsSpec = fieldsSpecMap[AssetClass.DATABASE.name()]
+        Map<String, ?> commonFieldsSpec = fieldsSpecMap[CustomDomainService.COMMON]
+        Map<String, ?> applicationFieldsSpec = fieldsSpecMap[AssetClass.APPLICATION.name()]
+        Map<String, ?> deviceFieldsSpec = fieldsSpecMap[AssetClass.DEVICE.name()]
+        Map<String, ?> storageFieldsSpec = fieldsSpecMap[AssetClass.STORAGE.name()]
+        Map<String, ?> dataBaseFieldsSpec = fieldsSpecMap[AssetClass.DATABASE.name()]
 
-	    ETLFieldsValidator validator = new ETLFieldsValidator()
-	    validator.addAssetClassFieldsSpecFor(ETLDomain.Application, commonFieldsSpec.fields + applicationFieldsSpec.fields)
-	    validator.addAssetClassFieldsSpecFor(ETLDomain.Device, commonFieldsSpec.fields + deviceFieldsSpec.fields)
-	    validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, commonFieldsSpec.fields + storageFieldsSpec.fields)
-	    validator.addAssetClassFieldsSpecFor(ETLDomain.Database, commonFieldsSpec.fields + dataBaseFieldsSpec.fields)
-	    validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec.fields)
+        ETLFieldsValidator validator = new ETLFieldsValidator()
+        validator.addAssetClassFieldsSpecFor(ETLDomain.Application, commonFieldsSpec.fields + applicationFieldsSpec.fields)
+        validator.addAssetClassFieldsSpecFor(ETLDomain.Device, commonFieldsSpec.fields + deviceFieldsSpec.fields)
+        validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, commonFieldsSpec.fields + storageFieldsSpec.fields)
+        validator.addAssetClassFieldsSpecFor(ETLDomain.Database, commonFieldsSpec.fields + dataBaseFieldsSpec.fields)
+        validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec.fields)
 
         return validator
     }
@@ -225,74 +231,74 @@ class ScriptProcessorService {
         Map<String, ?> result = [isValid: false]
 
         try {
-			Object dataset = fileSystemService.buildDataset(filename)
-			etlProcessor = new ETLProcessor(project,
-				dataset,
-				new DebugConsole(buffer: new StringBuilder()),
-				createFieldsSpecValidator(project),
-				createTagValidator(project)
-			)
+            Object dataset = fileSystemService.buildDataset(filename)
+            etlProcessor = new ETLProcessor(project,
+                    dataset,
+                    new DebugConsole(buffer: new StringBuilder()),
+                    createFieldsSpecValidator(project),
+                    createTagValidator(project)
+            )
 
-			etlProcessor.evaluate(scriptContent)
+            etlProcessor.evaluate(scriptContent)
             result.isValid = true
         } catch (all) {
             log.warn('Error testing script: ' + all.getMessage(), all)
             result.error = ETLProcessor.getErrorMessage(all)
         }
 
-	     if (etlProcessor) {
-		     result.consoleLog = etlProcessor?.debugConsole?.content()
-		     result.data = etlProcessor.finalResult()
-	     }
+        if (etlProcessor) {
+            result.consoleLog = etlProcessor?.debugConsole?.content()
+            result.data = etlProcessor.finalResult()
+        }
 
         return result
     }
 
-	/**
-	 * Method called by quartz job to test an ETL script
-	 * @param projectId - user's current project
-	 * @param scriptFilename - temporary test script filename
-	 * @param filename - temporary data filename
-	 * @param progressKey - progress key used for this ETL test interaction
-	 * @return
-	 */
-	Map<String, ?> testScript(Long projectId, String scriptFilename, String filename, String progressKey) {
-		// obtain test ETL script from temporary script file
-		String scriptContent = fileSystemService.openTemporaryFile(scriptFilename).text
+    /**
+     * Method called by quartz job to test an ETL script
+     * @param projectId - user's current project
+     * @param scriptFilename - temporary test script filename
+     * @param filename - temporary data filename
+     * @param progressKey - progress key used for this ETL test interaction
+     * @return
+     */
+    Map<String, ?> testScript(Long projectId, String scriptFilename, String filename, String progressKey) {
+        // obtain test ETL script from temporary script file
+        String scriptContent = fileSystemService.openTemporaryFile(scriptFilename).text
 
-		// build test data dataset from temporary file
-		String sampleDataFullFilename = fileSystemService.getTemporaryFullFilename(filename)
-		// obtain project
-		Project project = Project.get(projectId)
+        // build test data dataset from temporary file
+        String sampleDataFullFilename = fileSystemService.getTemporaryFullFilename(filename)
+        // obtain project
+        Project project = Project.get(projectId)
 
-		// update progress closure
-		ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
-			// if progress key is not provided, then just skip updating progress service
-			// this is useful during integration test invocation
-			if (progressKey) {
-				progressService.update(progressKey, percentComp, status.name(), detail)
-			}
-		} as ProgressCallback
+        // update progress closure
+        ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
+            // if progress key is not provided, then just skip updating progress service
+            // this is useful during integration test invocation
+            if (progressKey) {
+                progressService.update(progressKey, percentComp, status.name(), detail)
+            }
+        } as ProgressCallback
 
-		Boolean includeConsoleLog = true
-		ETLProcessorResult processorResult = executeAndRetrieveResults(
-			project,
-			null,
-			scriptContent,
-			sampleDataFullFilename,
-			updateProgressClosure,
-			includeConsoleLog)
+        Boolean includeConsoleLog = true
+        ETLProcessorResult processorResult = executeAndRetrieveResults(
+                project,
+                null,
+                scriptContent,
+                sampleDataFullFilename,
+                updateProgressClosure,
+                includeConsoleLog)
 
-		String outputFilename = saveResultsInFile(processorResult)
+        String outputFilename = saveResultsInFile(processorResult)
 
-		updateProgressClosure.reportProgress(
-			100,
-			true,
-			ProgressCallback.ProgressStatus.COMPLETED,
-			outputFilename)
+        updateProgressClosure.reportProgress(
+                100,
+                true,
+                ProgressCallback.ProgressStatus.COMPLETED,
+                outputFilename)
 
-		return [filename: outputFilename]
-	}
+        return [filename: outputFilename]
+    }
 
     /**
      * Checks if the syntax for a script content is correct using GrooyShell.parse method.
@@ -313,19 +319,19 @@ class ScriptProcessorService {
      * @param filename
      * @return a map with validSyntax boolean result and a list with map erros
      */
-    Map<String, ?> checkSyntax (Project project, String scriptContent, String filename) {
+    Map<String, ?> checkSyntax(Project project, String scriptContent, String filename) {
 
-	    Object dataset = fileSystemService.buildDataset(filename)
+        Object dataset = fileSystemService.buildDataset(filename)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
-		ETLProcessor etlProcessor = new ETLProcessor(
-			project,
-			dataset,
-			console,
-			new ETLFieldsValidator(),
-			new ETLTagValidator([:])
-		)
+        ETLProcessor etlProcessor = new ETLProcessor(
+                project,
+                dataset,
+                console,
+                new ETLFieldsValidator(),
+                new ETLTagValidator([:])
+        )
 
         List<Map<String, ?>> errors = []
 
@@ -356,47 +362,47 @@ class ScriptProcessorService {
         ]
     }
 
-	/**
-	 * Schedule a quartz job for the test ETL transform data process
-	 * @param project - user's current project
-	 * @param command - test ETL script and temporary data file name
-	 * @return Map - containing the progress key created to monitor the job execution progress
-	 */
-	Map<String, String> scheduleTestScript(Project project, DataScriptValidateScriptCommand command) {
+    /**
+     * Schedule a quartz job for the test ETL transform data process
+     * @param project - user's current project
+     * @param command - test ETL script and temporary data file name
+     * @return Map - containing the progress key created to monitor the job execution progress
+     */
+    Map<String, String> scheduleTestScript(Project project, DataScriptValidateScriptCommand command) {
 
-		// check if temporary data file still exists
-		if (!fileSystemService.getTemporaryFullFilename(command.filename)) {
-			throw new InvalidParamException('Invalid temporary data file name')
-		}
+        // check if temporary data file still exists
+        if (!fileSystemService.getTemporaryFullFilename(command.filename)) {
+            throw new InvalidParamException('Invalid temporary data file name')
+        }
 
-		// create test script temporary file
-		def (String scriptFilename, OutputStream os) = fileSystemService.createTemporaryFile(TEST_SCRIPT_PREFIX)
-		IOUtils.write(command.script, os)
-		os.flush()
-		os.close()
+        // create test script temporary file
+        def (String scriptFilename, OutputStream os) = fileSystemService.createTemporaryFile(TEST_SCRIPT_PREFIX)
+        IOUtils.write(command.script, os)
+        os.flush()
+        os.close()
 
-		// create progress key
-		String key = 'ETL-Test-Script-' + scriptFilename + '-' + StringUtil.generateGuid()
-		progressService.create(key, ProgressService.PENDING)
+        // create progress key
+        String key = 'ETL-Test-Script-' + scriptFilename + '-' + StringUtil.generateGuid()
+        progressService.create(key, ProgressService.PENDING)
 
-		// Kickoff the background job to generate the tasks
-		def jobTriggerName = 'TM-ETLTestScript-' + project.id + '-' + scriptFilename + '-' + StringUtil.generateGuid()
+        // Kickoff the background job to generate the tasks
+        def jobTriggerName = 'TM-ETLTestScript-' + project.id + '-' + scriptFilename + '-' + StringUtil.generateGuid()
 
-		// The triggerName/Group will allow us to controller on import
-		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
-		trigger.jobDataMap.projectId = project.id
-		trigger.jobDataMap.scriptFilename = scriptFilename
-		trigger.jobDataMap.filename = command.filename
-		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
-		trigger.jobDataMap.progressKey = key
-		trigger.setJobName('ETLTestScriptJob')
-		trigger.setJobGroup('tdstm-etl-test-script')
-		quartzScheduler.scheduleJob(trigger)
+        // The triggerName/Group will allow us to controller on import
+        Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
+        trigger.jobDataMap.projectId = project.id
+        trigger.jobDataMap.scriptFilename = scriptFilename
+        trigger.jobDataMap.filename = command.filename
+        trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
+        trigger.jobDataMap.progressKey = key
+        trigger.setJobName('ETLTestScriptJob')
+        trigger.setJobGroup('tdstm-etl-test-script')
+        quartzScheduler.scheduleJob(trigger)
 
-		log.info('scheduleJob() {} kicked of an ETL test script process for script and filename ({},{})',
-				securityService.currentUsername, scriptFilename, command.filename)
+        log.info('scheduleJob() {} kicked of an ETL test script process for script and filename ({},{})',
+                securityService.currentUsername, scriptFilename, command.filename)
 
-		// return progress key
-		return ['progressKey': key]
-	}
+        // return progress key
+        return ['progressKey': key]
+    }
 }
