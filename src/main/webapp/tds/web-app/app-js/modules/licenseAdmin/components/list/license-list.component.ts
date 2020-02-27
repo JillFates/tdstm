@@ -149,19 +149,21 @@ export class LicenseListComponent implements OnInit {
 					modalSize: ModalSize.MD
 				}
 			}).toPromise();
-			await this.dialogService.open({
-				componentFactoryResolver: this.componentFactoryResolver,
-				component: CreatedLicenseComponent,
-				data: {
-					requestLicenseModel: data.requestLicenseModel
-				},
-				modalConfiguration: {
-					title: 'License Request Completed',
-					draggable: true,
-					modalSize: ModalSize.MD
-				}
-			}).toPromise();
 			await this.gridComponent.reloadData();
+			if (data.requestLicense) {
+				await this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: CreatedLicenseComponent,
+					data: {
+						requestLicenseModel: data.requestLicense
+					},
+					modalConfiguration: {
+						title: 'License Request Completed',
+						draggable: true,
+						modalSize: ModalSize.MD
+					}
+				}).toPromise();
+			}
 		} catch (error) {
 			console.error(error);
 		}
