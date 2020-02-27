@@ -36,7 +36,7 @@ export abstract class ConfigurationCommonComponent extends Dialog {
 	 */
 	protected displayWarningMessage(validationMessage: string): Observable<any> {
 		if (this.field.isNew) {
-			return Observable.of({confirm: ''});
+			return Observable.of({confirm: DialogConfirmAction.CONFIRM});
 		}
 
 		return this.dialogService.confirm(

@@ -37,6 +37,7 @@ class AssetService {
 			case "APPLICATION":
 				assetModel = applicationService.getModelForCreate()
                 model.criticalityOptions = Application.CRITICALITY
+				model.personList = assetModel.personList
 				break
 			case "DATABASE":
 				assetModel = databaseService.getModelForCreate()
@@ -221,7 +222,7 @@ class AssetService {
 			standard.rackSource.constraints.values = addBlankToNonRequiredOptions(standard.rackSource, model.sourceRackSelect)
 			standard.rackTarget.constraints.values = addBlankToNonRequiredOptions(standard.rackTarget, model.targetRackSelect)
 			standard.sourceChassis.constraints.values = addBlankToNonRequiredOptions(standard.sourceChassis, model.sourceChassisSelect)
-			standard.targetChassis.constraints.values = addBlankToNonRequiredOptions(standard.constraints, model.targetChassisSelect)
+			standard.targetChassis.constraints.values = addBlankToNonRequiredOptions(standard.targetChassis, model.targetChassisSelect)
 		}
 		model.put('standardFieldSpecs', standard)
 
