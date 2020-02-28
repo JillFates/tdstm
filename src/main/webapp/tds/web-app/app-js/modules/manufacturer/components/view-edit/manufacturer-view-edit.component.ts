@@ -293,6 +293,7 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 	 * Remove alias from collection
 	 */
 	public removeAlias(index: number, itemId: number): void {
+		this.manufacturerForm.form.markAsDirty();
 		this.aliasDeleted.push(itemId);
 		this.aliasControls.splice(index, 1);
 
@@ -305,6 +306,7 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 	 * Add alias value to collection
 	 */
 	public focusOutAlias(event: any, item: any, index: number): void {
+		this.manufacturerForm.form.markAsDirty();
 		if (item) {
 			if (event.target.value !== item.name) {
 				this.aliasUpdated.push({id: item.id, name: event.target.value});
