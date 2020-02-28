@@ -20,7 +20,11 @@ import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidLicenseException
 import net.transitionmanager.exception.LogicException
 import net.transitionmanager.license.License as DomainLicense
-import net.transitionmanager.license.prefs.*
+import net.transitionmanager.license.prefs.FilePrivateKeyDataProvider
+import net.transitionmanager.license.prefs.FilePublicKeyDataProvider
+import net.transitionmanager.license.prefs.MyLicenseProvider
+import net.transitionmanager.license.prefs.TDSLicenseValidator
+import net.transitionmanager.license.prefs.TDSPasswordProvider
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
