@@ -47,7 +47,7 @@ export class AssetCommonDiagramHelper {
 				: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
 			rootNode: params.rootNode,
-			// extras: params.extras && params.extras
+			extras: params.extras
 		};
 	}
 

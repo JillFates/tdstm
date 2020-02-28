@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
 	selector: `
@@ -9,6 +9,8 @@ import {Component, Input} from '@angular/core';
 			<div>
 				<h4>{{title}}</h4>
 				<progress-bar [progress]="value.toString()" [color]="'#488aff'"></progress-bar>
+				<div class="text-center">{{message}}</div>
+				<div class="pull-right"><tds-button-close *ngIf="enableClose" (click)="onClose()"></tds-button-close></div>
 			</div>
 		</kendo-dialog>
 	`,
@@ -19,8 +21,18 @@ export class TDSProgressBar {
 	@Input() title = '';
 	@Input() value = 0;
 	@Input() opened = false;
+	@Input() message;
+	@Input() enableClose: boolean;
+	@Output() close: EventEmitter<void> = new EventEmitter<void>();
 
 	constructor() {
-		// comment
+		// Silence is golden
+	}
+
+	/**
+	 * On button close click emit the close event to parent.
+	 */
+	onClose(): void {
+		this.close.emit();
 	}
 }

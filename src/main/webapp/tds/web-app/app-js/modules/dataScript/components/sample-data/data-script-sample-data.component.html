@@ -9,66 +9,43 @@
 	<div class="row">
 		<div class="col-md-12 select-tab-options">
 			<div class="radio">
-				<label
-					[ngStyle]="{
-						'font-weight':
-							OPTIONS.selected === OPTIONS.FILE
-								? 500
-								: 400
-					}"
-				>
+				<clr-radio-wrapper>
 					<input
-						type="radio"
-						value="{{ OPTIONS.FILE }}"
-						[(ngModel)]="OPTIONS.selected"
-						name="loadSourceOption"
+							type="radio"
+							clrRadio
+							value="{{ OPTIONS.FILE }}"
+							[(ngModel)]="OPTIONS.selected"
+							name="loadSourceOption"
 					/>
-					{{
-						'DATA_INGESTION.DATASCRIPT.DESIGNER.UPLOAD_FILE'
-							| translate
-					}}
-				</label>
-				<label
-					style="margin-left: 10px;"
-					[ngStyle]="{
-						'font-weight':
-							OPTIONS.selected === OPTIONS.SERVICE
-								? 500
-								: 400
-					}"
-				>
+					<label [ngStyle]="{'font-weight':OPTIONS.selected === OPTIONS.FILE? 500: 400 }">
+						{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.UPLOAD_FILE' | translate }}
+					</label>
+				</clr-radio-wrapper>
+				<clr-radio-wrapper>
 					<input
-						type="radio"
-						value="{{ OPTIONS.SERVICE }}"
-						[(ngModel)]="OPTIONS.selected"
-						name="loadSourceOption"
+							type="radio"
+							clrRadio
+							value="{{ OPTIONS.SERVICE }}"
+							[(ngModel)]="OPTIONS.selected"
+							name="loadSourceOption"
 					/>
-					{{
-						'DATA_INGESTION.DATASCRIPT.DESIGNER.FETCH_DATA_FROM_WEBSERVICE'
-							| translate
-					}}
-				</label>
-				<label
-					style="margin-left: 10px;"
-					[ngStyle]="{
-						'font-weight':
-							OPTIONS.selected === OPTIONS.CSV
-								? 500
-								: 400
-					}"
-				>
+					<label style="margin-left: 10px;" [ngStyle]="{ 'font-weight': OPTIONS.selected === OPTIONS.SERVICE ? 500: 400}">
+						{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.FETCH_DATA_FROM_WEBSERVICE' | translate }}
+					</label>
+				</clr-radio-wrapper>
+				<clr-radio-wrapper>
 					<input
-						type="radio"
-						selected
-						value="{{ OPTIONS.CSV }}"
-						[(ngModel)]="OPTIONS.selected"
-						name="loadSourceOption"
+							type="radio"
+							clrRadio
+							selected
+							value="{{ OPTIONS.CSV }}"
+							[(ngModel)]="OPTIONS.selected"
+							name="loadSourceOption"
 					/>
-					{{
-						'DATA_INGESTION.DATASCRIPT.DESIGNER.PASTE_CONTENT'
-							| translate
-					}}
-				</label>
+					<label style="margin-left: 10px;" [ngStyle]="{ 'font-weight': OPTIONS.selected === OPTIONS.CSV ? 500 : 400 }" >
+						{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.PASTE_CONTENT' | translate }}
+					</label>
+				</clr-radio-wrapper>
 			</div>
 		</div>
 	</div>

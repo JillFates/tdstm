@@ -275,6 +275,7 @@ export const en_DICTIONARY: Object = {
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
+		'NORMAL_SCREEN': 'Normal Screen',
 		'SELECT_AN_ASSET': 'Select an Asset',
 		'FILTER_LABELS': 'Class filter',
 		'TIERS_ABOVE': 'Tiers above',

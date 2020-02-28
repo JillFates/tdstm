@@ -1,20 +1,28 @@
-import {Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+// Angular
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+// Store
+import {SetBundle} from '../../action/bundle.actions';
+import {Store} from '@ngxs/store';
+// Model
+import {BundleModel} from '../../model/bundle.model';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+// Service
 import {BundleService} from '../../service/bundle.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {KEYSTROKE} from '../../../../shared/model/constants';
 import {TaskService} from '../../../taskManager/service/task.service';
+import * as R from 'ramda';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 
 @Component({
 	selector: `bundle-view-edit-component`,
 	templateUrl: 'bundle-view-edit.component.html',
 })
-export class BundleViewEditComponent implements OnInit {
+export class BundleViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	public bundleModel: BundleModel = null;
 	public savedModel: BundleModel = null;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
@@ -30,23 +38,72 @@ export class BundleViewEditComponent implements OnInit {
 	public fromControlTT = '';
 	public toControlTT = '';
 	protected userTimeZone: string;
+	protected userDateTimeFormat: string;
 	private requiredFields = ['name'];
 	@ViewChild('startTimePicker', {static: false}) startTimePicker;
 	@ViewChild('completionTimePicker', {static: false}) completionTimePicker;
+
 	constructor(
 		private bundleService: BundleService,
+		private dialogService: DialogService,
 		private taskService: TaskService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
-		private promptService: UIPromptService,
-		private activeDialog: UIActiveDialogService,
 		private translatePipe: TranslatePipe,
-		@Inject('id') private id) {
+		private store: Store) {
+		super();
 		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
-		this.bundleId = this.id;
 	}
 
 	ngOnInit() {
+		this.bundleId = R.clone(this.data.bundleId);
+		this.editing = this.data.actionType === ActionType.EDIT;
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.canEditBundle,
+			active: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.switchToEdit.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.editing,
+			disabled: () => !this.validateRequiredFields(this.bundleModel) || !this.isDirty(),
+			type: DialogButtonType.ACTION,
+			action: this.saveForm.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.canEditBundle,
+			type: DialogButtonType.ACTION,
+			action: this.confirmDeleteBundleAndAssets.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => !this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEdit.bind(this)
+		});
+
+		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.userDateTimeFormat = this.preferenceService.getUserDateTimeFormat();
+
 		this.loadModel();
 	}
 
@@ -72,53 +129,38 @@ export class BundleViewEditComponent implements OnInit {
 		this.getModel(this.bundleId);
 	}
 
-	// Close dialog if back button is pressed
-	@HostListener('window:popstate', ['$event'])
-	onPopState(event) {
-		this.activeDialog.close()
-	}
-
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
-	}
-
 	public confirmDeleteBundle() {
-		this.promptService.open(
+		this.dialogService.confirm(
 			'Confirmation Required',
-			'WARNING: Deleting this bundle will remove any teams and any related step data',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
+			'WARNING: Deleting this bundle will remove any teams and any related step data'
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.deleteBundle();
 				}
-			})
-			.catch((error) => console.log(error));
+			});
 	}
 
 	public confirmDeleteBundleAndAssets() {
-		this.promptService.open(
+		this.dialogService.confirm(
 			'Confirmation Required',
 			'WARNING: Deleting this bundle will remove any teams, any related step data, AND ASSIGNED ASSETS (NO UNDO)',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.deleteBundleAndAssets();
 				}
-			})
-			.catch((error) => console.log(error));
+			});
 	}
 
 	private deleteBundle() {
 		this.bundleService.deleteBundle(this.bundleId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.activeDialog.close(result);
+					setTimeout(() => {
+						this.store.dispatch(new SetBundle(null));
+						this.onCancelClose();
+					});
 				}
 			});
 	}
@@ -127,7 +169,10 @@ export class BundleViewEditComponent implements OnInit {
 		this.bundleService.deleteBundleAndAssets(this.bundleId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.activeDialog.close(result);
+					setTimeout(() => {
+						this.store.dispatch(new SetBundle(null));
+						this.onCancelClose();
+					});
 				}
 			});
 	}
@@ -164,22 +209,25 @@ export class BundleViewEditComponent implements OnInit {
 
 				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
 				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
-				this.bundleModel.moveEvent = data && data.moveBundleInstance.moveEvent ? data.moveBundleInstance.moveEvent : {id: null, name: ''};
+				this.bundleModel.moveEvent = data && data.moveBundleInstance.moveEvent ? data.moveBundleInstance.moveEvent : {
+					id: null,
+					name: ''
+				};
 
 				this.rooms = data.rooms;
 				this.taskService.getEvents()
-				.subscribe((results: any) => {
-					this.moveEvents = results;
-					if (this.bundleModel.moveEvent) {
-						const currentEvent = results.find((result: any) => {
-							return result.id === this.bundleModel.moveEvent.id;
-						});
-						if (currentEvent) {
-							this.bundleModel.moveEvent.name = currentEvent.name;
+					.subscribe((results: any) => {
+						this.moveEvents = results;
+						if (this.bundleModel.moveEvent) {
+							const currentEvent = results.find((result: any) => {
+								return result.id === this.bundleModel.moveEvent.id;
+							});
+							if (currentEvent) {
+								this.bundleModel.moveEvent.name = currentEvent.name;
+							}
 						}
-					}
-					this.updateSavedFields();
-				});
+						this.updateSavedFields();
+					});
 			});
 	}
 
@@ -196,7 +244,13 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+		const validateDate = DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime);
+		if (!validateDate) {
+			this.dialogService.notify(
+				'Validation Required',
+				'The completion time must be later than the start time.'
+			).subscribe();
+		} else {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.bundleModel.startTime = this.bundleModel.startTime || '';
@@ -234,7 +288,7 @@ export class BundleViewEditComponent implements OnInit {
 	/**
 	 *  Put date in format to be accepted in a dateTimePicker
 	 */
-	public formatForDateTimePicker (time) {
+	public formatForDateTimePicker(time) {
 		let localDateFormatted = DateUtils.convertFromGMT(time, this.userTimeZone);
 		return time ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATETIME) : null;
 	}
@@ -244,40 +298,40 @@ export class BundleViewEditComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.savedModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.close();
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						this.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.activeDialog.close();
+			this.onCancelClose();
 		}
 	}
 
 	public cancelEdit(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.savedModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			)
-				.then(confirm => {
-					if (confirm) {
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 						this.editing = false;
 						this.bundleModel = JSON.parse(JSON.stringify(this.savedModel));
+						this.setTitle(this.getModalTitle());
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
 			this.editing = false;
+			if (!this.data.openFromList) {
+				this.setTitle(this.getModalTitle());
+			} else {
+				this.onCancelClose();
+			}
 		}
 	}
 
@@ -287,5 +341,29 @@ export class BundleViewEditComponent implements OnInit {
 
 	public onToChange(): void {
 		this.toControlTT = this.rooms.find(r => r.id === this.bundleModel.toId).roomName;
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @returns {string}
+	 */
+	private getModalTitle(): string {
+		// Every time we change the title, it means we switched to View, Edit or Create
+		setTimeout(() => {
+			// This ensure the UI has loaded since Kendo can change the signature of an object
+			// this.dataSignature = JSON.stringify(this.credentialModel);
+		}, 800);
+
+		if (this.editing) {
+			return 'Bundle Edit';
+		}
+		return 'Bundle Detail';
 	}
 }

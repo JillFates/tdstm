@@ -48,8 +48,8 @@ class Dataview {
 			isFavorite: isFavorite(currentPersonId),
 			schema    : JsonUtil.parseJson(reportSchema),
 			createdBy : getOwnerName(),
-			createdOn : TimeUtil.formatDate(dateCreated),
-			updatedOn : TimeUtil.formatDate(lastModified)
+			createdOn : dateCreated,
+			updatedOn : lastModified
 		]
 		return data
 	}

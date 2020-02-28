@@ -3,7 +3,7 @@ import {ITdsContextMenuOption} from 'tds-component-library/lib/context-menu/mode
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {Observable, ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link} from 'gojs';
+import {Diagram, Layout, Link, Spot} from 'gojs';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
@@ -60,6 +60,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	public showLabels = false;
 	public showLegend = false;
 	public assetIconsPath = ASSET_ICONS;
+	public toggleFullScreen = true;
 
 	public assetItem;
 
@@ -85,7 +86,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		{
 			icon: 'serverVirtual',
 			label: 'Virtual Server',
-			value: 'virtual server',
+			value: 'Device',
 			checked: false
 		},
 		{
@@ -109,7 +110,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		{
 			icon: 'other',
 			label: 'Other Device',
-			value: 'Device',
+			value: 'DEVICE',
 			checked: false
 		}
 	];
@@ -123,7 +124,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		private preferenceService: PreferenceService
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
-		this.getAssetList = this.assetExplorerService.getAssetListForComboBox.bind(this.assetExplorerService);
+		this.getAssetList = this.listAssets.bind(this);
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
 
@@ -139,6 +140,17 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	/**
+	 *
+	 * @param searchParams Based on the model params executes the search to get the corresponding assets list
+	 * @returns {Observable<any>}
+	 */
+	listAssets(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		const params = {...searchParams};
+		params.value = '';
+		return this.assetExplorerService.getAssetListForComboBox(params);
+	}
+
+		/**
 	 * A call to the Architecture graph service for getting the default graph data for the current user
 	 */
 	getArchitectureGraphPreferences() {
@@ -285,7 +297,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	goFullScreen() {
-		this.graph.showFullGraph();
+		this.toggleFullScreen = !this.toggleFullScreen;
 	}
 
 	toggleLegend() {
@@ -331,8 +343,9 @@ export class ArchitectureGraphComponent implements OnInit {
 			iconsOnly: iconsOnly,
 			extras: {
 				diagramOpts: {
-					autoScale: Diagram.Uniform,
-					allowZoom: true
+					initialAutoScale: Diagram.UniformToFill,
+					contentAlignment: Spot.Center,
+					allowZoom: true,
 				},
 				isExpandable: false
 			}

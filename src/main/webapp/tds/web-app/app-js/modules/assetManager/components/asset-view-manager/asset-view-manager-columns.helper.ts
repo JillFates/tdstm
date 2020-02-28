@@ -21,7 +21,7 @@ export const AssetViewManagerColumnsHelper = {
 	 +
 	 * @returns {GridColumnModel[]}
 	 */
-	createColumns: (): GridColumnModel[] => {
+	createColumns: (dateFormat): GridColumnModel[] => {
 		columns = [];
 		addColumn({
 			property: 'isFavorite',
@@ -54,7 +54,7 @@ export const AssetViewManagerColumnsHelper = {
 			resizable: true,
 			type: 'date',
 			filterable: true,
-			format: null,
+			format: dateFormat,
 			width: 150
 		});
 		addColumn({
@@ -63,7 +63,7 @@ export const AssetViewManagerColumnsHelper = {
 			resizable: true,
 			type: 'date',
 			filterable: true,
-			format: null,
+			format: dateFormat,
 			width: 150
 		});
 		addColumn({

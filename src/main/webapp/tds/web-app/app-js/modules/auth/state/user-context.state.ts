@@ -46,6 +46,16 @@ export class UserContextState {
 		return state;
 	}
 
+	@Selector()
+	static getUserEvent(state: UserContextModel) {
+		return state.event;
+	}
+
+	@Selector()
+	static getUserBundle(state: UserContextModel) {
+		return state.bundle;
+	}
+
 	/**
 	 * Get the current Token for the CSRFT
 	 * @param state

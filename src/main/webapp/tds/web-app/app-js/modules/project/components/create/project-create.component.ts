@@ -204,7 +204,13 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 	}
 
 	public saveForm(): void {
-		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel) && this.validatePartners(this.projectModel.partners)) {
+		const validateDate = DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel) && this.validatePartners(this.projectModel.partners);
+		if (!validateDate) {
+			this.dialogService.notify(
+				'Validation Required',
+				'The completion time must be later than the start time.'
+			).subscribe();
+		} else {
 			if (this.projectModel.startDate) {
 				this.projectModel.startDate.setHours(0, 0, 0, 0);
 				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
