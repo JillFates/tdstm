@@ -19,7 +19,7 @@ export const STATE_ICONS_PATH = {
 		iconAlt: '\uf254',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M360 64c13.255 0 24-10.745 24-24V24c0-13.255-10.745-24-24-24H24C10.745 0 0 10.745 0 24v16c0 13.255 10.745 24 24 24 0 90.965 51.016 167.734 120.842 192C75.016 280.266 24 357.035 24 448c-13.255 0-24 10.745-24 24v16c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24v-16c0-13.255-10.745-24-24-24 0-90.965-51.016-167.734-120.842-192C308.984 231.734 360 154.965 360 64z',
-		color: '#D3D3D3',
+		color: '#898989',
 		background: '#fff'
 	},
 	completed: {
@@ -51,7 +51,7 @@ export const ASSET_ICONS_PATH = {
 		iconAlt: '\uf0c8',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z',
-		color: '#333',
+		color: '#898989',
 		background: 'transparent',
 		iconName: 'faBox'
 	},

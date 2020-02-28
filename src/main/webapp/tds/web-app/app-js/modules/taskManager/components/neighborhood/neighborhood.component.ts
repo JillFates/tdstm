@@ -443,20 +443,24 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				data: [
 					{
 						label: TASK_TOOLTIP_FIELDS.STATUS,
-						value: t.status
+						value: t.status || ''
 					},
 					{
 						label: TASK_TOOLTIP_FIELDS.ASSIGNED_TO,
-						value: t.assignedTo
+						value: t.assignedTo || ''
 					},
 					{
 						label: TASK_TOOLTIP_FIELDS.TEAM,
-						value: t.team
+						value: t.team || ''
 					},
 					{
 						label: TASK_TOOLTIP_FIELDS.ASSET_CLASS,
-						value: t.asset && t.asset.assetType,
-						icon: assetIcon && assetIcon.iconName
+						value: t.asset && t.asset.assetType || '',
+						icon: {
+							name: assetIcon && assetIcon.iconName,
+							color: assetIcon && assetIcon.color,
+							background: assetIcon && assetIcon.background
+						}
 					},
 					{
 						label: TASK_TOOLTIP_FIELDS.ASSET_NAME,

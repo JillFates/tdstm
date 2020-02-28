@@ -182,8 +182,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		treeLayout.treeStyle = TreeLayout.StyleAlternating;
 		treeLayout.layerStyle = TreeLayout.LayerUniform;
 		treeLayout.angle = 0;
-		treeLayout.nodeSpacing = 100;
-		treeLayout.layerSpacing = 150;
+		treeLayout.nodeSpacing = 200;
+		treeLayout.layerSpacing = 200;
 
 		return treeLayout;
 	}
