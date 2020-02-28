@@ -65,44 +65,44 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 *
-	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
+	 * Query for getting all Dataviews where: belong to current project and either shared, system or are owned by
 	 * current whom in session
 	 *
 	 * @param whom
 	 * @param project
 	 * @return
 	 */
-    List<Dataview> list(Person userPerson, Project userProject) {
-        def query
+	List<Dataview> list(Person userPerson, Project userProject) {
+		def query
 		List<Long> favoriteSystemViewIds
 
-        boolean canSeeSystemViews = securityService.hasPermission(userPerson, Permission.AssetExplorerSystemList)
-        if (canSeeSystemViews) {
-            query = Dataview.where {
-                (project == userProject && (isShared == true || person == userPerson)) \
-				|| \
-				(project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
-            }
-        } else {
+		boolean canSeeSystemViews = hasPermission(Permission.AssetExplorerSystemList)
+		if (canSeeSystemViews) {
+			query = Dataview.where {
+				(project == userProject && (isShared == true || person == userPerson)) \
+				 ||  \
+				 (project.id == Project.DEFAULT_PROJECT_ID && (isSystem == true || isShared == true || person == userPerson))
+			}
+		} else {
 			// Get list of user's list favorite View Ids
-            favoriteSystemViewIds = FavoriteDataview.where { person == userPerson }
-        		.projections { property('dataview.id') }
+			favoriteSystemViewIds = FavoriteDataview.where { person == userPerson }
+				.projections { property('dataview.id') }
 				.list()
 
-            if (favoriteSystemViewIds) {
-                query = Dataview.where {
-                    (project == userProject  && (isShared == true || person == userPerson)) \
-					|| \
-                    (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
-                }
-            } else {
-                query = Dataview.where {
-                    (project == userProject  && (isShared == true || person == userPerson))
-                }
-            }
-        }
+			if (favoriteSystemViewIds) {
+				query = Dataview.where {
+					(project == userProject && (isShared == true || person == userPerson)) \
+					 ||  \
+					(project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
+				}
+			} else {
+				query = Dataview.where {
+					(project == userProject && (isShared == true || person == userPerson))
+				}
+			}
+		}
 
-        return query.list()
+		return query.list()
     }
 
 	/**
@@ -232,61 +232,45 @@ class DataviewService implements ServiceMethods {
 	 */
 	Map generateSaveOptions(Project project, Person whom, Dataview dataview) {
 		Set saveAsOptions = []
-
 		boolean hasGlobalOverridePerm = hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
 		boolean hasProjectOverridePerm = hasPermission(Permission.AssetExplorerOverrideAllUserProject)
 		boolean isDefaultProject = project.isDefaultProject()
-		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
 
-		// Determine the saveAsOptions
 		// User can always save as My View
 		if (hasPermission(Permission.AssetExplorerSaveAs)){
 			saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
 		}
 
-		if ( project && ! isDefaultProject ) {
-			// Check to see if user already has an overridden version of a system view for themselves and if not
-			// then they get the OVERRIDE_FOR_ME option
-			if ( dataview?.overridesView || dataview?.isSystem) {
-				if (Dataview.where {
-					project.id == project.id
-					// Make sure we're querying on the root system view id
-					overridesView.id == (dataview.overridesView ? dataview.overridesView.id : dataview.id)
-					person.id == whom.id
-					isShared == false
-				}.count() == 0) {
-					saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
-				}
+		// Check to see if user already has an overridden version of a system view for themselves and if not
+		// then they get the OVERRIDE_FOR_ME option
+		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
+		if ( isOverrideable ) {
+			Long overriddenViewId = (dataview.overridesView ? dataview.overridesView.id : dataview.id)
+
+			if (Dataview.where {
+				project.id == project.id
+				// Make sure we're querying on the root system view id
+				overridesView.id == overriddenViewId
+				person.id == whom.id
+				isShared == false
+			}.count() == 0) {
+				saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
 			}
 
 			// Check to see if anybody has an overridden version of a system view for ALL users and if not
 			// then they get the OVERRIDE_FOR_ALL option, as long as they also have that permission.
-			if (	dataview &&
-					isOverrideable &&
-					hasProjectOverridePerm &&
+			if (	(isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm) &&
 					Dataview.where {
 						project.id == project.id
 						// Make sure we're querying on the root system view id
-						overridesView.id == (dataview.overridesView ? dataview.overridesView.id : dataview.id)
+						overridesView.id == overriddenViewId
 						isShared == true
-					}.count() == 0 ) {
-						saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
-			}
-		}
-
-		// See about if the user can Save As OVERRIDE_FOR_ALL globally across all projects
-		if (dataview && isOverrideable && isDefaultProject && hasGlobalOverridePerm) {
-			if (Dataview.where {
-				project.id == project.id
-				// Make sure we're querying on the root system view id
-				overridesView.id == (dataview.overridesView ? dataview.overridesView.id : dataview.id)
-				isShared == true
-			}.count() == 0) {
+					}.count() == 0) {
 				saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
 			}
 		}
 
-		// Determine if the user can save the current view
+		// Determine if the user can Save the current view
 		Boolean canSaveCurrentView = false
 		if (dataview) {
 			if (dataview.personId == whom.id) {
@@ -608,13 +592,6 @@ class DataviewService implements ServiceMethods {
 					throwException(InvalidParameterException,
 							'dataview.validate.overrideGlobalPermission',
 							'You do not have the necessary permission to save into the Default project')
-				}
-
-				// Only allow overriding System views in the Default project for All Users
-				if (dataviewCommand.saveAsOption != ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL) {
-					throwException(InvalidParameterException,
-							'dataview.validate.overrideDefaultProjectOnlyAllUsers',
-							'Overriding system views in Default project is only allowed for All Users')
 				}
 
 				// Check if the there is already an overridden view already

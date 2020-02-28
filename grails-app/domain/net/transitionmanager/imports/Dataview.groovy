@@ -46,6 +46,7 @@ class Dataview {
 			id           : id,
 			name         : name,
 			hasOverride  : hasOverride(project),
+			isGlobal     : this.project.isDefaultProject(),
 			isSystem     : isSystem,
 			isShared     : isShared,
 			isOwner      : isOwner(whom.id),

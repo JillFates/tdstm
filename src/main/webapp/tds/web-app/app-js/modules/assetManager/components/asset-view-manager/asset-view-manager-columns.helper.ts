@@ -39,14 +39,15 @@ export const AssetViewManagerColumnsHelper = {
 	createColumns: (): GridColumnModel[] => {
 		columns = [];
 
-		addColumn({ property: 'isFavorite', label: 'ASSET_EXPLORER.INDEX.FAVORITE', sort: { isSorting: false, isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
-		addColumn({ property: 'name', label: 'ASSET_EXPLORER.INDEX.NAME', sort: { isSorting: false, isAscending: false  }, type: 'string', width: 100 });
+		addColumn({ property: 'isFavorite', label: 'ASSET_EXPLORER.INDEX.FAVORITE', sort: { isSorting: false, isAscending: false  }, type: 'boolean', width: 30, cellClass: 'text-center' });
+		addColumn({ property: 'name', label: 'ASSET_EXPLORER.INDEX.NAME', sort: { isSorting: false, isAscending: false  }, type: 'string', width: 300 });
 		addColumn({ property: 'createdBy', label: 'ASSET_EXPLORER.INDEX.CREATED_BY', sort: { isSorting: false, isAscending: false  }, type: 'string', width: 100 });
-		addColumn({ property: 'createdOn', label: 'ASSET_EXPLORER.INDEX.CREATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 100 });
-		addColumn({ property: 'updatedOn', label: 'ASSET_EXPLORER.INDEX.UPDATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 100 });
-		addColumn({ property: 'isShared', label: 'ASSET_EXPLORER.INDEX.SHARED',  sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
-		addColumn({ property: 'isSystem', label: 'ASSET_EXPLORER.INDEX.SYSTEM', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
-		addColumn({ property: 'isOverride', label: 'ASSET_EXPLORER.INDEX.OVERRIDE', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
+		addColumn({ property: 'createdOn', label: 'ASSET_EXPLORER.INDEX.CREATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 60 });
+		addColumn({ property: 'updatedOn', label: 'ASSET_EXPLORER.INDEX.UPDATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 60 });
+		addColumn({ property: 'isShared', label: 'ASSET_EXPLORER.INDEX.SHARED',  sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 50, cellClass: 'text-center' });
+		addColumn({ property: 'isGlobal', label: 'ASSET_EXPLORER.INDEX.GLOBAL',  sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 50, cellClass: 'text-center' });
+		addColumn({ property: 'isSystem', label: 'ASSET_EXPLORER.INDEX.SYSTEM', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 50, cellClass: 'text-center' });
+		addColumn({ property: 'isOverride', label: 'ASSET_EXPLORER.INDEX.OVERRIDE', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 50, cellClass: 'text-center' });
 
 		return columns;
 	},

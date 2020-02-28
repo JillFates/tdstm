@@ -129,6 +129,7 @@ export const en_DICTIONARY: Object = {
 			'CREATED_BY': 'Created By',
 			'CREATED_ON': 'Created On',
 			'UPDATED_ON': 'Updated On',
+			'GLOBAL': 'Global',
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
 			'OVERRIDE': 'Override',
