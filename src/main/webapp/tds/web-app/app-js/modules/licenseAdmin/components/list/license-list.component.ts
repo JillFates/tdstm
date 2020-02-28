@@ -109,7 +109,7 @@ export class LicenseListComponent implements OnInit {
 	 */
 	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0) {
-			await this.openLicenseViewEdit(event.dataItem.id, ActionType.VIEW);
+			await this.openLicenseViewEdit(event.dataItem, ActionType.VIEW);
 		}
 	}
 
@@ -204,7 +204,7 @@ export class LicenseListComponent implements OnInit {
 					licenseModel: licenseModel
 				},
 				modalConfiguration: {
-					title: 'Request New License',
+					title: 'License Detail',
 					draggable: true,
 					modalSize: ModalSize.LG
 				}

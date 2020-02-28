@@ -1,275 +1,214 @@
-<div
-	tds-autofocus
-	tds-handle-escape
-	(escPressed)="cancelCloseDialog()"
-	class="tds-modal-content has-side-nav data-script-view-edit-component"
->
-	<div class="modal-header">
-		<tds-button-custom
-			class="close"
-			[icon]="'close'"
-			(click)="cancelCloseDialog()"
-			[displayLabel]="false"
-			[flat]="true"
-		></tds-button-custom>
-		<div class="modal-title-container">
-			<div class="modal-title">
-				{{ 'LICENSE.LICENSE_DETAIL' | translate }}
+<div class="data-script-view-edit-component">
+	<form
+		name="licenseRequestForm"
+		role="form"
+		data-toggle="validator"
+		#licenseRequestForm="ngForm"
+		class="form-horizontal left-alignment"
+	>
+		<div class="box-body">
+			<div class="row">
+				<div class="col-sm-5">
+					<div class="form-group">
+						<label class="col-sm-3 control-label"
+							>Project:
+						</label>
+						<div class="col-sm-9">
+							<label
+								class="control-label "
+								style="text-transform: capitalize;"
+								>{{ licenseModel.project.name }}</label
+							>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-5">
+					<div class="form-group">
+						<label class="col-sm-4 control-label"
+							>Email contact:
+						</label>
+						<div class="col-sm-8">
+							<label class="control-label ">{{
+								licenseModel.email
+							}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" ng-if="licenseModel.clientName">
+				<div class="col-sm-5">
+					<div class="form-group">
+						<label class="col-sm-3 control-label"
+							>Client:
+						</label>
+						<div class="col-sm-9">
+							<label class="control-label ">{{
+								licenseModel.client.name
+							}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div>
+				<ul class="nav">
+					<li class="nav-item">
+						<a
+							href="#tab_1"
+							data-toggle="tab"
+							class="btn btn-link nav-link active"
+							>Details</a
+						>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab_1">
+						<div class="form-group">
+							<label
+								for="radioGroupMethod"
+								class="col-sm-1 control-label"
+								>Method:</label
+							>
+							<div class="col-sm-11" id="radioGroupMethod">
+								<clr-radio-container clrInline>
+									<clr-radio-wrapper
+										*ngFor="
+											let methodOption of methodOptions
+										"
+									>
+										<input
+											clrRadio
+											type="radio"
+											name="inlineRadioOptions"
+											value="servers"
+											[(ngModel)]="
+												licenseModel.method.name
+											"
+											[value]="methodOption.name"
+											disabled
+										/>
+										<label>
+											{{ methodOption.text }}
+										</label>
+									</clr-radio-wrapper>
+								</clr-radio-container>
+							</div>
+						</div>
+						<div
+							class="form-group sub-option-50"
+							*ngIf="
+								licenseModel.method.name === 'MAX_SERVERS'
+							"
+						>
+							<label class="col-sm-2 control-label"
+								>Max Server:</label
+							>
+							<div class="col-sm-10">
+								<label class="control-label ">{{
+									licenseModel.method.max
+								}}</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label"
+								>Environment:</label
+							>
+							<div class="col-sm-10">
+								<label
+									class="control-label"
+									style="text-transform: capitalize;"
+									>{{
+										licenseModel.environment | lowercase
+									}}</label
+								>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label"
+								>Inception:</label
+							>
+							<div class="col-sm-10">
+								<label class="control-label">{{
+									licenseModel.activationDate
+										| date: dateFormat
+								}}</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label"
+								>Expiration:</label
+							>
+							<div class="col-sm-10">
+								<label class="control-label">{{
+									licenseModel.expirationDate
+										| date: dateFormat
+								}}</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label
+								for="selectSpecialInstructions"
+								class="col-sm-12 control-label"
+								>Special Instructions and/or PO#
+								reference:</label
+							>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<textarea
+									clrTextarea
+									id="selectSpecialInstructions"
+									name="selectSpecialInstructions"
+									class="form-control"
+									rows="3"
+									placeholder=""
+									[(ngModel)]="licenseModel.requestNote"
+									[disabled]="true"
+								></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-1"></label>
+							<label
+								class="col-sm-2 control-label text-right element-width-50"
+								>Id:</label
+							>
+							<div class="col-sm-9">
+								<label class="control-label">{{
+									licenseModel.id
+								}}</label>
+							</div>
+						</div>
+						<div
+							class="form-group"
+							*ngIf="licenseModel.replaced"
+						>
+							<label
+								class="col-sm-2 control-label text-right element-width-100"
+								>Replaced:</label
+							>
+							<div class="col-sm-10">
+								<label class="control-label">{{
+									licenseModel.replaced.date | date
+								}}</label>
+								<label class="control-label pad-left-20"
+									>Server
+									<a
+										href="{{
+											licenseModel.replaced.url
+										}}"
+										>{{ licenseModel.replaced.name }}</a
+									></label
+								>
+							</div>
+						</div>
+					</div>
+					<!-- /.tab-pane -->
+					<div class="tab-pane" id="tab_2"></div>
+					<!-- /.tab-pane -->
+				</div>
+				<!-- /.tab-content -->
 			</div>
 		</div>
-	</div>
-	<div class="modal-body">
-		<form
-			name="licenseRequestForm"
-			role="form"
-			data-toggle="validator"
-			#licenseRequestForm="ngForm"
-			class="form-horizontal left-alignment"
-		>
-			<div class="box-body">
-				<div class="row">
-					<div class="col-sm-5">
-						<div class="form-group">
-							<label class="col-sm-3 control-label"
-								>Project:
-							</label>
-							<div class="col-sm-9">
-								<label
-									class="control-label "
-									style="text-transform: capitalize;"
-									>{{ licenseModel.project.name }}</label
-								>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-5">
-						<div class="form-group">
-							<label class="col-sm-4 control-label"
-								>Email contact:
-							</label>
-							<div class="col-sm-8">
-								<label class="control-label ">{{
-									licenseModel.email
-								}}</label>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row" ng-if="licenseModel.clientName">
-					<div class="col-sm-5">
-						<div class="form-group">
-							<label class="col-sm-3 control-label"
-								>Client:
-							</label>
-							<div class="col-sm-9">
-								<label class="control-label ">{{
-									licenseModel.client.name
-								}}</label>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div>
-					<ul class="nav">
-						<li class="nav-item">
-							<a
-								href="#tab_1"
-								data-toggle="tab"
-								class="btn btn-link nav-link active"
-								>Details</a
-							>
-						</li>
-					</ul>
-					<div class="tab-content">
-						<div class="tab-pane active" id="tab_1">
-							<div class="form-group">
-								<label
-									for="radioGroupMethod"
-									class="col-sm-1 control-label"
-									>Method:</label
-								>
-								<div class="col-sm-11" id="radioGroupMethod">
-									<clr-radio-container clrInline>
-										<clr-radio-wrapper
-											*ngFor="
-												let methodOption of methodOptions
-											"
-										>
-											<input
-												clrRadio
-												type="radio"
-												name="inlineRadioOptions"
-												value="servers"
-												[(ngModel)]="
-													licenseModel.method.name
-												"
-												[value]="methodOption.name"
-												disabled
-											/>
-											<label>
-												{{ methodOption.text }}
-											</label>
-										</clr-radio-wrapper>
-									</clr-radio-container>
-								</div>
-							</div>
-							<div
-								class="form-group sub-option-50"
-								*ngIf="
-									licenseModel.method.name === 'MAX_SERVERS'
-								"
-							>
-								<label class="col-sm-2 control-label"
-									>Max Server:</label
-								>
-								<div class="col-sm-10">
-									<label class="control-label ">{{
-										licenseModel.method.max
-									}}</label>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-2 control-label"
-									>Environment:</label
-								>
-								<div class="col-sm-10">
-									<label
-										class="control-label"
-										style="text-transform: capitalize;"
-										>{{
-											licenseModel.environment | lowercase
-										}}</label
-									>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-2 control-label"
-									>Inception:</label
-								>
-								<div class="col-sm-10">
-									<label class="control-label">{{
-										licenseModel.activationDate
-											| date: dateFormat
-									}}</label>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-2 control-label"
-									>Expiration:</label
-								>
-								<div class="col-sm-10">
-									<label class="control-label">{{
-										licenseModel.expirationDate
-											| date: dateFormat
-									}}</label>
-								</div>
-							</div>
-							<div class="form-group">
-								<label
-									for="selectSpecialInstructions"
-									class="col-sm-12 control-label"
-									>Special Instructions and/or PO#
-									reference:</label
-								>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-12">
-									<textarea
-										clrTextarea
-										id="selectSpecialInstructions"
-										name="selectSpecialInstructions"
-										class="form-control"
-										rows="3"
-										placeholder=""
-										[(ngModel)]="licenseModel.requestNote"
-										[disabled]="true"
-									></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-sm-1"></label>
-								<label
-									class="col-sm-2 control-label text-right element-width-50"
-									>Id:</label
-								>
-								<div class="col-sm-9">
-									<label class="control-label">{{
-										licenseModel.id
-									}}</label>
-								</div>
-							</div>
-							<div
-								class="form-group"
-								*ngIf="licenseModel.replaced"
-							>
-								<label
-									class="col-sm-2 control-label text-right element-width-100"
-									>Replaced:</label
-								>
-								<div class="col-sm-10">
-									<label class="control-label">{{
-										licenseModel.replaced.date | date
-									}}</label>
-									<label class="control-label pad-left-20"
-										>Server
-										<a
-											href="{{
-												licenseModel.replaced.url
-											}}"
-											>{{ licenseModel.replaced.name }}</a
-										></label
-									>
-								</div>
-							</div>
-						</div>
-						<!-- /.tab-pane -->
-						<div class="tab-pane" id="tab_2"></div>
-						<!-- /.tab-pane -->
-					</div>
-					<!-- /.tab-content -->
-				</div>
-			</div>
-			<!-- /.box-body -->
-		</form>
-	</div>
-	<div
-		class="modal-footer form-group-center"
-		*ngIf="licenseModel.status !== licenseStatus.ACTIVE"
-	>
-		<tds-button-custom
-			[icon]="'key'"
-			class="btn-primary pull-left"
-			(click)="applyLicenseKey()"
-			title="Apply License Key"
-		>
-		</tds-button-custom>
-
-		<tds-button-custom
-			class="btn-primary pull-left"
-			[icon]="'reply'"
-			(click)="resubmitLicenseRequest()"
-			title="Resubmit Request"
-		>
-		</tds-button-custom>
-
-		<tds-button-custom
-			[icon]="'envelope'"
-			class="btn-primary pull-left"
-			(click)="manuallyRequest()"
-			title="Manually Submit Request"
-		>
-		</tds-button-custom>
-	</div>
-	<div class="modal-sidenav btn-link">
-		<tds-button-delete
-			title="Delete License"
-			[ngClass]="{
-				'pull-left': licenseModel.status === licenseStatus.ACTIVE
-			}"
-			(click)="onDelete()"
-		>
-		</tds-button-delete>
-
-		<tds-button-cancel (click)="cancelCloseDialog()"></tds-button-cancel>
-	</div>
+		<!-- /.box-body -->
+	</form>
 </div>

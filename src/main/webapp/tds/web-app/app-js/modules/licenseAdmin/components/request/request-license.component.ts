@@ -38,14 +38,22 @@ export class RequestLicenseComponent extends Dialog implements OnInit {
 	}
 
 	ngOnInit(): void {
+
 		this.buttons.push({
-			name: 'request',
-			icon: 'check',
-			text: 'Submit Request',
+			name: 'save',
+			icon: 'floppy',
 			show: () => true,
 			disabled: () => !this.licenseRequestForm.form.valid,
-			type: DialogButtonType.CONTEXT,
+			type: DialogButtonType.ACTION,
 			action: this.onCreateRequestLicense.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
 		});
 
 		Observable.forkJoin(this.licenseAdminService.getEnvironments(), this.licenseAdminService.getProjects()).subscribe((res: any) => {

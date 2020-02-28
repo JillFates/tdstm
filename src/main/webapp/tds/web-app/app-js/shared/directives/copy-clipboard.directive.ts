@@ -18,7 +18,13 @@ export class CopyClipboardDirective {
 		if (!this.payload) {
 			return;
 		}
+		this.copy();
+	}
 
+	/**
+	 * Copy the data into the clipboard
+	 */
+	public copy(): void {
 		let listener = (e: ClipboardEvent) => {
 			let clipboard = e.clipboardData || window['clipboardData'];
 			clipboard.setData('text', this.payload.toString());
