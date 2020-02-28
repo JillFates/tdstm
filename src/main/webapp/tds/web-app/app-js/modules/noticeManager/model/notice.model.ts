@@ -12,15 +12,13 @@ export class NoticeColumnModel {
 			{
 				label: 'Title',
 				property: 'title',
-				filterType: FilterType.text,
-				width: 250,
+				filterType: FilterType.text
 			},
 			{
 				label: 'Type',
 				property: 'typeId',
 				filterType: FilterType.dropdown,
-				filterInputData: typeDropdownData,
-				width: 270,
+				filterInputData: typeDropdownData
 			},
 			{
 				label: 'Active',
@@ -38,28 +36,24 @@ export class NoticeColumnModel {
 						},
 					],
 					defaultItem: { text: '', value: null },
-				},
-				width: 120,
+				}
 			},
 			{
 				label: 'Activation Date',
 				property: 'activationDate',
 				format: dateFormat,
-				filterType: FilterType.date,
-				width: 170,
+				filterType: FilterType.date
 			},
 			{
 				label: 'Expiration Date',
 				property: 'expirationDate',
 				format: dateFormat,
-				filterType: FilterType.date,
-				width: 170,
+				filterType: FilterType.date
 			},
 			{
 				label: 'Sequence',
 				property: 'sequence',
-				filterType: FilterType.text,
-				width: 120,
+				filterType: FilterType.text
 			},
 			{
 				label: 'Locked',
@@ -77,8 +71,7 @@ export class NoticeColumnModel {
 						},
 					],
 					defaultItem: { text: '', value: null },
-				},
-				width: 120,
+				}
 			},
 		];
 	}

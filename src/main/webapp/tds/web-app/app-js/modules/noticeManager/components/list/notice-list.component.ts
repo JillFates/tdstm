@@ -1,8 +1,8 @@
 // Angular
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 // Components
 import { NoticeViewEditComponent } from '../view-edit/notice-view-edit.component';
-import { GridComponent } from 'tds-component-library';
+import {DialogConfirmAction, DialogService, GridComponent, ModalSize} from 'tds-component-library';
 // Service
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -19,8 +19,6 @@ import {
 	NoticeTypes,
 } from '../../model/notice.model';
 import { ActionType } from '../../../../shared/model/action-type.enum';
-// Kendo
-import { CellClickEvent } from '@progress/kendo-angular-grid';
 import {
 	GridRowAction,
 	HeaderActionButtonData,
@@ -30,6 +28,9 @@ import {
 	DropdownFilterData,
 	DropdownData,
 } from 'tds-component-library';
+
+// Kendo
+import { CellClickEvent } from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'tds-notice-list',
@@ -43,6 +44,7 @@ export class NoticeListComponent implements OnInit {
 	public gridSettings: GridSettings = {
 		defaultSort: [{ field: 'title', dir: 'asc' }],
 		sortSettings: { mode: 'single' },
+		selectableSettings: {enabled: true, mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,
@@ -58,11 +60,11 @@ export class NoticeListComponent implements OnInit {
 	@ViewChild(GridComponent, { static: false }) gridComponent: GridComponent;
 
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private noticeService: NoticeService,
-		private prompt: UIPromptService,
 		private translateService: TranslatePipe
 	) {
 		this.noticeTypes = [...NoticeTypes];
@@ -133,7 +135,7 @@ export class NoticeListComponent implements OnInit {
 
 	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0 && this.isEditAvailable()) {
-			await this.openNotice(event.dataItem.id, ActionType.View);
+			await this.openNotice(event.dataItem.id, ActionType.View, false);
 		}
 	}
 
@@ -156,7 +158,7 @@ export class NoticeListComponent implements OnInit {
 	public onEdit = async (dataItem: NoticeModel): Promise<void> => {
 		try {
 			if (this.isEditAvailable()) {
-				await this.openNotice(dataItem.id, ActionType.Edit);
+				await this.openNotice(dataItem.id, ActionType.Edit, true);
 				await this.gridComponent.reloadData();
 			}
 		} catch (error) {
@@ -166,13 +168,11 @@ export class NoticeListComponent implements OnInit {
 
 	public onDelete = async (dataItem: NoticeModel): Promise<void> => {
 		try {
-			const confirmation = await this.prompt.open(
+			const confirmation = await this.dialogService.confirm(
 				'Confirmation Required',
 				'You are about to delete the selected notice. Do you want to proceed?',
-				'Yes',
-				'No'
-			);
-			if (confirmation) {
+			).toPromise();
+			if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 				await this.noticeService
 					.deleteNotice(dataItem.id.toString())
 					.toPromise();
@@ -185,26 +185,43 @@ export class NoticeListComponent implements OnInit {
 
 	public onCreateNotice = async (): Promise<void> => {
 		try {
-			await this.dialogService.open(NoticeViewEditComponent, [
-				{ provide: NoticeModel, useValue: new NoticeModel() },
-				{ provide: Number, useValue: ActionType.Create },
-			]);
+			const data = await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: NoticeViewEditComponent,
+				data: {
+					noticeModel: new NoticeModel(),
+					actionType: ActionType.Create,
+					openFromList: false
+				},
+				modalConfiguration: {
+					title: 'Notice Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
-	public async openNotice(id: number, action: ActionType): Promise<void> {
+	public async openNotice(id: number, action: ActionType, openFromList = false): Promise<void> {
 		try {
 			const notice = await this.noticeService.getNotice(id).toPromise();
-			await this.dialogService.open(NoticeViewEditComponent, [
-				{
-					provide: NoticeModel,
-					useValue: notice as NoticeModel,
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: NoticeViewEditComponent,
+				data: {
+					noticeModel: notice as NoticeModel,
+					actionType: action,
+					openFromList: openFromList
 				},
-				{ provide: Number, useValue: action },
-			]);
+				modalConfiguration: {
+					title: 'Notice',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			console.error(error);
