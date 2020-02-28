@@ -99,7 +99,7 @@
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Comments
-                            <span class="badge" *ngIf="taskComment">
+                            <span class="badge" *ngIf="commentCount">
                                 {{ commentCount > 99 ? '99+' : commentCount }}
                             </span>
                         </button>
