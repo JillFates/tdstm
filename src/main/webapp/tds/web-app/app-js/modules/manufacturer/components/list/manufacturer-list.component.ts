@@ -136,7 +136,7 @@ export class ManufacturerListComponent implements OnInit {
 		} catch (error) {
 			console.error(error);
 		}
-	}
+	};
 
 	/**
 	 * Select the current element and open the Edit Dialog
@@ -150,7 +150,7 @@ export class ManufacturerListComponent implements OnInit {
 		} catch (error) {
 			console.error(error);
 		}
-	}
+	};
 
 	/**
 	 * Delete the selected Provider
@@ -159,13 +159,20 @@ export class ManufacturerListComponent implements OnInit {
 	private onDelete = async (dataItem: ManufacturerModel): Promise<void> => {
 		try {
 			if (this.isDeleteAvailable()) {
-				await this.manufacturerService.deleteManufacturer(dataItem.id).toPromise();
-				await this.gridComponent.reloadData();
+				this.dialogService.confirm(
+					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION')
+				).subscribe((result: any) => {
+						if (result.confirm === DialogConfirmAction.CONFIRM) {
+							this.manufacturerService.deleteManufacturer(dataItem.id).toPromise();
+							this.gridComponent.reloadData();
+						}
+					});
 			}
 		} catch (error) {
 			console.error(error);
 		}
-	}
+	};
 
 	private loadData = async (): Promise<ManufacturerModel[]> => {
 		try {
@@ -173,12 +180,13 @@ export class ManufacturerListComponent implements OnInit {
 		} catch (error) {
 			console.error(error);
 		}
-	}
+	};
 
 	/**
 	 * Open The Dialog to Create, View or Edit the Provider
-	 * @param {ProviderModel} providerModel
+	 * @param manufacturerModel
 	 * @param {number} actionType
+	 * @param openFromList
 	 */
 	private async openManufacturer(manufacturerModel: ManufacturerModel, actionType: ActionType, openFromList = false): Promise<void> {
 		try {
