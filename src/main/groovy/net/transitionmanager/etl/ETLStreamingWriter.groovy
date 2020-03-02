@@ -12,18 +12,60 @@ import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
 import groovy.transform.CompileStatic
 
+/**
+ * <p>Streaming reader solution for {@link ETLProcessorResult},
+ * This Writer class can convert to a JSON file, 2 different parts from {@link ETLProcessorResult}.</p>
+ * <p>This solution splits {@link ETLProcessorResult} in different files.
+ * One for the header, and one for each different data list in {@link DomainResult#data}
+ * </p>
+ * <BR/>
+ * <p>1) Saves data part of each {@link ETLProcessorResult#domains} in JSON format: </p>
+ * <pre>
+ *   List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+ *   String outputFilename = tmpFile[0]
+ *   OutputStream outputStream = (OutputStream) tmpFile[1]
+ *   new ETLStreamingWriter(outputStream).writeETLResultsData(domain.data)
+ * </pre>
+ * <p>At the same time, it populates 2 fields in {@link ETLProcessorResult}:</p>
+ *  <ul>
+ *      <li>{@link DomainResult#outputFilename}: defines where {@link ETLStreamingWriter}
+ *          saves each {@link DomainResult#data} list.
+ *      <li>{@link DomainResult#dataSize}: defines the amount of rows from {@link DomainResult#data}
+ *          were saved
+ *  </ul
+ * <BR>
+ * <p>2) Saves one part of {@link ETLProcessorResult} as <tt>header</tt> in JSON format:</p>
+ * <pre>
+ *  List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+ *  String outputFilename = tmpFile[0]
+ *  OutputStream os = (OutputStream) tmpFile[1]
+ *  new ETLStreamingWriter(os).writeETLResultsHeader(processorResult)
+ * </pre>
+ *
+ * @see net.transitionmanager.imports.ScriptProcessorService#saveDomainDataUsingStreaming
+ */
 @CompileStatic
-class JsonSerializer {
+class ETLStreamingWriter {
 
     OutputStream outputStream
     JsonGenerator generator
 
-    JsonSerializer(OutputStream outputStream) {
+    ETLStreamingWriter(OutputStream outputStream) {
         this.outputStream = outputStream
         generator = new JsonFactory()
                 .createGenerator(outputStream, JsonEncoding.UTF8)
     }
-
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} field,
+     * the main structure from {@link ETLProcessorResult}.
+     * <pre>
+     *  List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+     *  String outputFilename = tmpFile[0]
+     *  OutputStream os = (OutputStream) tmpFile[1]
+     *  new ETLStreamingWriter(os).writeETLResultsHeader(processorResult)
+     * </pre>
+     * @param result an instance of {@link ETLStreamingWriter#outputStream}
+     */
     void writeETLResultsHeader(ETLProcessorResult result) {
         generator.writeStartObject()
         writeETLInfo(result.ETLInfo)
@@ -36,7 +78,15 @@ class JsonSerializer {
         outputStream.flush()
         outputStream.close()
     }
-
+    /**
+     * <p>Writes in {@link ETLStreamingWriter#outputStream} field,
+     * a list of fields from {@link DomainResult#data}.</p>
+     * <p>Iterating {@link DomainResult#data}, it creates a new entry in
+     * {@link ETLStreamingWriter#outputStream} field following
+     * {@link ETLStreamingWriter#writeRowResult} field</p>
+     *
+     * @param data {@link DomainResult#data} list
+     */
     void writeETLResultsData(List<RowResult> data) {
         writeDataArray(data)
         generator.close()
@@ -44,6 +94,12 @@ class JsonSerializer {
         outputStream.close()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream}
+     * fields from {@link DomainResult}.
+     *
+     * @param domains
+     */
     private void writeDomains(List<DomainResult> domains) {
 
         generator.writeFieldName('domains')
@@ -54,6 +110,12 @@ class JsonSerializer {
         generator.writeEndArray()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream}
+     * fields from {@link DomainResult}.
+     *
+     * @param domain
+     */
     private void writeDomains(DomainResult domain) {
         generator.writeStartObject()
         generator.writeStringField('domain', domain.domain)
@@ -64,6 +126,11 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} fields from {@link RowResult}.
+     *
+     * @param data
+     */
     private void writeDataArray(List<RowResult> data) {
         generator.writeStartArray()
         for (RowResult rowResult in data) {
@@ -71,7 +138,11 @@ class JsonSerializer {
         }
         generator.writeEndArray()
     }
-
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} fields from {@link RowResult}.
+     *
+     * @param rowResult
+     */
     private void writeRowResult(RowResult rowResult) {
         generator.writeStartObject()
 
@@ -88,7 +159,14 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
-    private writeFieldResult(String fieldName, FieldResult fieldResult) {
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} fields from {@link FieldResult}
+     * assigned to a fieldName in {@link RowResult#fields} Map.
+     *
+     * @param fieldName
+     * @param fieldResult
+     */
+    private void writeFieldResult(String fieldName, FieldResult fieldResult) {
         generator.writeFieldName(fieldName)
         generator.writeStartObject()
 
@@ -107,7 +185,12 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
-    private writeFind(FindResult findResult) {
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} fields from {@link FindResult}.
+     *
+     * @param findResult
+     */
+    private void writeFind(FindResult findResult) {
         generator.writeFieldName('find')
         generator.writeStartObject()
         generator.writeObjectField('matchOn', findResult.matchOn)
@@ -117,6 +200,11 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} fields from {@link QueryResult#criteria} List.
+     *
+     * @param criteria
+     */
     private void writeCriteria(Map<String, Object> criteria) {
         generator.writeStartObject()
         generator.writeStringField('propertyName', criteria.propertyName?.toString())
@@ -125,6 +213,11 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} {@link QueryResult#criteria} List.
+     *
+     * @param criteriaList
+     */
     private void writeCriteriaList(List<Map<String, Object>> criteriaList) {
         generator.writeFieldName('criteria')
         generator.writeStartArray()
@@ -134,6 +227,11 @@ class JsonSerializer {
         generator.writeEndArray()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} fields from {@link QueryResult}.
+     *
+     * @param queryResult
+     */
     private void writeQuery(QueryResult queryResult) {
 
         generator.writeStartObject()
@@ -142,6 +240,11 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} a List of from {@link QueryResult}.
+     *
+     * @param queryResults
+     */
     private void writeQueryList(List<QueryResult> queryResults) {
         generator.writeFieldName('query')
         generator.writeStartArray()
@@ -151,7 +254,12 @@ class JsonSerializer {
         generator.writeEndArray()
     }
 
-    private writeFields(Map<String, FieldResult> fields) {
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} a Map with {@link FieldResult}.
+     *
+     * @param fields
+     */
+    private void writeFields(Map<String, FieldResult> fields) {
         generator.writeFieldName('fields')
         generator.writeStartObject()
 
@@ -162,6 +270,11 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
+    /**
+     * Writes in {@link ETLStreamingWriter#outputStream} {@link TagResults} field.
+     *
+     * @param tagResults
+     */
     private void writeTagResults(TagResults tagResults) {
         generator.writeFieldName('tags')
         generator.writeStartObject()
@@ -171,6 +284,12 @@ class JsonSerializer {
         generator.writeEndObject()
     }
 
+    /**
+     * Writes a {@code Collection<Long>} values in {@link ETLStreamingWriter#outputStream}.
+     *
+     * @param fieldName
+     * @param values
+     */
     private void writeNumberCollectionField(String fieldName, Collection<Long> values) {
         generator.writeFieldName(fieldName)
         generator.writeStartArray()
@@ -181,6 +300,12 @@ class JsonSerializer {
         generator.writeEndArray()
     }
 
+    /**
+     * Writes a {@code Collection<String>} values in {@link ETLStreamingWriter#outputStream}.
+     *
+     * @param fieldName
+     * @param values
+     */
     private void writeStringCollectionField(String fieldName, Collection<String> values) {
         generator.writeFieldName(fieldName)
         generator.writeStartArray()
@@ -191,24 +316,41 @@ class JsonSerializer {
         generator.writeEndArray()
     }
 
-    private void writeStringMapField(String fieldName, Map<String, String> fieldLabelMap) {
+    /**
+     * Writes a {@code Map<String, String>} Map in {@link ETLStreamingWriter#outputStream}.
+     *
+     * @param fieldName
+     * @param map
+     */
+    private void writeStringMapField(String fieldName, Map<String, String> map) {
         generator.writeFieldName(fieldName)
         generator.writeStartObject()
-        for (Map.Entry<String, String> entry in fieldLabelMap) {
+        for (Map.Entry<String, String> entry in map) {
             generator.writeStringField(entry.key, entry.value)
         }
         generator.writeEndObject()
     }
 
-    private void writeObjectMapField(String fieldName, Map<String, Object> fieldLabelMap) {
+    /**
+     * Writes a {@code Map<String, Object>} Map in {@link ETLStreamingWriter#outputStream}.
+     *
+     * @param fieldName
+     * @param map
+     */
+    private void writeObjectMapField(String fieldName, Map<String, Object> map) {
         generator.writeFieldName(fieldName)
         generator.writeStartObject()
-        for (Map.Entry<String, Object> entry in fieldLabelMap) {
+        for (Map.Entry<String, Object> entry in map) {
             generator.writeObjectField(entry.key, entry.value)
         }
         generator.writeEndObject()
     }
 
+    /**
+     * Writes a {@link ETLProcessorResult#ETLInfo} in {@link ETLStreamingWriter#outputStream}.
+     *
+     * @param ETLInfo
+     */
     private void writeETLInfo(Map<String, ?> ETLInfo) {
         generator.writeFieldName('ETLInfo')
         generator.writeStartObject()

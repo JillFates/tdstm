@@ -6,8 +6,8 @@ import com.fasterxml.jackson.core.JsonToken
 import groovy.transform.CompileStatic
 
 /**
- * Deserialization class takes ETL output data array in an input stream data,
- * and converts each ETL row in a Map that can be used in the import processe.
+ * Reader class takes ETL output data array in an input stream data,
+ * and converts each ETL row in a Map that can be used in the import process.
  * <pre>
  * 	"data": [
  * 		//{//
@@ -23,11 +23,11 @@ import groovy.transform.CompileStatic
  * @see net.transitionmanager.imports.DataImportService#importRowsIntoBatch(java.lang.Object, net.transitionmanager.imports.ImportBatch, java.io.InputStream, java.util.Map)
  */
 @CompileStatic
-class JsonDeserializer {
+class ETLStreamingReader {
 
     JsonParser parser
 
-    JsonDeserializer(InputStream inputStream) {
+    ETLStreamingReader(InputStream inputStream) {
         this.parser = new JsonFactory().createParser(inputStream)
     }
 
@@ -35,10 +35,9 @@ class JsonDeserializer {
      * <p>This method creates a new row Map from ETL InputStream data.</p>
      * <pre>
      *     InputStream inputStream = fileSystemService.openTemporaryFile(filename)
-     *     Closure closure = { Map<String, ?> rowData ->
+     *     new JacksonDeserializer(inputStream).eachRow { Map<String, ?> rowData ->
      *         println rowData
      *     //}//
-     *     new JacksonDeserializer(inputStream).eachRow(closure)
      * </pre>
      *  Variable {@code rowData} contains a Map with teh following JSON contact:
      * <pre>

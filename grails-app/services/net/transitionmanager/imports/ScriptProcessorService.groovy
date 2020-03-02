@@ -17,7 +17,7 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
-import net.transitionmanager.etl.JsonSerializer
+import net.transitionmanager.etl.ETLStreamingWriter
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.fbs.FBSProcessorResultBuilder
 import net.transitionmanager.project.Project
@@ -45,7 +45,7 @@ class ScriptProcessorService {
     /**
      * Defines if ETL results must be saved
      * using a Streaming library.
-     * @see net.transitionmanager.etl.JsonSerializer
+     * @see ETLStreamingWriter
      */
     @Value('${etl.results.save.streaming:false}')
     Boolean saveETLResultsUsingStreaming = false
@@ -117,7 +117,7 @@ class ScriptProcessorService {
      * @param processorResult an instance of {@code ETLProcessorResult}
      * @return file name created and saved in a temporary directory
      * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
-     * @see JsonSerializer#writeETLResultsHeader(com.tdsops.etl.ETLProcessorResult)
+     * @see ETLStreamingWriter#writeETLResultsHeader(com.tdsops.etl.ETLProcessorResult)
      */
     @CompileStatic
     String saveResultsUsingStreaming(ETLProcessorResult processorResult) {
@@ -128,7 +128,7 @@ class ScriptProcessorService {
         String outputFilename = tmpFile[0]
         OutputStream os = (OutputStream) tmpFile[1]
 
-        new JsonSerializer(os).writeETLResultsHeader(processorResult)
+        new ETLStreamingWriter(os).writeETLResultsHeader(processorResult)
         return outputFilename
     }
 
@@ -138,7 +138,7 @@ class ScriptProcessorService {
      * in deserialization step, reading each file with domain data.
      *
      * @param processorResult an instance of {@code ETLProcessorResult}
-     * @see JsonSerializer#writeETLResultsData(java.util.List)
+     * @see ETLStreamingWriter#writeETLResultsData(java.util.List)
      */
     private void saveDomainDataUsingStreaming(ETLProcessorResult processorResult) {
 
@@ -146,7 +146,7 @@ class ScriptProcessorService {
             List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
             String outputFilename = tmpFile[0]
             OutputStream outputStream = (OutputStream) tmpFile[1]
-            new JsonSerializer(outputStream).writeETLResultsData(domain.data)
+            new ETLStreamingWriter(outputStream).writeETLResultsData(domain.data)
             domain.outputFilename = outputFilename
             domain.dataSize = domain.data.size()
         }

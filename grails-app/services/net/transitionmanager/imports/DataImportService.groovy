@@ -32,7 +32,7 @@ import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
-import net.transitionmanager.etl.JsonDeserializer
+import net.transitionmanager.etl.ETLStreamingReader
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -93,7 +93,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	/**
 	 * Defines if ETL results must be saved
 	 * using a Streaming library.
-	 * @see net.transitionmanager.etl.JsonSerializer
+	 * @see net.transitionmanager.etl.ETLStreamingWriter
 	 */
 	@Value('${etl.results.save.streaming:false}')
 	Boolean saveETLResultsUsingStreaming = false
@@ -298,11 +298,11 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 * @param batch - current batch
 	 * @param inputStream - list of assets in an instance of {@code InputStream}
 	 * @param importContext - additional parameters required for logging
-	 * @see JsonDeserializer#eachRow(groovy.lang.Closure)
+	 * @see ETLStreamingReader#eachRow(groovy.lang.Closure)
 	 */
 	private void importRowsIntoBatchUsingStreaming(session, ImportBatch batch, InputStream inputStream, Map importContext) {
 
-		new JsonDeserializer(inputStream).eachRow { Map<String, ?> rowData ->
+		new ETLStreamingReader(inputStream).eachRow { Map<String, ?> rowData ->
 			log.debug "Processing row with content: ${rowData}"
 			// Keep track of the row number for reporting
 			importContext.rowNumber++
