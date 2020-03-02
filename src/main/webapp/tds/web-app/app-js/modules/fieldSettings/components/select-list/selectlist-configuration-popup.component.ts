@@ -54,18 +54,16 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	ngOnInit() {
 		this.buttons.push({
 			name: 'save',
-			icon: 'check',
-			text: 'Ok',
+			icon: 'floppy',
 			disabled: () => this.items.length === 0 || !this.isDirty(),
-			type: DialogButtonType.CONTEXT,
+			type: DialogButtonType.ACTION,
 			action: this.onSave.bind(this)
 		});
 
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
-			text: 'Cancel',
-			type: DialogButtonType.CONTEXT,
+			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});
 
