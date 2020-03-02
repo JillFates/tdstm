@@ -17,8 +17,7 @@
 		(dataStateChange)="dataStateChange($event)"
 		(cellClick)="onClickActionableColumn($event)"
 		[ngClass]="{ 'hide-filter': !showFilters }"
-		class="page-height"
-	>
+		class="page-height narrow-rows">
 		<ng-template kendoGridToolbarTemplate [position]="'top'">
 			<div class="clr-row">
 				<div class="clr-col-12">
@@ -162,14 +161,12 @@
 			<ng-template
 				kendoGridCellTemplate
 				let-dataItem
-				*ngIf="tagsFieldNames.includes(column.property)"
-			>
-				<div>
+				*ngIf="tagsFieldNames.includes(column.property)">
+				<div class="single-line-tags">
 					<span
 						*ngFor="let tag of dataItem[column.property]"
 						class="label tag dependency-tag"
-						[ngClass]="tag.css"
-					>
+						[ngClass]="tag.css">
 						{{ tag.name }}
 					</span>
 				</div>

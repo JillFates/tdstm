@@ -287,13 +287,11 @@
 			<ng-template
 				kendoGridCellTemplate
 				let-dataItem
-				*ngIf="column.property === 'tagAssets'"
-			>
+				*ngIf="column.property === 'tagAssets'">
 				<div
 					(mouseleave)="refreshTableSize($event)"
 					[ngClass]="showFullTags ? 'show-full-tags' : ''"
-					class="single-line-tags"
-				>
+					class="grid-tags single-line-tags">
 					<ng-template
 						ngFor
 						let-tag
