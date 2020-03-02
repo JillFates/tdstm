@@ -222,6 +222,13 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.onAcceptSuccess();
+					const projectLogo = result.data && result.data.projectLogoForProject && result.data.projectLogoForProject.id || '';
+
+					this.projectService.updateProjectInfo(
+						result.data.id,
+						this.projectModel.projectName,
+						this.projectService.getProjectImagePath(projectLogo)
+					);
 				}
 			});
 		}

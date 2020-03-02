@@ -9,14 +9,31 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 import {ProjectModel} from '../model/project.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
+import {Store} from '@ngxs/store';
+import {SetProject} from '../actions/project.actions';
 
 @Injectable()
 export class ProjectService {
 
 	private jobProgressUrl = '../ws/progress';
 
-	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
+	constructor(
+		private http: HttpClient,
+		private preferenceService: PreferenceService,
+		private store: Store) {
 		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
+	}
+
+	updateProjectInfo(projectId: number, projectName: string, projectLogo: string): void {
+		this.store.dispatch(new SetProject({
+			id: projectId,
+			name: projectName,
+			logoUrl: projectLogo
+		}));
+	}
+
+	getProjectImagePath(fileName: string): string {
+		return fileName ? `/tdstm/project/showImage/${fileName}` : '';
 	}
 
 	getProjects(): Observable<any> {
