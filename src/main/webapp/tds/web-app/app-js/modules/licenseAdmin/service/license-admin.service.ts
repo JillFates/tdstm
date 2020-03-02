@@ -1,18 +1,26 @@
+// Angular
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+// Service
+import {DateUtils} from '../../../shared/utils/date.utils';
+import {TranslatePipe} from '../../../shared/pipes/translate.pipe';
+// Model
+import {Flatten} from '../../../shared/model/data-list-grid.model';
+import {LicenseEnvironment, LicenseStatus, LicenseType} from '../model/license.model';
+import {FilterType} from 'tds-component-library';
+// Other
+import {Observable} from 'rxjs';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {Flatten} from '../../../shared/model/data-list-grid.model';
-import {DateUtils} from '../../../shared/utils/date.utils';
-import { FilterType } from 'tds-component-library';
 
 @Injectable()
 export class LicenseAdminService {
 
 	private readonly licenseUrl = '../ws/license';
 
-	constructor(private http: HttpClient) {
+	constructor(
+		private http: HttpClient,
+		private translateService: TranslatePipe) {
 	}
 
 	/**
@@ -25,6 +33,9 @@ export class LicenseAdminService {
 				licenseModels.forEach((model) => {
 					model.activationDate = ((model.activationDate) ? new Date(model.activationDate) : '');
 					model.expirationDate = ((model.expirationDate) ? new Date(model.expirationDate) : '');
+					model.licenseType = ((model.type === LicenseType.MULTI_PROJECT) ? this.translateService.transform('LICENSE.GLOBAL') : this.translateService.transform('LICENSE.SINGLE'));
+					model.licenseEnvironment = ((model.environment === LicenseEnvironment.ENGINEERING) ? this.translateService.transform('LICENSE.ENGINEERING') : this.translateService.transform('LICENSE.TRAINING'));
+					model.licenseStatus = ((model.status === LicenseStatus.PENDING) ? this.translateService.transform('GLOBAL.PENDING') : this.translateService.transform('GLOBAL.ACTIVE'));
 				});
 				return licenseModels;
 			})

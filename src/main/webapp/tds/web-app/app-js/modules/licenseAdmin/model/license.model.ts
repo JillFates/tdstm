@@ -7,68 +7,46 @@ export class LicenseColumnModel {
 		this.columns = [
 			{
 				label: 'Client',
-				filterable: true,
 				property: 'client.name',
-				filterType: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Project',
-				filterable: true,
 				property: 'project.name',
-				filterType: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Contact Email',
-				filterable: true,
 				property: 'email',
-				filterType: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Status',
-				filterable: true,
-				property: 'status',
-				filterType: 'text',
-				width: 160,
+				property: 'licenseStatus',
+				filterType: FilterType.text
 			}, {
 				label: 'Type',
-				filterable: true,
-				property: 'type',
-				type: 'text',
-				filterType: FilterType.dropdown,
-				dropdownData: [{ text: 'Single', value: 'SINGLE_PROJECT' }, { text: 'Global', value: 'MULTI_PROJECT' }],
-				width: 160,
+				property: 'licenseType',
+				filterType: FilterType.text
 			}, {
 				label: 'Method',
-				filterable: true,
 				property: 'method.name',
-				filterType: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Server/Tokens',
-				filterable: true,
 				property: 'method.max',
-				filterType: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Inception',
-				filterable: true,
 				property: 'activationDate',
-				filterType: 'date',
 				format: dateFormat,
-				width: 170
+				filterType: FilterType.date
 			}, {
 				label: 'Expiration',
-				filterable: true,
 				property: 'expirationDate',
-				filterType: 'date',
 				format: dateFormat,
-				width: 170
+				filterType: FilterType.date
 			}, {
 				label: 'Environment',
-				filterable: true,
-				property: 'environment',
-				filterType: 'text',
-				width: 160,
+				property: 'licenseEnvironment',
+				filterType: FilterType.text
 			}
 		];
 	}
@@ -85,7 +63,7 @@ export class RequestLicenseModel {
 export class LicenseModel {
 	id?: number;
 	key?: string;
-	name: string;
+	name?: string;
 	status?: string;
 	description?: string;
 	expirationDate?: string;
