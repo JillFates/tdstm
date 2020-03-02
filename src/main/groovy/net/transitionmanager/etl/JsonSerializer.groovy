@@ -13,12 +13,12 @@ import com.tdsops.etl.TagResults
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class JacksonSerializer {
+class JsonSerializer {
 
     OutputStream outputStream
     JsonGenerator generator
 
-    JacksonSerializer(OutputStream outputStream) {
+    JsonSerializer(OutputStream outputStream) {
         this.outputStream = outputStream
         generator = new JsonFactory()
                 .createGenerator(outputStream, JsonEncoding.UTF8)
@@ -32,11 +32,16 @@ class JacksonSerializer {
         writeDomains(result.domains)
         generator.writeEndObject()
         generator.close()
+
+        outputStream.flush()
+        outputStream.close()
     }
 
     void writeETLResultsData(List<RowResult> data) {
         writeDataArray(data)
         generator.close()
+        outputStream.flush()
+        outputStream.close()
     }
 
     private void writeDomains(List<DomainResult> domains) {
@@ -52,9 +57,10 @@ class JacksonSerializer {
     private void writeDomains(DomainResult domain) {
         generator.writeStartObject()
         generator.writeStringField('domain', domain.domain)
+        generator.writeStringField('outputFilename', domain.outputFilename)
+        generator.writeNumberField('dataSize', domain.dataSize)
         writeStringMapField('fieldLabelMap', domain.fieldLabelMap)
         writeStringCollectionField('fieldNames', domain.fieldNames)
-        // writeDataArray(domain.data)
         generator.writeEndObject()
     }
 

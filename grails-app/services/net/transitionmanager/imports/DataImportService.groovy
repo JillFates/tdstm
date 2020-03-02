@@ -22,6 +22,7 @@ import grails.converters.JSON
 import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
@@ -31,7 +32,7 @@ import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
-import net.transitionmanager.etl.JacksonDeserializer
+import net.transitionmanager.etl.JsonDeserializer
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -91,11 +92,11 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	TagService 				 tagService
 	/**
 	 * Defines if ETL results must be saved
-	 * in binary format using FlatBuffers library.
-	 * @see net.transitionmanager.fbs.FBSProcessorResultBuilder
+	 * using a Streaming library.
+	 * @see net.transitionmanager.etl.JsonSerializer
 	 */
-	@Value('${etl.results.saveBinary:false}')
-	Boolean saveResultsInBinaryFormat = false
+	@Value('${etl.results.save.streaming:false}')
+	Boolean saveETLResultsUsingStreaming = false
 
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
@@ -140,6 +141,23 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			Boolean sendResultByEmail
 	) {
 		return loadETLJsonIntoImportBatch(project, userLogin, etlProcessorResult.properties, '', true, sendResultByEmail)
+	}
+
+	/**
+	 * Defines in domainJson param does not contain results from the import process.
+	 * It also checks if current import process is using serialization using streaming
+	 * based on {@code DataImportService#saveETLResultsUsingStreaming} field.
+	 *
+	 * @param domainJson
+	 * @return true if domainJson contains empty results
+	 */
+	@NotTransactional()
+	Boolean importHasEmptyResults(Map domainJson){
+		if (saveETLResultsUsingStreaming) {
+			return domainJson.dataSize == 0
+		} else {
+			return domainJson.data.isEmpty()
+		}
 	}
 
 	/**
@@ -205,67 +223,65 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 		// Iterate over the domains and create batches for each
 		for (domainJson in importJsonData.domains) {
+
 			importContext.domainClass = domainJson.domain
-
 			log.debug "localFunction() in for loop: importContext=$importContext"
-			// TODO: JOHN
-//			List<JSONObject> importRows = domainJson.data
-//			if (!importRows) {
-//				importResults.errors << "Domain ${importContext.domainClass} contained no data"
-//				importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0]
-//			}
 
+			 //TODO: John. What we need to do if the import process contains empty results.
+			if (importHasEmptyResults(domainJson)){
+				importResults.errors << "Domain ${importContext.domainClass} contained no data"
+				importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0]
 
-			// Process each batch in a separate transaction to help with performance and memory
-			ImportBatch.withNewTransaction { session ->
-				// Attach the project to the current transaction
-				// project.attach()
+			} else {
+				// Process each batch in a separate transaction to help with performance and memory
+				ImportBatch.withNewTransaction { session ->
+					// Attach the project to the current transaction
+					// project.attach()
 
-				// Reset the batch level context variables
-				importContext.with {
-					errors = []
-					rowsCreated = 0
-					rowsSkipped = 0
-					rowNumber = 0
-				}
-				importContext.fieldNames = domainJson.fieldNames
-				importContext.fieldLabelMap = domainJson.fieldLabelMap
+					// Reset the batch level context variables
+					importContext.with {
+						errors = []
+						rowsCreated = 0
+						rowsSkipped = 0
+						rowNumber = 0
+					}
+					importContext.fieldNames = domainJson.fieldNames
+					importContext.fieldLabelMap = domainJson.fieldLabelMap
 
-				// Create a Transfer Batch for the asset class
-				ImportBatch batch = createImportBatch(importContext)
+					// Create a Transfer Batch for the asset class
+					ImportBatch batch = createImportBatch(importContext)
 
-				// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
-				if (batch == null) {
-					// Creating the batch failed so record the error and metrics for endpoint consumer
-					importResults.errors << importContext.errors
-					importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0]
-
-				} else {
-
-					if (!saveResultsInBinaryFormat) {
-
-						List<JSONObject> importRows = domainJson.data
-						// Import the assets for this batch
-						importRowsIntoBatch(session, batch, importRows, importContext)
+					// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
+					if (batch == null) {
+						// Creating the batch failed so record the error and metrics for endpoint consumer
+						importResults.errors << importContext.errors
+						importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0]
 
 					} else {
 
-						String filename = datasetFileName + '_' + domainJson.domain + '.json'
-						InputStream inputStream = fileSystemService.openTemporaryFile(filename)
-						if (!inputStream) {
-							throw new InvalidParamException('Specified input file not found')
+						if (saveETLResultsUsingStreaming) {
+
+							InputStream inputStream = fileSystemService.openTemporaryFile(domainJson.outputFilename)
+							if (!inputStream) {
+								throw new InvalidParamException('Specified input file not found')
+							}
+							// Import the assets for this batch using Streaming process
+							importRowsIntoBatchUsingStreaming(session, batch, inputStream, importContext)
+
+						} else {
+							List<JSONObject> importRows = domainJson.data
+							// Import the assets for this batch
+							importRowsIntoBatch(session, batch, importRows, importContext)
 						}
 
-						importRowsIntoBatch(session, batch, inputStream, importContext)
+
+						// Update the batch with information about the import results
+						batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
+
+						// Update the reporting
+						importResults.batchesCreated++
+						importResults.domains << [domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated]
 					}
-
-
-					// Update the batch with information about the import results
-					batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
-
-					// Update the reporting
-					importResults.batchesCreated++
-					importResults.domains << [domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated]
 				}
 			}
 		}
@@ -275,16 +291,18 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	}
 
 	/**
-	 * Import all the assets for the given batch.
+	 * Import all the assets for the given InputStream.
+	 * It reads Map<String, ?> rowData from InputStream parameter.
+	 * For each row read, it creates an new row using {@code DataImportService#importRow}
 	 *
 	 * @param batch - current batch
 	 * @param inputStream - list of assets in an instance of {@code InputStream}
 	 * @param importContext - additional parameters required for logging
+	 * @see JsonDeserializer#eachRow(groovy.lang.Closure)
 	 */
-	//@CompileStatic
-	private void importRowsIntoBatch(session, ImportBatch batch, InputStream inputStream, Map importContext) {
+	private void importRowsIntoBatchUsingStreaming(session, ImportBatch batch, InputStream inputStream, Map importContext) {
 
-		Closure closure = { Map<String, ?> rowData ->
+		new JsonDeserializer(inputStream).eachRow { Map<String, ?> rowData ->
 			log.debug "Processing row with content: ${rowData}"
 			// Keep track of the row number for reporting
 			importContext.rowNumber++
@@ -297,7 +315,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			// Process the fields for this row
 			importRow(session, batch, rowData, importContext)
 		}
-		new JacksonDeserializer(inputStream).eachRow(closure)
 	}
 
 	/**

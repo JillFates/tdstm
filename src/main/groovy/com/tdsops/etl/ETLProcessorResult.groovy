@@ -523,6 +523,16 @@ class DomainResult {
 	Map<String, String> fieldLabelMap = [:]
 
 	List<RowResult> data = new ArrayList<RowResult>()
+    /**
+     * Filename of DomainResult saved on disk using a Streaming solution.
+     * @see net.transitionmanager.etl.JsonSerializer#writeDataArray(java.util.List)
+     */
+    String outputFilename
+	/**
+	 * Defines amount of {@code DomainResult#data} list. It used in serialized step
+	 * using streaming solution.
+	 */
+	Integer dataSize = 0
 
 	/**
 	 * Add the field name for an instance of Element

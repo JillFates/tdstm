@@ -17,7 +17,7 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
-import net.transitionmanager.etl.JacksonSerializer
+import net.transitionmanager.etl.JsonSerializer
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.fbs.FBSProcessorResultBuilder
 import net.transitionmanager.project.Project
@@ -42,14 +42,13 @@ class ScriptProcessorService {
     ProgressService progressService
     Scheduler quartzScheduler
     TagService tagService
-
     /**
      * Defines if ETL results must be saved
-     * in binary format using FlatBuffers library.
-     * @see FBSProcessorResultBuilder
+     * using a Streaming library.
+     * @see net.transitionmanager.etl.JsonSerializer
      */
-    @Value('${etl.results.saveBinary:false}')
-    Boolean saveResultsInBinaryFormat = false
+    @Value('${etl.results.save.streaming:false}')
+    Boolean saveETLResultsUsingStreaming = false
 
 
     private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
@@ -77,18 +76,18 @@ class ScriptProcessorService {
 
     /**
      * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using format
-     * depending {@code ScriptProcessorService#saveResultsInBinaryFormat} boolean field
+     * depending {@code ScriptProcessorService#saveETLResultsUsingStreaming} boolean field
      *
      * @param processorResult an instance of {@code ETLProcessorResult}
      * @return file name created and saved in a temporary directory
      * @see ScriptProcessorService#saveResultsInJSONFile(com.tdsops.etl.ETLProcessorResult)
-     * @see ScriptProcessorService#saveResultsInBinaryFile(com.tdsops.etl.ETLProcessorResult)
+     * @see ScriptProcessorService#saveResultsUsingStreaming(com.tdsops.etl.ETLProcessorResult)
      */
     @CompileStatic
     String saveResultsInFile(ETLProcessorResult processorResult) {
 
-        if (saveResultsInBinaryFormat) {
-            return saveResultsInBinaryFile(processorResult)
+        if (saveETLResultsUsingStreaming) {
+            return saveResultsUsingStreaming(processorResult)
         } else {
             return saveResultsInJSONFile(processorResult)
         }
@@ -118,28 +117,41 @@ class ScriptProcessorService {
      * @param processorResult an instance of {@code ETLProcessorResult}
      * @return file name created and saved in a temporary directory
      * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
-     * @see FBSProcessorResultBuilder#buildInputStream()
+     * @see JsonSerializer#writeETLResultsHeader(com.tdsops.etl.ETLProcessorResult)
      */
     @CompileStatic
-    String saveResultsInBinaryFile(ETLProcessorResult processorResult) {
+    String saveResultsUsingStreaming(ETLProcessorResult processorResult) {
+
+        saveDomainDataUsingStreaming(processorResult)
 
         List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
         String outputFilename = tmpFile[0]
         OutputStream os = (OutputStream) tmpFile[1]
-        new JacksonSerializer(os).writeETLResultsHeader(processorResult)
-        os.flush()
-        os.close()
 
-        for(DomainResult domain in processorResult.domains){
-            tmpFile = fileSystemService.createTemporaryFileWithSuffix(outputFilename, "_$domain.domain", 'json')
-            OutputStream outputStream = (OutputStream) tmpFile[1]
-            new JacksonSerializer(outputStream).writeETLResultsData(domain.data)
-            outputStream.flush()
-            outputStream.close()
-        }
-
+        new JsonSerializer(os).writeETLResultsHeader(processorResult)
         return outputFilename
     }
+
+    /**
+     * Saves each {@code ETLProcessor#domains} in an new File using {@code JsonSerializer} class.
+     * It also saves each new output file name in {@code DomainResult#outputFilename}. It is used
+     * in deserialization step, reading each file with domain data.
+     *
+     * @param processorResult an instance of {@code ETLProcessorResult}
+     * @see JsonSerializer#writeETLResultsData(java.util.List)
+     */
+    private void saveDomainDataUsingStreaming(ETLProcessorResult processorResult) {
+
+        for (DomainResult domain in processorResult.domains) {
+            List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+            String outputFilename = tmpFile[0]
+            OutputStream outputStream = (OutputStream) tmpFile[1]
+            new JsonSerializer(outputStream).writeETLResultsData(domain.data)
+            domain.outputFilename = outputFilename
+            domain.dataSize = domain.data.size()
+        }
+    }
+
 
     /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
@@ -289,7 +301,7 @@ class ScriptProcessorService {
                 updateProgressClosure,
                 includeConsoleLog)
 
-        String outputFilename = saveResultsInFile(processorResult)
+        String outputFilename = saveResultsInJSONFile(processorResult)
 
         updateProgressClosure.reportProgress(
                 100,
