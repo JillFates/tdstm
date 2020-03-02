@@ -201,7 +201,7 @@ class BulkAssetETLService implements ServiceMethods {
 				break
 
 			case AssetEntity:
-				value = value.assetName
+				value = [id: value.id, name:value.assetName]
 				break
 
 			case Collection:
