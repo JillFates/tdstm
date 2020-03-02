@@ -1,6 +1,5 @@
 package net.transitionmanager.imports
 
-
 import com.tdsops.ETLTagValidator
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdsops.etl.DebugConsole
@@ -19,7 +18,6 @@ import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.etl.ETLStreamingWriter
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.fbs.FBSProcessorResultBuilder
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.tag.TagService
@@ -30,7 +28,6 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-import org.springframework.beans.factory.annotation.Value
 
 @Transactional
 class ScriptProcessorService {
@@ -42,14 +39,6 @@ class ScriptProcessorService {
     ProgressService progressService
     Scheduler quartzScheduler
     TagService tagService
-    /**
-     * Defines if ETL results must be saved
-     * using a Streaming library.
-     * @see ETLStreamingWriter
-     */
-    @Value('${etl.results.save.streaming:false}')
-    Boolean saveETLResultsUsingStreaming = false
-
 
     private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
     private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
@@ -75,25 +64,6 @@ class ScriptProcessorService {
     }
 
     /**
-     * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using format
-     * depending {@code ScriptProcessorService#saveETLResultsUsingStreaming} boolean field
-     *
-     * @param processorResult an instance of {@code ETLProcessorResult}
-     * @return file name created and saved in a temporary directory
-     * @see ScriptProcessorService#saveResultsInJSONFile(com.tdsops.etl.ETLProcessorResult)
-     * @see ScriptProcessorService#saveResultsUsingStreaming(com.tdsops.etl.ETLProcessorResult)
-     */
-    @CompileStatic
-    String saveResultsInFile(ETLProcessorResult processorResult) {
-
-        if (saveETLResultsUsingStreaming) {
-            return saveResultsUsingStreaming(processorResult)
-        } else {
-            return saveResultsInJSONFile(processorResult)
-        }
-    }
-
-    /**
      * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using JSON format
      *
      * @param processorResult an instance of {@code ETLProcessorResult}
@@ -111,11 +81,12 @@ class ScriptProcessorService {
     }
 
     /**
-     * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using Binary format
-     * from FlatBuffers library.
+     * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using Streaming format
+     * from Fast Jackson library.
      *
      * @param processorResult an instance of {@code ETLProcessorResult}
      * @return file name created and saved in a temporary directory
+     *
      * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
      * @see ETLStreamingWriter#writeETLResultsHeader(com.tdsops.etl.ETLProcessorResult)
      */

@@ -93,12 +93,3 @@ tdstm {
 	}
 }
 grails.mail.default.from = "TDS TransitionManager <tm-prod@transitionaldata.com>"
-
-/**
- * Defines if ETL processor results must be serialized
- * in a temporary file using JSON format or a Streaming solution.
- *
- * JSON format is created using Grails GSON views library.
- * Streaming solution is created using jackson JSON parser.
- */
-etl.results.save.streaming = true

@@ -4,6 +4,10 @@ import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLBaseSpec
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorResult
+import com.tdsops.etl.FieldResult
+import com.tdsops.etl.RowResult
+import com.tdsops.etl.TagResults
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import spock.lang.Shared
 
 class ETLStreamingWriterSpec extends ETLBaseSpec {
@@ -25,23 +29,53 @@ class ETLStreamingWriterSpec extends ETLBaseSpec {
                     new DomainResult(
                             domain: 'Application',
                             fieldLabelMap: ['id': 'Id', 'assetName': 'Name'],
-                            fieldNames: ['id', 'assetName'].toSet()
+                            fieldNames: ['id', 'assetName'].toSet(),
+                            data: [
+                                    new RowResult(
+                                            op: ImportOperationEnum.INSERT,
+                                            rowNum: 1,
+                                            errorCount: 0,
+                                            warn: false,
+                                            duplicate: false,
+                                            errors: [],
+                                            fields: [
+                                                    id: new FieldResult(
+                                                            originalValue: '123456789',
+                                                            value: 123456789,
+                                                            init: null,
+                                                            fieldOrder: 1,
+                                                            errors: [],
+                                                            warn: false,
+                                                            find: null,
+                                                            create: null,
+                                                            update: null
+                                                    )
+                                            ],
+                                            domain: 'Application',
+                                            comments: [],
+                                            tags: new TagResults(add: ['FUBAR', 'SNAFU'])
+                                    )
+                            ]
                     )
             ]
-            data = [
-                    
-            ]
         }
-
-
     }
 
     void 'test can write DomainResult List in an OutputStream'() {
 
-        given:
+        given: 'an outputStream and an ETLProcessResult'
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
 
+        when: 'ETLStreamingWriter serialized ETLProcessResult in the outputStream'
+            new ETLStreamingWriter(byteArrayOutputStream).writeETLResultsData(processorResult.domains[0].data)
+            String results = new String(byteArrayOutputStream.toByteArray(), 'UTF-8')
 
+        then: 'OutputStream results in String format contains JSON serialized content'
+            results.contains('"tags":{"add":["FUBAR","SNAFU"],"remove":[],"replace":{}}')
+            results.contains('{"errors":[],"rowNum":1,"errorCount":0,"warn":false,"duplicate":false,"op":"Insert"')
+            results.contains('"fields":{"id":{"fieldOrder":1,"warn":false,"errors":[],"init":null,"originalValue":"123456789","value":123456789}}')
+            results.contains('"domain":"Application"')
+            results.contains('"comments":[]')
     }
 
     void 'test can write ETLProcessorResult as header in an OutputStream'() {
