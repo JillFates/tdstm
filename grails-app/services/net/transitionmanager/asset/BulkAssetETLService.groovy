@@ -8,10 +8,9 @@ import net.transitionmanager.command.bulk.BulkETLCommand
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.LogicException
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.DataviewService
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAsset
@@ -192,39 +191,40 @@ class BulkAssetETLService implements ServiceMethods {
 				}
 
 				break
-			case Number || Date || Boolean:
+
+			case Number:
+			case Long:
+			case Integer:
+			case Date:
+			case Boolean:
+			case null:
 				break
+
 			case AssetEntity:
 				value = value.assetName
 				break
-			case Person:
-				value = value.toString()
-				break
-			case MoveBundle:
-				value = value.name
-				break
-			case Room:
-				value = value.roomName
-				break
-			case Rack:
-				value = value.tag
-				break
+
 			case Collection:
-				if(value && value[0] instanceof TagAsset) {
+				if (value && value[0] instanceof TagAsset) {
 					value = tagAssetService.getTags(currentProject, assetId)*.name
+				} else if (!value) {
+					value = []
+				} else {
+					throw new LogicException('Collection not found for Bulk ETL value conversion.')
 				}
+
 				break
+
 			case Enum:
 				value = value.name()
 				break
-			case { GormUtil.isDomainClass(it) }:
-				if (value.hasProperty('name')) {
-					value = value.name
-					break
-				}
 
-				value = value.id
+			case { GormUtil.isDomainClass(it) }:
+				value = [id: value.id, name: value.toString()]
 				break
+
+			default:
+				throw new LogicException("Type not handled(${value.getClass().name}) for Bulk ETL value conversion.")
 		}
 
 		return value
