@@ -1599,8 +1599,6 @@ body.error-handling div.error-page {
       font-size: 27px; }
     body.error-handling div.error-page div.error-content p {
       font-size: 18px; }
-      body.error-handling div.error-page div.error-content p.action-description {
-        font-size: 15px; }
 
 i.licensing-error-warning {
   color: #FFCC00;
