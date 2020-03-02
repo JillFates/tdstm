@@ -24,6 +24,12 @@ export class ProjectService {
 		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
 	}
 
+	/**
+	 * Notify about update project info
+	 * @param projectId Id of the project changed
+	 * @param projectName Name of the project changed
+	 * @param projectLogo Logo of the project changed
+	 */
 	updateProjectInfo(projectId: number, projectName: string, projectLogo: string): void {
 		this.store.dispatch(new SetProject({
 			id: projectId,
@@ -32,6 +38,11 @@ export class ProjectService {
 		}));
 	}
 
+	/**
+	 * Get the corresponding project image
+	 * @param fileName name of the picture file
+	 * @return Full path to the file
+	 */
 	getProjectImagePath(fileName: string): string {
 		return fileName ? `/tdstm/project/showImage/${fileName}` : '';
 	}

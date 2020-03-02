@@ -282,6 +282,7 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 				this.projectModel.timeZone = data.timezone;
 				this.projectTypes = data.projectTypes;
 
+				// notify about project updates
 				this.projectService.updateProjectInfo(
 					this.projectId,
 					this.projectModel.projectName,

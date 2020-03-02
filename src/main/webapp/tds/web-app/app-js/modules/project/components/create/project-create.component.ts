@@ -222,8 +222,10 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.onAcceptSuccess();
+					// get the project image logo
 					const projectLogo = result.data && result.data.projectLogoForProject && result.data.projectLogoForProject.id || '';
 
+					// notify about project updates
 					this.projectService.updateProjectInfo(
 						result.data.id,
 						this.projectModel.projectName,
