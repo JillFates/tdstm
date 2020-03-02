@@ -1,14 +1,14 @@
 /**
- * tdstm-config.groovy.default
- *
- * This is an optional configuration file that is used to override settings in the grails-app/conf/*.groovy files. To use this,
- * copy this file to a configuration directory  renaming it appropriately (e.g. /etc/tdstm-config.groovy) and then provide a
- * JVM -D argument in the start up of the application as shown:
- *
- *	grails -Dtdstm.config.location=/etc/tdstm-config.groovy run-app
- *	java -Dtdstm.config.location=/etc/tdstm-config.groovy ...
- *
- **/
+* tdstm-config.groovy.default
+*
+* This is an optional configuration file that is used to override settings in the grails-app/conf/*.groovy files. To use this,
+* copy this file to a configuration directory  renaming it appropriately (e.g. /etc/tdstm-config.groovy) and then provide a
+* JVM -D argument in the start up of the application as shown:
+*
+*	grails -Dtdstm.config.location=/etc/tdstm-config.groovy run-app
+*	java -Dtdstm.config.location=/etc/tdstm-config.groovy ...
+*
+**/
 
 //
 // Database Properties
@@ -30,11 +30,11 @@ grails {
 		username = 'tm-prod'
 		password = "7UJuhepR"
 		props = [
-				"mail.smtp.auth":"true",
-				"mail.smtp.socketFactory.port":"587",
-				"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-				"mail.smtp.socketFactory.fallback":"false"
-		]
+			"mail.smtp.auth":"true",
+			"mail.smtp.socketFactory.port":"587",
+			"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+			"mail.smtp.socketFactory.fallback":"false"
+			]
 	}
 }
 //
