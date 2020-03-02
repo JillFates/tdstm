@@ -7,7 +7,7 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured('isAuthenticated()')
-class RecipesController implements ControllerMethods {
+class RecipeController implements ControllerMethods {
 
 	UserPreferenceService userPreferenceService
 
