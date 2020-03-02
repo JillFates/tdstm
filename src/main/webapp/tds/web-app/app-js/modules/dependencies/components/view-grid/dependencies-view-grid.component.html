@@ -132,14 +132,13 @@
 			<ng-template kendoGridFilterCellTemplate let-filter>
 				<div class="has-feedback" style="margin-bottom:0px;">
 					<!-- Asset Tags Filter Template -->
-					<tds-asset-tag-selector
-						*ngIf="column.property === 'tagsAsset' || column.property === 'tagsDependent'"
-						[tagList]="state.tagList"
-						(valueChange)="
-							onTagFilterChange(column.property, $event)
-						"
-						[placeholder]="'Filter'"
-					>
+					<tds-asset-tag-selector *ngIf="column.property === 'tagsAsset' || column.property === 'tagsDependent'"
+																	#tagSelector
+																	[popupClass]="'grid-filter-tag-selector'"
+																	[tagList]="state.tagList"
+																	[viewFilterModel]="column.filter"
+																	(valueChange)="onTagFilterChange(column, $event)"
+																	[placeholder]="'Filter'">
 					</tds-asset-tag-selector>
 					<div
 						*ngIf="column.property !== 'tagsAsset' && column.property !== 'tagsDependent'"

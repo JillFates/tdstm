@@ -207,13 +207,12 @@
 			<!-- Asset Tags Filter Template -->
 			<ng-template
 				kendoGridFilterCellTemplate *ngIf="currentStatus.showAssetsFilter && column.property === 'tagAssets'">
-				<tds-asset-tag-selector
-					#tagSelector
-					[popupClass]="'assets-view-grid'"
-					[tagList]="metadata.tagList"
-					placeholder="{{ 'GLOBAL.FILTER' | translate }}"
-					[viewFilterModel]="column.filter"
-					(valueChange)="onTagFilterChange(column, $event)"
+				<tds-asset-tag-selector #tagSelector
+																[popupClass]="'grid-filter-tag-selector'"
+																[tagList]="metadata.tagList"
+																placeholder="{{ 'GLOBAL.FILTER' | translate }}"
+																[viewFilterModel]="column.filter"
+																(valueChange)="onTagFilterChange(column, $event)"
 				>
 				</tds-asset-tag-selector>
 			</ng-template>
