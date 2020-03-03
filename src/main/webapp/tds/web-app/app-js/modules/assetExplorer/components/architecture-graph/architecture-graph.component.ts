@@ -356,8 +356,6 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	updateNodeData(data, iconsOnly) {
 		const clonedData = this.removeNodeNamesForNotSelectedCategories(data);
-		console.log(clonedData.nodes);
-		console.log(iconsOnly);
 
 		const diagramHelper = new ArchitectureGraphDiagramHelper();
 		this.data$.next(diagramHelper.diagramData({

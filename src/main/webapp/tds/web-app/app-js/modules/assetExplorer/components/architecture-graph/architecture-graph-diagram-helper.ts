@@ -120,7 +120,6 @@ export class ArchitectureGraphDiagramHelper {
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
-		// panel.add(nodeShape);
 		panel.add(panelBody);
 		node.add(panel);
 
