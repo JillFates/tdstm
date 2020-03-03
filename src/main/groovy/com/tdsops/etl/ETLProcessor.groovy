@@ -6,6 +6,7 @@ import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.etl.dataset.ETLIterator
 import com.tdsops.etl.etlmap.DefineETLMapCommand
 import com.tdsops.etl.etlmap.ETLMap
+import com.tdsops.etl.fieldspec.FieldLookupCommand
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -1407,6 +1408,21 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     void addETLMap(String name, ETLMap etlMap) {
         // Validates map name previously defined
         this.etlMaps[name] = etlMap
+    }
+
+    /**
+     * Defines an instance of {@code FieldLookupCommand}
+     * to resolve {@link ETLProcessor#fieldLookup(com.tdsops.etl.ETLDomain)} command.
+     * <pre>
+     *  fieldLookup Application with 'TCO - Current Cost' set tcoCurrentCostField
+     * </pre>
+     * @param domain a an instance of {@link ETLDomain}
+     *
+     * @return current instance of {@code FieldLookupCommand}
+     */
+    @CompileStatic
+    FieldLookupCommand fieldLookup(ETLDomain domain) {
+        return new FieldLookupCommand(domain, this)
     }
     /**
      * <b>Cache ETL command.</b><br>
