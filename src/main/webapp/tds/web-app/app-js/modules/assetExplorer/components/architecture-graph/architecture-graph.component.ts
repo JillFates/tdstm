@@ -182,10 +182,6 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	onAssetSelected(event) {
 		if (event) {
-			this.graphLabels.forEach(item => {
-				item.checked = false;
-			});
-			this.showLabels = false;
 			this.assetId = event.id;
 			this.loadData();
 		}
@@ -312,21 +308,45 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param index of the selected checkbox
 	 */
 	updateGraphLabels(index) {
+		this.toggleGraphLabel(index);
+		this.updateNodeData(this.currentNodesData, false);
+	}
+
+	/**
+	 * Check/uncheck the value for an specific graph label
+	 * @param index  Index of the array to be modified
+	 */
+	toggleGraphLabel(index: number): void {
 		this.graphLabels[index].checked = !this.graphLabels[index].checked;
-		// TODO: filter nodes for removing labels on graph
-		this.categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
-		if (this.categories.length > 0 && this.assetId) {
-			let tempNodesData = JSON.parse(JSON.stringify(this.currentNodesData));
-			tempNodesData.nodes.forEach( node => {
-				if (!this.categories.includes(node.assetClass)) {
-					node.name = '';
-				}
-			});
-			this.updateNodeData(tempNodesData, false);
-		} else {
-			this.categories = [];
-			this.updateNodeData(this.currentNodesData, true);
-		}
+	}
+
+	/**
+	 * Iterate over the current selected categories, in case the category is not selected
+	 * remove the node names for that categories
+	 * @param data graph data and configuration
+	 * @returns the clone of graph data modified
+	 */
+	removeNodeNamesForNotSelectedCategories(data: any): any {
+		let clonedNodes = JSON.parse(JSON.stringify(data));
+
+		const categories = this.getSelectedCategories(); // this.categories || [];
+		clonedNodes.nodes.forEach(node => {
+			// Clear the node name if the assetClass is not included on the categories selected
+			if (!categories.includes(node.assetClass)) {
+				node.name = '';
+			}
+		});
+		// }
+		return clonedNodes;
+	}
+
+	/**
+	 * Returns an array containing just the current selected categories
+	 */
+	getSelectedCategories(): any[] {
+		return this.graphLabels
+			.filter( label => label.checked)
+			.map( label => label.value.toUpperCase());
 	}
 
 	/**
@@ -339,7 +359,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
 			currentUserId: 1,
-			data: data,
+			data: this.removeNodeNamesForNotSelectedCategories(data) ,
 			iconsOnly: iconsOnly,
 			extras: {
 				diagramOpts: {
