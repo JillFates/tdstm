@@ -1,4 +1,4 @@
-import { Component} from '@angular/core';
+import {Component, ComponentFactoryResolver} from '@angular/core';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DependecyService } from '../../service/dependecy.service';
 import { AssetEditComponent } from '../asset/asset-edit.component';
@@ -16,6 +16,7 @@ import {PersonModel} from '../../../../shared/components/add-person/model/person
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {DialogService, ModalSize} from 'tds-component-library';
 
 export function ApplicationShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -25,6 +26,8 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 	class ApplicationShowComponent extends AssetCommonShow {
 
 		constructor(
+			private componentFactoryResolver: ComponentFactoryResolver,
+			private newDialogService: DialogService,
 			activeDialog: UIActiveDialogService,
 			dialogService: UIDialogService,
 			assetService: DependecyService,
@@ -63,18 +66,25 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 		}
 
-		launchManageStaff(id): void {
-			if (id) {
-				this.dialogService.extra(UserManageStaffComponent, [
-					{provide: 'id', useValue: id},
-					{provide: PersonModel, useValue: {}}
-				], false, true).then( (result: any)  => {
-					console.log(result);
-				}).catch(result => {
-					if (result) {
-						console.error(result);
+		/**
+		 * Open the User Management Staff Component
+		 * @param personModelId
+		 */
+		public launchManageStaff(personId: number): void {
+			if (personId) {
+				this.newDialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: UserManageStaffComponent,
+					data: {
+						personId: personId
+					},
+					modalConfiguration: {
+						title: 'Manage Staff',
+						draggable: true,
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-user-manage-dialog'
 					}
-				});
+				}).subscribe();
 			}
 		}
 

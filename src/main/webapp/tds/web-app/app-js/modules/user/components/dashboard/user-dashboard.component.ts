@@ -1,5 +1,5 @@
 // Angular
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 // Services
 import { TaskService } from '../../../taskManager/service/task.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -31,6 +31,8 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogService, ModalSize} from 'tds-component-library';
+import {ProviderViewEditComponent} from '../../../provider/components/view-edit/provider-view-edit.component';
 
 @Component({
 	selector: 'user-dashboard',
@@ -66,9 +68,11 @@ export class UserDashboardComponent implements OnInit {
 	@ViewChild('taskGrid', { static: false }) taskGrid: GridComponent;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private userService: UserService,
 		private taskService: TaskService,
-		private dialogService: UIDialogService,
+		private oldDialogService: UIDialogService,
+		private dialogService: DialogService,
 		private notifierService: NotifierService,
 		private translate: TranslatePipe,
 		private store: Store) {
@@ -163,7 +167,7 @@ export class UserDashboardComponent implements OnInit {
 				currentUserId
 			}
 		};
-		this.dialogService.extra(TaskDetailComponent, [
+		this.oldDialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
 		]).then((result) => {
 			if (result && result.shouldOpenTask) {
@@ -189,7 +193,7 @@ export class UserDashboardComponent implements OnInit {
 					this.userContext.timezone,
 					this.userContext.dateFormat,
 					this.taskService,
-					this.dialogService,
+					this.oldDialogService,
 					this.translate);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
@@ -200,7 +204,7 @@ export class UserDashboardComponent implements OnInit {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditCreateComponent, [
+				this.oldDialogService.extra(TaskEditCreateComponent, [
 					{ provide: TaskDetailModel, useValue: clone(model) }
 				], false, false)
 					.then(result => {
@@ -264,18 +268,25 @@ export class UserDashboardComponent implements OnInit {
 		});
 	}
 
-	private launchManageStaff(id): void {
-		if (id) {
-			this.dialogService.extra(UserManageStaffComponent, [
-				{provide: 'id', useValue: id},
-				{provide: PersonModel, useValue: {}}
-			], false, false).then( (result: any)  => {
-				console.log(result);
-			}).catch(result => {
-				if (result) {
-					console.error(result);
+	/**
+	 * Open the User Management Staff Component
+	 * @param personModelId
+	 */
+	private launchManageStaff(personId: number): void {
+		if (personId) {
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: UserManageStaffComponent,
+				data: {
+					personId: personId
+				},
+				modalConfiguration: {
+					title: 'Manage Staff',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-user-manage-dialog'
 				}
-			});
+			}).subscribe();
 		}
 	}
 
@@ -284,7 +295,7 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public openAssetDialog(id, assetClass): void {
-		this.dialogService.open(AssetShowComponent, [
+		this.oldDialogService.open(AssetShowComponent, [
 			{provide: 'ID', useValue: id},
 			{provide: 'ASSET', useValue: assetClass}
 		], DIALOG_SIZE.XXL);
