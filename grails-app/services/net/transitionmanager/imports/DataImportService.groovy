@@ -1963,12 +1963,20 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			inputFilename,
 			updateProgressCallback)
 
-		if (!dataScript.isAutoProcess) {
-			result.filename = scriptProcessorService.saveResultsUsingStreaming(processorResult)
+		result.filename = scriptProcessorService.saveResultsUsingStreaming(processorResult)
 
-		} else {
-			Map importResults = loadETLResultsIntoAutoProcessImportBatch(project, userLogin, processorResult, sendResultsByEmail)
+		if (dataScript.isAutoProcess) {
 
+			InputStream inputStream = fileSystemService.openTemporaryFile(result.filename)
+			if (!inputStream) {
+				throw new InvalidParamException('Specified input file not found')
+			}
+
+			JSONObject importJson = JsonUtil.parseFile(inputStream)
+
+			inputStream.close()
+
+			Map importResults = loadETLJsonIntoImportBatch(project, userLogin, importJson, result.filename)
 			if (importResults.batchesCreated > 0) {
 				log.debug "Notify ImportBatchJon with importResults:$importResults"
 				notify('NEXT_BATCH_READY', new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
