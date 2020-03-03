@@ -1900,5 +1900,63 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-17215')
+	void 'test can use NumberUtil and and StringUtil in an ETl script'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				application id,vendor name,app version,url,reference id
+				12134556,Apple Inc.,1.0.0,www.tds.com/license,
+			""")
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'application id' set applicationId 
+					if (NumberUtil.isLong(applicationId.wrappedObject)){
+						load 'id' with NumberUtil.toLong(applicationId.wrappedObject)
+					} 
+					extract 'url' set url
+					if (StringUtil.isNotBlank(url.wrappedObject)){
+						 load 'license' with StringUtil.ellipsis(url.wrappedObject, 15)
+					}
+				}
+			""".stripIndent())
+
+		then: 'Every column for every row is transformed with toDate transformation'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+
+					assertWith(data[0], RowResult) {
+						errorCount == 0
+						assertWith(fields.id, FieldResult) {
+							value == 12134556l
+							originalValue = null
+							init == null
+						}
+						assertWith(fields.license, FieldResult) {
+							value == 'www.tds.com/...'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
 
 }
