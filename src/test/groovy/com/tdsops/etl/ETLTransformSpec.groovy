@@ -1922,12 +1922,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 				domain Application
 				iterate {
 					extract 'application id' set applicationId 
-					if (NumberUtil.isLong(applicationId.wrappedObject)){
-						load 'id' with NumberUtil.toLong(applicationId.wrappedObject)
+					if (NumberUtil.isLong(applicationId)){
+						load 'id' with NumberUtil.toLong(applicationId)
 					} 
 					extract 'url' set url
-					if (StringUtil.isNotBlank(url.wrappedObject)){
-						 load 'license' with StringUtil.ellipsis(url.wrappedObject, 15)
+					if (StringUtil.isNotBlank(url)){
+						 load 'license' with StringUtil.ellipsis(url, 15)
 					}
 				}
 			""".stripIndent())
@@ -1957,6 +1957,4 @@ class ETLTransformSpec extends ETLBaseSpec {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
-
-
 }

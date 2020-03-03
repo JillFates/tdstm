@@ -7,14 +7,14 @@ import com.tdsops.etl.dataset.ETLIterator
 import com.tdsops.etl.etlmap.DefineETLMapCommand
 import com.tdsops.etl.etlmap.ETLMap
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
 import groovy.transform.TimedInterrupt
+import net.transitionmanager.etl.NumberUtilForETL
+import net.transitionmanager.etl.StringUtilForETL
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.ScriptExpressionChecker
 import org.apache.commons.lang3.RandomStringUtils
@@ -2060,8 +2060,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
                     'org.apache.commons.lang3.RegExUtils',
                     'org.apache.commons.lang3.StringUtils',
                     'org.springframework.beans.factory.annotation.Autowired',
-                    'com.tdssrc.grails.NumberUtil',
-                    'com.tdssrc.grails.StringUtil'
+                    'net.transitionmanager.etl.NumberUtilForETL',
+                    'net.transitionmanager.etl.StringUtilForETL'
             ]
             starImportsWhitelist = []
             // Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
@@ -2080,7 +2080,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
             receiversClassesWhiteList = [
                     Object, // TODO: This is too much generic class.
                     Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
-                    Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils, NumberUtil, StringUtil
+                    Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils, NumberUtilForETL, StringUtilForETL
             ].asImmutable()
         }
 
@@ -2089,8 +2089,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         customizer.addImport('RandomUtils', 'org.apache.commons.lang3.RandomUtils')
         customizer.addImport('RegExUtils', 'org.apache.commons.lang3.RegExUtils')
         customizer.addImport('StringUtils', 'org.apache.commons.lang3.StringUtils')
-        customizer.addImport('StringUtil', 'com.tdssrc.grails.StringUtil')
-        customizer.addImport('NumberUtil', 'com.tdssrc.grails.NumberUtil')
+        customizer.addImport('StringUtil', 'net.transitionmanager.etl.StringUtilForETL')
+        customizer.addImport('NumberUtil', 'net.transitionmanager.etl.NumberUtilForETL')
 
         secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
         CompilerConfiguration configuration = new CompilerConfiguration()
