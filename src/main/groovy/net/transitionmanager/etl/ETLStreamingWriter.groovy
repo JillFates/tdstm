@@ -155,7 +155,7 @@ class ETLStreamingWriter {
         writeFields(rowResult.fields)
         generator.writeStringField('domain', rowResult.domain)
         writeStringCollectionField('comments', rowResult.comments)
-        writeTagResults(rowResult.tags)
+        if (rowResult.tags) writeTagResults(rowResult.tags)
         generator.writeEndObject()
     }
 

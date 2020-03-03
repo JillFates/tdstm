@@ -1921,7 +1921,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		if (!dataScriptId) {
 			errorMsg = 'Missing required dataScriptId parameter'
 		} else if (!filename) {
-			errorMsg = 'Missing filename par	ameter'
+			errorMsg = 'Missing filename parameter'
 		} else if (!fileSystemService.temporaryFileExists(filename)) {
 			errorMsg = 'Specified input file not found'
 		} else {
