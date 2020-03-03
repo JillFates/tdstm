@@ -46,7 +46,7 @@ class License {
 	Date 		lastUpdated
 
 	/** Last time that we saw this License in compliance (number of servers or other constraints) */
-	String 		lastComplianceHash = License.complianceShiftDate()
+	String 		lastComplianceHash = encodeDate(complianceShiftDate())
 
 	static mapping = {
 		id 			generator: 'assigned'
@@ -92,6 +92,17 @@ class License {
 		}
 	}
 
+	/*
+	 * Encodes a Date passed to the function
+	 * @param date to encode
+	 * @return AES encoded String
+	 */
+	private String encodeDate( Date date ) {
+		long epochTime = date.time
+		String epochStr = "${epochTime}"
+		return AESCodec.getInstance().encode(epochStr, id)
+	}
+
 	/**
 	 * Returns the decripted form of the las seen compliance Date
 	 * If is set in the past, and the number of licenses is below permitted then we assume it was the last time that the license was valid
@@ -110,9 +121,8 @@ class License {
 	 * @param date to set
 	 */
 	void lastComplianceDate( Date date ) {
-		long epochTime = date.time
-		String epochStr = "${epochTime}"
-		setLastComplianceHash( AESCodec.getInstance().encode(epochStr, id) )
+		String encodedDate = encodeDate( date )
+		setLastComplianceHash( encodedDate )
 	}
 
 	PartyGroup getClient(){

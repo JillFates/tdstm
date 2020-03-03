@@ -293,7 +293,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 						}
 
 						return getLicenseObj(lic)
-					} catch (GeneralSecurityException gse) {
+					} catch (gse) {
 						log.error("Security Exception when trying to verify license(id: ${lic.id}) lastComplianceDate mrking it as CORRUPT", gse)
 						lic.status = DomainLicense.Status.CORRUPT
 						lic.save()
@@ -405,22 +405,24 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				if (numServers > licState.numberOfLicenses) {
 
 					// if stored last compliance is in valid future date lets set the last compliance Date to them all (in case of overlapped)
-					if (domLicense.lastComplianceDate() > now) {
+					Date lastComplianceDate = domLicense.lastComplianceDate()
+					if (lastComplianceDate > now) {
+						lastComplianceDate = now
+
 						licenseObjs.each { lic ->
 							DomainLicense dl = DomainLicense.get(lic.productKey)
-							dl.lastComplianceDate(now)
+							dl.lastComplianceDate(lastComplianceDate)
 							dl.save()
 						}
 					}
 
-					licState.lastCompliantDate = now
+					licState.lastCompliantDate = lastComplianceDate
 
-					int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
+					int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate, now)
 					if (gracePeriod > 0) {
-						licState.state = State.UNLICENSED // State.NONCOMPLIANT
+						licState.state = State.NONCOMPLIANT
 						licState.message = "The Server count has exceeded the license limit of ${licState.numberOfLicenses} by ${numServers - licState.numberOfLicenses} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
-						licState.valid = true
-						// licState.valid = false
+						licState.valid = false
 					} else {
 						licState.state = State.UNLICENSED // State.INBREACH
 						licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${licState.numberOfLicenses} to re-enable all application features."
@@ -466,12 +468,11 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @param lastCompliantDate
 	 * @return
 	 */
-	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate){
+	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate, Date now = new Date()){
 		if ( !lastCompliantDate ) {
 			throwException(LogicException, 'license.admin.lastCompliantDate.expected', 'Last Compliance Date Expected')
 		}
 		Date graceDate = DateUtils.addDays(lastCompliantDate, gracePeriodDays)
-		Date now = new Date()
 		return (graceDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
 	}
 
