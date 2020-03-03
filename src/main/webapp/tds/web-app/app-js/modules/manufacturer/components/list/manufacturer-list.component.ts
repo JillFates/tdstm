@@ -164,8 +164,7 @@ export class ManufacturerListComponent implements OnInit {
 					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION')
 				).subscribe((result: any) => {
 						if (result.confirm === DialogConfirmAction.CONFIRM) {
-							this.manufacturerService.deleteManufacturer(dataItem.id).toPromise();
-							this.gridComponent.reloadData();
+							this.manufacturerService.deleteManufacturer(dataItem.id).toPromise().finally(() => this.gridComponent.reloadData());
 						}
 					});
 			}

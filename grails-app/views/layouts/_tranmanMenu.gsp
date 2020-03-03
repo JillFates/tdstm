@@ -57,7 +57,6 @@
                                 </tds:hasPermission>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Manage Model Library</li>
                             <li class="menu-child-item menu-list-manufacturers">
                                 <a href="/tdstm/module/manufacturer/list">List Manufacturers</a>
                             </li>

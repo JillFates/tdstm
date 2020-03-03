@@ -7,7 +7,7 @@ import com.tdssrc.grails.TimeUtil
  */
 class ManufacturerAlias {
 
-    Integer id
+    Long id
 	String name
 	Manufacturer manufacturer
 	Date dateCreated

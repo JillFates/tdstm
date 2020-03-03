@@ -14,7 +14,7 @@ export class ManufacturerService {
 	getManufacturerList(): Observable<ManufacturerModel[]> {
 		const url = `${this.manufacturerUrl}/listJson?sord=ASC`;
 		return this.http.get(url)
-			.map((response: any) => response.rows)
+			.map((response: any) => response.data.rows)
 			.catch((error: any) => error);
 	}
 

@@ -68,9 +68,7 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
             data
         }
 
-		def jsonData = [rows: results]
-
-		render jsonData as JSON
+        renderSuccessJson([rows: results])
 	}
 
 	@HasPermission(Permission.ManufacturerView)

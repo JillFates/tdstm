@@ -156,11 +156,11 @@ class ManufacturerService implements ServiceMethods {
 
 	boolean update(Manufacturer manufacturer, String deletedAka, List<String> akaToSave, Map<String, String> akaToUpdate) {
 		if (deletedAka) {
-			List<Integer> maIds = deletedAka.split(",").collect() { it as Integer }
+			List<Long> maIds = deletedAka.split(",").collect() { it as Long }
 			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.id in :maIds", [maIds: maIds])
 		}
         if (akaToUpdate.size() > 0) {
-            def manufacturerAliasList = ManufacturerAlias.findAllByManufacturer(manufacturer)
+            ManufacturerAlias manufacturerAliasList = ManufacturerAlias.findAllByManufacturer(manufacturer)
             manufacturerAliasList.each { manufacturerAlias ->
                 manufacturerAlias.name = akaToUpdate[manufacturerAlias.id]
                 manufacturerAlias.save(flush:true)
