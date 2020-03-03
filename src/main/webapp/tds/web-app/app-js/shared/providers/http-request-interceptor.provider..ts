@@ -139,7 +139,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 					});
 				}
 
-				return throwError(error);
+				return throwError(errorMessage);
 			}), finalize(() => {
 				this.notifierService.broadcast({
 					name: 'httpRequestCompleted',
