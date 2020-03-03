@@ -208,10 +208,12 @@
 			<ng-template
 				kendoGridFilterCellTemplate *ngIf="currentStatus.showAssetsFilter && column.property === 'tagAssets'">
 				<tds-asset-tag-selector #tagSelector
+																class="grid-filter"
 																[popupClass]="'grid-filter-tag-selector'"
 																[tagList]="metadata.tagList"
 																placeholder="{{ 'GLOBAL.FILTER' | translate }}"
 																[viewFilterModel]="column.filter"
+																[showClearButton]="true"
 																(valueChange)="onTagFilterChange(column, $event)"
 				>
 				</tds-asset-tag-selector>

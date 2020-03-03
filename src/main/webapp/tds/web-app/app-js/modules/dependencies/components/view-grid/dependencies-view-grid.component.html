@@ -134,9 +134,11 @@
 					<!-- Asset Tags Filter Template -->
 					<tds-asset-tag-selector *ngIf="column.property === 'tagsAsset' || column.property === 'tagsDependent'"
 																	#tagSelector
+																	class="grid-filter"
 																	[popupClass]="'grid-filter-tag-selector'"
 																	[tagList]="state.tagList"
 																	[viewFilterModel]="column.filter"
+																	[showClearButton]="true"
 																	(valueChange)="onTagFilterChange(column, $event)"
 																	[placeholder]="'Filter'">
 					</tds-asset-tag-selector>

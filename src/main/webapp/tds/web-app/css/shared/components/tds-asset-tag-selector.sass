@@ -105,6 +105,18 @@
     .k-input:-ms-input-placeholder
       font-size: 14px
       color: $asset-tag-placeholder
+
+  &.grid-filter
+    display: inline-block
+    min-width: 180px
+    max-width: 210px
+
+tds-asset-tag-selector
+  .clear-button
+    vertical-align: top
+    .tds-button
+      padding: 0
+
 /* Global, but protected by the scope */
 $asset-tag-selector-default-label-color: #656565
 .asset-tag-selector-single-container
@@ -223,7 +235,6 @@ $asset-tag-selector-default-label-color: #656565
   font-weight: 500
   color: black
 
-// asset-explorer-view-grid, .asset-explorer-view-grid-component
 .k-grid
   .label.tag
     @include asset-tag-style

@@ -32,6 +32,7 @@ import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services
 import { takeUntil } from 'rxjs/operators';
 import { Observable, ReplaySubject } from 'rxjs';
 import { fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
+import { ViewColumn, ViewSpec } from '../../../assetExplorer/model/view-spec.model';
 
 declare var jQuery: any;
 
@@ -66,6 +67,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
+	private TAG_ASSET_COLUMN_WIDTH = 260;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -83,6 +85,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
 		this.model = this.route.snapshot.data['report'];
+		this.prepareView(this.model);
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
 	}
 
@@ -110,6 +113,19 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
 		this.reloadStrategy();
 		this.initialiseComponent();
+	}
+
+	/**
+	 * Configuration for tag assets column width.
+	 */
+	prepareView(model: ViewModel): void {
+		if (model && model.schema && model.schema.columns) {
+			model.schema.columns.forEach((column: ViewColumn) => {
+				if (column.property === 'tagAssets') {
+					column.width = this.TAG_ASSET_COLUMN_WIDTH;
+				}
+			});
+		}
 	}
 
 	/**
