@@ -195,7 +195,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
-					this.updateNodeData(this.currentNodesData, true);
+					this.updateNodeData(this.currentNodesData, false);
 				});
 	}
 
@@ -355,11 +355,15 @@ export class ArchitectureGraphComponent implements OnInit {
 	 *  @param iconsOnly if show the labels or not
 	 */
 	updateNodeData(data, iconsOnly) {
+		const clonedData = this.removeNodeNamesForNotSelectedCategories(data);
+		console.log(clonedData.nodes);
+		console.log(iconsOnly);
+
 		const diagramHelper = new ArchitectureGraphDiagramHelper();
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
 			currentUserId: 1,
-			data: this.removeNodeNamesForNotSelectedCategories(data) ,
+			data: clonedData,
 			iconsOnly: iconsOnly,
 			extras: {
 				diagramOpts: {
