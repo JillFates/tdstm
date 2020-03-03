@@ -275,6 +275,8 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 						this.editing = false;
 						this.eventModel = JSON.parse(JSON.stringify(this.savedModel));
 						this.setTitle(this.getModalTitle());
+					} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+						this.onCancelClose();
 					}
 				});
 		} else {
