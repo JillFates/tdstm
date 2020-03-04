@@ -223,7 +223,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	public onEdit(): void {
 		if (this.isEditAvailable()) {
-			this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+			const _override = this.queryParams._override;
+			this.router.navigate(['asset', 'views', this.model.id, 'edit'], {
+				queryParams: { _override }
+			});
 		}
 	}
 
