@@ -366,7 +366,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 					this.dataSignature = JSON.stringify(this.credentialModel);
 					this.modalType = this.actionTypes.VIEW;
 					this.setTitle(this.getModalTitle(this.modalType));
-				} else {
+				} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
 					this.onCancelClose();
 				}
 			});

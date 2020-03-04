@@ -328,6 +328,8 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 						this.editing = false;
 						this.bundleModel = JSON.parse(JSON.stringify(this.savedModel));
 						this.setTitle(this.getModalTitle());
+					} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+						this.onCancelClose();
 					}
 				});
 		} else {

@@ -496,6 +496,8 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 						this.projectModel = JSON.parse(JSON.stringify(this.savedModel));
 						this.projectLogoId = this.savedProjectLogoId;
 						this.setTitle(this.getModalTitle());
+					} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+						this.onCancelClose();
 					}
 				});
 		} else {

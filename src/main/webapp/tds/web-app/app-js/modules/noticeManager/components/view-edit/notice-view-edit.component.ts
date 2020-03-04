@@ -164,15 +164,13 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			).subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
-					if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
-						// Put back original model
-						this.model = JSON.parse(this.dataSignature);
-						this.dataSignature = JSON.stringify(this.model);
-						this.action = ActionType.View;
-						this.setTitle(this.getModalTitle(this.action));
-					} else {
-						this.onCancelClose();
-					}
+					// Put back original model
+					this.model = JSON.parse(this.dataSignature);
+					this.dataSignature = JSON.stringify(this.model);
+					this.action = ActionType.View;
+					this.setTitle(this.getModalTitle(this.action));
+				} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+					this.onCancelClose();
 				}
 			});
 		} else {
