@@ -168,9 +168,8 @@
 						<ng-template
 							kendoGridCellTemplate
 							*ngIf="column.property === 'color'"
-							let-dataItem
-						>
-							<div class="text-center">
+							let-dataItem>
+							<div class="single-line-tags text-center">
 								<span
 									[ngClass]="dataItem.css"
 									class="label tag"
