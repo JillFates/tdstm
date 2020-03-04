@@ -27,6 +27,7 @@
     "@fortawesome/fontawesome-svg-core": "1.2.27",
     "@fortawesome/free-solid-svg-icons": "5.12.1",
     "@fortawesome/free-brands-svg-icons": "5.12.1",
+    "@fortawesome/pro-solid-svg-icons": "5.12.1",
     "@ngxs/devtools-plugin": "3.4.3",
     "@ngxs/logger-plugin": "3.4.3",
     "@ngxs/storage-plugin": "3.4.3",
@@ -71,7 +72,7 @@
     "ramda": "0.25.0",
     "rxjs": "6.4.0",
     "rxjs-compat": "6.4.0",
-    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.1.17.tgz",
+    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.1.18.tgz",
     "zone.js": "0.10.0"
   },
   "devDependencies": {
