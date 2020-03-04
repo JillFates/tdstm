@@ -1,3 +1,7 @@
+@mixin tds-tag-hover
+  &:hover
+    color: black
+    font-weight: bolder
 /* Exclusive for Angular*/
 .asset-tag-selector-component
   $asset-tag-placeholder: #999
@@ -146,29 +150,40 @@ $asset-tag-selector-default-label-color: #656565
   border-radius: 2px
 .tag-black
   background-color: black !important
+  @include tds-tag-hover
 .tag-grey
   background-color: #e6e6e6 !important
+  @include tds-tag-hover
 .tag-red
   background-color: #f2d9e1 !important
+  @include tds-tag-hover
 .tag-orange
   background-color: #f2e8d9 !important
+  @include tds-tag-hover
 .tag-yellow
   background-color: #eaf2d9 !important
+  @include tds-tag-hover
 .tag-green
   background-color: #d9f2d9 !important
+  @include tds-tag-hover
 .tag-cyan
   background-color: #d9f2ec !important
+  @include tds-tag-hover
 .tag-blue
   background-color: #d9e8f2 !important
+  @include tds-tag-hover
 .tag-purple
   background-color: #dad9f2 !important
+  @include tds-tag-hover
 .tag-pink
   background-color: #efd9f2 !important
+  @include tds-tag-hover
 .tag-white
   background-color: white !important
+  @include tds-tag-hover
 .tag-unselected
   background-color: unset !important
-
+  @include tds-tag-hover
 .single-line-tags
   margin-top: 5px
 .single-line-tags:hover, .show-full-tags
