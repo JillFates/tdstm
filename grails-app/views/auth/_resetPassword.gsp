@@ -17,6 +17,10 @@
 	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
 	<!-- Clarity CSS -->
 	<link rel="stylesheet" href="https://unpkg.com/@clr/ui/clr-ui.min.css" />
+    <!--CLARITY ICONS STYLE-->
+    <link rel="stylesheet" href="${resource(dir:'dist/css/clarity',file:'clr-icons.min.css')}">
+    <!--CLARITY ICONS API & ALL ICON SETS-->
+    <script src="${resource(dir:'dist/js/vendors/clarity',file:'clr-icons.min.js')}"></script>
 
 	<!-- General Template Style -->
 	<asset:stylesheet href="css/tds-style.css" />
@@ -45,13 +49,13 @@
 						src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 				</div>
 
-				<g:form action="applyNewPassword" id="forgotPasswordForm" name="forgotPasswordForm">
+				<g:form action="resetPassword" name="forgotPasswordForm" method="post">
 					<input type="hidden" name="username" id="username" value="${username}" />
 					<input type="hidden" name="token" id="token" value="${token}" />
 					<p>The final step is to enter your email address associated with your account and a new password.
 					</p>
 					<div class="clr-row">
-							<form clrForm clrLayout="vertical">
+                        <form clrForm clrLayout="vertical">
 								<clr-input-container class="clr-col-12">
 									<input clrInput class="clr-input" type="email"
 										   name="email" id="email" placeholder="Enter your email address"
@@ -62,25 +66,97 @@
 										   class="clr-input" id="passwordId" name="password" autocorrect="off"
 										   autocapitalize="off" placeholder="Enter your <g:if test="${changingPassword}">New </g:if> password" onkeyup="PasswordValidation.checkPassword(this)" style="width: 100%"/>
 								</clr-password-container>
-								<div class="clr-col-12">
-									<em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
-									<em id="lengthRequirementId" size="${minPasswordLength}">Password must be at least ${minPasswordLength} characters long<b class="ok"></b></em><br/>
-									<em id="passwordRequirementsId">Password must contain at least 3 of these requirements:</em><br/>
-									<ul>
-										<li><em id="uppercaseRequirementId">Uppercase characters<b class="ok"></b></em></li>
-										<li><em id="lowercaseRequirementId">Lowercase characters<b class="ok"></b></em></li>
-										<li><em id="numericRequirementId">Numeric characters<b class="ok"></b></em></li>
-										<li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
-									</ul>
-								</div>
+                                <div class="requirements-container">
+                                    <div class="clr-row">
+                                        <div class="clr-col-10">
+                                            <span class="label no-border responsive-text">
+                                                Password must not contain the username
+                                            </span>
+                                        </div>
+                                        <div class="clr-col-2">
+                                            <clr-icon shape="" class="is-success" id="usernameRequirementId"></clr-icon>
+                                        </div>
+                                    </div>
+                                    <div class="clr-row">
+                                        <div class="clr-col-10">
+                                            <span class="label no-border responsive-text">
+                                                Password must be at least ${minPasswordLength} characters long
+                                            </span>
+                                        </div>
+                                        <div class="clr-col-2">
+                                            <clr-icon shape="" class="is-success" min-size="${minPasswordLength}" id="lengthRequirementId"></clr-icon>
+                                        </div>
+                                    </div>
+                                    <div class="clr-row">
+                                        <div class="clr-col-10">
+                                            <span class="label no-border responsive-text" style="text-align: left; white-space: normal;">
+                                                Password must contain at least 3 of these requirements:
+                                            </span>
+                                        </div>
+                                        <div class="clr-col-2">
+                                            <clr-icon shape="" class="is-success" id="passwordRequirementsId">
+                                            </clr-icon>
+                                        </div>
+                                    </div>
+                                    <ul class="list" style="padding: 0 1rem 0 1rem;">
+                                        <li>
+                                            <div class="clr-row">
+                                                <div class="clr-col-11">
+                                                    <span class="label no-border responsive-text">
+                                                        Uppercase characters
+                                                    </span>
+                                                </div>
+                                                <div class="clr-row-1">
+                                                    <clr-icon shape="" class="is-success" id="uppercaseRequirementId"></clr-icon>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="clr-row">
+                                                <div class="clr-col-11">
+                                                    <span class="label no-border responsive-text">
+                                                        Lowercase characters
+                                                    </span>
+                                                </div>
+                                                <div class="clr-row-1">
+                                                    <clr-icon shape="" class="is-success" id="lowercaseRequirementId"></clr-icon>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="clr-row">
+                                                <div class="clr-col-11">
+                                                    <span class="label no-border responsive-text">
+                                                        Numeric characters
+                                                    </span>
+                                                </div>
+                                                <div class="clr-row-1">
+                                                    <clr-icon shape="" class="is-success" id="numericRequirementId"></clr-icon>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="clr-row">
+                                                <div class="clr-col-11">
+                                                    <span class="label no-border responsive-text">
+                                                        Nonalphanumeric characters
+                                                    </span>
+                                                </div>
+                                                <div class="clr-row-1">
+                                                    <clr-icon shape="" class="is-success" id="symbolRequirementId"></clr-icon>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
 								<clr-password-container class="clr-col-12">
 									<input clrPassword class="clr-input" type="password" id="confirmPasswordId"
 										   name="confirmPassword" autocorrect="off" autocapitalize="off"
 										   placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)" style="width: 100%"
 										   required/>
-									<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
 								</clr-password-container>
-								<div class="clr-col-12 buttons-container">
+                                <span id="retypedPasswordMatchRequirementId" class="label no-border" style="color: red;">Passwords should match</span><br>
+                                <div class="clr-col-12 buttons-container">
 									<div class="clr-row">
 										<div class="clr-col-xl-4 clr-col-lg-5 clr-col-md-5 clr-col-sm-12">
 											<a href="javascript:void(0)" (click)="backToLogin()"
@@ -88,7 +164,7 @@
 										</div>
 										<div class="clr-col-xl-8 clr-col-lg-7 clr-col-md-7 clr-col-sm-12">
 											<g:if test="${validToken}">
-												<g:actionSubmit id="resetPasswordSubmitButton" class="btn btn-primary btn-block btn-flat" value="Update Password" action="applyNewPassword"/>
+												<g:actionSubmit id="resetPasswordSubmitButton" class="btn btn-primary btn-block btn-flat" value="Update Password" action="applyNewPassword" disabled="true"/>
 											</g:if>
 										</div>
 									</div>
