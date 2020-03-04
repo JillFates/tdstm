@@ -422,4 +422,13 @@ export class AssetExplorerService {
 
 		return dependencies;
 	}
+
+	/**
+	 * GET - Returns the default save options configuration for a view.
+	 */
+	getSaveOptions(): Observable<any> {
+		return this.http.get(`${this.assetExplorerUrl}/saveOptions`)
+			.map((response: any) => response.saveOptions)
+			.catch((error: any) => error);
+	}
 }

@@ -1,10 +1,10 @@
 // Angular
-import {Injectable} from '@angular/core';
-import {Router, Resolve, ActivatedRouteSnapshot} from '@angular/router';
+import { Injectable } from '@angular/core';
+import { Router, Resolve, ActivatedRouteSnapshot } from '@angular/router';
 // Services
-import {AssetExplorerService} from '../service/asset-explorer.service';
+import { AssetExplorerService } from '../service/asset-explorer.service';
 // Others
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class ReportResolveService implements Resolve<any> {
@@ -18,19 +18,22 @@ export class ReportResolveService implements Resolve<any> {
 	resolve(route: ActivatedRouteSnapshot): Observable<any> | boolean {
 		const reportId = route.params['id'];
 		if (!reportId) {
-			// We are on a Create Model, we inject a empty Object
-			return Observable.of({
-				isFavorite: false,
-				isOwner: true,
-				isShared: false,
-				isSystem: false,
-				schema: {
-					columns: [],
-					domains: []
-				}
-			});
+			return this.assetExplorerService.getSaveOptions()
+				.map(saveOptions => {
+					return {
+						saveOptions: saveOptions,
+						isFavorite: false,
+						isOwner: true,
+						isShared: false,
+						isSystem: false,
+						schema: {
+							columns: [],
+							domains: []
+						}
+					};
+				});
 		} else {
-			return this.assetExplorerService.getReport(reportId, {queryParamsObj: route.queryParams}).map(reports => {
+			return this.assetExplorerService.getReport(reportId, { queryParamsObj: route.queryParams }).map(reports => {
 				return reports;
 			}).catch((err) => {
 				console.error('ReportResolveService:', 'An Error Occurred trying to fetch Single Report ' + reportId);
@@ -47,11 +50,11 @@ export class ReportResolveService implements Resolve<any> {
 	 */
 	public populateReport(reports) {
 		if (Array.isArray(reports)) {
-			reports.map( rep => {
+			reports.map(rep => {
 				if (Array.isArray(rep.items)) {
-					rep.items.map( (item) => {
+					rep.items.map((item) => {
 						const _override: string = item.hasOverride ? 'false' : null;
-						item.queryParams = {_override};
+						item.queryParams = { _override };
 					})
 				}
 			})

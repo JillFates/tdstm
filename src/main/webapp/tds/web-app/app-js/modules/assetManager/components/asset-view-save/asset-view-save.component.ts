@@ -44,7 +44,7 @@ import { ActivatedRoute } from '@angular/router';
                                                name="name"
                                                id="name"
                                                class="form-control"
-                                               placeholder="View Name"
+                                               placeholder="Enter a name for the view"
                                                [disabled]="!isSaveInMyViewMode()"
                                                (keyup)="onNameChanged()"
                                                [(ngModel)]="model.name"
