@@ -47,7 +47,8 @@ import java.sql.Timestamp
  */
 class DataviewService implements ServiceMethods {
 
-	static         ProjectService        projectService
+	@Lazy
+	static ProjectService projectService = { -> ApplicationContextHolder.getBean('projectService', ProjectService) }()
 				   UserPreferenceService userPreferenceService
 	@Lazy
 	private static CustomDomainService   customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
