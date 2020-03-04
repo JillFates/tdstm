@@ -130,7 +130,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * Create an Asset Dataview for Asset Explorer ('Save As' action on Asset Explorer)
 	 * The service method will check for permissions AssetExplorerSystemCreate or AssetExplorerCreate
 	 * appropriately.
-	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
+	 * @return status:200 json{ "status": "success"/"fail", "data": { "dataview:Object", "saveOptions":Object } }
 	 */
 	@HasPermission(Permission.AssetExplorerCreate)
 	def createDataview() {
@@ -138,8 +138,10 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		validateCommandObject(command)
 		Project project = projectForWs
 		Person whom = currentPerson()
-		Map dataviewMap = dataviewService.create(project, whom, command).toMap(project, whom)
-		renderSuccessJson([dataView: dataviewMap])
+		Dataview dataview = dataviewService.create(project, whom, command)
+		Map dataviewMap = dataview.toMap(project, whom)
+		Map saveOptions = dataviewService.generateSaveOptions(project, whom, dataview)
+		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
 	}
 
 	/**
