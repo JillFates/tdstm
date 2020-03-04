@@ -50,9 +50,9 @@ declare var jQuery: any;
 		        </ng-template>
 		        <ng-template kendoMultiSelectItemTemplate let-dataItem>
 		            <div class="asset-tag-selector-single-container">
-									<div class="asset-tag-selector-single-item {{dataItem.css}}">
-										<i class="fa fa-fw fa-check"></i> {{ dataItem.name }}
-									</div>
+						<div class="asset-tag-selector-single-item tag-kendo-selector {{dataItem.css}}">
+							<i class="fa fa-fw fa-check"></i> {{ dataItem.name }}
+						</div>
 		            </div>
 		        </ng-template>
 		    </kendo-multiselect>
