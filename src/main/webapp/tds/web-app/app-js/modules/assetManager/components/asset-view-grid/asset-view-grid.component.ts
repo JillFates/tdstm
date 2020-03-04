@@ -245,6 +245,28 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		return column.label;
 	}
 
+	/**
+	 * Gets the data type of the specified column
+	 * @param {ViewColumn} column
+	 * @returns {string}
+	 */
+	getType(column: ViewColumn): string {
+		const controlMap = {
+			'String' : 'text',
+			'Date' : 'date',
+			'DateTime' : 'dateTime',
+			'Number' : 'number',
+			'Boolean' : 'boolean'
+		}
+		let domainFields = this.fields.find(key => key.domain === column.domain.toUpperCase());
+		let field = domainFields ? domainFields.fields.find(key => key.field === column.property) : null;
+		if (field) {
+			return controlMap[field.control];
+		}
+		column.notFound = true;
+		return null;
+	}
+
 	rowCallbackClass(context: RowClassArgs) {
 		let obj = {};
 		obj[context.dataItem.common_assetClass.toLowerCase()] = true;
