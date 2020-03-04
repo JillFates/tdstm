@@ -440,7 +440,6 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 				if (val) {
 					const type = !!val.assetType ? val.assetType.replace(' ', '').toLowerCase()
 						: val.type && val.type.replace(' ', '').toLowerCase();
-					console.log('icon: ', type, val);
 					return this.getIcon(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.iconAlt;
