@@ -7,7 +7,6 @@ import com.tdssrc.grails.TimeUtil
  */
 class ManufacturerAlias {
 
-    Long id
 	String name
 	Manufacturer manufacturer
 	Date dateCreated
@@ -19,6 +18,7 @@ class ManufacturerAlias {
 	static mapping = {
 		autoTimestamp false
 		version false
+        id column: 'id'
 	}
 
 	def beforeInsert = {
