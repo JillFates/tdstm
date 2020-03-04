@@ -357,6 +357,15 @@ export class ArchitectureGraphComponent implements OnInit {
 	updateNodeData(data, iconsOnly) {
 		const clonedData = this.removeNodeNamesForNotSelectedCategories(data);
 
+		// extras: {
+		// 	diagramOpts: {
+		// 		initialAutoScale: Diagram.UniformToFill,
+		// 			contentAlignment: Spot.Center,
+		// 			allowZoom: true,
+		// 	},
+		// 	isExpandable: false
+		// }
+
 		const diagramHelper = new ArchitectureGraphDiagramHelper();
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
@@ -364,12 +373,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			data: clonedData,
 			iconsOnly: iconsOnly,
 			extras: {
-				diagramOpts: {
-					initialAutoScale: Diagram.UniformToFill,
-					contentAlignment: Spot.Center,
-					allowZoom: true,
-				},
-				isExpandable: false
+				initialAutoScale: Diagram.UniformToFill,
 			}
 		}));
 	}
