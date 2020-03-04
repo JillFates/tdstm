@@ -1,0 +1,50 @@
+// tds-tranman-menu {
+// 	@media (max-width: 768px) {
+// 		margin-top: 49px;
+// 		position: relative;
+// 		display: block;
+// 	}
+// }
+
+.main-header.header-component {
+	display: block;
+	height: auto;
+	white-space: normal;
+
+	.branding {
+		height: 45px;
+		width: 93px;
+		overflow: hidden;
+		min-width: 0;
+		margin: 0;
+		padding: 0;
+		img {
+			width: auto;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+	}
+	.nav {
+		display: block;
+		box-shadow: none;
+		-webkit-box-shadow: 0;
+	}
+	.nav-icon-text {
+		font-size: 14px;
+		line-height: 14px;
+		clr-icon {
+			margin: 0;
+		}
+	}
+	.user-account {
+		clr-icon {
+			margin-top: -2px;
+			color: #000;
+			background: #ccc;
+			border: #ccc solid 4px;
+			border-radius: 50%;
+		}
+	}
+}

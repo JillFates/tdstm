@@ -54,6 +54,9 @@ if(userHome) {
 	candidates << "$userHome/.grails/${appName}-config.groovy"
 }
 
+//adding a default canidate for the build servers
+candidates << "./tdstm-config.groovy"
+
 boolean foundAppConfig=false
 for (appConfigLocation in candidates) {
 	File f

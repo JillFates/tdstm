@@ -4,7 +4,6 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
@@ -19,23 +18,23 @@ import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 import net.transitionmanager.utils.Profiler
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -44,20 +43,22 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 
+
 	ApplicationService applicationService
 	AssetEntityService assetEntityService
-	AssetService assetService
-	CommentService commentService
-	CustomDomainService customDomainService
-	ControllerService controllerService
-	DatabaseService databaseService
-	DeviceService deviceService
-	MoveBundleService moveBundleService
-	PageRenderer groovyPageRenderer
-	ProgressService progressService
-	Scheduler quartzScheduler
-	StorageService storageService
-	PartyRelationshipService partyRelationshipService
+	AssetService       assetService
+	CommentService     commentService
+	TaskService        taskService
+	ControllerService  controllerService
+	DatabaseService    databaseService
+	DeviceService      deviceService
+	MoveBundleService  moveBundleService
+	PageRenderer       groovyPageRenderer
+	ProgressService    progressService
+	Scheduler          quartzScheduler
+	StorageService     storageService
+    PartyRelationshipService partyRelationshipService
+    CustomDomainService customDomainService
 	UserPreferenceService userPreferenceService
 
 	/**
@@ -68,7 +69,7 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def checkForUniqueName(){
-		UniqueNameCommand command = populateCommandObject(UniqueNameCommand)
+		UniqueNameCommand command = populateCommandObject(UniqueNameCommand, false)
 		boolean unique = true
 		AssetClass assetClassSample
 		Long foundAssetId
@@ -130,7 +131,7 @@ class WsAssetController implements ControllerMethods {
 		log.debug("assetId: {}, name: {}, dependencies: {}", assetId, name, dependencies)
 
 		List<String> errors = []
-		CloneAssetCommand command = populateCommandObject(CloneAssetCommand)
+		CloneAssetCommand command = populateCommandObject(CloneAssetCommand, false)
 		Project project = getProjectForWs()
 
 		if (command.cloneDependencies && !securityService.hasPermission(Permission.AssetCloneDependencies)) {
@@ -192,7 +193,6 @@ class WsAssetController implements ControllerMethods {
 	   Project project = projectForWs
 
 	   BulkDeleteDependenciesCommand command = populateCommandObject(BulkDeleteDependenciesCommand)
-	   validateCommandObject(command)
 	   renderAsJson(resp: assetService.bulkDeleteDependencies(project, command.dependencies))
    }
 
@@ -216,6 +216,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetView)
 	def getTemplate(Long id, String mode) {
 		final List modes = ['edit','show']
+
 		if (! modes.contains(mode) || id == null ) {
 			sendBadRequest()
 			return
@@ -228,8 +229,15 @@ class WsAssetController implements ControllerMethods {
 			return
 		}
 
-		Map model = [ asset: asset ]
+		Map model = [
+			asset           : asset,
+			dependencyBundle: AssetDependencyBundle.findByAsset(asset)?.dependencyBundle,
+			taskCount       : taskService.countByAssetEntity(asset),
+			commentCount    : commentService.countByAssetEntity(asset)
+		]
+
 		String domainName = asset.assetClass.toString()
+
 		switch (domainName) {
 			case "APPLICATION":
 				model << applicationService.getModelForShow(asset.project, asset, params)
@@ -249,14 +257,17 @@ class WsAssetController implements ControllerMethods {
 		}
 
 		domainName=domainName.toLowerCase()
+
 		try {
 			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
+
 			if (pageHtml) {
 				render pageHtml
 			} else {
 				log.error "getTemplate() Generate page failed domainName=$domainName, mode=$mode\n  model:$model"
 				sendNotFound()
 			}
+
 		} catch (e) {
 			log.error "getTemplate() Generate page for domainName=$domainName, mode=$mode had an exception: ${e.getMessage()}"
 			sendNotFound()
@@ -393,7 +404,7 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.BundleView)
 	def retrieveBundleChange() {
-		BundleChangeCommand command = populateCommandObject(BundleChangeCommand)
+		BundleChangeCommand command = populateCommandObject(BundleChangeCommand, false)
 		Project project = getProjectForWs()
 
 		// The id of the bundle retrieve from the asset in the dependency (if such dependency exists).
@@ -460,7 +471,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetCreate)
 	def saveAsset() {
 		// Populate the command with the data coming from the request.
-		AssetCommand command = populateCommandObject(AssetCommand)
+		AssetCommand command = populateCommandObject(AssetCommand, false)
 		// Save the new asset.
 		AssetEntity asset = assetEntityService.saveOrUpdateAsset(command)
 		renderSuccessJson(['id': asset.id])
@@ -473,7 +484,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetEdit)
 	def updateAsset(Long id) {
 		// Populate the command with the data coming from the request.
-		AssetCommand command = populateCommandObject(AssetCommand)
+		AssetCommand command = populateCommandObject(AssetCommand, false)
 		// Update the asset.
 		assetEntityService.saveOrUpdateAsset(command)
 		renderSuccessJson('Success!')
@@ -569,7 +580,7 @@ class WsAssetController implements ControllerMethods {
 		// Retrieve the project for the user.
 		Project project = getProjectForWs()
 		// Populate the command object with the data coming from the request
-		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand)
+		AssetCommentSaveUpdateCommand command = populateCommandObject(AssetCommentSaveUpdateCommand, false)
 		// Save or update the comment
 		commentService.saveOrUpdateAssetComment(project, command)
 	}

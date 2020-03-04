@@ -11,28 +11,33 @@
                         <div class="form-group row" style="margin-bottom: 5px;">
                             <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_DATA_ACTION' | translate}}</label>
                             <div class="col-sm-{{uiConfig.inputColSize}}">
-                                <select [(ngModel)]="selectedActionOption"
+                                <select clrSelect [(ngModel)]="selectedActionOption"
                                         (ngModelChange)="onActionScriptChange($event)"
                                         name="fetch"
                                         id="fetch"
-                                        class="form-control pd-top-5" >
+                                        class="form-control"
+                                        [disabled]="actionOptions.length == 0">
                                     <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                     <option *ngFor="let option of actionOptions"
                                             [ngValue]="option">{{option.name}}</option>
                                 </select>
                             </div>
-                            <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
+                            <tds-button class="col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
                                 <i aria-hidden="true" class="fa"
                                    [ngClass]="{'fa-fw fa-spinner fast-right-spinner': fetchInProcess,
                                                'fa-check green': fetchResult?.status === 'success' && fetchInputUsed === 'action',
                                                'fa-thumbs-down red': fetchResult?.status === 'error' && fetchInputUsed === 'action'}"></i>
                                 <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
-                            </button>
-                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"
-                                  class="control-label col-md-{{uiConfig.urlColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
-                                <br>
-                            </span>
+                            </tds-button>
+<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"-->
+<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
+<!--                                <br>-->
+<!--                                <a href="javascript:void(0);"-->
+<!--                                   (click)="onViewData('FETCH')" >-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
+<!--                                </a>-->
+<!--                            </span>-->
 
                         </div>
                         <div class="form-group row" style="margin-bottom: 5px;">
@@ -74,27 +79,27 @@
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_WITH_DATA_SCRIPT' | translate}}
                            </label>
                            <div class="col-sm-{{uiConfig.inputColSize}}">
-                               <select [ngModel]="selectedScriptOption"
+                               <select clrSelect [ngModel]="selectedScriptOption"
                                        (ngModelChange)="onChangeSelectedScript($event)"
                                        name="transform"
                                        id="transform"
-                                       class="form-control pd-top-5">   
+                                       class="form-control">
                                    <option *ngFor="let option of dataScriptOptions"
                                            [ngValue]="option">{{option.name | translate}}</option>
                                </select>
                             </div>
-                            <button *ngIf="uiConfig.showManualProcessElements"
+                            <tds-button *ngIf="uiConfig.showManualProcessElements"
                                     [disabled]="disableTransformButton() || transformInProcess"
                                     (click)="onTransform()"
-                                    class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
+                                    class="col-sm-{{uiConfig.buttonColSize}}">
                                 <i aria-hidden="true" class="fa"
                                    [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
                                                'fa-check green': transformResult?.status === 'success',
                                                'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
                                 <span>{{uiConfig.transformBtnLabel | translate}}</span>
-                            </button>
+                            </tds-button>
 
-                            <button *ngIf="uiConfig.showAutoProcessElements"
+                            <tds-button *ngIf="uiConfig.showAutoProcessElements"
                                     [disabled]="disableTransformButton() || transformInProcess"
                                     (click)="onImport()"
                                     class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
@@ -103,7 +108,12 @@
                                                'fa-check green': transformResult?.status === 'success',
                                                'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
                                 <span>{{uiConfig.transformBtnLabel | translate}}</span>
-                            </button>
+                            </tds-button>
+<!--                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);"-->
+<!--                               (click)="onViewData('TRANSFORM')"-->
+<!--                               class="control-label col-sm-{{uiConfig.urlColSize}}">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
+<!--                            </a>-->
                         </div>
 
                         <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showAutoProcessElements">
@@ -115,7 +125,7 @@
                                 </span>
                                 <div class="checkbox">
                                     <label for="emailMe">
-                                        <input type="checkbox" id="emailMe" name="emailMe" [(ngModel)]="uiConfig.sendNotification"/>    
+                                        <input type="checkbox" id="emailMe" name="emailMe" [(ngModel)]="uiConfig.sendNotification"/>
                                         <span class="checkbox-label">{{'IMPORT_ASSETS.AUTO_IMPORT.CHECKBOX_LABEL' | translate}}</span>
                                     </label>
                                 </div>
@@ -134,7 +144,7 @@
                         </div>
 
                         <!-- Load Data Row -->
-                        <div class="form-group row krka" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualProcessElements">
+                        <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualProcessElements">
                            <label class="col-sm-{{uiConfig.labelColSize}} control-label">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
                            </label>
@@ -154,25 +164,25 @@
                                     <kendo-grid-column title="Records" field="rowsCreated"></kendo-grid-column>
                                 </kendo-grid>
                             </div>
-                           <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
+                           <tds-button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                    (click)="onImport()"
-                                   class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
+                                   class="col-sm-{{uiConfig.buttonColSize}}">
                                <i aria-hidden="true" class="fa"
                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': importInProcess,
                                                'fa-check green': importResult?.status === 'success',
                                                'fa-thumbs-down red': importResult?.status === 'error'}"></i>
                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}</span>
-                           </button>
+                           </tds-button>
                            <a [routerLink]="['/importbatch','list']" class="control-label col-sm-{{uiConfig.urlColSize}}">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
                            </a>
                         </div>
                         <!-- Clear Button Row -->
                         <div class="row clear-button">
-                           <button (click)="onClear()"
-                                   class="btn btn-default col-md-offset-{{(uiConfig.labelColSize + uiConfig.inputColSize)}} col-sm-{{uiConfig.buttonColSize}}">
+                           <tds-button (click)="onClear()"
+                                   class="col-md-offset-{{(uiConfig.labelColSize + uiConfig.inputColSize)}} col-sm-{{uiConfig.buttonColSize}}">
                                {{'GLOBAL.CLEAR' | translate}}
-                           </button>
+                           </tds-button>
                        </div>
 
                         <!-- View Content Tabbed Panel Row -->

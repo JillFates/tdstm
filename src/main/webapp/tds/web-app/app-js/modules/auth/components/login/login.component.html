@@ -1,91 +1,93 @@
-<div class="login-component" *ngIf="!redirectUser">
-    <div class="login-box" [ngClass]="{'login-notice': loginInfo && loginInfo.notices.length > 0 }">
-        <div class="login-box-body">
-            <div class="login-logo">
-                <a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-                    <img src="/tdstm/assets/images/TMLoginLogo_v4.7.png" border="0" alt="Learn more about TransitionManager">
-                </a>
-            </div>
-
-            <div class="callout pre-login-message" *ngFor="let notice of loginInfo.notices">
-                <div [innerHTML]="notice['htmlText'] | safeHtml"></div>
-            </div>
-
-            <h1 class="login-box-msg" [ngClass]="{'message': loginInfo.sessionExpired}">
-                <span *ngIf="!loginInfo.sessionExpired">{{'LOGIN.START_YOUR_SESSION' | translate}}</span>
-                <span *ngIf="loginInfo.sessionExpired">{{'LOGIN.SESSION_EXPIRED' | translate}}</span>
-            </h1>
-
-            <form action="signIn" name="loginForm" class="login-form"  #loginForm='ngForm' >
-                <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
-                    {{loginInfo.config?.authorityLabel}}
-                    <kendo-dropdownlist
-                            name="authority"
-                            [defaultItem]="defaultAuthorityItem"
-                            [valuePrimitive]="true"
-                            [(ngModel)]="loginModel.authority"
-                            [data]="loginInfo.config.authorityList"
-                            required
-                    >
-                    </kendo-dropdownlist>
-                </div>
-                <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.PROMPT">
-                    {{'LOGIN.DOMAIN' | translate}}:
-                    <input type="text"
-                           class="form-control authority"
-                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
-                           name="authority"
-                           [(ngModel)]="loginModel.authority"
-                           placeholder="Enter {{loginInfo.config?.authorityLabel}}"
-                           title="Enter {{loginInfo.config?.authorityLabel}}"
-                           autocorrect="off"
-                           autocapitalize="off"
-                           required>
-                </div>
-                <div class="form-group has-feedback">
-                    <input type="text" class="form-control username"
-                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
-                           name="username"
-                           id="usernameid"
-                           [(ngModel)]="loginModel.username"
-                           placeholder="Enter your username"
-                           title="Enter your username"
-                           autocorrect="off"
-                           autocapitalize="off"
-                           required>
-                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
-                </div>
-                <div class="form-group has-feedback">
-                    <input type="password" class="form-control"
-                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
-                           name="password"
-                           id="password"
-                           [(ngModel)]="loginModel.password"
-                           autocorrect="off"
-                           autocapitalize="off"
-                           placeholder="Enter your password"
-                           title="Enter your password"
-                           required/>
-                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                </div>
-                <div class="message">{{errMessage}}</div>
-                <div class="row">
-                    <div class="col-xs-8">
-                    </div>
-                    <!-- /.col -->
-                    <div class="col-xs-4">
-                        <button type="submit" id="submitButton" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()" [disabled]="onLoginProgress">
-                            <img src="/tdstm/tds/web-app/assets/images/loader.gif" border="0" *ngIf="onLoginProgress" /> Sign In
-                        </button>
-                    </div>
-                    <!-- /.col -->
-                </div>
-            </form>
-
-            <div class="login-forgot-password-link">
-                <pre><a [routerLink]="['/auth','forgot']" id="forgot-your-password">{{'LOGIN.FORGOT_PASSWORD' | translate}}?</a></pre>
-            </div>
-            <div class="build-info">{{loginInfo.buildVersion}} <span class="float-right">All rights reserved. Patent Pending</span></div>
-        </div>
-    </div>
+<div class="login-component clr-row" *ngIf="!redirectUser">
+	<div class="clr-col-5 login-component-form__wrapper">
+		<div class="clr-row clr-justify-content-center">
+			<section class="login-component-form__section clr-col-8 clr-align-self-center">
+				<h1>
+					<a href="https://spencerbrewery.com/">
+						<img src="/tdstm/tds/web-app/assets/images/transitionLargeLogo.svg" alt="Transition Manager Logo" />
+					</a>
+				</h1>
+				<form clrForm action="signIn" name="loginForm" class="login-form is-fullwidth" #loginForm="ngForm" clrLayout="vertical" (keyup.enter)="onLogin()">
+					<clr-select-container class="clr-col-12" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
+						<select clrSelect
+								name="authority"
+								[(ngModel)]="loginModel.authority"
+								(keydown.enter)="$event.stopImmediatePropagation(); $event.preventDefault(); onLogin();"
+								required>
+							<option value="Select {{ loginInfo.config?.authorityLabel }}" disabled>Select {{ loginInfo.config?.authorityLabel }}</option>
+							<option *ngFor=" let authority of loginInfo.config.authorityList"
+                                    [value]="authority"
+								    [attr.selected]="authority === defaultAuthorityItem">
+                                {{ authority }}</option>
+						</select>
+						<clr-control-error>{{ loginInfo.config?.authorityLabel }} Required</clr-control-error>
+					</clr-select-container>
+					<clr-input-container class="clr-col-12" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.PROMPT" >
+						<input clrInput type="text" name="authority"
+							[ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
+							[(ngModel)]="loginModel.authority"
+							placeholder="Enter {{loginInfo.config?.authorityLabel}}"
+							required />
+						<clr-control-error>{{ loginInfo.config?.authorityLabel }} Required</clr-control-error>
+					</clr-input-container>
+					<clr-input-container class="clr-col-12">
+						<input clrInput type="text"
+							[ngClass]="{ 'ng-invalid-not-touched': !loginForm.form.touched}"
+							name="username"
+							id="usernameid"
+							[(ngModel)]="loginModel.username"
+							placeholder="Username"
+							required />
+						<clr-control-error>Incorrect Login Information</clr-control-error>
+					</clr-input-container>
+					<clr-password-container class="clr-col-12 login-password__clr-container">
+						<input clrPassword placeholder="Password" name="password" id="password" [(ngModel)]="loginModel.password" required />
+						<clr-control-error>Incorrect Login Information</clr-control-error>
+					</clr-password-container>
+					<div class="clr-col-12">
+						<a [routerLink]="['/auth', 'forgot']" id="forgot-your-password">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a>
+					</div>
+					<div class="clr-col-12" *ngIf="errMessage">
+						<div class="alert alert-danger" role="alert">
+							<div class="alert-items">
+								<div class="alert-item static">
+									<div class="alert-icon-wrapper">
+										<clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+									</div>
+									<span class="alert-text">{{errMessage}}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clr-col-12 login-notice__wrapper" *ngIf="loginInfo.notices.length > 0">
+						<div class="alert alert-info" role="alert" *ngFor="let notice of loginInfo.notices">
+							<div class="alert-items">
+								<div class="alert-item static">
+									<div class="alert-icon-wrapper">
+										<clr-icon
+											class="alert-icon"
+											shape="info-circle"
+										></clr-icon>
+									</div>
+									<span class="alert-text" [innerHTML]="notice['htmlText'] | safeHtml"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clr-col-12 login-button__wrapper">
+						<tds-button
+								id="loginBtn"
+								class="login-button"
+								theme="primary"
+								state="{{onLoginProgress? 'loading' : 'default'}}"
+								title="Click here to login"
+								(click)="onLogin()">
+							Log In
+						</tds-button>
+					</div>
+					<div class="build-info">{{loginInfo.buildVersion}} Patent Pending</div>
+				</form>
+			</section>
+		</div>
+	</div>
 </div>

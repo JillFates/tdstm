@@ -14,13 +14,15 @@ import { NgForm } from '@angular/forms';
 				<kendo-grid
 					[data]="parameterList"
 					[pageSize]="25"
-					[height]="430">
+                    class="row-actions-1-children"
+                    [height]="430">
 					<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
-						<tds-button-add class="float-right mar-right-15"
-														[id]="'btnAddParameter'"
-														[title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
-														(click)="onAddParameter()">
-						</tds-button-add>
+						<tds-button-create class="float-right"
+						                   [displayLabel]="false"
+											[id]="'btnAddParameter'"
+											[title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
+											(click)="onAddParameter()">
+						</tds-button-create>
 					</ng-template>
 					<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index"
 														 field="{{column.property}}"
@@ -37,26 +39,28 @@ import { NgForm } from '@angular/forms';
 							<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i
 								class="fa fa-fw fa-code api-boolean-icon"></i></span>
 						</ng-template>
-						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW"
-												 let-dataItem>
-							<div class="tds-action-button-set">
-								<tds-button-delete *ngIf="dataItem.required === 0  || dataItem.required === false"
-																	 (click)="onDeleteParameter($event, dataItem)">
-								</tds-button-delete>
-							</div>
-						</ng-template>
+                        <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
+                            <div class="action-button btn-link">
+                                <clr-dropdown *ngIf="dataItem.required === 0  || dataItem.required === false">
+                                    <tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+                                    <clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+                                        <a clrDropdownItem (click)="onDeleteParameter($event, dataItem)">Delete</a>
+                                    </clr-dropdown-menu>
+                                </clr-dropdown>
+                            </div>
+                        </ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem
 												 let-rowIndex="rowIndex">
 							<div
 								*ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-								<input (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean"
+								<input clrCheckbox (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean"
 											 name="{{column.property + columnIndex + rowIndex}}-param" (change)="onValuesChange()"
 											 [(ngModel)]="dataItem[column.property]"/>
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'paramName'">
 								<!-- Name -->
 								<input (keypress)="getOnInputKey($event)"
-											 type="text" required class="param-text-input"
+								       clrInput type="text" required class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-param"
 											 (change)="onValuesChange()"
 											 [(ngModel)]="dataItem.paramName"
@@ -78,7 +82,7 @@ import { NgForm } from '@angular/forms';
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'value'">
 								<!-- Value -->
-								<input (keypress)="getOnInputKey($event)"
+								<input (keypress)="getOnInputKey($event)" clrInput
 											 *ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'"
 											 type="text" class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-user-defined"
@@ -104,7 +108,7 @@ import { NgForm } from '@angular/forms';
 							</div>
 							<!-- Description -->
 							<div *ngIf="column.type === 'text' && column.property === 'desc'">
-								<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input"
+								<input (keypress)="getOnInputKey($event)" type="text" clrInput class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.description"/>
 							</div>
 						</ng-template>
@@ -156,7 +160,7 @@ export class ApiActionViewEditParamatersComponent {
 	@Input('commonFieldSpecs') commonFieldSpecs: any;
 	@Output('onValuesChange') onValuesChangeEmitter: EventEmitter<{ parameterList: Array<any>, isFormValid: boolean }>
 		= new EventEmitter<{ parameterList: Array<any>, isFormValid: boolean }>();
-	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
+	@ViewChild('apiActionParametersForm', {static: false}) apiActionParametersForm: NgForm;
 	actionTypes = ActionType;
 	apiActionParameterColumnModel = new APIActionParameterColumnModel();
 	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;

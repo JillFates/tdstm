@@ -7,14 +7,14 @@ import modules.AssetsMenuModule
 class AssetImportETLPage extends Page {
 
     static at = {
-        assetImportPageTitle.text().trim()  == "Import Assets (ETL)"
+        assetImportPageTitle.text()  == "Import Assets (ETL)"
         assetImportBreadcrumbs[0].text()   == "Assets"
 
     }
 
     static content = {
-        assetImportPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        assetImportBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        assetImportPageTitle (wait:true){$("section.content-header h2")}
+        assetImportBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }

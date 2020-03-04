@@ -58,10 +58,10 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			if (defaultEvent) {
 				moveEvent = MoveEvent.get(defaultEvent)
 				if (moveEvent?.projectId != project.id) {
-					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ?0 order by me.name asc",[project])
 				}
 			} else {
-				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ?0 order by me.name asc",[project])
 			}
 		}
 
@@ -210,7 +210,6 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 	def saveNews() {
 		Project project = controllerService.getProjectForPage(this)
 		SaveNewsCommand news = populateCommandObject(SaveNewsCommand)
-		validateCommandObject(news)
 
 		if (!project) {
 			flash.message = null
@@ -231,7 +230,6 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.NewsEdit)
 	def updateNews() {
 		UpdateNewsCommand news = populateCommandObject(UpdateNewsCommand)
-		validateCommandObject(news)
 		Project project = controllerService.getProjectForPage(this)
 
 		if (!project) {

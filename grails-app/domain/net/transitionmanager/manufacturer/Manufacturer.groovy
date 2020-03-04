@@ -43,21 +43,6 @@ class Manufacturer {
 		lastModified = TimeUtil.nowGMT()
 	}
 
-	/*
-	 * Handle cascading delete logic that is not implemented through constraints
-	 *   1. Set all AssetEntity.manufacturer to null
-	 *   2. Delete all manufacturer Aliases
-	 *   3. TODO - handle Room?
-	 *   4. TODO - What about the sync tables?
-	 */
-	def beforeDelete = {
-		// <SL> moved to ManufacturerService
-		/*withNewSession {
-			executeUpdate('update AssetEntity set manufacturer=null where manufacturer=?', [this])
-			executeUpdate('delete ManufacturerAlias where manufacturer=?', [this])
-		}*/
-	}
-
 	/**
 	 * The number of Models associated with this Manufacturer.
 	 */

@@ -8,7 +8,7 @@ import pages.Tasks.Cookbook.*
 import pages.Tasks.TaskManager.*
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 /**
  * This class sweeps over the Tasks Menu.
@@ -22,7 +22,7 @@ class TasksLandingPageSpec extends GebReportingSpec {
     static testCount
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
@@ -49,14 +49,6 @@ class TasksLandingPageSpec extends GebReportingSpec {
             at MenuPage
     }
 
-    def "2. Verify the My Tasks Landing Page"() {
-        when: 'The user goes to the My Tasks page'
-            tasksModule.goToMyTasks()
-
-        then: 'The My Tasks Page is loaded successfully'
-            at MyTasksPage
-    }
-
     def "3. Verify the Task Manager Landing Page"() {
         when: 'The user goes to the Task Manager page'
             tasksModule.goToTasksManager()
@@ -73,7 +65,15 @@ class TasksLandingPageSpec extends GebReportingSpec {
             at TaskGraphPage
     }
 
-    def "5. Verify the Task Timeline Landing Page"() {
+    def "5. Verify the GoJS Task Graph Landing Page"() {
+        when: 'The user goes to the Go JS Task Graph Page'
+            tasksModule.goToGoJSTaskGraph()
+
+        then: 'The Go JS Task Graph Page is loaded successfully'
+            at GoJSTaskGraphPage
+    }
+
+    def "6. Verify the Task Timeline Landing Page"() {
         when: 'The user goes to the Task Timeline page'
             tasksModule.goToTaskTimeline()
 
@@ -81,7 +81,7 @@ class TasksLandingPageSpec extends GebReportingSpec {
             at TaskTimelinePage
     }
 
-    def "6. Verify the Task Cookbook Landing Page"() {
+    def "7. Verify the Task Cookbook Landing Page"() {
         when: 'The user goes to the Task Cookbook page'
             tasksModule.goToTasksCookbook()
 
@@ -89,7 +89,7 @@ class TasksLandingPageSpec extends GebReportingSpec {
             at CookbookPage
     }
 
-    def "7. Verify the Generation History Landing Page"() {
+    def "8. Verify the Generation History Landing Page"() {
         when: 'The user goes to the Generation History page'
             tasksModule.goToGenerationHistory()
 
@@ -97,7 +97,7 @@ class TasksLandingPageSpec extends GebReportingSpec {
             at GenerationHistoryPage
     }
 
-    def "8. Verify the Import Tasks Landing Page"() {
+    def "9. Verify the Import Tasks Landing Page"() {
         when: 'The user goes to the Import Tasks page'
             tasksModule.goToImportTasks()
 

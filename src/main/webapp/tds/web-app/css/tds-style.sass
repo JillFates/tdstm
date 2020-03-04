@@ -1,12 +1,8 @@
-// USING A CUSTOM BEM http://getbem.com/introduction/
-// .block {}
-// .block-element {}
-// .block--modifier {}
-// .block-element--modifier {}
+@import "../../node_modules/tds-component-library/themes.scss"
 
 // Include all basic elements for UI.
 @import "base/index"
-
+@import "kendo/clarity"
 /* General Elements */
 // TODO:  these elements below should be placed in the elements/index.sass
 @import "elements/forms/forms"
@@ -19,13 +15,13 @@
 @import "elements/general/dialog_buttons"
 @import "elements/general/popup"
 @import "elements/general/modal"
+@import "elements/general/tds-modal"
 @import "elements/general/checkbox"
 @import "elements/general/code-mirror-component"
 @import "elements/general/flexbox"
 // Components (TODO: this should fusion with page/module folder)
 @import "elements/index"
 @import "shared/components/tds-supports-depends"
-@import "shared/components/combo-box-group"
 @import "shared/components/tds-asset-tag-selector"
 @import "shared/components/aka.component"
 @import "shared/components/pie-countdown.component"
@@ -39,21 +35,25 @@
 @import "shared/components/number-control.component"
 @import "shared/components/action-button.component"
 @import "shared/components/bulk-change-counter"
-@import "shared/components/filter-input"
 @import "shared/components/modal-page-wrapper.component"
+@import "shared/components/combobox.component"
+//@import "shared/components/diagram-layout.component"
+@import "shared/components/circle-countdown.component"
+@import "shared/components/task-context-menu.component"
 // Specific Module Layout/Components
 @import "shared/directives/tds-ui-prompt"
 @import "shared/directives/tds-ui-modal-decorator"
 @import "page/index"
 // Legacy ONLY
 @import "legacy/support/jqDialog"
-@import "legacy/assetExplorer/tds-angular-component"
+//@import "legacy/assetExplorer/tds-angular-component"
 // Only General Layout for the Template
 @import "layout/top-nav"
 @import "layout/left-nav"
 @import "layout/header_top"
 @import "layout/main-content"
 @import "layout/footer-content"
-
-// Kendo Customization
-@import "kendo/kendo"
+@import "bootstrap-overrides"
+@import "clarity-overrides"
+@import "kendo-overrides"
+@import "component-ui"

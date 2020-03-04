@@ -175,11 +175,15 @@ export class UIExtraDialog implements OnDestroy {
 	 */
 	private processMultipleDialogBackgrounds(closingDialog?: boolean): void {
 		let divs = jQuery('tds-ui-dialog div.modal.fade.in');
-		let index = 1;
+		let index = divs.length;
 		for (let div of divs) {
 			if (!closingDialog) {
 				this.currentActiveModalDivIndex = index;
-				jQuery(div).addClass('no-background');
+				// a couple of the view allow the modal background, before removing the background class
+				// check if this one is not one of them
+				if (!jQuery(div).hasClass('allow-modal-background')) {
+					jQuery(div).addClass('no-background');
+				}
 				if (index === divs.length) {
 					jQuery(div).removeClass('no-background');
 				}

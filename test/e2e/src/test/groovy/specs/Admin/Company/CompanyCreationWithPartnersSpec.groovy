@@ -13,7 +13,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class CompanyCreationWithPartnersSpec extends GebReportingSpec {
@@ -33,7 +33,7 @@ class CompanyCreationWithPartnersSpec extends GebReportingSpec {
     static successCreationMessage = "PartyGroup "+companyInfo.name+" created"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

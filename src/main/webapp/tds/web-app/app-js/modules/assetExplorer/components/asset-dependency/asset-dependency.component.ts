@@ -14,30 +14,9 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 	selector: 'asset-dependency',
 	templateUrl: 'asset-dependency.component.html',
 	styles: [`
-        table {
-            margin-top: 10px;
-        }
-
-        .modal-body th {
-            background: white !important;
-        }
-
-        .modal-body {
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .modal-body table {
-            border-spacing: inherit !important;
-        }
-
-        .modal-body table tr th,
-        .modal-body table tr td {
-            border-top: 0px !important;
-        }
-
         td.lbl-asset-dependency-direction,
         form.dependency-edit-fields td.legend-fields {
+			padding: 2px 0;
             font-weight: bold;
             color: green;
             font: 12px helvetica, arial, sans-serif !important;
@@ -71,11 +50,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
             text-decoration: line-through;
         }
 
-        .half-size {
-            width: 60%;
-        }
-
-        .separator-table {
+		.separator-table {
             border-top: 2px solid #f4f4f4 !important;
             margin-top: 10px !important;
         }
@@ -140,7 +115,30 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	 * @return {void)
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.hasChanges()) {
+			this.promptForSave()
+				.then(confirm => {
+					if (confirm) {
+						this.dismiss();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.dismiss();
+		}
+	}
+
+	/**
+	 * Launch the prompt modal asking for saving changes
+	 *
+	 */
+	private promptForSave(): Promise<any> {
+		return this.promptService.open(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'),
+		)
 	}
 
 	/**
@@ -181,10 +179,27 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Cancel the edit changes
+	 * Cancel the edit changes, if there is changes prompt for saving
 	 * @return {void)
 	 */
 	protected cancelEdit(): void {
+		if (this.hasChanges()) {
+			this.promptForSave()
+				.then(confirm => {
+					if (confirm) {
+						this.changeToViewMode();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.changeToViewMode();
+		}
+	}
+
+	/**
+	 * Se the current view mode to read mode
+	 */
+	private changeToViewMode(): void {
 		this.setEditMode(false);
 		this.editedDependencies = this.getInitialEditDependencies();
 	}
@@ -237,7 +252,6 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		this.confirmDelete()
 			.then((result) => {
 				if (result) {
-					console.log(result);
 					const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
 
 					const dependencyChange = {
@@ -249,7 +263,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						.subscribe((result) => {
 							if (result) {
 								if (dependencyType === DependencyType.dependencyA) {
-									this.cancelCloseDialog();
+									this.close({delete: true});
 								} else {
 									this.dependencyB = null;
 								}
@@ -257,6 +271,13 @@ export class AssetDependencyComponent extends UIExtraDialog {
 						}, (error) => console.log('Error:', error));
 				}
 			});
+	}
+
+	/**
+	 * Determines if there is changes in place
+	 */
+	private hasChanges(): boolean {
+		return this.editedDependencies.dependencies;
 	}
 
 	/**

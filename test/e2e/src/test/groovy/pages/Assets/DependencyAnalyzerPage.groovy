@@ -14,8 +14,8 @@ class DependencyAnalyzerPage extends Page {
     }
 
     static content = {
-        depenAnalyzerPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        depenAnalyzerPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        depenAnalyzerPageTitle (wait:true) { $("section", 	class:"content-header").find("h2")}
+        depenAnalyzerPageBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }

@@ -67,8 +67,8 @@ class Room {
 	int getAssetCount() {
 		executeQuery('''
 				SELECT COUNT(*) FROM AssetEntity
-				where (roomSource=? and rackSource is not null)
-				   or (roomTarget=? and rackTarget is not null)
+				where (roomSource=?0 and rackSource is not null)
+				   or (roomTarget=?1 and rackTarget is not null)
 		''', [this, this])[0]
 	}
 
@@ -82,10 +82,10 @@ class Room {
 	}
 
 	private static final String[] BEFORE_DELETE_HQL = [
-			'update AssetEntity set roomSource=null, sourceRoom=null, sourceLocation=null where roomSource=?',
-			'update AssetEntity set roomTarget=null, targetRoom=null, targetLocation=null where roomTarget=?',
-			'update MoveBundle set sourceRoom=null where sourceRoom=?',
-			'update MoveBundle set targetRoom=null where targetRoom=?']
+			'update AssetEntity set roomSource=null, sourceRoom=null, sourceLocation=null where roomSource=?0',
+			'update AssetEntity set roomTarget=null, targetRoom=null, targetLocation=null where roomTarget=?0',
+			'update MoveBundle set sourceRoom=null where sourceRoom=?0',
+			'update MoveBundle set targetRoom=null where targetRoom=?0']
 
 	def beforeInsert = {
 		dateCreated = lastUpdated = TimeUtil.nowGMT()

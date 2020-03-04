@@ -16,16 +16,16 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 	template: `
         <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="asset-clone-component modal fade in tds-ui-modal-decorator" id="asset-clone-component" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content resizable tds-angular-component-content"
+                <div class="tds-modal-content has-side-nav with-box-shadow resizable tds-angular-component-content"
                      tds-ui-modal-decorator=""
                      [options]="modalOptions"
                      [style.width.px]="750"
                      [style.height]="'auto'">
 
                     <div class="modal-header">
-                        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+                        <tds-button-close aria-label="Close" class="close" icon="close" [flat]="true"
+                                          (click)="cancelCloseDialog()">
+                        </tds-button-close>
                         <h4 class="modal-title">Clone Asset</h4>
                     </div>
                     <div class="modal-body">
@@ -60,22 +60,28 @@ import {AssetModalModel} from '../../model/asset-modal.model';
                         </form>
                     </div>
                     <div class="modal-footer form-group-center">
-                        <button type="button" class="btn btn-default pull-left" *ngIf="canCloneAssets()"
-                                [disabled]="newAssetName.value.length == 0"
-                                (click)="cloneAssetValidations(true)">
-                            <span class="glyphicon glyphicon-edit"></span>
-                            <span>Clone & Edit</span>
-                        </button>
-                        <button type="button" class="btn btn-default pull-left" *ngIf="canCloneAssets()"
-                                [disabled]="newAssetName.value.length == 0"
-                                (click)="cloneAssetValidations(false)">
-                            <span  class="glyphicon glyphicon-duplicate"></span>
-                            <span>Clone</span>
-                        </button>
-                        <button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
-                            <span class="glyphicon glyphicon-ban-circle"></span>
-                            <span>Cancel</span>
-                        </button>
+                    </div>
+                    <div class="modal-sidenav form-group-center">
+                        <nav class="modal-sidenav btn-link">
+	                        <tds-button-custom
+			                        icon="ruler-pencil"
+                                    *ngIf="canCloneAssets()"
+                                    [disabled]="newAssetName.value.length == 0"
+                                    (click)="cloneAssetValidations(true)"
+                                    tooltip="Clone & Edit">
+	                        </tds-button-custom>
+                            <tds-button-custom
+                                    *ngIf="canCloneAssets()"
+		                            icon="copy"
+                                    [disabled]="newAssetName.value.length == 0"
+                                    (click)="cloneAssetValidations(false)"
+                                    tooltip="Clone">
+                            </tds-button-custom>
+                            <tds-button-close
+                                    tooltip="Cancel"
+                                    (click)="cancelCloseDialog()">
+                            </tds-button-close>
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -90,7 +96,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	public assetName: string;
 	public uniqueAssetName: boolean;
 	public existAsset: any;
-	@ViewChild('includeDependencies') includeDependencies: ElementRef;
+	@ViewChild('includeDependencies', {static: false}) includeDependencies: ElementRef;
 
 	constructor(
 		public cloneModalModel: AssetModalModel,
@@ -100,7 +106,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 		private dialogService: UIDialogService,
 		private prompt: UIPromptService) {
 		super('#asset-clone-component');
-		this.modalOptions = { isResizable: true, isCentered: true };
+		this.modalOptions = { isResizable: false, isCentered: true };
 		this.uniqueAssetName = false;
 	}
 

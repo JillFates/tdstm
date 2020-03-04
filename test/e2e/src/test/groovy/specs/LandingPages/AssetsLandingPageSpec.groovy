@@ -9,7 +9,7 @@ import pages.Assets.AssetViewManager.*
 import pages.Assets.AssetViews.*
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 /**
  * This class sweeps over the Assets Menu.
@@ -24,7 +24,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
     static assetPagesLinks = 18
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
@@ -110,16 +110,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             verifyViewTitle("Databases")
     }
 
-    def "8. Verify the Physical Storage Landing Page"() {
-        when: 'The user goes to the Physical Storage page'
-            assetsModule.goToStorageDevices()
-
-        then: 'The Physical Storage Page is loaded successfully'
-            at ViewPage
-            verifyViewTitle("Physical Storage")
-    }
-
-    def "9. Verify the Logical Storage Landing Page"() {
+    def "8. Verify the Logical Storage Landing Page"() {
         when: 'The user goes to the Databases page'
             assetsModule.goToStorageLogical()
 
@@ -128,7 +119,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             verifyViewTitle("Logical Storage")
     }
 
-    def "10. Verify the Dependencies Landing Page"() {
+    def "9. Verify the Dependencies Landing Page"() {
         when: 'The user goes to the Dependencies page'
             assetsModule.goToDependencies()
 
@@ -136,7 +127,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             at DependenciesPage
     }
 
-    def "11. Verify the Comments Landing Page"() {
+    def "10. Verify the Comments Landing Page"() {
         when: 'The user goes to the Comments page'
             assetsModule.goToComments()
 
@@ -144,7 +135,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             at CommentsPage
     }
 
-    def "12. Verify the Dependency Analyzer Landing Page"() {
+    def "11. Verify the Dependency Analyzer Landing Page"() {
         when: 'The user goes to the Dependency Analyzer page'
             assetsModule.goToDependencyAnalyzer()
 
@@ -152,12 +143,20 @@ class AssetsLandingPageSpec extends GebReportingSpec {
             at DependencyAnalyzerPage
     }
 
-    def "13. Verify the Architecture Graph Landing Page"() {
-        when: 'The user goes to the Dependency Analyzer page'
+    def "12. Verify the Architecture Graph Landing Page"() {
+        when: 'The user goes to the Architecture Graph page'
             assetsModule.goToArchitectureGraph()
 
         then: 'The Architecture Graph Page is loaded successfully'
             at ArchitectureGraphPage
+    }
+
+    def "13. Verify the Go JS Architecture Graph Landing Page"() {
+        when: 'The user goes to the Go JS Architecture graph page'
+            assetsModule.goToGoJSArchitectureGraph()
+
+        then: 'The Architecture Graph Page is loaded successfully'
+            at GoJSArchitectureGraphPage
     }
 
     def "14. Verify the Export Assets Landing Page"() {

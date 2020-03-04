@@ -168,14 +168,6 @@ class Model {
 		}
 	}
 
-	def beforeDelete = {
-		// <SL> moved to ModelService
-		/*withNewSession {
-			executeUpdate('update AssetEntity set model=null where model=?', [this])
-			executeUpdate('delete ModelAlias where model=?', [this])
-		}*/
-	}
-
 	int getNoOfConnectors() {
 		ModelConnector.countByModel(this)
 	}

@@ -10,7 +10,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 /**
  * @author ingrid
  */
@@ -34,7 +34,7 @@ class CompanyEditionSpec extends GebReportingSpec {
     ]
     static newValues
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

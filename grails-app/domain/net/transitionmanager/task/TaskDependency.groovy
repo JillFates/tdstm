@@ -20,12 +20,12 @@ class TaskDependency {
 	Integer tmpPredecessorDepCount  // Transient for TaskService.getNeighborhood
 
 	static mapping = {
-		assetComment fetch: 'join'
+		assetComment fetch: 'join', lazy: false
 		downstreamTaskCount sqltype: 'INT(6)'
 		id column: 'task_dependency_id'
 		pathDepth sqltype: 'INT(6)'
 		pathDuration sqltype: 'INT(6)'
-		predecessor fetch: 'join'
+		predecessor fetch: 'join', lazy: false
 		type sqltype: 'char', length: 2
 	}
 

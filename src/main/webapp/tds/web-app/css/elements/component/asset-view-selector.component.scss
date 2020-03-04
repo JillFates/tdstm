@@ -1,0 +1,78 @@
+kendo-popup {
+  .tds-asset-view-popup {
+    width: 300%;
+    .asset-view-selector {
+      padding: unset;
+      margin-top: -28px;
+      width: 100%;
+      display: flex;
+
+      > i.fa-search {
+        line-height: inherit;
+        top: 3px;
+      }
+
+      .searchFilterInput {
+        padding: unset;
+        padding: 1px 4px;
+        height: 24px;
+        font-size: 13px;
+      }
+    }
+
+    .section-container {
+      overflow: auto;
+      width: 100%;
+      margin-left: -2px;
+      padding-left: 2px;
+      padding-right: 2px;
+      margin-bottom: -1px;
+      padding-bottom: 5px;
+
+      .folder-row {
+        color: #656565;
+
+        .badge {
+          margin-top: 2px;
+        }
+      }
+
+      .option-row {
+        margin-top: 5px;
+
+        .btn-sm {
+          border: 0;
+          margin: 0;
+
+          &:hover {
+            background-color: inherit;
+          }
+        }
+
+        ul {
+          padding-left: 10px;
+          margin-top: 5px;
+          word-wrap: break-word;
+        }
+      }
+    }
+
+    .k-item.k-state-selected {
+      overflow: auto;
+
+      .section-container {
+        background-color: inherit;
+      }
+    }
+
+    kendo-list .k-list-scroller .k-list .k-item {
+      overflow: auto;
+
+      &:hover,
+      &.k-state-selected,
+      &.k-state-selected:not(:hover) {
+        background: inherit !important;
+      }
+    }
+  }
+}

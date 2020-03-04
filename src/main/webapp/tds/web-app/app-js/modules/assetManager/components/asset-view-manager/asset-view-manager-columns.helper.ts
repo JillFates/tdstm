@@ -1,19 +1,6 @@
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 
-// PRIVATE -------------------------------------------
-
-const DEFAULT_COLUMN_NAME = 'createdOn';
 let columns: GridColumnModel[] = [];
-
-/**
- * Given a name return the corresponding column searching by property
- +
- * @param name Property Name
- * @returns {GridColumnModel}
- */
-function getColumnByName(name): GridColumnModel {
-	return columns.find((column: GridColumnModel) => column.property === name);
-}
 
 /**
  * Add a column to the columns collection
@@ -25,8 +12,6 @@ function addColumn(column: GridColumnModel) {
 	columns.push(column);
 }
 
-// PUBLIC -------------------------------------------
-
 /**
  * Handle View Manager columns
  */
@@ -36,38 +21,67 @@ export const AssetViewManagerColumnsHelper = {
 	 +
 	 * @returns {GridColumnModel[]}
 	 */
-	createColumns: (): GridColumnModel[] => {
+	createColumns: (dateFormat): GridColumnModel[] => {
 		columns = [];
-
-		addColumn({ property: 'isFavorite', label: 'ASSET_EXPLORER.INDEX.FAVORITE', sort: { isSorting: false, isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
-		addColumn({ property: 'name', label: 'ASSET_EXPLORER.INDEX.NAME', sort: { isSorting: false, isAscending: false  }, type: 'string', width: 100 });
-		addColumn({ property: 'createdBy', label: 'ASSET_EXPLORER.INDEX.CREATED_BY', sort: { isSorting: false, isAscending: false  }, type: 'string', width: 100 });
-		addColumn({ property: 'createdOn', label: 'ASSET_EXPLORER.INDEX.CREATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 100 });
-		addColumn({ property: 'updatedOn', label: 'ASSET_EXPLORER.INDEX.UPDATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 100 });
-		addColumn({ property: 'isShared', label: 'ASSET_EXPLORER.INDEX.SHARED',  sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
-		addColumn({ property: 'isSystem', label: 'ASSET_EXPLORER.INDEX.SYSTEM', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100, cellClass: 'text-center' });
-
-		return columns;
-	},
-
-	/**
-	 * Mark a column as sorted, mark the rest of columns as unsorted
-	 +
-	 * @param columnName  column Name
-	 * @returns {GridColumnModel[]}
-	 */
-	setColumnAsSorted(columnName: string): GridColumnModel[] {
-		if (!columnName) {
-			columnName = DEFAULT_COLUMN_NAME;
-		}
-
-		const restartedSort = { sort: { isSorting: false, isAscending: false } };
-
-		columns = columns.map((column: GridColumnModel) => {
-			const sort = (column.property === columnName) ? { sort: {isSorting: true, isAscending: !column.sort.isAscending } } : restartedSort ;
-			return Object.assign({}, column, sort);
+		addColumn({
+			property: 'isFavorite',
+			label: 'ASSET_EXPLORER.INDEX.FAVORITE',
+			resizable: false,
+			type: 'boolean',
+			width: 120,
+			cellClass: ['text-center']
 		});
-
+		addColumn({
+			property: 'name',
+			label: 'ASSET_EXPLORER.INDEX.NAME',
+			resizable: true,
+			type: 'text',
+			width: 250,
+			filterable: true,
+			cellClass: ['link-text']
+		});
+		addColumn({
+			property: 'createdBy',
+			label: 'ASSET_EXPLORER.INDEX.CREATED_BY',
+			resizable: true,
+			type: 'text',
+			filterable: true,
+			width: 130
+		});
+		addColumn({
+			property: 'createdOn',
+			label: 'ASSET_EXPLORER.INDEX.CREATED_ON',
+			resizable: true,
+			type: 'date',
+			filterable: true,
+			format: dateFormat,
+			width: 150
+		});
+		addColumn({
+			property: 'updatedOn',
+			label: 'ASSET_EXPLORER.INDEX.UPDATED_ON',
+			resizable: true,
+			type: 'date',
+			filterable: true,
+			format: dateFormat,
+			width: 150
+		});
+		addColumn({
+			property: 'isShared',
+			label: 'ASSET_EXPLORER.INDEX.SHARED',
+			resizable: false,
+			type: 'boolean',
+			width: 100,
+			cellClass: ['text-center']
+		});
+		addColumn({
+			property: 'isSystem',
+			label: 'ASSET_EXPLORER.INDEX.SYSTEM',
+			resizable: false,
+			type: 'boolean',
+			width: 110,
+			cellClass: ['text-center']
+		});
 		return columns;
 	},
 	/**
@@ -78,20 +92,8 @@ export const AssetViewManagerColumnsHelper = {
 	 */
 	setFormatToDateColumns(format: string): GridColumnModel[] {
 		columns = columns.map((column: GridColumnModel) => {
-			return (column.type === 'date') ? ({...column, format}) : column;
+			return (column.type === 'date') ? ({ ...column, format }) : column;
 		});
-
 		return columns;
-	},
-	/**
-	 * Get the current sorted column, otherwise return the default column
-	 +
-	 * @returns {GridColumnModel}
-	 */
-	getCurrentSortedColumnOrDefault(): GridColumnModel {
-		const match: GridColumnModel =  columns.find((column: GridColumnModel) => column.sort.isSorting);
-
-		return match || getColumnByName(DEFAULT_COLUMN_NAME);
 	}
-
 };

@@ -15,7 +15,7 @@ import {
 	ViewChild,
 } from '@angular/core';
 import {TagModel} from '../../../modules/assetTags/model/tag.model';
-import {MultiSelectComponent} from '@progress/kendo-angular-dropdowns';
+import { MultiSelectComponent, PreventableEvent } from '@progress/kendo-angular-dropdowns';
 
 import { from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
@@ -25,9 +25,9 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-asset-tag-selector',
 	template: `
-		<div class="asset-tag-selector-component">
+		<div class="{{classComponent}}">
 		    <kendo-switch *ngIf="showSwitch && switchVisible"
-		            class="asset-tag"
+		            class=""
 		            [(ngModel)]="assetSelectorModel.switch"
 		            [onLabel]="'ALL'"
 		            [offLabel]="'ANY'"
@@ -50,20 +50,30 @@ declare var jQuery: any;
 		        </ng-template>
 		        <ng-template kendoMultiSelectItemTemplate let-dataItem>
 		            <div class="asset-tag-selector-single-container">
-		                <div class="asset-tag-selector-single-item  {{dataItem.css}}">
-		                    <i class="fa fa-fw fa-check"></i> {{ dataItem.name }}
-		                </div>
+									<div class="asset-tag-selector-single-item {{dataItem.css}}">
+										<i class="fa fa-fw fa-check"></i> {{ dataItem.name }}
+									</div>
 		            </div>
 		        </ng-template>
 		    </kendo-multiselect>
 		    <span class="component-action-open" (click)="openTagSelector()"></span>
 		</div>
+		<tds-button
+			*ngIf="showClearButton && assetSelectorModel.tags && assetSelectorModel.tags.length"
+			class="clear-button"
+			(click)="clearTags()"
+			[title]="'Clear Filter'"
+			icon="times-circle"
+			[small]="true"
+			[flat]="true">
+		</tds-button>
 	`,
 	styles: []
 })
 
 export class AssetTagSelectorComponent implements OnChanges, OnInit {
-	@ViewChild('assetTagSelectorComponent') assetTagSelectorComponent: MultiSelectComponent;
+	@ViewChild('assetTagSelectorComponent', {static: false}) assetTagSelectorComponent: MultiSelectComponent;
+	@Input() popupClass = '';
 	@Input('tagList') sourceTagList: Array<TagModel>;
 	// Used to control if the Switch is require for the UI
 	@Input('showSwitch') showSwitch = true;
@@ -75,19 +85,22 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@Input('viewFilterModel') viewFilterModel: string;
 	// Optional Place holder
 	@Input('placeholder') placeholder = '';
+	@Input('showClearButton') showClearButton: boolean;
+
+	@Input('class') classList;
 
 	// Use to control if the Switch becomes visible
 	public switchVisible = false;
 	public tagList: Array<TagModel> = [];
-
 	public assetSelectorModel = {
 		switch: false,
 		tags: []
 	};
+	public classComponent = '';
 
 	ngOnInit(): void {
 		this.tagList = this.sourceTagList.slice();
-
+		this.classComponent = `asset-tag-selector-component ${this.classList || ''}`;
 		if (this.model) {
 			this.assetSelectorModel.tags = this.model.tags;
 			this.assetSelectorModel.switch = this.model.operator === 'ALL' ? true : false;
@@ -133,11 +146,8 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 			// Iterate over the global dropdown to apply specific classes for this component only
 			jQuery('.asset-tag-selector-single-container').parent().parent().find('li').removeClass('asset-tag-selector-item-selected');
 			jQuery('.asset-tag-selector-single-container').parent().parent().find('.k-state-selected').addClass('asset-tag-selector-item-selected');
+			jQuery('.asset-tag-selector-single-container').parent().closest('kendo-popup').addClass(this.popupClass);
 		}, 0);
-
-		setTimeout(() => {
-			console.log();
-		}, 1000)
 	}
 
 	/**
@@ -206,6 +216,14 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 */
 	private onShowHideSwitch(): void {
 		this.switchVisible = this.assetSelectorModel.tags.length > 1;
+	}
+
+	/**
+	 * Clear current tag selection.
+	 */
+	clearTags(): void {
+		this.reset();
+		this.onValueChange();
 	}
 
 }

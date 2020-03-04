@@ -1,0 +1,36 @@
+.dropdown-menu > li > a {
+  padding: 0 20px;
+  line-height: 35px;
+  color: $color-text;
+}
+
+.alert.alert-info,
+.alert.alert-danger,
+.alert.alert-warning,
+.alert.alert-success {
+  padding: 0;
+  margin: 6px 0 0 0;
+  line-height: 18px;
+  font-size: 13px;
+  color: $color-text !important;
+  p {
+    line-height: 18px;
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+    color: $color-text !important;
+  }
+}
+
+.alert.alert-info {
+  background-color: $color-info-screen !important;
+}
+.alert.alert-danger {
+  background-color: $color-danger-screen !important;
+}
+.alert.alert-warning {
+  background-color: $color-warning-screen !important;
+}
+.alert.alert-success {
+  background-color: $color-success-screen !important;
+}

@@ -1,7 +1,8 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, Input, OnInit} from '@angular/core';
 // Component
 import {ApplyKeyComponent} from '../apply-key/apply-key.component';
+import {ManualRequestComponent} from '../manual-request/manual-request.component';
 // Service
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -9,42 +10,86 @@ import {LicenseAdminService} from '../../service/license-admin.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 // Model
 import {LicenseModel, MethodOptions, LicenseStatus} from '../../model/license.model';
-// Other
-import {DateUtils} from '../../../../shared/utils/date.utils';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {ManualRequestComponent} from '../manual-request/manual-request.component';
-import {UserContextModel} from '../../../auth/model/user-context.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tds-license-detail',
 	templateUrl: 'license-detail.component.html'
 })
-export class LicenseDetailComponent implements OnInit {
+export class LicenseDetailComponent extends Dialog implements OnInit {
+	@Input() data: any;
 
 	public environmentList: any = [];
 	protected projectList: any = [];
 	public dateFormat = DateUtils.DEFAULT_FORMAT_DATE;
 	public methodOptions = MethodOptions;
 	public licenseStatus = LicenseStatus;
+	public licenseModel: LicenseModel = {};
 
 	constructor(
-		public licenseModel: LicenseModel,
-		public promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService,
-		private prompt: UIPromptService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private licenseAdminService: LicenseAdminService,
 		private preferenceService: PreferenceService,
-		private dialogService: UIDialogService,
-		private notifierService: NotifierService,
-		private userContext: UserContextService) {
+		private translatePipe: TranslatePipe,
+		private notifierService: NotifierService
+	) {
+		super();
 	}
 
 	ngOnInit(): void {
+		this.licenseModel = Object.assign({}, this.data.licenseModel);
 
-		this.userContext.getUserContext().subscribe((userContext: UserContextModel) => {
-				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.onDelete.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'applyKey',
+			icon: 'key',
+			text: 'Apply License Key',
+			show: () => this.licenseModel.status !== this.licenseStatus.ACTIVE,
+			type: DialogButtonType.CONTEXT,
+			action: this.applyLicenseKey.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'resubmitRequest',
+			icon: 'redo',
+			text: 'Resubmit Request',
+			show: () => this.licenseModel.status !== this.licenseStatus.ACTIVE,
+			type: DialogButtonType.CONTEXT,
+			action: this.resubmitLicenseRequest.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'resubmitRequest',
+			icon: 'details',
+			text: 'Manually Submit Request',
+			show: () => this.licenseModel.status !== this.licenseStatus.ACTIVE,
+			type: DialogButtonType.CONTEXT,
+			action: this.manuallyRequest.bind(this)
+		});
+
+		this.preferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
+			this.dateFormat = dateFormat;
 		});
 
 		this.licenseAdminService.getLicense(this.licenseModel.id).subscribe((licenseModel: LicenseModel) => {
@@ -56,33 +101,43 @@ export class LicenseDetailComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		super.onCancelClose();
 	}
 
 	/**
 	 * Open Apply License Key Dialog
 	 */
-	protected applyLicenseKey(): void {
-		this.dialogService.extra(ApplyKeyComponent,
-			[{provide: LicenseModel, useValue: this.licenseModel}],
-			false, false)
-			.then((result) => {
-				//
-			})
-			.catch(error => console.log('Cancel Apply Key'));
+	private async applyLicenseKey(): Promise<void> {
+		await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ApplyKeyComponent,
+			data: {
+				licenseModel: this.licenseModel
+			},
+			modalConfiguration: {
+				title: 'Apply License Key',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).toPromise();
 	}
 
 	/**
 	 * Open a dialog for a Manual Request
 	 */
-	protected manuallyRequest(): void {
-		this.dialogService.extra(ManualRequestComponent,
-			[{provide: LicenseModel, useValue: this.licenseModel}],
-			false, false)
-			.then((result) => {
-				//
-			})
-			.catch(error => console.log('Cancel Manual Request'));
+	private async manuallyRequest(): Promise<void> {
+		await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ManualRequestComponent,
+			data: {
+				licenseModel: this.licenseModel
+			},
+			modalConfiguration: {
+				title: 'Email License',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).toPromise();
 	}
 
 	/**
@@ -112,15 +167,25 @@ export class LicenseDetailComponent implements OnInit {
 	 * Delete the current License
 	 */
 	public onDelete(): void {
-		this.prompt.open('Confirmation Required', 'You are about to delete the license. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.licenseAdminService.deleteLicense(this.licenseModel.id).subscribe(
+		this.dialogService.confirm(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			'You are about to delete the license. Do you want to proceed?'
+		).subscribe((result: any) => {
+			if (result.confirm === DialogConfirmAction.CONFIRM) {
+				this.licenseAdminService
+					.deleteLicense(this.licenseModel.id)
+					.subscribe(
 						(result) => {
-							this.activeDialog.dismiss();
-						},
-						(err) => console.log(err));
-				}
-			});
+							this.onCancelClose();
+						});
+			}
+		});
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

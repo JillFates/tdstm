@@ -6,7 +6,7 @@ class ProjectsMenuModule extends Module {
 
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
-        menuBar { menuContainer.find("div#navbar-collapse")}
+        menuBar { menuContainer.find("div#mobile-nav") }
 
         projectsItem { menuBar.find("li.menu-parent-projects") }
         projectsMenu  { projectsItem.find("ul",class:"dropdown-menu menu-item-expand")}
@@ -21,7 +21,7 @@ class ProjectsMenuModule extends Module {
         projectsETLScripts { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/datascript/list")}
         projectsActions { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/action/list")}
         projectsTags { projectsMenu.find("li.menu-projects-tags")}
-        projectName { menuContainer.find("li a#nav-project-name")}
+        projectName { menuContainer.find("span#nav-project-name").find("span")}
         projectLicenseIcon { menuContainer.find("li a.licensing-error-warning i.fa-warning")}
 
     }
@@ -102,7 +102,7 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToProjectsStaff(){
-        selectMenu projectsItem
+        selectMprojectNameenu projectsItem
         selectItem projectsStaffItem
     }
 

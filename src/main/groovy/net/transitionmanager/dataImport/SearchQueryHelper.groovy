@@ -18,6 +18,7 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.Project
+import org.apache.groovy.json.internal.LazyMap
 
 @Slf4j
 class SearchQueryHelper {
@@ -1038,8 +1039,8 @@ class SearchQueryHelper {
 			// Note the test of initValue and fieldName being a LazyMap. In testing it was discovered that accessing certain JSONObject node elements was
 			// returning a LazyMap instead of a null value. Tried to reproduce in simple testcase but unsuccessful therefore had to add this
 			// extra test.  See ticket TM-10981.
-			value = (value instanceof groovy.json.internal.LazyMap) ? null : value
-			init = (init instanceof groovy.json.internal.LazyMap) ? null : init
+			value = (value instanceof LazyMap) ? null : value
+			init = (init instanceof LazyMap) ? null : init
 		}
 		return [value, init]
 	}

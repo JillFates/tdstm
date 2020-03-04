@@ -15,7 +15,6 @@
 			}
 		}
         </g:javascript>
-        <r:layoutResources />
     </head>
     <body>
         <tds:subHeader title="Create Company" crumbs="['Admin','Company', 'Create']"/><br/>
@@ -108,6 +107,6 @@
     $('.menu-parent-admin').addClass('active');
 
 </script>
-<r:layoutResources />
     </body>
+<r:layoutResources />
 </html>

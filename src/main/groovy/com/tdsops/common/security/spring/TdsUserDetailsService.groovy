@@ -61,7 +61,6 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 			authorities,
 			(long) userLogin.id,
 			(long) userLogin.person.id,
-			userLogin.saltPrefix,
 			permissions)
 	}
 }

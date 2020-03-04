@@ -39,9 +39,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			appOwner: null
 		};
 
-		@ViewChild('controlSME1') public controlSME1: any;
-		@ViewChild('controlSME2') public controlSME2: any;
-		@ViewChild('controlAppOwner') public controlAppOwner: any;
+		@ViewChild('controlSME1', {static: false}) public controlSME1: any;
+		@ViewChild('controlSME2', {static: false}) public controlSME2: any;
+		@ViewChild('controlAppOwner', {static: false}) public controlAppOwner: any;
 
 		constructor(
 			@Inject('model') model: any,

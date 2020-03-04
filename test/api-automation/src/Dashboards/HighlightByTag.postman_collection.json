@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1601c6ca-4ecf-4486-8b03-0ade7025f6ae",
+		"_postman_id": "bdd1714d-27b8-4f55-b1bc-e79113be4df2",
 		"name": "Highliht by Tag",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -106,6 +113,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -134,7 +146,6 @@
 					"listen": "test",
 					"script": {
 						"id": "9225c624-4d57-46e8-a2fe-ef5222212ff3",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -153,7 +164,8 @@
 							"    postman.setGlobalVariable(\"tag_id\", data.id);",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -167,6 +179,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -194,7 +211,6 @@
 					"listen": "test",
 					"script": {
 						"id": "47254e45-116d-4858-ac45-c60c5b7b51e8",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -208,7 +224,8 @@
 							"",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -222,6 +239,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -250,13 +272,13 @@
 					"listen": "test",
 					"script": {
 						"id": "a705c2f8-8c38-4136-a230-5507e98731b4",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -270,6 +292,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -298,13 +325,13 @@
 					"listen": "test",
 					"script": {
 						"id": "a705c2f8-8c38-4136-a230-5507e98731b4",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -318,6 +345,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -346,7 +378,6 @@
 					"listen": "test",
 					"script": {
 						"id": "c155b28d-4cce-480e-a0ed-53faf40984ad",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -363,7 +394,8 @@
 							"    pm.expect(jsonObject[1]).to.equal(assetID02);",
 							"};",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -377,6 +409,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -405,7 +442,6 @@
 					"listen": "test",
 					"script": {
 						"id": "5349121b-3913-4ff6-955c-b73a5881cea4",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -422,8 +458,12 @@
 							"//This code cleans up the global variables created through code that should live only in this collection ",
 							"pm.globals.unset(\"tag_id\");",
 							"pm.globals.unset(\"assetID01\");",
-							"pm.globals.unset(\"assetID02\");"
-						]
+							"pm.globals.unset(\"assetID02\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -438,6 +478,11 @@
 					{
 						"key": "Accept",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
