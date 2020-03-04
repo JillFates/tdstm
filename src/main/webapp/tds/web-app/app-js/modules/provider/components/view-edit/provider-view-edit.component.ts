@@ -186,7 +186,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 					this.dataSignature = JSON.stringify(this.providerModel);
 					this.modalType = this.actionTypes.VIEW;
 					this.setTitle(this.getModalTitle(this.modalType));
-				} else {
+				} else if (result.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
 					this.onCancelClose();
 				}
 			});

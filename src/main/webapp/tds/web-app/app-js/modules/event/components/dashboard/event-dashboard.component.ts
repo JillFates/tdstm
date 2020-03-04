@@ -1,31 +1,31 @@
 // Angular
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
-import { pathOr } from 'ramda';
-import * as R from  'ramda';
-import 'hammerjs';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 // Store
 import {Store} from '@ngxs/store';
 // Action
 import {SetEvent} from '../../action/event.actions';
 // Services
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
-import { EventsService } from '../../service/events.service';
-import { NewsModel, NewsDetailModel } from '../../model/news.model';
-import { EventModel, EventPlanStatus } from '../../model/event.model';
-// Components
-import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
-import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
-// Model
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import {ActivatedRoute} from '@angular/router';
-import {takeWhile} from 'rxjs/operators';
-import {TaskCategoryComponent} from '../task-category/task-category.component';
-import {Permission} from '../../../../shared/model/permission.model';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {EventsService} from '../../service/events.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {DialogService, ModalSize} from 'tds-component-library';
+// Components
+import {NewsCreateEditComponent} from '../news-create-edit/news-create-edit.component';
+import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
+import {TaskCategoryComponent} from '../task-category/task-category.component';
+// Model
+import {NewsModel, NewsDetailModel} from '../../model/news.model';
+import {EventModel, EventPlanStatus} from '../../model/event.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {Permission} from '../../../../shared/model/permission.model';
+// Other
+import {takeWhile} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {pathOr} from 'ramda';
+import * as R from 'ramda';
+import 'hammerjs';
 
 @Component({
 	selector: 'event-dashboard',
@@ -57,10 +57,11 @@ export class EventDashboardComponent implements OnInit {
 	public hasViewUnpublishedPermission = false;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private route: ActivatedRoute,
 		private eventsService: EventsService,
 		private preferenceService: PreferenceService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private notifierService: NotifierService,
 		private permissionService: PermissionService,
 		private store: Store) {}
@@ -211,14 +212,21 @@ export class EventDashboardComponent implements OnInit {
 	 * Open the view to create/edit news
   	 * @param {NewsDetailModel} model  News info
 	*/
-	private openCreateEditNews(model: NewsDetailModel): void  {
-		this.dialogService.open(NewsCreateEditComponent, [
-			{ provide: NewsDetailModel, useValue: model },
-		]).then(result => {
-			this.getNewsFromEvent(this.selectedEvent.id);
-		}, error => {
-			console.log(error);
-		});
+	public async openCreateEditNews(model: NewsDetailModel): Promise<void> {
+
+		await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: NewsCreateEditComponent,
+			data: {
+				newsDetailModel: model
+			},
+			modalConfiguration: {
+				title: 'Event',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).toPromise();
+		await this.getNewsFromEvent(this.selectedEvent.id);
 	}
 
 	/**
@@ -226,7 +234,6 @@ export class EventDashboardComponent implements OnInit {
 	*/
 	public onCreateNews(): void {
 		const model = new NewsDetailModel();
-
 		model.commentObject.moveEvent.id = this.selectedEvent.id;
 		this.openCreateEditNews(model);
 	}
