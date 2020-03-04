@@ -58,6 +58,15 @@ declare var jQuery: any;
 		    </kendo-multiselect>
 		    <span class="component-action-open" (click)="openTagSelector()"></span>
 		</div>
+		<tds-button
+			*ngIf="showClearButton && assetSelectorModel.tags && assetSelectorModel.tags.length"
+			class="clear-button"
+			(click)="clearTags()"
+			[title]="'Clear Filter'"
+			icon="times-circle"
+			[small]="true"
+			[flat]="true">
+		</tds-button>
 	`,
 	styles: []
 })
@@ -76,6 +85,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@Input('viewFilterModel') viewFilterModel: string;
 	// Optional Place holder
 	@Input('placeholder') placeholder = '';
+	@Input('showClearButton') showClearButton: boolean;
 
 	@Input('class') classList;
 
@@ -90,7 +100,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 
 	ngOnInit(): void {
 		this.tagList = this.sourceTagList.slice();
-		this.classComponent = `asset-tag-selector-component ${this.classList}`;
+		this.classComponent = `asset-tag-selector-component ${this.classList || ''}`;
 		if (this.model) {
 			this.assetSelectorModel.tags = this.model.tags;
 			this.assetSelectorModel.switch = this.model.operator === 'ALL' ? true : false;
@@ -206,6 +216,14 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 */
 	private onShowHideSwitch(): void {
 		this.switchVisible = this.assetSelectorModel.tags.length > 1;
+	}
+
+	/**
+	 * Clear current tag selection.
+	 */
+	clearTags(): void {
+		this.reset();
+		this.onValueChange();
 	}
 
 }
