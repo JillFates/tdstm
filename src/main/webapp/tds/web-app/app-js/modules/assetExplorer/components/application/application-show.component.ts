@@ -3,8 +3,6 @@ import {Component, ComponentFactoryResolver} from '@angular/core';
 // Model
 import {DialogService, ModalSize} from 'tds-component-library';
 // Service
-import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
@@ -16,7 +14,7 @@ import { DependecyService } from '../../service/dependecy.service';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
 
-export function ApplicationShowComponent(template, modelId: number, metadata: any) {
+export function ApplicationShowComponent(template, modelId: number, metadata: any, parentDialog: any) {
 	@Component({
 		selector: `tds-application-show`,
 		template: template
@@ -24,12 +22,9 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 	class ApplicationShowComponent extends AssetCommonShow {
 
 		constructor(
-			private componentFactoryResolver: ComponentFactoryResolver,
-			private newDialogService: DialogService,
-			activeDialog: UIActiveDialogService,
-			dialogService: UIDialogService,
+			componentFactoryResolver: ComponentFactoryResolver,
+			dialogService: DialogService,
 			assetService: DependecyService,
-			prompt: UIPromptService,
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
 			userContextService: UserContextService,
@@ -38,15 +33,15 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			assetTagUIWrapperService: AssetTagUIWrapperService
 			) {
 				super(
-					activeDialog,
+					componentFactoryResolver,
 					dialogService,
 					assetService,
-					prompt,
 					assetExplorerService,
 					notifierService,
 					userContextService,
 					windowService,
 					architectureGraphService,
+					parentDialog,
 					assetTagUIWrapperService
 				);
 				this.mainAsset = modelId;
@@ -60,7 +55,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 		 */
 		public launchManageStaff(personId: number): void {
 			if (personId) {
-				this.newDialogService.open({
+				this.dialogService.open({
 					componentFactoryResolver: this.componentFactoryResolver,
 					component: UserManageStaffComponent,
 					data: {

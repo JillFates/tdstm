@@ -1,11 +1,4 @@
-import { TagModel } from '../../../assetTags/model/tag.model';
-import { AssetExplorerService } from '../../../assetManager/service/asset-explorer.service';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import {
-	UIActiveDialogService,
-	UIDialogService,
-} from '../../../../shared/services/ui-dialog.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+// Angular
 import {
 	OnInit,
 	AfterViewInit,
@@ -14,21 +7,28 @@ import {
 	ViewChild,
 	QueryList, ComponentFactoryResolver,
 } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TagService } from '../../../assetTags/service/tag.service';
-import { AssetShowComponent } from './asset-show.component';
-import { equals as ramdaEquals, clone as ramdaClone } from 'ramda';
-import { AssetCommonHelper } from './asset-common-helper';
-import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { UIHandleEscapeDirective as EscapeHandler } from '../../../../shared/directives/handle-escape-directive';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {NgForm} from '@angular/forms';
+// Model
+import {TagModel} from '../../../assetTags/model/tag.model';
 import {DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+// Component
+import {AssetShowComponent} from './asset-show.component';
 import {AssetEditComponent} from './asset-edit.component';
+// Service
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {AssetCommonHelper} from './asset-common-helper';
+import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
+import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 
@@ -53,18 +53,15 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	private initialModel: any = null;
 
 	constructor(
-		public componentFactoryResolver: ComponentFactoryResolver,
+		protected componentFactoryResolver: ComponentFactoryResolver,
 		protected model: any,
-		protected activeDialog: UIActiveDialogService,
 		protected userContextService: UserContextService,
 		protected permissionService: PermissionService,
 		protected assetExplorerService: AssetExplorerService,
 		protected dialogService: DialogService,
-		protected oldDialogService: UIDialogService,
 		protected notifierService: NotifierService,
 		protected tagService: TagService,
 		protected metadata: any,
-		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private parentDialog: any
 	) {
@@ -315,32 +312,30 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	/**
-	 allows to delete the application assets
+	 * Allows to delete the application assets
 	 */
 	deleteAsset(assetId) {
-		this.promptService
-			.open(
-				'Confirmation Required',
-				'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-				'OK',
-				'Cancel'
-			)
-			.then(success => {
-				if (success) {
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+			),
+			'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.assetExplorerService.deleteAssets([assetId]).subscribe(
 						res => {
 							if (res) {
 								this.notifierService.broadcast({
 									name: 'reloadCurrentAssetList',
 								});
-								this.activeDialog.dismiss();
+								this.cancelCloseDialog();
 							}
 						},
 						error => console.log(error)
 					);
 				}
-			})
-			.catch(error => console.log(error));
+			});
 	}
 
 	protected focusAssetModal(): void {

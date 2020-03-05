@@ -31,7 +31,6 @@ import {AssetExplorerService} from '../../../assetManager/service/asset-explorer
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
-import {ApplicationCreateComponent} from '../application/application-create.component';
 
 @Component({
 	selector: `tds-asset-all-show`,
@@ -104,16 +103,16 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 				const additionalImports = [AssetExplorerModule];
 				switch (this.asset) {
 					case 'APPLICATION':
-						this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata), this.view, additionalImports).subscribe();
+						this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
 						break;
 					case 'DATABASE':
-						this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata), this.view, additionalImports).subscribe();
+						this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
 						break;
 					case 'DEVICE':
-						this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata), this.view, additionalImports).subscribe();
+						this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
 						break;
 					case 'STORAGE':
-						this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata), this.view, additionalImports).subscribe();
+						this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
 						break;
 				}
 			});

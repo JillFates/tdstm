@@ -19,7 +19,8 @@ import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {DialogService} from 'tds-component-library';
+import {DialogService, ModalSize} from 'tds-component-library';
+import {AssetShowComponent} from '../asset/asset-show.component';
 
 const pleaseSelectMessage = 'Please Select';
 
@@ -50,18 +51,15 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		constructor(
 			@Inject('model') model: any,
 			componentFactoryResolver: ComponentFactoryResolver,
-			activeDialog: UIActiveDialogService,
 			userContextService: UserContextService,
 			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
 			dialogService: DialogService,
-			oldDialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 			) {
-				super(componentFactoryResolver, model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, oldDialogService, notifierService, tagService, metadata, promptService, translatePipe, parentDialog);
+				super(componentFactoryResolver, model, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, translatePipe, parentDialog);
 		}
 
 		ngOnInit() {
@@ -262,26 +260,26 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
-			this.oldDialogService.extra(AddPersonComponent,
-				[UIDialogService,
-					{
-						provide: PersonModel,
-						useValue: personModel
-					},
-					PersonService
-				], false, true)
-				.then((result) => {
-					if (this.model.sourcePersonList && this.model[modelListParameter]) {
-						this.model.sourcePersonList.push({personId: result.id, fullName: result.name});
-						this.model[modelListParameter].push({personId: result.id, fullName: result.name});
-					}
-					this.model.asset[fieldName].id = result.id;
-					this.updatePersonReferences();
-				})
-				.catch((error) => {
-					// get back to previous value
-					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
-				});
+
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AddPersonComponent,
+				data: {
+					personModel: personModel
+				},
+				modalConfiguration: {
+					title: 'TODO: ADD PERSON', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).subscribe((data: any) => {
+				if (this.model.sourcePersonList && this.model[modelListParameter]) {
+					this.model.sourcePersonList.push({personId: data.id, fullName: data.name});
+					this.model[modelListParameter].push({personId: data.id, fullName: data.name});
+				}
+				this.model.asset[fieldName].id = data.id;
+				this.updatePersonReferences();
+			});
 		}
 
 		/**

@@ -1,23 +1,26 @@
+// Angular
+import {OnInit, AfterContentInit, ComponentFactoryResolver} from '@angular/core';
+// Service
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependecyService} from '../../service/dependecy.service';
-import {HostListener, OnInit, AfterContentInit } from '@angular/core';
-import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {WindowService} from '../../../../shared/services/window.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
+// Model
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
+import {DialogService, ModalSize} from 'tds-component-library';
+// Component
 import {AssetShowComponent} from './asset-show.component';
 import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.component';
 import {AssetCommonHelper} from './asset-common-helper';
-import {WindowService} from '../../../../shared/services/window.service';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+// Other
 import {ReplaySubject} from 'rxjs';
-import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link, Spot} from 'gojs';
-import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
-import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {Layout, Link, Spot} from 'gojs';
 
 declare var jQuery: any;
 
@@ -38,15 +41,15 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 	protected linkTemplate$: ReplaySubject<Link> = new ReplaySubject(1);
 
 	constructor(
-		protected activeDialog: UIActiveDialogService,
-		protected dialogService: UIDialogService,
+		protected componentFactoryResolver: ComponentFactoryResolver,
+		protected dialogService: DialogService,
 		protected assetService: DependecyService,
-		protected prompt: UIPromptService,
 		protected assetExplorerService: AssetExplorerService,
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
 		protected windowService: WindowService,
 		protected architectureGraphService: ArchitectureGraphService,
+		private parentDialog: any,
 		private assetTagUIWrapperService?: AssetTagUIWrapperService
 	) {
 			jQuery('[data-toggle="popover"]').popover();
@@ -56,12 +59,6 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 					this.userTimeZone = userContext.timezone;
 					this.currentUser = userContext.user;
 				});
-	}
-
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
 	}
 
 	/**
@@ -81,17 +78,32 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 		}, 500);
 	}
 
-	cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
-		jQuery('body').removeClass('modal-open');
+	/***
+	 * Close the Active Dialog
+	 */
+	protected cancelCloseDialog(): void {
+		const assetShowComponent = <AssetShowComponent>this.parentDialog;
+		assetShowComponent.onDismiss();
 	}
 
-	showAssetDetailView(assetClass: string, id: number) {
-		this.dialogService.replace(AssetShowComponent, [
-				{provide: 'ID', useValue: id},
-				{provide: 'ASSET', useValue: assetClass}],
-			DIALOG_SIZE.XXL);
-		jQuery('body').addClass('modal-open');
+	protected showAssetDetailView(assetClass: string, id: number) {
+		// Close current dialog before open new one
+		this.cancelCloseDialog();
+
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: id,
+				assetClass: assetClass
+			},
+			modalConfiguration: {
+				title: '', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe();
 	}
 
 	/**
@@ -104,18 +116,23 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 	showDependencyView(type: string, assetId: number, dependencyAsset: number, rowId = '') {
 		this.assetService.getDependencies(assetId, dependencyAsset)
 			.subscribe((result) => {
-				jQuery('body').addClass('modal-open');
-				this.dialogService.extra(AssetDependencyComponent, [
-					{ provide: 'ASSET_DEP_MODEL', useValue: result }])
-					.then(res => {
-						// if the dependency was deleted remove it from the grid
-						if (res && res.delete) {
-							this.deleteDependencyRowUpdateCounter(type, rowId)
-						}
-					})
-					.catch(res => {
-						console.log(res);
-					});
+
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: AssetDependencyComponent,
+					data: {
+						assetDependency: result
+					},
+					modalConfiguration: {
+						title: 'Dependency Detail',
+						draggable: true,
+						modalSize: ModalSize.MD,
+					}
+				}).subscribe( (data) => {
+					if (data && data.delete) {
+						this.deleteDependencyRowUpdateCounter(type, rowId)
+					}
+				});
 			}, (error) => console.log(error));
 	}
 

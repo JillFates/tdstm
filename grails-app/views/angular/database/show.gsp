@@ -3,49 +3,10 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content has-side-nav tds-angular-component-content">
-    <div class="modal-header" [ngClass]="{'modal-header-height':showDetails}">
-        <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
-            <clr-icon aria-hidden="true" shape="close"></clr-icon>
-        </button>
-
+<div>
+    <div>
 		<div class="clr-row">
-			<div class="clr-col-6">
-				<div class="modal-title-container">
-					<div class="badge modal-badge" style="">D</div>
-					<h4 class="modal-title">${asset.assetName}</h4>
-					<div class="modal-subtitle">${asset?.moveBundle}</div>
-					<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
-				</div>
-                <div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
-                    <div *ngIf="readMore">
-                        <p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
-                    </div>
-                    <div *ngIf="!readMore" class="readMore">
-                        <g:if test="${asset.description?.length() > 80}">
-                            <div class="truncated-description">${asset.description.substring(0,80)}...</div>
-                            <a (click)="readMore = !readMore">Read More</a>
-                        </g:if>
-                        <g:else>
-                            <div class="truncated-description">${asset.description}</div>
-                        </g:else>
-                    </div>
-                </div>
-			</div>
-
-			<div  class="clr-col-6">
-				<div class="minimized-arch-thumbnail" *ngIf="!!showDetails">
-					<tds-lib-diagram-layout
-							[data]="data$ | async"
-							[layout]="diagramLayout$ | async"
-							[linkTemplate]="linkTemplate$ | async"
-							(expandActionDispatched)="onExpandActionDispatched()"
-							[hideExpand]="false"
-							[hideOverview]="true"
-							[hideControlButtons]="true" #graph></tds-lib-diagram-layout>
-				</div>
-			</div>
-			<div class="clr-col-12">
+			<div class="clr-col-11">
 				<tds-tab-scroller>
 					<tds-scroller-item>
 						<button tdsScrollerLink>
@@ -94,7 +55,8 @@
 			</div>
 		</div>
     </div>
-    <div class="modal-body asset-crud" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
+
+    <div class="asset-crud" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
 			<div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
 				<g:if test="${errors}">
@@ -218,22 +180,4 @@
 		</div>
     </div>
 
-    <div class="modal-sidenav form-group-center">
-		<nav class="modal-sidenav btn-link">
-			<tds-button-edit (click)="showAssetEditView()" tooltip="Edit" icon="pencil"></tds-button-edit>
-			<tds-button-clone (click)="onCloneAsset()" tooltip="Clone" icon="copy"></tds-button-clone>
-			<tds:hasPermission permission="${Permission.AssetDelete}">
-				<tds-button-delete
-						tooltip="Delete Asset"
-						class="btn-danger"
-						[permissions]="['${Permission.AssetDelete}']"
-						(click)="onDeleteAsset()">
-				</tds-button-delete>
-			</tds:hasPermission>
-			<tds-button-close
-                tooltip="Close"
-                (click)="cancelCloseDialog()">
-			</tds-button-close>
-		</nav>
-	</div>
 </div>
