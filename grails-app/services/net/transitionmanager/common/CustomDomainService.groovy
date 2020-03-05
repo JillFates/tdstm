@@ -327,7 +327,8 @@ class CustomDomainService implements ServiceMethods {
      * @return the string for updating the given field.
      */
     String updateFieldData(Map oldFieldSpec, Map newFieldSpec){
-        if(!oldFieldSpec || (oldFieldSpec.control == newFieldSpec.control && oldFieldSpec.shared == newFieldSpec.shared)){
+        if(!oldFieldSpec || (oldFieldSpec.control == newFieldSpec.control && oldFieldSpec.shared == newFieldSpec.shared)||
+           (oldFieldSpec.control == newFieldSpec.control && oldFieldSpec.shared && !newFieldSpec.shared)){
             return
         }
 
