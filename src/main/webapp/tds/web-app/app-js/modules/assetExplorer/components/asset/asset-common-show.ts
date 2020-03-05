@@ -77,7 +77,9 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 			let tableRow = <HTMLElement>document.querySelector('.one-column');
 			let tableRowSiblingWidth = <HTMLElement>(<HTMLElement>document.querySelector('.fit-tags-to-view')).previousSibling;
 			tagsDiv.style.width = (tableRow.offsetWidth - tableRowSiblingWidth.offsetWidth) + 'px';
-			this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
+			if (this.assetTagUIWrapperService) {
+				this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
+			}
 		}, 500);
 	}
 
