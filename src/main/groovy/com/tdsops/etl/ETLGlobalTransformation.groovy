@@ -25,8 +25,8 @@ class ETLGlobalTransformation {
     List<Pair<String, String>> replacements = []
 
     ETLGlobalTransformation() {
-        trimmer = true
         sanitizer = true
+        trimmer = false
     }
 
     /**
@@ -41,8 +41,12 @@ class ETLGlobalTransformation {
 
         if (element.value instanceof CharSequence) {
 
-            if (trimmer) element.trim()
-            if (sanitizer) element.sanitize()
+            if (sanitizer) {
+                element.sanitize()
+            } else if (trimmer) {
+                element.trim()
+            }
+
             for (Pair<String, String> replacer in replacements) {
                 element.replace(replacer.aValue, replacer.bValue)
             }
