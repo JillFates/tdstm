@@ -14,7 +14,6 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
 import {AssetViewConfigComponent} from './components/asset-view-config/asset-view-config.component';
 import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
-import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 
 /**
  * Asset Manager Route States
@@ -129,16 +128,6 @@ export const AssetManagerRoute: Routes = [
 		},
 		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
-	},
-	{
-		path: AssetExplorerStates.ARCHITECTURE_GRAPH.url,
-		data: {
-			page: {
-				title: 'Architecture Graph', instruction: '', menu: ['ASSETS.ASSETS', 'Architecture Graph']
-			}
-		},
-		component: ArchitectureGraphComponent,
-		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 
