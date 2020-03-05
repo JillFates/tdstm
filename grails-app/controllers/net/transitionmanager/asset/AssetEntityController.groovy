@@ -439,7 +439,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		assetCommentsInstance.each {
 			if (viewUnpublished || it.isPublished)
-				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
+				assetCommentsList <<[commentInstance: it.toMap(), assetEntityId: it.assetEntity.id,
 									 cssClass: it.dueDate < today ? 'Lightpink' : 'White',
 									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
 									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
