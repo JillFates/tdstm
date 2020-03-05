@@ -8,7 +8,7 @@ import {
 	OnChanges,
 	SimpleChanges,
 	ChangeDetectionStrategy,
-	OnDestroy, HostListener
+	OnDestroy, HostListener, ComponentFactoryResolver
 } from '@angular/core';
 import {Observable, ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
@@ -64,6 +64,8 @@ import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui
 import {NavigationEnd, Router} from '@angular/router';
 import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
 import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
+import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
+import {DialogService, ModalSize} from 'tds-component-library';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -140,10 +142,12 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private notifier: NotifierService,
 		private dialog: UIDialogService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
@@ -368,19 +372,25 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 * @param data
 	 */
 	protected onShow(data: any) {
-		this.dialog.open(AssetShowComponent, [
-			{ provide: 'ID', useValue: data['common_id'] },
-			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.XXL, false)
-			.then(asset => {
-				if (asset) {
-					this.createDependencyPromise(asset.assetClass, asset.id);
-				}
-				this.onReload();
-			}).catch(error => {
-				console.log('Error:', error);
-				this.onReload();
-			});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: data['common_id'],
+				assetClass: data['common_assetClass']
+			},
+			modalConfiguration: {
+				title: data['common_assetName'] + ' ' + data['common_moveBundle'],
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe( (data: any) => {
+			if (data.asset) {
+				this.createDependencyPromise(data.asset.assetClass, data.asset.id);
+			}
+			this.onReload();
+		});
 	}
 
 	/**

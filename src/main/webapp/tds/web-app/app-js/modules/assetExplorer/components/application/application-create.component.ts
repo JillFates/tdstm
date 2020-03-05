@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject, OnInit, AfterViewInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, AfterViewInit, ViewChild, ComponentFactoryResolver} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
@@ -19,10 +19,11 @@ import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogService} from 'tds-component-library';
 
 const pleaseSelectMessage = 'Please Select';
 
-export function ApplicationCreateComponent(template: string, model: any, metadata: any): any {
+export function ApplicationCreateComponent(template: string, model: any, metadata: any, parentDialog: any): any {
 	@Component({
 		selector: 'tds-application-create',
 		template: template,
@@ -48,17 +49,19 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 
 		constructor(
 			@Inject('model') model: any,
+			componentFactoryResolver: ComponentFactoryResolver,
 			activeDialog: UIActiveDialogService,
 			userContextService: UserContextService,
 			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
-			dialogService: UIDialogService,
+			dialogService: DialogService,
+			oldDialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 			) {
-				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
+				super(componentFactoryResolver, model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, oldDialogService, notifierService, tagService, metadata, promptService, translatePipe, parentDialog);
 		}
 
 		ngOnInit() {
@@ -259,7 +262,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
-			this.dialogService.extra(AddPersonComponent,
+			this.oldDialogService.extra(AddPersonComponent,
 				[UIDialogService,
 					{
 						provide: PersonModel,

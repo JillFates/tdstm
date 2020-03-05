@@ -20,12 +20,16 @@ import {DeviceCreateComponent} from '../device/device-create.component';
 import {ApplicationCreateComponent} from '../application/application-create.component';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
+import {ApplicationEditComponent} from '../application/application-edit.component';
 
 @Component({
 	selector: `tds-asset-all-create`,
 	template: `<div #view></div>`
 })
 export class AssetCreateComponent extends DynamicComponent implements AfterViewInit {
+
+	// Keeps the last component created, there is always one in place only
+	private lastComponent = {};
 
 	@ViewChild('view', {read: ViewContainerRef, static: true}) view: ViewContainerRef;
 
@@ -54,16 +58,32 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 					setTimeout( () => {
 						switch (this.asset) {
 							case 'APPLICATION':
-								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata, this), this.view).subscribe((componentRef: any) => {
+									// @ts-ignore
+									const currentDialogComponentInstance = <ApplicationCreateComponent>componentRef.instance;
+									console.log(currentDialogComponentInstance);
+								});
 								break;
 							case 'DATABASE':
-								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata, this), this.view).subscribe((componentRef: any) => {
+									// @ts-ignore
+									const currentDialogComponentInstance = <DatabaseCreateComponent>componentRef.instance;
+									console.log(currentDialogComponentInstance);
+								});
 								break;
 							case 'DEVICE':
-								this.registerAndCreate(DeviceCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(DeviceCreateComponent(template, model, metadata, this), this.view).subscribe((componentRef: any) => {
+									// @ts-ignore
+									const currentDialogComponentInstance = <DeviceCreateComponent>componentRef.instance;
+									console.log(currentDialogComponentInstance);
+								});
 								break;
 							case 'STORAGE':
-								this.registerAndCreate(StorageCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(StorageCreateComponent(template, model, metadata, this), this.view).subscribe((componentRef: any) => {
+									// @ts-ignore
+									const currentDialogComponentInstance = <StorageCreateComponent>componentRef.instance;
+									console.log(currentDialogComponentInstance);
+								});
 								break;
 
 						}

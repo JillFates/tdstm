@@ -138,30 +138,6 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 		}
 	}
 
-	/**
-	 allows to delete the application assets
-	 */
-	onDeleteAsset() {
-
-		this.prompt.open('Confirmation Required',
-			'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-			'OK', 'Cancel')
-			.then( success => {
-				if (success) {
-					this.assetExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
-						if (res) {
-							this.notifierService.broadcast({
-								name: 'reloadCurrentAssetList'
-							});
-							this.activeDialog.dismiss();
-							jQuery('body').removeClass('modal-open');
-						}
-					}, (error) => console.log(error));
-				}
-			})
-			.catch((error) => console.log(error));
-	}
-
 	getGraphUrl(): string {
 		return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
 	}

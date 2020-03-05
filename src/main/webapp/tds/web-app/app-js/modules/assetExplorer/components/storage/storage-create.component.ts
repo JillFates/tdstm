@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
@@ -16,8 +16,9 @@ import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogService} from 'tds-component-library';
 
-export function StorageCreateComponent(template: string, model: any, metadata: any): any {
+export function StorageCreateComponent(template: string, model: any, metadata: any, parentDialog: any): any {
 	@Component({
 		selector: 'tds-storage-create',
 		template: template,
@@ -28,17 +29,19 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 	class StorageCreateComponent extends AssetCommonEdit implements OnInit {
 		constructor(
 			@Inject('model') model: any,
+			componentFactoryResolver: ComponentFactoryResolver,
 			activeDialog: UIActiveDialogService,
 			userContextService: UserContextService,
 			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
-			dialogService: UIDialogService,
+			dialogService: DialogService,
+			oldDialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 		) {
-			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
+			super(componentFactoryResolver, model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, oldDialogService, notifierService, tagService, metadata, promptService, translatePipe, parentDialog);
 		}
 
 		ngOnInit() {
