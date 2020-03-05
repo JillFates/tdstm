@@ -99,7 +99,21 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
 		private assetTagUIWrapperService: AssetTagUIWrapperService) {
+		this.initResolveData();
+	}
 
+	ngOnInit(): void {
+		this.handleQueryParams();
+		this.globalQueryParams = this.route.snapshot.queryParams;
+		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
+		this.reloadStrategy();
+		this.initialiseComponent();
+	}
+
+	/**
+	 * After Report Resolver has finished initialize models/variables of the component.
+	 */
+	initResolveData(): void {
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
@@ -108,16 +122,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
 		this.handleOverrideState(this.model);
-	}
-
-	ngOnInit(): void {
-
-		this.handleQueryParams();
-		this.globalQueryParams = this.route.snapshot.queryParams;
-		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
-
-		this.reloadStrategy();
-		this.initialiseComponent();
 	}
 
 	/**
@@ -142,14 +146,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
 				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
-					this.metadata.tagList = this.lastSnapshot.data['tagList'];
-					this.fields = this.lastSnapshot.data['fields'];
-					this.domains = this.lastSnapshot.data['fields'];
-					const { dataView } = this.lastSnapshot.data['report'];
-					this.model = dataView ;
-					this.dataSignature = this.stringifyCopyOfModel(this.model);
+					this.initResolveData();
 					this.initialiseComponent();
-					this.handleOverrideState(this.model);
 				}
 			}
 		});
