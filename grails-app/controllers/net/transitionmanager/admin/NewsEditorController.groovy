@@ -1,5 +1,6 @@
 package net.transitionmanager.admin
 
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
@@ -220,7 +221,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			return
 		}
 
-		MoveEventNews men = newsEditorService.save(project, newsParams.moveEventId.toString().toLong(), newsParams.comment.toString(), newsParams.resolution.toString(), isArchived)
+		MoveEventNews men = newsEditorService.save(project, NumberUtil.toLong(newsParams.moveEventId), newsParams.comment.toString(), newsParams.resolution.toString(), isArchived)
         renderSuccessJson(men)
 	}
 
@@ -242,7 +243,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			return
 		}
 
-		MoveEventNews men = newsEditorService.update(project, newsParams.newsId.toString().toLong(), newsParams.comment.toString(), newsParams.resolution.toString(), isArchived)
+		MoveEventNews men = newsEditorService.update(project, NumberUtil.toLong(newsParams.newsId), newsParams.comment.toString(), newsParams.resolution.toString(), isArchived)
         renderSuccessJson(men)
 	}
 
