@@ -152,14 +152,6 @@ export class AssetCommonShow implements OnInit {
 			.catch((error) => console.log(error));
 	}
 
-	getGraphUrl(): string {
-		return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
-	}
-
-	openGraphUrl() {
-		this.windowService.getWindow().open(this.getGraphUrl(), '_blank');
-	}
-
 	getGoJsGraphUrl(): string {
 		return `/tdstm/module/asset/architecture-graph?assetId=${this.mainAsset}&levelsUp=0&levelsDown=3`;
 	}
@@ -169,7 +161,7 @@ export class AssetCommonShow implements OnInit {
 	}
 
 	onExpandActionDispatched(): void {
-		this.openGraphUrl();
+		this.openGoJsGraphUrl();
 	}
 
 	/**
