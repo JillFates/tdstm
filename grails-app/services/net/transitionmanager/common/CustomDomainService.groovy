@@ -366,7 +366,7 @@ class CustomDomainService implements ServiceMethods {
                 return
 
             default:
-                updateFieldString = anyTypeToNull([oldFieldSpec.field])
+                updateFieldString = anyTypeToNull(oldFieldSpec.field)
         }
 
         return updateFieldString
