@@ -127,9 +127,9 @@ class WsUserController implements ControllerMethods {
 		}
 
 		renderSuccessJson(
-				person: person,
-				projects: projects,
-				projectInstance: project,
+				person: person.toMap(),
+				projects: projects*.toMap(),
+				projectInstance: project.toMap(),
 				projectLogoId: projectLogo?.id,
 				movedayCategories: AssetComment.moveDayCategories
 		)

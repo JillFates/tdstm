@@ -32,7 +32,7 @@ export class DependenciesColumnModel {
 				label: 'Asset Tags',
 				property: 'tagsAsset',
 				type: 'tags',
-				width: 220
+				width: 260
 			},
 			{
 				label: 'Type',

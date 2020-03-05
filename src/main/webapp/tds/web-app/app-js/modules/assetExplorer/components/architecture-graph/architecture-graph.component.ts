@@ -132,7 +132,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		// If it comes from asset explorer
 		if (this.urlParams && this.urlParams.assetId) {
 			this.assetId = this.urlParams.assetId;
-			this.loadData();
+			this.loadData(true);
 		}
 		this.getArchitectureGraphPreferences();
 		this.initSearchModel();
@@ -189,13 +189,24 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	/**
 	 * Loads the asset data once an item has been clicked
+	 * Optionally accepts a flag to set the current selected asset
+	 * @param setInitialAsset When true set the initial value for the selected asset
 	 * */
-	loadData() {
+	loadData(setInitialAsset = false): void {
 		this.architectureGraphService
 			.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
 					this.updateNodeData(this.currentNodesData, false);
+					if (setInitialAsset && res && res.nodes) {
+						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
+						if (selectedAsset) {
+							this.asset = {
+								id: selectedAsset.id,
+								text: selectedAsset.name,
+							};
+						}
+					}
 				});
 	}
 
