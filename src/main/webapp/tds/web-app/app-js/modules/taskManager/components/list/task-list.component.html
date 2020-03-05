@@ -43,7 +43,6 @@
 						>
 							<option
 								*ngFor="let event of eventList"
-								[attr.selected]="selectedEventId === event.id"
 								[value]="event.id"
 							>{{ event.name }}</option
 							>
