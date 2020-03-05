@@ -147,7 +147,7 @@ class WsProjectController implements ControllerMethods {
 
 		renderSuccessJson([
 				  clients              : projectDetails.clients,
-				  projectInstance      : project,
+				  projectInstance      : project.toMap(),
 				  timezone             : project.timezone?.label ?: '',
 				  client               : project.client,
 				  defaultBundle        : project.defaultBundle.toMap(),
