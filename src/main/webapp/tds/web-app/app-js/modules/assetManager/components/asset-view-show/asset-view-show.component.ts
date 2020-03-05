@@ -175,8 +175,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			name: 'notificationHeaderTitleChange',
 			title: this.model.name
 		});
-
-		this.onQuery();
 		this.gridState = Object.assign({}, this.gridState, {sort: [
 				{
 					field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
@@ -216,7 +214,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				this.data = result;
 				jQuery('[data-toggle="popover"]').popover();
 			}, err => console.log(err));
-		}, 2000);
+		}, 500);
 	}
 
 	public onEdit(): void {
