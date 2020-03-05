@@ -26,16 +26,32 @@ import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.compone
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
+import { faLayerPlus, faLayerMinus } from '@fortawesome/pro-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 
 declare var jQuery: any;
 
 interface OverrideState {
-	icon?: string;
-	isOverride?: boolean;
+	isOverwritten: boolean;
+	icon?: IconDefinition;
 	color?: string;
-	offLabel?: string;
-	onLabel?: string;
-}
+	tooltip?: string;
+};
+const IS_OVERRIDE_CHILD: OverrideState = {
+	icon: faLayerMinus,
+	color: 'green',
+	isOverwritten: true,
+	tooltip: 'Revert to Project View',
+};
+const	IS_OVERRIDE_PARENT: OverrideState = {
+	icon: faLayerPlus,
+	color: 'blue',
+	isOverwritten: false,
+	tooltip: 'Display Personal System View'
+};
+const	IS_NOT_OVERRIDE: OverrideState = {
+	isOverwritten: false
+};
 
 @Component({
 	selector: 'tds-asset-view-show',
@@ -65,26 +81,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		sort: []
 	};
 	private queryParams: any = {};
-	// TODO: Rebase it to use the proper icons instead of refresh
-	private readonly overrideAssetViewStates: any = {
-		IS_OVERRIDE_CHILD: {
-			// icon: 'layer-minus',
-			icon: 'refresh',
-			color: 'green',
-			isOverriden: true,
-			label: 'Revert to Project View',
-		},
-		IS_OVERRIDE_PARENT: {
-			// icon: 'layer-plus',
-			icon: 'refresh',
-			color: 'blue',
-			isOverriden: false,
-			label: 'Display Personal System View'
-		},
-		IS_NOT_OVERRIDE: {
-			isOverride: false
-		}
-	};
 
 	@ViewChild('select') select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid') assetExplorerViewGrid: AssetViewGridComponent
@@ -153,9 +149,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	/**
+	 * Set the override state object.
+	 * @param isOverride
+	 * @param hasOverride
+	 */
 	private handleOverrideState({isOverride, hasOverride}: ViewModel): void {
-		const { IS_OVERRIDE_CHILD, IS_OVERRIDE_PARENT, IS_NOT_OVERRIDE } = this.overrideAssetViewStates;
-
 		if (isOverride) {
 			this.currentOverrideState = IS_OVERRIDE_CHILD;
 		} else if (hasOverride) {

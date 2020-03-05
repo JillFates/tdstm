@@ -55,16 +55,13 @@
                         >
             </tds-button-custom>
 
-            
-            <tds-button-custom 
-                        class="pull-right no-action-button"
-                        isIconButton="true"
-                        [ngStyle]="{color: currentOverrideState.color}"
-                        [icon]="currentOverrideState.icon"
-                        [tooltip]="currentOverrideState.offLabel"
-                        (click)="toggleAssetView()"
-                        >
-            </tds-button-custom>
+					<button *ngIf="currentOverrideState.icon" type="button"
+									class="view-override-button tds-action-button--just-icon pull-right"
+									[title]="currentOverrideState.tooltip"
+									(click)="toggleAssetView()">
+						<fa-icon [icon]="currentOverrideState.icon">
+						</fa-icon>
+					</button>
         </div>
         <div class="box-body">
             <asset-explorer-view-grid
