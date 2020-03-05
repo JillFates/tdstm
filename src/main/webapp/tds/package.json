@@ -27,7 +27,6 @@
     "@fortawesome/fontawesome-svg-core": "1.2.27",
     "@fortawesome/free-solid-svg-icons": "5.12.1",
     "@fortawesome/free-brands-svg-icons": "5.12.1",
-    "@fortawesome/pro-solid-svg-icons": "5.12.1",
     "@ngxs/devtools-plugin": "3.4.3",
     "@ngxs/logger-plugin": "3.4.3",
     "@ngxs/storage-plugin": "3.4.3",

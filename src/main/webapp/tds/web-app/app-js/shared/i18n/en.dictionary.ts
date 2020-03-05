@@ -534,5 +534,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Applications Grouped by Dependencies',
 		'DEPENDENCIES_BY_VENDOR': 'Dependencies by Vendor',
 		'TOP_TAGS': 'Top Tags'
+	},
+	'MANUFACTURER': {
+		'LIST': 'Manufacturer List'
 	}
 };
