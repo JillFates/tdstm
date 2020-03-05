@@ -13,7 +13,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import net.minidev.json.JSONObject
+import org.grails.web.json.JSONObject
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.dataview.DataviewApiFilterParam
 import net.transitionmanager.command.dataview.DataviewApiParamsCommand
@@ -31,6 +31,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.person.FavoriteDataview
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
@@ -42,20 +43,22 @@ import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
 import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.util.JsonViewRenderService
+//import org.springframework.context.annotation.Lazy
 
-import java.security.InvalidParameterException
 /**
  * Service class with main database operations for Dataview.
  * @see Dataview
  */
 class DataviewService implements ServiceMethods {
 
-	ProjectService projectService
 	JsonViewRenderService jsonViewRenderService
 
-	// TODO : JPM 1/2020 : @Diego - why was this lazy loaded instead of just using the IOC? This should be documented here...
+	@Lazy
+	static ProjectService projectService = { -> ApplicationContextHolder.getBean('projectService', ProjectService) }()
 	@Lazy
 	private static CustomDomainService customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
+
+	UserPreferenceService userPreferenceService
 
 	static final InvalidParamException MISSING_ID_EXCEPTION     = new InvalidParamException('Missing required id')
 	static final EmptyResultException  VIEW_NOT_FOUND_EXCEPTION = new EmptyResultException('View was not found')
@@ -1539,7 +1542,6 @@ class DataviewService implements ServiceMethods {
 
 		return results
 	}
-
 
 	/**
 	 * Mixed fields are those, such as startupBy, shutdownBy and testingBy that may

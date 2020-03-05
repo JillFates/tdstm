@@ -366,7 +366,7 @@ class CustomDomainService implements ServiceMethods {
                 return
 
             default:
-                updateFieldString = anyTypeToNull([oldFieldSpec.field])
+                updateFieldString = anyTypeToNull(oldFieldSpec.field)
         }
 
         return updateFieldString
@@ -679,7 +679,13 @@ class CustomDomainService implements ServiceMethods {
 
         allFieldSpecs(currentProject, ALL_ASSET_CLASSES).each { key, value ->
             value.fields.each { Map<String, String> field ->
-                fields[field.field] = [control: field.control, bulkChangeActions: field.bulkChangeActions, customValues: field?.constraints?.values ?: [], label: field.label]
+                fields[field.field] = [
+                    control          : field.control,
+                    bulkChangeActions: field.bulkChangeActions,
+                    customValues     : field?.constraints?.values ?: [],
+                    constraints      : field.constraints,
+                    label            : field.label
+                ]
             }
 
             types[key]= fields

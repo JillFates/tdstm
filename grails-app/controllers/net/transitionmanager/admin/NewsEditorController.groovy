@@ -1,5 +1,6 @@
 package net.transitionmanager.admin
 
+import com.tdsops.common.sql.SqlUtil
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
@@ -90,7 +91,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 		MoveBundle moveBundle = bundleId ? fetchDomain(MoveBundle, [id: bundleId]) : null
 
 		StringBuilder assetCommentsQuery = new StringBuilder("""select ac.asset_comment_id as id, ac.date_created as createdAt, display_option as displayOption,
-									CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
+									${SqlUtil.personFullNameSql('p1')} as createdBy, ${SqlUtil.personFullNameSql('p2')} as resolvedBy,
 									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
 									from asset_comment ac
 									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
@@ -99,7 +100,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 									left join person p2 on (p2.person_id = ac.resolved_by) where ac.comment_type = 'issue' and """)
 
 		StringBuilder moveEventNewsQuery = new StringBuilder("""select mn.move_event_news_id as id, mn.date_created as createdAt, 'U' as displayOption,
-											CONCAT_WS(' ',p1.first_name, p1.last_name) as createdBy, CONCAT_WS(' ',p2.first_name, p2.last_name) as resolvedBy,
+											${SqlUtil.personFullNameSql('p1')} as createdBy, ${SqlUtil.personFullNameSql('p2')} as resolvedBy,
 											'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity
 											from move_event_news mn
 											left join move_event me on (me.move_event_id = mn.move_event_id)

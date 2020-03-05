@@ -171,5 +171,11 @@
 			</div>
 		</div>
 	</section>
-	<tds-progress-bar [opened]="opened" [title]="title" [value]="progress_value"></tds-progress-bar>
+	<tds-progress-bar [opened]="opened"
+										[title]="title"
+										[value]="progress_value"
+										[message]="exportMessage"
+										[enableClose]="enableClose()"
+										(close)="onExportClose()">
+	</tds-progress-bar>
 </div>

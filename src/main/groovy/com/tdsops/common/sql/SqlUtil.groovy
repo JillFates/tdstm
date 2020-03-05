@@ -886,6 +886,16 @@ class SqlUtil {
 	}
 
 	/**
+	 * Create and return a string that can be used in a SQL query to build a person's fullname
+	 * @param tableAlias -- an alias, such as 'p1', in case the query requires the use of aliases.
+	 * @return the string to be embedded in the query.
+	 */
+	static String personFullNameSql(String tableAlias = null) {
+		String alias = tableAlias ? "$tableAlias." : ""
+		return "CONCAT_WS(' ', ${alias}first_name, NULLIF(${alias}middle_name, ''), NULLIF(${alias}last_name, ''))"
+	}
+
+	/**
 	 * Handle the filtering of many to many relationships.
 	 * @param fieldSearchData
 	 * @return

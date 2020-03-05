@@ -33,12 +33,9 @@ import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
-import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectAssetMap
-import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.search.AssetDependencyQueryBuilder
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
@@ -961,69 +958,50 @@ class AssetEntityService implements ServiceMethods {
 		if(assetIds.size() == 0) {
 			return 0
 		}
-		List<AssetEntity> assets = AssetEntity.where { id in assetIds}.list()
 
-		ProjectAssetMap.where { asset in assets }.deleteAll()
-
-		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
+		namedParameterJdbcTemplate.update('delete from project_asset_map where (asset_id) IN (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE project_team SET latest_asset_id = null where (latest_asset_id)  IN (:assetIds)', [assetIds: assetIds])
 
 		// Delete asset comments
-		AssetComment.where {
-			assetEntity in assets
-			commentType != AssetCommentType.TASK
-		}.deleteAll()
-
+		namedParameterJdbcTemplate.update('delete from asset_comment where (asset_entity_id) IN (:assetIds) AND comment_type != :taskType', [assetIds: assetIds, taskType: AssetCommentType.TASK])
 		// Null out asset references in Tasks
-		AssetComment.executeUpdate('''
-			UPDATE AssetComment c SET c.assetEntity=null
-			WHERE c.assetEntity.id IN (:assets)
-			''',
-			[assets: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE asset_comment SET asset_entity_id = null where (asset_entity_id)  IN (:assetIds)', [assetIds: assetIds])
+
 
 		// Delete cabling where asset is the From in the relationship
-		AssetCableMap.where { assetFrom in assets }.deleteAll()
-
+		namedParameterJdbcTemplate.update('delete from asset_cable_map where (asset_from_id) IN (:assetIds)', [assetIds: assetIds, taskType: AssetCommentType.TASK])
 		// Null out cable references where the asset is the To in the relationship
-		AssetCableMap.executeUpdate('''
-			UPDATE AssetCableMap
-			SET cableStatus=:status, assetTo=null, assetToPort=null
-			WHERE assetTo.id in (:assets)''', [assets: assetIds] + [status: AssetCableStatus.UNKNOWN])
+		namedParameterJdbcTemplate.update('UPDATE asset_cable_map SET cable_status = :status, asset_to_id = null, asset_to_port_id = null where (asset_to_id)  IN (:assetIds)', [assetIds: assetIds, status: AssetCableStatus.UNKNOWN])
 
-		AssetDependency.where {
-			asset in assets || dependent in assets
-		}.deleteAll()
 
-		AssetDependencyBundle.where { asset in assets }.deleteAll()
+		namedParameterJdbcTemplate.update('delete from asset_dependency where (asset_id) IN (:assetIds) OR dependent_id IN (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('delete from asset_dependency_bundle where (asset_id) IN (:assetIds)', [assetIds: assetIds])
+
 
 		// Clear any possible Chassis references
-		AssetEntity.executeUpdate('''
-			UPDATE AssetEntity SET sourceChassis=NULL, sourceBladePosition=NULL
-			WHERE sourceChassis.id in (:assets)
-			''',
-			[assets: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE asset_entity SET source_chassis_id = NULL, source_blade_position=NULL where (source_chassis_id)  IN (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('UPDATE asset_entity SET target_chassis_id = NULL, target_blade_position=NULL where (target_chassis_id)  IN (:assetIds)', [assetIds: assetIds])
 
-		AssetEntity.executeUpdate('''
-			UPDATE AssetEntity SET targetChassis=NULL, targetBladePosition=NULL
-			WHERE targetChassis.id in (:assets)
-			''',
-			[assets: assetIds])
 
 		// Delete a few Application related domains for those where the id matches an Application. This
 		// shouldn't be an issue when deleting other asset classes because nothing will be found.
-		ApplicationAssetMap.executeUpdate('''
-			DELETE ApplicationAssetMap
-			WHERE application.id in :assetIds OR asset.id in :assetIds''',
-			[assetIds:assetIds])
+		namedParameterJdbcTemplate.update('delete from application_asset_map where (application_id) IN (:assetIds) OR (asset_id) In (:assetIds)', [assetIds: assetIds])
+		namedParameterJdbcTemplate.update('delete from app_move_event where (application_id) IN (:assetIds)', [assetIds: assetIds])
 
-		AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application.id in :assetIds',
-			[assetIds:assetIds] )
 
 		// Last but not least, delete the asset itself. Note that GORM/Hibernate is smart
 		// enough to know when a subclass of AssetEntity is being references so deleting AssetEntity will
 		// delete Application, Database or other domains that extend it. Pretty cool - huh!
-		int count = AssetEntity.where { id in assetIds }.deleteAll()
+		//It was cool but with over 8000 rows, it slowed down because, it was was create a temporary table and doing a sub-select.
+		// int count = AssetEntity.where { id in assetIds }.deleteAll()
 
-		return count
+		//Using JDBC for now Until we can find another workaround.
+		int countApps = namedParameterJdbcTemplate.update('delete from application where (app_id) IN (:assetIds)', [assetIds: assetIds])
+		int countFiles = namedParameterJdbcTemplate.update('delete from files where (files_id) IN (:assetIds)', [assetIds: assetIds])
+		int countDbs = namedParameterJdbcTemplate.update('delete from data_base where (db_id) IN (:assetIds)', [assetIds: assetIds])
+		int count = namedParameterJdbcTemplate.update('delete from asset_entity where (asset_entity_id) IN (:assetIds)', [assetIds: assetIds])
+
+		return count + countApps + countFiles + countDbs
 	}
 
 	/**
@@ -1853,15 +1831,15 @@ class AssetEntityService implements ServiceMethods {
 				*/
 				switch (value) {
 					case 'sme':
-						query.append("CONCAT_WS(' ', NULLIF(p.first_name, ''), NULLIF(p.middle_name, ''), NULLIF(p.last_name, '')) AS sme,")
+						query.append("${SqlUtil.personFullNameSql('p')} AS sme,")
 						joinQuery.append("\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n")
 						break
 					case 'sme2':
-						query.append("CONCAT_WS(' ', NULLIF(p1.first_name, ''), NULLIF(p1.middle_name, ''), NULLIF(p1.last_name, '')) AS sme2,")
+						query.append("${SqlUtil.personFullNameSql('p1')} AS sme2,")
 						joinQuery.append("\n LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id \n")
 						break
 					case 'modifiedBy':
-						query.append("CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,")
+						query.append("${SqlUtil.personFullNameSql('p2')} AS modifiedBy,")
 						joinQuery.append("\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n")
 						break
 					case 'lastUpdated':
@@ -1873,7 +1851,7 @@ class AssetEntityService implements ServiceMethods {
 						joinQuery.append("\n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id \n")
 						break
 					case 'appOwner':
-						query.append("CONCAT_WS(' ', NULLIF(p3.first_name, ''), NULLIF(p3.middle_name, ''), NULLIF(p3.last_name, '')) AS appOwner,")
+						query.append("${SqlUtil.personFullNameSql('p3')} AS appOwner,")
 						joinQuery.append("\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n")
 						break
 					case ~/appVersion|appVendor|appTech|appAccess|appSource|license|businessUnit|appFunction|criticality|userCount|userLocations|useFrequency|drRpoDesc|drRtoDesc|shutdownFixed|moveDowntimeTolerance|testProc|startupProc|url|shutdownDuration|startupFixed|startupDuration|testingFixed|testingDuration/:
@@ -1907,8 +1885,7 @@ class AssetEntityService implements ServiceMethods {
 						Map<String,String> byPrefixes = [shutdownBy: "sdb", startupBy: "sub", testingBy: "teb"]
 						String byProperty = WebUtil.splitCamelCase(value)
 						String prefix = byPrefixes[value]
-						query.append("(IF(${byProperty} REGEXP '^[0-9]{1,}\$', CONCAT_WS(' ',  NULLIF(${prefix}.first_name, ''), " +
-								"NULLIF(${prefix}.middle_name, ''), NULLIF(${prefix}.last_name, '')), a.${byProperty})) as ${value},")
+						query.append("(IF(${byProperty} REGEXP '^[0-9]{1,}\$', ${SqlUtil.personFullNameSql(prefix)}, a.${byProperty})) as ${value},")
 	      				joinQuery.append("\n LEFT OUTER JOIN person ${prefix} ON ${prefix}.person_id=a.${byProperty} \n")
 
 						break
