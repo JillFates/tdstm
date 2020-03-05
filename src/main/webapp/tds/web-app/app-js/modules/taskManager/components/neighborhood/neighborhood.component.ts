@@ -423,11 +423,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			nodeDataArray,
 			linkDataArray,
 			extras: {
-				diagramOpts: {
-					initialAutoScale: Diagram.Uniform,
-					allowZoom: true
-				},
-				isExpandable: false
+				initialAutoScale: Diagram.Uniform,
+				allowZoom: true
 			}
 		}));
 	}
@@ -939,11 +936,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			nodeDataArray,
 			linkDataArray,
 			extras: {
-				diagramOpts: {
-					autoScale: Diagram.Uniform,
-					allowZoom: false
-				},
-				isExpandable: false
+				autoScale: Diagram.Uniform,
 			}
 		}));
 	}

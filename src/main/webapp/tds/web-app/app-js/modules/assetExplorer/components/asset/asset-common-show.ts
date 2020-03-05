@@ -194,14 +194,7 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 					currentUserId: this.currentUser.id,
 					data: res,
 					iconsOnly: true,
-					extras: {
-						diagramOpts: {
-							// initialAutoScale: Diagram.UniformToFill,
-							contentAlignment: Spot.Center,
-							allowZoom: false
-						},
-						isExpandable: false
-					}
+					extras: {}
 				}));
 			});
 	}
