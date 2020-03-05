@@ -13,7 +13,6 @@ import {ProjectModel} from '../../model/project.model';
 import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Store} from '@ngxs/store';
-import {SetProject} from '../../actions/project.actions';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {
 	Dialog,
@@ -283,11 +282,13 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 				this.projectModel.timeZone = data.timezone;
 				this.projectTypes = data.projectTypes;
 
-				this.store.dispatch(new SetProject({
-					id: this.projectId,
-					name: this.projectModel.projectName,
-					logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''
-				}));
+				// notify about project updates
+				this.projectService.updateProjectInfo(
+					this.projectId,
+					this.projectModel.projectName,
+					this.projectService.getProjectImagePath(this.projectLogoId || '')
+				);
+
 				this.updateSavedFields();
 			});
 	}
@@ -327,11 +328,12 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 					this.savedProjectLogoId = this.projectLogoId;
 					this.retrieveImageTimestamp = (new Date()).getTime();
 
-					this.store.dispatch(new SetProject({
-						id: this.projectId,
-						name: this.projectModel.projectName,
-						logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp : ''
-					}));
+					const projectImage = this.projectLogoId ? this.projectLogoId + '?' + this.retrieveImageTimestamp : '';
+					this.projectService.updateProjectInfo(
+						this.projectId,
+						this.projectModel.projectName,
+						this.projectService.getProjectImagePath(projectImage)
+					);
 				}
 			});
 		}
@@ -494,6 +496,8 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 						this.projectModel = JSON.parse(JSON.stringify(this.savedModel));
 						this.projectLogoId = this.savedProjectLogoId;
 						this.setTitle(this.getModalTitle());
+					} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+						this.onCancelClose();
 					}
 				});
 		} else {

@@ -260,7 +260,7 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 				if (result.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 					this.dataScriptModel = Object.assign({}, this.data.dataScriptModel);
 					this.changeToViewDataScript();
-				} else {
+				} else if (result.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
 					this.onCancelClose();
 				}
 			});

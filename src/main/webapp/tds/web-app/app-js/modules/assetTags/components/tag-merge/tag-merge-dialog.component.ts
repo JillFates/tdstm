@@ -22,6 +22,7 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 	public tagList: Array<TagModel> = [];
 	public tagModel: TagModel;
 	public mergeToTag: TagModel;
+	private dataSignature: string;
 
 	private readonly MERGE_CONFIRMATION = 'ASSET_TAGS.TAG_LIST.MERGE_CONFIRMATION';
 
@@ -37,18 +38,16 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 
 		this.buttons.push({
 			name: 'save',
-			icon: 'check',
-			text: 'Merge',
+			icon: 'floppy',
 			disabled: () => !this.mergeToTag || !this.mergeToTag.id,
-			type: DialogButtonType.CONTEXT,
+			type: DialogButtonType.ACTION,
 			action: this.onMerge.bind(this)
 		});
 
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
-			text: 'Cancel',
-			type: DialogButtonType.CONTEXT,
+			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});
 
@@ -66,6 +65,7 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 				this.mergeToTag = defaultEmptyItem;
 				this.tagList.push(defaultEmptyItem);
 				this.tagList.push(...result.data.filter(item => item.id !== this.tagModel.id));
+				this.dataSignature = JSON.stringify(this.mergeToTag);
 			} else {
 				this.handleError(result.errors ? result.errors[0] : 'an error ocurred while loading the tag list.');
 			}
@@ -98,7 +98,26 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
-		this.onCancelClose();
+		if (this.isDirty()) {
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM) {
+					this.onCancelClose();
+				}
+			});
+		} else {
+			this.onCancelClose();
+		}
+	}
+
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	protected isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify(this.mergeToTag);
 	}
 
 	/**

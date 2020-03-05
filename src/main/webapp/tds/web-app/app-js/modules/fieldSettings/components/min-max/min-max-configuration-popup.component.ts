@@ -36,18 +36,16 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 	ngOnInit(): void {
 		this.buttons.push({
 			name: 'save',
-			icon: 'check',
-			text: 'Ok',
+			icon: 'floppy',
 			disabled: () => !this.isDirty() || (!this.templateForm.valid && !this.minIsValid),
-			type: DialogButtonType.CONTEXT,
+			type: DialogButtonType.ACTION,
 			action: this.onSave.bind(this)
 		});
 
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
-			text: 'Cancel',
-			type: DialogButtonType.CONTEXT,
+			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});
 

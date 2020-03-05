@@ -537,7 +537,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 						this.dataSignature = JSON.stringify(this.apiActionModel);
 						this.modalType = this.actionTypes.VIEW;
 						this.setTitle(this.getModalTitle(this.modalType));
-					} else {
+					} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
 						this.onCancelClose();
 					}
 				});

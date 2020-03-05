@@ -1,46 +1,36 @@
 // Angular
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { pathOr } from 'ramda';
-
+import {AfterViewInit, Component, ComponentFactoryResolver, Input, OnInit, ViewChild} from '@angular/core';
 // Component
-import { RichTextEditorComponent } from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
-import { ViewHtmlComponent } from '../view-html/view-html.component';
+import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
+import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
-import { NoticeService } from '../../service/notice.service';
-import {
-	UIActiveDialogService,
-	UIDialogService,
-} from '../../../../shared/services/ui-dialog.service';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { StringUtils } from '../../../../shared/utils/string.utils';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import {
-	PREFERENCES_LIST,
-	PreferenceService,
-} from '../../../../shared/services/preference.service';
+import {NoticeService} from '../../service/notice.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {StringUtils} from '../../../../shared/utils/string.utils';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 // Kendo
-import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
-// import {NoticeModel, NoticeTypes, NoticeType} from '../../model/notice.model';
-import {
-	NoticeModel,
-	NoticeTypes,
-	NOTICE_TYPE_MANDATORY,
-	NOTICE_TYPE_POST_LOGIN,
-} from '../../model/notice.model';
-import { Permission } from '../../../../shared/model/permission.model';
-import { ActionType } from '../../../../shared/model/action-type.enum';
+import {NOTICE_TYPE_MANDATORY, NOTICE_TYPE_POST_LOGIN, NoticeModel, NoticeTypes} from '../../model/notice.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {ActionType} from '../../../../shared/model/action-type.enum';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+// Other
+import * as R from 'ramda';
+import {NgForm} from '@angular/forms';
+
 @Component({
 	selector: 'tds-notice-view-edit',
 	templateUrl: 'notice-view-edit.component.html',
 })
-export class NoticeViewEditComponent implements OnInit, AfterViewInit {
-	@ViewChild('htmlTextField', { static: false })
-	htmlText: RichTextEditorComponent;
-	@ViewChild('typeIdField', { static: false }) typeId: DropDownListComponent;
+export class NoticeViewEditComponent extends Dialog implements OnInit, AfterViewInit {
+	@Input() data: any;
+
+	@ViewChild('form', {read: NgForm, static: true}) form: NgForm;
+
+	@ViewChild('htmlTextField', {static: false}) htmlText: RichTextEditorComponent;
+	@ViewChild('typeIdField', {static: false}) typeId: DropDownListComponent;
 
 	public EnumActionType = ActionType;
 	private dataSignature: string;
@@ -49,6 +39,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		typeId: null,
 		name: 'Select a Type',
 	};
+
 	MANDATORY = NOTICE_TYPE_MANDATORY;
 	noticeType: any;
 	noticeIsLocked: boolean;
@@ -57,20 +48,75 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	maxDate = null;
 	typeName = '';
 	userDateFormat = '';
+	public action: ActionType = ActionType.View;
+
 	constructor(
-		private translate: TranslatePipe,
-		private originalModel: NoticeModel,
-		public action: ActionType,
-		public activeDialog: UIActiveDialogService,
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private translatePipe: TranslatePipe,
 		private noticeService: NoticeService,
-		private promptService: UIPromptService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService
-	) {}
+	) {
+		super();
+	}
 
 	ngOnInit() {
-		this.model = { ...this.originalModel };
+		this.model = R.clone(this.data.noticeModel);
+		this.action = this.data.actionType;
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.action === ActionType.Edit || this.action === ActionType.View,
+			active: () => this.action === ActionType.Edit,
+			type: DialogButtonType.ACTION,
+			action: this.editNotice.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.action === ActionType.Edit || this.action === ActionType.Create,
+			disabled: () => !this.formValid() || !this.isCreateEditAvailable() || !this.isDirty(),
+			type: DialogButtonType.ACTION,
+			action: this.saveNotice.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.action !== ActionType.Create,
+			type: DialogButtonType.ACTION,
+			action: this.deleteNotice.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => this.action === ActionType.View || this.action === ActionType.Create,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.action === ActionType.Edit,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEditDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'viewHTML',
+			icon: 'code',
+			text: 'View HTML',
+			show: () => true,
+			disabled: () => !this.model.htmlText || this.model.htmlText.length <= 0,
+			type: DialogButtonType.CONTEXT,
+			action: this.viewHTML.bind(this)
+		});
+
 		if (this.model.needAcknowledgement) {
 			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
@@ -83,7 +129,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			this.typeName = currentType.name;
 		}
 
-		this.noticeType = { typeId: (this.model && this.model.typeId) || null };
+		this.noticeType = {typeId: (this.model && this.model.typeId) || null};
 
 		if (this.model.expirationDate) {
 			this.setMaxDate(this.model.expirationDate);
@@ -96,91 +142,87 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 
 		this.dataSignature = JSON.stringify(this.model);
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle(this.action));
+		});
 	}
 
 	ngAfterViewInit() {
 		setTimeout(
 			() =>
-				(this.htmlText.editor.editorContainer.title = this.translate.transform(
+				(this.htmlText.editor.editorContainer.title = this.translatePipe.transform(
 					'NOTICE.TOOLTIP_MESSAGE'
 				))
 		);
 	}
 
-	protected cancelDialog(): void {
+	public cancelEditDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translate.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translate.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translate.transform('GLOBAL.CONFIRM'),
-					this.translate.transform('GLOBAL.CANCEL')
-				)
-				.then(confirm => {
-					if (confirm) {
-						if (this.action === ActionType.Edit) {
-							this.action = ActionType.View;
-						} else {
-							this.activeDialog.dismiss();
-						}
-					}
-				})
-				.catch(error => console.log(error));
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
+					// Put back original model
+					this.model = JSON.parse(this.dataSignature);
+					this.dataSignature = JSON.stringify(this.model);
+					this.action = ActionType.View;
+					this.setTitle(this.getModalTitle(this.action));
+				} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			if (this.action === ActionType.Edit) {
+			if (!this.data.openFromList) {
 				this.action = ActionType.View;
+				this.setTitle(this.getModalTitle(this.action));
 			} else {
-				this.activeDialog.dismiss();
+				this.onCancelClose();
 			}
 		}
 	}
 
-	protected closeDialog(): void {
+	/**
+	 * Required by the HTML Handler
+	 */
+	public cancelHTMLInputDialog(): void {
+		if (this.action === ActionType.Create || this.action === ActionType.View) {
+			this.cancelCloseDialog();
+		}
+		if (this.action === ActionType.Edit) {
+			this.cancelEditDialog();
+		}
+	}
+
+	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translate.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translate.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translate.transform('GLOBAL.CONFIRM'),
-					this.translate.transform('GLOBAL.CANCEL')
-				)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.dismiss();
-					}
-				})
-				.catch(error => console.log(error));
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			this.activeDialog.dismiss();
+			this.onCancelClose();
 		}
 	}
 
 	protected deleteNotice(): void {
-		this.promptService
-			.open(
-				'Confirmation Required',
-				'You are about to delete the selected notice. Do you want to proceed?',
-				'Yes',
-				'No'
-			)
-			.then(res => {
-				if (res) {
-					this.noticeService
-						.deleteNotice(this.model.id.toString())
-						.subscribe(
-							res => this.activeDialog.close(),
-							error => console.error(error)
-						);
-				}
-			});
+		this.dialogService.confirm(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			'You are about to delete the selected notice. Do you want to proceed?'
+		).subscribe((data: any) => {
+			if (data.confirm === DialogConfirmAction.CONFIRM) {
+				this.noticeService
+					.deleteNotice(this.model.id.toString())
+					.subscribe(
+						res => this.onCancelClose()
+					);
+			}
+		});
 	}
 
 	/**
@@ -189,7 +231,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	private getPayloadFromModel(): any {
 		this.model.typeId = this.noticeType && this.noticeType.typeId;
 
-		const payload = { ...this.model };
+		const payload = {...this.model};
 
 		if (payload.typeId === this.MANDATORY) {
 			payload.typeId = NOTICE_TYPE_POST_LOGIN;
@@ -224,12 +266,12 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 
 		if (payload.id) {
 			this.noticeService.editNotice(payload).subscribe(
-				notice => this.activeDialog.close(notice),
+				notice => this.onAcceptSuccess(notice),
 				error => console.error(error)
 			);
 		} else {
 			this.noticeService.createNotice(payload).subscribe(
-				notice => this.activeDialog.close(notice),
+				notice => this.onAcceptSuccess(notice),
 				error => console.error(error)
 			);
 		}
@@ -238,32 +280,32 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	/**
 	 * Opens the view to pre-render the HTML
 	 */
-	protected viewHTML(): void {
-		this.dialogService
-			.extra(
-				ViewHtmlComponent,
-				[{ provide: NoticeModel, useValue: this.model }],
-				false,
-				false
-			)
-			.then(result => {
-				//
-			})
-			.catch(error => console.log('View HTML Closed'));
+	private async viewHTML(): Promise<void> {
+		await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ViewHtmlComponent,
+			data: {
+				model: this.model
+			},
+			modalConfiguration: {
+				title: 'View HTML',
+				draggable: true,
+				modalCustomClass: 'custom-notice-view-html-dialog',
+				modalSize: ModalSize.CUSTOM
+			}
+		}).toPromise();
 	}
 
 	/**
 	 * Determines if all the field forms comply with the validation rules
 	 * @param {any} form  - Main form holding all the field
 	 */
-	protected formValid(form: any): boolean {
+	protected formValid(): boolean {
 		const noticeType = this.noticeType && this.noticeType.typeId;
 		const isValid =
 			this.model &&
 			this.model.title &&
-			this.isValidHtmlText() &&
-			(noticeType || noticeType === 0) &&
-			form.valid;
+			this.isValidHtmlText() && (noticeType || noticeType === 0) && this.form.valid;
 
 		const returnValue =
 			noticeType === this.MANDATORY
@@ -305,6 +347,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	protected editNotice(): void {
 		this.action = ActionType.Edit;
+		this.setTitle(this.getModalTitle(this.action));
 	}
 
 	/**
@@ -342,17 +385,18 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 * @returns {any} - Returns the field or null if not found
 	 */
 	public getFormField(form: any, controlName: string): any {
-		const field = pathOr(null, ['controls', controlName], form);
+		const field = R.pathOr(null, ['controls', controlName], form);
 
 		return field === null
 			? null
 			: {
-					valid: field.valid,
-					touched: field.touched,
-					dirty: field.dirty,
-					errors: field.errors || {},
+				valid: field.valid,
+				touched: field.touched,
+				dirty: field.dirty,
+				errors: field.errors || {},
 			};
 	}
+
 	/**
 	 * Based on modalType action returns the corresponding title
 	 * @param {ActionType} modalType
@@ -360,15 +404,15 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	getModalTitle(modalType: ActionType): string {
 		if (modalType === ActionType.Edit) {
-			return this.translate.transform('NOTICE.EDIT_NOTICE');
+			return this.translatePipe.transform('NOTICE.EDIT_NOTICE');
 		}
 
 		if (modalType === ActionType.Create) {
-			return this.translate.transform('NOTICE.NOTICE_CREATE');
+			return this.translatePipe.transform('NOTICE.NOTICE_CREATE');
 		}
 
 		if (modalType === ActionType.View) {
-			return this.translate.transform('NOTICE.SHOW_NOTICE');
+			return this.translatePipe.transform('NOTICE.SHOW_NOTICE');
 		}
 
 		return '';
@@ -379,5 +423,12 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	onChangeNoticeType(value: any) {
 		this.model.typeId = value && value.typeId;
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

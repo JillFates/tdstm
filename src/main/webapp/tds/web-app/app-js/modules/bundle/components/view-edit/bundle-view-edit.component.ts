@@ -105,6 +105,10 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		this.userDateTimeFormat = this.preferenceService.getUserDateTimeFormat();
 
 		this.loadModel();
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
 	}
 
 	/**
@@ -179,6 +183,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 
 	public switchToEdit() {
 		this.editing = true;
+		this.setTitle(this.getModalTitle());
 		// Small delay when switch so the elements are visible
 		setTimeout(() => {
 			if (this.bundleModel.startTime) {
@@ -323,6 +328,8 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 						this.editing = false;
 						this.bundleModel = JSON.parse(JSON.stringify(this.savedModel));
 						this.setTitle(this.getModalTitle());
+					} else if (data.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+						this.onCancelClose();
 					}
 				});
 		} else {
