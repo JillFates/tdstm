@@ -1,0 +1,71 @@
+<div class="dependency-analyzer-container content body">
+	<div class="row task-manager-sub-header">
+		<div class="col-md-2  ">
+			<label class="dependency-analyzer-control-label">{{'DEPENDENCY_ANALYZER.DEPENDENCY_GROUPS' | translate}}:</label>
+			<tds-button>{{ 'DEPENDENCY_ANALYZER.REGENERATE' | translate}}</tds-button>
+		</div>
+		<div class="col-md-2 ">
+			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.BUNDLE' | translate}}:</label>
+			<kendo-dropdownlist
+				id="dependency-analyzer-teams-dropdown"
+				textField="label"
+				valueField="label"
+				[ngClass]="'dependency-analyzer-custom-dropdown'"
+				[value]="selectedBundle"
+				[data]="teamHighlights$ | async"
+				(selectionChange)="highlightByTeam($event)"
+				[(ngModel)]="selectedBundle"
+                #teamHighlightDropdown>
+			</kendo-dropdownlist>
+		</div>
+
+		<div class="col-md-2 ">
+			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.TAGS' | translate}}:</label>
+			<kendo-dropdownlist
+				id="dependency-analyzer-tags-dropdown"
+				textField="label"
+				valueField="label"
+				[ngClass]="'dependency-analyzer-custom-dropdown'"
+				[value]="selectedTags"
+				[data]="teamHighlights$ | async"
+				(selectionChange)="highlightByTeam($event)"
+				[(ngModel)]="selectedTags"
+                #teamHighlightDropdown>
+			</kendo-dropdownlist>
+		</div>
+
+		<div class="col-md-4 chk-filter-container">
+			<clr-checkbox-wrapper class="inline">
+				<input
+					clrCheckbox
+					id="showWIPonly"
+					type="checkbox"
+					name="showWIPonly"
+					class="component-action-just-planning"
+					[(ngModel)]="showOnlyWIP"
+					(change)="onShowOnlyWIPChange($event)"/>
+				<label
+					class="clr-control-label clr-control-label-sm inline"
+					for="showWIPonly"
+				>{{'DEPENDENCY_ANALYZER.SHOW_ONLY_WIP' | translate}}</label>
+			</clr-checkbox-wrapper>
+		</div>
+
+		<div class="col-md-2">
+			<button class="refresh-container-btn btn" (click)="refreshDiagram()">
+				<fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
+			</button>
+		</div>
+
+<!--			<label class="task-chk-container">-->
+<!--				<input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />-->
+<!--				<span class="checkmark"></span>-->
+<!--				Minimize Auto Tasks-->
+<!--			</label>-->
+	</div>
+	<tds-grid
+		[gridModel]="gridModel"
+		(cellClick)="cellClick($event)">
+	</tds-grid>
+
+</div>

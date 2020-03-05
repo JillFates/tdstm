@@ -182,8 +182,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		treeLayout.treeStyle = TreeLayout.StyleAlternating;
 		treeLayout.layerStyle = TreeLayout.LayerUniform;
 		treeLayout.angle = 0;
-		treeLayout.nodeSpacing = 200;
-		treeLayout.layerSpacing = 200;
+		treeLayout.nodeSpacing = 300;
+		treeLayout.layerSpacing = 300;
 
 		return treeLayout;
 	}
@@ -438,7 +438,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('text', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					const type = !!val.assetType ? val.assetType.replace(' ', '').toLowerCase()
+						: val.type && val.type.replace(' ', '').toLowerCase();
 					return this.getIcon(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.iconAlt;
@@ -448,7 +449,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('stroke', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					const type = !!val.assetType ? val.assetType.replace(' ', '').toLowerCase()
+						: val.type && val.type.replace(' ', '').toLowerCase();
 					return this.getIconColor(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.color;
@@ -458,7 +460,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('fill', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					const type = !!val.assetType ? val.assetType.replace(' ', '').toLowerCase()
+						: val.type && val.type.replace(' ', '').toLowerCase();
 					return this.getIconColor(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.color;
@@ -468,7 +471,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('background', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					const type = val.assetType ? val.assetType.replace(' ', '').toLowerCase()
+						: val.type && val.type.replace(' ', '').toLowerCase();
 					return this.getBackgroundColor(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.background;

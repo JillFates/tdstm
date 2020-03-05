@@ -51,7 +51,7 @@ import {
 	AssetDependency,
 } from '../../service/open-asset-dependencies.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import {ViewColumn} from '../../../assetExplorer/model/view-spec.model';
+import { AssetTagSelectorComponent } from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 
 declare var jQuery: any;
 
@@ -70,6 +70,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
 	@ViewChild('tdsBulkChangeButton', { static: false })
+	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
 	tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid', { static: false }) grid: GridComponent;
 	public dependenciesColumnModel: DependenciesColumnModel;
@@ -289,14 +290,15 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * @param {string} field Name of the tags filter column
 	 * @param {any}  filter Object containing the tags context information
 	 */
-	protected onTagFilterChange(field: string, filter: any): void {
+	protected onTagFilterChange(column: GridColumnModel, filter: any): void {
+		column.filter = '';
+		const field = column.property;
 		let operator = filter.operator && filter.operator === 'ALL' ? '&' : '|';
-
 		const tags = (filter.tags || [])
 			.filter(tag => !isNaN(tag.id))
 			.map(tag => tag.id)
 			.join(operator);
-
+		column.filter = tags;
 		this.tagsStateSubject.next({ field, tags });
 	}
 
@@ -429,6 +431,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			delete column.filter;
 		});
 		this.onFilter({filter: ''});
+		if (this.tagSelector) {
+			this.tagSelector.reset();
+		}
 	}
 
 	/**

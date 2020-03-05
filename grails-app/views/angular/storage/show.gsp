@@ -50,38 +50,44 @@
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Supports
-							<span class="badge" id="asset-detail-support-counter">
-                                <g:if test="${supportAssets.size() > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${supportAssets.size()}
-                                </g:else>
-                            </span>
+							<g:set var="supportsCounter" value="${supportAssets.size() as Integer}"/>
+							<g:if test="${supportsCounter > 0}">
+								<span class="badge" id="asset-detail-support-counter">
+									<g:if test="${supportsCounter > 99}">
+										99+
+									</g:if>
+									<g:else>
+										${supportsCounter}
+									</g:else>
+								</span>
+							</g:if>
                         </button>
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Depends On
-							<span class="badge" id="asset-detail-dependent-counter">
-                                <g:if test="${dependentAssets.size() > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${dependentAssets.size()}
-                                </g:else>
-                            </span>
+							<g:set var="dependentCounter" value="${dependentAssets.size() as Integer}"/>
+							<g:if test="${dependentCounter > 0}">
+								<span class="badge" id="asset-detail-dependent-counter">
+									<g:if test="${dependentCounter > 99}">
+										99+
+									</g:if>
+									<g:else>
+										${dependentCounter}
+									</g:else>
+								</span>
+							</g:if>
                         </button>
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Tasks
-                            <span class="badge">
+                            <span class="badge" *ngIf="taskCount">
                                 {{ taskCount > 99 ? '99+' : taskCount }}
                             </span>
                         </button>
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Comments
-                            <span class="badge">
+                            <span class="badge" *ngIf='commentCount'>
                                 {{ commentCount > 99 ? '99+' : commentCount }}
                             </span>
                         </button>

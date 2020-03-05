@@ -18,14 +18,12 @@
             span
               div
                 border-radius: 2px
-                height: 26px
-                padding-left: 7px
-                padding-right: 28px
-                font-size: 13px
-                padding-top: 5px
                 font-weight: 600
-                margin-top: 1px
-                margin-left: 1px
+                height: 20px
+                line-height: 10px
+                font-size: 11px
+                padding: 5px 28px 5px 7px
+                margin: 2px
                 max-width: 155px
                 white-space: nowrap
                 overflow: hidden
@@ -33,7 +31,6 @@
             span.k-select
               span.k-i-close
                 margin-left: -31px
-                font-size: 18px
       span.k-clear-value
         display: none !important
   // -------------------------------------------------------------------
@@ -105,6 +102,18 @@
     .k-input:-ms-input-placeholder
       font-size: 14px
       color: $asset-tag-placeholder
+
+  &.grid-filter
+    display: inline-block
+    min-width: 180px
+    max-width: 210px
+
+tds-asset-tag-selector
+  .clear-button
+    vertical-align: top
+    .tds-button
+      padding: 0
+
 /* Global, but protected by the scope */
 $asset-tag-selector-default-label-color: #656565
 .asset-tag-selector-single-container
@@ -136,10 +145,10 @@ $asset-tag-selector-default-label-color: #656565
 
 .label.tag
   width: 60px
-  height: 27px
+  //height: 27px
   display: block
   margin: 0 auto 0 auto
-  padding-top: 8px
+  padding-top: 5px
   font-size: 11px
   color: $asset-tag-selector-default-label-color!important
   border: unset
@@ -168,7 +177,10 @@ $asset-tag-selector-default-label-color: #656565
   background-color: white !important
 .tag-unselected
   background-color: unset !important
-
+.tag-kendo-selector
+  &:hover
+    color: black
+    font-weight: bolder
 .single-line-tags
   margin-top: 5px
 .single-line-tags:hover, .show-full-tags
@@ -208,5 +220,98 @@ $asset-tag-selector-default-label-color: #656565
       max-height: unset
       display: inline-block
 
-kendo-popup .k-popup
-  border-color: #ccc !important
+
+// ########################
+@mixin asset-tag-style
+  border-radius: 2px
+  border: 0
+  height: 100% !important
+  padding: 5px 7px
+  margin-bottom: 7px !important
+
+@mixin asset-tag-font-style
+  font-size: 11px
+  text-align: center
+  font-weight: 500
+  color: black
+
+.k-grid
+  .label.tag
+    @include asset-tag-style
+
+  .k-grid-header
+    tr
+      td
+        .asset-tag-selector-component
+          .k-multiselect
+            padding: 0
+            top: 0
+            .k-multiselect-wrap
+              border: 1px solid #ccc
+              border-radius: 3px
+              font-size: 13px
+              min-height: 26px
+              font-weight: 500
+              kendo-searchbar
+                width: 100%
+                input
+                  height: 100%
+                  width: 100%
+              div[class^="tag"]
+                @include asset-tag-font-style
+                @include asset-tag-style
+                padding-right: 28px
+                margin-bottom: 0 !important
+                max-width: 143px
+          kendo-switch
+            float: right
+            z-index: 2
+            width: 55px
+            top: 4px
+            height: 24px
+            position: relative
+            .k-switch-container
+              border-width: .1em
+              border-color: rgba(0, 0, 0, 0.17)
+              color: inherit !important
+              margin-right: 4px
+              background-color: transparent !important
+            .k-switch-handle
+              width: 2.3em
+              height: 2.2em
+              background-color: #5f9fcf !important
+            .k-switch-label-on, .k-switch-label-off
+              right: 4px
+              font-size: 10px
+              width: 100%
+              font-weight: 600
+            &.k-switch-on
+              .k-switch-label-on
+                right: -6px
+              .k-switch-handle
+                left: calc(100% - 2.3em)
+
+  .show-full-tags
+    max-height: unset
+    display: inline-block
+    .dots-for-tags
+      display: none
+  .asset-tag.k-switch
+    top: 5.6px !important
+
+
+kendo-popup.grid-filter-tag-selector
+  kendo-list
+    .k-list-scroller .k-list
+      overflow: auto
+      .k-item
+        padding: 0px 4px
+        &:last-child
+          margin-bottom: 10px
+    .asset-tag-selector-single-container
+      margin-left: 0
+      margin-top: 0
+    .asset-tag-selector-single-item
+      @include asset-tag-font-style
+      @include asset-tag-style
+      margin-bottom: 2px !important

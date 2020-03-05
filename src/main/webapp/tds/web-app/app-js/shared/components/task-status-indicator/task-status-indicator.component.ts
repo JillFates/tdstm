@@ -6,11 +6,12 @@ import { Component, Input } from '@angular/core';
 		<span [ngSwitch]="propertyName">
 			<span *ngSwitchCase="'status'">
 				<span [ngClass]="'status status-' + value" [ngSwitch]="value">
-					<clr-icon *ngSwitchCase="'Ready'" shape="thumbs-up" class="is-solid"></clr-icon>
-					<clr-spinner *ngSwitchCase="'Started'" clrInline class="static"></clr-spinner>
-					<clr-icon *ngSwitchCase="'Hold'" shape="pause" class="is-solid"></clr-icon>
-					<clr-icon *ngSwitchCase="'Completed'" shape="check" class="is-solid"></clr-icon>
-					<clr-icon *ngSwitchCase="'Pending'" shape="minus" class="is-solid"></clr-icon>
+					<fa-icon *ngSwitchCase="'Ready'" [icon]="['fas', 'thumbs-up']"></fa-icon>
+					<fa-icon *ngSwitchCase="'Started'" [icon]="['fas', 'circle-notch']"></fa-icon>
+					<fa-icon *ngSwitchCase="'Hold'" [icon]="['fas', 'pause']"></fa-icon>
+					<fa-icon *ngSwitchCase="'Completed'" [icon]="['fas', 'check']"></fa-icon>
+					<fa-icon *ngSwitchCase="'Pending'" [icon]="['fas', 'hourglass-start']"></fa-icon>
+					<fa-icon *ngSwitchCase="'Planned'" [icon]="['fas', 'square']"></fa-icon>
 				</span>
 				{{ displayLabel ? value : '' }}
 			</span>
