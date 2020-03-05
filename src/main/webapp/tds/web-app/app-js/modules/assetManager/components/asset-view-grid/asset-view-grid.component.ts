@@ -103,7 +103,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
 		this.gridStateChange.emit({...this.gridState, skip: 0});
-		this.modelChange.emit();
 	}
 
 	public currentFields = [];
