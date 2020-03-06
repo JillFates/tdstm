@@ -13,6 +13,8 @@ import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
 import groovy.transform.TimedInterrupt
+import net.transitionmanager.etl.NumberUtilForETL
+import net.transitionmanager.etl.StringUtilForETL
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.ScriptExpressionChecker
 import org.apache.commons.lang3.RandomStringUtils
@@ -135,7 +137,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     Map<String, Tuple2<String, String>> columnNamePartsCache = [:]
     /**
      * ETLMap definitions used by defineETLMap command
-     * @see ETLProcessor#defineMap(java.lang.String, groovy.lang.Closure)
+     * @see ETLProcessor#defineMap(com.tdsops.etl.ETLDomain)
+     * @see ETLProcessor#loadMap(java.lang.String)
      */
     Map<String, ETLMap> etlMaps = [:]
 
@@ -175,36 +178,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * A set of Global transformations that will be apply over each iteration
      */
-    Set<Closure> globalTransformers = new HashSet<Closure>()
-
-    /**
-     * Safe Global transformation that checks the type before applying a transformation
-     */
-    static Trimmer = { Element element ->
-        if (element.value instanceof CharSequence) {
-            element.trim()
-        }
-    }
-
-    /**
-     * Safe Global transformation that checks the type before applying a transformation
-     */
-    static Sanitizer = { Element element ->
-        if (element.value instanceof CharSequence) {
-            element.sanitize()
-        }
-    }
-
-    /**
-     * Safe Global transformation that checks the type before applying a transformation
-     */
-    static Replacer = { String regex, String replacement ->
-        return { Element element ->
-            if (element.value instanceof CharSequence) {
-                element.replace(regex, replacement)
-            }
-        }
-    }
+    ETLGlobalTransformation globalTransformation
 
     /**
      * After completing a load 'comments' command, this methods adds results in {@code ETLProcessorResult}
@@ -222,13 +196,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     String getFilename() {
         return dataset != null ? dataset.filename() : dataSetFacade.fileName()
     }
-/**
- * Some words to be used in an ETL script.
- * <b> read labels</b>
- * <b> console on/off</b>
- * <b> ignore record</b>
- * <b> ... transform with ...</b>
- */
+
+    /**
+     * Some words to be used in an ETL script.
+     * <b> read labels</b>
+     * <b> console on/off</b>
+     * <b> ignore record</b>
+     * <b> ... transform with ...</b>
+     */
     static enum ReservedWord {
 
         labels, with, on, off, record, ControlCharacters, populated
@@ -591,13 +566,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor trim(ReservedWord reservedWord) {
-
         if (reservedWord == ReservedWord.on) {
-            globalTransformers.add(Trimmer)
+            globalTransformation.trimmer == true
         } else if (reservedWord == ReservedWord.off) {
-            globalTransformers.remove(Trimmer)
+            globalTransformation.trimmer == false
         }
-
         debugConsole.info "Global trim status changed: $reservedWord"
         return this
     }
@@ -608,13 +581,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor sanitize(ReservedWord reservedWord) {
-
         if (reservedWord == ReservedWord.on) {
-            globalTransformers.add(Sanitizer)
+            globalTransformation.sanitizer = true
         } else if (reservedWord == ReservedWord.off) {
-            globalTransformers.remove(Sanitizer)
+            globalTransformation.sanitizer = true
         }
-
         debugConsole.info "Global sanitize status changed: $reservedWord"
         return this
     }
@@ -626,7 +597,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return
      */
     ETLProcessor replace(String regex, String replacement) {
-        globalTransformers.add(Replacer(regex, replacement))
+        globalTransformation.addReplacer(regex, replacement)
         debugConsole.info "Global replace regex: $regex wuth replacement: $replacement"
         return this
     }
@@ -637,11 +608,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return
      */
     Map<String, ?> replace(ReservedWord reservedWord) {
-        debugConsole.info "Global trm status changed: $reservedWord"
         if (reservedWord == ReservedWord.ControlCharacters) {
             return [
-                    with: { y ->
-                        globalTransformers.add(Replacer(ControlCharactersRegex, y))
+                    with: { replacement ->
+                        replace(ControlCharactersRegex, replacement)
                     }
             ]
         } else {
@@ -1769,14 +1739,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     @CompileStatic
     void applyGlobalTransformations(Element element) {
-        globalTransformers.each { transformer ->
-            transformer(element)
-        }
+        globalTransformation.applyAll(element)
     }
 
     private void initializeDefaultGlobalTransformations() {
-        globalTransformers.add(Trimmer)
-        globalTransformers.add(Sanitizer)
+        globalTransformation = new ETLGlobalTransformation()
     }
 
     /**
@@ -2058,6 +2025,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
                     'org.apache.commons.lang3.RegExUtils',
                     'org.apache.commons.lang3.StringUtils',
                     'org.springframework.beans.factory.annotation.Autowired',
+                    'net.transitionmanager.etl.NumberUtilForETL',
+                    'net.transitionmanager.etl.StringUtilForETL'
             ]
             starImportsWhitelist = []
             // Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
@@ -2076,7 +2045,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
             receiversClassesWhiteList = [
                     Object, // TODO: This is too much generic class.
                     Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
-                    Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils
+                    Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils, NumberUtilForETL, StringUtilForETL
             ].asImmutable()
         }
 
@@ -2085,6 +2054,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         customizer.addImport('RandomUtils', 'org.apache.commons.lang3.RandomUtils')
         customizer.addImport('RegExUtils', 'org.apache.commons.lang3.RegExUtils')
         customizer.addImport('StringUtils', 'org.apache.commons.lang3.StringUtils')
+        customizer.addImport('StringUtil', 'net.transitionmanager.etl.StringUtilForETL')
+        customizer.addImport('NumberUtil', 'net.transitionmanager.etl.NumberUtilForETL')
 
         secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
         CompilerConfiguration configuration = new CompilerConfiguration()
