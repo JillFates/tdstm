@@ -74,6 +74,7 @@ export class TaskListComponent implements OnInit {
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
 	private dashboardFilters = ['filter', 'status', 'role', 'category'];
+	private dateValues = ['actStart', 'actFinish', 'dueDate', 'estStart', 'estFinish', 'latestStart', 'latestFinish'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
@@ -88,6 +89,8 @@ export class TaskListComponent implements OnInit {
 	public hasViewUnpublishedPermission = false;
 	public isFiltering  = false;
 	public allTasksPermission: boolean;
+	private timeZone: string;
+	private dateFormat: string;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -100,7 +103,8 @@ export class TaskListComponent implements OnInit {
 		private dialogService: DialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
-		private activatedRoute: ActivatedRoute) {
+		private activatedRoute: ActivatedRoute,
+		private preferenceService: PreferenceService) {
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
 		this.allTasksPermission = this.permissionService.hasPermission(Permission.TaskManagerAllTasks);
 		this.justMyTasks = !this.allTasksPermission;
@@ -127,6 +131,8 @@ export class TaskListComponent implements OnInit {
 	ngOnInit(): void {
 		fixContentWrapper();
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.timeZone = this.preferenceService.getUserTimeZone();
+		this.dateFormat = this.preferenceService.getUserDateFormat();
 		this.headerActionButtons = [
 			{
 				icon: 'plus',
@@ -697,7 +703,11 @@ export class TaskListComponent implements OnInit {
 		Object.values(customColumns).forEach((custom: string, index: number) => {
 			const column = `userSelectedCol${ index }`;
 			let match = this.columnsModel.find(item => item.property === column);
-			match.label = assetCommentFields[custom];
+			if (match) {
+				match.label = assetCommentFields[custom];
+				match.type = this.dateValues.includes(custom) ? 'date' : 'text';
+				match.format = this.dateFormat;
+			}
 			this.currentCustomColumns[column] = custom;
 		});
 		this.allAvailableCustomColumns = [];
@@ -741,21 +751,30 @@ export class TaskListComponent implements OnInit {
 		// Add field filters
 		if (this.grid.state.filter && this.grid.state.filter.filters.length > 0) {
 			this.grid.state.filter.filters.forEach((filter: FilterDescriptor) => {
-				request[filter.field as string] = filter.value;
+				if (!request[filter.field as string]) {
+					request[filter.field as string] = filter.value;
+				}
 			});
 		}
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
-				this.reloadGridData(result.rows, result.totalCount);
-				this.loading = false;
-				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 				for (let i = 0; i < result.totalCount; i++) {
+					for (let j = 0; j < 5; j++) {
+						let colName = 'userSelectedCol' + j;
+						if (result.rows[i] && this.dateValues.includes(this.currentCustomColumns[colName])) {
+							result.rows[i][colName] = result.rows[i][colName] ?
+								DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.rows[i][colName]), DateUtils.SERVER_FORMAT_DATE) : '';
+						}
+					}
 					let info = result.rows[i] ? result.rows[i].actionBarInfo : null;
 					if (info) {
 						let actionBarModel = this.taskService.convertToTaskActionInfoModel(info);
 						this.taskActionInfoModels.set(result.rows[i].id.toString(), actionBarModel);
 					}
 				}
+				this.reloadGridData(result.rows, result.totalCount);
+				this.loading = false;
+				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 			});
 		this.loaderService.stopProgress();
 
