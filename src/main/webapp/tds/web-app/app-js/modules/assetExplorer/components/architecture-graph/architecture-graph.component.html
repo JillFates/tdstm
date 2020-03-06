@@ -27,15 +27,15 @@
 						[serviceRequest]="getAssetList">
 				</tds-combobox>
 				<div class="tiers-above">
-					<tds-button icon="minus-circle" (click)="extractLevelsUp()"></tds-button>
+					<tds-button icon="minus-circle" [disabled]="!assetId" (click)="extractLevelsUp()"></tds-button>
 					<label>{{levelsUp}}</label>
-					<tds-button icon="plus-circle" (click)="addLevelsUp()" class="add-level-up-graph"></tds-button>
+					<tds-button icon="plus-circle" [disabled]="!assetId" (click)="addLevelsUp()" class="add-level-up-graph"></tds-button>
 					<label>{{'ARCHITECTURE.TIERS_ABOVE' | translate}}</label>
 				</div>
 				<div class="tiers-below">
-					<tds-button icon="minus-circle" (click)="extractLevelsDown()"></tds-button>
+					<tds-button icon="minus-circle" [disabled]="!assetId" (click)="extractLevelsDown()"></tds-button>
 					<label>{{levelsDown}}</label>
-					<tds-button icon="plus-circle" (click)="addLevelsDown()" class="add-level-up-graph"></tds-button>
+					<tds-button icon="plus-circle" [disabled]="!assetId" (click)="addLevelsDown()" class="add-level-up-graph"></tds-button>
 					<label>{{'ARCHITECTURE.TIERS_BELOW' | translate}}</label>
 				</div>
 				<div class="graph-checkbox">
