@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import {Component, ComponentFactoryResolver, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
@@ -34,7 +34,7 @@ import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
-import { HeaderActionButtonData } from 'tds-component-library';
+import {DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { Store } from '@ngxs/store';
@@ -90,13 +90,14 @@ export class TaskListComponent implements OnInit {
 	public allTasksPermission: boolean;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
 		private loaderService: UILoaderService,
 		private store: Store,
 		private permissionService: PermissionService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
@@ -207,16 +208,19 @@ export class TaskListComponent implements OnInit {
 				currentUserId: this.userContext.user.id
 			}
 		};
-		this.dialogService.extra(TaskEditCreateComponent, [
-			{ provide: TaskDetailModel, useValue: taskCreateModel }
-		]).then((result) => {
-			if (result) {
-				this.search();
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskEditCreateComponent,
+			data: {
+				taskCreateModel: taskCreateModel
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
 			}
-		}).catch(result => {
-			if (result) {
-				// nothing
-			}
+		}).subscribe((data: any) => {
+			this.search();
 		});
 	}
 
@@ -231,24 +235,27 @@ export class TaskListComponent implements OnInit {
 				title: 'Task Detail'
 			}
 		};
-		this.dialogService.extra(TaskDetailComponent, [
-			{ provide: TaskDetailModel, useValue: taskDetailModel }
-		]).then((result) => {
-			if (result) {
-				if (result.isDeleted) {
-					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-						this.search();
-					});
-				} else if (result.shouldOpenTask) {
-					this.onOpenTaskDetailHandler(result.commentInstance);
-				} else if (result.shouldEdit) {
-					this.onOpenTaskEditHandler(result.id);
-				} else {
-					this.search(parseInt(taskRow.id, 10));
-				}
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskDetailComponent,
+			data: {
+				taskDetailModel: taskDetailModel
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
 			}
-		}).catch(result => {
-			if (result) {
+		}).subscribe((data: any) => {
+			if (data.isDeleted) {
+				this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+					this.search();
+				});
+			} else if (data.shouldOpenTask) {
+				this.onOpenTaskDetailHandler(data.commentInstance);
+			} else if (data.shouldEdit) {
+				this.onOpenTaskEditHandler(data.id);
+			} else {
 				this.search(parseInt(taskRow.id, 10));
 			}
 		});
@@ -263,7 +270,8 @@ export class TaskListComponent implements OnInit {
 					this.userContext.dateFormat,
 					this.taskService,
 					this.dialogService,
-					this.translate);
+					this.translate,
+					this.componentFactoryResolver);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',
@@ -273,21 +281,26 @@ export class TaskListComponent implements OnInit {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditCreateComponent, [
-					{ provide: TaskDetailModel, useValue: clone(model) }
-				], false, false)
-					.then(result => {
-						if (result) {
-							if (result.isDeleted) {
-								this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-									this.search();
-								});
-							} else {
-								this.search(parseInt(taskRow.id, 10));
-							}
-						}
-					}).catch(result => {
-					// do nothing.
+
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: TaskEditCreateComponent,
+					data: {
+						taskDetailModel: model
+					},
+					modalConfiguration: {
+						title: '',
+						draggable: true,
+						modalSize: ModalSize.MD
+					}
+				}).subscribe((data: any) => {
+					if (data.isDeleted) {
+						this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+							this.search();
+						});
+					} else {
+						this.search(parseInt(taskRow.id, 10));
+					}
 				});
 			});
 	}
@@ -340,16 +353,21 @@ export class TaskListComponent implements OnInit {
 	 * @param assetClass: string
 	 */
 	onOpenAssetDetailHandler(taskRow: any): void {
-		this.dialogService.open(AssetShowComponent,
-			[UIDialogService,
-				{ provide: 'ID', useValue: taskRow.assetEntityId },
-				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
-				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.XXL).then(result => {
-				// nothing
-		}).catch(result => {
-			console.error('rejected: ' + result);
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				id: taskRow.assetEntityId,
+				asset: taskRow.assetEntityAssetClass,
+				assetExplorerModule: AssetExplorerModule
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe();
+
 	}
 
 	/**

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
 import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from '../../model/task-detail.model';
@@ -24,6 +24,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
+import {DialogService, ModalSize} from 'tds-component-library';
 
 @Component({
 	selector: `task-detail`,
@@ -55,9 +56,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	taskActionInfoModel: TaskActionInfoModel;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private promptService: UIPromptService,
 		private userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
@@ -107,7 +109,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 					this.userPreferenceService.getUserDateFormat(),
 					this.taskManagerService,
 					this.dialogService,
-					this.translatePipe);
+					this.translatePipe,
+					this.componentFactoryResolver);
 				this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
 				this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
 
@@ -264,12 +267,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		const assetClass = this.taskManagerService.getAssetCategory(this.model.assetClass.id);
 
 		if (assetClass) {
-			this.dialogService.replace(AssetShowComponent,
-				[UIDialogService,
-					{ provide: 'ID', useValue: id },
-					{ provide: 'ASSET', useValue: assetClass }
-				], DIALOG_SIZE.XXL);
-
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetShowComponent,
+				data: {
+					id: id,
+					asset: assetClass
+				},
+				modalConfiguration: {
+					title: '',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).subscribe();
 			this.close();
 		} else {
 			this.notifierService.broadcast({
@@ -301,36 +311,39 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			}
 		};
 
-		this.dialogService.extra(TaskEditCreateComponent, [
-			{provide: TaskDetailModel, useValue: taskCreateModel}
-		], false, false)
-			.then(result => {
-				if (result) {
-					const task = {
-						category: result.assetComment.category,
-						desc: result.assetComment.comment,
-						id: result.assetComment.id,
-						model: {
-							id: result.assetComment.id,
-							text: result.assetComment.comment
-						},
-						originalId: '',
-						status: result.assetComment.status,
-						taskId: result.assetComment.id,
-						taskNumber: result.assetComment.taskNumber
-					};
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskEditCreateComponent,
+			data: {
+				taskDetailModel: taskCreateModel
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((data: any) => {
+			const task = {
+				category: data.assetComment.category,
+				desc: data.assetComment.comment,
+				id: data.assetComment.id,
+				model: {
+					id: data.assetComment.id,
+					text: data.assetComment.comment
+				},
+				originalId: '',
+				status: data.assetComment.status,
+				taskId: data.assetComment.id,
+				taskNumber: data.assetComment.taskNumber
+			};
 
-					taskList.unshift(task);
-					gridHelper.addDataItem(task);
-					console.log('Reloading');
-					const payload = this.modelHelper.getPayloadForUpdate();
+			taskList.unshift(task);
+			gridHelper.addDataItem(task);
+			console.log('Reloading');
+			const payload = this.modelHelper.getPayloadForUpdate();
 
-					this.taskManagerService.updateTask(payload)
-						.subscribe((result) => this.loadTaskDetail());
-				}
-
-			}).catch(result => {
-			console.log('Cancel:', result);
+			this.taskManagerService.updateTask(payload)
+				.subscribe((result) => this.loadTaskDetail());
 		});
 	}
 
@@ -353,12 +366,17 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Opens the action summary modal.
 	 */
 	openTaskActionSummaryDetailHandler(): void {
-		this.dialogService.extra(TaskActionSummaryComponent, [
-			{ provide: TaskDetailModel, useValue: this.taskDetailModel }
-		]).then((result) => {
-			// do nothing, modal was closed;
-		}).catch(result => {
-			// do nothing, modal was closed
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskActionSummaryComponent,
+			data: {
+				taskDetailModel: this.taskDetailModel
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe();
 	}
 }

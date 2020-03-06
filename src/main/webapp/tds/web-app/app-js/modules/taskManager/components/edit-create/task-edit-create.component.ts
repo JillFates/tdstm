@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 import { TaskEditCreateCommonComponent } from '../common/task-edit-create-common.component';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -7,6 +7,7 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { TaskService } from '../../service/task.service';
+import {DialogService} from 'tds-component-library';
 
 declare var jQuery: any;
 
@@ -19,15 +20,16 @@ export class TaskEditCreateComponent extends TaskEditCreateCommonComponent imple
 
 	@ViewChild('dueDatePicker', { static: false}) dueDatePicker;
 	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
 		taskDetailModel: TaskDetailModel,
 		taskManagerService: TaskService,
-		dialogService: UIDialogService,
+		dialogService: DialogService,
 		promptService: UIPromptService,
 		userPreferenceService: PreferenceService,
 		permissionService: PermissionService,
 		translatePipe: TranslatePipe) {
 
-		super(taskDetailModel, taskManagerService, dialogService, promptService, userPreferenceService, permissionService, translatePipe);
+		super(componentFactoryResolver, taskDetailModel, taskManagerService, dialogService, promptService, userPreferenceService, permissionService, translatePipe);
 
 	}
 

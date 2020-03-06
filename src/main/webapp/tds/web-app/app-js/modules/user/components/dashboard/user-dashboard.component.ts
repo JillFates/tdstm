@@ -193,8 +193,9 @@ export class UserDashboardComponent implements OnInit {
 					this.userContext.timezone,
 					this.userContext.dateFormat,
 					this.taskService,
-					this.oldDialogService,
-					this.translate);
+					this.dialogService,
+					this.translate,
+					this.componentFactoryResolver);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',

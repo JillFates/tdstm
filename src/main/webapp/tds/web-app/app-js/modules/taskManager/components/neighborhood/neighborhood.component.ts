@@ -1,4 +1,12 @@
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+	Component,
+	ComponentFactoryResolver,
+	ElementRef,
+	HostListener,
+	OnDestroy,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {distinctUntilChanged, map, skip, takeUntil, timeout} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -44,6 +52,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {
 	ITdsContextMenuModel
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
+import {DialogService, ModalSize} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -97,12 +106,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	neighborId: any;
 
 	constructor(
+			private componentFactoryResolver: ComponentFactoryResolver,
 			private taskService: TaskService,
 			private activatedRoute: ActivatedRoute,
 			private userContextService: UserContextService,
 			private reportService: ReportsService,
 			private preferenceService: PreferenceService,
-			private dialogService: UIDialogService,
+			private dialogService: DialogService,
 			private notifierService: NotifierService,
 			private location: Location,
 			private translatePipe: TranslatePipe,
@@ -741,21 +751,25 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			}
 		};
 
-		this.dialogService.extra(TaskDetailComponent, [
-			{provide: TaskDetailModel, useValue: taskDetailModel}
-		], false, false)
-			.then(result => {
-				if (result && result.shouldEdit) {
-					return this.editTask({task: {id: result.id && result.id.id}});
-				}
-				if (result && result.isDeleted) {
-					const taskId = result.id && result.id.id;
-					return this.taskService.deleteTaskComment(taskId)
-						.subscribe(() => this.removeGraphNode(taskId));
-				}
-			}).catch(result => {
-			if (result) {
-				console.error('catch: ', result);
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskDetailComponent,
+			data: {
+				taskDetailModel: taskDetailModel
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((data: any) => {
+			if (data && data.shouldEdit) {
+				return this.editTask({task: {id: data.id && data.id.id}});
+			}
+			if (data && data.isDeleted) {
+				const taskId = data.id && data.id.id;
+				return this.taskService.deleteTaskComment(taskId)
+					.subscribe(() => this.removeGraphNode(taskId));
 			}
 		});
 	}
@@ -774,7 +788,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					this.userContext.user,
 					this.userContext.dateFormat,
 					this.taskService, this.dialogService,
-					this.translatePipe);
+					this.translatePipe,
+					this.componentFactoryResolver);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',
@@ -786,24 +801,26 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
 
-				this.dialogService.extra(TaskEditCreateComponent, [
-					{provide: TaskDetailModel, useValue: clone(model)}
-				], false, false)
-					.then(result => {
-						if (result && result.isDeleted) {
-							const taskId = result.id && result.id.id;
-							return this.taskService.deleteTaskComment(taskId)
-								.subscribe(() => this.removeGraphNode(taskId));
-						} else if (result) {
-							this.updateGraphNode(result.assetComment);
-						}
-
-					}).catch(result => {
-					if (result) {
-						console.error('Error: ', result)
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: TaskEditCreateComponent,
+					data: {
+						taskDetailModel: taskDetailModel
+					},
+					modalConfiguration: {
+						title: '',
+						draggable: true,
+						modalSize: ModalSize.MD
+					}
+				}).subscribe((data: any) => {
+					if (data && data.isDeleted) {
+						const taskId = data.id && data.id.id;
+						return this.taskService.deleteTaskComment(taskId)
+							.subscribe(() => this.removeGraphNode(taskId));
+					} else if (data) {
+						this.updateGraphNode(data.assetComment);
 					}
 				});
-
 			});
 	}
 
@@ -818,14 +835,20 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				.pipe(takeUntil(this.unsubscribe$))
 				.subscribe(res => {
 				if (res.assetClass) {
-					this.dialogService.open(AssetShowComponent,
-						[UIDialogService,
-							{ provide: 'ID', useValue: asset.id },
-							{ provide: 'ASSET', useValue: res.assetClass },
-							{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-						], DIALOG_SIZE.LG).catch(result => {
-						console.error('rejected: ' + result);
-					});
+					this.dialogService.open({
+						componentFactoryResolver: this.componentFactoryResolver,
+						component: AssetShowComponent,
+						data: {
+							id: asset.id,
+							asset: res.assetClass,
+							assetExplorerModule: AssetExplorerModule
+						},
+						modalConfiguration: {
+							title: '',
+							draggable: true,
+							modalSize: ModalSize.MD
+						}
+					}).subscribe();
 				} else {
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
@@ -904,6 +927,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			};
 			this.diagramLayoutService.setFullGraphCache(fullGraph);
 		}
+
 	}
 
 	/**

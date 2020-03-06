@@ -6,7 +6,7 @@ import {
 	OnDestroy,
 	ViewChild,
 	ViewChildren,
-	QueryList
+	QueryList, ComponentFactoryResolver
 } from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {NgForm} from '@angular/forms';
@@ -37,6 +37,8 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {StringUtils} from '../../../../shared/utils/string.utils';
+import {DialogService, ModalSize} from 'tds-component-library';
+import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
 
 declare var jQuery: any;
 
@@ -72,9 +74,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 	public taskViewType: string;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private promptService: UIPromptService,
 		private userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
@@ -104,7 +107,8 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 				this.userPreferenceService.getUserDateFormat(),
 				this.taskManagerService,
 				this.dialogService,
-				this.translatePipe);
+				this.translatePipe,
+				this.componentFactoryResolver);
 
 			this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
 				this.modelHelper.getModelForCreate(this.taskDetailModel)
@@ -362,21 +366,24 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 			duration: this.model.durationParts
 		};
 
-		this.dialogService.extra(DateRangeSelectorComponent,
-			[
-				{provide: UIPromptService, useValue: this.promptService},
-				{provide: DateRangeSelectorModel, useValue: clone(dateModel)}
-			], false, false).then((result: DateRangeSelectorModel) => {
-			if (result) {
-				const {start, end, duration, locked} = result;
-				this.model.estimatedStart = start;
-				this.model.estimatedFinish = end;
-				this.model.durationParts = duration;
-				this.model.locked = locked;
-				this.hasModelChanges = true;
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: DateRangeSelectorComponent,
+			data: {
+				dateRangeSelectorModel: dateModel
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
 			}
-		}).catch(result => {
-			// console.log('Dismissed Dialog');
+		}).subscribe((data: any) => {
+			const {start, end, duration, locked} = data;
+			this.model.estimatedStart = start;
+			this.model.estimatedFinish = end;
+			this.model.durationParts = duration;
+			this.model.locked = locked;
+			this.hasModelChanges = true;
 		});
 	}
 
