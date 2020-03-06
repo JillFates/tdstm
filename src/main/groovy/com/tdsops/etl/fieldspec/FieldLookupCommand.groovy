@@ -31,12 +31,12 @@ class FieldLookupCommand {
      * based on its field label value using {@link ETLProcessor#lookUpFieldDefinition(com.tdsops.etl.ETLDomain, java.lang.String)}
      * If there is not a field label defined it throws a {@link com.tdsops.etl.ETLProcessorException}.
      *
-     * @param field a String field label value
+     * @param labelName a String field label value
      * @return current instance of {@link FieldLookupCommand}
      * @see com.tdsops.etl.ETLFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
      */
-    FieldLookupCommand with(String field) {
-        fieldDefinition = etlProcessor.lookUpFieldDefinition(domain, field)
+    FieldLookupCommand with(String labelName) {
+        fieldDefinition = etlProcessor.lookUpFieldDefinition(domain, labelName)
         return this
     }
 

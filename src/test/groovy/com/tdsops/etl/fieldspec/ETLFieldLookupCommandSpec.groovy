@@ -77,7 +77,7 @@ class ETLFieldLookupCommandSpec extends Specification implements FieldSpecValida
 				    extract 'name' load 'assetName' set name
 				    fieldLookup Device with 'Cost Basis' set costField
 				    extract 'cost' transform with toLong() load costField set cost
-				    find Device by 'assetName' eq name and costField eq cost into 'Id' 
+				    assert costField.wrappedObject == 'custom3'
 				}
 				
 			""".stripIndent())
@@ -90,28 +90,9 @@ class ETLFieldLookupCommandSpec extends Specification implements FieldSpecValida
 
 					assertWith(data[0], RowResult) {
 						errorCount == 0
-						assertWith(fields['assetName'], FieldResult) {
-							value == 'acmevmprod01'
-							originalValue == 'acmevmprod01'
-						}
 						assertWith(fields['custom3'], FieldResult) {
 							value == 1234l
 							originalValue = '1234'
-						}
-						assertWith(fields['id'], FieldResult) {
-							value == null
-							originalValue = null
-						assertWith(find, FindResult){
-							query.size() == 1
-							assertQueryResult(
-								query[0],
-								ETLDomain.Device,
-								[
-									['assetName', FindOperator.eq.name(), 'acmevmprod01'],
-									['custom3', FindOperator.eq.name(), 1234l]
-								]
-							)
-						}
 						}
 					}
 				}
@@ -143,8 +124,6 @@ class ETLFieldLookupCommandSpec extends Specification implements FieldSpecValida
 				iterate {
 				    extract 'name' load 'assetName' set name
 				    fieldLookup Device with 'Invalid Label Name' set costField
-				    extract 'cost' transform with toLong() load costField set cost
-				    find Device by 'assetName' eq name and costField eq cost into 'Id' 
 				}
 				
 			""".stripIndent())
