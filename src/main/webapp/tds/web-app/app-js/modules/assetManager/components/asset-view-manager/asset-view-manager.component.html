@@ -10,7 +10,7 @@
 					<div class="box-body no-padding">
 						<ul class="nav nav-pills nav-stacked">
 							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
-								<a (click)="selectFolder(folder)" href="javascript:void(0)" style="font-size: 18px;">
+								<a (click)="selectFolder(folder)" href="javascript:void(0)">
 									<i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder?.name}}
 									<span class="label label-primary pull-right">{{folder.items.length}}</span>
 								</a>
@@ -60,7 +60,7 @@
 								<tbody *ngIf="selectedFolder">
 									<tr *ngFor="let report of selectedFolder.items | filter:{ name: searchText}">
 										<td class="asset-explorer-td-actions k-custom-command-column">
-											<div class="tds-action-button-set" style="font-size: 18px;">
+											<div class="tds-action-button-set">
 												<tds-button-edit [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
 												    tooltip="Edit View"
 											        (click)="onEditReport(report)">
