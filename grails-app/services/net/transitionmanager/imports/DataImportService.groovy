@@ -184,8 +184,16 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			throw new InvalidParamException('Specified input file not found')
 		}
 
-		JSONObject importJsonData = JsonUtil.parseFile(datasetInpuStream)
-		datasetInpuStream.close()
+		JSONObject importJsonData = null
+		try {
+			importJsonData = JsonUtil.parseFile(datasetInpuStream)
+		} finally {
+			datasetInpuStream.close()
+		}
+
+		if (!importJsonData) {
+			throw new InvalidParamException('Invalid input file not found')
+		}
 
 		// Map which summarizes the results from the import process.
 		Map importResults = [batchesCreated: 0, domains: [], errors: []]
