@@ -71,6 +71,18 @@ export class AssetCommonShow implements OnInit {
 		jQuery('[data-toggle="popover"]').popover();
 	}
 
+	ngAfterContentInit(): void {
+		setTimeout(() => {
+			let tagsDiv = <HTMLElement>document.querySelector('.tags-container');
+			let tableRow = <HTMLElement>document.querySelector('.one-column');
+			let tableRowSiblingWidth = <HTMLElement>(<HTMLElement>document.querySelector('.fit-tags-to-view')).previousSibling;
+			tagsDiv.style.width = (tableRow.offsetWidth - tableRowSiblingWidth.offsetWidth) + 'px';
+			if (this.assetTagUIWrapperService) {
+				this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
+			}
+		}, 500);
+	}
+
 	cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 		jQuery('body').removeClass('modal-open');
@@ -176,14 +188,7 @@ export class AssetCommonShow implements OnInit {
 					currentUserId: this.currentUser.id,
 					data: res,
 					iconsOnly: true,
-					extras: {
-						diagramOpts: {
-							// initialAutoScale: Diagram.UniformToFill,
-							contentAlignment: Spot.Center,
-							allowZoom: false
-						},
-						isExpandable: false
-					}
+					extras: {}
 				}));
 			});
 	}
