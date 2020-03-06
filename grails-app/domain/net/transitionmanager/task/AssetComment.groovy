@@ -638,12 +638,16 @@ class AssetComment {
 			assetType    : assetEntity.assetType,
 			createdBy    : [id: createdBy.id, name: createdBy.toString()],
 			comment      : comment,
+			commentType  : commentType,
+			taskNumber   : taskNumber,
+			status       : status,
 			category     : category,
 			lastUpdated  : lastUpdated,
 			dateCreated  : dateCreated,
 			dateResolved : dateResolved,
 			assignedTo   : assignedTo?.toString() ?: '',
-			isResolved   : dateResolved ? 'Yes' : 'No'
+			isResolved   : dateResolved ? 'Yes' : 'No',
+			isPublished  : isPublished,
 		]
 		return dataMap
 	}
