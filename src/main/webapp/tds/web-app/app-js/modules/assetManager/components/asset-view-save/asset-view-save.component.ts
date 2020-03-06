@@ -184,8 +184,14 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		return this.model.saveAsOption === this.saveAsOptions.OVERRIDE_FOR_ALL.value;
 	}
 
+	/**
+	 * If save as my own view (my view mode) is selected then check for name uniqueness, otherwise form is always valid.
+	 */
 	public isValid(): boolean {
-		return this.model.name && this.model.name.trim() !== '' && this.isUnique;
+		if (this.isSaveInMyViewMode()) {
+			return this.model.name && this.model.name.trim() !== '' && this.isUnique;
+		}
+		return true;
 	}
 
 	public startModel() {
