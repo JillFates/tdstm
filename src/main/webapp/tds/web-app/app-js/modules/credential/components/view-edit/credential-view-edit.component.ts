@@ -39,7 +39,11 @@ import {Observable} from 'rxjs';
             .radio-aligned {
                 margin: 4px 4px 0;
                 vertical-align: top;
-            }
+			}
+
+			.syntax-errors-box {
+				max-height: 200px;
+			}
 
             .label-detail {
                 font-weight: normal;
