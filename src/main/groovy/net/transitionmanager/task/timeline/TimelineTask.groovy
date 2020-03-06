@@ -47,6 +47,7 @@ class TimelineTask {
     String assetType
     AssetClass assetClass
     Boolean isCriticalPath
+    Integer taskSpec
 
     List<TimelineDependency> taskDependencies = []
 
@@ -91,7 +92,8 @@ class TimelineTask {
                 assetEntityId: values[19],
                 assetName: values[20],
                 assetType: values[21],
-                assetClass: values[22]
+                assetClass: values[22],
+                taskSpec: values[23]
         )
     }
 }
