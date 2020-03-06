@@ -1,0 +1,29 @@
+.status-Ready {
+  color: #fff;
+  background: $color-success;
+}
+.status-Started {
+  color: #3c8dbc;
+  background: transparent;
+}
+.status-Hold {
+  color: #585656;
+  background: $color-hold;
+  padding-top: 1px;
+}
+.status-Completed {
+  color: #fff;
+  background: #3c8dbc;
+}
+.status-Pending {
+  color: #898989;
+  background: transparent !important;
+  padding-top: 1px;
+}
+.status-Warning {
+  background: $color-warning;
+}
+.status-Planned {
+  color: #898989;
+  background: #898989 !important;
+}

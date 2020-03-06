@@ -42,9 +42,8 @@
                         <a href="/tdstm/admin/exportAccounts">Export Accounts</a>
                     </li>
                     <li class="divider"></li>
-                    <li class="menu-parent-item">Manage Model Library</li>
-                    <li class="menu-child-item menu-list-manufacturers">
-                        <a href="/tdstm/manufacturer/list">List Manufacturers</a>
+                    <li class="menu-parent-admin-manufacturers menu-list-manufacturers">
+                        <a [routerLink]="['/manufacturer','list']">List Manufacturers</a>
                     </li>
                     <li class="menu-child-item menu-list-models">
                         <a href="/tdstm/model/list">List Models</a>
@@ -145,6 +144,9 @@
                     <li class="divider"></li>
                     <li *ngIf="hasPermission(permission.DepAnalyzerView)" class="menu-child-item menu-parent-assets-dependency-analyzer">
                         <a href="/tdstm/moveBundle/dependencyConsole" class="mmlink">Dependency Analyzer</a>
+                    </li>
+                    <li *ngIf="hasPermission(permission.DepAnalyzerView)" class="menu-child-item menu-parent-assets-dependency-analyzer-clr">
+                        <a [routerLink]="['/asset','dependency-analyzer']">Angular Dependency Analyzer</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ArchitectureView)" class="menu-child-item menu-parent-assets-architecture-graph">
                         <a href="/tdstm/assetEntity/architectureViewer" class="mmlink">Architecture Graph</a>

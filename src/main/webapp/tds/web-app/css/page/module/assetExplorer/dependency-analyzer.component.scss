@@ -1,0 +1,238 @@
+.dependency-analyzer-container {
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  background-color: #fff;
+}
+
+.dependency-analyzer-container.content {
+  padding-top: 5px !important;
+}
+
+.task-graph-diagram-container {
+  width: 100%;
+  flex: 1;
+  margin-left: 0;
+  z-index: 70;
+}
+
+.task-manager-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.task-manager-sub-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  z-index: 79;
+}
+
+.task-graph-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3c8dbc;
+}
+
+.views-btn-group {
+  min-height: 44px;
+}
+
+.task-graph-subheader {
+  min-height: 37px;
+}
+
+.dropdown-z-index {
+  z-index: 5000;
+}
+
+.dependency-analyzer-btn {
+  background-color: #fff !important;
+  border: 1px solid #ddd !important;
+  font-size: 1.2em !important;
+  color: #908f8f !important;
+}
+
+.refresh-container-btn {
+  background-color: #fff !important;
+  border: none;
+  font-size: 1.2em !important;
+  color: #3c8dbc !important;
+}
+
+.highlight-filter-container {
+  display: table;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 0 2px 0 2px;
+}
+
+.highlight-filter-container > .btn {
+  background-color: transparent !important;
+  color: #908f8f !important;
+}
+
+.highlight-filter-control {
+  width: 90%;
+  border: none;
+  display: table-cell !important;
+}
+
+.chk-filter-container {
+  display: table !important;
+}
+
+.task-chk-container {
+  display: table-cell;
+  position: relative;
+  padding-left: 25px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin-left: 0.5em;
+}
+
+.task-chk-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.task-chk-container.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-chk-container input:disabled {
+  cursor: not-allowed;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.task-chk-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.task-chk-container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.task-chk-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.task-chk-container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.v-align-center {
+  vertical-align: middle;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.dependency-analyzer-pie-countdown-container {
+  display: inline-block;
+}
+
+.dependency-analyzer-control-label {
+  margin-right: 3px;
+}
+
+.k-dropdown-10-em {
+  width: 10.4em !important;
+}
+
+.dependency-analyzer-team-highlight {
+  margin-left: 3px !important;
+  margin-bottom: 2px !important;
+}
+
+.k-button[ng-reflect-icon="close-outline"] {
+  border-radius: 15px !important;
+}
+
+.dependency-analyzer-custom-dropdown {
+  width: 70% !important;
+  display: inline-block !important;
+}
+
+.disp-inline-block {
+  display: inline-block;
+}
+
+.disp-table-cell {
+  display: table-cell;
+}
+
+.clear-icon-button {
+  float: right;
+  cursor: pointer;
+}
+
+.k-icon {
+  font-family: "WebComponentsIcons", serif !important;
+}
+
+//#graph-control-btn-group {
+//  position: absolute;
+//  bottom: 40px;
+//  left: 40px;
+//  z-index: 999;
+//}
+
+//#graph-control-btn-group > .btn {
+//  background-color: #dddddd !important;
+//  border-color: #c4d0dc !important;
+//  color: #333333 !important;
+//  width: 100% !important;
+//  padding: 0 .2rem 0 .2rem !important;
+//  min-width: 1.5rem !important;
+//  border-radius: 0.3rem !important;
+//  margin: 0 0 0.05rem 0 !important;
+//}
+//
+//#graph-control-btn-group > .btn:hover {
+//  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
+//}
+//
+//#graph-control-btn-group > .btn:active {
+//  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
+//}
+//
+//#graph-control-btn-group > .btn:focus {
+//  outline: none !important;
+//}

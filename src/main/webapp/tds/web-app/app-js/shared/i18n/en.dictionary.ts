@@ -272,6 +272,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'ARCHITECTURE': {
 		'ARCHITECTURE_GRAPH': 'Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
@@ -287,6 +288,14 @@ export const en_DICTIONARY: Object = {
 		'SAVE_PREFERENCES': 'Save Preferences',
 		'RESET_DEFAULTS': 'Reset Default',
 		'ASSET_CLASSES': 'Asset Classes: '
+	},
+	'DEPENDENCY_ANALYZER': {
+		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_GROUPS': 'Dependency Groups',
+		'REGENERATE': 'Regenerate',
+		'BUNDLE': 'Bundle',
+		'TAGS': 'Tags',
+		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
@@ -525,5 +534,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Applications Grouped by Dependencies',
 		'DEPENDENCIES_BY_VENDOR': 'Dependencies by Vendor',
 		'TOP_TAGS': 'Top Tags'
+	},
+	'MANUFACTURER': {
+		'LIST': 'Manufacturer List'
 	}
 };

@@ -3,7 +3,7 @@ export const STATE_ICONS_PATH = {
 		iconAlt: '\uf1ce',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34zm192-34l-136-136c-9.4-9.4-24.6-9.4-33.9 0l-22.6 22.6c-9.4 9.4-9.4 24.6 0 33.9l96.4 96.4-96.4 96.4c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l136-136c9.4-9.2 9.4-24.4 0-33.8z',
-		color: '#01ab08',
+		color: '#3c8dbc',
 		background: '#ffffff'
 	},
 	// play: '\uf144',
@@ -16,7 +16,7 @@ export const STATE_ICONS_PATH = {
 	},
 	// pause: '\uf28c',
 	pending: {
-		iconAlt: '\uf254',
+		iconAlt: '\uf251',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M360 64c13.255 0 24-10.745 24-24V24c0-13.255-10.745-24-24-24H24C10.745 0 0 10.745 0 24v16c0 13.255 10.745 24 24 24 0 90.965 51.016 167.734 120.842 192C75.016 280.266 24 357.035 24 448c-13.255 0-24 10.745-24 24v16c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24v-16c0-13.255-10.745-24-24-24 0-90.965-51.016-167.734-120.842-192C308.984 231.734 360 154.965 360 64z',
 		color: '#898989',
@@ -42,6 +42,15 @@ export const STATE_ICONS_PATH = {
 		icon: 'F M104 224H24c-13.255 0-24 10.745-24 24v240c0 13.255 10.745 24 24 24h80c13.255 0 24-10.745 24-24V248c0-13.255-10.745-24-24-24zM64 472c-13.255 0-24-10.745-24-24s10.745-24 24-24 24 10.745 24 24-10.745 24-24 24zM384 81.452c0 42.416-25.97 66.208-33.277 94.548h101.723c33.397 0 59.397 27.746 59.553 58.098.084 17.938-7.546 37.249-19.439 49.197l-.11.11c9.836 23.337 8.237 56.037-9.308 79.469 8.681 25.895-.069 57.704-16.382 74.757 4.298 17.598 2.244 32.575-6.148 44.632C440.202 511.587 389.616 512 346.839 512l-2.845-.001c-48.287-.017-87.806-17.598-119.56-31.725-15.957-7.099-36.821-15.887-52.651-16.178-6.54-.12-11.783-5.457-11.783-11.998v-213.77c0-3.2 1.282-6.271 3.558-8.521 39.614-39.144 56.648-80.587 89.117-113.111 14.804-14.832 20.188-37.236 25.393-58.902C282.515 39.293 291.817 0 312 0c24 0 72 8 72 81.452z',
 		color: '#fff',
 		background: '#01ab08'
+	},
+	planned: {
+		name: 'planned',
+		iconAlt: '\uf0c8',
+		// tslint:disable-next-line:max-line-length
+		icon: 'F M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z',
+		color: '#9e9e9e',
+		background: 'transparent',
+		iconName: 'faBox'
 	}
 };
 
@@ -55,14 +64,14 @@ export const ASSET_ICONS_PATH = {
 		background: 'transparent',
 		iconName: 'faBox'
 	},
-	physical: {
-		name: 'physical',
-		iconAlt: '\uf0a0',
+	physicalserver: {
+		name: 'physical server',
+		iconAlt: '\uf233',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M12.41 148.02l232.94 105.67c6.8 3.09 14.49 3.09 21.29 0l232.94-105.67c16.55-7.51 16.55-32.52 0-40.03L266.65 2.31a25.607 25.607 0 0 0-21.29 0L12.41 107.98c-16.55 7.51-16.55 32.53 0 40.04zm487.18 88.28l-58.09-26.33-161.64 73.27c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.51 209.97l-58.1 26.33c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 276.3c16.55-7.5 16.55-32.5 0-40zm0 127.8l-57.87-26.23-161.86 73.37c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.29 337.87 12.41 364.1c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 404.1c16.55-7.5 16.55-32.5 0-40z',
 		color: '#9e9e9e',
 		background: 'transparent',
-		iconName: 'faHdd'
+		iconName: 'faServer'
 	},
 	server: {
 		name: 'server',
@@ -121,7 +130,7 @@ export const ASSET_ICONS_PATH = {
 	// virtual machine
 	vm: {
 		name: 'vm',
-		iconAlt: '\uf108',
+		iconAlt: '\uf233',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M528 0H48C21.5 0 0 21.5 0 48v320c0 26.5 21.5 48 48 48h192l-16 48h-72c-13.3 0-24 10.7-24 24s10.7 24 24 24h272c13.3 0 24-10.7 24-24s-10.7-24-24-24h-72l-16-48h192c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48zm-16 352H64V64h448v288z',
 		color: '#9e9e9e',
@@ -139,15 +148,40 @@ export const ASSET_ICONS_PATH = {
 	},
 	network: {
 		name: 'network',
-		iconAlt: '\uf6ff',
+		iconAlt: '\uf0e8',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M640 264v-16c0-8.84-7.16-16-16-16H344v-40h72c17.67 0 32-14.33 32-32V32c0-17.67-14.33-32-32-32H224c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h72v40H16c-8.84 0-16 7.16-16 16v16c0 8.84 7.16 16 16 16h104v40H64c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h160c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32h-56v-40h304v40h-56c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h160c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32h-56v-40h104c8.84 0 16-7.16 16-16zM256 128V64h128v64H256zm-64 320H96v-64h96v64zm352 0h-96v-64h96v64z',
 		color: '#9e9e9e',
 		background: 'transparent',
+		iconName: 'faSitemap'
+	},
+	logicalstorage: {
+		name: 'storage',
+		iconAlt: '\uf07b',
+		// tslint:disable-next-line:max-line-length
+		icon: 'F M464 128H272l-64-64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48z',
+		color: '#9e9e9e',
+		background: 'transparent',
 		iconName: 'faFolder'
-	}
-	// general: '\uf1b3'
-	// unknown: 'M32 18.451l-16-12.42-16 12.42v-5.064l16-12.42 16 12.42zM28 18v12h-8v-8h-8v8h-8v-12l12-9z'
+	},
+	virtualserver: {
+		name: 'virtual server',
+		iconAlt: '\uf233',
+		// tslint:disable-next-line:max-line-length
+		icon: 'F M464 128H272l-64-64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48z',
+		color: '#9e9e9e',
+		background: 'transparent',
+		iconName: 'faServer'
+	},
+	physicalstorage: {
+		name: 'physical storage',
+		iconAlt: '\uf0a0',
+		// tslint:disable-next-line:max-line-length
+		icon: 'F M464 128H272l-64-64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48z',
+		color: '#9e9e9e',
+		background: 'transparent',
+		iconName: 'faHdd'
+	},
 };
 
 export const CTX_MENU_ICONS_PATH = {
