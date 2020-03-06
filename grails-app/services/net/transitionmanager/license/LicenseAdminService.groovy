@@ -2,6 +2,7 @@ package net.transitionmanager.license
 
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugins.mail.MailService
@@ -273,7 +274,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				licState.type = null
 
 			} else {
-				Date now = new Date()
+				Date now = TimeUtil.nowGMT()
 				long nowTime = now.getTime()
 
 				String currentHost = getHostName()
@@ -422,7 +423,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					if (gracePeriod > 0) {
 						licState.state = State.NONCOMPLIANT
 						licState.message = "The Server count has exceeded the license limit of ${licState.numberOfLicenses} by ${numServers - licState.numberOfLicenses} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
-						licState.valid = false
+						licState.valid = true
 					} else {
 						licState.state = State.UNLICENSED // State.INBREACH
 						licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${licState.numberOfLicenses} to re-enable all application features."
@@ -468,7 +469,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 * @param lastCompliantDate
 	 * @return
 	 */
-	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate, Date now = new Date()){
+	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate, Date now = TimeUtil.nowGMT() ){
 		if ( !lastCompliantDate ) {
 			throwException(LogicException, 'license.admin.lastCompliantDate.expected', 'Last Compliance Date Expected')
 		}
@@ -574,8 +575,8 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 		license.max = licObj.numberOfLicenses
 		license.bannerMessage = bannerMessage
 
-		license.activationDate = new Date(licObj.goodAfterDate)
-		license.expirationDate = new Date(licObj.goodBeforeDate)
+		license.activationDate = TimeUtil.roundedDate(licObj.goodAfterDate)
+		license.expirationDate = TimeUtil.roundedDate(licObj.goodBeforeDate)
 
 		log.debug("license.activationDate: {}", license.activationDate)
 		log.debug("license.expirationDate: {}", license.expirationDate)
