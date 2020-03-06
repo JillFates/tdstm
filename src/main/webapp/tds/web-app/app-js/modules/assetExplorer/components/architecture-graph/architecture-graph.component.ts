@@ -385,10 +385,11 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
-		this.graph.showFullGraphBtn = false;
 		if (this.assetId) {
 			this.loadData();
 		}
+		this.graph.showFullGraphBtn = false;
+		this.graph.nodeMove = false;
 	}
 
 	/**
