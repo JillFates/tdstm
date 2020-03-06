@@ -7,7 +7,6 @@ import {AssetExplorerService} from '../../../assetManager/service/asset-explorer
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
-import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {WindowService} from '../../../../shared/services/window.service';
 // Component
 import { DependecyService } from '../../service/dependecy.service';
@@ -29,8 +28,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			windowService: WindowService,
-			architectureGraphService: ArchitectureGraphService,
-			assetTagUIWrapperService: AssetTagUIWrapperService
+			architectureGraphService: ArchitectureGraphService
 			) {
 				super(
 					componentFactoryResolver,
@@ -41,8 +39,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 					userContextService,
 					windowService,
 					architectureGraphService,
-					parentDialog,
-					assetTagUIWrapperService
+					parentDialog
 				);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;

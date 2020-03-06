@@ -31,6 +31,7 @@ import {AssetExplorerService} from '../../../assetManager/service/asset-explorer
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
+import {DOMAIN} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `tds-asset-all-show`,
@@ -68,7 +69,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 			icon: 'pencil',
 			show: () => this.isEditAvailable(),
 			type: DialogButtonType.ACTION,
-			action: this.showAssetEditView.bind(this)
+			action: this.showAssetEditView.bind(this, this.data.assetId, this.asset)
 		});
 
 		this.buttons.push({
@@ -151,7 +152,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 	/**
 	 * Open same Model in Edit Mode
 	 */
-	private showAssetEditView(): void {
+	private showAssetEditView(assetId: any, assetClass: any): void {
 		// Close View and Open Edit
 		this.onCancelClose();
 
@@ -159,8 +160,8 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: AssetEditComponent,
 			data: {
-				assetId: this.modelId,
-				assetClass: this.asset
+				assetId: assetId,
+				assetClass: assetClass
 			},
 			modalConfiguration: {
 				title: '', // data['common_assetName'] + ' ' + data['common_moveBundle'],
@@ -191,21 +192,33 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 				modalSize: ModalSize.MD
 			}
 		}).subscribe((data: any) => {
-			// Close Current View and Open/Edit depending the context
-			this.onCancelClose();
-			// if (data.clonedAsset && data.showEditView) {
-			// 	const componentParameters = [
-			// 		{ provide: 'ID', useValue: data.assetId },
-			// 		{ provide: 'ASSET', useValue: DOMAIN.APPLICATION }
-			// 	];
-			//
-			// 	this.dialogService
-			// 		.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
-			// } else if (!data.clonedAsset && data.showView) {
-			// 	this.showAssetDetailView(DOMAIN.APPLICATION, data.assetId);
-			// }
+			if (data.clonedAsset && data.showEditView) {
+				this.showAssetEditView(data.assetId, DOMAIN.APPLICATION);
+			} else if (!data.clonedAsset && data.showView) {
+				this.showAssetDetailView(DOMAIN.APPLICATION, data.assetId);
+			}
 		});
 
+	}
+
+	protected showAssetDetailView(assetClass: string, id: number) {
+		// Close View and Open Edit
+		this.onCancelClose();
+
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: id,
+				assetClass: assetClass
+			},
+			modalConfiguration: {
+				title: '', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe();
 	}
 
 	/**

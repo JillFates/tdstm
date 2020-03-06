@@ -10,7 +10,6 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {DialogService} from 'tds-component-library';
-import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 export function DatabaseShowComponent(template, modelId: number, metadata: any, parentDialog: any) {
 	@Component({
@@ -26,8 +25,7 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any, 
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			windowService: WindowService,
-			architectureGraphService: ArchitectureGraphService,
-			assetTagUIWrapperService: AssetTagUIWrapperService
+			architectureGraphService: ArchitectureGraphService
 		) {
 			super(
 				componentFactoryResolver,
@@ -38,8 +36,7 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any, 
 				userContextService,
 				windowService,
 				architectureGraphService,
-				parentDialog,
-				assetTagUIWrapperService
+				parentDialog
 			);
 			this.mainAsset = modelId;
 			this.assetTags = metadata.assetTags;

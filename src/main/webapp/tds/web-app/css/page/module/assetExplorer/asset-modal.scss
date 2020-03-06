@@ -249,43 +249,21 @@
       }
     }
 
-    .fit-tags-to-view {
-        height: 30px;
-      .tags-container {
-        height: 25px;
-        overflow: hidden;
-      }
-      .dots-for-tags {
-        display: inline-block;
-        margin: 2px;
-        vertical-align: baseline;
-        text-align: center;
-        width: auto;
-        font-weight: 600;
-        font-size: 11px;
-        padding-right: 30px;
-      }
-      &:hover {
-      .tags-container {
-        height: auto;
-        overflow: unset;
-      }
-      .label.tag {
-        margin-bottom: 3px;
-        width: auto;
-        display: inline-block;
-      }
-      .dots-for-tags {
-        display: none;
-        padding-right: 10px;
-      }
-      }
+    /* TAGS ----------------- START */
+    .tag-list-edit,
+    .tag-list-view {
+      display: block;
     }
 
-    // tds-diagram-layout styling in body
-    .modal-body-graph {
-      min-height: 300px;
-      border: 1px solid #ddd;
+    .fit-tags-to-view {
+      overflow: hidden;
+      display: inline-block;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      &:hover {
+        overflow: unset;
+        white-space: unset;
+      }
     }
 
     .tag + .tag {
@@ -293,12 +271,23 @@
     }
 
     .label.tag {
+      padding: 5px 7px;
+      font-size: 11px;
+      font-weight: 600;
+      margin: 2px;
       border-radius: 2px;
+      height: 20px;
+      line-height: 10px;
       border: 0;
-      font-weight: 500;
-      margin-bottom: 3px;
       width: auto;
       display: inline-block;
+    }
+    /* TAGS ----------------- END */
+
+    // tds-diagram-layout styling in body
+    .modal-body-graph {
+      min-height: 300px;
+      border: 1px solid #ddd;
     }
 
   }

@@ -26,8 +26,7 @@ export function StorageShowComponent(template, modelId: number, metadata: any, p
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			windowService: WindowService,
-			architectureGraphService: ArchitectureGraphService,
-			assetTagUIWrapperService: AssetTagUIWrapperService
+			architectureGraphService: ArchitectureGraphService
 		) {
 			super(
 				componentFactoryResolver,
@@ -38,8 +37,7 @@ export function StorageShowComponent(template, modelId: number, metadata: any, p
 				userContextService,
 				windowService,
 				architectureGraphService,
-				parentDialog,
-				assetTagUIWrapperService
+				parentDialog
 			);
 			this.mainAsset = modelId;
 			this.assetTags = metadata.assetTags;

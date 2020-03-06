@@ -1,5 +1,5 @@
 // Angular
-import {OnInit, AfterContentInit, ComponentFactoryResolver} from '@angular/core';
+import {OnInit, ComponentFactoryResolver} from '@angular/core';
 // Service
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {DependecyService} from '../../service/dependecy.service';
@@ -7,7 +7,6 @@ import {AssetExplorerService} from '../../../assetManager/service/asset-explorer
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
-import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
 // Model
 import {TagModel} from '../../../assetTags/model/tag.model';
@@ -20,11 +19,11 @@ import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.com
 import {AssetCommonHelper} from './asset-common-helper';
 // Other
 import {ReplaySubject} from 'rxjs';
-import {Layout, Link, Spot} from 'gojs';
+import {Layout, Link} from 'gojs';
 
 declare var jQuery: any;
 
-export class AssetCommonShow implements OnInit, AfterContentInit {
+export class AssetCommonShow implements OnInit {
 
 	protected userDateFormat: string;
 	protected userTimeZone: string;
@@ -49,8 +48,7 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 		protected userContextService: UserContextService,
 		protected windowService: WindowService,
 		protected architectureGraphService: ArchitectureGraphService,
-		private parentDialog: any,
-		private assetTagUIWrapperService?: AssetTagUIWrapperService
+		private parentDialog: any
 	) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
@@ -66,16 +64,6 @@ export class AssetCommonShow implements OnInit, AfterContentInit {
 	 */
 	ngOnInit(): void {
 		jQuery('[data-toggle="popover"]').popover();
-	}
-
-	ngAfterContentInit(): void {
-		setTimeout(() => {
-			let tagsDiv = <HTMLElement>document.querySelector('.tags-container');
-			let tableRow = <HTMLElement>document.querySelector('.one-column');
-			let tableRowSiblingWidth = <HTMLElement>(<HTMLElement>document.querySelector('.fit-tags-to-view')).previousSibling;
-			tagsDiv.style.width = (tableRow.offsetWidth - tableRowSiblingWidth.offsetWidth) + 'px';
-			this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
-		}, 500);
 	}
 
 	/***

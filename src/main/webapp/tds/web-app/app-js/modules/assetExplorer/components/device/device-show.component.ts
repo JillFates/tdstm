@@ -45,8 +45,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any, pa
 			userContextService: UserContextService,
 			private permissionService: PermissionService,
 			windowService: WindowService,
-			architectureGraphService: ArchitectureGraphService,
-			assetTagUIWrapperService: AssetTagUIWrapperService
+			architectureGraphService: ArchitectureGraphService
 		) {
 			super(
 				componentFactoryResolver,
@@ -57,8 +56,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any, pa
 				userContextService,
 				windowService,
 				architectureGraphService,
-				parentDialog,
-				assetTagUIWrapperService
+				parentDialog
 			);
 			this.mainAsset = modelId;
 			this.assetTags = metadata.assetTags;
