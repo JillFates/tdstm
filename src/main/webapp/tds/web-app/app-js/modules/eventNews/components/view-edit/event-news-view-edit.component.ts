@@ -140,7 +140,7 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	 * Create Edit a Provider
 	 */
 	protected onSaveEventNews(): void {
-		if (this.eventNewsModel.newsId !== null) {
+		if (this.eventNewsModel.newsId) {
 			this.eventsService.updateNews(this.eventNewsModel).subscribe(
 				(result: any) => {
 					this.onAcceptSuccess(result);

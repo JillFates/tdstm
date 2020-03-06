@@ -221,7 +221,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			return
 		}
 
-		MoveEventNews men = newsEditorService.save(project, NumberUtil.toLong(newsParams.moveEventId), newsParams.comment.toString(), newsParams.resolution.toString(), isArchived)
+		MoveEventNews men = newsEditorService.save(project, NumberUtil.toLong(newsParams.moveEventId), newsParams.comment, newsParams.resolution, isArchived)
         renderSuccessJson(men)
 	}
 
@@ -243,7 +243,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			return
 		}
 
-		MoveEventNews men = newsEditorService.update(project, NumberUtil.toLong(newsParams.newsId), newsParams.comment.toString(), newsParams.resolution.toString(), isArchived)
+		MoveEventNews men = newsEditorService.update(project, NumberUtil.toLong(newsParams.newsId), newsParams.comment, newsParams.resolution, isArchived)
         renderSuccessJson(men)
 	}
 
