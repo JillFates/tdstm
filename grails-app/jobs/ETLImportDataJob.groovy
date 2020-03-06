@@ -9,7 +9,7 @@ import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 
 /**
- * Cron job to execute {@link DataImportService#loadETLResultsIntoAutoProcessImportBatch(net.transitionmanager.project.Project, net.transitionmanager.security.UserLogin, com.tdsops.etl.ETLProcessorResult, java.lang.Boolean)}
+ * Cron job to execute {@link DataImportService#loadETLJsonIntoImportBatch(net.transitionmanager.project.Project, net.transitionmanager.security.UserLogin, java.lang.String)}
  *
  * Taking parameters from {@link net.transitionmanager.asset.WsAssetImportController#loadData(java.lang.String)} it initializes the import process.
  */

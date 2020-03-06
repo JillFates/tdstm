@@ -225,7 +225,7 @@ class AssetEntity {
 		application nullable: true, size: 0..255
 		assetName blank: false, size: 0..255
 		shortName nullable: true, size: 0..255
-		assetType nullable: true, size: 0..255
+		assetType nullable: true, size: 0..255, validator: assetTypeValidator()
 		priority nullable: true, validator: inList(optionsClosure(PRIORITY_OPTION), 'priority')
 		planStatus nullable: true, validator: inList(optionsClosure(STATUS_OPTION), 'planStatus')
 		purchaseDate nullable: true
@@ -323,6 +323,18 @@ class AssetEntity {
 
 	String toString() {
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
+	}
+
+	/**
+	 * Used to set the model object on the device and will automatically copy the model.assetType into the device
+	 * assetType filed to keep the two consistent.
+	 * @param model - the model object to set
+	 */
+	void setModel(Model model) {
+		this.model = model
+		if (model) {
+			this.assetType = model.assetType
+		}
 	}
 
 	/*
@@ -513,4 +525,18 @@ class AssetEntity {
 		AssetEntity clonedAsset = GormUtil.cloneDomain(this, replaceKeys) as AssetEntity
 		return clonedAsset
 	}
+
+	/*
+	 * the validator for the assetType field that will assure that the device.assetType == device.model.assetType
+	 */
+	static Closure assetTypeValidator() {
+		return { value, AssetEntity domainObject ->
+			if (domainObject.model && domainObject.model.assetType != value) {
+				return 'assetEntity.validation.assetType.conflict'
+			}
+
+			return true
+		}
+	}
+
 }

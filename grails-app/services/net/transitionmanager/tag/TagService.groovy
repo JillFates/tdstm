@@ -5,7 +5,6 @@ import grails.gorm.transactions.Transactional
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
-
 /**
  * A service for dealing with tags
  */
@@ -294,7 +293,7 @@ class TagService implements ServiceMethods {
 	 */
 	String getTagSelect(List<Long> tagIds) {
 		if (tagIds) {
-			return ",COALESCE(group_concat(t.tag_id),'') as tags"
+			return "group_concat(distinct COALESCE(ta.tag_id, 0)) as tags"
 		}
 
 		return ''
@@ -316,7 +315,7 @@ class TagService implements ServiceMethods {
 
 		if (tagMatch == 'ANY') {
 			queryParams.tagIds = tagIds
-			return "AND t.tag_id in (:tagIds)"
+			return "AND ta.tag_id in (:tagIds)"
 
 		} else {
 			queryParams.tagIds = tagIds
@@ -339,7 +338,6 @@ class TagService implements ServiceMethods {
 		if (tagIds && tagMatch == 'ANY') {
 			return """
 					LEFT OUTER JOIN tag_asset ta ON a.asset_entity_id = ta.asset_id
-					LEFT OUTER JOIN tag t ON ta.tag_id = t.tag_id
 				"""
 		}
 

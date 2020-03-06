@@ -19,9 +19,11 @@ import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
@@ -46,6 +48,7 @@ class WsAssetController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	AssetService assetService
 	CommentService commentService
+	CustomDomainService customDomainService
 	ControllerService controllerService
 	DatabaseService databaseService
 	DeviceService deviceService
@@ -54,6 +57,7 @@ class WsAssetController implements ControllerMethods {
 	ProgressService progressService
 	Scheduler quartzScheduler
 	StorageService storageService
+	PartyRelationshipService partyRelationshipService
 	UserPreferenceService userPreferenceService
 
 	/**
@@ -350,7 +354,8 @@ class WsAssetController implements ControllerMethods {
 			model.modelName = model.asset.model.modelName;
 		}
 
-
+		Project project = projectForWs
+		model.personList = partyRelationshipService.getProjectApplicationStaff(project)
 
 		String domainName = AssetClass.getDomainForAssetType(model.asset.assetClass.toString())
 		if (mode == 'show') {
@@ -369,7 +374,16 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def getDefaultCreateModel(String assetClass) {
-		renderAsJson( assetService.getCreateModel(getProjectForWs(), assetClass) )
+		Project project = projectForWs
+		Map model = assetService.getCreateModel(getProjectForWs(), assetClass)
+
+		// Add the custom field specs to the model
+		model.put('customs', assetEntityService.getCustomFieldsSettings(project, assetClass, true) )
+
+		// Add the standardFieldASpecs to the model
+		assetService.addFieldSpecsToCrudModel(project, assetClass, model)
+
+		renderAsJson( model )
 	}
 
 	/**
