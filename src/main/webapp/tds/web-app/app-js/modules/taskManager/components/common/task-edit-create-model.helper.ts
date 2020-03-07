@@ -9,7 +9,7 @@ import {SingleNoteModel} from '../../../assetExplorer/components/single-note/mod
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskService} from '../../service/task.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {DialogService, ModalSize} from 'tds-component-library';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
 import {TaskDetailComponent} from '../detail/task-detail.component';
 import {ComponentFactoryResolver} from '@angular/core';
 
@@ -749,16 +749,18 @@ export class TaskEditCreateModelHelper {
 					singleNoteModel: singleNoteModel
 				},
 				modalConfiguration: {
-					title: '',
+					title: 'Note Create',
 					draggable: true,
 					modalSize: ModalSize.MD
 				}
 			}).subscribe((data: any) => {
-				this.createNote(this.model.id, data)
-					.subscribe((result) => {
-						console.log('The result is:', result);
-						observer.next(result);
-					});
+				if (data.status === DialogExit.ACCEPT) {
+					this.createNote(this.model.id, data.note)
+						.subscribe((result) => {
+							console.log('The result is:', result);
+							observer.next(result);
+						});
+				}
 			});
 		});
 	}

@@ -1,37 +1,47 @@
-import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
-import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
-import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver, Input, OnInit} from '@angular/core';
+// Model
+import { ModalType} from '../../../../shared/model/constants';
 import {TaskDetailModel} from '../../model/task-detail.model';
-import {TaskService} from '../../service/task.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
 import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/model/task-notes-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
+import {AlertType} from '../../../../shared/model/alert.model';
+import { UserContextModel } from '../../../auth/model/user-context.model';
+import { TaskActionInfoModel } from '../../model/task-action-info.model';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
+// Component
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
+// Service
+import {TaskService} from '../../service/task.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {WindowService} from '../../../../shared/services/window.service';
-import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
-import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
-import { TaskActionInfoModel } from '../../model/task-action-info.model';
-import {DialogService, ModalSize} from 'tds-component-library';
+import * as R from 'ramda';
 
 @Component({
 	selector: `task-detail`,
 	templateUrl: 'task-detail.component.html',
 	styles: []
 })
-export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
+export class TaskDetailComponent extends Dialog  implements OnInit {
+	@Input() data: any;
 
 	protected modalType = ModalType;
 	protected dateFormat: string;
@@ -48,34 +58,57 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	protected hasCookbookPermission = false;
 	public hasEditTaskPermission = false;
 	public hasDeleteTaskPermission = false;
-	public modalOptions: DecoratorOptions;
 	public model: any = {};
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
 	taskActionInfoModel: TaskActionInfoModel;
+	private taskDetailModel: TaskDetailModel;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
-		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,
 		private dialogService: DialogService,
-		private promptService: UIPromptService,
 		private userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private windowService: WindowService,
 		private notifierService: NotifierService,
 		private userContextService: UserContextService) {
+		super();
 
-		super('#task-detail-component');
-		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
 	}
 
 	ngOnInit() {
+		this.taskDetailModel = R.clone(this.data.taskDetailModel);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.hasEditTaskPermission,
+			type: DialogButtonType.ACTION,
+			action: this.editTaskDetail.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.hasDeleteTaskPermission,
+			type: DialogButtonType.ACTION,
+			action: this.deleteTask.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
 		this.hasChanges = false;
 		this.dateFormat = this.userPreferenceService.getUserDateFormat();
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
@@ -89,6 +122,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
+
+		setTimeout(() => {
+			this.setTitle(this.taskDetailModel.modal.title);
+		});
 	}
 
 	/**
@@ -98,7 +135,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		this.taskManagerService.getTaskDetails(this.taskDetailModel.id)
 			.subscribe((res) => {
 				if (!res) {
-					this.dismiss();
+					super.onCancelClose();
 					return;
 				}
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
@@ -146,7 +183,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * @param task
 	 */
 	public openTaskDetail(task: any, modalType: ModalType): void {
-		this.close({commentInstance: {...task, id: task.taskId}, shouldOpenTask: true});
+		super.onCancelClose({commentInstance: {...task, id: task.taskId}, shouldOpenTask: true});
 	}
 
 	public onCollapseTaskDetail(): void {
@@ -157,21 +194,24 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Close Dialog
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss(this.hasChanges);
+		super.onCancelClose({hasChanges: this.hasChanges});
 	}
 	/**
 	 * Prompt confirm delete a task
 	 * delegate operation to host component
 	 */
 	deleteTask(): void {
-		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRM')	,
-			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
-			this.translatePipe.transform('GLOBAL.CONFIRM'),
-			this.translatePipe.transform('GLOBAL.CANCEL'))
-			.then(result => {
-				if (result) {
-					this.close({id: this.taskDetailModel, isDeleted: true})
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+			),
+			this.translatePipe.transform(
+				'TASK_MANAGER.DELETE_TASK'
+			)
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					super.onCancelClose({id: this.taskDetailModel, isDeleted: true})
 				}
 			});
 	}
@@ -179,7 +219,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Open view to edit task details
 	 */
 	public editTaskDetail(): void {
-		this.close({id: this.taskDetailModel, shouldEdit: true});
+		super.onCancelClose({id: this.taskDetailModel, shouldEdit: true});
 	}
 
 	/**
@@ -267,20 +307,21 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		const assetClass = this.taskManagerService.getAssetCategory(this.model.assetClass.id);
 
 		if (assetClass) {
+			super.onCancelClose();
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
 				component: AssetShowComponent,
 				data: {
-					id: id,
-					asset: assetClass
+					assetId: id,
+					assetClass: assetClass
 				},
 				modalConfiguration: {
-					title: '',
+					title: 'TODO:',
 					draggable: true,
-					modalSize: ModalSize.MD
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
 				}
 			}).subscribe();
-			this.close();
 		} else {
 			this.notifierService.broadcast({
 				name: AlertType.DANGER,
@@ -318,32 +359,35 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				taskDetailModel: taskCreateModel
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Create Task',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
 		}).subscribe((data: any) => {
-			const task = {
-				category: data.assetComment.category,
-				desc: data.assetComment.comment,
-				id: data.assetComment.id,
-				model: {
+			if (data.status === DialogExit.ACCEPT) {
+				const task = {
+					category: data.assetComment.category,
+					desc: data.assetComment.comment,
 					id: data.assetComment.id,
-					text: data.assetComment.comment
-				},
-				originalId: '',
-				status: data.assetComment.status,
-				taskId: data.assetComment.id,
-				taskNumber: data.assetComment.taskNumber
-			};
+					model: {
+						id: data.assetComment.id,
+						text: data.assetComment.comment
+					},
+					originalId: '',
+					status: data.assetComment.status,
+					taskId: data.assetComment.id,
+					taskNumber: data.assetComment.taskNumber
+				};
 
-			taskList.unshift(task);
-			gridHelper.addDataItem(task);
-			console.log('Reloading');
-			const payload = this.modelHelper.getPayloadForUpdate();
+				taskList.unshift(task);
+				gridHelper.addDataItem(task);
+				console.log('Reloading');
+				const payload = this.modelHelper.getPayloadForUpdate();
 
-			this.taskManagerService.updateTask(payload)
-				.subscribe((result) => this.loadTaskDetail());
+				this.taskManagerService.updateTask(payload)
+					.subscribe((result) => this.loadTaskDetail());
+			}
 		});
 	}
 
@@ -373,10 +417,17 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				taskDetailModel: this.taskDetailModel
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Task',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.LG
 			}
 		}).subscribe();
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

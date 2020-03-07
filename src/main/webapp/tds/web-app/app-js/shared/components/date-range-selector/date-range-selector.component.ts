@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {Component, OnInit, ChangeDetectionStrategy, Input} from '@angular/core';
 
 import {UIExtraDialog} from '../../services/ui-dialog.service';
 import { UIPromptService} from '../../directives/ui-prompt.directive';
@@ -7,119 +7,125 @@ import {DateRangeSelectorModel} from './model/date-range-selector.model';
 import {DateUtils} from '../../utils/date.utils';
 import { SelectionRange } from '@progress/kendo-angular-dateinputs';
 import {TranslatePipe} from '../../pipes/translate.pipe';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import * as R from 'ramda';
 
 declare var jQuery: any;
 @Component({
 	selector: 'tds-date-range-selector',
 	template: `
-        <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in date-range-selector-component" id="date-range-selector-component" data-backdrop="static" tabindex="0" role="dialog">
-            <div class="modal-dialog modal-md" role="document">
-                <div class="tds-modal-content with-box-shadow tds-angular-component-content" tds-ui-modal-decorator=""
-                     [options]="modalOptions">
-                    <div class="modal-header">
-						<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
-							<clr-icon aria-hidden="true" shape="close"></clr-icon>
-						</button>
-                        <h4 class="modal-title">{{getTitle()}}</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-body-container">
-                            <form name="dateRangeSelectorForm" role="form" data-toggle="validator" #dateRangeSelectorForm='ngForm' class="form-horizontal left-alignment">
-                                <div>
-                                    <div class="times-container">
-                                        <div class="times-section">
-																					<!---->
-                                            <kendo-dateinput
-																										(valueChange)="onDateChanged('start', $event)"
-                                                    [format]="this.model.dateFormat +' '+this.model.timeFormat"
-                                                    [(value)]="model.start"></kendo-dateinput>
-                                        </div>
-                                        <div class="times-section">
-																					<!---->
-                                            <kendo-dateinput
-																							(valueChange)="onDateChanged('end', $event)"
-																										[disabled]="model.locked"
-                                                    [format]="this.model.dateFormat +' '+this.model.timeFormat"
-                                                    [(value)]="model.end"></kendo-dateinput>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <kendo-multiviewcalendar
-                                                [(activeRangeEnd)]="activeRangeEnd"
-                                                (selectionRangeChange)="handleSelectionRange($event)"
-                                                kendoDateRangeSelection [selectionRange]="model"></kendo-multiviewcalendar>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="duration-controls">
-                                        <div class="duration-value"><label>Estimated duration</label></div>
-                                        <div class="duration-value">
-                                            <input type="number"
-                                                   min="0"
-                                                   (change)="onChangeDuration('days')"
-                                                   [(ngModel)]="model.duration.days" name="durationDays" id="durationDays" >
-                                            <label class="label-part" for="durationDays">Days</label>
-                                        </div>
-                                        <div  class="duration-value">
-                                            <input type="number"
-                                                   min="0"
-                                                   (change)="onChangeDuration('hours')"
-                                                   [(ngModel)]="model.duration.hours" name="durationHours" id="durationHours" >
-                                            <label class="label-part" for="durationHours">Hours</label>
-                                        </div>
-                                        <div  class="duration-value">
-                                            <input type="number"
-                                                   min="0"
-                                                   (change)="onChangeDuration('minutes')"
-                                                   [(ngModel)]="model.duration.minutes" name="durationMinutes" id="durationMinutes" >
-                                            <label class="label-part" for="durationMinutes">Minutes</label>
-                                        </div>
-                                        <label data-toggle="popover"
-                                               data-trigger="hover"
-                                               class="duration-value label-part"
-                                               data-container="body"
-                                               data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
-                                            <i class="fa fa-fw  lock-state"
-                                               [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
-                                               (click)="model.locked = !model.locked">
-                                            </i>
-                                        </label>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="modal-footer form-group-center">
-						<tds-button-save theme="primary" [disabled]="!canSave()" (click)="save()">Save</tds-button-save>
-						<tds-button-cancel (click)="cancelCloseDialog()">Cancel</tds-button-cancel>
-                    </div>
-                </div>
-            </div>
+        <div class="date-range-selector-component">
+			<form name="dateRangeSelectorForm" role="form" data-toggle="validator" #dateRangeSelectorForm='ngForm' class="form-horizontal left-alignment">
+				<div>
+					<div class="times-container">
+						<div class="times-section">
+																	<!---->
+							<kendo-dateinput
+																						(valueChange)="onDateChanged('start', $event)"
+									[format]="this.model.dateFormat +' '+this.model.timeFormat"
+									[(value)]="model.start"></kendo-dateinput>
+						</div>
+						<div class="times-section">
+																	<!---->
+							<kendo-dateinput
+																			(valueChange)="onDateChanged('end', $event)"
+																						[disabled]="model.locked"
+									[format]="this.model.dateFormat +' '+this.model.timeFormat"
+									[(value)]="model.end"></kendo-dateinput>
+						</div>
+					</div>
+					<div>
+						<kendo-multiviewcalendar
+								[(activeRangeEnd)]="activeRangeEnd"
+								(selectionRangeChange)="handleSelectionRange($event)"
+								kendoDateRangeSelection [selectionRange]="model"></kendo-multiviewcalendar>
+					</div>
+				</div>
+				<div>
+					<div class="duration-controls">
+						<div class="duration-value"><label>Estimated duration</label></div>
+						<div class="duration-value">
+							<input type="number"
+								   min="0"
+								   (change)="onChangeDuration('days')"
+								   [(ngModel)]="model.duration.days" name="durationDays" id="durationDays" >
+							<label class="label-part" for="durationDays">Days</label>
+						</div>
+						<div  class="duration-value">
+							<input type="number"
+								   min="0"
+								   (change)="onChangeDuration('hours')"
+								   [(ngModel)]="model.duration.hours" name="durationHours" id="durationHours" >
+							<label class="label-part" for="durationHours">Hours</label>
+						</div>
+						<div  class="duration-value">
+							<input type="number"
+								   min="0"
+								   (change)="onChangeDuration('minutes')"
+								   [(ngModel)]="model.duration.minutes" name="durationMinutes" id="durationMinutes" >
+							<label class="label-part" for="durationMinutes">Minutes</label>
+						</div>
+						<label data-toggle="popover"
+							   data-trigger="hover"
+							   class="duration-value label-part"
+							   data-container="body"
+							   data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
+							<i class="fa fa-fw  lock-state"
+							   [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
+							   (click)="model.locked = !model.locked">
+							</i>
+						</label>
+					</div>
+				</div>
+			</form>
         </div>
 	`,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnInit {
+export class DateRangeSelectorComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
+	public model: DateRangeSelectorModel;
 	dataSignature: string;
-	title: string;
-	modalOptions: DecoratorOptions;
 	activeRangeEnd = 'start';
 
 	constructor(
-		public model: DateRangeSelectorModel,
-		private promptService: UIPromptService,
+		private dialogService: DialogService,
 		private translatePipe: TranslatePipe) {
-
-		super('#date-range-selector-component');
-		this.modalOptions = { isDraggable: true, isResizable: false, isCentered: false };
+		super();
 	}
 
 	ngOnInit() {
+		this.model = R.clone(this.data.dateRangeSelectorModel);
 		this.dataSignature = JSON.stringify(this.model);
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			text: 'Save',
+			show: () => true,
+			disabled: () => !this.canSave(),
+			type: DialogButtonType.CONTEXT,
+			action: this.save.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			text: 'Cancel',
+			show: () => true,
+			type: DialogButtonType.CONTEXT,
+			action: this.cancelCloseDialog.bind(this)
+		})
+
 		jQuery('[data-toggle="popover"]')
 			.popover({
 				container: 'body'
 			});
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
 	}
 	/**
 	 * Verify the Object has not changed
@@ -151,7 +157,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	 * Save the changes
 	 */
 	save(): void {
-		this.close(this.model);
+		this.onAcceptSuccess(this.model);
 	}
 
 	/**
@@ -159,20 +165,21 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
-
-			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')	,
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'))
-				.then(confirm => {
-					if (confirm) {
-						this.dismiss();
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
+				)
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.dismiss();
+			super.onCancelClose();
 		}
 	}
 
@@ -273,9 +280,9 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	/**
 	 * Based upon current activeRangeEnd value display the window title
-	 * @returns {void}
+	 * @returns {string}
 	 */
-	getTitle(): string {
+	getModalTitle(): string {
 		const startMessage = this.translatePipe.transform('TASK_MANAGER.EDIT.SELECT_START_DATE');
 		const endMessage = this.translatePipe.transform('TASK_MANAGER.EDIT.SELECT_END_DATE');
 
@@ -285,4 +292,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		return this.activeRangeEnd === 'start' ? startMessage : endMessage;
 	}
 
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
 }

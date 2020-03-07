@@ -300,12 +300,13 @@ export class TaskCommentComponent implements OnInit {
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: TaskEditCreateComponent,
 			data: {
-				taskCreateModel: taskCreateModel
+				taskDetailModel: taskCreateModel
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Task',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
 		}).subscribe((data: any) => {
 			this.createDataGrids();
@@ -334,9 +335,10 @@ export class TaskCommentComponent implements OnInit {
 				taskDetailModel: taskDetailModel
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Task',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
 		}).subscribe((data: any) => {
 			if (data.isDeleted) {
@@ -395,9 +397,10 @@ export class TaskCommentComponent implements OnInit {
 						taskDetailModel: model
 					},
 					modalConfiguration: {
-						title: '',
+						title: 'Task',
 						draggable: true,
-						modalSize: ModalSize.MD
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
 					}
 				}).subscribe((data: any) => {
 					if (data.isDeleted) {
