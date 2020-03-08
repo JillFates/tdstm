@@ -1,52 +1,55 @@
-import { ActivatedRoute } from '@angular/router';
+// Angular
+import {ActivatedRoute} from '@angular/router';
 import {Component, ComponentFactoryResolver, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
-import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
-import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
-import { Observable } from 'rxjs/Observable';
-import { map } from 'rxjs/operators';
-import {pathOr} from 'ramda';
-import {
-	CellClickEvent,
-	DetailCollapseEvent,
-	DetailExpandEvent,
-	GridComponent,
-	GridDataResult, PageChangeEvent
-} from '@progress/kendo-angular-grid';
-import { ReportsService } from '../../../reports/service/reports.service';
-import { TaskService } from '../../service/task.service';
+// Model
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS, LOADER_IDLE_PERIOD,
 	ModalType
 } from '../../../../shared/model/constants';
-import { forkJoin } from 'rxjs';
-import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
-import { ColumnMenuService } from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
-import { SortUtils } from '../../../../shared/utils/sort.utils';
-import { taskListColumnsModel } from '../../model/task-list-columns.model';
-import { TaskDetailModel } from '../../model/task-detail.model';
-import { TaskDetailComponent } from '../detail/task-detail.component';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { ObjectUtils } from '../../../../shared/utils/object.utils';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { clone, hasIn } from 'ramda';
-import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
-import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
-import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
-import {DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { Store } from '@ngxs/store';
-import { SetEvent } from '../../../event/action/event.actions';
-import { TaskStatus } from '../../model/task-edit-create.model';
-import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
-import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { TaskActionInfoModel } from '../../model/task-action-info.model';
-import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {taskListColumnsModel} from '../../model/task-list-columns.model';
+import {TaskDetailModel} from '../../model/task-detail.model';
+import {SetEvent} from '../../../event/action/event.actions';
+import {TaskStatus} from '../../model/task-edit-create.model';
+import {TaskActionInfoModel} from '../../model/task-action-info.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+// Component
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
+import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
+// Service
+import {DataGridOperationsHelper, fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
+import {ReportsService} from '../../../reports/service/reports.service';
+import {TaskService} from '../../service/task.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {ColumnMenuService} from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+// Other
+import {Observable} from 'rxjs/Observable';
+import {map} from 'rxjs/operators';
+import {pathOr} from 'ramda';
+import {
+	DetailCollapseEvent,
+	DetailExpandEvent,
+	GridComponent,
+	GridDataResult, PageChangeEvent
+} from '@progress/kendo-angular-grid';
+import {forkJoin} from 'rxjs';
+import {hasIn} from 'ramda';
+import {Store} from '@ngxs/store';
+import {FilterDescriptor, SortDescriptor} from '@progress/kendo-data-query';
 
 @Component({
 	selector: 'task-list',
@@ -218,12 +221,13 @@ export class TaskListComponent implements OnInit {
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: TaskEditCreateComponent,
 			data: {
-				taskCreateModel: taskCreateModel
+				taskDetailModel: taskCreateModel
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Create Task',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
 		}).subscribe((data: any) => {
 			this.search();
@@ -248,9 +252,10 @@ export class TaskListComponent implements OnInit {
 				taskDetailModel: taskDetailModel
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Task Detail',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
 		}).subscribe((data: any) => {
 			if (data.isDeleted) {
@@ -295,9 +300,10 @@ export class TaskListComponent implements OnInit {
 						taskDetailModel: model
 					},
 					modalConfiguration: {
-						title: '',
+						title: 'Task Edit',
 						draggable: true,
-						modalSize: ModalSize.MD
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
 					}
 				}).subscribe((data: any) => {
 					if (data.isDeleted) {
