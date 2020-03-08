@@ -34,13 +34,14 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import * as R from 'ramda';
+import {TaskStatus} from '../../model/task-edit-create.model';
 
 @Component({
 	selector: `task-detail`,
 	templateUrl: 'task-detail.component.html',
 	styles: []
 })
-export class TaskDetailComponent extends Dialog  implements OnInit {
+export class TaskDetailComponent extends Dialog implements OnInit {
 	@Input() data: any;
 
 	protected modalType = ModalType;
@@ -62,7 +63,7 @@ export class TaskDetailComponent extends Dialog  implements OnInit {
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
-	taskActionInfoModel: TaskActionInfoModel;
+	private taskActionInfoModel: TaskActionInfoModel = null;
 	private taskDetailModel: TaskDetailModel;
 
 	constructor(
@@ -128,6 +129,67 @@ export class TaskDetailComponent extends Dialog  implements OnInit {
 		});
 	}
 
+	private prepareTaskActionButtons(): void {
+		this.buttons = this.buttons.filter((button: any) => {
+			return (['toPlay', 'toDone', 'toInvoke', 'toResetAction', 'toAssignTo', 'toNeighborhood'].indexOf(button.name) === -1)
+		});
+
+		this.buttons.push({
+			name: 'toPlay',
+			icon: 'play',
+			text: 'Start',
+			show: () => this.taskActionInfoModel && [TaskStatus.READY].indexOf(this.taskActionInfoModel.status) >= 0,
+			type: DialogButtonType.CONTEXT,
+			action: this.onStartTask.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toDone',
+			icon: 'check',
+			text: 'Done',
+			show: () => this.taskActionInfoModel && [TaskStatus.READY, TaskStatus.STARTED].indexOf(this.taskActionInfoModel.status) >= 0,
+			type: DialogButtonType.CONTEXT,
+			action: this.onDoneTask.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toInvoke',
+			icon: 'cog',
+			text: ((this.taskActionInfoModel.invokeButton && this.taskActionInfoModel.invokeButton.label) ? this.taskActionInfoModel.invokeButton.label : 'Invoke'),
+			show: () => this.showInvoke(),
+			disabled: () => !this.permissionService.hasPermission(Permission.ActionInvoke) || (this.taskActionInfoModel.invokeButton && this.taskActionInfoModel.invokeButton.disabled),
+			type: DialogButtonType.CONTEXT,
+			action: this.onInvoke.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toResetAction',
+			icon: 'power',
+			text: 'Reset Action',
+			show: () => this.taskActionInfoModel && this.taskActionInfoModel.apiActionId && this.taskActionInfoModel.status === TaskStatus.HOLD,
+			type: DialogButtonType.CONTEXT,
+			action: this.onReset.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toAssignTo',
+			icon: 'user',
+			text: 'Assign To Me',
+			show: () => this.showAssignToMe(),
+			type: DialogButtonType.CONTEXT,
+			action: this.onAssignToMe.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toNeighborhood',
+			icon: 'power',
+			text: 'Neighborhood',
+			show: () => this.taskActionInfoModel && (this.taskActionInfoModel.predecessors + this.taskActionInfoModel.successors > 0),
+			type: DialogButtonType.CONTEXT,
+			action: this.onNeighborhood.bind(this)
+		});
+	}
+
 	/**
 	 * Load All Asset Class and Retrieve
 	 */
@@ -174,8 +236,9 @@ export class TaskDetailComponent extends Dialog  implements OnInit {
 			.subscribe((result: TaskActionInfoModel[]) => {
 				if (result && result[taskId]) {
 					this.taskActionInfoModel = result[taskId];
+					this.prepareTaskActionButtons();
 				}
-		});
+			});
 	}
 
 	/**
@@ -422,6 +485,30 @@ export class TaskDetailComponent extends Dialog  implements OnInit {
 				modalSize: ModalSize.LG
 			}
 		}).subscribe();
+	}
+
+	showInvoke(): boolean {
+		if (this.taskActionInfoModel
+			&& this.taskActionInfoModel.invokeButton
+			&& this.taskActionInfoModel.invokeButton !== null) {
+			this.taskActionInfoModel.invokeButton = this.taskActionInfoModel.invokeButton;
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Determines if Assign to me button can be shown.
+	 */
+	showAssignToMe(): boolean {
+		return (this.taskActionInfoModel
+			&&
+			(	( !this.taskActionInfoModel.assignedTo
+					||
+					this.userContext.person.id !== this.taskActionInfoModel.assignedTo )
+				&&
+				[TaskStatus.READY, TaskStatus.PENDING, TaskStatus.STARTED].indexOf(this.taskActionInfoModel.status) >= 0
+			) );
 	}
 
 	/**
