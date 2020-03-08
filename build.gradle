@@ -261,10 +261,12 @@ assets {
 	minifyCss = true
 }
 
-[bootRun, test, integrationTest, runScript, console].each { runTask ->//dbmUpdate
-	configure(runTask) {
-		systemProperties System.properties
-	}
+// The run task added by the application plugin
+// is also of type JavaExec.
+tasks.withType(JavaExec) {
+	// Assign all Java system properties from
+	// the command line to the JavaExec task.
+	systemProperties System.properties
 }
 
 // Customize Git properties plugin.
