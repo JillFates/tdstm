@@ -5,6 +5,7 @@ import com.tdsops.etl.ETLFieldDefinition
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.LocalVariableDefinition
+import com.tdsops.etl.LocalVariableFacade
 
 /**
  * This Class interprets the following ETL command:
@@ -16,15 +17,15 @@ import com.tdsops.etl.LocalVariableDefinition
 class FieldLookupCommand {
 
     ETLDomain domain
-    ETLProcessor etlProcessor
+    ETLProcessor processor
     ETLFieldDefinition fieldDefinition
 
-    FieldLookupCommand(ETLDomain domain, ETLProcessor etlProcessor) {
+    FieldLookupCommand(ETLDomain domain, ETLProcessor processor) {
         if (!domain.isAsset()) {
             throw ETLProcessorException.domainWithoutFieldSpec(domain)
         }
         this.domain = domain
-        this.etlProcessor = etlProcessor
+        this.processor = processor
     }
     /**
      * Lookup part for this command. It can find an instance of {@link ETLFieldDefinition}
@@ -36,7 +37,7 @@ class FieldLookupCommand {
      * @see com.tdsops.etl.ETLFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
      */
     FieldLookupCommand with(String labelName) {
-        fieldDefinition = etlProcessor.lookUpFieldDefinition(domain, labelName)
+        fieldDefinition = processor.lookUpFieldDefinition(domain, labelName)
         return this
     }
 
@@ -45,7 +46,8 @@ class FieldLookupCommand {
      * @param localVariable
      */
     void set(LocalVariableDefinition localVariable) {
-        etlProcessor.addLocalVariableInBinding(localVariable.name, fieldDefinition.name)
+        LocalVariableFacade localVariableFacade = new LocalVariableFacade(fieldDefinition.name, this.processor)
+        processor.addLocalVariableInBinding(localVariable.name, localVariableFacade)
     }
 
 }
