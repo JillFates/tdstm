@@ -12,7 +12,6 @@ import { UserManageStaffComponent } from '../../../../shared/modules/header/comp
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 // Model
 import { TaskDetailModel } from '../../../taskManager/model/task-detail.model';
-import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {
 	ActivePersonColumnModel,
 	ApplicationColumnModel,
@@ -21,18 +20,17 @@ import {
 	TaskColumnModel,
 } from '../../model/user-dashboard-columns.model';
 import { COLUMN_MIN_WIDTH } from '../../../dataScript/model/data-script.model';
-import { DIALOG_SIZE , ModalType} from '../../../../shared/model/constants';
+import { ModalType} from '../../../../shared/model/constants';
 import { GridComponent } from '@progress/kendo-angular-grid';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { Store } from '@ngxs/store';
 import {SetProject} from '../../../project/actions/project.actions';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
-import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DialogService, ModalSize} from 'tds-component-library';
-import {ProviderViewEditComponent} from '../../../provider/components/view-edit/provider-view-edit.component';
+import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 
 @Component({
 	selector: 'user-dashboard',
@@ -71,7 +69,6 @@ export class UserDashboardComponent implements OnInit {
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private userService: UserService,
 		private taskService: TaskService,
-		private oldDialogService: UIDialogService,
 		private dialogService: DialogService,
 		private notifierService: NotifierService,
 		private translate: TranslatePipe,
@@ -167,27 +164,32 @@ export class UserDashboardComponent implements OnInit {
 				currentUserId
 			}
 		};
-		this.oldDialogService.extra(TaskDetailComponent, [
-			{provide: TaskDetailModel, useValue: taskDetailModel}
-		]).then((result) => {
-			if (result && result.shouldOpenTask) {
-				this.openTaskDetailView(result.commentInstance)
-			} else if (result && result.shouldEdit) {
-				this.openTaskEditView(result.id);
-			} else {
-				this.fetchTasksForGrid();
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskDetailComponent,
+			data: {
+				taskDetailModel: taskDetailModel
+			},
+			modalConfiguration: {
+				title: 'Task Detail',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
-
-		}).catch(result => {
-			if (!result) {
+		}).subscribe((data: any) => {
+			if (data && data.shouldOpenTask) {
+				this.openTaskDetailView(data.commentInstance)
+			} else if (data && data.shouldEdit) {
+				this.openTaskEditView(data.id);
+			} else {
 				this.fetchTasksForGrid();
 			}
 		});
 	}
 
-	public openTaskEditView(comment: any): void {
+	public openTaskEditView(taskRow: any): void {
 		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
-		this.taskService.getTaskDetails(comment.id)
+		this.taskService.getTaskDetails(taskRow.id)
 			.subscribe((res) => {
 				let modelHelper = new TaskEditCreateModelHelper(
 					this.userContext.timezone,
@@ -205,13 +207,21 @@ export class UserDashboardComponent implements OnInit {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.oldDialogService.extra(TaskEditCreateComponent, [
-					{ provide: TaskDetailModel, useValue: clone(model) }
-				], false, false)
-					.then(result => {
+
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: TaskEditCreateComponent,
+					data: {
+						taskDetailModel: model
+					},
+					modalConfiguration: {
+						title: 'Task Edit',
+						draggable: true,
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
+					}
+				}).subscribe((data: any) => {
 						this.fetchTasksForGrid();
-					}).catch(result => {
-					this.fetchTasksForGrid();
 				});
 			});
 	}
@@ -296,10 +306,21 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public openAssetDialog(id, assetClass): void {
-		this.oldDialogService.open(AssetShowComponent, [
-			{provide: 'ID', useValue: id},
-			{provide: 'ASSET', useValue: assetClass}
-		], DIALOG_SIZE.XXL);
+
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				id: id,
+				asset: assetClass,
+				assetExplorerModule: AssetExplorerModule
+			},
+			modalConfiguration: {
+				title: '',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe();
 	}
 
 	public handlePersonClicked(event): void {
