@@ -53,8 +53,7 @@
 									name="showCyclesOnGraph"
 									id="showCyclesOnGraph"
 									class="k-checkbox"
-									[checked]="showCycles"
-									(change)="toggleShowCycles()">
+									[(ngModel)]="showCycles">
 							<label for="showCyclesOnGraph" class="k-checkbox-label">{{'ARCHITECTURE.SHOW_CYCLICAL_REFERENCE' | translate}}</label>
 						</clr-checkbox-wrapper>
 					</div>
