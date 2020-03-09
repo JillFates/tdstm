@@ -426,4 +426,14 @@ class SqlUtilTests extends Specification implements DataTest {
 			"!nULl   "  | "id IS NOT NULL"
 	}
 
+	void "Test the building of a person's full name via personFullNameSql"() {
+		expect: 'the expression for building the full name is constructed correctly'
+			SqlUtil.personFullNameSql(prefix) == fullName
+		where:
+			prefix	|	fullName
+			null	|	"CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), NULLIF(last_name, ''))"
+			''		|	"CONCAT_WS(' ', first_name, NULLIF(middle_name, ''), NULLIF(last_name, ''))"
+			'p'		|	"CONCAT_WS(' ', p.first_name, NULLIF(p.middle_name, ''), NULLIF(p.last_name, ''))"
+	}
+
 }

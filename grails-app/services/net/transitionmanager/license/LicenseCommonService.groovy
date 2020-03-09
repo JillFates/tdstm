@@ -2,12 +2,13 @@ package net.transitionmanager.license
 
 import groovy.util.logging.Slf4j
 import grails.core.GrailsApplication
+import net.transitionmanager.service.ServiceMethods
 
 /**
  * Created by octavio on 12/27/16.
  */
 @Slf4j
-class LicenseCommonService {
+class LicenseCommonService implements ServiceMethods {
 	/* TAG grapper for messaging */
 	public static BEGIN_LIC_TAG = "-----BEGIN LICENSE-----"
 	public static END_LIC_TAG = "-----END LICENSE-----"

@@ -169,6 +169,7 @@ export class ExportAssetComponent implements OnInit {
 			} else if (this.exportStatus === EXPORT_STATUS.COMPLETED) {
 				saveAs(this.exportService.getBundleFile(taskId), progress['data'].header.split('=')[1]);
 				this.progress_value = 100;
+				setTimeout(() => this.onExportClose(), 1000);
 			} else if (this.exportStatus === EXPORT_STATUS.FAILED || this.exportStatus === EXPORT_STATUS.CANCELLED) {
 				this.exportMessage = progress['detail'] || 'Export Failed';
 				console.error(this.exportMessage);

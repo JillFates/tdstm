@@ -51,6 +51,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
 		'CORRUPT': 'Corrupt',
+		'EXPIRED': 'Expired',
 		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
