@@ -64,7 +64,6 @@
 						<tds-button icon="{{showLabels ? 'minus' : 'plus'}}" title="{{showLabels ? 'Hide Labels' : 'Show Labels'}}" (click)="toggleShowLabels()" class="add-level-up-graph"></tds-button>
 						<div class="label-items" *ngIf="showLabels">
 							<div class="graph-checkbox" *ngFor="let label of graphLabels; let i = index">
-<!--								[checked]="label.checked"-->
 								<clr-checkbox-wrapper>
 									<input
 											clrCheckbox
@@ -85,18 +84,18 @@
 					</div>
 					<div class="graph-commands">
 						<div class="graph-command">
-							<tds-button [className]="'btn-block'" (click)="regenerateGraph()">{{'ARCHITECTURE.REGENERATE_GRAPH' | translate}}</tds-button>
+							<tds-button [disabled]="!assetId" [className]="'btn-block'" (click)="regenerateGraph()">{{'ARCHITECTURE.REGENERATE_GRAPH' | translate}}</tds-button>
 						</div>
 						<div class="graph-command">
-							<tds-button [className]="'btn-block'" (click)="savePreferences()">{{'ARCHITECTURE.SAVE_PREFERENCES' | translate}}</tds-button>
+							<tds-button [disabled]="!archGraphForm.dirty" [className]="'btn-block'" (click)="savePreferences()">{{'ARCHITECTURE.SAVE_PREFERENCES' | translate}}</tds-button>
 						</div>
 						<div class="graph-command">
 							<tds-button [className]="'btn-block'" (click)="resetDefaults()">{{'ARCHITECTURE.RESET_DEFAULTS' | translate}}</tds-button>
 						</div>
 					</div>
                     <div>
-						<input type="hidden" name="levelsDown" [(ngModel)]="levelsDown">
-						<input type="hidden" name="levelsUp" [(ngModel)]="levelsUp">
+						<input type="hidden" name="levelsDown" [(ngModel)]="levelsDown" />
+						<input type="hidden" name="levelsUp" [(ngModel)]="levelsUp"  />
 					</div>
 				</form>
 

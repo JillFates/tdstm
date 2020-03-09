@@ -18,6 +18,7 @@ import {
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {NgForm} from '@angular/forms';
 
 declare var jQuery: any;
 
@@ -28,6 +29,8 @@ declare var jQuery: any;
 export class ArchitectureGraphComponent implements OnInit {
 	// References
 	@ViewChild('graph', {static: false}) graph: any;
+	@ViewChild('archGraphForm', { static: false }) protected form: NgForm;
+
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 	public datasource: any[] = [{id: '', text: ''}];
@@ -228,6 +231,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	extractLevelsUp() {
 		if (this.levelsUp > 0) {
 			this.levelsUp--;
+			this.form.controls.levelsUp.markAsDirty();
 			this.loadData();
 		}
 	}
@@ -237,6 +241,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	addLevelsUp() {
 		this.levelsUp++;
+		this.form.controls.levelsUp.markAsDirty();
 		this.loadData();
 	}
 
@@ -245,6 +250,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	addLevelsDown() {
 		this.levelsDown++;
+		this.form.controls.levelsDown.markAsDirty();
 		this.loadData();
 	}
 
@@ -254,6 +260,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	extractLevelsDown() {
 		if (this.levelsDown > 0) {
 			this.levelsDown--;
+			this.form.controls.levelsDown.markAsDirty();
 			this.loadData();
 		}
 	}
