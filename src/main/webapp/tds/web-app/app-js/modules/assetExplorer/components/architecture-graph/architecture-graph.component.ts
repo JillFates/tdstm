@@ -193,8 +193,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param setInitialAsset When true set the initial value for the selected asset
 	 * */
 	loadData(setInitialAsset = false): void {
-		this.architectureGraphService
-			.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
+		if (this.assetId) {
+			this.architectureGraphService
+				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
 					this.updateNodeData(this.currentNodesData, false);
@@ -208,6 +209,7 @@ export class ArchitectureGraphComponent implements OnInit {
 						}
 					}
 				});
+		}
 	}
 
 	/**
@@ -319,16 +321,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param index of the selected checkbox
 	 */
 	updateGraphLabels(index) {
-		this.toggleGraphLabel(index);
-		this.updateNodeData(this.currentNodesData, false);
-	}
-
-	/**
-	 * Check/uncheck the value for an specific graph label
-	 * @param index  Index of the array to be modified
-	 */
-	toggleGraphLabel(index: number): void {
-		this.graphLabels[index].checked = !this.graphLabels[index].checked;
+		if (this.assetId) {
+			this.updateNodeData(this.currentNodesData, false);
+		}
 	}
 
 	/**
@@ -385,9 +380,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
-		if (this.assetId) {
-			this.loadData();
-		}
+		this.loadData();
 		this.graph.showFullGraphBtn = false;
 		this.graph.nodeMove = false;
 	}
