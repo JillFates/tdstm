@@ -290,7 +290,7 @@ export const en_DICTIONARY: Object = {
 		'ASSET_CLASSES': 'Asset Classes: '
 	},
 	'DEPENDENCY_ANALYZER': {
-		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_ANALYZER': 'Angular Dependency Analyzer',
 		'DEPENDENCY_GROUPS': 'Dependency Groups',
 		'REGENERATE': 'Regenerate',
 		'BUNDLE': 'Bundle',

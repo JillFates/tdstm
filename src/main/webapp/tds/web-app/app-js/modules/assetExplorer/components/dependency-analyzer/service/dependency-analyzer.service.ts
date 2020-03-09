@@ -10,10 +10,9 @@ import 'rxjs/add/operator/catch';
  */
 @Injectable()
 export class DependencyAnalyzerService {
-	private readonly baseURL = '/tdstm/ws/architectureGraph';
+	private readonly baseURL = '/tdstm/ws/dependencyConsole';
 	private readonly GRAPH_PREFERENCES = `${this.baseURL}/preferences/`;
-	private readonly ARCHITECTURE_GRAPH_LEGEND = `${this.baseURL}/legend/`;
-	private readonly ARCHITECTURE_GRAPH_DATA = `${this.baseURL}`;
+	private readonly DEPENDENCY_ANALYZER_URL = `${this.baseURL}`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -24,25 +23,11 @@ export class DependencyAnalyzerService {
 	 * @returns {Observable<any>}
 	 * TODO: @sam please use the previously already implemented getEvents() from task.service.ts.
 	 */
-	getArchitectureGraphData(assetId: number, levelsUp: number, levelsDown: number, mode: string): Observable<any> {
-		let params;
-		params = new HttpParams()
-			.set('assetId', String(assetId))
-			.set('levelsUp', String(levelsUp))
-			.set('levelsDown', String(levelsDown))
-			.set('mode', mode);
-		return this.http.get(`${this.ARCHITECTURE_GRAPH_DATA}`, {params})
+	getDependencyAnalyzerData(): Observable<any> {
+		return this.http.get(`${this.DEPENDENCY_ANALYZER_URL}`)
 			.map((response: any) => {
 				return response;
 			})
 			.catch((error: any) => error);
-	}
-
-	getArchitectureGraphPreferences(): Observable<any> {
-		return this.http.get(`${this.GRAPH_PREFERENCES}`)
-			.map( (response: any) => {
-				return response || [];
-			})
-			.catch( (error: any) => error);
 	}
 }
