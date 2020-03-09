@@ -8,6 +8,7 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
+import {ModelService} from '../../service/model.service';
 // Model
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {UserContextModel} from '../../../auth/model/user-context.model';
@@ -86,7 +87,7 @@ export class AssetCommonShow implements OnInit {
 				assetClass: assetClass
 			},
 			modalConfiguration: {
-				title: '', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+				title: 'Asset',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'

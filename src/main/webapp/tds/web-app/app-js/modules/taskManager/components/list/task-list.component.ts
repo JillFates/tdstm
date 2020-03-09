@@ -369,14 +369,15 @@ export class TaskListComponent implements OnInit {
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: AssetShowComponent,
 			data: {
-				id: taskRow.assetEntityId,
-				asset: taskRow.assetEntityAssetClass,
+				assetId: taskRow.assetEntityId,
+				assetClass: taskRow.assetEntityAssetClass,
 				assetExplorerModule: AssetExplorerModule
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Asset',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
 			}
 		}).subscribe();
 

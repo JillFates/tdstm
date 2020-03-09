@@ -32,6 +32,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 import {DOMAIN} from '../../../../shared/model/constants';
+import {Observable} from 'rxjs';
 
 @Component({
 	selector: `tds-asset-all-show`,
@@ -99,23 +100,30 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
-			this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}).subscribe((response: any) => {
-				let template = response;
-				const additionalImports = [AssetExplorerModule];
-				switch (this.asset) {
-					case 'APPLICATION':
-						this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
-						break;
-					case 'DATABASE':
-						this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
-						break;
-					case 'DEVICE':
-						this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
-						break;
-					case 'STORAGE':
-						this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
-						break;
-				}
+			Observable.zip(
+				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}),
+				this.http.get(`../ws/asset/showModel/${this.modelId}`))
+				.subscribe((response: any) => {
+					let template = response[0];
+					let model = response[1];
+
+					this.setTitle(this.getModalTitle(model));
+
+					const additionalImports = [AssetExplorerModule];
+					switch (this.asset) {
+						case 'APPLICATION':
+							this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
+							break;
+						case 'DATABASE':
+							this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
+							break;
+						case 'DEVICE':
+							this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
+							break;
+						case 'STORAGE':
+							this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata, this), this.view, additionalImports).subscribe();
+							break;
+					}
 			});
 		});
 	}
@@ -164,7 +172,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 				assetClass: assetClass
 			},
 			modalConfiguration: {
-				title: '', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+				title: 'Asset',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
@@ -213,7 +221,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 				assetClass: assetClass
 			},
 			modalConfiguration: {
-				title: '', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+				title: 'Asset',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
@@ -248,6 +256,15 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 
 	private isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetEdit);
+	}
+
+	private getModalTitle(assetModel: any): string {
+		return `<div class="modal-title-container">
+			<div class="badge modal-badge" style="">A</div>
+			<h4 class="modal-title">${assetModel.asset.assetName}</h4>
+			<div class="modal-subtitle">${assetModel.moveBundle}</div>
+			<div class="badge modal-subbadge"></div>
+		</div>`;
 	}
 
 	/**

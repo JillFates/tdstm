@@ -758,9 +758,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				taskDetailModel: taskDetailModel
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Task Detail',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
 		}).subscribe((data: any) => {
 			if (data && data.shouldEdit) {
@@ -808,9 +809,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						taskDetailModel: taskDetailModel
 					},
 					modalConfiguration: {
-						title: '',
+						title: 'Task Edit',
 						draggable: true,
-						modalSize: ModalSize.MD
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
 					}
 				}).subscribe((data: any) => {
 					if (data && data.isDeleted) {
@@ -839,14 +841,15 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						componentFactoryResolver: this.componentFactoryResolver,
 						component: AssetShowComponent,
 						data: {
-							id: asset.id,
-							asset: res.assetClass,
+							assetId: asset.id,
+							assetClass: res.assetClass,
 							assetExplorerModule: AssetExplorerModule
 						},
 						modalConfiguration: {
-							title: '',
+							title: 'Asset',
 							draggable: true,
-							modalSize: ModalSize.MD
+							modalSize: ModalSize.CUSTOM,
+							modalCustomClass: 'custom-asset-modal-dialog'
 						}
 					}).subscribe();
 				} else {

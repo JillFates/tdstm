@@ -379,7 +379,7 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 					assetClass: assetClass
 				},
 				modalConfiguration: {
-					title: 'TODO:',
+					title: 'Asset',
 					draggable: true,
 					modalSize: ModalSize.CUSTOM,
 					modalCustomClass: 'custom-asset-modal-dialog'

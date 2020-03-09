@@ -217,7 +217,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 				assetClass: assetClass
 			},
 			modalConfiguration: {
-				title: '', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+				title: 'Asset',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
@@ -270,11 +270,14 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	 * On Cancel if there is changes notify user
 	 */
 	public onCancelEdit = (): void => {
-		if ( this.assetTagsDirty || !ramdaEquals(this.initialModel, this.model)) {
+		if (this.assetTagsDirty || !ramdaEquals(this.initialModel, this.model)) {
 			this.promptSaveChanges(this.model.assetId === undefined);
 		} else {
-			if (this.model.assetId) {
+			const assetEditComponent = <AssetEditComponent>this.parentDialog;
+			if (this.model.assetId && !assetEditComponent.data.openFromList) {
 				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+			} else {
+				this.cancelCloseDialog();
 			}
 		}
 	}

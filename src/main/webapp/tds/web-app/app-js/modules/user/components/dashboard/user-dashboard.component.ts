@@ -311,14 +311,15 @@ export class UserDashboardComponent implements OnInit {
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: AssetShowComponent,
 			data: {
-				id: id,
-				asset: assetClass,
+				assetId: id,
+				assetClass: assetClass,
 				assetExplorerModule: AssetExplorerModule
 			},
 			modalConfiguration: {
-				title: '',
+				title: 'Asset',
 				draggable: true,
-				modalSize: ModalSize.MD
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
 			}
 		}).subscribe();
 	}

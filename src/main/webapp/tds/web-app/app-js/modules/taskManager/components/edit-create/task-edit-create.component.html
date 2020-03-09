@@ -514,7 +514,7 @@
 						</tr>
 					</table>
 				</tr>
-				<tr class="deps grow-container just-task-edit-view">
+				<tr class="deps grow-container" [ngClass]="{'just-task-create-view': taskDetailModel.modal.type === modalType.CREATE}">
 					<td colspan="5">
 						<tds-task-notes [dataGridTaskNotesHelper]="dataGridTaskNotesHelper"
 														(create)="createNote()"></tds-task-notes>
