@@ -157,14 +157,16 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * A call to the Architecture graph service for getting the default graph data for the current user
 	 */
 	getArchitectureGraphPreferences() {
-		this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
-			this.dataForSelect = res.assetClassesForSelect;
-			this.levelsUp = +res.graphPrefs.levelsUp;
-			this.levelsDown = +res.graphPrefs.levelsDown;
-			this.showCycles = res.graphPrefs.showCycles;
-			this.appLbl = res.graphPrefs.appLbl;
-			this.labelOffset = res.graphPrefs.labelOffset;
-			this.assetClasses = res.graphPrefs.assetClasses;
+		this.architectureGraphService
+			.getArchitectureGraphPreferences()
+			.subscribe((res: any) => {
+				this.dataForSelect = res.assetClassesForSelect;
+				this.levelsUp = +res.graphPrefs.levelsUp;
+				this.levelsDown = +res.graphPrefs.levelsDown;
+				this.showCycles = res.graphPrefs.showCycles;
+				this.appLbl = res.graphPrefs.appLbl;
+				this.labelOffset = res.graphPrefs.labelOffset;
+				this.assetClasses = res.graphPrefs.assetClasses;
 		});
 	}
 
@@ -404,7 +406,8 @@ export class ArchitectureGraphComponent implements OnInit {
 				showCycles: this.showCycles,
 				appLbl: this.categories.length > 0
 			};
-			this.preferenceService.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
+			this.preferenceService
+				.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
 				if (res.status === 'success') {
 					console.log('Preferences saved correctly');
 				}
