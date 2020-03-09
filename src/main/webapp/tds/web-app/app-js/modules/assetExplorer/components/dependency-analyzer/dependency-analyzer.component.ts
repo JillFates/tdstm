@@ -30,7 +30,7 @@ export class DependencyAnalyzerComponent implements OnInit {
 	ngOnInit(): void {
 		console.log('hello world');
 		this.dependencyAnalyzerService.getDependencyAnalyzerData().subscribe(( res: DependencyAnalyzerDataModel) => {
-			this.bundleList = res.moveBundle;
+			this.bundleList = res;
 
 		})
 	}

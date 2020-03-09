@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {DependencyAnalyzerDataModel} from '../model/dependency-analyzer-data.model';
 
 /**
  * @name Dependency Analizer Service
@@ -23,7 +24,7 @@ export class DependencyAnalyzerService {
 	 * @returns {Observable<any>}
 	 * TODO: @sam please use the previously already implemented getEvents() from task.service.ts.
 	 */
-	getDependencyAnalyzerData(): Observable<any> {
+	getDependencyAnalyzerData(): Observable<DependencyAnalyzerDataModel> {
 		return this.http.get(`${this.DEPENDENCY_ANALYZER_URL}`)
 			.map((response: any) => {
 				return response;
