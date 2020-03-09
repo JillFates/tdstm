@@ -44,6 +44,7 @@ import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.util.JsonViewRenderService
 //import org.springframework.context.annotation.Lazy
+import org.apache.commons.collections4.CollectionUtils
 
 /**
  * Service class with main database operations for Dataview.
@@ -475,8 +476,8 @@ class DataviewService implements ServiceMethods {
 		if (dataviewCommand.overridesView) {
 			// Get the list of filters fzrom the orginal system view
 			Map systemViewFilters = [:]
-			JSONObject schema = dataviewCommand.overridesView.schemaAsJSONObject()
-			schema?.columns.each {
+			JSONObject rootSchema = dataviewCommand.overridesView.schemaAsJSONObject()
+			rootSchema?.columns.each {
 				systemViewFilters.put(it.property, [filter: it.filter, label: it.label] )
 			}
 
@@ -495,7 +496,7 @@ class DataviewService implements ServiceMethods {
 			// Iterate over the systemViewsFilters that have filters (probably none) and make sure that they're the same
 			// First get a short list of systemView columns that are not in the override view
 			List<String>systemViewColumnNames = systemViewFilters.keySet() as List
-			List<String>overrideViewColumnNames = schema?.columns.collect { it.property }
+			List<String>overrideViewColumnNames = rootSchema?.columns.collect { it.property }
 			List<String>missingSystemColumns = systemViewColumnNames - overrideViewColumnNames
 			missingSystemColumns.each {
 				if (systemViewFilters[it].filter) {
@@ -507,6 +508,16 @@ class DataviewService implements ServiceMethods {
 						'dataview.validate.overrideFiltersMatch',
 						[columnsWithBadFilters],
 						"Filters for column(s) {$columnsWithBadFilters} must match the original system view")
+			}
+
+			// Check to make sure that the domains of the views match as well
+			List<String>rootViewDomains = rootSchema.domains
+			List<String>overrideViewDomains = dataviewCommand.schema.domains
+			if ( CollectionUtils.disjunction(rootViewDomains, overrideViewDomains ).size() > 0 ) {
+				throwException(InvalidParamException.class,
+						'dataview.validate.overrideDomainMismatch',
+						[columnsWithBadFilters],
+						'When overriding a system view the Asset Classes can not be modified')
 			}
 		}
 	}
