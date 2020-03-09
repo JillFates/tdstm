@@ -138,11 +138,11 @@ class DashboardService implements ServiceMethods {
 		List<MoveBundle> moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = :moveEvent ORDER BY mb.startTime ", [moveEvent: moveEvent])
 
 		Map model = [
-			project                       : project,
+			project                       : project.toMap(),
 			projectLogo                   : ProjectLogo.findByProject(project),
-			moveEvent                     : moveEvent,
-			moveEventsList                : moveEventsList,
-			moveBundleList                : moveBundleList,
+			moveEvent                     : moveEvent.toMap(),
+			moveEventsList                : moveEventsList*.toMap(),
+			moveBundleList                : moveBundleList*.toMap(),
 			timeToUpdate                  : userPreferenceService.getPreference(UserPreferenceEnum.DASHBOARD_REFRESH) ?: 'never',
 			EventDashboardDialOverridePerm: securityService.hasPermission(Permission.EventDashboardDialOverride),
 			viewUnpublished               : viewUnpublished ? '1' : '0'

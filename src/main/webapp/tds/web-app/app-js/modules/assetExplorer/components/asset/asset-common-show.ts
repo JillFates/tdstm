@@ -71,6 +71,18 @@ export class AssetCommonShow implements OnInit {
 		jQuery('[data-toggle="popover"]').popover();
 	}
 
+	ngAfterContentInit(): void {
+		setTimeout(() => {
+			let tagsDiv = <HTMLElement>document.querySelector('.tags-container');
+			let tableRow = <HTMLElement>document.querySelector('.one-column');
+			let tableRowSiblingWidth = <HTMLElement>(<HTMLElement>document.querySelector('.fit-tags-to-view')).previousSibling;
+			tagsDiv.style.width = (tableRow.offsetWidth - tableRowSiblingWidth.offsetWidth) + 'px';
+			if (this.assetTagUIWrapperService) {
+				this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
+			}
+		}, 500);
+	}
+
 	cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
 		jQuery('body').removeClass('modal-open');
@@ -152,14 +164,6 @@ export class AssetCommonShow implements OnInit {
 			.catch((error) => console.log(error));
 	}
 
-	getGraphUrl(): string {
-		return `/tdstm/assetEntity/architectureViewer?assetId=${this.mainAsset}&level=2`;
-	}
-
-	openGraphUrl() {
-		this.windowService.getWindow().open(this.getGraphUrl(), '_blank');
-	}
-
 	getGoJsGraphUrl(): string {
 		return `/tdstm/module/asset/architecture-graph?assetId=${this.mainAsset}&levelsUp=0&levelsDown=3`;
 	}
@@ -169,7 +173,7 @@ export class AssetCommonShow implements OnInit {
 	}
 
 	onExpandActionDispatched(): void {
-		this.openGraphUrl();
+		this.openGoJsGraphUrl();
 	}
 
 	/**
@@ -184,14 +188,7 @@ export class AssetCommonShow implements OnInit {
 					currentUserId: this.currentUser.id,
 					data: res,
 					iconsOnly: true,
-					extras: {
-						diagramOpts: {
-							// initialAutoScale: Diagram.UniformToFill,
-							contentAlignment: Spot.Center,
-							allowZoom: false
-						},
-						isExpandable: false
-					}
+					extras: {}
 				}));
 			});
 	}

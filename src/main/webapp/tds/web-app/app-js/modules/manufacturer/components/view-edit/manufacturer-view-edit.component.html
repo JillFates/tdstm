@@ -1,0 +1,198 @@
+<div class="provider-view-edit-component">
+	<form
+		name="manufacturerForm"
+		role="form"
+		data-toggle="validator"
+		#manufacturerForm="ngForm"
+		class="form-horizontal left-alignment"
+		>
+		<div class="box-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label
+							for="name"
+							class="col-sm-2 control-label"
+							[ngClass]="{'required-field': modalType !== actionTypes.VIEW}">
+							Name:
+						</label>
+						<div
+							class="col-sm-9"
+							*ngIf="modalType !== actionTypes.VIEW"
+						>
+							<input
+								clrInput
+								#nameElement
+								type="text"
+								(keyup)="onValidateUniqueness()"
+								id="name"
+								name="name"
+								class="form-control"
+								[(ngModel)]="manufacturerModel.name"
+								required
+								[ngClass]="{
+									'has-error': !manufacturerForm.form.valid
+								}"
+							/>
+							<span
+								*ngIf="!isUnique && !isEmptyValue()"
+								style="color: red; font-weight: bold;"
+								>Manufacturer name must be unique</span
+							>
+						</div>
+						<div
+							class="col-sm-9"
+							*ngIf="modalType === actionTypes.VIEW"
+						>
+							<label class="control-label label-detail">{{
+								manufacturerModel.name
+							}}</label>
+						</div>
+					</div>
+                    <div class="form-group">
+                        <label
+                                class="col-sm-2 control-label">
+                            AKA:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <div class="clr-row" *ngFor="let item of aliasControls; let i = index">
+                                <div class="clr-col-9">
+                                    <input clrInput type="text" value="{{item.name}}" style="width: 100%;" (focusout)="focusOutAlias($event, item, i)" (keyup)="onValidateAliasUniqueness($event.target.value, i)"/>
+                                    <span #aliasSpan style="color: red; font-weight: bold; display: none">Alias name must be unique</span
+                                    >
+                                </div>
+                                <div class="clr-col-3">
+                                    <button class="btn btn-icon btn-danger btn-sm" (click)="removeAlias(i, item.id)"><clr-icon shape="times"></clr-icon></button>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-sm" (click)="addAlias()">Add AKA</button>
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                manufacturerModel.alias
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="description"
+                                class="col-sm-2 control-label">
+                            Description:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <input
+                                    clrInput
+                                    type="text"
+                                    id="description"
+                                    name="description"
+                                    class="form-control"
+                                    [(ngModel)]="manufacturerModel.description"
+                            />
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                manufacturerModel.description
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="corporateName"
+                                class="col-sm-2 control-label">
+                            Corporate Name:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <input
+                                    clrInput
+                                    type="text"
+                                    id="corporateName"
+                                    name="corporateName"
+                                    class="form-control"
+                                    [(ngModel)]="manufacturerModel.corporateName"
+                            />
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                manufacturerModel.corporateName
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="corporateLocation"
+                                class="col-sm-2 control-label">
+                            Corporate Location:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <input
+                                    clrInput
+                                    type="text"
+                                    id="corporateLocation"
+                                    name="corporateLocation"
+                                    class="form-control"
+                                    [(ngModel)]="manufacturerModel.corporateLocation"
+                            />
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                manufacturerModel.corporateLocation
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="website"
+                                class="col-sm-2 control-label">
+                            Website:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <input
+                                    clrInput
+                                    type="text"
+                                    id="website"
+                                    name="website"
+                                    class="form-control"
+                                    [(ngModel)]="manufacturerModel.website"
+                            />
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                manufacturerModel.website
+                                }}</label>
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

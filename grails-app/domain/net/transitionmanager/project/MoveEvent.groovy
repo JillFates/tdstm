@@ -88,6 +88,32 @@ class MoveEvent {
 
 	String toString() { name }
 
+	Map toMap() {
+		return [
+			project              : [
+				id  : project.id,
+				name: project.name
+			],
+			name                 : name,
+			description          : description,
+			calcMethod           : calcMethod,
+			runbookStatus        : runbookStatus,
+			runbookVersion       : runbookVersion,
+			runbookBridge1       : runbookBridge1,
+			runbookBridge2       : runbookBridge2,
+			videolink            : videolink,
+			runbookRecipe        : runbookRecipe,
+			apiActionBypass      : apiActionBypass,
+			revisedCompletionTime: revisedCompletionTime,
+			actualStartTime      : actualStartTime,
+			actualCompletionTime : actualCompletionTime,
+			estStartTime         : estStartTime,
+			estCompletionTime    : estCompletionTime,
+			dateCreated          : dateCreated,
+			lastUpdated          : lastUpdated
+		]
+	}
+
 	boolean belongsToClient(client) {
 		project.clientId == client?.id
 	}

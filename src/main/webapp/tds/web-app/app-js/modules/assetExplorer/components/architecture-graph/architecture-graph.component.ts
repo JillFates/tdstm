@@ -132,7 +132,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		// If it comes from asset explorer
 		if (this.urlParams && this.urlParams.assetId) {
 			this.assetId = this.urlParams.assetId;
-			this.loadData();
+			this.loadData(true);
 		}
 		this.getArchitectureGraphPreferences();
 		this.initSearchModel();
@@ -182,10 +182,6 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	onAssetSelected(event) {
 		if (event) {
-			this.graphLabels.forEach(item => {
-				item.checked = false;
-			});
-			this.showLabels = false;
 			this.assetId = event.id;
 			this.loadData();
 		}
@@ -193,13 +189,24 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	/**
 	 * Loads the asset data once an item has been clicked
+	 * Optionally accepts a flag to set the current selected asset
+	 * @param setInitialAsset When true set the initial value for the selected asset
 	 * */
-	loadData() {
+	loadData(setInitialAsset = false): void {
 		this.architectureGraphService
 			.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
-					this.updateNodeData(this.currentNodesData, true);
+					this.updateNodeData(this.currentNodesData, false);
+					if (setInitialAsset && res && res.nodes) {
+						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
+						if (selectedAsset) {
+							this.asset = {
+								id: selectedAsset.id,
+								text: selectedAsset.name,
+							};
+						}
+					}
 				});
 	}
 
@@ -312,21 +319,45 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param index of the selected checkbox
 	 */
 	updateGraphLabels(index) {
+		this.toggleGraphLabel(index);
+		this.updateNodeData(this.currentNodesData, false);
+	}
+
+	/**
+	 * Check/uncheck the value for an specific graph label
+	 * @param index  Index of the array to be modified
+	 */
+	toggleGraphLabel(index: number): void {
 		this.graphLabels[index].checked = !this.graphLabels[index].checked;
-		// TODO: filter nodes for removing labels on graph
-		this.categories = this.graphLabels.filter( label => label.checked).map( label => label.value.toUpperCase());
-		if (this.categories.length > 0 && this.assetId) {
-			let tempNodesData = JSON.parse(JSON.stringify(this.currentNodesData));
-			tempNodesData.nodes.forEach( node => {
-				if (!this.categories.includes(node.assetClass)) {
-					node.name = '';
-				}
-			});
-			this.updateNodeData(tempNodesData, false);
-		} else {
-			this.categories = [];
-			this.updateNodeData(this.currentNodesData, true);
-		}
+	}
+
+	/**
+	 * Iterate over the current selected categories, in case the category is not selected
+	 * remove the node names for that categories
+	 * @param data graph data and configuration
+	 * @returns the clone of graph data modified
+	 */
+	removeNodeNamesForNotSelectedCategories(data: any): any {
+		let clonedNodes = JSON.parse(JSON.stringify(data));
+
+		const categories = this.getSelectedCategories(); // this.categories || [];
+		clonedNodes.nodes.forEach(node => {
+			// Clear the node name if the assetClass is not included on the categories selected
+			if (!categories.includes(node.assetClass)) {
+				node.name = '';
+			}
+		});
+		// }
+		return clonedNodes;
+	}
+
+	/**
+	 * Returns an array containing just the current selected categories
+	 */
+	getSelectedCategories(): any[] {
+		return this.graphLabels
+			.filter( label => label.checked)
+			.map( label => label.value.toUpperCase());
 	}
 
 	/**
@@ -335,19 +366,17 @@ export class ArchitectureGraphComponent implements OnInit {
 	 *  @param iconsOnly if show the labels or not
 	 */
 	updateNodeData(data, iconsOnly) {
+		const clonedData = this.removeNodeNamesForNotSelectedCategories(data);
 		const diagramHelper = new ArchitectureGraphDiagramHelper();
+
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
 			currentUserId: 1,
-			data: data,
+			data: clonedData,
 			iconsOnly: iconsOnly,
 			extras: {
-				diagramOpts: {
-					initialAutoScale: Diagram.UniformToFill,
-					contentAlignment: Spot.Center,
-					allowZoom: true,
-				},
-				isExpandable: false
+				initialAutoScale: Diagram.UniformToFill,
+				allowZoom: true
 			}
 		}));
 	}
@@ -356,10 +385,11 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
-		this.graph.showFullGraphBtn = false;
 		if (this.assetId) {
 			this.loadData();
 		}
+		this.graph.showFullGraphBtn = false;
+		this.graph.nodeMove = false;
 	}
 
 	/**
