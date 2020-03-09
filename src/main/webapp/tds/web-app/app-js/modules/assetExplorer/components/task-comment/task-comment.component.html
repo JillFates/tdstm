@@ -2,6 +2,7 @@
 	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
 		<kendo-grid
 			*ngIf="dataGridTaskHelper"
+			class="tds-table"
 			[data]="dataGridTaskHelper.gridData"
 			[sort]="dataGridTaskHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -127,6 +128,7 @@
 	>
 		<kendo-grid
 			*ngIf="dataGridCommentHelper"
+			class="tds-table"
 			[data]="dataGridCommentHelper.gridData"
 			[sort]="dataGridCommentHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
