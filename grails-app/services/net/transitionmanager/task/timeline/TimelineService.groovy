@@ -139,7 +139,7 @@ class TimelineService implements ServiceMethods {
                            t.assetEntity.assetName,
                            t.assetEntity.assetType,
                            t.assetEntity.assetClass,
-                           NULLIF(true, true) as taskSpec
+                           t.taskSpec
 
                     from Task t
                     left outer join t.apiAction
