@@ -3134,7 +3134,7 @@ table.text-center th {
 }
 .login-page,
 .register-page {
-  background: #fff url(/tdstm/tds/web-app/assets/images/login-background.jpg) no-repeat;
+  background: #fff url(/tdstm/assets/images/login-background.jpg) no-repeat;
   background-size: cover;
 }
 .login-box,

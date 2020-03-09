@@ -14,8 +14,8 @@ buildscript {
 }
 
 plugins {
-  id "com.gorylenko.gradle-git-properties" version "2.0.0"
-	id "org.asciidoctor.convert" version "1.5.3"
+	id "com.gorylenko.gradle-git-properties"  version "2.0.0"
+	id "org.asciidoctor.convert"              version "1.5.3"
 }
 
 version "5.0.0-alpha"
@@ -118,7 +118,6 @@ dependencies {
 	}
 
 	compile 'org.apache.httpcomponents:httpclient:4.5.5'
-
 	compile 'org.apache.commons:commons-lang3:3.8.1'
 	compile 'com.google.guava:guava:19.0'
 	compile 'net.sf.jasperreports:jasperreports:4.5.1'
@@ -262,10 +261,12 @@ assets {
 	minifyCss = true
 }
 
-[bootRun, test, integrationTest, runScript, console].each { runTask ->//dbmUpdate
-	configure(runTask) {
-		systemProperties System.properties
-	}
+// The run task added by the application plugin
+// is also of type JavaExec.
+tasks.withType(JavaExec) {
+	// Assign all Java system properties from
+	// the command line to the JavaExec task.
+	systemProperties System.properties
 }
 
 // Customize Git properties plugin.
