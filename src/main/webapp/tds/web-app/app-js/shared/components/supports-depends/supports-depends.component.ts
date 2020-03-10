@@ -141,8 +141,7 @@ declare var jQuery: any;
                 *ngIf="dataGridDependsOnHelper"
                 class="dependents-grid is-dependent-on"
                 [data]="dataGridDependsOnHelper.gridData"
-                [sort]="dataGridDependsOnHelper.state.sort"
-                [sortable]="{mode:'single'}"
+                [sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridDependsOnHelper.sortChange($event)">
 
