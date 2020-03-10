@@ -185,7 +185,7 @@
                         </a>
                     </li>
                     <li *ngIf="hasPermission(permission.NewsEdit)" class="menu-child-item menu-parent-planning-event-news">
-                        <a href="/tdstm/newsEditor/newsEditorList">List Event News</a>
+                        <a [routerLink]="['/event-news','list']" >List Event News</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewEventPrep)" class="menu-child-item menu-planning-pre-checklist">
                         <a [routerLink]="['reports','preEventCheckList']">Pre-Event Checklist</a>
