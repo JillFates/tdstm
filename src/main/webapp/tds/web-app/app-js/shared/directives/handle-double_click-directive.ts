@@ -30,9 +30,11 @@ export class UIHandleDoubleClickDirective {
 			return counter > 0 || Boolean(isBannedClass);
 		});
 		if (isChildOfBannedClass) {
+			console.log('Ignored');
 			return;
 		}
 
+		console.log('Attending');
 		this.doubleClick.emit();
 	}
 }
