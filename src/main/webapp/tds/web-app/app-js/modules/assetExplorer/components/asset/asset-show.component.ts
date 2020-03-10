@@ -101,13 +101,11 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
-				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}),
-				this.http.get(`../ws/asset/showModel/${this.modelId}`))
+				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}))
 				.subscribe((response: any) => {
 					let template = response[0];
-					let model = response[1];
 
-					this.setTitle(this.getModalTitle(model));
+					// this.setTitle(this.getModalTitle(model));
 
 					const additionalImports = [AssetExplorerModule];
 					switch (this.asset) {
