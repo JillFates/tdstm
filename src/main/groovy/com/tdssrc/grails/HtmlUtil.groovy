@@ -305,6 +305,6 @@ class HtmlUtil {
 	 * @return
 	 */
 	static String escapePersonFullName(String firstName, String middleName, String lastName) {
-		return HtmlUtil.escape(firstName + (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : ''))
+		return escape(StringUtil.join([firstName, middleName, lastName]))
 	}
 }
