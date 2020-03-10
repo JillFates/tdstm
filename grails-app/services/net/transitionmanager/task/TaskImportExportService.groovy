@@ -208,22 +208,22 @@ class TaskImportExportService implements ServiceMethods {
 		actualFinish			: [type: 'datetime', ssPos:20, formPos:21, domain: 'C', width:120, locked:false,
 										label: 'Actual Finish', template:changeTmpl('actualFinish'), transform:xfrmDateTimeToString],
 
-		category				: [type: 'string', ssPos:22, formPos:23, domain: 'C', width:120, locked:false, modifiable:true,
+		category				: [type: 'string', ssPos:21, formPos:22, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Category', template:changeTmpl('category'), transform:xfrmString],
 
-		dueDate					: [type: 'date', ssPos:23, formPos:24, domain: 'C', width:120, locked:false, modifiable:true,
+		dueDate					: [type: 'date', ssPos:22, formPos:23, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Due Date', template:changeTmpl('dueDate'), transform:xfrmDateToString],
 
-		createdOn				: [type: 'date', ssPos:24, formPos:25, domain: 'C', width:120, locked:false,
+		createdOn				: [type: 'date', ssPos:23, formPos:24, domain: 'C', width:120, locked:false,
 										label: 'Created On', template:changeTmpl('createdOn'), transform:xfrmDateToString],
 
-		createdBy				: [type: 'string', ssPos:25, formPos:26, domain: 'C', width:120, locked:false,
+		createdBy				: [type: 'string', ssPos:24, formPos:25, domain: 'C', width:120, locked:false,
 										label: 'Created By', template:changeTmpl('createdBy')],
 
-		moveEvent				: [type: 'string', ssPos:26, formPos:27, domain: 'A', width:120, locked:false, modifiable:true,
+		moveEvent				: [type: 'string', ssPos:25, formPos:26, domain: 'A', width:120, locked:false, modifiable:true,
 										label: 'Move Event', template:changeTmpl('moveEvent'), transform:xfrmMoveEventToString, foreignKey: true],
 
-		batchId 				: [type:'number', ssPos:27, formPos:28, domain:'C', width:80, locked: false,
+		batchId 				: [type:'number', ssPos:26, formPos:27, domain:'C', width:80, locked: false,
 										label: 'Batch Id', transform:xfrmString, template:changeTmpl('batchId')],
 	]
 
