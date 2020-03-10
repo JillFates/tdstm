@@ -494,6 +494,8 @@ class StringUtil {
 
 	/**
 	 * Join all the given arguments into a single string using the given separator.
+	 * ignoring null or white space elements. i.e.:
+	 * join(['Hello', null, '', '    ', 'World', ' '], ',') == "Hello,World"
 	 * @param args - a list of strings to join
 	 * @param joinStr - a separator
 	 * @return a string with the values appropriately joined.
