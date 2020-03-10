@@ -1,5 +1,5 @@
 // Angular
-import {Component, ViewChild, OnInit, OnDestroy} from '@angular/core';
+import {Component, ViewChild, OnInit, OnDestroy, ComponentFactoryResolver} from '@angular/core';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
 // Model
 import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
@@ -10,7 +10,6 @@ import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params'
 import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
 // Service
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
@@ -20,8 +19,7 @@ import {AssetGlobalFiltersService} from '../../service/asset-global-filters.serv
 import {AssetViewSelectorComponent} from '../asset-view-selector/asset-view-selector.component';
 import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
 import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
-import { HeaderActionButtonData } from 'tds-component-library';
-
+import {DialogExit, DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
 // Other
 import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
@@ -70,9 +68,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private TAG_ASSET_COLUMN_WIDTH = 260;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private route: ActivatedRoute,
 		private router: Router,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private notifier: NotifierService,
@@ -241,17 +240,26 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	public onSaveAs(): void {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
-		this.dialogService.open(AssetViewSaveComponent, [
-			{ provide: ViewModel, useValue: this.model },
-			{ provide: ViewGroupModel, useValue: selectedData }
-		]).then(result => {
-			this.model = result;
-			this.dataSignature = this.stringifyCopyOfModel(this.model);
-			setTimeout(() => {
-				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
-			});
-		}).catch(result => {
-			console.log('error');
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetViewSaveComponent,
+			data: {
+				viewModel: this.model,
+				viewGroupModel: selectedData
+			},
+			modalConfiguration: {
+				title: 'Save List View',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe( (data: any) => {
+			if (data.status === DialogExit.ACCEPT) {
+				this.model = data;
+				this.dataSignature = this.stringifyCopyOfModel(this.model);
+				setTimeout(() => {
+					this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+				});
+			}
 		});
 	}
 
@@ -277,13 +285,18 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			this.assetGlobalFiltersService.prepareFilters(assetExportModel.assetQueryParams, this.globalQueryParams);
 		}
 
-		this.dialogService.open(AssetViewExportComponent, [
-			{ provide: AssetExportModel, useValue: assetExportModel }
-		]).then(result => {
-			console.log(result);
-		}).catch(result => {
-			console.log('error:', result);
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetViewExportComponent,
+			data: {
+				assetExportModel: assetExportModel
+			},
+			modalConfiguration: {
+				title: 'Export to Excel',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe();
 	}
 
 	public onFavorite(): void {

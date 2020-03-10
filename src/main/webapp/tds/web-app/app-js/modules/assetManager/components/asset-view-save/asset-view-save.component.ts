@@ -1,106 +1,96 @@
-import {AfterViewInit, Component} from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { ViewModel, ViewGroupModel } from '../../../assetExplorer/model/view.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
+// Angular
+import {AfterViewInit, Component, OnInit} from '@angular/core';
+// Model
+import {ViewModel, ViewGroupModel} from '../../../assetExplorer/model/view.model';
+import {AlertType} from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {Dialog, DialogButtonType} from 'tds-component-library';
+// Service
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import * as R from 'ramda';
+
 @Component({
 	selector: 'asset-explorer-view-save',
 	template: `
-        <div class="tds-modal-content asset-explorer-view-save-component has-side-nav">
-            <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <clr-icon aria-hidden="true" shape="close"></clr-icon>
-                </button>
-                <h4 class="modal-title">Save List View</h4>
-            </div>
-            <div class="modal-body">
-                <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="name" class="col-sm-3 control-label">View Name:
-                                <span class="required_field">*</span>
-                            </label>
-                            <div class="col-sm-9">
-                                <input type="text" (keyup)="onNameChanged()" name="name" id="name" class="form-control" placeholder="View Name" [(ngModel)]="model.name" required>
-                                <span *ngIf="!isUnique" class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-													<div class="col-sm-9 col-sm-offset-3">
-														<div *ngIf="isSystemCreatePermitted()" class="checkbox">
-															<clr-checkbox-wrapper class="inline">
-																<input clrCheckbox type="checkbox"
-																			 [name]="'isSystem'"
-																			 (change)="onIsSystemChange()"
-																			 [(ngModel)]="model.isSystem">
-																<label class="clr-control-label inline">
-																	{{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}
-																</label>
-															</clr-checkbox-wrapper>
-														</div>
-														<div class="checkbox" >
-															<clr-checkbox-wrapper class="inline">
-																<input clrCheckbox type="checkbox"
-																			 [name]="'shared'"
-																			 [disabled]="model.isSystem"
-																			 [(ngModel)]="model.isShared">
-																<label class="clr-control-label inline" [ngClass]="{'disabled-input' : model.isSystem}">
-																	{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}
-																</label>
-															</clr-checkbox-wrapper>
-														</div>
-													</div>
-                        </div>
-                        <div class="form-group">
-													<div class="col-sm-9 col-sm-offset-3">
-														<div class="checkbox favorite inline"
-																 (click)="onFavorite()">
-															<i class="fa fa-star-o text-yellow"
-																 [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
-															<label (click)="onFavorite()">
-																<input type="checkbox"
-																			 name="favorite"
-																			 style="visibility:hidden"
-																			 (click)="onFavorite()">
-																{{ 'GLOBAL.ADD_FAVORITES' | translate }}
-															</label>
-														</div>
-													</div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-sidenav btn-link">
-				<tds-button
-					icon="floppy"
-                        (click)="confirmCloseDialog()"
-                        [disabled]="!isValid()" title="Save">Save
-                </tds-button>
-                <tds-button
-					icon="ban"
-						(click)="cancelCloseDialog()"
-						title="Cancel"
-                        >Cancel
-                </tds-button>
-            </div>
-        </div>
+		<div class="asset-explorer-view-save-component">
+			<form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
+				<div class="box-body">
+					<div class="form-group">
+						<label for="name" class="col-sm-3 control-label">View Name:
+							<span class="required_field">*</span>
+						</label>
+						<div class="col-sm-9">
+							<input type="text" (keyup)="onNameChanged()" name="name" id="name" class="form-control" placeholder="View Name" [(ngModel)]="model.name" required>
+							<span *ngIf="!isUnique" class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-9 col-sm-offset-3">
+							<div *ngIf="isSystemCreatePermitted()" class="checkbox">
+								<clr-checkbox-wrapper class="inline">
+									<input clrCheckbox type="checkbox"
+												 [name]="'isSystem'"
+												 (change)="onIsSystemChange()"
+												 [(ngModel)]="model.isSystem">
+									<label class="clr-control-label inline">
+										{{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}
+									</label>
+								</clr-checkbox-wrapper>
+							</div>
+							<div class="checkbox" >
+								<clr-checkbox-wrapper class="inline">
+									<input clrCheckbox type="checkbox"
+												 [name]="'shared'"
+												 [disabled]="model.isSystem"
+												 [(ngModel)]="model.isShared">
+									<label class="clr-control-label inline" [ngClass]="{'disabled-input' : model.isSystem}">
+										{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}
+									</label>
+								</clr-checkbox-wrapper>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-9 col-sm-offset-3">
+							<div class="checkbox favorite inline"
+									 (click)="onFavorite()">
+								<i class="fa fa-star-o text-yellow"
+									 [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
+								<label (click)="onFavorite()">
+									<input type="checkbox"
+												 name="favorite"
+												 style="visibility:hidden"
+												 (click)="onFavorite()">
+									{{ 'GLOBAL.ADD_FAVORITES' | translate }}
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
 	`
 })
-export class AssetViewSaveComponent implements AfterViewInit {
-	model: ViewModel;
+export class AssetViewSaveComponent extends Dialog implements OnInit, AfterViewInit {
 	public isUnique = true;
+	public model: ViewModel;
+	public favorites: ViewGroupModel;
+
 	constructor(
-		model: ViewModel,
-		private favorites: ViewGroupModel,
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService) {
+		super();
+	}
 
-		this.model = { ...model };
+	ngOnInit(): void {
+		this.model = R.clone(this.data.viewModel);
+		this.favorites = R.clone(this.data.viewGroupModel);
+
 		if (this.model.id) {
 			this.model.name = `Copy of ${this.model.name}`;
 			this.model.id = null;
@@ -110,6 +100,23 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.model.isSystem) {
 			this.model.isShared = false;
 		}
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => true,
+			disabled: () => !this.isValid(),
+			type: DialogButtonType.ACTION,
+			action: this.confirmCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
 	}
 
 	ngAfterViewInit(): void {
@@ -119,13 +126,13 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		super.onCancelClose();
 	}
 
 	public confirmCloseDialog() {
 		this.assetExpService.saveReport(this.model)
-			.subscribe(result => result && this.activeDialog.close(result),
-			error => this.activeDialog.dismiss(error));
+			.subscribe(result => result && super.onAcceptSuccess(result),
+			error => super.onCancelClose(error));
 	}
 
 	public isValid(): boolean {
@@ -185,5 +192,12 @@ export class AssetViewSaveComponent implements AfterViewInit {
 					(error) => console.log(error.message));
 		}
 
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

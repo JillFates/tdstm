@@ -42,7 +42,6 @@ import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-m
 import {Permission} from '../../../../shared/model/permission.model';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../../assetExplorer/model/asset-entity.model';
 import {AssetModalModel} from '../../../assetExplorer/model/asset-modal.model';
-import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 import {DialogService, ModalSize} from 'tds-component-library';
 // Component
