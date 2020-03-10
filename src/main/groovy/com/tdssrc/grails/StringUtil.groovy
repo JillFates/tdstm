@@ -492,4 +492,14 @@ class StringUtil {
 		return UUID.randomUUID()
 	}
 
+	/**
+	 * Join all the given arguments into a single string using the given separator.
+	 * @param args - a list of strings to join
+	 * @param joinStr - a separator
+	 * @return a string with the values appropriately joined.
+	 */
+	static String join (Collection<String> args, String joinStr=' ') {
+		args?.findAll({it?.trim()}).join(joinStr)
+	}
+
 }
