@@ -53,7 +53,6 @@ class RecipeHistorySpec extends GebReportingSpec {
                     '    id: 1100,',
                     '    description: \'Startup ALL applications\',',
                     '    title: \'Startup app ${it.assetName}\',',
-                    '    workflow: \'AppStartup\',',
                     '    team: \'APP_COORD\',',
                     '    category: \'startup\',',
                     '    duration: 10,',
@@ -72,7 +71,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        tasksModule.goToTasksCookbook()
+        waitFor{tasksModule.goToTasksCookbook()}
         at CookbookPage
         commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         // Create clean recipe verify stuff
@@ -93,7 +92,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeWithTasksDataMap.recipeText+'"');
         waitFor {editorModalCloseBtn.click()}
         at TabEditorPage
-        waitFor {edTabSaveWipBtn.click()}
+        waitFor (5) {edTabSaveWipBtn.click()}
         at CookbookPage
         waitFor {taskGenerationTab.click()}
         at TabTaskGenPage
@@ -101,9 +100,9 @@ class RecipeHistorySpec extends GebReportingSpec {
         waitFor { buildOutOp.click()}
         waitFor { tskGTabGenUsingWipCBox.click()}
         waitFor { tskGTabGenerateTasksBtn.click()}
-        waitForProgressBar()
+        //waitForProgressBar()
         at TabTaskGenTabSummaryPage
-        waitFor { tskGTabSummaryList.find("li", 0).text().contains("Status: Complete")}
+        waitFor { tskGTabSummaryList.find("li", 0).text().contains("Status: Completed")}
     }
 
     def setup() {
@@ -170,7 +169,7 @@ class RecipeHistorySpec extends GebReportingSpec {
 
         then: 'Some Elements should be disabled'
             hisTabActTab.parent(".active")
-            hisTabActTabPublishBtn.text() == "Publish"
+            hisTabActTabPublishBtn.text() == "PUBLISH"
             hisTabActTabPublishBtn.@disabled == "true"
             hisTabActTabResetBtn.@disabled == "true"
             hisTabActTabRefreshBtn.@disabled == "true"
@@ -262,7 +261,7 @@ class RecipeHistorySpec extends GebReportingSpec {
             at TabHistoryTabActionsPage
 
         then: 'Different elements should be present'
-            hisTabActTabPublishBtn.text() == "Publish"
+            hisTabActTabPublishBtn.text() == "PUBLISH"
             hisTabActTabPublishBtn.@disabled == ""
             hisTabActTabResetBtn.@disabled == ""
             hisTabActTabRefreshBtn.@disabled == ""
