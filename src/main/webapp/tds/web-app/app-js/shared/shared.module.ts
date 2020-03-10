@@ -39,6 +39,7 @@ import {AssetTagUIWrapperService} from './services/asset-tag-ui-wrapper.service'
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
+import {UIHandleDoubleClickDirective} from './directives/handle-double_click-directive';
 import {UILoaderDirective} from './directives/ui-loader.directive';
 import {UIToastDirective} from './directives/ui-toast.directive';
 import {UIDialogDirective} from './directives/ui-dialog.directive';
@@ -125,6 +126,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 	declarations: [
 		UIAutofocusDirective,
 		UIHandleEscapeDirective,
+		UIHandleDoubleClickDirective,
 		UILoaderDirective,
 		UIToastDirective,
 		UIBooleanPipe,
@@ -191,6 +193,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UILoaderDirective,
 		UIAutofocusDirective,
 		UIHandleEscapeDirective,
+		UIHandleDoubleClickDirective,
 		UIToastDirective,
 		UIDialogDirective,
 		UIBooleanPipe,
