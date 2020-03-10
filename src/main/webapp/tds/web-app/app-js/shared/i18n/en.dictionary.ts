@@ -82,7 +82,9 @@ export const en_DICTIONARY: Object = {
 		'TOTAL': 'Total',
 		'TIMEZONE': 'Time Zone Select',
 		'DATE_TIMEZONE': 'Date and Timezone',
-		'DATE_FORMAT': 'Date Format'
+		'DATE_FORMAT': 'Date Format',
+		'LOADING_RECORDS': 'Loading records...',
+		'NO_RECORDS': 'No records found'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -538,5 +540,5 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 	},
 	'MANUFACTURER': {
 		'LIST': 'Manufacturer List'
-	}
+	},
 };

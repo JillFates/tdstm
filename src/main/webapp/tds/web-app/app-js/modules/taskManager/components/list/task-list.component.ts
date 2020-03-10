@@ -91,6 +91,7 @@ export class TaskListComponent implements OnInit {
 	public allTasksPermission: boolean;
 	private timeZone: string;
 	private dateFormat: string;
+	protected gridMessage;
 
 	constructor(
 		private taskService: TaskService,
@@ -738,6 +739,7 @@ export class TaskListComponent implements OnInit {
 				}
 			});
 		}
+		this.gridMessage = this.translate.transform('GLOBAL.LOADING_RECORDS');
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
 				for (let i = 0; i < result.totalCount; i++) {
@@ -757,6 +759,7 @@ export class TaskListComponent implements OnInit {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.loading = false;
 				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+				this.gridMessage = (result.totalCount > 0) ? this.translate.transform('GLOBAL.NO_RECORDS') : '';
 			});
 		this.loaderService.stopProgress();
 
