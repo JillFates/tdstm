@@ -594,7 +594,8 @@ class AssetComment {
 			dateCreated  : dateCreated,
 			dateResolved : dateResolved,
 			assignedTo   : assignedTo?.toString() ?: '',
-			isResolved   : dateResolved ? 'Yes' : 'No'
+			isResolved   : dateResolved ? 'Yes' : 'No',
+			assetClass: assetEntity.assetClass
 		]
 		return dataMap
 	}
