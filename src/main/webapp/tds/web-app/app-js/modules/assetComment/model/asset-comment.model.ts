@@ -45,6 +45,7 @@ export class AssetCommentColumnModel {
 				label: 'Asset',
 				property: 'assetName',
 				type: 'text',
+				class: 'column-cursor-pointer',
 				width: 170
 			},
 			{
