@@ -346,11 +346,11 @@ class DataviewService implements ServiceMethods {
 
 		// Check if the view is favorite and must be unfavorited.
 		if (dataview.isFavorite(whom.id) && !dataviewCommand.isFavorite) {
-			deleteFavoriteDataview(whom, project, dataview.id)
+			deleteFavoriteDataview(project, whom, dataview.id)
 		} else {
 			// Check if the view must be favorited
 			if (!dataview.isFavorite(whom.id) && dataviewCommand.isFavorite) {
-				addFavoriteDataview(whom, project, dataview.id)
+				addFavoriteDataview(project, whom, dataview.id)
 			}
 		}
 
@@ -401,8 +401,9 @@ class DataviewService implements ServiceMethods {
 
 		dataview.save()
 
-		if (dataviewCommand.isFavorite) {
-			addFavoriteDataview(whom, currentProject, dataview.id)
+		// Only bother creating the Favorite on Create if the user is creating view for themselves TM-17291
+		if (dataviewCommand.isFavorite && !  dataviewCommand.overridesView) {
+			addFavoriteDataview(currentProject, whom, dataview.id)
 		}
 
 		return dataview
