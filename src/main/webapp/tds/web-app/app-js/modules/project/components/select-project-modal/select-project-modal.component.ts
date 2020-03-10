@@ -7,7 +7,7 @@ import {Store} from '@ngxs/store';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-import {PostNotices} from '../../../auth/action/login.actions';
+import {PostNotices} from '../../../auth/action/notice.actions';
 
 // Model
 enum ProjectType {

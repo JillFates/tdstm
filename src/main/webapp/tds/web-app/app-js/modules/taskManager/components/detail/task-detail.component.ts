@@ -55,6 +55,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
 	taskActionInfoModel: TaskActionInfoModel;
+	public ignoreDoubleClickClasses = ['btn', 'actionable-link', 'k-grid'];
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,
@@ -107,7 +108,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
 				this.modelHelper = new TaskEditCreateModelHelper(
 					this.userTimeZone,
-					this.userPreferenceService.getUserCurrentDateFormatOrDefault(),
+					this.userPreferenceService.getUserDateFormat(),
 					this.taskManagerService,
 					this.dialogService,
 					this.translatePipe);

@@ -1,10 +1,10 @@
-import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.FindCondition
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import grails.gorm.transactions.Rollback
@@ -85,7 +85,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can find a domain Property Name with loaded Data Value'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -171,7 +171,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -305,7 +305,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can grab the reference to the FINDINGS to be used later'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -416,7 +416,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			assetDependency.save(flush: true, failOnError: true)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""asset_id,type,c1
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""asset_id,type,c1
 				${application.id},${type},${c1}""".stripIndent())
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -468,7 +468,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can find a domain Property Name with loaded Data Value for a dependent'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -537,7 +537,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -593,7 +593,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<Application> applications = [
@@ -696,7 +696,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
 				1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
 				2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
@@ -800,7 +800,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can create a domain when not found a instance with find command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -909,7 +909,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can throw an Exception if whenNotFound command defines an update action'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -990,7 +990,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can throw an Exception if whenFound command defines a create action'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -1068,7 +1068,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -1150,7 +1150,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 	void 'test can update a domain when found a instance with find command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -1262,7 +1262,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
 				${racks[0].id},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
 				13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L

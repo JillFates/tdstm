@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit } from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
@@ -38,6 +38,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			sme2: null,
 			appOwner: null
 		};
+
+		@ViewChild('controlSME1') public controlSME1: any;
+		@ViewChild('controlSME2') public controlSME2: any;
+		@ViewChild('controlAppOwner') public controlAppOwner: any;
 
 		constructor(
 			@Inject('model') model: any,
@@ -77,6 +81,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				};
 			}
 			this.updatePersonReferences();
+			this.preparePersonList();
 		}
 
 		/**
@@ -134,12 +139,93 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 				}
 			});
 		}
-		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[]): void {
+
+		/**
+		 * Search and copy over the Person List for SME 1
+		 * @param filter
+		 */
+		public filterSME1Change(filter: any): void {
+			this.model.sme1PersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
+		 * On focus open the dropdown
+		 */
+		public focusSME1(): void {
+			this.controlSME1.toggle(true);
+			this.controlSME2.toggle(false);
+			this.controlAppOwner.toggle(false);
+		}
+
+		/**
+		 * Search and copy over the Person List for SME 2
+		 * @param filter
+		 */
+		public filterSME2Change(filter: any): void {
+			this.model.sme2PersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
+		 * On focus open the dropdown
+		 */
+		public focusSME2(): void {
+			this.controlSME1.toggle(false);
+			this.controlSME2.toggle(true);
+			this.controlAppOwner.toggle(false);
+		}
+
+		/**
+		 * Search and copy over the Person List for App Owner
+		 * @param filter
+		 */
+		public filterAppOwnerChange(filter: any): void {
+			this.model.appOwnerPersonList = this.model.sourcePersonList.filter((s) => {
+				return s.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+			});
+		}
+
+		/**
+		 * On focus open the dropdown
+		 */
+		public focusAppOwner(): void {
+			this.controlSME1.toggle(false);
+			this.controlSME2.toggle(false);
+			this.controlAppOwner.toggle(true);
+		}
+
+		public onClose(event: any, dropdownlist: any): void {
+			event.preventDefault();
+			// Close the list if the component is no longer focused
+			setTimeout(() => {
+				if (!dropdownlist.wrapper.nativeElement.contains(document.activeElement)) {
+					dropdownlist.toggle(false);
+				}
+			});
+		}
+
+		/**
+		 * Add the person to the Asset Model, if the Person is "Add Person" it invokes the Dialog to add a new one
+		 * @param person
+		 * @param asset
+		 * @param fieldName
+		 * @param companies
+		 * @param teams
+		 * @param staffTypes
+		 * @param modelListParameter
+		 * @param dropdown
+		 */
+		onAddPerson(person: any, asset: string, fieldName: string, companies: any[], teams: any[], staffTypes: any[], modelListParameter: string, dropdown: any): void {
 			if (person.personId !== this.addPersonItem.personId) {
 				this.model.asset[fieldName].id = person.personId;
+				dropdown.toggle(false);
 				return;
 			}
 
+			dropdown.toggle(false);
 			const personModel = new PersonModel();
 			personModel.asset = asset;
 			personModel.fieldName = fieldName;
@@ -155,7 +241,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					PersonService
 				], false, true)
 				.then((result) => {
-					this.personList.push({personId: result.id, fullName: result.name})
+					if (this.model.sourcePersonList && this.model[modelListParameter]) {
+						this.model.sourcePersonList.push({personId: result.id, fullName: result.name});
+						this.model[modelListParameter].push({personId: result.id, fullName: result.name});
+					}
 					this.model.asset[fieldName].id = result.id;
 					this.updatePersonReferences();
 				})
@@ -164,15 +253,22 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
 				});
 		}
-		getPersonList(personList: any[]) {
-			if (!this.personList) {
-				this.personList = personList;
-				if (this.permissionService.hasPermission('PersonCreate')) {
-					this.personList.unshift(this.addPersonItem)
-				}
+
+		/**
+		 * Prepare the Person List with the Person Create if it has the permission
+		 */
+		preparePersonList() {
+			if (this.permissionService.hasPermission('PersonCreate')) {
+				this.model.personList.unshift(this.addPersonItem);
 			}
-			return this.personList;
+			// Save a copy of the Person List
+			this.model.sourcePersonList = R.clone(this.model.personList);
+			// Create each instance
+			this.model.appOwnerPersonList = R.clone(this.model.sourcePersonList);
+			this.model.sme1PersonList = R.clone(this.model.sourcePersonList);
+			this.model.sme2PersonList = R.clone(this.model.sourcePersonList);
 		}
+
 		updatePersonReferences(): void {
 			this.persons.sme = { personId: this.model.asset.sme.id};
 			this.persons.sme2 = { personId: this.model.asset.sme2.id};

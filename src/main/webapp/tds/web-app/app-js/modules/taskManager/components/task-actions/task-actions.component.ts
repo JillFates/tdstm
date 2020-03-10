@@ -132,14 +132,14 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	 * Determines if Done button can be shown.
 	 */
 	showDone(): boolean {
-		return [TaskStatus.READY, TaskStatus.STARTED].indexOf(this.taskStatus) >= 0;
+		return this.taskActionInfoModel && [TaskStatus.READY, TaskStatus.STARTED].indexOf(this.taskActionInfoModel.status) >= 0;
 	}
 
 	/**
 	 * Determines if Start button can be shown.
 	 */
 	showStart(): boolean {
-		return [TaskStatus.READY].indexOf(this.taskStatus) >= 0;
+		return this.taskActionInfoModel && [TaskStatus.READY].indexOf(this.taskActionInfoModel.status) >= 0;
 	}
 
 	/**
@@ -148,8 +148,12 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	showAssignToMe(): boolean {
 		return (this.taskActionInfoModel
 			&&
-			(!this.taskActionInfoModel.assignedTo || this.userContext.person.id !== this.taskActionInfoModel.assignedTo)
-			&& ([TaskStatus.READY, TaskStatus.PENDING, TaskStatus.STARTED].indexOf(this.taskStatus) >= 0));
+			(	( !this.taskActionInfoModel.assignedTo
+				||
+				this.userContext.person.id !== this.taskActionInfoModel.assignedTo )
+				&&
+				[TaskStatus.READY, TaskStatus.PENDING, TaskStatus.STARTED].indexOf(this.taskActionInfoModel.status) >= 0
+		) );
 	}
 
 	/**
@@ -165,7 +169,7 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	 */
 	showReset(): boolean {
 		return this.taskActionInfoModel
-			&& this.taskActionInfoModel.apiActionId && this.taskStatus === TaskStatus.HOLD;
+			&& this.taskActionInfoModel.apiActionId && this.taskActionInfoModel.status === TaskStatus.HOLD;
 	}
 
 	/**
@@ -187,7 +191,7 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	showDelay(): boolean {
 		return this.taskActionInfoModel
 			&& this.taskActionInfoModel.category && this.taskActionInfoModel.category !== 'moveday'
-			&& this.taskStatus === TaskStatus.READY;
+			&& this.taskActionInfoModel.status === TaskStatus.READY;
 	}
 
 	/**

@@ -13,6 +13,7 @@ declare var jQuery: any;
 	template: `
 		<div class="content body">
 			<tds-report-toggle-filters [hideFilters]="hideFilters"
+			                           							 (reload)="onReload()"
 																 (toggle)="toggleFilters($event)"
 																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
@@ -148,6 +149,16 @@ export class ApplicationProfilesReportComponent extends ReportComponent {
 				this.onBundleListChange({id: moveBundleId});
 			});
 		});
+	}
+
+	/**
+	 * Revert the page to its initial state.
+	 */
+	public onReload(): void {
+		this.hideFilters = false;
+		this.generatedReport = false;
+		this.reportResult = null;
+		this.onLoad();
 	}
 
 	/**

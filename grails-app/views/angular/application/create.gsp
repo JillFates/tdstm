@@ -43,16 +43,20 @@
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${assetInstance.appVersion}" ngmodel="model.asset.appVersion" tabindex="13"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${assetInstance.sme}" />
 											<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
-												<kendo-dropdownlist #controlSme
-													[tabIndex]="20"
+												<kendo-dropdownlist #controlSME1
+														[filterable]="true"
+														(filterChange)="filterSME1Change($event)"
+														(focus)="focusSME1()"
+														(close)="onClose($event, controlSME1)"
+														[tabIndex]="20"
 														class="tm-input-control person-list"
 														name="modelAssetSme"
 														[(ngModel)]="persons.sme"
-														(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+														(valueChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'sme1PersonList', controlSME1)"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="getPersonList(${personList as JSON})">
+														[data]="model.sme1PersonList">
 												</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="29" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
@@ -64,16 +68,20 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${assetInstance.sme2}"/>
 											<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd"  >
 												<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
-													<kendo-dropdownlist  #controlSme2
+													<kendo-dropdownlist  #controlSME2
+																		 [filterable]="true"
+																		 (filterChange)="filterSME2Change($event)"
+																		 (focus)="focusSME2()"
+																		 (close)="onClose($event, controlSME2)"
 																		 [tabIndex]="21"
 																		 class="tm-input-control person-list"
 																		 name="modelAssetSme2"
 																		 [(ngModel)]="persons.sme2"
-																		 (selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+																		 (valueChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'sme2PersonList', controlSME2)"
 																		 [defaultItem]="defaultItem"
 																		 [textField]="'fullName'"
 																		 [valueField]="'personId'"
-																		 [data]="getPersonList(${personList as JSON})">
+																		 [data]="model.sme2PersonList">
 													</kendo-dropdownlist>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${assetInstance.criticality}" tabindex="30"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
@@ -85,16 +93,20 @@
 											<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 												<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')"
 													 title="Swap Contacts"></div>
-												<kendo-dropdownlist
+												<kendo-dropdownlist #controlAppOwner
+														[filterable]="true"
+														(filterChange)="filterAppOwnerChange($event)"
+														(focus)="focusAppOwner()"
+														(close)="onClose($event, controlAppOwner)"
 														[tabIndex]="22"
 														class="tm-input-control"
 														name="modelAssetappOwner"
 														[(ngModel)]="persons.appOwner"
-														(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+														(valueChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'appOwnerPersonList', controlAppOwner)"
 														[defaultItem]="defaultItem"
 														[textField]="'fullName'"
 														[valueField]="'personId'"
-														[data]="getPersonList(${personList as JSON})">
+														[data]="model.appOwnerPersonList">
 												</kendo-dropdownlist>
 											</td>
 

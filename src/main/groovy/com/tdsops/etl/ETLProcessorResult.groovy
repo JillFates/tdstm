@@ -13,14 +13,12 @@ import groovy.transform.CompileStatic
  * <br>
  * Every part of the results are covered in formatter functions.
  */
-@ConfigureMarshalling
 class ETLProcessorResult {
 
 	static final Integer CURRENT_VERSION = 2
 	/**
 	 * ETL Processor used to collect results in a ETL Procesor Result instance.
 	 */
-	@DoNotMarshall
 	ETLProcessor processor
 	/**
 	 * Defines JSON version for the import the process.
@@ -34,17 +32,15 @@ class ETLProcessorResult {
 	/**
 	 * Current reference for the domain instance and its contents
 	 */
-	@DoNotMarshall
 	DomainResult reference
 	/**
 	 * Collection of results with their data fields map
 	 */
-	List<Map<String, DomainResult>> domains = []
+	List<DomainResult> domains = (List<DomainResult>)[]
 	/**
 	 * Result row index position in the reference.data list
 	 * @see DomainResult#data
 	 */
-	@DoNotMarshall
 	Integer resultIndex = -1
 
 	/**
@@ -55,7 +51,7 @@ class ETLProcessorResult {
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
-			originalFilename: processor.dataSetFacade.fileName(),
+			originalFilename: processor.getFilename()
 		]
 	}
 
@@ -63,7 +59,7 @@ class ETLProcessorResult {
 	 * Adds dataScriptId in ETLInfo map for results
 	 * @param dataScriptId an id of an instance of DataScript
 	 */
-	void addDataScriptIdInETLInfo(Long dataScriptId){
+	void addDataScriptIdInETLInfo(Long dataScriptId) {
 		this.ETLInfo.dataScriptId = dataScriptId
 	}
 
@@ -74,7 +70,7 @@ class ETLProcessorResult {
 	void addCurrentSelectedDomain(ETLDomain domain) {
 		endRow()
 		reference = domains.find { it.domain == domain.name() }
-		if(!reference){
+		if (!reference) {
 			reference = new DomainResult(domain: domain.name())
 			domains.add(reference)
 		}
@@ -88,6 +84,7 @@ class ETLProcessorResult {
 	 * After that, It saves the new element in the data results.
 	 * @param element an instance of Element
 	 */
+	@CompileStatic
 	void loadElement(Element element) {
 		RowResult currentRow = findOrCreateCurrentRow()
 		currentRow.ignore = false
@@ -128,7 +125,7 @@ class ETLProcessorResult {
 	 * Removes an element instance value current results
 	 * @param element ans instance of {@code Element}
 	 */
-	void removeElement(Element element){
+	void removeElement(Element element) {
 		RowResult currentRow = findOrCreateCurrentRow()
 		currentRow.removeElement(element.fieldDefinition.name)
 	}
@@ -136,16 +133,16 @@ class ETLProcessorResult {
 	/**
 	 * Add a FoundElement in the result based on its property
 	 * <pre>
-	 *		whenFound asset create {
-	 *			assetClass Application
-	 *			assetName primaryName
-	 *			assetType primaryType
-	 *			"SN Last Seen": NOW
-	 *		}
+	 * 		whenFound asset create {
+	 * 			assetClass Application
+	 * 			assetName primaryName
+	 * 			assetType primaryType
+	 * 			"SN Last Seen": NOW
+	 *	}
 	 * </pre>
 	 * @param foundElement
 	 */
-	void addFoundElement(FoundElement foundElement){
+	void addFoundElement(FoundElement foundElement) {
 		RowResult currentRow = findOrCreateCurrentRow()
 		currentRow.ignore = false
 		currentRow.addFoundElement(foundElement)
@@ -160,7 +157,7 @@ class ETLProcessorResult {
 	 * @param findElement
 	 */
 	void addFindWarnMessage(ETLFindElement findElement) {
-		if(findElement.currentFind.objects){
+		if (findElement.currentFind.objects) {
 			RowResult currentRow = findOrCreateCurrentRow()
 			currentRow.addFindElementWarnMessage(findElement)
 		}
@@ -169,31 +166,76 @@ class ETLProcessorResult {
 	/**
 	 * After completing a load 'comments' command, this methods adds results in {@code ETLProcessorResult}
 	 * <pre>
-	 *		extract 'column.name' load 'comments'
-	 *		....
-	 *		load 'comments' with myVar
+	 * 		extract 'column.name' load 'comments'
+	 * 		....
+	 * 		load 'comments' with myVar
 	 * </pre>
 	 * @param commentElement an instance of {@code CommentElement}
 	 */
 	void addComments(CommentElement commentElement) {
 		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
 		currentRow.addComments(commentElement)
 	}
+
+	/**
+	 * Adds a single tag to an asset if not already associated
+	 * to the current row.
+	 * <pre>
+	 * 	tagAdd 'Code Blue'
+	 * </pre>
+	 * @param tag a String tag name
+	 */
+	void addTag(String tag) {
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
+		currentRow.addTag(tag)
+	}
+
+	/**
+	 * Removes a single tag from an asset if associated
+	 * to the current row.
+	 * <pre>
+	 * 	tagRemove 'Code Blue'
+	 * </pre>
+	 * @param tag a String tag name
+	 */
+	void removeTag(String tag) {
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
+		currentRow.removeTag(tag)
+	}
+
+	/**
+	 * Replaces one tag with another tag on an asset if associated
+	 * to the current row
+	 * <pre>
+	 * 	tagReplace 'a', 'b'
+	 * </pre>
+	 * @param currentTag a Tag name to be replaced
+	 * @param newTag a new Tag for replacing
+	 */
+	void replaceTag(String currentTag, String newTag) {
+		RowResult currentRow = findOrCreateCurrentRow()
+		currentRow.ignore = false
+		currentRow.replaceTag(currentTag, newTag)
+	}
+
 	/**
 	 * Restart result index for the next row to be processed in an ETL script iteration
 	 */
-	void startRow(){
+	void startRow() {
 		resultIndex = -1
 	}
 
 	/**
 	 * Mark the end of a row cleaning up the ignored result
 	 */
-	void endRow(){
+	void endRow() {
 		// Check first if the scenario with an iterate without defining a domain and read labels
-		if(reference && processor.iterateIndex){
+		if (reference && processor.iterateIndex) {
 			RowResult currentRow = findOrCreateCurrentRow()
-			if(currentRow.ignore){
+			if (currentRow.ignore) {
 				ignoreCurrentRow()
 			}
 		}
@@ -203,8 +245,8 @@ class ETLProcessorResult {
 	 * Remove the current row from results going back the previous row results
 	 */
 	void ignoreCurrentRow() {
-		if(resultIndex >= 0){
-			if(resultIndex >= reference.data.size() + 1){
+		if (resultIndex >= 0) {
+			if (resultIndex >= reference.data.size() + 1) {
 				throw ETLProcessorException.ignoreOnlyAllowOnNewRows()
 			}
 			reference.data.remove(resultIndex)
@@ -220,11 +262,12 @@ class ETLProcessorResult {
 	 *
 	 * @return and instance of RowResult
 	 */
+	@CompileStatic
 	RowResult findOrCreateCurrentRow() {
-		if(resultIndex == -1){
+		if (resultIndex == -1) {
 			reference.data.add(new RowResult(
 				fieldsValidator: processor.fieldsValidator,
-				rowNum: processor.iterateIndex.pos,
+				rowNum: processor.currentRowIndex,
 				domain: reference.domain)
 			)
 			resultIndex = reference.data.size() - 1
@@ -235,10 +278,10 @@ class ETLProcessorResult {
 	/**
 	 * Return current row using resultIndex value
 	 * @return an instance of RowResult
-	 * @see RowResult
-	 * @see ETLProcessorResult#resultIndex
+	 * @see RowResult* @see ETLProcessorResult#resultIndex
 	 */
-	RowResult currentRow(){
+	@CompileStatic
+	RowResult currentRow() {
 		return reference.data[resultIndex]
 	}
 
@@ -247,7 +290,8 @@ class ETLProcessorResult {
 	 * @param fieldNameOrLabel a name or label for a domain field.
 	 * @return an object with value content
 	 */
-	Object getFieldValue(String fieldNameOrLabel){
+	@CompileStatic
+	Object getFieldValue(String fieldNameOrLabel) {
 		if (resultIndex >= 0) {
 
 			RowResult row = currentRow()
@@ -265,7 +309,7 @@ class ETLProcessorResult {
 	 * @param columnName
 	 * @return
 	 */
-	Boolean hasColumn(String columnName){
+	Boolean hasColumn(String columnName) {
 		if (resultIndex >= 0) {
 			RowResult row = currentRow()
 			return row.hasField(columnName)
@@ -288,7 +332,7 @@ class ETLProcessorResult {
 
 		Map<String, Map<String, String>> map = processor.fieldsValidator.fieldLabelMapForResults()
 
-		domains.each {DomainResult domainResult ->
+		domains.each { DomainResult domainResult ->
 			if (map?.containsKey(domainResult.domain)) {
 				domainResult.setFieldLabelMap(map[domainResult.domain])
 			}
@@ -300,14 +344,14 @@ class ETLProcessorResult {
 		]
 
 		if (includeConsoleLog) {
-			results.put( 'consoleLog',this.processor.debugConsole.content() )
+			results.put('consoleLog', this.processor.debugConsole.content())
 		}
 
 		return results
 	}
 
-	void addFieldLabelMapInResults(Map<String, Map<String, String>> map){
-		domains.each {DomainResult domainResult ->
+	void addFieldLabelMapInResults(Map<String, Map<String, String>> map) {
+		domains.each { DomainResult domainResult ->
 			if (map?.containsKey(domainResult.domain)) {
 				domainResult.setFieldLabelMap(map[domainResult.domain])
 			}
@@ -384,7 +428,7 @@ class ETLProcessorResult {
 					Object rowValue = row.fields[fname].value
 
 					// Determine if the value is a String
-					if (rowValue instanceof CharSequence && values[i] instanceof CharSequence ) {
+					if (rowValue instanceof CharSequence && values[i] instanceof CharSequence) {
 						matched = rowValue.equalsIgnoreCase(values[i].toString())
 					} else {
 						matched = rowValue == values[i]
@@ -437,7 +481,6 @@ class ETLProcessorResult {
  * </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class DomainResult {
 
 	/**
@@ -515,7 +558,6 @@ class DomainResult {
  * </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class RowResult {
 
 	String op = ImportOperationEnum.INSERT
@@ -524,20 +566,19 @@ class RowResult {
 	Boolean warn = false
 	Boolean duplicate = false
 	List<String> errors = []
-	@DoNotMarshall
 	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
-	@DoNotMarshall
 	String domain
-	@DoNotMarshall
 	ETLFieldsValidator fieldsValidator
 	List<String> comments = []
+	TagResults tags
 
 	/**
 	 * Add element to the current row data
 	 * @param element
 	 */
-	void addLoadElement(Element element){
+	@CompileStatic
+	void addLoadElement(Element element) {
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.addLoadElement(element)
 		this.errorCount = fieldData.errors.size() + this.errors.size()
@@ -547,7 +588,7 @@ class RowResult {
 	 * Add initialized element to the current row data
 	 * @param element
 	 */
-	void addInitElement(Element element){
+	void addInitElement(Element element) {
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.init = element.init
 	}
@@ -559,16 +600,16 @@ class RowResult {
 	 *    "errors": ["found with wrong asset class"],
 	 *
 	 *    "asset": {
-	 * 		....
+	 *    	....
 	 * 		"warn":true,
 	 * 		"errors": ["found with wrong asset class"],
 	 * 		    ....
-	 * 	   }
-	 * 	}
+	 *	   }
+	 * }
 	 * </pre>
 	 * @param findElement the find element with the warn message
 	 */
-	void addFindElement(ETLFindElement findElement){
+	void addFindElement(ETLFindElement findElement) {
 		FieldResult fieldData = findOrCreateFieldData(findElement.currentFind.fieldDefinition)
 		fieldData.addFindElement(findElement)
 
@@ -583,7 +624,21 @@ class RowResult {
 		this.errorCount = fieldData.errors.size()
 	}
 
-	void addFoundElement(FoundElement foundElement){
+	/**
+	 * Returns <tt>true</tt> if {@code RowResult#fields} Map contains a mapping for the specified
+	 * fieldName.
+	 * @param fieldName a String field Name
+	 * @return true if {@code RowResult#fields} Map fieldName key
+	 */
+	Boolean containsKey(String fieldName){
+		return fields.containsKey(fieldName)
+	}
+
+	/**
+	 * Used to store a FoundElement into the ELT Result
+	 * @param foundElement
+	 */
+	void addFoundElement(FoundElement foundElement) {
 		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition)
 		fieldData.addFoundElement(foundElement)
 	}
@@ -596,12 +651,12 @@ class RowResult {
 	 *    "errors": ["found with wrong asset class"],
 	 *
 	 *    "asset": {
-	 * 		....
+	 *    	....
 	 * 		"warn":true,
 	 * 		"errors": ["found with wrong asset class"],
 	 * 		    ....
-	 * 	    }
-	 * 	}
+	 *	    }
+	 * }
 	 * </pre>
 	 * @param findElement the find element with the warn message
 	 */
@@ -616,8 +671,8 @@ class RowResult {
 	 * Removes an element instance value current results
 	 * @param fieldName a field name used in {@code RowResul#fields}
 	 */
-	void removeElement(String fieldName){
-		if(fields.containsKey(fieldName)){
+	void removeElement(String fieldName) {
+		if (fields.containsKey(fieldName)) {
 			fields.remove(fieldName)
 		}
 	}
@@ -627,8 +682,9 @@ class RowResult {
 	 * @param element
 	 * @return
 	 */
-	FieldResult findOrCreateFieldData(ETLFieldDefinition fieldDefinition){
-		if(!fields.containsKey(fieldDefinition.name)){
+	@CompileStatic
+	FieldResult findOrCreateFieldData(ETLFieldDefinition fieldDefinition) {
+		if (!fields.containsKey(fieldDefinition.name)) {
 			fields[fieldDefinition.name] = new FieldResult(fieldOrder: fields.size(), fieldDefinition: fieldDefinition)
 		}
 		return fields[fieldDefinition.name]
@@ -639,12 +695,12 @@ class RowResult {
 	 * @param fieldNameOrLabel a name or label for a domain field.
 	 * @return an instance of {@code FieldResult}
 	 */
-	FieldResult getField(String fieldNameOrLabel){
+	FieldResult getField(String fieldNameOrLabel) {
 
 		Map<String, String> fieldLabelMap = fieldsValidator.labelFieldMap[domain]
-		String fieldName = fieldLabelMap.containsKey(fieldNameOrLabel)? fieldLabelMap[fieldNameOrLabel]: fieldNameOrLabel
+		String fieldName = fieldLabelMap.containsKey(fieldNameOrLabel) ? fieldLabelMap[fieldNameOrLabel] : fieldNameOrLabel
 
-		if(!fields.containsKey(fieldName)) {
+		if (!fields.containsKey(fieldName)) {
 			throw ETLProcessorException.unknownDomainProperty(fieldName)
 		}
 
@@ -659,7 +715,7 @@ class RowResult {
 	 * @return true or false if {@code RowResult}
 	 * 			contains a field name or not.
 	 */
-	Boolean hasField(String fieldName){
+	Boolean hasField(String fieldName) {
 		return fields.containsKey(fieldName)
 	}
 
@@ -670,36 +726,75 @@ class RowResult {
 	void addComments(CommentElement commentElement) {
 		this.comments.add(commentElement.commentText)
 	}
+
+	/**
+	 * Adds a new comment content in {@code RowResult#tags} field.
+	 * <pre>
+	 * 	tagAdd 'Code Blue'
+	 * </pre>
+	 * @param tag
+	 */
+	void addTag(String tag) {
+		getTagResults().add(tag)
+	}
+
+	/**
+	 * Removes a single tag from an asset if associated
+	 * to the current row.
+	 * <pre>
+	 * 	tagRemove 'Code Blue'
+	 * </pre>
+	 * @param tag a String tag name
+	 */
+	void removeTag(String tag) {
+		getTagResults().remove(tag)
+	}
+
+	/**
+	 * Replaces one tag with another tag on an asset if associated
+	 * <pre>
+	 * 	tagReplace 'a', 'b'
+	 * </pre>
+	 * @param currentTag a Tag name to be replaced
+	 * @param newTag a new Tag for replacing
+	 */
+	void replaceTag(String currentTag, String newTag) {
+		getTagResults().replace(currentTag, newTag)
+	}
+	/**
+	 * Lazy initialization for {@code RowResult#tags}
+	 * field.
+	 * @return an instance of {@code TagResults}
+	 */
+	private TagResults getTagResults() {
+		if (!tags) {
+			tags = new TagResults()
+		}
+		return tags
+	}
 }
 
 /**
  * Prepares some of the fields result in the data result.
  * <pre>
- *	"asset": {
- *	    "value": "",
- *	    "originalValue": "",
- *	    "init": "Default Value"
- *		"warn":true,
- *		"warnMsg": "found with wrong asset class",
- *		"duplicate": true,
- *			"find": {
- *				"query": [
- *					{"domain": "Application", "kv": {"id": null}},
- *					{"domain": "Application", "kv": { "assetName": "CommGen", "assetType": "Application" }},
- *					{"domain": "Application", "kv": { "assetName": "CommGen" }},
- *					{"domain": "Asset", "kv": { "assetName": "CommGen" }, "warn": true}
- *				],
- *				"matchOn": 2,
- *				"results": [12312,123123,123123123]
- *			},
- *		}
- * </pre>
+ * 	"asset": {* 	    "value": "",
+ * 	    "originalValue": "",
+ * 	    "init": "Default Value"
+ * 		"warn":true,
+ * 		"warnMsg": "found with wrong asset class",
+ * 		"duplicate": true,
+ * 			"find": {* 				"query": [
+ *{"domain": "Application", "kv": {"id": null}},
+ *{"domain": "Application", "kv": { "assetName": "CommGen", "assetType": "Application" }},
+ *{"domain": "Application", "kv": { "assetName": "CommGen" }},
+ *{"domain": "Asset", "kv": { "assetName": "CommGen" }, "warn": true}* 				],
+ * 				"matchOn": 2,
+ * 				"results": [12312,123123,123123123]
+ *},
+ *}* </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class FieldResult {
-
-	@DoNotMarshall
 	ETLFieldDefinition fieldDefinition
 	Object originalValue
 	Object value
@@ -708,11 +803,9 @@ class FieldResult {
 	 * Define order in which fields are created during an ETL script execution
 	 * <pre>
 	 *  domain Device
-	 *  iterate {
-	 *  	extract 1 load 'Name'
+	 *  iterate {*  	extract 1 load 'Name'
 	 *  	extract 2 load 'Description'
-	 *  }
-	 * </pre>
+	 *}* </pre>
 	 * Then {@code RowResult.data} will be added using this order:
 	 * <pre>
 	 *  rowResult.data.put('assetName', new FieldResult(fieldOrder: 0, value:..))
@@ -730,8 +823,8 @@ class FieldResult {
 	 * Add errors list in JSON results
 	 * @param errors
 	 */
-	private void addErrors(List<String> errors){
-		if(errors){
+	private void addErrors(List<String> errors) {
+		if (errors) {
 			this.errors.addAll(errors)
 		}
 	}
@@ -748,19 +841,18 @@ class FieldResult {
 	/**
 	 * Prepares the query data Map in the ETLProcessorResult
 	 * <pre>
-	 *	"query": [
-	 *		{
-	 *			"domain": "Application",
-	 *			"kv": {"id": null},
-	 *	    	"errors" : ["Named parameter [id] value may not be null"]
-	 *		},
-	 *	]
+	 * 	"query": [
+	 *{* 			"domain": "Application",
+	 * 			"kv": {"id": null},
+	 * 	    	"errors" : ["Named parameter [id] value may not be null"]
+	 *},
+	 * 	]
 	 * </pre>
 	 * @param findElement
 	 * @return
 	 */
 	void addFindElement(ETLFindElement findElement) {
-		this.addErrors((List<String>)findElement.currentFind.errors)
+		this.addErrors((List<String>) findElement.currentFind.errors)
 		this.find.addQueryAndResults(findElement)
 	}
 
@@ -778,7 +870,7 @@ class FieldResult {
 	 * @param foundElement
 	 */
 	void addFoundElement(FoundElement foundElement) {
-		if(foundElement.getAction() == FoundElement.FoundElementType.create){
+		if (foundElement.getAction() == FoundElement.FoundElementType.create) {
 			create = foundElement.propertiesMap
 		} else {
 			update = foundElement.propertiesMap
@@ -787,8 +879,8 @@ class FieldResult {
 }
 
 @CompileStatic
-@ConfigureMarshalling
 class FindResult {
+
 	List<QueryResult> query = []
 	List<Long> results = []
 	Integer size = 0
@@ -814,7 +906,7 @@ class FindResult {
 	 * @param findElement the find element with the warn message
 	 */
 	private void addResults(ETLFindElement findElement) {
-		if(!this.results && findElement.results){
+		if (!this.results && findElement.results) {
 			this.results = findElement.results.objects.collect { it as Long }
 			this.size = this.results.size()
 			this.matchOn = findElement.results.matchOn as Integer
@@ -828,7 +920,7 @@ class FindResult {
 		query.add(
 			new QueryResult(
 				domain: findElement.currentDomain.name(),
-				criteria: (List<Map<String, Object>>)findElement.currentFind.statement.conditions.collect { FindCondition condition ->
+				criteria: (List<Map<String, Object>>) findElement.currentFind.statement.conditions.collect { FindCondition condition ->
 					return [
 						propertyName: condition.propertyName,
 						operator    : condition.operator.name(),
@@ -843,7 +935,7 @@ class FindResult {
 	 * Add query and Results in JSON result
 	 * @param findElement
 	 */
-	void addQueryAndResults(ETLFindElement findElement){
+	void addQueryAndResults(ETLFindElement findElement) {
 		addQuery(findElement)
 		addResults(findElement)
 	}
@@ -851,34 +943,81 @@ class FindResult {
 /**
  * Prepares the query data Map in the ETLProcessorResult
  * <pre>
- *	"query": [
- *		{
- *			"domain": "Application",
- *			"criteria": [
- *				{"propertyName": "assetName", "operator": "eq","value": "zulu01"},
- *				{"propertyName": "priority", "operator": "gt","value": 2},
- *			],
- *	    	"error" : "Named parameter [id] value may not be null"
- *		},
- *	]
+ * 	"query": [
+ *{* 			"domain": "Application",
+ * 			"criteria": [
+ *{"propertyName": "assetName", "operator": "eq","value": "zulu01"},
+ *{"propertyName": "priority", "operator": "gt","value": 2},
+ * 			],
+ * 	    	"error" : "Named parameter [id] value may not be null"
+ *},
+ * 	]
  * </pre>
  * @param findElement
  * @return
  */
 @CompileStatic
-@ConfigureMarshalling
 class QueryResult {
+
 	String domain
 	List<Map<String, Object>> criteria = []
 
 	@Override
 	String toString() {
 		return "QueryResult{"
-			.concat( "domain=")
+			.concat("domain=")
 			.concat(domain)
 			.concat(", kv=")
 			.concat(criteria.toString())
 			.concat('}')
 
 	}
+}
+
+/*
+ * JSON representation for tags added in an ETL script.
+ * <pre>
+ * {
+ * 	"fields": { ... },
+ * 	"tags" : {
+ * 		"add": ["Code Blue", "FUBAR", "SNAFU"],
+ *  	"remove": ["Blah", "xyzzy"],
+ *  	"replace": {"a":"b", "e":"f", "c":"d", "g":"h"}
+ *  }
+ * }
+ * </pre>
+ * This class manages all the ETL tag commands.
+ * <pre>
+ *     tagAdd 'Code Blue'
+ *     tagAdd 'FUBAR','SNAFU'
+ *
+ *     tagRemove 'Blah'
+ *     tagRemove 'Blah','xyzzy'
+ *
+ *     tagReplace 'a', 'b'
+ *     tagReplace 'e':'f'
+ *     tagReplace 'c':'d', 'g':'h'
+ * </pre>
+ * @see com.tdsops.etl.ETLProcessor#tagAdd(java.lang.String)
+ * @see com.tdsops.etl.ETLProcessor#tagRemove(java.lang.String)
+ * @see com.tdsops.etl.ETLProcessor#tagReplace(java.lang.String, java.lang.String)
+ */
+class TagResults {
+
+	Set<String> add = [] as Set
+	Set<String> remove = [] as Set
+	Map<String, String> replace = [:]
+
+	void add(String tagName) {
+		add.add(tagName)
+	}
+
+	void remove(String tagName) {
+		remove.add(tagName)
+	}
+
+	void replace(String currentTag, String newTag) {
+		replace[currentTag] = newTag
+	}
+
 }

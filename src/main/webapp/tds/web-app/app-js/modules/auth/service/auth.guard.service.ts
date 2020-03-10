@@ -46,7 +46,7 @@ export class AuthGuardService implements CanActivate {
 		let guardResults = Observable.forkJoin(guardRequests).pipe(
 			map(([successToSaveLastPage, permissions]) => {
 				if (!successToSaveLastPage) {
-					// console.info('AuthGuardService:', 'Session has expired');
+					// console.error('AuthGuardService:', 'Session has expired');
 					this.store.dispatch(new Logout());
 					return Observable.of(false);
 				}
@@ -55,8 +55,8 @@ export class AuthGuardService implements CanActivate {
 
 				this.userContext = this.store.selectSnapshot(UserContextState.getUserContext);
 				let requiresLicense: boolean = route.data['requiresLicense'];
-				if (requiresLicense && (!this.userContext.licenseInfo || !this.userContext.licenseInfo.license.isValid)) {
-					this.windowService.getWindow().location.href = '/tdstm/errorHandler/licensing';
+				if (requiresLicense && (!this.userContext.license || !this.userContext.license.isValid)) {
+					this.router.navigate(['/security/licenseNotFound']);
 					return Observable.of(false);
 				}
 

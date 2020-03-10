@@ -28,7 +28,17 @@
 				</div>
 			</div>
 			<div class="col-sm-6 filters-section">
-				<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+				<div class="pull-right">
+					<tds-button-custom
+							class="component-action-clear-filters"
+							id="btnClean"
+							icon="times"
+							title="Clear filters"
+							[disabled]="!hasFilterApplied()"
+							(click)="onClearFilters()">
+					</tds-button-custom>
+					<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn pull-right"><i class="fa fa-fw fa-refresh"></i></div>
+				</div>
 			</div>
 		</ng-template>
 

@@ -29,6 +29,7 @@ import net.transitionmanager.action.Provider
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
@@ -735,7 +736,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			os.close()
 
 		when: 'calling to transform the data with the ETL script'
-			Map transformResults = dataImportService.transformEtlData(project.id, dataScript.id, fileUploadName)
+			Map transformResults = dataImportService.transformEtlData(project.id, Mock(UserLogin), dataScript.id, fileUploadName, false)
 			String transformedFileName = transformResults['filename']
 		then: 'the results should have a filename'
 			transformResults.containsKey('filename')
@@ -745,7 +746,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		then: 'a JSON object should be created'
 			transformJson != null
 		and: 'the ETLInfo has the name of the temporary file'
-			transformJson.ETLInfo.originalFilename == fileUploadName
+			transformJson.ETLInfo.originalFilename == fileSystemService.getTemporaryFullFilename(fileUploadName)
 		and: 'there is only one domain'
 			transformJson.domains.size() == 1
 		and: 'the Domain is Dependency'

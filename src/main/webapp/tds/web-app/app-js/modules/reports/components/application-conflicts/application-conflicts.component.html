@@ -1,6 +1,7 @@
 <div class="content body">
 	<tds-report-toggle-filters [hideFilters]="hideFilters"
 														 (toggle)="toggleFilters($event)"
+							   							 (reload)="onReload()"
 														 [disabled]="!generatedReport"></tds-report-toggle-filters>
 	<div class="box-body">
 		<form class="formly form-horizontal" role="form" novalidate>
@@ -76,7 +77,7 @@
 						<div class="container" *ngIf="isDisplayingReport">
 							<div class="header">
 								<div class="main-title">Application Conflicts - {{reportProject}}: {{reportBundle}} and App Owner: {{reportOwner}}</div>
-								<div class="sub-title">This analysis was performed on {{ reportDate | date: dateFormatTime}} for {{userContext ? userContext.person.firstName : ''}}.</div>
+								<div class="sub-title">This analysis was performed on {{ reportDate | tdsDateTime: userTimeZone}} for {{userContext ? userContext.person.firstName : ''}}.</div>
 							</div>
 
 							<div class="results">

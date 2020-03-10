@@ -1,5 +1,15 @@
 // Angular
-import {Component, Input, Output, EventEmitter, HostListener, ViewChild, ElementRef} from '@angular/core';
+import {
+	Component,
+	Input,
+	Output,
+	EventEmitter,
+	HostListener,
+	ViewChild,
+	ElementRef,
+	OnInit,
+	AfterContentInit, AfterViewInit
+} from '@angular/core';
 import {EventRowType} from './../../model/event.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -8,8 +18,9 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	selector: 'tds-task-category',
 	templateUrl: 'task-category.component.html'
 })
-export class TaskCategoryComponent {
+export class TaskCategoryComponent implements OnInit, AfterViewInit {
 	@Input() taskCategories: any;
+	@Input() scrollPosition: number;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
 	@ViewChild('categoryContainer') categoryContainer: ElementRef;
 
@@ -31,7 +42,16 @@ export class TaskCategoryComponent {
 	];
 
 	constructor(private preferenceService: PreferenceService) {
+	}
+
+	ngOnInit() {
 		this.setInitialConfiguration();
+	}
+
+	ngAfterViewInit() {
+		if (this.categoryContainer) {
+			this.categoryContainer.nativeElement.scrollLeft = this.currentScroll;
+		}
 	}
 
 	public handleScroll(e): void {
@@ -39,20 +59,11 @@ export class TaskCategoryComponent {
 	}
 
 	/**
-	 * Sets the current position of the scrollbar for the category list
-	 * @param scroll - The scroll position to start at.
-	 */
-	public setContainerScroll(scroll: number): void {
-		if (this.categoryContainer) {
-			this.categoryContainer.nativeElement.scrollLeft = scroll;
-		}
-	}
-
-	/**
 	 * Set the initial configuration to determine how many elements to show
 	*/
 	private setInitialConfiguration(): void {
 		this.colSize = 2;
+		this.currentScroll = this.scrollPosition;
 
 		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
 		.subscribe((preferences) => {

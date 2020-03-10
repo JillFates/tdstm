@@ -10,6 +10,7 @@ import {ReportComponent} from '../report.component';
 		<div class="content body">
 			<tds-report-toggle-filters [hideFilters]="hideFilters"
 																 (toggle)="toggleFilters()"
+			                           							 (reload)="onReload()"
 																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
@@ -48,7 +49,7 @@ import {ReportComponent} from '../report.component';
 										</div>
 									</div>
 									<div class="form-group row input">
-										<label class="col-sm-2 control-label" for="starstWithList">Start of with</label>
+										<label class="col-sm-2 control-label" for="starstWithList">Begins with</label>
 										<div class="col-sm-3">
 											<kendo-dropdownlist
 												name="startsWithList"
@@ -167,6 +168,16 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 				});
 			});
 		});
+	}
+
+	/**
+	 * Revert the page to its initial state.
+	 */
+	public onReload(): void {
+		this.hideFilters = false;
+		this.generatedReport = false;
+		this.reportResult = null;
+		this.onLoad();
 	}
 
 	/**

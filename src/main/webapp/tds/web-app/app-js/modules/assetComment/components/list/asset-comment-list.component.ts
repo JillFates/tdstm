@@ -80,9 +80,24 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
+	/**
+	 * Returns whether or not any filters are applied to the grid.
+	 */
+	hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
+	}
+
 	protected onFilter(column: any): void {
 		const root = this.assetCommentService.filterColumn(column, this.state);
 		this.filterChange(root);
+	}
+
+	public onClearFilters(): void {
+		this.state.filter.filters = [];
+		this.assetCommentColumnModel.columns.forEach((column) => {
+			delete column.filter;
+		});
+		this.onFilter({filter: ''});
 	}
 
 	protected clearValue(column: any): void {

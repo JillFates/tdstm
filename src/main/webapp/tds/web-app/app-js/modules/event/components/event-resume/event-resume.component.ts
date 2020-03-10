@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, } from '@angular/core';
+import {Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import {EventPlanStatus} from '../../model/event.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -8,9 +8,10 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	selector: 'tds-event-resume',
 	templateUrl: 'event-resume.component.html'
 })
-export class EventResumeComponent {
+export class EventResumeComponent implements OnChanges {
 	public userTimeZone = '';
 	public dateTimeFormat = '';
+	public datePrefixString = '';
 	@Input() event: EventPlanStatus = null;
 
 	constructor(private preferenceService: PreferenceService) {
@@ -21,4 +22,27 @@ export class EventResumeComponent {
 		});
 	}
 
+	ngOnInit() {
+		this.setClockMode();
+	}
+
+	/**
+	* Sets the clockMode property
+	*/
+	private setClockMode(): void {
+		if (this.event.clockMode === 'countdown') {
+			this.datePrefixString = 'Starts on '
+		}
+		if (this.event.clockMode === 'elapsed') {
+			this.datePrefixString = 'Started on '
+		}
+		if (this.event.clockMode === 'finished') {
+			this.datePrefixString = 'Completed on '
+		}
+	}
+
+	ngOnChanges(changes: SimpleChanges) {
+		this.setClockMode();
+		console.log(changes);
+	}
 }

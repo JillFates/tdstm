@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, ElementRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, OnDestroy} from '@angular/core';
 import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 
@@ -14,9 +14,15 @@ import {FIELD_COLORS} from '../../model/field-settings.model';
 import {NumberConfigurationPopupComponent} from '../number/number-configuration-popup.component';
 import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
 import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
-import {AlertType} from '../../../../shared/model/alert.model';
+
 import { FieldSettingsService } from '../../service/field-settings.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DOMAIN} from '../../../../shared/model/constants';
+import {ProjectService} from '../../../project/service/project.service';
+import {Observable, Subject} from 'rxjs';
+import {Select} from '@ngxs/store';
+import {takeUntil} from 'rxjs/operators';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 
 declare var jQuery: any;
 
@@ -31,7 +37,15 @@ declare var jQuery: any;
 		.has-error,.has-error:focus { border: 1px #f00 solid;}
 	`]
 })
-export class FieldSettingsGridComponent implements OnInit {
+export class FieldSettingsGridComponent implements OnInit, OnDestroy {
+
+	// Retrieve the User context
+	@Select(state => state.TDSApp.userContext) userContext$: Observable<any>;
+	// Current User Context Model
+	public userContextModel: UserContextModel = null;
+	// To Call on Component Destroy
+	private atComponentDestroy: Subject<boolean> = new Subject<boolean>();
+
 	@Output('save') saveEmitter = new EventEmitter<any>();
 	@Output('cancel') cancelEmitter = new EventEmitter<any>();
 	@Output('add') addEmitter = new EventEmitter<any>();
@@ -49,7 +63,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	private fieldsSettings: FieldSettingsModel[];
 	public gridData: GridDataResult;
 	public colors = FIELD_COLORS;
-	public hasAtLeastOneInvalidField = false;
 	public formHasError: boolean = null;
 	public isDirty = false;
 	public state: State = {
@@ -75,15 +88,30 @@ export class FieldSettingsGridComponent implements OnInit {
 	protected lastEditedControl = null;
 	public availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
+	// Only APPLICATION asset types has the plan methodology feature.
+	private planMethodology = null;
+
 	constructor(
 		private loaderService: UILoaderService,
 		private prompt: UIPromptService,
 		private dialogService: UIDialogService,
+		private projectService: ProjectService,
 		private translate: TranslatePipe,
 		private fieldSettingsService: FieldSettingsService) {
+
+		this.userContext$.pipe(takeUntil(this.atComponentDestroy)).subscribe((userContext: UserContextModel) => {
+			this.userContextModel = userContext;
+		});
 	}
 
 	ngOnInit(): void {
+		// if we are on the Application, we get the planMethodology param
+		if (this.data.domain === DOMAIN.APPLICATION) {
+			this.projectService.getModelForProjectViewEdit(this.userContextModel.project.id).subscribe((project: any) => {
+				this.planMethodology = project.data.planMethodology;
+			});
+		}
+
 		this.fieldsSettings = this.data.fields;
 		this.refresh();
 		this.domains = [].concat.apply([], this.domainsList);
@@ -543,7 +571,10 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * @returns {boolean} True or False
 	 */
 	protected isFieldUsedAsPlanMethodology(field: FieldSettingsModel): boolean {
-		return this.data.planMethodology && this.data.planMethodology === field.field;
+		if (this.data.domain === DOMAIN.APPLICATION) {
+			return this.planMethodology !== null && this.planMethodology.field && this.planMethodology === field.field;
+		}
+		return false;
 	}
 
 	/**
@@ -655,6 +686,14 @@ export class FieldSettingsGridComponent implements OnInit {
 	private resetValidationFlags(): void {
 		this.formHasError = null;
 		this.setIsDirty(false);
+	}
+
+	/**
+	 * Destroy any subscribed observable
+	 */
+	ngOnDestroy(): void {
+		// Globally Destroy anything attached to it
+		this.atComponentDestroy.unsubscribe();
 	}
 
 }

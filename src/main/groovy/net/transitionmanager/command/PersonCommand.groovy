@@ -17,6 +17,7 @@ class PersonCommand implements CommandObject {
 	String department
 	String location
 	String stateProv
+	Long company
 	String country
 	String workPhone
 	String mobilePhone
@@ -27,6 +28,7 @@ class PersonCommand implements CommandObject {
 	Integer travelOK
 
 	static constraints = {
+		company nullable: true
 		importFrom Person, include: [
 			'firstName',
 			'middleName',

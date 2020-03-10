@@ -1,10 +1,12 @@
 package net.transitionmanager.imports
 
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.etl.Column
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.TDSJSONDriver
+import com.tdsops.etl.dataset.ETLDataset
+import com.tdsops.etl.dataset.ETLIterator
 import com.tdssrc.grails.GormUtil
-import getl.data.Dataset
 import getl.data.Field
 import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
@@ -18,7 +20,6 @@ import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.DataScript
-import net.transitionmanager.imports.DataScriptMode
 import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
@@ -77,8 +78,9 @@ class DataScriptService implements ServiceMethods{
         dataScript.with {
             name = dataScriptJson.name
             description = dataScriptJson.description
+			isAutoProcess = dataScriptJson.isAutoProcess?:false
+			useWithAssetActions = dataScriptJson.useWithAssetActions?:false
             target = dataScriptJson.target
-            mode = DataScriptMode.forLabel(dataScriptJson.mode)
             etlSourceCode = dataScriptJson.etlSourceCode?:dataScript.etlSourceCode
             provider = providerInstance
             // if it's an existing instance, update the lastModifiedBy field
@@ -202,17 +204,27 @@ class DataScriptService implements ServiceMethods{
         return isUnique
     }
 
-    /**
-     * Return a list of DataScripts for the current project and provider (optional).
-     * @param providerId
-     * @return
-     */
-    List<DataScript> getDataScripts(Long providerId = null) {
+	/**
+	 * Returns a list of DataScripts for the current project and provider (optional).
+	 *
+	 * @param currentProject The current project passed in from the controller
+	 * @param providerId Optional provider id to filter on.
+	 * @param assetActions If the list is to be filtered to just actions for bulk asset ETL( useWithAssetActions and isAutoProcess are both true).
+	 *
+	 * @return A list of DataScripts.
+	 */
+    List<DataScript> getDataScripts(Project currentProject, Long providerId = null, boolean assetActions) {
         return DataScript.where {
-            project == securityService.userCurrentProject
+            project == currentProject
+
             if (providerId) {
                 provider.id == providerId
             }
+
+			if(assetActions){
+				useWithAssetActions == true
+				isAutoProcess == true
+			}
         }.list()
     }
 
@@ -329,6 +341,72 @@ class DataScriptService implements ServiceMethods{
     }
 
 	/**
+	 * <p>It creates a Map result for an instance of {@code ETLDataset}.</p>
+	 * <p>Given the following CSV dataset:</p>
+	 * <pre>
+	 *	application name, application vendor
+	 *	iOS,Apple
+	 *	Windows,Microsoft
+	 *	...
+	 * </pre>
+	 * <p>It creates the following map as response:</p>
+	 * <pre>
+	 * 	[
+	 *		[
+	 *			'application name': 'iOS',
+	 *			'application vendor': 'Apple'
+	 *		],
+	 *		[
+	 *			'application name': 'Windows',
+	 *			'application vendor': 'Microsoft'
+	 *		]
+	 *  ]
+	 * </pre>
+	 * <p></p>
+	 * @param dataset
+	 * @param rootNode
+	 * @param maxRows
+	 * @return
+	 */
+	Map<String, ?> buildMapResultForETLDataset(ETLDataset dataset, String rootNode, Long maxRows) {
+
+		Map<String, ?> results = [
+				config: dataset.readColumns().collect { [property: it.label, type: 'text'] },
+				rows  : []
+		]
+
+		ETLIterator iterator = dataset.iterator()
+		Long rowsCount = 0
+		try {
+			while (iterator.hasNext() && rowsCount++ < maxRows) {
+				Map<String, ?> row = dataset.convertRowValuesToMap(iterator.next())
+				results.rows.add(row)
+			}
+		} finally {
+			iterator.close()
+		}
+
+		return results
+	}
+
+	@Deprecated
+	Map<String, ?> buildMapResultForGETLDataset(DataSetFacade dataSetFacade, String rootNode, Long maxRows){
+		if (dataSetFacade.isJson && rootNode != null) {
+			dataSetFacade.setRootNode(rootNode)
+		}
+
+		return [
+				config: dataSetFacade.fields().collect {
+					[
+							property: it.name,
+							type    : (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+					]
+				},
+				rows  : dataSetFacade.rows().take(maxRows.intValue())
+		]
+
+	}
+	/**
 	* Parse a file that represent a MAP of data
 	* Current Formats supported:
 	*   JSON, CSV, EXCEL
@@ -341,25 +419,17 @@ class DataScriptService implements ServiceMethods{
 		String message
 		try {
 
-			if ( id ) {
+			if (id) {
 				saveSampleFile(id, originalFileName, fileName)
 			}
 
-			Dataset dataset = fileSystemService.buildDataset(fileSystemService.getTemporaryFullFilename(fileName))
-			DataSetFacade dataSetFacade = new DataSetFacade(dataset)
-			if (dataSetFacade.isJson && rootNode != null) {
-				dataSetFacade.setRootNode(rootNode)
-			}
+			Object dataset = fileSystemService.buildDataset(fileSystemService.getTemporaryFullFilename(fileName))
 
-			return [
-				config: dataSetFacade.fields().collect {
-					[
-						property: it.name,
-						type    : (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
-					]
-				},
-				rows  : dataSetFacade.rows().take(maxRows.intValue())
-			]
+			if (dataset instanceof ETLDataset) {
+				return buildMapResultForETLDataset((ETLDataset)dataset, rootNode, maxRows)
+			} else {
+				return buildMapResultForGETLDataset((DataSetFacade) dataset, rootNode, maxRows)
+			}
 
 		} catch (ex) {
 			log.info(ex.message)

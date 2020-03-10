@@ -1,18 +1,19 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
+import com.tdsops.tm.enums.domain.AssetClass
+import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
-import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.Mock
-import net.transitionmanager.imports.DataScript
-import net.transitionmanager.model.Model
-import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
 import org.grails.web.json.JSONObject
 import spock.lang.See
 
@@ -104,7 +105,7 @@ class ETLResultsSpec extends ETLBaseSpec {
 	void 'test can transform to JSON the result of an ETL script evaluation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [

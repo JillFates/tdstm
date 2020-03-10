@@ -1,9 +1,19 @@
 <div class="event-resume-component" *ngIf="event">
     <div class="event-description">{{event.description}}</div>
-    <div class="event-start-date">{{event.startDate | tdsDateTime: userTimeZone: dateTimeFormat}}</div>
-    <div class="event-daytime">{{event.dayTime}}</div>
+    <div *ngIf="event.clockMode!=='none'" class="clock-event-date">
+        <span *ngIf="event.clockMode=='finished'; else eventStartTimeBlock">
+            {{datePrefixString}}{{event.complDate | tdsDateTime: userTimeZone: dateTimeFormat}}
+        </span>
+        <ng-template #eventStartTimeBlock>
+            {{datePrefixString}}{{event.startDate | tdsDateTime: userTimeZone: dateTimeFormat}}
+        </ng-template>
+    </div>
+    <div *ngIf="event.clockMode!=='none'; else notEventStartBlock" class="event-daytime">{{event.dayTime}}</div>
+    <ng-template #notEventStartBlock>
+        <h5 style="color:red;">The event start time has not been set</h5>
+    </ng-template>
     <div class="after-results">
-        <div class="event-units">
+        <div *ngIf="event.startDate" class="event-units">
             <div>Days</div>
             <div>Hours</div>
             <div>Mins</div>

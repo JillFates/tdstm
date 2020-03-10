@@ -1,6 +1,8 @@
 package net.transitionmanager.command.task
 
-class ExportTimelineCommand {
+import net.transitionmanager.command.CommandObject
+
+class ExportTimelineCommand implements CommandObject{
 
 	/**
 	 * Should belongs to {@code MoveEvent#id}

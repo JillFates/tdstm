@@ -5,6 +5,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import { ProjectService } from '../../project/service/project.service';
 
 @Injectable()
 export class UserService {
@@ -12,7 +13,8 @@ export class UserService {
 	private userUrl = '../ws/user';
 	private licenseUrl = '../ws';
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private projectService: ProjectService) {
+		this.projectService.getDefaultProject().subscribe();
 	}
 
 	getUserContext(): Observable<any> {
@@ -24,13 +26,17 @@ export class UserService {
 			}).catch((error: any) => error);
 	}
 
-	getLicenseInfo(): Observable<any> {
+	/**
+	 * Get only the license applied to the user
+	 * That helps to show or hide different sections of the app
+	 */
+	getLicense(): Observable<any> {
 		return this.http.get(`${this.licenseUrl}/license/info`)
 			.map((response: any) => {
 				if (response && response.status === 'success') {
-					return response.data;
+					return response.data.license;
 				}
-				return null;
+				return {};
 			}).catch((error: any) => error);
 	}
 }

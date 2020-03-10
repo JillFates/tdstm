@@ -26,17 +26,38 @@ import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.compone
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
-import { Store } from '@ngxs/store';
-import { UserContextModel } from '../../../auth/model/user-context.model';
+import { faLayerPlus, faLayerMinus } from '@fortawesome/pro-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 
 declare var jQuery: any;
+
+interface OverrideState {
+	isOverwritten: boolean;
+	icon?: IconDefinition;
+	color?: string;
+	tooltip?: string;
+};
+const IS_OVERRIDE_CHILD: OverrideState = {
+	icon: faLayerMinus,
+	color: 'green',
+	isOverwritten: true,
+	tooltip: 'Revert to Project View',
+};
+const	IS_OVERRIDE_PARENT: OverrideState = {
+	icon: faLayerPlus,
+	color: 'blue',
+	isOverwritten: false,
+	tooltip: 'Display Personal System View'
+};
+const	IS_NOT_OVERRIDE: OverrideState = {
+	isOverwritten: false
+};
 
 @Component({
 	selector: 'tds-asset-view-show',
 	templateUrl: 'asset-view-show.component.html'
 })
 export class AssetViewShowComponent implements OnInit, OnDestroy {
-
 	private currentId;
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
@@ -44,21 +65,22 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public saveOptions: any;
 	protected domains: DomainModel[] = [];
 	public metadata: any = {};
-	private lastSnapshot;
-	protected navigationSubscription;
+	private lastSnapshot: any;
+	protected navigationSubscription: any;
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
+	protected readonly SAVE_BUTTON_ID = 'btnSave';
+	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
+	public currentOverrideState: OverrideState;
+	// When the URL contains extra parameters we can determinate the form contains hidden filters
+	public hiddenFilters = false;
 	public gridState: State = {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
-	private userContext:UserContextModel;
-	protected readonly SAVE_BUTTON_ID = 'btnSave';
-	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
-	// When the URL contains extra parameters we can determinate the form contains hidden filters
-	public hiddenFilters = false;
+	private queryParams: any = {};
 
 	@ViewChild('select') select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid') assetExplorerViewGrid: AssetViewGridComponent
@@ -72,9 +94,22 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
-		private assetTagUIWrapperService: AssetTagUIWrapperService,
-		private store: Store) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService) {
+		this.initResolveData();
+	}
 
+	ngOnInit(): void {
+		this.handleQueryParams();
+		this.globalQueryParams = this.route.snapshot.queryParams;
+		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
+		this.reloadStrategy();
+		this.initialiseComponent();
+	}
+
+	/**
+	 * After Report Resolver has finished initialize models/variables of the component.
+	 */
+	initResolveData(): void {
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
@@ -82,21 +117,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.model = dataView;
 		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
-	}
-
-	ngOnInit(): void {
-
-		// Get all Query Params
-		this.route.queryParams.subscribe(map => map);
-		this.globalQueryParams = this.route.snapshot.queryParams;
-		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
-
-		this.reloadStrategy();
-		this.initialiseComponent();
-
-		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-			this.userContext = userContext;
-		});
+		this.handleOverrideState(this.model);
 	}
 
 	/**
@@ -121,16 +142,26 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
 				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
-					this.metadata.tagList = this.lastSnapshot.data['tagList'];
-					this.fields = this.lastSnapshot.data['fields'];
-					this.domains = this.lastSnapshot.data['fields'];
-					const { dataView } = this.lastSnapshot.data['report'];
-					this.model = dataView ;
-					this.dataSignature = this.stringifyCopyOfModel(this.model);
+					this.initResolveData();
 					this.initialiseComponent();
 				}
 			}
 		});
+	}
+
+	/**
+	 * Set the override state object.
+	 * @param isOverride
+	 * @param hasOverride
+	 */
+	private handleOverrideState({isOverride, hasOverride}: ViewModel): void {
+		if (isOverride) {
+			this.currentOverrideState = IS_OVERRIDE_CHILD;
+		} else if (hasOverride) {
+			this.currentOverrideState = IS_OVERRIDE_PARENT;
+		} else {
+			this.currentOverrideState = IS_NOT_OVERRIDE;
+		}
 	}
 
 	/**
@@ -143,7 +174,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			name: 'notificationHeaderTitleChange',
 			title: this.model.name
 		});
-
 		this.gridState = Object.assign({}, this.gridState, {sort: [
 				{
 					field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
@@ -153,41 +183,60 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public onQuery(): void {
-		let params = {
-			offset: this.gridState.skip,
-			limit: this.gridState.take,
-			sortDomain: this.model.schema.sort.domain,
-			sortProperty: this.model.schema.sort.property,
-			sortOrder: this.model.schema.sort.order,
-			filters: {
-				domains: this.model.schema.domains,
-				columns: this.model.schema.columns
+		setTimeout(() => {
+			let params = {
+				offset: this.gridState.skip,
+				limit: this.gridState.take,
+				sortDomain: this.model.schema.sort.domain,
+				sortProperty: this.model.schema.sort.property,
+				sortOrder: this.model.schema.sort.order,
+				filters: {
+					domains: this.model.schema.domains,
+					columns: this.model.schema.columns
+				}
+			};
+
+			if (this.hiddenFilters) {
+				this.assetGlobalFiltersService.prepareFilters(params, this.globalQueryParams);
+
+				let justPlanning = this.assetGlobalFiltersService.getJustPlaningFilter(this.globalQueryParams);
+				if (justPlanning !== null) {
+					this.assetExplorerViewGrid.justPlanning = justPlanning;
+				}
 			}
-		};
 
-		if (this.hiddenFilters) {
-			this.assetGlobalFiltersService.prepareFilters(params, this.globalQueryParams);
-
-			let justPlanning = this.assetGlobalFiltersService.getJustPlaningFilter(this.globalQueryParams);
-			if (justPlanning !== null) {
-				this.assetExplorerViewGrid.justPlanning = justPlanning;
+			if (this.justPlanning) {
+				params['justPlanning'] = true;
 			}
-		}
 
-		if (this.justPlanning) {
-			params['justPlanning'] = true;
-		}
-
-		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
-			this.data = result;
-			jQuery('[data-toggle="popover"]').popover();
-		}, err => console.log(err));
+			this.assetExplorerService.query(this.model.id, params).subscribe(result => {
+				this.data = result;
+				jQuery('[data-toggle="popover"]').popover();
+			}, err => console.log(err));
+		}, 500);
 	}
 
 	public onEdit(): void {
 		if (this.isEditAvailable()) {
-			this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+			const _override = this.queryParams._override;
+			this.router.navigate(['asset', 'views', this.model.id, 'edit'], {
+				queryParams: { _override }
+			});
 		}
+	}
+
+	public toggleAssetView() {
+		let dataViewId;
+		const _override = !this.queryParams._override;
+
+		if (this.model.overridesView) {
+			dataViewId = this.model.overridesView.id
+		} else {
+			dataViewId = this.model.id;
+		}
+		return this.router.navigate(['/asset', 'views', dataViewId, 'show'], {
+			queryParams: { _override }
+		});
 	}
 
 	public onSave() {
@@ -206,8 +255,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = this.stringifyCopyOfModel(this.model);
+			const mode = this.model.overridesView ? 'show' : 'edit';
 			setTimeout(() => {
-				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+				this.select.loadData();
+				this.router.navigate(['asset', 'views', this.model.id, mode]);
 			});
 		}).catch(result => {
 			console.log('error');
@@ -231,6 +282,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			queryId: this.model.id,
 			viewName: this.model.name
 		};
+
+		if (this.hiddenFilters) {
+			this.assetGlobalFiltersService.prepareFilters(assetExportModel.assetQueryParams, this.globalQueryParams);
+		}
 
 		this.dialogService.open(AssetViewExportComponent, [
 			{ provide: AssetExportModel, useValue: assetExportModel }
@@ -283,11 +338,19 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				columns: model.schema.columns
 			}
 		};
+
 		if (justPlanning) {
 			assetQueryParams['justPlanning'] = justPlanning;
 		}
 
 		return assetQueryParams;
+	}
+
+	private handleQueryParams() {
+		this.route.queryParams.subscribe((params) => {
+			const _override = !params._override || params._override === 'true' || params._override === true;
+			this.queryParams = { _override };
+		});
 	}
 
 	/**
@@ -302,6 +365,14 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		return JSON.stringify(modelCopy);
 	}
 
+/**
+	 * Determines if show we can show Save/Save All buttons at all.
+	 * @returns {boolean}
+	 */
+	public isOverrideView(): boolean {
+		return this.model.isOverride;
+	}
+
 	/**
 	 * Determines if show we can show Save/Save All buttons at all.
 	 * @returns {boolean}
@@ -310,6 +381,18 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		return this.model.id && (this.canSave() || this.canSaveAs());
 		// long & old validation will leave it for the moment.
 		// return this.model.id && (this.model.isOwner || (this.model.isSystem && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))));
+	}
+
+	/**
+	 * Determines determines the string of the save button label.
+	 * @returns {string}
+	 */
+	public getSaveButtonLabel() {
+		if (!this.canSave() && this.canSaveAs()) {
+			return 'GLOBAL.SAVE_AS'
+		} else {
+			return 'GLOBAL.SAVE'
+		}
 	}
 
 	/**
@@ -327,7 +410,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	public canSaveAs(): boolean {
 		// If it's a system view
-		return this.saveOptions.saveAs;
+		return (
+			this.saveOptions &&
+			Array.isArray(this.saveOptions.saveAsOptions) &&
+			this.saveOptions.saveAsOptions.length > 0
+		);
 	}
 
 	public isEditAvailable(): boolean {
@@ -377,28 +464,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
 
-	public isDefaultProject(): boolean {
-		return (
-			this.userContext && 
-			this.userContext.project &&
-			this.userContext.defaultProject && 
-			this.userContext.project.id === this.userContext.defaultProject.id
-		);
-	}
-
 	public isSaveButtonDisabled(): boolean {
-		if (!this.model.id) {
-			return !(
-				(
-					this.isDefaultProject() &&
-					this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate)
-				) || (
-					!this.isDefaultProject() &&
-					this.permissionService.hasPermission(Permission.AssetExplorerCreate)
-				)
-			);
-		}
-		return false;
+		return !this.canSave() && !this.canSaveAs();
 	}
 
 	/**
@@ -411,6 +478,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			saveButtonId: this.getSaveButtonId(),
 			canSave: this.canSave(),
 			canSaveAs: this.canSaveAs(),
+			saveButtonLabel: this.getSaveButtonLabel(),
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
 			disableSaveButton: this.isSaveButtonDisabled()

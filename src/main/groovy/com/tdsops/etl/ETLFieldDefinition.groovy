@@ -1,9 +1,11 @@
 package com.tdsops.etl
 
 import com.tdsops.tm.enums.ControlType
+import groovy.transform.CompileStatic
 import net.transitionmanager.person.Person
 import org.grails.datastore.mapping.model.PersistentProperty
 
+@CompileStatic
 class ETLFieldDefinition {
 
 	private String name
@@ -35,7 +37,7 @@ class ETLFieldDefinition {
 	ETLFieldDefinition(Map<String, ?> fieldSpec) {
 		this.name = fieldSpec.field
 		this.label = fieldSpec.label
-		this.type = classForControlType(fieldSpec.control)
+		this.type = classForControlType((String)fieldSpec.control)
 	}
 
 	/**

@@ -68,6 +68,7 @@ export class AssetViewConfigComponent implements OnInit {
 	currentTab = 0;
 	previewButtonClicked = false;
 	public metadata: any = {};
+	private queryParams: any = {};
 
 	constructor(
 		private route: ActivatedRoute,
@@ -90,6 +91,7 @@ export class AssetViewConfigComponent implements OnInit {
 			this.currentTab = 1;
 			this.draggableColumns = this.model.schema.columns.slice();
 		}
+		this.handleQueryParams();
 	}
 
 	ngOnInit(): void {
@@ -317,7 +319,9 @@ export class AssetViewConfigComponent implements OnInit {
 
 	public onCancel() {
 		if (this.model && this.model.id) {
-			this.router.navigate(['asset', 'views', this.model.id, 'show']);
+			const _override = this.queryParams._override;
+			this.router.navigate(['asset', 'views', this.model.id, 'show'],
+				{ queryParams: { _override } });
 		} else {
 			this.router.navigate(['asset', 'views']);
 		}
@@ -566,6 +570,23 @@ export class AssetViewConfigComponent implements OnInit {
 			.filter((column: ViewColumn) => !column.locked);
 
 		return Boolean(nonLocked.length);
+	}
+
+	/**
+	 * Store query params from url.
+	 */
+	private handleQueryParams() {
+		this.route.queryParams.subscribe((params) => {
+			const _override = !params._override || params._override === 'true' || params._override === true;
+			this.queryParams = { _override };
+		});
+	}
+
+	/**
+	 * Checks if current model is a system view
+	 */
+	isSystemView(): boolean {
+		return this.model.isSystem
 	}
 
 }

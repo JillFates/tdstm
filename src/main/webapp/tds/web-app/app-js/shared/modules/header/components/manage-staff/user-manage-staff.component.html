@@ -91,9 +91,9 @@
                                         <td valign="top" class="name"><span>City/State/Zip:</span></td>
                                         <td valign="top" class="value" colspan="2">
                                             <span *ngIf="!editing" class="personShow" id="locationId">
-                                                {{personModel.location ? personModel.location : '' + " " +
-                                                personModel.stateProv  ? personModel.stateProv : '' + " " +
-                                                personModel.country ? personModel.country : ''}}</span>
+                                                {{(personModel.location ? personModel.location : '') + " " +
+                                                (personModel.stateProv  ? personModel.stateProv : '') + " " +
+                                                (personModel.country ? personModel.country : '')}}</span>
                                             <div *ngIf="editing"><input style="width:100px" name="location" [(ngModel)]="personModel.location"/><input style="width:25px" name="stateProv" [(ngModel)]="personModel.stateProv"/><input style="width:40px" name="country" [(ngModel)]="personModel.country"/></div>
                                         </td>
                                     </tr>

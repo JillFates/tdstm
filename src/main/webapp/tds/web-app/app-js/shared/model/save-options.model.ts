@@ -1,5 +1,6 @@
 export class SaveOptions {
-    saveAs?: boolean;
-    save?: boolean;
-    saveAsOptions?: Array<string> ;
+	public save?: boolean;
+	public saveAsOptions?: Array<string>;
+	public canShare?: boolean;
+	public canOverride?: boolean;
 }

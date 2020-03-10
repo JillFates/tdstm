@@ -65,6 +65,9 @@
 							<button onclick="baseLine()" title="Baseline" class="baseline-btn"><label>Baseline Plan</label></button>
 						</span>
 
+						<div style="float: right;" class="task-timeline-progress-wrapper">
+							<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+						</div>
 					</div>
 					<!-- control panel -->
 					<div id="controlPanelId" class="graphPanel">

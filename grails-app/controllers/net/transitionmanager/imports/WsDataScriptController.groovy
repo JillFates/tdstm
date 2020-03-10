@@ -2,9 +2,9 @@ package net.transitionmanager.imports
 
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.DataScriptValidateScriptCommand
-import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.DataScriptNameValidationCommand
+import net.transitionmanager.command.datascript.ListCommand
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -87,13 +87,11 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     /**
      * Return a list with all the DataScripts for this project. Optionally, a provider Id can
      * be included in the request to narrow down the search.
-     *
-     * @return
      */
     @HasPermission(Permission.ETLScriptView)
     def list() {
-        Long providerId = NumberUtil.toLong(request.JSON.providerId)
-        List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)?.sort {it.name}
+        ListCommand command = populateCommandObject(ListCommand)
+        List<DataScript> dataScripts = dataScriptService.getDataScripts(projectForWs, command.providerId, command.useWithAssetActions)?.sort {it.name}
         renderSuccessJson(dataScripts*.toMap(DataScript.BASE_INFO))
     }
 
@@ -179,7 +177,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
 
         String rootNode = params.rootNode ?: ''
 
-        Long maxRows = 2500000
+        Long maxRows = 250000
         Map jsonMap = dataScriptService.parseDataFromFile(id, originalFileName, filename, rootNode, maxRows)
         renderSuccessJson(jsonMap)
     }

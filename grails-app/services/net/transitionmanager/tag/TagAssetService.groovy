@@ -59,7 +59,7 @@ class TagAssetService implements ServiceMethods {
 	 *
 	 * @return A List of tagAssets linking tags, to assets.
 	 */
-	List<TagAsset> applyTags(Project currentProject, List<Long> tagIds, Long assetId) {
+	List<TagAsset>  applyTags(Project currentProject, List<Long> tagIds, Long assetId) {
 		AssetEntity asset = get(AssetEntity, assetId, currentProject)
 
 		List<TagAsset> tagAssets = tagIds.collect { Long tagId ->

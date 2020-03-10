@@ -1,5 +1,8 @@
 package com.tdsops.etl
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class DebugConsole {
 
 	/**

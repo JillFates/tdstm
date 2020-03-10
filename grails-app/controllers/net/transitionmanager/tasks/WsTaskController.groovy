@@ -5,11 +5,12 @@ import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.task.Task
+import org.grails.web.json.JSONArray
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetEntityService
@@ -279,7 +280,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	def listTasks(ListTaskCommand params) {
 		validateCommandObject(params)
 		Map<String, String> definedSortableFields = [
-				'actFinish'         : 'actFinish',
+				'actFinish'         : 'dateResolved',
 				'actStart'          : 'actStart',
 				'apiAction'         : 'apiAction',
 				'assetName'         : 'assetName',
@@ -328,7 +329,14 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 
 		userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
 		userPreferenceService.setPreference(UserPreferenceEnum.MY_TASK, params.justMyTasks)
-		userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == 1)
+
+		if (params.viewUnpublished) {
+			securityService.requirePermission Permission.TaskPublish
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, true)
+		}else{
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, false)
+		}
+
 		userPreferenceService.setMoveEventId params.moveEvent
 
 		// Determine if only unpublished tasks need to be fetched.
@@ -377,6 +385,28 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
     }
 
 	/**
+	 * Create a map containing all the information necessary for the task action bar for a given task
+	 * @param task - The task the information is based off.
+	 * @return - The map to be used by the task action bar
+	 */
+	Map createTaskActionBarMap(Task task) {
+		Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
+		return [
+				taskId: task.id,
+				apiActionId: task.apiAction?.id,
+				apiActionInvokedAt: task.apiActionInvokedAt,
+				apiActionCompletedAt: task.apiActionCompletedAt,
+				assignedTo: task.assignedTo?.id,
+				assignedToName: task.assignedTo?.toString() ?: '',
+				category: task.category,
+				invokeActionDetails: invokeActionDetails,
+				predecessorsCount: task.taskDependencies.size(),
+				status: task.status,
+				successorsCount: TaskDependency.countByPredecessor(task)
+		]
+	}
+
+	/**
 	 * Retrieve the information required by the front-end for rendering the Action Bar for a given Task.
 	 * @param taskId - the id of the task.
 	 * @return the API Action ID (if any), the ID of the person assigned to the task (if any), the number of
@@ -386,18 +416,20 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
     def getInfoForActionBar(Long taskId) {
         Project project = getProjectForWs()
         AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
-        Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
-        renderAsJson(
-                apiActionId: task.apiAction?.id,
-                apiActionInvokedAt: task.apiActionInvokedAt,
-                apiActionCompletedAt: task.apiActionCompletedAt,
-                invokeActionDetails: invokeActionDetails,
-                assignedTo: task.assignedTo?.id,
-                predecessorsCount: task.taskDependencies.size(),
-                successorsCount: TaskDependency.countByPredecessor(task),
-                category: task.category
-        )
+		renderSuccessJson(createTaskActionBarMap(task))
     }
+
+	@HasPermission(Permission.TaskManagerView)
+	def getBulkInfoForActionBar() {
+		Project project = getProjectForWs()
+		JSONArray taskIds = request.JSON
+		List<Map> taskList = []
+		for (Integer id: taskIds) {
+			AssetComment task = GormUtil.findInProject(project, AssetComment, id, true)
+			taskList.push(createTaskActionBarMap(task))
+		}
+		renderSuccessJson(taskList)
+	}
 
 
     /**

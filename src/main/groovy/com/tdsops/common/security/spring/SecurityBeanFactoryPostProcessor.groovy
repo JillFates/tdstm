@@ -24,7 +24,7 @@ class SecurityBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 				'auditService', 'grailsLinkGenerator', 'messageSource', 'securityService'
 
 		updateClassAndAddProperties beanFactory, 'authenticationSuccessHandler', TdsAuthenticationSuccessHandler,
-				'auditService', 'securityService', 'userPreferenceService', 'userService', 'noticeService'
+				'auditService', 'securityService', 'userPreferenceService', 'userService', 'noticeService','grailsApplication'
 
 		updateClassAndAddProperties beanFactory, 'objectDefinitionSource', TdsAnnotationFilterInvocationDefinition
 	}

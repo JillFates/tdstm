@@ -75,12 +75,12 @@ class MoveBundle extends Party {
 		Map moveEventMap
 		if (moveEvent) {
 			moveEventMap = [
-			    id: moveEvent.id,
+				id: moveEvent.id,
 				name: moveEvent.name
 			]
 		}
 		[
-		    id: id,
+			id: id,
 			name: name,
 			description: description,
 			startTime: startTime,
@@ -90,8 +90,7 @@ class MoveBundle extends Party {
 			useForPlanning: useForPlanning,
 			sourceRoom: sourceRoom.toString(),
 			targetRoom: targetRoom.toString(),
-			tasksCreated: tasksCreated,
-			assets: assets
+			tasksCreated: tasksCreated
 		]
 	}
 }

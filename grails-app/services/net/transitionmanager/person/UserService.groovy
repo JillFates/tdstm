@@ -367,6 +367,9 @@ class UserService implements ServiceMethods {
 			// TODO - implement this validation
 			// if (userLogin.person...)
 
+		} else if (userInfo.username) {
+				userLogin = UserLogin.findByUsername(userInfo.username)
+				log.debug "$mn Found user by Username"
 		} else {
 
 			// User wasn't found so let's try by the Person information

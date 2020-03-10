@@ -65,6 +65,10 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getAssignedTeam(commentId: any): Observable<any> {
+		if ( commentId == null ) {
+			return Observable.of([]);
+		}
+
 		return this.http.post(`${ this.baseURL }/assetEntity/updateAssignedToSelect?format=json&forView=&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
@@ -89,6 +93,10 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getStatusList(commentId: any): Observable<any> {
+		if ( commentId == null ) {
+			return Observable.of([]);
+		}
+
 		return this.http.post(`${ this.baseURL }/assetEntity/updateStatusSelect?format=json&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
@@ -400,6 +408,24 @@ export class TaskService {
 		);
 	}
 
+	getBulkTaskActionInfo(taskIds: Array<number>): Observable<any> {
+		return this.http.post(this.baseURL + '/ws/task/getBulkActionInfo', taskIds)
+			.map((response: any) => {
+				let data = response.data;
+				let returnObj = {};
+				if (!data) {
+					return returnObj;
+				}
+				data.forEach(task => {
+					if (task.taskId) {
+						returnObj[task.taskId] = this.convertToTaskActionInfoModel(task);
+					}
+				});
+				return returnObj;
+			})
+			.catch((error: any) => error);
+	}
+
 	/**
 	 * GET - Get the custom columns tasks.
 	 */
@@ -439,25 +465,35 @@ export class TaskService {
 	getTaskActionInfo(taskId: number): Observable<any> {
 		return this.http.get(this.TASK_ACTION_INFO_URL.replace('{taskId}', taskId.toString()))
 			.pipe(map((response: any) => {
-					let result: TaskActionInfoModel = {
-						predecessors: response.predecessorsCount || 0,
-						successors: response.successorsCount || 0,
-						assignedTo: response.assignedTo,
-						apiActionId: response.apiActionId,
-						apiActionCompletedAt: response.apiActionCompletedAt,
-						apiActionInvokedAt: response.apiActionInvokedAt,
-						category: response.category
-					};
-					if (response.invokeActionDetails) {
-						result.invokeButton = { ...response.invokeActionDetails };
-					}
-					return result;
+				return this.convertToTaskActionInfoModel(response.data || response);
 				}),
 				catchError(error => {
 					console.error(error);
 					return error;
 				})
 			);
+	}
+
+	/**
+	 * Converts raw response data from getTaskActionInfo/getTaskList into TaskActionInfoModel object
+	 * @param actionBarInfo - The object that contains all the data for the TaskActionInfoModel
+	 */
+	convertToTaskActionInfoModel(actionBarInfo: any): TaskActionInfoModel {
+		let result: TaskActionInfoModel = {
+			predecessors: actionBarInfo.predecessorsCount || 0,
+			successors: actionBarInfo.successorsCount || 0,
+			assignedTo: actionBarInfo.assignedTo,
+			assignedToName:  actionBarInfo.assignedToName,
+			apiActionId: actionBarInfo.apiActionId,
+			apiActionCompletedAt: actionBarInfo.apiActionCompletedAt,
+			apiActionInvokedAt: actionBarInfo.apiActionInvokedAt,
+			category: actionBarInfo.category,
+			status: actionBarInfo.status
+		};
+		if (actionBarInfo.invokeActionDetails) {
+			result.invokeButton = { ...actionBarInfo.invokeActionDetails };
+		}
+		return result;
 	}
 
 	/**

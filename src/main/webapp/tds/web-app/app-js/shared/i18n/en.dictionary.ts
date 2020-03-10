@@ -47,6 +47,8 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
+		'CORRUPT': 'Corrupt',
+		'EXPIRED': 'Expired',
 		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
@@ -128,14 +130,16 @@ export const en_DICTIONARY: Object = {
 			'CREATED_BY': 'Created By',
 			'CREATED_ON': 'Created On',
 			'UPDATED_ON': 'Updated On',
+			'GLOBAL': 'Global',
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
+			'OVERRIDE': 'Override',
 		},
 		'SYSTEM_VIEW': 'System View',
 		'SAVE_LIST_VIEW': 'Save List View',
-		'SAVE_IN_MY_VIEWS': 'Save in My Views',
-		'OVERRIDE_EXISTING_VIEW_ME': 'Override Existing View (For me)',
-		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override Existing View (All Users)',
+		'SAVE_IN_MY_VIEWS': 'Save as My Own View',
+		'OVERRIDE_EXISTING_VIEW_ME': 'Override System View (for Me)',
+		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override System View (for All Users)',
 		'BULK_CHANGE' : {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
@@ -147,6 +151,10 @@ export const en_DICTIONARY: Object = {
 			'DELETE': {
 				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel',
 				'CONFIRM_DELETE_DEPENDENCIES': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel'
+			},
+			'RUN': {
+				'CONFIRM_RUN_ASSETS': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel',
+				'CONFIRM_RUN_DEPENDENCIES': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel'
 			},
 			'ACTIONS': {
 				'ADD': 'Add to existing',
@@ -344,6 +352,11 @@ export const en_DICTIONARY: Object = {
 		'PRODUCTION': 'Production',
 	},
 	'IMPORT_ASSETS': {
+		'AUTO_IMPORT': {
+			'HEADLINE': 'The results will be automatically loaded into Imported Batch(es) and posted',
+			'INITIATE_IMPORT': 'Schedule Job',
+			'CHECKBOX_LABEL': 'Email me the results of the Import process'
+		},
 		'MANUAL_IMPORT': {
 			'IMPORT_ASSETS_ETL': 'Import Assets (ETL)',
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
@@ -437,9 +450,13 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'ERROR_TITLE': 'Oops! Something went wrong.',
 		'ERROR_MESSAGE': 'The TransitionManager team will fix this as soon as possible.',
 		'UNAUTHORIZED_TITLE': 'You don\'t have permission to view this page.',
+		'UNLICENSED_TITLE': 'A license is required in order to enable all features of this application.',
 		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
 		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
-		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.'
+		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.',
+		'WHY_THIS': 'Why am I seeing this?',
+		'LICENSE_EXPIRED': 'Your TransitionManager license is missing, expired or is otherwise no longer valid for this project.',
+		'LICENSE_ADMINISTRATOR': 'Your Administrator can manage the license from the Admin Menu, or if you are the Administrator and need assistance, please open a ticket at:'
 	},
 	'PROVIDER': {
 		'CREATE_PROVIDER': 'Create Provider',

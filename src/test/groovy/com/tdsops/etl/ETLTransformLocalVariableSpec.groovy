@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-
+import com.tdsops.etl.dataset.ETLDataset
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import net.transitionmanager.common.CoreService
@@ -43,7 +43,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 	void 'test can transform a local variable using uppercase method'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name
 				acmevmprod01
 			""", fileSystemService)
@@ -61,7 +61,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				read labels
 				domain Application
 				iterate {
-					set columnVar with 'Name'
+					set columnVar with 'name'
 					extract columnVar transform with lowercase() set nameVar
 					if (nameVar){
 						nameVar transform with uppercase() set upperNameVar
@@ -89,7 +89,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 	void 'test can transform a local variable using a chain of methods'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name
 				acmevmprod01
 			""", fileSystemService)
@@ -132,7 +132,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 	void 'test can throw an exception applying a transformation using non valid local variable'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name
 				acmevmprod01
 			""", fileSystemService)

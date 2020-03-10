@@ -5,6 +5,7 @@ import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.person.FavoriteDataview
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import org.grails.web.json.JSONObject
 
 /**
  * Database table mapping for 'report'.
@@ -16,15 +17,15 @@ class Dataview {
 	Project project
 	Person  person
 	String  name
-	Boolean isSystem
-	Boolean isShared
+	Boolean isSystem = false
+	Boolean isShared = false
 	String  reportSchema
 	Date    dateCreated
 	Date    lastModified
 	Dataview overridesView
 
 	static constraints = {
-		name size: 1..255, unique: 'project', validator: uniqueNameValidator()
+		name size: 1..255
 		person nullable: true
 		lastModified nullable: true
 		overridesView nullable: true
@@ -39,19 +40,23 @@ class Dataview {
 	 * @param currentPersonId current person in session.
 	 * @return
 	 */
-	Map toMap(Long currentPersonId) {
+	Map toMap(Project project, Person whom) {
 
 		Map data = [
-			id        : id,
-			name      : name,
-			isSystem  : isSystem,
-			isShared  : isShared,
-			isOwner   : isOwner(currentPersonId),
-			isFavorite: isFavorite(currentPersonId),
-			schema    : JsonUtil.parseJson(reportSchema),
-			createdBy : getOwnerName(),
-			createdOn : TimeUtil.formatDate(dateCreated),
-			updatedOn : TimeUtil.formatDate(lastModified)
+			id           : id,
+			name         : name,
+			hasOverride  : hasOverride(project),
+			isGlobal     : this.project.isDefaultProject(),
+			isSystem     : isSystem,
+			isShared     : isShared,
+			isOwner      : isOwner(whom.id),
+			isFavorite   : isFavorite(whom.id),
+			isOverride   : isOverrideView(),
+			schema       : schemaAsJSONObject(),
+			createdBy    : getOwnerName(),
+			createdOn    : TimeUtil.formatDate(dateCreated),
+			overridesView: overridesView,
+			updatedOn    : TimeUtil.formatDate(lastModified)
 		]
 		return data
 	}
@@ -75,11 +80,39 @@ class Dataview {
 	 * @return
 	 */
 	boolean isFavorite(Long currentPersonId) {
+		Long dvId = this.id
 		int favCount = FavoriteDataview.where {
-			dataview == this
+			dataview.id == dvId
 			person.id == currentPersonId
 		}.count()
 		return favCount > 0
+	}
+
+	/**
+	 * Determine if the dataview has an override view
+	 * @return
+	 */
+	boolean isOverrideView() {
+		return overridesView != null
+	}
+
+	/**
+	 * Used to determine if the current view has an override
+	 * @param project
+	 * @return returns true if the current view is a system and there is one or more overridden versions of the view
+	 * in the default project and/or in the project referenced.
+	 */
+	boolean hasOverride(Project project) {
+		boolean overridden = false
+		if (id && isSystem && project) {
+			// Note that the where closure didn't work correctly reference id directly, hence the dvId variable
+			Long dvId = this.id		
+			overridden = Dataview.where {
+					project.id in [project.id, Project.DEFAULT_PROJECT_ID]
+					overridesView.id == dvId
+				}.count() > 0
+		}
+		return overridden
 	}
 
 	/**
@@ -94,6 +127,14 @@ class Dataview {
 		return ''
 	}
 
+	/**
+	 * Returns the schema as a Map instead of a JSON string
+	 * @return
+	 */
+	JSONObject schemaAsJSONObject() {
+		reportSchema ? JsonUtil.parseJson(reportSchema) : null
+	}
+
 	def beforeInsert = {
 		dateCreated = dateCreated = TimeUtil.nowGMT()
 	}
@@ -101,22 +142,4 @@ class Dataview {
 		lastModified = TimeUtil.nowGMT()
 	}
 
-	/**
-	 * Used to validate that name is unique within the project
-	 */
-	static Closure uniqueNameValidator() {
-		return { value, target ->
-			int count = Dataview.where {
-				project == target.project
-				name == value
-				if (id) {
-					id != target.id
-				}
-			}.count()
-
-			if (count > 0) {
-				return 'default.not.unique.message'
-			}
-		}
-	}
 }

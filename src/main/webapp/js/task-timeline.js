@@ -22,8 +22,6 @@ $(document).ready(function () {
 
 	loadTeams();
 
-	$('#moveEventId option[value="349"]').attr("selected",true);
-
 	$("input[name=mode]").on('change', function(ev) {
 		if(ev && ev.target && ev.target.value === 'C'){
 			$('#baselinePlanButton').hide();
@@ -57,14 +55,13 @@ function displayWarningOrErrorMsg(isCyclical) {
 function 	buildGraph(response, status) {
 
 	// show the loading spinner
-	$('#spinnerId').css('display', 'block');
 
 	// restore export button
 	$('#exportCriticalPathButton').removeClass('disabledLabel');
 
 	// check for errors in the ajax call
-	if (status == 'error') {
-		displayWarningOrErrorMsg(response.responseText == 'cyclical')
+	if (status === 'error') {
+		displayWarningOrErrorMsg(response.responseText === 'cyclical')
 		return;
 	}
 
@@ -72,12 +69,20 @@ function 	buildGraph(response, status) {
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
 	var ready = false;
-	var items = data.tasks;
+
 	// if the event has no tasks show an error message and exit
-	if (items.length === 0 ) {
+	if (!data || data.tasks.length === 0) {
 		displayWarningOrErrorMsg(false);
 		return;
 	}
+	if(
+		!data.startDate ||
+		!data.endDate
+	) {
+		return alert('The tasks do not have start and end Date. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');
+	}
+
+	var items = data.tasks;
 
 	// graph default config
 	var miniRectStroke = 1.0;
@@ -107,6 +112,29 @@ function 	buildGraph(response, status) {
 	var useHeights = $('#useHeightCheckBoxId').is(':checked');
 	var taskSelected = null;
 
+	var parsedStartDate = parseDate(data.startDate);
+	var parsedEndDate = parseDate(data.endDate);
+
+	if(parsedEndDate.getTime() <= parsedStartDate.getTime()) {
+		var newEndTime = new Date(parsedStartDate.getTime());
+		newEndTime.setMinutes(newEndTime.getMinutes() + 5);
+		parsedEndDate = new Date(newEndTime.getTime());
+	}
+
+	/**
+	 * This code will be kept here for testing the task time line getting the startdate as first task estStart Date, and endDate as last task estFinish Date.
+	 var reversedTasks = items.slice().reverse();
+	 var firstTask =  items.find(function (task) {
+				return task.estStart !== null && task.estStart !== undefined;
+			}) ;
+	 var lastTask = reversedTasks.find(function (task) {
+				return task.estFinish !== null && task.estFinish !== undefined;
+			});
+
+	 if(firstTask) parsedStartDate = parseDate(firstTask.estStart);
+	 if(lastTask) parsedEndDate = parseDate(lastTask.estFinish);
+	 */
+
 	// perform all necesary precalculations on the data
 	sanitizeData(items, dependencies);
 
@@ -115,12 +143,15 @@ function 	buildGraph(response, status) {
 	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
 	var graphExtraPadding = 10; // extra padding width for the graph on the page
 	var zoomScale = 2;
-	var d3Linear = getTimeFormatToDraw(parseDate(data.startDate), parseDate(data.endDate),false, data);
+
+
+	var d3Linear = getTimeFormatToDraw(parsedStartDate, parsedEndDate,false, data);
 	var x = d3.time.scale()
-		.domain([parseDate(data.startDate), parseDate(data.endDate)])
+		.domain([parsedStartDate, parsedEndDate])
 		.range([0, windowWidth - graphPageOffset * 2 - graphExtraPadding]);
+
 	var x1 = d3.time.scale()
-		.domain(x.domain())
+		.domain([parsedStartDate, parsedEndDate])
 		.range([0, x.range()[1] * zoomScale]);
 
 	// perform the stacking layout algorithm then determine the width and height of the graphs
@@ -439,8 +470,8 @@ function 	buildGraph(response, status) {
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'main axis minute')
 			.call(function(a, b){
-			    axisDefs.x1MainGraphAxis(a, b);
-            }),
+				axisDefs.x1MainGraphAxis(a, b);
+			}),
 
 		miniMinuteAxis: mini.append('svg:g')
 			.attr('transform', 'translate(0,' + miniHeight + ')')
@@ -451,7 +482,7 @@ function 	buildGraph(response, status) {
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'axis hour')
 			.call(axisDefs.xHourAxis)
-	}
+	};
 
 	// construct the line representing the current time
 	var mainNowLine = mainTranslator.append('svg:line')
@@ -466,15 +497,19 @@ function 	buildGraph(response, status) {
 		.attr('y2', miniHeight)
 		.attr('class', 'todayLine');
 
-	// shift the today line every 3000 miliseconds
+	// shift the today line every 3000 miliseconvads
 	d3.timer(function () {
+		var _now = now();
+		var x1Val = x1(_now) + 0.5;
+		var xVal = x(_now) + 0.5;
 		mainNowLine
-			.attr('x1', x1(now()) + 0.5)
-			.attr('x2', x1(now()) + 0.5);
+			.attr('x1', x1Val)
+			.attr('x2', x1Val);
 		miniNowLine
-			.attr('x1', x(now()) + 0.5)
-			.attr('x2', x(now()) + 0.5);
+			.attr('x1', xVal)
+			.attr('x2', xVal);
 	}, 3000);
+
 
 	// construct the container for the task polygons
 	var itemPolys = mainTranslator.append('svg:g')
@@ -512,9 +547,9 @@ function 	buildGraph(response, status) {
 		.x(x)
 		.on("brush", brushed)
 		.on("brushend", brushedEnd)
-		.extent([parseDate(data.startDate), new Date(Math.min(parseDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
+		.extent([parsedStartDate, parsedEndDate]);
 
-	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
+	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]) + 1;
 	zoomScale = extentWidth / width;
 	x1.range([0, width / zoomScale]);
 
@@ -641,6 +676,7 @@ function 	buildGraph(response, status) {
 
 	// updates the svg
 	function display(resized, scaled, repainting) {
+
 		if (!ready)
 			return;
 
@@ -1062,7 +1098,6 @@ function 	buildGraph(response, status) {
 
 	// gets the points string for task polygons
 	function getPoints(d) {
-		// debugger;
 		var points = {};
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
@@ -1440,22 +1475,9 @@ function 	buildGraph(response, status) {
 	 - corrects any impossible start times for tasks */
 	function sanitizeData(tasks, dependencies) {
 
-
 		data.searchFilter = '';
 
-        // convert all data to its proper format
-        if (data.startDate === undefined) {
-            data.items.forEach( task => {
-                if (task.estStart != undefined) {
-                    if (data.startDate == undefined || task.estStart < data.startDate) {
-                        data.startDate = new Date(task.estStart);
-                    }
-                }
-            });
-            //data.startDate = new Date(Date.now());
-        }
-        let startTime = parseDate(data.startDate);
-        let endTime = parseDate(data.endDate);
+		let startTime = parseDate(data.startDate);
 
 		for (var i = 0; i < items.length; ++i) {
 			items[i].successors = [];
@@ -1463,28 +1485,23 @@ function 	buildGraph(response, status) {
 			items[i].redundantSuccessors = [];
 			items[i].redundantPredecessors = [];
 		}
-        // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
-        for (let c = 0; c < data.cycles.size(); c++) {
-            let cycle = data.cycles[c];
-            let firstId = parseInt(cycle[0]);
-            let lastId = parseInt(cycle[cycle.size() - 1]);
-            let firstNode = items[binarySearch(items, firstId, 0, items.length - 1)];
-            let lastNode = items[binarySearch(items, lastId, 0, items.length - 1)];
+		// if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
+		for (let c = 0; c < data.cycles.size(); c++) {
+			let cycle = data.cycles[c];
+			let firstId = parseInt(cycle[0]);
+			let lastId = parseInt(cycle[cycle.size() - 1]);
+			let firstNode = items[binarySearch(items, firstId, 0, items.length - 1)];
+			let lastNode = items[binarySearch(items, lastId, 0, items.length - 1)];
 
-            let depObject = { "predecessor": lastNode, "successor": firstNode, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
-            depObject.root = lastNode.root;
-            lastNode.redundantSuccessors.push(depObject);
-            firstNode.redundantPredecessors.push(depObject);
-            dependencies.push(depObject);
-            //firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
-            firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
+			let depObject = { "predecessor": lastNode, "successor": firstNode, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
+			depObject.root = lastNode.root;
+			lastNode.redundantSuccessors.push(depObject);
+			firstNode.redundantPredecessors.push(depObject);
+			dependencies.push(depObject);
+			firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
+		}
 
-        }
-
-
-
-
-        // if there are cyclical structures, tell the user that the data might be inaccurate
+		// if there are cyclical structures, tell the user that the data might be inaccurate
 		if (data.cycles.length > 0){
 			alert("This task data contains cyclical dependency structures, so the resulting timeline may not be entirely accurate. Dependencies that create cyclical structures will be displayed as green lines.");
 		}
@@ -1492,8 +1509,7 @@ function 	buildGraph(response, status) {
 		// if there is more than 1 start task, create a fake root task
 		data.root = null;
 		if (starts.size() > 1) {
-			// debugger;
-            var earliest = starts[0].startInitial;
+			var earliest = starts[0].startInitial;
 			for (var i = 0; i < starts.size(); i++) {
 				var task = items[binarySearch(items, starts[i], 0, items.length - 1)];
 				task.predecessorIds.push(-10);
@@ -1503,32 +1519,29 @@ function 	buildGraph(response, status) {
 			root.id = -10;
 			root.comment = 'root';
 			root.root = true;
-
-
 			root.estStart = startTime;
-            root.estFinish = new Date(startTime.getTime() + 1);
+			root.estFinish = new Date(startTime.getTime() + 1);
 			root.predecessorIds = [];
 			items = [root].concat(items);
 			data.root = root;
 		} else if (items.size() > 0) {
-			// debugger;
 			data.root = items[binarySearch(items, starts[0], 0, items.length - 1)];
 		}
 
-        let unknownStarts = [];
+		let unknownStarts = [];
 
 		for (let i = 0; i < items.length; ++i) {
-		    if (!items[i].estStart) {
-                unknownStarts.push(i);
-            }
-            items[i].milestone = (items[i].duration === 0);
-            if (items[i].estStart) {
-                items[i].estStart = new Date(items[i].estStart);
-            }
-            if (items[i].estFinish) {
-                items[i].estFinish = new Date(items[i].estFinish);
-            }
-            items[i].start = items[i].estStart;
+			if (!items[i].estStart) {
+				unknownStarts.push(i);
+			}
+			items[i].milestone = (items[i].duration === 0);
+			if (items[i].estStart) {
+				items[i].estStart = new Date(items[i].estStart);
+			}
+			if (items[i].estFinish) {
+				items[i].estFinish = new Date(items[i].estFinish);
+			}
+			items[i].start = items[i].estStart;
 			items[i].end = items[i].estFinish;
 			items[i].exChild = null;
 			items[i].exParent = null;
@@ -1545,16 +1558,16 @@ function 	buildGraph(response, status) {
 			items[i].siblingGroupParents = [];
 			items[i].childGroups = [];
 		}
-		s
+
 		// if there are undefined start dates and no cycles, alert the user
-        if (unknownStarts.size() > 0 || !data.startDate || !data.endDate) {
-            alert('Some tasks are missing the estimated start/end dates. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');
-            return;
-        }
+		if (unknownStarts.size() > 0 || !data.startDate || !data.endDate) {
+			alert('Some tasks are missing the estimated start/end dates. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');
+			return;
+		}
 
 		// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created
-		for (var i = 0; i < items.length; ++i)
-			if (items[i] && items[i].predecessorIds)
+		for (var i = 0; i < items.length; ++i){
+			if (items[i] && items[i].predecessorIds){
 				for (var j = 0; j < items[i].predecessorIds.length; ++j) {
 					var predecessorIndex = binarySearch(items, items[i].predecessorIds[j], 0, items.length - 1)
 					if (items[predecessorIndex]) {
@@ -1569,6 +1582,8 @@ function 	buildGraph(response, status) {
 						}
 					}
 				}
+			}
+		}
 
 		// find and remove any redundant dependencies using a queue for a breadth first search
 		var queue = [];
@@ -2375,31 +2390,33 @@ function 	buildGraph(response, status) {
 	}
 
 	// gets the current time as a Date object
-	function now() {
+	function now (){
 		var now = new Date();
-		return new Date(now.getTime());
+		return parseDate(now.toISOString());
 	}
 
 	// returns true if all of task d's predecessors are completed
 	function isReady(d) {
 		for (var i = 0; i < d.predecessors.length; ++i)
-			if (d.predecessors[i].predecessor.status != 'Completed')
+			if (d.predecessors[i].predecessor.status !== 'Completed')
 				return false;
 		return true
 	}
 
 	// returns true if the event was a left click, return false if it was a different kind of click
 	function isLeftClick() {
-		if (d3.event.isLeftClick == undefined)
-			return d3.event.button == 0
-		return d3.event.isLeftClick()
+		if (!d3.event.isLeftClick){
+			return d3.event.button === 0;
+		} else {
+			return d3.event.isLeftClick();
+		}
 	}
 }
 
 function submitForm() {
 	$('.chart').remove();
 	d3.select('#svgContainerId').style('display', 'none');
-	generateGraph($('#moveEventId').val());
+	generateGraph();
 }
 
 // populate the team select
@@ -2434,60 +2451,60 @@ function loadTeams() {
 }
 
 function baseLine(){
-    var id = $('#moveEventId').val();
+	var id = $('#moveEventId').val();
 
-    var params = {id:id};
-    params.viewUnpublished = $('#viewUnpublishedId').is(':checked');
+	var params = {id:id};
+	params.viewUnpublished = $('#viewUnpublishedId').is(':checked');
 
-    $('#spinnerId').css('display', 'block');
+	$('#spinnerId').css('display', 'block');
 
-    var url;
+	var url;
 
-    url = tdsCommon.createAppURL('/wsTimeline/baseline');
-    jQuery.ajax({
-        dataType: 'json',
-        url: url,
-        data:params,
-        type: 'POST',
-        complete: function (ev) {
-        	var msgObj = JSON.parse(ev.responseText);
-        	if(msgObj && msgObj.message) {
+	url = tdsCommon.createAppURL('/wsTimeline/baseline');
+	jQuery.ajax({
+		dataType: 'json',
+		url: url,
+		data:params,
+		type: 'POST',
+		complete: function (ev) {
+			var msgObj = JSON.parse(ev.responseText);
+			if(msgObj && msgObj.message) {
 				alert(msgObj.message);
 			}
-        	generateGraph();
+			generateGraph();
 			$('#spinnerId').css('display', 'none');
-        }
-    });
+		}
+	});
 }
-
-
-
 
 /**
  * Call the REST API to grab the data to generate the Timeline
  */
-function generateGraph(ev) {
-    var id = $('#moveEventId').val();
-    var mode = $("input[name=mode]:checked").val();
-    var viewUnpublished = $('#viewUnpublishedId').is(':checked');
+function generateGraph() {
+	var id = $('#moveEventId').val();
+	if(!+id){
+		return;
+	}
+	var mode = $("input[name=mode]:checked").val();
+	var viewUnpublished = $('#viewUnpublishedId').is(':checked');
 
-    $('#spinnerId').css('display', 'block');
+	$('#spinnerId').css('display', 'block');
 
-    var params = {
-        id:id,
-        mode:mode,
-        viewUnpublished:viewUnpublished
-    };
+	var params = {
+		id:id,
+		mode:mode,
+		viewUnpublished:viewUnpublished
+	};
 
-    var queryParams = $.param(params);
+	var queryParams = $.param(params);
 
-    var url = tdsCommon.createAppURL('/wsTimeline/timeline?'+queryParams);
-    jQuery.ajax({
-        dataType: 'json',
-        url: url,
-        type: 'GET',
-        complete: buildGraph
-    });
+	var url = tdsCommon.createAppURL('/wsTimeline/timeline?'+queryParams);
+	jQuery.ajax({
+		dataType: 'json',
+		url: url,
+		type: 'GET',
+		complete: buildGraph
+	});
 }
 
 // highlight tasks matching the user's regex
@@ -2566,18 +2583,24 @@ function parseDate(date) {
 	return new Date(momentStartDate.valueOf());
 }
 
+// gets the current time as a Date object
+function now (){
+	var now = new Date();
+	return parseDate(now.toISOString());
+}
+
 function exportCriticalPath() {
-    var eventId = $('#moveEventId').val();
-    if (eventId && (eventId != 0) && (!$('#exportCriticalPathButton').hasClass('disabledLabel'))) {
-        window.open(tdsCommon.createAppURL("/wsTimeline/exportCPA?showAll=true&id=" + eventId), '_blank');
-    }
+	var eventId = $('#moveEventId').val();
+	if (eventId && (eventId != 0) && (!$('#exportCriticalPathButton').hasClass('disabledLabel'))) {
+		window.open(tdsCommon.createAppURL("/wsTimeline/exportCPA?showAll=true&id=" + eventId), '_blank');
+	}
 }
 
 function baselinePlan() {
-    var eventId = $('#moveEventId').val();
-    if (eventId && (eventId != 0) && (!$('#baselinePlanButton').hasClass('disabledLabel'))) {
-        window.open(tdsCommon.createAppURL("/wsTimeline/baseline?id=" + eventId), '_blank');
-    }
+	var eventId = $('#moveEventId').val();
+	if (eventId && (eventId != 0) && (!$('#baselinePlanButton').hasClass('disabledLabel'))) {
+		window.open(tdsCommon.createAppURL("/wsTimeline/baseline?id=" + eventId), '_blank');
+	}
 }
 
 var _MS_PER_MIN = 60000,

@@ -83,7 +83,10 @@ class FindingsFacade {
 		List<Object> results = []
 		if (!ids.isEmpty()) {
 			Class domainClass = findElement.currentDomain.clazz
-			results = domainClass.where { id in ids }.list(readonly: true)
+			results = domainClass.createCriteria().list {
+				'in' ('id', ids)
+				readOnly(true)
+			}
 		}
 		return results
 	}

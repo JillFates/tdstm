@@ -13,6 +13,8 @@ import {SortUtils} from '../../../../utils/sort.utils';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 import {Observable} from 'rxjs';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {Store} from '@ngxs/store';
+import {SetTimeZoneAndDateFormat} from '../../../../../modules/auth/action/timezone-dateformat.actions';
 
 declare var jQuery: any;
 // Work-around for deprecated jQuery functionality
@@ -51,7 +53,8 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 		private headerService: HeaderService,
 		private preferenceService: PreferenceService,
 		private translatePipe: TranslatePipe,
-		private promptService: UIPromptService) {
+		private promptService: UIPromptService,
+		private store: Store) {
 		super('#datetime-modal');
 	}
 
@@ -208,8 +211,14 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 		} else {
 			this.headerService.saveDateAndTimePreferences(params).subscribe(
 				(result: any) => {
-					this.cancelCloseDialog();
-					location.reload();
+					// Update the storage before reload the window
+					this.store.dispatch(new SetTimeZoneAndDateFormat({
+						timezone: params.timezone,
+						dateFormat: params.datetimeFormat
+					})).subscribe(() => {
+						this.cancelCloseDialog();
+						location.reload();
+					});
 				},
 				(err) => console.log(err));
 		}

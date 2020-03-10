@@ -219,6 +219,13 @@ class UrlMappings {
 				GET: 'actions'
 			]
 		}
+
+		'/ws/bulkChange/etl' {
+			controller = 'wsBulkAssetChange'
+			action = [
+				PUT: 'runETL'
+			]
+		}
 		/******************************************************/
 
 		"/ws/moveBundle/list" {
@@ -271,14 +278,14 @@ class UrlMappings {
 			action = [GET: "index"]
 		}
 
+		"/ws/event/taskCategoriesStats/$id?" {
+			controller = 'wsEvent'
+			action = [GET: 'taskCategoriesStats']
+		}
+
 		"/ws/moveEvent/dashboardModel" {
 			controller = "wsEvent"
 			action = [GET: "getEventDashboardModel"]
-		}
-
-		"/ws/moveEvent/taskCategoriesStats/$moveEventId" {
-			controller = 'wsEvent'
-			action = [GET: 'taskCategoriesStats']
 		}
 
 		"/ws/moveEvent/list" {
@@ -311,7 +318,7 @@ class UrlMappings {
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 
-		"/ws/dashboard/eventData/$id" {
+		"/ws/dashboard/eventData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"eventData"]
 		}
@@ -418,6 +425,11 @@ class UrlMappings {
 			action = [POST: 'initiateTransformData']
 		}
 
+		"/ws/assetImport/autoBatchProcessing" {
+			controller = 'wsAssetImport'
+			action = [POST: 'autoBatchProcessing']
+		}
+
 		"/ws/assetImport/viewData" {
 			controller = 'wsAssetImport'
 			action = [GET: 'viewData']
@@ -492,6 +504,11 @@ class UrlMappings {
 		"/ws/task/getInfoForActionBar/$taskId" {
 			controller = "wsTask"
 			action = [GET: "getInfoForActionBar"]
+		}
+
+		"/ws/task/getBulkActionInfo" {
+			controller = "wsTask"
+			action = [POST: "getBulkInfoForActionBar"]
 		}
 
 		"/ws/task/customColumns" {
@@ -736,7 +753,7 @@ class UrlMappings {
 
 		"/ws/user/updateLastPage" {
 			controller = "wsUser"
-			action = [GET:"updateLastPage"]
+			action = [PUT:"updateLastPage"]
 		}
 
 		"/ws/progress" {
@@ -1150,6 +1167,13 @@ class UrlMappings {
 					POST: "createDataview",
 					PUT: "updateDataview",
 					DELETE: "deleteDataview"
+			]
+		}
+
+		"/ws/assetExplorer/saveOptions/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "saveOptions"
 			]
 		}
 
@@ -1603,6 +1627,7 @@ class UrlMappings {
 		"/ws/${controller}/$id/$action(.$format)?"(version: "1.0", namespace:"v1", method: "GET")
 
 		// REST API
+		// API version 1
 		"/api/projects/heartbeat"(controller: 'project', action: 'heartbeat', namespace:"v1", method: "GET")
 
 		"/api/${controller}"(version: "1.0", namespace: "v1", method: "GET")
@@ -1617,6 +1642,9 @@ class UrlMappings {
 		"/api/${controller}/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")
 		"/api/${controller}(.$format)?"(action: "save", version: "1.0", namespace:"v1", method: "POST")
 
+		"/api/$controller/$action(.$format)?"(version: "1.0", namespace: "v1", method: "POST")
+
+		// API version 2
 		"/api/${controller}"(version: "2.0", namespace: "v2", method: "GET")
 		"/api/${controller}/$id(.$format)?"(version: "2.0", action: "show", namespace: "v2", method: "GET")
 		"/api/${controller}/$id(.$format)?"(action: "delete", version: "2.0", namespace: "v2", method: "DELETE")

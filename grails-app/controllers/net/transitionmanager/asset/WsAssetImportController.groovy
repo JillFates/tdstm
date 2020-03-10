@@ -7,6 +7,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.command.InitiateTransformDataActionCommand
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
@@ -136,6 +137,7 @@ class WsAssetImportController implements ControllerMethods {
 	 *
 	 * @param id - the id of the DataScript that should be used to Transform the data
 	 * @param filename - the name of the temporary file that was provided by the fetch action
+	 * @param sendResultsByEmail - Defines if an auto import process results should be sent by email
 	 * @return	JSON Map containing the following
 	 * 		status <String> indicating success|error
 	 * 		errors <List> a list of error messages that occurred
@@ -147,11 +149,19 @@ class WsAssetImportController implements ControllerMethods {
 	 * 			]
 	 */
 	@HasPermission(Permission.AssetImport)
-	def initiateTransformData(Long dataScriptId, String filename) {
+	def initiateTransformData(){
 		def stopwatch = new StopWatch()
 		stopwatch.start()
+		InitiateTransformDataActionCommand actionCommand  = populateCommandObject(InitiateTransformDataActionCommand)
+		validateCommandObject(actionCommand)
+
 		Project project = getProjectForWs()
-		Map result = dataImportService.scheduleETLTransformDataJob(project, dataScriptId, filename)
+		Map result = dataImportService.scheduleETLTransformDataJob(
+			project,
+			actionCommand.dataScriptId,
+			actionCommand.filename,
+			actionCommand.sendNotification
+		)
 		renderSuccessJson(result)
 		log.info 'transformData() ETL Transformation took {}', stopwatch.endDuration()
 	}
@@ -202,7 +212,11 @@ class WsAssetImportController implements ControllerMethods {
 		List<Map> dataScripts = []
 		where = DataScript.where { project == project }.readOnly(true)
 		where.list().each() {
-			dataScripts << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
+			dataScripts << [
+					id:it.id,
+					name: "${it.provider.name} - ${it.name}",
+					isAutoProcess: it.isAutoProcess
+			]
 		}
 		dataScripts = dataScripts.sort { it.name }
 		results.dataScripts = dataScripts

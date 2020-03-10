@@ -172,11 +172,6 @@
                                     </g:link>
                                 </li>
                                 <li class="divider"></li>
-                                <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                                    <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">
-                                        <asset:image src="icons/magnifier.png" width="16" height="16" /> All Assets
-                                    </g:link>
-                                </li>
                                 <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
                                     <g:link class="mmlink" mapping="assetViewShow" id="7" elementId="7">
                                         <tds:svgIcon name="application_menu" width="16" height="16" /> Applications
@@ -200,6 +195,11 @@
                                 <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                                     <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
                                         <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Logical Storage
+                                    </g:link>
+                                </li>
+                                <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
+                                    <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">
+                                        <asset:image src="icons/magnifier.png" width="16" height="16" /> All Assets
                                     </g:link>
                                 </li>
                                 <li class="divider"></li>

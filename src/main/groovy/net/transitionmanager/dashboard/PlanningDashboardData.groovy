@@ -114,7 +114,7 @@ class PlanningDashboardData {
 		return [
 			assignedAppPerc: percentageMetrics.assignedAppPerc,
 			confirmedAppPerc: percentageMetrics.confirmedAppPerc,
-			validated: basicMetrics.applicationCount - validateMetrics.unknownAppToValidate,
+			validated: validateMetrics.validated,
 			planReady: validateMetrics.planReady,
 			appDependenciesCount: dependencyMetrics.appDependenciesCount,
 			serverDependenciesCount: dependencyMetrics.serverDependenciesCount,
@@ -208,6 +208,7 @@ class PlanningDashboardData {
 		static final String selectCount = 'SELECT count(ae)'
 		static final String baseWhere = 'WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)'
 		static final String deviceWhere = "$baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
+		static final String otherDeviceWhere = "$baseWhere AND ae.assetClass=:assetClass AND (ae.assetType NOT IN (:type) OR ae.assetType IS NULL)"
 		protected PlanningDashboardData planningDashboardData
 
 		/**
@@ -230,10 +231,11 @@ class PlanningDashboardData {
 		 * @param asset - 'Application', 'Database', etc.
 		 * @param countArgs - parameters to inject to the query.
 		 * @param additionalClauses - additional clauses that need to be used for querying.
+		 * @param isOther - a flag for signaling that the query is for other devices. This is because "Other Devices" query is a little different.
 		 * @return
 		 */
-		Long getAssetCount(String asset, Map countArgs, List<String> additionalClauses = []) {
-			String where = (asset == 'AssetEntity' && !additionalClauses) ? deviceWhere : baseWhere
+		Long getAssetCount(String asset, Map countArgs, List<String> additionalClauses = [], boolean isOther = false) {
+			String where = (asset == 'AssetEntity' && !additionalClauses) ? (isOther ? otherDeviceWhere : deviceWhere) : baseWhere
 			String countQuery = "$selectCount FROM $asset ae $where ${additionalClauses.join(" ")}"
 			return AssetEntity.executeQuery(countQuery, countArgs)[0]
 		}
@@ -449,7 +451,7 @@ class PlanningDashboardData {
 			if (customFieldSetting?.constraints?.values) {
 				Map sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
 					if ( ! it ) {
-						result[Application.UNKNOWN] = 0
+						result[Application.PLAN_METHODOLOGY_UNKNOWN] = 0
 					} else if (metrics[it]) {
 						result[it] = 0
 					}
@@ -477,9 +479,9 @@ class PlanningDashboardData {
 		long fileToValidate
 		long otherToValidate
 		long planReady
+		long validated
 		long phyStorageToValidate
 		long psToValidate
-		long unknownAppToValidate
 		long vsToValidate
 
 		void calculate() {
@@ -490,13 +492,14 @@ class PlanningDashboardData {
 			Map validateArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.UNKNOWN]
 			Map deviceValidateArgs = validateArgs + [assetClass:AssetClass.DEVICE]
 			Map planReadyArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.PLAN_READY]
+			Map validatedArgs = [project: project, moveBundles: moveBundleList, validation: ValidationType.VALIDATED]
 
 			appToValidate = getAssetCount('Application', validateArgs, basicValidateClauses)
-			unknownAppToValidate = getAssetCount('Application', validateArgs, basicValidateClauses)
 			dbToValidate = getAssetCount('Database', validateArgs, basicValidateClauses)
 			fileToValidate = getAssetCount('Files', validateArgs, basicValidateClauses)
 			otherToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.nonOtherTypes], otherValidateClauses)
 			planReady = getAssetCount('Application', planReadyArgs, basicValidateClauses)
+			validated = getAssetCount('Application', validatedArgs, basicValidateClauses)
 			phyStorageToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.storageTypes], deviceValidateClauses)
 			psToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.physicalServerTypes], deviceValidateClauses)
 			vsToValidate = getAssetCount('AssetEntity', deviceValidateArgs + [type:AssetType.virtualServerTypes], deviceValidateClauses)
@@ -575,7 +578,7 @@ class PlanningDashboardData {
 				application: [domain: 'Application', args: eventWiseArgs],
 				database: [domain: 'Database', args: eventWiseArgs],
 				file: [domain: 'Files', args: eventWiseArgs],
-				other: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes]],
+				other: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes], other: true],
 				physicalAsset: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass: AssetClass.DEVICE, type: AssetType.physicalServerTypes]],
 				physicalStorage: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass:AssetClass.DEVICE, type:AssetType.storageTypes]],
 				server: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass: AssetClass.DEVICE, type: AssetType.allServerTypes]],
@@ -586,7 +589,8 @@ class PlanningDashboardData {
 
 			if (moveBundles) {
 				queryInfo.each { String key, Map params ->
-					assetCounts[key] = getAssetCount(params['domain'], params['args'])
+					boolean isOther = 'other' in params ? params['other'] : false
+					assetCounts[key] = getAssetCount(params['domain'], params['args'], [], isOther)
 				}
 			}
 
@@ -595,9 +599,9 @@ class PlanningDashboardData {
 			}
 
 			Map openIssuesParams = [project: project, type: AssetCommentType.TASK, event: moveEvent,
-			                        status : [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.PENDING]]
+			                        statusExcluded : AssetCommentStatus.COMPLETED ]
 			String openIssuesQuery = """SELECT count(*) FROM AssetComment WHERE project=:project
-				AND commentType=:type AND status IN (:status) AND moveEvent=:event AND isPublished=true"""
+				AND commentType=:type AND status <> :statusExcluded AND moveEvent=:event AND isPublished=true"""
 			Long openIssueCount = AssetComment.executeQuery(openIssuesQuery, openIssuesParams)[0]
 
 			metrics['openTasks'] << [moveEvent: moveEvent.id, count: openIssueCount]
@@ -672,7 +676,7 @@ class PlanningDashboardData {
 			confirmedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.confirmedApplicationCount)
 			movedDatabasePerc = NumberUtil.percentage(basicMetrics.databaseCount, movedDbCount)
 			doneAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
-			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.applicationCount)
+			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
 			movedOtherPerc = NumberUtil.percentage(deviceMetrics.otherAssetCount, movedOtherCount)
 			physicalServerPerc = NumberUtil.percentage(deviceMetrics.totalPhysicalServerCount, movedPhysicalServerCount)
 			physicalStoragePerc = NumberUtil.percentage(deviceMetrics.phyStorageCount, movedPhyStorageCount)

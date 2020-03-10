@@ -6,7 +6,7 @@ export class UserContextModel {
 	project?: any;
 	timezone?: string;
 	user?: any;
-	licenseInfo?: any;
+	license?: any;
 	permissions?: any[];
 	buildVersion?: string;
 	postNotices?: any;
@@ -15,12 +15,12 @@ export class UserContextModel {
 	};
 	error?: string;
 	alternativeProjects?: [];
-	defaultProject?:any;
+	defaultProject?: any;
 }
 
 export enum USER_CONTEXT_REQUEST {
-	USER_INFO = 0,
-	LICENSE_INFO = 1,
+	USER = 0,
+	LICENSE = 1,
 	PERMISSIONS = 2,
 	NOTICES = 3
 }

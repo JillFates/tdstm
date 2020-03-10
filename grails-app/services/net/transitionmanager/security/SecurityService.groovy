@@ -35,6 +35,7 @@ import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ProjectRequiredException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.PartyRelationship
@@ -63,7 +64,7 @@ import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
-class SecurityService implements ServiceMethods, InitializingBean {
+class SecurityService implements InitializingBean {
 	private static final int ONE_HOUR = 60 * 60 * 1000
 	private static final Collection<String> SECURITY_ROLES = ['USER', 'EDITOR', 'SUPERVISOR']
 
@@ -238,7 +239,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Project project = getUserCurrentProject()
 
 		if(project == null){
-			throw new EmptyResultException('No project selected')
+			throw new ProjectRequiredException('No project selected')
 		}
 
 		return project
@@ -305,7 +306,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Person person = userLogin ? userLogin.person : getUserLoginPerson()
 		List<Long> projectIds = []
 		Boolean showAllProjPerm = hasPermission(Permission.ProjectShowAll)
-		Boolean hasAccessToDefaultProject = securityService.hasPermission(person, Permission.ProjectManageDefaults)
+		Boolean hasAccessToDefaultProject = hasPermission(person, Permission.ProjectManageDefaults)
 
 		if (showAllProjPerm) {
 			// Find all the projects that are available for the user's company as client or as partner or owner
@@ -530,13 +531,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			} else {
 
 				// See if the user account is properly configured to a state that they're allowed to change their password
-				securityService.validateAllowedToChangePassword(userLogin)
+				validateAllowedToChangePassword(userLogin)
 
 
 				//
 				// Made it throught the guantlet of password requirements so lets update the password
 				//
-				securityService.setUserLoginPassword(userLogin, command.password, command.confirmPassword)
+				setUserLoginPassword(userLogin, command.password, command.confirmPassword)
 
 				if (!userLogin.save(failOnError: false)) {
 					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
@@ -571,7 +572,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	@Transactional
 	void unlockAccount(UserLogin account) {
 		requirePermission Permission.UserUnlock
-
+		account.failedLoginAttempts = 0
 		account.lockedOutUntil = null
 		account.lastLogin = TimeUtil.nowGMT()
 		auditService.saveUserAudit UserAuditBuilder.userAccountWasUnlockedBy(getCurrentUsername(), account)

@@ -789,9 +789,13 @@ div.graphContainer {
     padding: 0px !important;
     margin: 0px !important;
     overflow: hidden;
-    font-size: 0; }
+    font-size: 0;
+    position: relative;
+    top: 30px; }
     div.graphContainer div#svgContainerId svg {
       border: none !important; }
+  div.graphContainer button.baseline-btn {
+    margin: 0 10px; }
 
 div.graphContainer.fullscreen {
   background-color: #ffffff;
@@ -1595,6 +1599,8 @@ body.error-handling div.error-page {
       font-size: 27px; }
     body.error-handling div.error-page div.error-content p {
       font-size: 18px; }
+      body.error-handling div.error-page div.error-content p.action-description {
+        font-size: 15px; }
 
 i.licensing-error-warning {
   color: #FFCC00;
@@ -1635,6 +1641,9 @@ div.license-warning-message-button {
 div.content-wrapper div.container .body table.asset-summary-table {
   border-spacing: 2px;
   border-collapse: initial; }
+
+div.content-wrapper div.container .indent {
+  padding-left: 30px; }
 
 div.content-wrapper div.container .body table#assetListIdGrid div.ui-jqgrid-bdiv {
   overflow-x: hidden !important; }
@@ -1855,6 +1864,10 @@ div.content-wrapper div.container .dependencyConsoleForm {
 
 #personHighlightSelectId_listbox * {
   cursor: pointer; }
+
+div #dependecy-control {
+  height: calc(100% - 30px);
+  overflow: auto; }
 
 #levelsUpId, #levelsDownId {
   width: 20px;

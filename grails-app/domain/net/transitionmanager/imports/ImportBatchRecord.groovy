@@ -1,6 +1,7 @@
 package net.transitionmanager.imports
 
 import com.tdsops.etl.DomainClassQueryHelper
+import com.tdsops.etl.TagResults
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
@@ -108,6 +109,25 @@ class ImportBatchRecord {
 	 */
 	String comments = defaultCommentFieldValue
 
+	/*
+	 * ETL process creates a JSON field called tags in {@code ETLProcessorResult}.
+	 * The format will be similar to:
+	 * <pre>
+	 *	{
+	 *		"tags":{
+	 *			"add":["GDPR","PCI","SOX"],
+	 *			"remove":["HIPPA","PCI","SOX"],
+	 *			"replace":{
+	 *				"PCI":"PCI",
+	 *				"HIPPA":"SOX",
+	 *				"GDPR":"PCI"
+	 *			},
+	 *		}
+	 *	}
+	 * </pre>
+	 */
+	String tags
+
 	Date lastUpdated
 
 	static belongsTo = [
@@ -122,6 +142,7 @@ class ImportBatchRecord {
 		lastUpdated nullable: true
 		sourceRowId nullable: true
 		warn range: 0..1
+		tags nullable: true
 	}
 
 	static mapping = {
@@ -182,7 +203,7 @@ class ImportBatchRecord {
 					initVal = record.init
 				}
 
-				currentValues[fieldName] = value
+				currentValues[fieldName] = value ? value : ' '
 
 				if ( initVal ) {
 					initValues[fieldName] = initVal
@@ -199,6 +220,7 @@ class ImportBatchRecord {
 			domainMap.errorList = errorListAsList()
 			domainMap.fieldsInfo = fieldsInfoAsMap()
 			domainMap.comments = commentsAsList()
+			domainMap.tags = tagsAsMap()
 
 			// Populate the results of the find/elseFind queries if the record is pending
 			if (status == ImportBatchStatusEnum.PENDING) {
@@ -282,6 +304,39 @@ class ImportBatchRecord {
 	List commentsAsList() {
 		return JsonUtil.parseJsonList(comments)
 	}
+	/**
+	 * Retrieves {@code ImportBatchRecord#tags} in a Map format.
+	 * <pre>
+	 * 	{
+	 * 		"add": ["Code Blue", "FUBAR", "SNAFU"],
+	 *  	"remove": ["Blah", "xyzzy"],
+	 *  	"replace": {"a":"b", "e":"f", "c":"d", "g":"h"}
+	 *  }
+	 * </pre>
+	 * @return a Map with tags content
+	 */
+	Map tagsAsMap() {
+		this.tags ? JsonUtil.parseJson(this.tags) : [:]
+	}
+	/**
+	 * Saves {@code ImportBatchRecord#tags}
+	 * previously transforming it to a JSON.
+	 * @param tags a Map with tags structure.
+	 * @see ImportBatchRecord#tags
+	 */
+	void saveTagsAsMap(Map tags) {
+		this.tags = JsonUtil.toJson(tags)
+	}
+
+	/**
+	 * Saves {@code ImportBatchRecord#tags}
+	 * previously transforming it to a JSON.
+	 * @param tags a Map with tags structure.
+	 * @see ImportBatchRecord#tags
+	 */
+	void saveTagsAsMap(TagResults tags) {
+		this.tags = JsonUtil.toJson(tags)
+	}
 
 	// TODO : JPM 2/2018 : When using these setters the assignments were NOT working correctly
 	//
@@ -316,5 +371,13 @@ class ImportBatchRecord {
 	 */
 	boolean hasComments() {
 		return comments != defaultCommentFieldValue
+	}
+
+	/**
+	 * Checks if {@code ImportBatchRecord#tags} field is different than null
+	 * @return true if tags contains any value or false if tags is null
+	 */
+	boolean hasTags() {
+		return tags != null && tags.trim() != '{"add":[],"remove":[],"replace":{}}'
 	}
 }

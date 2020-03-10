@@ -31,7 +31,8 @@ declare var jQuery: any;
 		<div class="content body">
 			<tds-report-toggle-filters [hideFilters]="hideFilters"
 				[disabled]="!generatedReport"
-				(toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+				(toggle)="toggleFilters($event)"
+				(reload)="onReload()"></tds-report-toggle-filters>
 			<section class="box-body">
 				<form class="formly form-horizontal">
 					<div class="box box-primary">
@@ -99,17 +100,34 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 	}
 
 	ngOnInit() {
-		const commonCalls = [this.reportsService.getEvents(), this.reportsService.getDefaults()];
+		this.onLoad();
+	}
 
+	/**
+	 * Load UI data from the backend.
+	 */
+	onLoad(): void {
+		const commonCalls = [this.reportsService.getEvents(), this.reportsService.getDefaults()];
 		Observable.forkJoin(commonCalls)
 			.subscribe((results) => {
 				const [events, defaults] = results;
 				this.model.events = events.map((item) => ({id: item.id.toString(), text: item.name}));
 				this.model.defaultEvent.id = pathOr(null, ['preferences', 'TASK_CREATE_EVENT'], defaults);
 				if (this.model.defaultEvent.id === 'null' || this.model.defaultEvent.id === null) {
-						this.model.defaultEvent.id = this.model.events[0].id;
+					this.model.defaultEvent.id = this.model.events[0].id;
 				}
 			})
+	}
+
+	/**
+	 * Revert the page to its initial state.
+	 */
+	public onReload(): void {
+		this.hideFilters = false;
+		this.generatedReport = false;
+		this.reportResult = null;
+		this.html = null;
+		this.onLoad();
 	}
 
 	/**

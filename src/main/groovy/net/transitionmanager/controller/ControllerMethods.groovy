@@ -448,10 +448,25 @@ trait ControllerMethods {
 
 	// void validateCommand(net.transitionmanager.command.CredentialCommand co) {
 	void validateCommandObject(Object co) {
+		if (co?.hasProperty('project') && co.project){
+			validateProject(co.project)
+		}
+
 		if (! co.validate()) {
 			String msg = GormUtil.allErrorsString(co)
 			// Call the invalidParamExceptionHandler
 			throw new InvalidParamException(msg)
+		}
+	}
+
+	/**
+	 * Validates if a project parameter is accessible for the current userLogin.
+	 *
+	 * @param project an instance of {@code Project}
+	 */
+	void validateProject(Project project){
+		if (!securityService.hasAccessToProject(project, securityService.userLogin)){
+			throw new InvalidParamException('Invalid project')
 		}
 	}
 	/**
@@ -552,16 +567,12 @@ trait ControllerMethods {
 				project = Project.get(projectId)
 			}
 		} else {
-
-			// Load the user's currently selected project
-			project = securityService.userCurrentProject
-			if (! project) {
-				throw new ProjectRequiredException('No current project selected for session')
-			}
+			// Load the user's currently selected project{
+			project = securityService.getUserCurrentProjectOrException()
 		}
 
 		if (! project) {
-			throw new EmptyResultException('Project not found')
+			throw new ProjectRequiredException('No project selected')
 		}
 
 		return project

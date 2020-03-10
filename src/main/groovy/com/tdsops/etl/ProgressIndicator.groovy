@@ -115,7 +115,7 @@ trait ProgressIndicator {
 	 * @param currentRow
 	 * @param totalRows - number of rows in the dataSet for the current iterate loop
 	 */
-	void reportRowProgress(Integer currentRow, Integer totalRows) {
+	void reportRowProgress(Integer currentRow, Long totalRows) {
 		if (progressCallback) {
 
 			if (frequencyCounter == -1) {

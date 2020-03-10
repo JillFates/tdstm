@@ -7,6 +7,7 @@ import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 
 import {StringUtils} from '../../../shared/utils/string.utils';
+import {NoticeModel} from '../../noticeManager/model/notice.model';
 
 @Injectable()
 export class PostNoticesService {
@@ -19,15 +20,17 @@ export class PostNoticesService {
 	 * Get the user post notices
 	 * @returns boolean
 	*/
-	getUserPostNotices(): Observable<any> {
+	public getPostNotices(): Observable<any> {
 		return this.http.get(`${this.baseURL}/fetchPostLoginNotices`)
 			.map((result: any) => {
 				let notices = result.data && result.data.notices || [];
-				notices.forEach( (notice: any) => {
+				// Process Notices and Clean it
+				notices = notices.map((notice: NoticeModel) => {
 					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+					notice.sequence = notice.sequence || 0;
+					return notice;
 				});
-
-				return result && result.data || [];
+				return notices;
 			})
 			.catch((error: any) => error);
 	}
@@ -38,8 +41,7 @@ export class PostNoticesService {
     */
 	notifyContinue(): Observable<any> {
 		return this.http.get(`${this.baseURL}/continue`)
-			.map((result: any) =>  result)
-			.catch((error: any) => error);
+			.map((result: any) =>  result);
 	}
 
 	/**

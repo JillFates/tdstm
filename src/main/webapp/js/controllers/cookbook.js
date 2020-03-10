@@ -166,6 +166,8 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index +
 		'" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" />';
 	scope.colDef = [
+	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**',
+        sortable: false, cellTemplate: actionsTemplate},
 	{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***',
 		editableCellTemplate: scope.edittableField},
 	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false,
@@ -174,9 +176,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	{field:'lastUpdated', displayName:'Last Updated', enableCellEdit: false, width: '****', cellTemplate : scope.dateCellTemplate},
 	{field:'versionNumber', displayName:'Version', cellClass: 'text-right', enableCellEdit: false,
 		width: '**'},
-	{field:'hasWIP', displayName:'WIP', cellClass: 'text-center', enableCellEdit: false, width: '*'},
-	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**',
-		sortable: false, cellTemplate: actionsTemplate}
+	{field:'hasWIP', displayName:'WIP', cellClass: 'text-center', enableCellEdit: false, width: '*'}
 	];
 
 	scope.colDefNoData = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];

@@ -390,7 +390,7 @@ class SearchQueryHelper {
 	 */
 	private static AssetDependency fetchAssetDependencyByAssets(Map fieldsInfo, Map context ) {
 		Object primary
-		AssetEntity supporting
+		Object supporting
 		AssetDependency dependency
 
 		log.debug 'fetchAssetDependencyByAssets() was called'
@@ -722,7 +722,7 @@ class SearchQueryHelper {
 	 */
 	private static List fetchReferenceOfEntityField(Object entity, String fieldName, Map fieldsValueMap, Map context, String parentFieldName = '') {
 		List<Object> entities = []
-		Object searchValue = fieldsValueMap[fieldName]
+		Object searchValue = (fieldsValueMap[fieldName] instanceof String) ? fieldsValueMap[fieldName] : fieldsValueMap[fieldName]?.value?.toString()
 		Manufacturer mfg
 		String errorMsg
 
@@ -862,7 +862,7 @@ class SearchQueryHelper {
 						errorMsg = "Reference ${fieldName} of domain ${refDomainName} does not support alternate key lookups"
 						return [entities, errorMsg]
 					}
-					entities = GormUtil.findDomainByAlternateKey(refDomainClass, (String)searchValue.value, (Project)context.project, extraCriteria)
+					entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, (Project)context.project, extraCriteria)
 				}
 
 				// If not found and the domain has an alias (mfg/model) then try looking up that way

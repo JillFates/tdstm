@@ -1,21 +1,22 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
+import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import grails.test.mixin.Mock
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import spock.lang.Issue
 import spock.lang.See
 import spock.util.mop.ConfineMetaClassChanges
@@ -63,7 +64,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 	void 'test can throw an Exception if lookup does not contain a valid field name'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -102,7 +103,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test can lookup results and used LOOKUP found to check results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -185,7 +186,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test group data using LOOKUP as a String list in a custom field'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -243,7 +244,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test can lookup results and used LOOKUP notFound to check results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -321,7 +322,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test that when the lookup finds previous results that the current result is the earlier one'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -403,7 +404,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test lookup with multiple criteria'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(RVToolsCSVContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -420,9 +421,9 @@ class ETLLookupSpec extends ETLBaseSpec {
 						set lookupFieldNameVar with 'assetName'
 						set serialNumVar with '422e2244-f78c-2012-b56a-e435d7519abf'
 						iterate {
-							extract 'Vm' load 'Name'
-							extract 'Vm Id' load 'externalRefId'
-							extract 'Vm Uuid' load 'serialNumber'
+							extract 'VM' load 'Name'
+							extract 'VM ID' load 'externalRefId'
+							extract 'VM UUID' load 'serialNumber'
 							extract 'OS according to the VMware Tools' load 'os'
 
 							// the serialNumber is that of the 2nd row in the csv
@@ -458,9 +459,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 					data[2].fields.externalRefId.value == 'vm-44956'
 					data[2].fields.serialNumber.value == '422ea90a-b80a-81de-0d4c-6f111142c4f7'
 					data[2].fields.os.value == 'Microsoft Windows Server 2012 (64-bit)'
-					! data[2].fields.custom1
-					! data[3].fields.custom1
-					! data[4].fields.custom1
+					!data[2].fields.custom1
+					!data[3].fields.custom1
+					!data[4].fields.custom1
+					!data[5].fields.custom1
 				}
 			}
 
@@ -471,7 +473,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test can lookup results and used !LOOKUP to check results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -549,7 +551,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test can enable console and log LOOKUP variable'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -627,7 +629,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test when lookup does not find results that the current result is new'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(RVToolsCSVContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -650,11 +652,11 @@ class ETLLookupSpec extends ETLBaseSpec {
 					iterate {
 						domain Device
 
-							extract 'Vm' load 'Name'
+							extract 'VM' load 'Name'
 							def vmName = CE
 
-							extract 'Vm Id' load 'externalRefId'
-							extract 'Vm Uuid' load 'serialNumber'
+							extract 'VM ID' load 'externalRefId'
+							extract 'VM UUID' load 'serialNumber'
 							extract 'OS according to the VMware Tools' load 'os'
 
 							// Grab the cluster name to be used in Application and Dependency section
@@ -728,7 +730,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				assertWith(domains[2]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
-					data.size() == 5
+					data.size() == 6
 				}
 			}
 
@@ -738,7 +740,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 	void 'test the ETLProcessorResult lookupInReference method'() {
 		setup:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
@@ -784,7 +786,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 	void 'test setting a variable at ETLProcessor level'() {
 		setup:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 			ETLProcessor etlProcessor = new ETLProcessor(
 					  GMDEMO,
 					  dataSet,
@@ -822,7 +824,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 	void 'test setting a variable at Element level'() {
 		setup:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(DependencyDataSetContent)
 			ETLProcessor etlProcessor = new ETLProcessor(
 					  GMDEMO,
 					  dataSet,
@@ -835,9 +837,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.domain( domain )
 			etlProcessor.read(ETLProcessor.ReservedWord.labels)
 
-			etlProcessor.iterateIndex = new IterateIndex(1)
-			def row = etlProcessor.dataSetFacade.rows()[0]
-			etlProcessor.addCrudRowData(row)
+			def row = etlProcessor.dataset.iterator().next()
+			etlProcessor.currentRow = new Row(row, etlProcessor)
+            etlProcessor.rows.add(etlProcessor.currentRow)
+
 			Element el = etlProcessor.extract(1)
 
 

@@ -2,6 +2,7 @@
 	<tds-report-toggle-filters 
 		[hideFilters]="hideFilters" 
 		[disabled]="!generatedReport"
+		(reload)="onReload()"
 		(toggle)="toggleFilters($event)"></tds-report-toggle-filters>
 	<div class="box-body">
 		<div class="box box-primary">
@@ -16,7 +17,7 @@
 					<div class="container" *ngIf="isDisplayingReport">
 						<div class="header">
 							<div class="main-title">{{reportProject}}: {{reportBundle}} - Includes databases matching: {{reportTitle}}</div>
-							<div class="sub-title">This analysis was performed on {{ reportDate | date: dateFormatTime}} for {{userContext ? userContext.person.firstName : ''}}.</div>
+							<div class="sub-title">This analysis was performed on {{ reportDate | tdsDateTime: userTimeZone}} for {{userContext ? userContext.person.firstName : ''}}.</div>
 						</div>
 						<div class="results">
 							<div class="report-output">

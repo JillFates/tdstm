@@ -22,6 +22,7 @@ import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class CustomDomainService implements ServiceMethods {
     static final String ALL_ASSET_CLASSES = 'ASSETS'
@@ -35,6 +36,8 @@ class CustomDomainService implements ServiceMethods {
 
     static final List<String> CUSTOM_REQUIRED_BULK_ACTIONS = ["replace"]
     static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
+
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
     SettingService settingService
     /**
@@ -217,6 +220,7 @@ class CustomDomainService implements ServiceMethods {
 
         Map currentStoredFieldSpecs = [:]
 
+
         try{
             currentStoredFieldSpecs = allFieldSpecs(project, domain)
         } catch(ConfigurationException silentFail) {}
@@ -224,6 +228,9 @@ class CustomDomainService implements ServiceMethods {
 
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
+
+            // This list will contain all the portions of SQL code for updating the fields that are being added/updated.
+            List<String> updateFieldStrings = []
 
             if (customFieldSpec) {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
@@ -256,7 +263,16 @@ class CustomDomainService implements ServiceMethods {
 
                     if (((String) field.field).startsWith('custom')) {
 
-                        updateFieldData(fieldsLookUp[(String)field.field],field, assetClassType, project)
+                        // Prevent inconsistencies when saving the field by accidentally leaving the 'shared' property empty.
+                        if (field.shared == null) {
+                            field.shared = 0
+                        }
+
+                        String updateFieldString = updateFieldData(fieldsLookUp[(String)field.field],field)
+                        // If a change in the specs for this field is detected, add the SQL code to the list.
+                        if (updateFieldString) {
+                            updateFieldStrings << updateFieldString
+                        }
                         customFieldsToSave << field.field
 
                         if(field?.constraints?.required){
@@ -267,8 +283,20 @@ class CustomDomainService implements ServiceMethods {
                     }
                 }
 
+                // Determine the fields that were added.
                 List<String> customFieldsToClear = CollectionUtils.disjunction( currentCustomFields, customFieldsToSave)
-                clearCustomFields(project, assetClassType, customFieldsToClear)
+
+                if (customFieldsToClear) {
+                    // Set all the new fields to null, to override possible all data.
+                    List<String> customFieldsToClearSql = setAllToNull(customFieldsToClear)
+
+                    // Add all the new fields to the list of fields to be updated.
+                    updateFieldStrings.addAll(customFieldsToClearSql)
+                }
+
+                // Execute a single SQL update statement for clear all the necessary custom fields for this asset class.
+                clearCustomFieldsForClass(project, assetClassType, updateFieldStrings)
+
 
                 settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType, customFieldSpec.toString(), customFieldSpecVersion)
             } else {
@@ -296,30 +324,31 @@ class CustomDomainService implements ServiceMethods {
      *
      * @param oldFieldSpec The old specification used for the field name, and to determine what the old control was.
      * @param newFieldSpec The new Specification, what the field was updated to, used to determine what the new control is.
-     * @param assetClassType The assetClassType to update the custom data for.
-     * @param project The project to update the custom data for.
+     * @return the string for updating the given field.
      */
-    void updateFieldData(Map oldFieldSpec, Map newFieldSpec, String assetClassType, Project project){
-        if(!oldFieldSpec || (oldFieldSpec.control == newFieldSpec.control && oldFieldSpec.shared == newFieldSpec.shared)){
+    String updateFieldData(Map oldFieldSpec, Map newFieldSpec){
+        if(!oldFieldSpec || (oldFieldSpec.control == newFieldSpec.control && oldFieldSpec.shared == newFieldSpec.shared)||
+           (oldFieldSpec.control == newFieldSpec.control && oldFieldSpec.shared && !newFieldSpec.shared)){
             return
         }
 
         String key = newFieldSpec.shared ? '': "${oldFieldSpec.control}-${newFieldSpec.control}"
 
+        String updateFieldString = null
 
         switch (key) {
             case "$ControlType.DATE.value-$ControlType.DATETIME.value":
-                dataDateToDateTime(project, assetClassType, oldFieldSpec.field)
-                return
+                updateFieldString = dataDateToDateTime(oldFieldSpec.field)
+                break
 
             case "$ControlType.DATETIME.value-$ControlType.DATE.value":
-                dataDateTimeToDate(project, assetClassType, oldFieldSpec.field)
-                return
+                updateFieldString = dataDateTimeToDate(oldFieldSpec.field)
+                break
 
             case "$ControlType.STRING.value-$ControlType.YES_NO.value":
             case "$ControlType.LIST.value-$ControlType.YES_NO.value":
-                dataToYesNo(project, assetClassType, oldFieldSpec.field)
-                return
+                updateFieldString = dataToYesNo(oldFieldSpec.field)
+                break
 
             case "$ControlType.NUMBER.value-$ControlType.LIST.value":
             case "$ControlType.STRING.value-$ControlType.LIST.value":
@@ -327,19 +356,22 @@ class CustomDomainService implements ServiceMethods {
             case "$ControlType.DATETIME.value-$ControlType.LIST.value":
             case "$ControlType.DATE.value-$ControlType.LIST.value":
                 //The list conversion doesn't require any data conversion
-                return
+                break
 
             case "$ControlType.NUMBER.value-$ControlType.STRING.value":
             case "$ControlType.YES_NO.value-$ControlType.STRING.value":
             case "$ControlType.DATE.value-$ControlType.STRING.value":
             case "$ControlType.DATETIME.value-$ControlType.STRING.value":
             case "$ControlType.LIST.value-$ControlType.STRING.value":
-                dataToString(project, assetClassType, oldFieldSpec.field, newFieldSpec?.constraints?.maxSize ?: 255)
+                updateFieldString = dataToString(oldFieldSpec.field, newFieldSpec?.constraints?.maxSize ?: 255)
                 return
 
             default:
-                clearCustomFields(project, assetClassType, [oldFieldSpec.field])
+                updateFieldString = anyTypeToNull(oldFieldSpec.field)
         }
+
+        return updateFieldString
+
 
     }
 
@@ -648,7 +680,13 @@ class CustomDomainService implements ServiceMethods {
 
         allFieldSpecs(currentProject, ALL_ASSET_CLASSES).each { key, value ->
             value.fields.each { Map<String, String> field ->
-                fields[field.field] = [control: field.control, bulkChangeActions: field.bulkChangeActions, customValues: field?.constraints?.values ?: []]
+                fields[field.field] = [
+                    control          : field.control,
+                    bulkChangeActions: field.bulkChangeActions,
+                    customValues     : field?.constraints?.values ?: [],
+                    constraints      : field.constraints,
+                    label            : field.label
+                ]
             }
 
             types[key]= fields
@@ -745,50 +783,67 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
-     * Converts data stored in a custom field from a date to a date time, adding the time 00:00:00.
-     *
-     * @param project The project to update the data for.
-     * @param assetClassName The assetClass to update the data for.
-     * @param fieldName The fieldName/column to update the data for.
+     * Update the assets for the project and asset class using the list of strings to set each individual field.
+     * @param project - user's current project.
+     * @param assetClassName - the asset class.
+     * @param updateFieldStrings - the list of sql codes to update the fields.
+     * @return the number of assets that were updated (-1 if the list is null or empty).
      */
     @Transactional
-    void dataDateToDateTime(Project project, String assetClassName, String fieldName) {
-       String timeOffset = TimeUtil.timeZoneOffset
+    Long clearCustomFieldsForClass(Project project, String assetClassName, List<String> updateFieldStrings) {
+        Long recordsUpdated = -1
+        String assetClass = AssetClass.safeValueOf(assetClassName).name()
+        if (updateFieldStrings) {
+            String updateString = updateFieldStrings.join(", ")
+            String sql = "UPDATE asset_entity SET $updateString WHERE project_id=:project AND asset_class=:assetClass"
 
-        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
-        String sql = 'update AssetEntity set '
+            recordsUpdated = namedParameterJdbcTemplate.update(sql,[project: project.id, assetClass: assetClass])
+        }
+        return recordsUpdated
+    }
 
-        sql += """$fieldName = DATE_FORMAT( CONVERT_TZ( $fieldName, '$timeOffset', '+00:00') , '%Y-%m-%dT%H:%i:%sZ')
-                  where project=:project and assetClass=:assetClass
-               """
+    /**
+     * For each field construct the portion of SQL statement to set that field to null.
+     * @param fieldNames - a list of field names.
+     * @return a list with strings to set the given fields to null.
+     */
+    List<String> setAllToNull(List<String> fieldNames) {
+        List<String> updateFieldStrings = []
+        for (String fieldName in fieldNames) {
+            updateFieldStrings << anyTypeToNull(fieldName)
+        }
+        return updateFieldStrings
+    }
 
-        AssetEntity.executeUpdate(
-            sql,
-            [project: project, assetClass: assetClass]
-        )
+    /**
+     * Statement for setting the given field to null.
+     *
+     * @param fieldName the field to be updated.
+     * @return The part of a SQL statement needed to appropriately update the given field.
+     */
+    String anyTypeToNull(String fieldName) {
+        return "$fieldName = NULL"
+    }
+
+    /**
+     * Converts data stored in a custom field from a date to a date time, adding the time 00:00:00.
+     *
+     * @param fieldName The fieldName/column to update the data for.
+     * @return The part of a SQL statement needed to appropriately update the given field.
+     */
+    String dataDateToDateTime(String fieldName) {
+        String timeOffset = TimeUtil.timeZoneOffset
+        return "$fieldName = DATE_FORMAT( CONVERT_TZ( $fieldName, '$timeOffset', '+00:00') , '%Y-%m-%dT%H:%i:%sZ')"
     }
 
     /**
      * Converts data stored in a custom field from a date time to a date, striping off the time.
      *
-     * @param project The project to update the data for.
-     * @param assetClassName The assetClass to update the data for.
      * @param fieldName The fieldName/column to update the data for.
+     * @return The part of a SQL statement needed to appropriately update the given field.
      */
-    @Transactional
-    void dataDateTimeToDate(Project project, String assetClassName, String fieldName) {
-
-        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
-        String sql = 'update AssetEntity set '
-
-        sql += """$fieldName = DATE(STR_TO_DATE($fieldName , '%Y-%m-%dT%TZ'))
-                  where project=:project and assetClass=:assetClass
-               """
-
-        AssetEntity.executeUpdate(
-            sql,
-            [project: project, assetClass: assetClass]
-        )
+    String dataDateTimeToDate(String fieldName) {
+        return "$fieldName = DATE(STR_TO_DATE($fieldName , '%Y-%m-%dT%TZ'))"
     }
 
     /**
@@ -797,47 +852,24 @@ class CustomDomainService implements ServiceMethods {
      * @param project The project to update the data for.
      * @param assetClassName The assetClass to update the data for.
      * @param fieldName The fieldName/column to update the data for.
+     * @return The part of a SQL statement needed to appropriately update the given field.
      */
-    @Transactional
-    void dataToYesNo(Project project, String assetClassName, String fieldName) {
-
-        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
-        String sql = 'update AssetEntity set '
-
-        sql += """$fieldName = case when (lower($fieldName) = 'yes') then 'Yes'
+    String dataToYesNo(String fieldName) {
+        return """$fieldName = case when (lower($fieldName) = 'yes') then 'Yes'
                                     when (lower($fieldName) = 'no') then 'No'
                                     else NULL
                                end
-                  where project=:project and assetClass=:assetClass
                """
-
-        AssetEntity.executeUpdate(
-            sql,
-            [project: project, assetClass: assetClass]
-        )
     }
 
     /**
      * Converts data stored in a custom field to a string, truncating to the maxLength size for the new field.
      *
-     * @param project The project to update the data for.
-     * @param assetClassName The assetClass to update the data for.
      * @param fieldName The fieldName/column to update the data for.
      * @param maxLength The max length to truncate the string to.
+     * @return The part of a SQL statement needed to appropriately update the given field.
      */
-    @Transactional
-    void dataToString(Project project, String assetClassName, String fieldName, Integer maxLength) {
-
-        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
-        String sql = 'update AssetEntity set '
-
-        sql += """$fieldName = substring($fieldName,1, $maxLength)
-                  where project=:project and assetClass=:assetClass
-               """
-
-        AssetEntity.executeUpdate(
-            sql,
-            [project: project, assetClass: assetClass]
-        )
+    String dataToString(String fieldName, Integer maxLength) {
+        return "$fieldName = substring($fieldName,1, $maxLength)"
     }
 }

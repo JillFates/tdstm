@@ -12,9 +12,9 @@ import {
 } from '../../../dataScript/service/data-script.service';
 import {
 	ASSET_IMPORT_FILE_UPLOAD_TYPE,
-	ETL_SCRIPT_FILE_UPLOAD_TYPE,
 	FILE_UPLOAD_TYPE_PARAM,
 	PROGRESSBAR_INTERVAL_TIME
+
 } from '../../../../shared/model/constants';
 import {ImportBatchStates} from '../../import-batch-routing.states';
 
@@ -27,7 +27,14 @@ declare var jQuery: any;
 export class ImportAssetsComponent implements OnInit {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
-	public dataScriptOptions = [];
+
+	private readonly dataScriptOptionsInitial = {
+		id: -1,
+		name: 'GLOBAL.PLEASE_SELECT',
+		isAutoProcess: false
+	};
+	public dataScriptOptions = [this.dataScriptOptionsInitial];
+	public selectedScriptOption = this.dataScriptOptions[0];
 	public selectedActionOption = -1;
 	private transformInterval: any;
 	public importResult: any;
@@ -46,14 +53,21 @@ export class ImportAssetsComponent implements OnInit {
 	public fetchResult: any;
 	public fetchInProcess = false;
 	public fetchInputUsed: 'action' | 'file' = 'action';
-	public selectedScriptOption = -1;
 	public file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
-	public uiConfig: any = {
+	readonly UI_CONFIG = {
 		labelColSize: 3,
 		inputColSize: 3,
 		buttonColSize: 1,
-		urlColSize: 2
+		urlColSize: 2,
+		showTransformButton: false,
+		showAutoProcessElements: false,
+		showManuaProcesslElements: false,
+		hasFinishedManualImport: false,
+		transformBtnLabel: '',
+		sendNotification: false
 	};
+
+	public uiConfig: any = {...this.UI_CONFIG};
 
 	constructor(
 		private importAssetsService: ImportAssetsService,
@@ -65,8 +79,19 @@ export class ImportAssetsComponent implements OnInit {
 	ngOnInit(): void {
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
 			this.actionOptions = result.actions;
-			this.dataScriptOptions = result.dataScripts;
+			this.dataScriptOptions = [...this.dataScriptOptions, ...result.dataScripts];
 		});
+	}
+
+	onChangeSelectedScript(etlScript) {
+		this.selectedScriptOption = etlScript;
+		if (etlScript === this.dataScriptOptionsInitial) {
+			this.uiConfig = {...this.UI_CONFIG};
+		} else if (etlScript.isAutoProcess) {
+			this.setAutoProcessScript();
+		} else {
+			this.setManualProcessScript();
+		}
 	}
 
 	/**
@@ -118,7 +143,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.transformResult = null;
 		this.transformFileContent = null;
 		this.importResult = null;
-		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result: ApiResponseModel) => {
+		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename, this.uiConfig.sendNotification).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 				this.transformProgress.progressKey = result.data.progressKey;
 				this.setTransformProgressInterval();
@@ -198,12 +223,30 @@ export class ImportAssetsComponent implements OnInit {
 	 * Calls Import process on endpoint.
 	 */
 	public onImport(): void {
+		let service: any, filename: any;
 		this.importInProcess = true;
 		this.importResult = null;
-		this.importAssetsService.postImport(this.transformResult.data.filename).subscribe( (result) => {
+		if (this.selectedScriptOption.isAutoProcess) {
+			filename = this.fetchResult.filename;
+			service = this.importAssetsService.postTransform(this.selectedScriptOption, filename, this.uiConfig.sendNotification);
+		} else {
+			filename = this.transformResult.data.filename;
+			service = this.importAssetsService.postImport(filename);
+		}
+
+		service.subscribe(( result: any ) => {
 			this.importResult = result;
 			this.postImportResult();
 			this.importInProcess = false;
+			if (this.uiConfig.showAutoProcessElements) {
+				this.onClear();
+				this.notifier.broadcast({
+					name: AlertType.SUCCESS,
+					message: 'The ETL import process was succesfully initiated'
+				});
+			}
+		}, (err) => {
+			console.log(err);
 		});
 	}
 
@@ -279,12 +322,25 @@ export class ImportAssetsComponent implements OnInit {
 	 * Clears out most of results peformed on the page.
 	 */
 	public onClear(): void {
-		this.removeFileByUID();
+		this.uiConfig = {...this.UI_CONFIG};
+		this.selectedScriptOption = this.dataScriptOptionsInitial;
+		this.selectedActionOption = -1;
+		this.clearFileList();
+		this.importResult = null;
+		this.importInProcess = false;
+		this.transformInProcess = false;
+		this.transformResult = null;
+		this.importResult = null;
 	}
 
 	public disableTransformButton() {
-		return !this.selectedScriptOption || this.selectedScriptOption === -1
-			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === ApiResponseModel.API_ERROR;
+		return (
+			!this.selectedScriptOption ||
+			this.selectedScriptOption.id === this.dataScriptOptionsInitial.id ||
+			!this.fetchResult ||
+			!this.fetchResult.filename ||
+			this.fetchResult.status === ApiResponseModel.API_ERROR
+		);
 	}
 
 	private clearFilename(e?: any) {
@@ -304,13 +360,17 @@ export class ImportAssetsComponent implements OnInit {
 		const tempServerFilesToDelete = [ this.fetchResult.filename ];
 
 		// delete temporary transformed file
-		if (this.transformResult) {
+		if (this.transformResult && this.transformResult.data) {
+		// if (this.transformResult && this.transformResult.status !== 'error') {
 			tempServerFilesToDelete.push(this.transformResult.data.filename)
+		}
+
+		if (this.selectedScriptOption.isAutoProcess) {
+			tempServerFilesToDelete.push( this.fetchResult.filename);
 		}
 
 		// get the coma separated file names to delete
 		e.data = { filename: tempServerFilesToDelete.join(',') };
-
 		this.fetchResult = null;
 		this.fetchFileContent = null;
 		this.transformResult = null;
@@ -323,6 +383,11 @@ export class ImportAssetsComponent implements OnInit {
 		e.data = {};
 		e.data[FILE_UPLOAD_TYPE_PARAM] = ASSET_IMPORT_FILE_UPLOAD_TYPE;
 		this.clearFilename();
+	}
+
+	private clearFileList(): void {
+		this.kendoUploadInstance.fileList.clear();
+		this.fetchResult = null;
 	}
 
 	private removeFileByUID(): void {
@@ -345,5 +410,25 @@ export class ImportAssetsComponent implements OnInit {
 			this.clearFilename();
 			this.fetchResult = { status: 'error' };
 		}
+	}
+
+	private setAutoProcessScript() {
+		this.uiConfig = {
+			...this.uiConfig,
+			showAutoProcessElements: true,
+			showManualProcessElements: false,
+			sendNotification: true,
+			transformBtnLabel: 'IMPORT_ASSETS.AUTO_IMPORT.INITIATE_IMPORT'
+		}
+	}
+
+	private setManualProcessScript() {
+		this.uiConfig = {
+			...this.uiConfig,
+			showAutoProcessElements: false,
+			showManualProcessElements: true,
+			sendNotification: false,
+			transformBtnLabel: 'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM'
+		};
 	}
 }

@@ -25,7 +25,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-grid';
-import {ReplaySubject} from 'rxjs';
+import {Observable, ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 import {DataScriptEtlBuilderComponent} from '../etl-builder/data-script-etl-builder.component';
@@ -177,7 +177,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
 			(result) => {
-				this.reloadDataScripts();
+				this.reloadDataScripts().subscribe();
 			},
 			(err) => console.log(err));
 	}
@@ -193,12 +193,23 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	protected reloadDataScripts(): void {
-		this.dataIngestionService.getDataScripts()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(
-			(result: DataScriptModel[]) => { this.setDataGrid(result); },
-			(err) => console.log(err));
+	protected reloadDataScripts(): Observable<any> {
+		return new Observable( (observer: any) => {
+			this.dataIngestionService
+				.getDataScripts()
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(
+					(result: DataScriptModel[]) => {
+						this.setDataGrid(result);
+						observer.next();
+						observer.complete();
+					},
+					err => {
+						observer.next(err);
+						observer.complete();
+					}
+				);
+		});
 	}
 
 	/**
@@ -211,13 +222,14 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 			{ provide: DataScriptModel, useValue: dataScriptModel },
 			{ provide: Number, useValue: actionType }
 		]).then(result => {
-			this.reloadDataScripts();
-			if (actionType === ActionType.CREATE) {
-				setTimeout(() => {
-					this.selectRow(result.dataScript.id);
-					this.openDataScriptDialogViewEdit(result.dataScript, ActionType.VIEW);
-				}, 500);
-			}
+			return this.reloadDataScripts().subscribe(() => {
+				if (actionType === ActionType.CREATE) {
+					setTimeout(() => {
+						this.selectRow(result.dataScript.id);
+						this.openDataScriptDialogViewEdit(result.dataScript, ActionType.VIEW);
+					}, 500);
+				}
+			});
 		}).catch(result => {
 			// on dialog close, do nothing ..
 		});
@@ -231,7 +243,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		this.dialogService.extra(DataScriptEtlBuilderComponent, [
 			{ provide: DataScriptModel, useValue: dataScriptModel },
 		]).then(result => {
-			this.reloadDataScripts();
+			this.reloadDataScripts().subscribe();
 		}).catch(result => {
 			// on dialog close, do nothing ..
 		});

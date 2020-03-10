@@ -23,7 +23,7 @@
                                         <div *ngIf="rowIndex === RowType.Tasks && column.compose; else simpleValue">
                                             <a [routerLink]="['/taskManager', 'list']"
                                                 [queryParams]="{category: column.compose.category, justRemaining: 0}">
-                                                <span [innerHtml]="column.compose.tskComp + ' of ' + column.compose.tskTot "></span>
+                                                <span [innerHtml]="column.compose.completedTasks + ' of ' + column.compose.totalTasks "></span>
                                             </a>
                                         </div>
                                     </ng-template>

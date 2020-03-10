@@ -5,6 +5,8 @@ import com.tdsops.etl.ETLProcessor.ReservedWord
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ObjectUtil
 import com.tdssrc.grails.StringUtil
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.apache.commons.lang3.StringUtils
 
@@ -22,6 +24,7 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 @Slf4j(value = 'logger')
+@CompileStatic
 class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidator {
 
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -240,6 +243,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param methodName
 	 * @param args
 	 */
+	@CompileDynamic
 	def methodMissing(String methodName, args) {
 		// try to delegate the method to the value's class
 		if (value != null && !(value instanceof Element)) {
@@ -271,6 +275,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param name
 	 * @return
 	 */
+	@CompileDynamic
 	def propertyMissing(String name) {
 		processor.debugConsole.info "Missing property $name"
 		throw ETLProcessorException.parameterMissing(name)
@@ -288,6 +293,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param name
 	 * @return
 	 */
+	@CompileDynamic
 	Object get(String name) {
 		return value."$name"
 	}
@@ -301,6 +307,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param params List of parameters that SHOULD contain the position (starting in 1) and the characters to Take from the String
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element middle(Integer... params) {
 		value = transformStringObject('middle', value) {
 
@@ -341,6 +348,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param dictionary
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element substitute(def dictionary) {
 		if (dictionary.containsKey(value)) {
 			value = dictionary[value]
@@ -359,6 +367,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param defaultValue
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element substitute(def dictionary, defaultValue) {
 		if (dictionary.containsKey(value)) {
 			value = dictionary[value]
@@ -538,6 +547,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param format - an array of possible date formats to use
 	 * @return - a date instance
 	 */
+	@CompileDynamic
 	Element toDate(String... listOfFormats) {
 		if (CollectionUtils.isEmpty(listOfFormats)) {
 			return this
@@ -578,8 +588,8 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @return the element instance that received this command
 	 */
 	Element sanitize() {
-		value = transformStringObject('sanitize', value) {
-			StringUtil.sanitize(it)
+		value = transformStringObject('sanitize', value) { String value ->
+			StringUtil.sanitize(value)
 		}
 		return this
 	}
@@ -593,8 +603,8 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @return the element instance that received this command
 	 */
 	Element trim() {
-		value = transformStringObject('trim', value) {
-			it.trim()
+		value = transformStringObject('trim', value) {Object value->
+			((String)value).trim()
 		}
 
 		return this
@@ -622,6 +632,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param content
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element replaceFirst(String content, String with) {
 		value = transformStringObject('replaceFirst', value) {
 			it.replaceFirst(content, with)
@@ -637,6 +648,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param content
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element replaceAll(String content, String with) {
 		value = transformStringObject('replaceAll', value) {
 			it.replaceAll(content, with)
@@ -652,6 +664,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param content
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element replaceLast(String content, String with) {
 		value = transformStringObject('replaceLast', value) {
 			it.reverse().replaceFirst(content, with).reverse()
@@ -668,6 +681,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * <code>
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element uppercase() {
 		value = transformStringObject('uppercase', value) {
 			it.toUpperCase()
@@ -677,7 +691,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 
 	/**
 	 * Format this element value to the printf-style format strings
-	 * @see https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
+	 * see https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
 	 * In case that the format is not provided we use a default one to each of the following types:
 	 *    Date	                  %1$tY-%1$tm-%1$td
 	 *    Number (Integer, Long)	%,d
@@ -723,6 +737,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * <code>
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element lowercase() {
 		value = transformStringObject('lowercase', value) {
 			it.toLowerCase()
@@ -739,6 +754,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param amount
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element left(Integer amount) {
 		value = transformStringObject('left', value) {
 			it.take(amount)
@@ -755,6 +771,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param amount
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element right(Integer amount) {
 		value = transformStringObject('right', value) {
 			it.reverse()?.take(amount)?.reverse()
@@ -773,6 +790,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param replacement
 	 * @return the element instance that received this command
 	 */
+	@CompileDynamic
 	Element replace(String regex, String replacement) {
 		value = transformStringObject('replace', value) {
 			it.replaceAll(regex, replacement)
@@ -850,6 +868,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param anotherElement an ETL Element
 	 * @return a new instance of Element class
 	 */
+	@CompileDynamic
 	Element plus(Element anotherElement) {
 		return copy(this.value + anotherElement?.value,)
 	}
@@ -863,6 +882,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @param anotherElement an ETL Element
 	 * @return a new instance of Element class
 	 */
+	@CompileDynamic
 	Element plus(String value) {
 		return copy(this.value + value)
 	}
@@ -890,8 +910,10 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
 	 * <code>
-	 *  extract 1 load 'description' when { it > 1000 }*     ...
-	 * 	load 'description' with myVar when { it > 1000 }* </code>
+	 *  extract 1 load 'description' when { it > 1000 } //
+	 *  ...
+	 * 	load 'description' with myVar when { it > 1000 } //
+	 * 	</code>
 	 * @param closure Closure to determine if it is necessary
 	 * 			to remove current {@code Element} instance from {@code ETLProcessorResult}
 	 * @return current{@code Element} instance
@@ -942,6 +964,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * checks that the wrapped value is not Null nor Blank
 	 * @return
 	 */
+	@CompileDynamic
 	private boolean isValueSet() {
 		return !(
 			value == null ||
@@ -982,6 +1005,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 *
 	 * @return current instance of {@code Element}
 	 */
+	@CompileDynamic
 	Element round() {
 
 		if (!this.value) {
@@ -1006,6 +1030,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 *
 	 * @return current instance of {@code Element}
 	 */
+	@CompileDynamic
 	Element abs() {
 
 		if (!this.value) {
@@ -1030,6 +1055,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 *
 	 * @return current instance of {@code Element}
 	 */
+	@CompileDynamic
 	Element ceil() {
 
 		if (!this.value) {
@@ -1086,7 +1112,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * Perform {@code StringUtils#prependIfMissing} over {@code Element#value}
 	 * <code>
-	 * extract 'url' transform with appendIfMissing('com')
+	 * extract 'url' transform with prependIfMissing('com')
 	 * </code>
 	 *
 	 * @param otherValue a {@code String} value
@@ -1104,12 +1130,12 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * Perform {@code StringUtils#prependIfMissingIgnoreCase} over {@code Element#value}
 	 * <code>
-	 * extract 'url' transform with appendIfMissing('com')
+	 * extract 'url' transform with prependIfMissingIgnoreCase('com')
 	 * </code>
 	 *
 	 * @param otherValue a {@code String} value
 	 * @return current instance of {@code Element}
-	 * @see StringUtils#prependIfMissingIgnoreCase(java.lang.String, java.lang.CharSequence, boolean, java.lang.CharSequence ...)
+	 * StringUtils#prependIfMissingIgnoreCase(java.lang.String, java.lang.CharSequence, boolean, java.lang.CharSequence ...)
 	 */
 	Element prependIfMissingIgnoreCase(String otherValue) {
 
@@ -1127,6 +1153,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 *
 	 * @return current instance of {@code Element}
 	 */
+	@CompileDynamic
 	Element floor() {
 
 		if (!this.value) {

@@ -65,6 +65,7 @@ import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.m
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {NavigationEnd, Router} from '@angular/router';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -94,17 +95,14 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
-	private displayCreateButton: boolean;
 	private showFullTags = false;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
-		this.displayCreateButton = this.getDisplayCreateButton();
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
 		this.gridStateChange.emit({...this.gridState, skip: 0});
-		this.modelChange.emit();
 	}
 
 	public currentFields = [];
@@ -150,7 +148,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
 		private userContextService: UserContextService,
-		private assetTagUIWrapperService: AssetTagUIWrapperService) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService,
+		private router: Router) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -160,6 +159,12 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	ngOnInit(): void {
+		this.router.events.subscribe((e) => {
+			if (e instanceof NavigationEnd) {
+				this.onClearHiddenFilters();
+			}
+		});
+
 		this.gridData = {
 			data: [],
 			total: 0
@@ -605,17 +610,15 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	/**
-	 * Validates if should display the create button, depends on the view
-	 * that is trying to show.
+	 * Validates if the current view belongs to the main views  (excluding AllAssets)
+	 * @param viewId Id of the view to search for
+	 * @return {boolean} Flag that indicates if viewId is found inside of the main views
 	 */
-	protected getDisplayCreateButton() {
-		return this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS ||
-			this._viewId === this.ASSET_ENTITY_MENU.All_APPLICATIONS ||
-			this._viewId === this.ASSET_ENTITY_MENU.All_DATABASES ||
-			this._viewId === this.ASSET_ENTITY_MENU.All_DEVICE ||
-			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL ||
-			this._viewId === this.ASSET_ENTITY_MENU.All_SERVERS ||
-			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL;
+	protected isMainView(viewId: ASSET_ENTITY_MENU): boolean {
+		const isMainView =	(<any>Object).values(this.ASSET_ENTITY_MENU).includes(viewId);
+		const isAllAssets = viewId === this.ASSET_ENTITY_MENU.All_ASSETS;
+
+		return isMainView && !isAllAssets;
 	}
 
 	/**
@@ -624,7 +627,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 */
 	public getDynamicConfiguration(): any {
 		return {
-			displayCreateButton: this.displayCreateButton,
 			canCreateAssets: this.canCreateAssets,
 			hasFilterApplied: this.hasFilterApplied(),
 			hasSelectedItems: this.hasSelectedItems(),

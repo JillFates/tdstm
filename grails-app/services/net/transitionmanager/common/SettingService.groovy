@@ -102,9 +102,6 @@ class SettingService implements ServiceMethods {
             try {
                 Map<String, ?> settingMap = JsonUtil.convertJsonToMap(setting.json)
                 settingMap.put(VERSION_KEY, setting.version)
-                if (setting.key == AssetClass.APPLICATION.name()) {
-                    settingMap.put(PLAN_METHODOLOGY_KEY, setting.project.planMethodology)
-                }
                 fixEmptyConstraints(settingMap)
                 return settingMap
             } catch (Exception e) {
@@ -114,6 +111,7 @@ class SettingService implements ServiceMethods {
         } else {
             return null
         }
+
     }
 
     /**
@@ -220,11 +218,7 @@ class SettingService implements ServiceMethods {
         settingMap?.fields?.each { Map<String, Map<String, List<String>>> field ->
             List<String> values = field.constraints?.values
             if ( values ) {
-                Set newValues = new HashSet()
-                for (v in values) {
-                    newValues << StringUtils.trim(v)
-                }
-                field.constraints.values = newValues.toList()
+                field.constraints.values = values*.trim().unique()
             }
         }
     }

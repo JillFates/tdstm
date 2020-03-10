@@ -13,8 +13,8 @@
         <tr>
             <th>Name</th>
             <th>SME</th>
-            <th>Start</th>
-            <th>Finish</th>
+            <th>Begin</th>
+            <th>End</th>
             <th>Duration (hh:mm)</th>
             <th>Window</th>
         </tr>

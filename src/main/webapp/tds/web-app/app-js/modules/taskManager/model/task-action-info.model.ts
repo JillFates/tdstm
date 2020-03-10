@@ -3,13 +3,15 @@
  * Specifically handles the api GET call response from /ws/task/getInfoForActionBar/{taskId}
  */
 export interface TaskActionInfoModel {
+	category: string,
 	predecessors: number,
-	successors: number,
 	assignedTo: string,
+	assignedToName: string,
 	apiActionId: number,
 	apiActionCompletedAt: any,
 	apiActionInvokedAt: any,
-	category: string,
+	status: string,
+	successors: number,
 	invokeButton?: {
 		disabled: boolean,
 		tooltipText: string,

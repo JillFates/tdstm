@@ -108,13 +108,14 @@
                                                         <label><span>Action</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <kendo-dropdownlist
+                                                        <kendo-combobox
+																																class="api-action-combobox"
                                                                 name="apiActionList"
-                                                                [data]="model.apiActionList"
+																																[data]="model.apiActionList"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
                                                                 [(ngModel)]="model.apiAction">
-                                                        </kendo-dropdownlist>
+                                                        </kendo-combobox>
                                                     </td>
                                                 </tr>
 
@@ -231,7 +232,7 @@
                                                             </div>
                                                             <label data-toggle="popover"
                                                                    data-trigger="hover"
-                                                                   data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
+                                                                   data-content="Click to toggle the lock. When locked, changes to the Earliest Start/Finish will preserve the Duration">
                                                                 <i class="fa fa-fw  lock-state"
                                                                    [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
                                                                    (click)="toggleLocked()">
@@ -240,7 +241,7 @@
                                                         </div>
                                                     </td>
                                                     <td class="label N edge-cell" nowrap="nowrap">
-                                                        <label><span>Estimated Start</span></label>
+                                                        <label><span>Earliest Start</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <kendo-dateinput
@@ -253,7 +254,7 @@
                                                     </td>
 
                                                     <td class="label N edge-cell" nowrap="nowrap">
-                                                        <label><span>Estimated Finish</span></label>
+                                                        <label><span>Earliest Finish</span></label>
                                                     </td>
 
                                                     <td class="valueNW estimated-finish">
@@ -331,7 +332,7 @@
                                                     <td class="label N edge-cell" nowrap="nowrap">
                                                             <label><span>Completion %</span></label>
                                                     </td>
-    
+
                                                     <td class="valueNW completion">
                                                         <tds-number-control
                                                             name="percentageComplete"
@@ -356,10 +357,10 @@
                                     <table class="dates-info">
                                         <tbody>
                                             <tr>
-                                                <td class="date-created">Created by {{model.personCreateObj}} at {{model.dateCreated | date:dateFormatTime}}
+                                                <td class="date-created">Created by {{model.personCreateObj}} at {{model.dateCreated | tdsDateTime:userTimeZone:dateFormatTime}}
                                                     {{(model.taskSpecId)? ' with spec id ' + model.taskSpecId: ''}}
                                                     <span *ngIf="model.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{model.recipe?.id}}/gentasks/start"> {{model.recipe?.name}}</a></span>
-                                                <td class="last-updated">Last updated: {{model.lastUpdated | date:dateFormatTime}}</td>
+                                                <td class="last-updated">Last updated: {{model.lastUpdated | tdsDateTime:userTimeZone:dateFormatTime}}</td>
                                             </tr>
                                         </tbody>
                                     </table>

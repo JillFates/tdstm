@@ -68,11 +68,11 @@ class DashboardService implements ServiceMethods {
 		}
 
 		// helper closure to return the effort remaining or blank
-		def effortRemaining = {status, defVal='' ->
+		def effortRemaining = {status, defVal='0' ->
 			def time = defVal
 			def sd = taskStatusMap[status]
 			if (sd.taskCount) {
-				time = TimeUtil.ago( sd.timeInMin * 60 )
+				time = TimeUtil.ago( sd.timeInMin * 60 ) ?: '0'
 			}
 			return time
 		}
@@ -100,7 +100,7 @@ class DashboardService implements ServiceMethods {
 		model.effortRemainPending = effortRemaining('Pending')
 		model.effortRemainReady = effortRemaining('Ready')
 		model.effortRemainStarted = effortRemaining('Started')
-		//model.effortRemainHold = effortRemaining('Hold')
+		model.effortRemainHold = effortRemaining('Hold')
 		model.effortRemainDone = effortRemaining('Completed')
 
 		// Process Team information
@@ -131,7 +131,7 @@ class DashboardService implements ServiceMethods {
 	 * @param project - the user's current project.
 	 * @param moveEvent - the event selected by the user.
 	 * @param viewUnpublished - whether or not unpublished tasks should be included in the model.
-	 * @return
+	 * @return  A model with Event Dashboard info
 	 */
 	Map getEventDashboardModel(Project project, MoveEvent moveEvent, boolean viewUnpublished) {
 		List<MoveEvent> moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])

@@ -21,6 +21,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 
 	public modalType = ModalType;
+	public userTimeZone: string;
 	public dateFormatTime: string;
 	public assetClassOptions: any[];
 	public commentCategories: string[];
@@ -39,10 +40,8 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	}
 
 	ngOnInit(): void {
-		this.userContextService.getUserContext()
-			.subscribe((userContext: UserContextModel) => {
-				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-			});
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 
 		this.loadCommentCategories();
 	}

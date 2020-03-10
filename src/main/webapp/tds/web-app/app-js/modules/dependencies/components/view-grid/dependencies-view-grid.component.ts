@@ -57,6 +57,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {OpenAssetDependenciesService, AssetDependency} from '../../service/open-asset-dependencies.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ViewColumn} from '../../../assetExplorer/model/view-spec.model';
 
 declare var jQuery: any;
 
@@ -131,6 +132,13 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private setupBulkCheckboxService() {
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.bulkCheckboxService.setIdFieldName('id');
+	}
+
+	/**
+	 * Returns whether or not any filters are applied to the grid.
+	 */
+	hasFilterApplied(): boolean {
+		return this.state.gridState.filter.filters.length > 0;
 	}
 
 	/**
@@ -369,6 +377,14 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		const clonedState = clone(this.state);
 		clonedState.gridState.filter.filters = filters;
 		this.componentState.next(clonedState);
+	}
+
+	public onClearFilters(): void {
+		this.state.gridState.filter.filters = [];
+		this.dependenciesColumnModel.columns.forEach((column) => {
+			delete column.filter;
+		});
+		this.onFilter({filter: ''});
 	}
 
 	/**
