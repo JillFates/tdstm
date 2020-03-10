@@ -66,7 +66,8 @@ declare var jQuery: any;
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Comment Create</a>
+                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
+                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
 								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
@@ -190,7 +191,8 @@ declare var jQuery: any;
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-								<a clrDropdownItem (click)="onAddEditComment(dataItem)">Comment Create</a>
+                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
+                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
 								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
