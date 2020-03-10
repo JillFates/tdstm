@@ -37,7 +37,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}" />
-									<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
+									<td class="clickableText valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
 										<tdsAngular:tooltipSpan field="${standardFieldSpecs.manufacturer}">
 											<a *ngIf="isManufacturerLinkAvailable()" (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
                                             <span *ngIf="!isManufacturerLinkAvailable()">{{getManufacturer('${assetEntity.manufacturer}')}}</span>
@@ -55,7 +55,7 @@
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}" />
-									    <td class="valueNW ${standardFieldSpecs.model.imp?:''}">
+									    <td class="clickableText valueNW ${standardFieldSpecs.model.imp?:''}">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">
                                                 <a *ngIf="isModelLinkAvailable()"
                                                    (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')" [innerText]="getModelName('${assetEntity.model}')"></a>
