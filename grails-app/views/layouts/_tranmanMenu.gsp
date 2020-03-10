@@ -252,7 +252,7 @@
                             </g:if>
                             <tds:hasPermission permission="${Permission.NewsEdit}">
                                 <li class="menu-child-item menu-parent-planning-event-news">
-                                    <g:link controller="newsEditor">List Event News</g:link>
+                                    <a href="/tdstm/module/event-news/list">List Event News</a>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventPrep}">

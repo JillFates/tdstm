@@ -12,7 +12,7 @@ class TabTaskGenPage extends Page {
         tskGTabEventSelectorLabel == "Event:"
         tskGTabAutoPubTaskCboxLabel == "Automatically publish tasks"
         tskGTabGenUsingWipCBoxLabel == "Generate using WIP recipe"
-        tskGTabGenerateTasksBtn.text() == "Generate Tasks"
+        tskGTabGenerateTasksBtn.text() == "GENERATE TASKS"
     }
 
     static content = {
@@ -26,7 +26,7 @@ class TabTaskGenPage extends Page {
         tskGTabAutoPubTaskCBox              { $('input#autoPublishTasks')}
         tskGTabGenUsingWipCBoxLabel         { $("label", for: "generateUsingWIP").text()}
         tskGTabGenUsingWipCBox              { $('input#generateUsingWIP')}
-        tskGTabGenerateTasksBtn(wait:true)  { $("a#generateTask")}
+        tskGTabGenerateTasksBtn(wait:true)  { $("button#generateTask")}
         commonsModule { module CommonsModule }
     }
 

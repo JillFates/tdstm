@@ -7,7 +7,7 @@ class ErrorMessagePage extends Page {
     static at = {
         errorModalWindow.isDisplayed()
         errorModalTitle.text() == "Error"
-        errorModalCloseBtn.text() == "Close"
+        errorModalCloseBtn.text() == "CLOSE"
     }
 
     static content = {
