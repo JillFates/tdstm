@@ -43,7 +43,17 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 
-		this.loadCommentCategories();
+		/*
+		TODO: This is a Hack!! I Hate this Dialog it does too much!:
+		it shows the Comments in a way with different permissions
+		it creates the comments with another permissions,
+		I believe that this should be splitted in at least 2 different dialogs/Views
+		ticket TM-15968 was solved but introduced a new problem in TM-17288
+		the next If solves the problem (I Hate Ifs! with passion  :P )
+		*/
+		if ( this.permissionService.hasPermission(Permission.TaskBatchView) ) {
+			this.loadCommentCategories();
+		}
 	}
 
 	/**
