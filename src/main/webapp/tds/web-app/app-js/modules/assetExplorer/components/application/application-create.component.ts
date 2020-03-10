@@ -1,26 +1,21 @@
-/**
- *  The component is being used dynamically, some vars will show as not being used or referenced but they could be part
- *  of the GSP
- *
- *  Use angular/views/TheAssetType as reference
- */
+// Angular
 import {Component, Inject, OnInit, AfterViewInit, ViewChild, ComponentFactoryResolver} from '@angular/core';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import * as R from 'ramda';
+// Model
+import {DialogService, ModalSize} from 'tds-component-library';
+import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
+// Component
+import {AssetCommonEdit} from '../asset/asset-common-edit';
+import {AddPersonComponent} from '../../../../shared/components/add-person/add-person.component';
+// Service
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {AssetCommonEdit} from '../asset/asset-common-edit';
-import { AddPersonComponent } from '../../../../shared/components/add-person/add-person.component';
-import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
-import {PersonService} from '../../../../shared/services/person.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {DialogService, ModalSize} from 'tds-component-library';
-import {AssetShowComponent} from '../asset/asset-show.component';
+// Other
+import * as R from 'ramda';
 
 const pleaseSelectMessage = 'Please Select';
 

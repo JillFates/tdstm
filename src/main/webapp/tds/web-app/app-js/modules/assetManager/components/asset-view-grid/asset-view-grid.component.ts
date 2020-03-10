@@ -54,7 +54,6 @@ import {TaskEditCreateComponent} from '../../../taskManager/components/edit-crea
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
-import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
 // Service
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -437,7 +436,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: AssetCreateComponent,
 			data: {
-				asset: assetEntityType,
+				assetClass: assetEntityType,
+				openFromList: true
 			},
 			modalConfiguration: {
 				title: 'Create',
@@ -446,7 +446,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				modalCustomClass: 'custom-asset-modal-dialog'
 			}
 		}).subscribe( (data: any) => {
-			this.createDependencyPromise(data.assetClass, 0);
+			if (data.assetClass) {
+				this.createDependencyPromise(data.assetClass, 0);
+			}
 		});
 	}
 
