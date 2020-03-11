@@ -20,8 +20,6 @@ class TaskGraphService implements ServiceMethods {
 
     NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
-
-    SecurityService securityService
     TimelineService timelineService
     UserPreferenceService userPreferenceService
 
@@ -48,8 +46,12 @@ class TaskGraphService implements ServiceMethods {
             TaskHighlightOptions.mapRowToHighlightMap(row)
         }
 
+        // Update the viewUnpublished and event preferences if needed.
+        updateEventAndViewUnpublishedPreferences(moveEvent, viewUnpublished)
+
         return TaskHighlightOptions.getHighlightOptions(tasks)
     }
+
 
     /**
      * Searches the tasks for the Task Graph given a Command Object with the corresponding parameters.
@@ -98,12 +100,21 @@ class TaskGraphService implements ServiceMethods {
         tasks.addAll(namedParameterJdbcTemplate.queryForList(queryInfo.query, queryInfo.params)*.taskId)
 
         // Update the viewUnpublished and event preferences if needed.
-        UserLogin userLogin = securityService.userLogin
-        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.MOVE_EVENT, moveEvent)
-        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
+        updateEventAndViewUnpublishedPreferences(moveEvent, viewUnpublished)
 
         return tasks.unique { Long a, Long b -> a <=> b }
 
+    }
+
+    /**
+     * Update the viewUnpublished and move event preferences if they've changed.
+     * @param moveEvent
+     * @param viewUnpublished
+     */
+    private void updateEventAndViewUnpublishedPreferences(MoveEvent moveEvent, boolean viewUnpublished) {
+        UserLogin userLogin = securityService.userLogin
+        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.MOVE_EVENT, moveEvent)
+        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
     }
 
 }
