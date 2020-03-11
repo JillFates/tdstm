@@ -1,4 +1,6 @@
 import {Directive, HostListener, Output, EventEmitter, Input} from '@angular/core';
+import {DecoratorOptions} from '../model/ui-modal-decorator.model';
+
 declare var jQuery: any;
 
 @Directive({
