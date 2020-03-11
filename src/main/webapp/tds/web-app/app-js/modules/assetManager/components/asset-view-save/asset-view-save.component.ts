@@ -49,7 +49,7 @@ import { ActivatedRoute } from '@angular/router';
                                                (keyup)="onNameChanged()"
                                                [(ngModel)]="model.name"
                                                required>
-                                        <span *ngIf="!isUnique"
+                                        <span *ngIf="!isUnique && isSaveInMyViewMode()"
                                               class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
 
                                         <div class="checkbox" *ngIf="saveOptions.canShare">
