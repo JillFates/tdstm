@@ -42,7 +42,6 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	public gridData: GridDataResult;
 	public resultSet: AssetCommentModel[];
 	public dateFormat = '';
-	public hasCommentViewPermission: boolean;
 	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
@@ -69,7 +68,6 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 				this.dateFormat = dateFormat;
 				this.assetCommentColumnModel = new AssetCommentColumnModel(`{0:${ dateFormat }}`);
 			});
-		this.hasCommentViewPermission = this.permissionService.hasPermission(Permission.CommentView);
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -120,8 +118,10 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex === 1 && this.hasCommentViewPermission) {
-			this.openAssetCommentDialogViewEdit(event['dataItem'], ModalType.VIEW);
+		if (event.columnIndex === 1) {
+			if ( this.permissionService.hasPermission(Permission.CommentView) ) {
+				this.openAssetCommentDialogViewEdit(event['dataItem'], ModalType.VIEW);
+			}
 		}
 	}
 
