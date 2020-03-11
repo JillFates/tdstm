@@ -60,22 +60,33 @@
           }
 
           &.status-Ready {
-            background: $color-success;
+            background: $color-status-ready;
           }
           &.status-Started {
-            color: #0092d1;
+            color: $color-status-started;
           }
           &.status-Hold {
-            background: $color-hold;
+            background: $color-status-hold;
           }
           &.status-Completed {
-            background: $color-info;
+            background: $color-status-completed;
           }
           &.status-Pending {
-            color: $color-icon;
+            color: $color-status-pending;
           }
           &.status-Warning {
             background: $color-warning;
+          }
+          &.status-Unknown {
+            color: $color-status-unknown;
+            background-color: $bg-color-status-unknown;
+          }
+          &.status-Questioned {
+            color: $color-status-questioned;
+            background: $bg-color-status-questioned;
+          }
+          &.status-Future {
+            background: $color-status-future;
           }
         }
       }

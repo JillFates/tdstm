@@ -15,8 +15,7 @@ import {
 	Size,
 	TextBlock, TreeLayout
 } from 'gojs';
-import {IGraphTask, TASK_OPTION_LABEL} from '../../model/graph-task.model';
-import {ContainerComp} from '../../../../shared/components/diagram-layout/model/legacy-diagram-context-menu.model';
+import {ContainerComp, IGraphTask, TASK_OPTION_LABEL} from '../../model/graph-task.model';
 import {TaskActionEvents} from '../common/constants/task-action-events.constant';
 import {TaskStatus} from '../../model/task-edit-create.model';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -147,7 +146,7 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 			linkDataArray: params.linkDataArray,
 			currentUserId: params.currentUserId,
 			ctxMenuOptions: this.contextMenuOptions(),
-			nodeTemplate: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
+			nodeTemplate: this.nodeTemplate({ isExpandable: params.extras && params.extras.isExpandable }),
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: this.lowScaleNodeTemplate(),
 			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
