@@ -24,7 +24,7 @@ declare var jQuery: any;
                 class="dependents-grid"
                 [data]="dataGridSupportsOnHelper.gridData"
                 [sort]="dataGridSupportsOnHelper.state.sort"
-                [sortable]="{mode:'single'}"
+								[sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
 
