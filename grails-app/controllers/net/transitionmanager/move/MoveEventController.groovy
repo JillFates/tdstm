@@ -107,7 +107,7 @@ class MoveEventController implements ControllerMethods, PaginationMethods {
 			}
 
 			def moveEventSnapshot = MoveEventSnapshot.executeQuery('''
-				FROM MoveEventSnapshot WHERE moveEvent=? AND type=?
+				FROM MoveEventSnapshot WHERE moveEvent=?0 AND type=?1
 				ORDER BY dateCreated DESC
 			''', [moveEvent , "P"])[0]
 			def cssClass = "statusbar_good"

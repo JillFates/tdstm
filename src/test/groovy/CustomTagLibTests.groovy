@@ -1,18 +1,20 @@
 import asset.pipeline.grails.AssetProcessorService
 import com.tdssrc.grails.TimeUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.testing.gorm.DataTest
+import grails.testing.web.taglib.TagLibUnitTest
 import net.transitionmanager.person.Person
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import org.grails.web.mapping.DefaultLinkGenerator
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import test.AbstractUnitSpec
 
 import java.text.SimpleDateFormat
 
-@TestFor(CustomTagLib)
-@Mock([UserLogin, UserPreference, Person])
-class CustomTagLibTests extends AbstractUnitSpec {
+class CustomTagLibTests extends AbstractUnitSpec implements DataTest, TagLibUnitTest<CustomTagLib>{
 
 	// the <tds:convertDate> taglet HTML mockup
 	private static final String convertDateTag = '<tds:convertDate date="${date}" format="${format}"/>'
@@ -21,6 +23,29 @@ class CustomTagLibTests extends AbstractUnitSpec {
 	private static final String convertDateTimeTag = '<tds:convertDateTime date="${date}" timeZone="${timeZone}" format="${format}"/>'
 
 	private Date testDate
+
+	Closure doWithSpring() {
+		{ ->
+			authenticationTrustResolver(AuthenticationTrustResolverImpl)
+
+			springSecurityService(SpringSecurityService) {
+				authenticationTrustResolver = ref('authenticationTrustResolver')
+			}
+
+			securityService(SecurityService) {
+				grailsApplication = ref('grailsApplication')
+				springSecurityService = ref('springSecurityService')
+			}
+
+			userPreferenceService(UserPreferenceService) {
+				springSecurityService = ref('springSecurityService')
+			}
+		}
+	}
+
+	void setupSpec(){
+		mockDomains UserLogin, UserPreference, Person
+	}
 
 	void setup() {
 		testDate = TimeUtil.parseDateTimeWithFormatter('GMT', '2012-08-20T10:00:00-0000', new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"))

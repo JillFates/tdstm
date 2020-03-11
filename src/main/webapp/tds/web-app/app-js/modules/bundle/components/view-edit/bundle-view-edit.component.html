@@ -1,173 +1,296 @@
-<div tds-autofocus class="modal-content bundle-view-edit-component" id="bundle-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
-     <div class="modal-header">
-         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-             <span aria-hidden="true">×</span>
-         </button>
-         <h4 class="modal-title">Bundle {{editing ? "Edit" : "Detail"}}</h4>
-     </div>
-    <div class="modal-body">
-        <div class="modal-body-container">
-            <div *ngIf="!editing" class="body" style="width: 95%">
-                <div class="steps_table">
-                    <table>
-                        <tbody>
+<div class="bundle-view-edit-component">
+	<div *ngIf="!editing">
+		<div class="steps_table">
+			<table>
+				<tbody>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>Name:</label>
+						</td>
+						<td valign="top" class="value">
+							<label>
+								{{ savedModel?.name }}
+								<span *ngIf="isDefaultBundle">(Default)</span>
+							</label>
+						</td>
+					</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Name:</td>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>Description:</label>
+						</td>
+						<td valign="top" class="value">
+							<label>{{ savedModel?.description }}</label>
+						</td>
+					</tr>
 
-                            <td valign="top" class="value">
-                                {{savedModel?.name}}
-                                <span *ngIf="isDefaultBundle">(Default)</span>
-                            </td>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>From:</label>
+						</td>
+						<td valign="top" class="value">
+							<label>
+								<span *ngIf="sourceRoom != 'null'">{{
+									sourceRoom
+								}}</span>
+							</label>
+						</td>
+					</tr>
 
-                        </tr>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>To:</label>
+						</td>
+						<td valign="top" class="value">
+							<label>
+								<span *ngIf="targetRoom != 'null'">{{
+									targetRoom
+								}}</span>
+							</label>
+						</td>
+					</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Description:</td>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>Start Time:</label>
+						</td>
+						<td valign="top" class="value">
+							<label>
+								{{
+									savedModel?.startTime | tdsDateTime: userTimeZone:userDateTimeFormat
+								}}
+							</label>
+						</td>
+					</tr>
 
-                            <td valign="top" class="value">{{savedModel?.description}}</td>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>Completion Time:</label>
+						</td>
+						<td valign="top" class="value">
+							<label>
+								{{
+									savedModel?.completionTime | tdsDateTime: userTimeZone:userDateTimeFormat
+								}}
+							</label>
+						</td>
+					</tr>
 
-                        </tr>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>Event:</label>
+						</td>
+						<td valign="top" class="value">
+							<a
+								(click)="cancelCloseDialog()"
+								routerLink="event/list"
+								[queryParams]="{
+									show: savedModel?.moveEvent.id
+								}"
+							>
+								{{ savedModel?.moveEvent.name }}
+							</a>
+						</td>
+					</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">From:</td>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label>Order:</label>
+						</td>
+						<td valign="top" class="value">
+							<label>{{ savedModel?.operationalOrder }}</label>
+						</td>
+					</tr>
 
-                            <td valign="top" class="value"><span *ngIf="sourceRoom != 'null'">{{sourceRoom}}</span></td>
+					<tr class="prop">
+						<td valign="top" class="name">
+							<label class="api-action-for-planning">Use For Planning:</label>
+						</td>
 
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">To:</td>
-
-                            <td valign="top" class="value"><span *ngIf="targetRoom != 'null'">{{targetRoom}}</span></td>
-
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Start Time:</td>
-                            <td valign="top" class="value">{{savedModel?.startTime | tdsDateTime: userTimeZone}}</td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Completion Time:</td>
-                            <td valign="top" class="value">{{savedModel?.completionTime | tdsDateTime: userTimeZone}}</td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Event:</td>
-
-                            <td valign="top" class="value">
-                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEvent.id}">
-                                    {{savedModel?.moveEvent.name}}
-                                </a>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Order:</td>
-
-                            <td valign="top" class="value">{{savedModel?.operationalOrder}}</td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Use For Planning:</td>
-
-                            <td valign="top" class="value">
-                                <input *ngIf="savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked" style="margin: 0px"
-                                       disabled="disabled"/>
-                                <input *ngIf="!savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" style="margin: 0px" disabled="disabled"/>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="modal-footer form-group-center">
-                    <div *ngIf="canEditBundle">
-                        <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
-                        <tds-button-delete class="btn-danger" (click)="confirmDeleteBundle()"></tds-button-delete>
-                        <button class="btn btn-action tds-action-button tds-button-delete btn-danger tds-generic-button" (click)="confirmDeleteBundleAndAssets()">
-                            <div class="tds-action-button-container">
-                                <i class="fa fa-fw fa-trash"></i>Delete Bundle & Assets
-                            </div>
-                        </button>
-                        <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
-                    </div>
-                </div>
-            </div>
-            <form [hidden]="!editing" action="save" method="post" name="bundleEditForm">
-                <div class="dialog steps_table">
-                    <table style="border:0">
-                        <tbody>
-                        <tr>
-                            <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name"><b>Name:&nbsp;<span style="color: red">*</span></b></td>
-                            <td valign="top" class="value">
-                                <input type="text" [(ngModel)]="bundleModel.name" style="width:180px" id="name" name="name"/>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Description:</td>
-                            <td valign="top" class="value">
-                                <input type="text" [(ngModel)]="bundleModel.description"  style="width:98%" id="description" name="description"/>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">From:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.fromId" [valuePrimitive]="true" [textField]="'roomName'" [valueField]="'id'" [data]="rooms"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">To:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.toId" [valuePrimitive]="true" [textField]="'roomName'" [valueField]="'id'" [data]="rooms"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Start Time:</td>
-                            <td valign="top" class="value">
-                                <tds-datetime-control #startTimePicker name="startTime" [(ngModel)]="bundleModel.startTime"></tds-datetime-control>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Completion Time:</td>
-                            <td valign="top" class="value">
-                                <tds-datetime-control #completionTimePicker name="completionTime" [(ngModel)]="bundleModel.completionTime"></tds-datetime-control>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Event:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="moveEventId" name="moveEvent" [(ngModel)]="bundleModel.moveEvent" [textField]="'name'" [valueField]="'id'" [data]="moveEvents"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Order:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" [data]="orderNums"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Use for Planning:</td>
-                            <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked" style="margin: 0px" [(ngModel)]="bundleModel.useForPlanning"/></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer form-group-center">
-                    <tds-button-save [disabled]="!validateRequiredFields(bundleModel) || !isDirty()" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
-                    <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
-                </div>
-            </form>
-        </div>
-    </div>
+						<td valign="top" class="value">
+							<input
+									clrCheckbox
+									disabled
+									type="checkbox"
+									[ngModel]="savedModel?.useForPlanning"
+							/>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div *ngIf="editing">
+		<table style="border:0">
+			<tbody>
+				<tr>
+					<td colspan="2">
+						<div class="required">
+							Fields marked ( * ) are mandatory
+						</div>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="name">Name:
+							<span class="requiredProp" style="color:red">*</span>
+						</label>
+					</td>
+					<td class="value">
+						<clr-input-container>
+							<input
+									clrInput
+									type="text"
+									[(ngModel)]="bundleModel.name"
+									id="name"
+									name="name"
+									maxlength="255"
+							/>
+							<clr-control-helper>{{bundleModel.name?.length}}/255</clr-control-helper>
+						</clr-input-container>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="description">Description: </label>
+					</td>
+					<td class="value">
+						<clr-input-container>
+							<input
+									clrInput
+									type="text"
+									[(ngModel)]="bundleModel.description"
+									id="description"
+									name="description"
+									maxlength="255"
+							/>
+							<clr-control-helper>{{bundleModel.description?.length}}/255</clr-control-helper>
+						</clr-input-container>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="sourceRoomId">From</label>
+					</td>
+					<td class="value">
+						<select
+								title="{{fromControlTT}}"
+								class="select-fixed-width"
+								clrSelect
+								name="sourceRoom"
+								id="sourceRoomId"
+								[(ngModel)]="bundleModel.fromId"
+								(change)="onFromChange()"
+						>
+							<option
+									*ngFor="let room of rooms"
+									[ngValue]="room.id"
+							>{{ (room.roomName.length > 25) ? (room.roomName | slice:0:25) + '...' : room.roomName}}</option
+							>
+						</select>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="targetRoomId">To:</label>
+					</td>
+					<td class="value">
+						<select
+								title="{{toControlTT}}"
+								class="select-fixed-width"
+								clrSelect
+								name="targetRoom"
+								id="targetRoomId"
+								[(ngModel)]="bundleModel.toId"
+								(change)="onToChange()"
+						>
+							<option
+									*ngFor="let room of rooms"
+									[ngValue]="room.id"
+							>{{ (room.roomName.length > 25) ? (room.roomName | slice:0:25) + '...' : room.roomName}}</option
+							>
+						</select>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="startTime">Start Time:</label>
+					</td>
+					<td valign="top" class="value">
+						<tds-datetime-control
+								#startTimePicker
+								id="startTime"
+								name="startTime"
+								[(ngModel)]="bundleModel.startTime"
+						></tds-datetime-control>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="completionTime">Completion Time:</label>
+					</td>
+					<td valign="top" class="value">
+						<tds-datetime-control
+								#completionTimePicker
+								id="completionTime"
+								name="completionTime"
+								[(ngModel)]="bundleModel.completionTime"
+						></tds-datetime-control>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="moveEventId">Event:</label>
+					</td>
+					<td class="value">
+						<select
+								class="select-fixed-width"
+								clrSelect
+								name="moveEvent"
+								id="moveEventId"
+								[(ngModel)]="bundleModel.moveEvent"
+						>
+							<option
+									*ngFor="let moveEvent of moveEvents"
+									[ngValue]="moveEvent"
+							>{{ moveEvent.name }}</option
+							>
+						</select>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="operationalOrderId">Order:</label>
+					</td>
+					<td class="value">
+						<select
+								clrSelect
+								name="operationalOrder"
+								id="operationalOrderId"
+								[(ngModel)]="bundleModel.operationalOrder"
+						>
+							<option
+									*ngFor="let orderNum of orderNums"
+									[ngValue]="orderNum"
+							>{{ orderNum }}</option
+							>
+						</select>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td class="name">
+						<label for="useForPlanning" class="api-action-for-planning">Use for Planning:</label>
+					</td>
+					<td class="value">
+						<input
+								clrCheckbox
+								id="useForPlanning"
+								type="checkbox"
+								[(ngModel)]="bundleModel.useForPlanning"
+						/>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </div>

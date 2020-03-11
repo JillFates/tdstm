@@ -18,6 +18,7 @@ class ManufacturerAlias {
 	static mapping = {
 		autoTimestamp false
 		version false
+        id column: 'id'
 	}
 
 	def beforeInsert = {

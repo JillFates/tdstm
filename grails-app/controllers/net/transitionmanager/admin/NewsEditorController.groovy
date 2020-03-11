@@ -1,6 +1,7 @@
 package net.transitionmanager.admin
 
 import com.tdsops.common.sql.SqlUtil
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
@@ -58,10 +59,10 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			if (defaultEvent) {
 				moveEvent = MoveEvent.get(defaultEvent)
 				if (moveEvent?.projectId != project.id) {
-					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ?0 order by me.name asc",[project])
 				}
 			} else {
-				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ?0 order by me.name asc",[project])
 			}
 		}
 
@@ -92,7 +93,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 
 		StringBuilder assetCommentsQuery = new StringBuilder("""select ac.asset_comment_id as id, ac.date_created as createdAt, display_option as displayOption,
 									${SqlUtil.personFullNameSql('p1')} as createdBy, ${SqlUtil.personFullNameSql('p2')} as resolvedBy,
-									ac.comment_type as commentType, comment , resolution, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
+									ac.comment_type as commentType, comment , resolution, null as is_archived, date_resolved as resolvedAt, ae.asset_entity_id as assetEntity
 									from asset_comment ac
 									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id)
 									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
@@ -101,7 +102,7 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 
 		StringBuilder moveEventNewsQuery = new StringBuilder("""select mn.move_event_news_id as id, mn.date_created as createdAt, 'U' as displayOption,
 											${SqlUtil.personFullNameSql('p1')} as createdBy, ${SqlUtil.personFullNameSql('p2')} as resolvedBy,
-											'news' as commentType, message as comment ,	resolution, date_archived as resolvedAt, null as assetEntity
+											'news' as commentType, message as comment ,	resolution, is_archived, date_archived as resolvedAt, null as assetEntity
 											from move_event_news mn
 											left join move_event me on (me.move_event_id = mn.move_event_id)
 											left join project p on (p.project_id = me.project_id) left join person p1 on (p1.person_id = mn.created_by)
@@ -138,7 +139,6 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 		assetCommentsQuery.append(" and ac.comment_type = 'news' ")
 
 		def queryForCommentsList = new StringBuilder(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery)
-
 		List<Map> result = namedParameterJdbcTemplate.query(queryForCommentsList.toString(), queryParams, new MoveEventNewsMapper()).collect {[
 			createdAt: it.createdAt,
 			createdBy: it.createdBy,
@@ -147,10 +147,15 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			resolution: it.resolution,
 			resolvedAt: it.resolvedAt,
 			resolvedBy: it.resolvedBy,
-			newsId: it.id
+			newsId: it.id,
+            isArchived: it.isArchived
 		]}
 		render result as JSON
 	}
+
+    def getIt() {
+
+    }
 
 	/**
 	 * @return assetComment / moveEventNews object based on comment Type as JSON object
@@ -209,16 +214,16 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.NewsCreate)
 	def saveNews() {
 		Project project = controllerService.getProjectForPage(this)
-		SaveNewsCommand news = populateCommandObject(SaveNewsCommand)
-		validateCommandObject(news)
+        Map newsParams = request.JSON;
+        int isArchived = (newsParams.isArchived) ? 1 : 0
 
-		if (!project) {
+        if (!project) {
 			flash.message = null
 			return
 		}
 
-		MoveEventNews men = newsEditorService.save(project, news.moveEventId, news.message, news.resolution, news.isArchived)
-		renderHandler(men, news.mode, news.moveBundle, news.viewFilter, news.moveEventId)
+		MoveEventNews men = newsEditorService.save(project, NumberUtil.toLong(newsParams.moveEventId), newsParams.comment, newsParams.resolution, isArchived)
+        renderSuccessJson(men)
 	}
 
 	/**
@@ -230,17 +235,17 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.NewsEdit)
 	def updateNews() {
-		UpdateNewsCommand news = populateCommandObject(UpdateNewsCommand)
-		validateCommandObject(news)
 		Project project = controllerService.getProjectForPage(this)
+        Map newsParams = request.JSON;
+        int isArchived = (newsParams.isArchived) ? 1 : 0
 
 		if (!project) {
 			flash.message = null
 			return
 		}
 
-		MoveEventNews men = newsEditorService.update(project, news.id, news.message, news.resolution, news.isArchived)
-		renderHandler(men, news.mode, news.moveBundle, news.viewFilter, null)
+		MoveEventNews men = newsEditorService.update(project, NumberUtil.toLong(newsParams.newsId), newsParams.comment, newsParams.resolution, isArchived)
+        renderSuccessJson(men)
 	}
 
 	/**
@@ -297,7 +302,8 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			commentType: rs.getString('commentType'),
 			resolution: rs.getString('resolution'),
 			resolvedAt: rs.getDate('resolvedAt'),
-			resolvedBy: rs.getString('resolvedBy')
+			resolvedBy: rs.getString('resolvedBy'),
+            isArchived: rs.getBoolean('is_archived')
 		]}
 	}
 }

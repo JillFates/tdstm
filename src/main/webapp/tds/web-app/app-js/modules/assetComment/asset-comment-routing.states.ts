@@ -21,6 +21,12 @@ export class AssetCommentStates {
 	};
 }
 
+/**
+ * Top menu parent section class for all Dependencies module.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
+
 export const AssetCommentRoute: Routes = [
 	{path: '', pathMatch: 'full', redirectTo: AssetCommentStates.COMMENT_LIST.url},
 	{
@@ -30,6 +36,7 @@ export const AssetCommentRoute: Routes = [
 				title: 'ASSETS.COMMENTS',
 				instruction: '',
 				menu: ['ASSETS.ASSETS', 'ASSETS.COMMENTS'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-comments-list', subMenu: true }
 			},
 			requiresAuth: true
 		},

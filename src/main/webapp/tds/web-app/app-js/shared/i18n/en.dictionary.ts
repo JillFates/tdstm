@@ -14,6 +14,8 @@ export const en_DICTIONARY: Object = {
 		'ACTIVE': 'Active',
 		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
+		'CHECK_SYNTAX': 'Check Syntax',
+		'COLLAPSE': 'Collapse',
 		'CONFIGURE': 'Configure',
 		'CREATE': 'Create',
 		'CLOSE': 'Close',
@@ -21,6 +23,7 @@ export const en_DICTIONARY: Object = {
 		'DELETE': 'Delete',
 		'EDIT': 'Edit',
 		'EXPORT': 'Export',
+		'EXPAND': 'Expand',
 		'FILTER': 'Filter',
 		'LIST': 'List',
 		'LEGEND': 'Legend',
@@ -100,6 +103,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
+		'EDIT_ACTION': 'Edit Action',
+		'DELETE_ACTION': 'Delete Action',
 		'API_ACTION': 'Action',
 		'API_ACTIONS': 'Actions',
 	},
@@ -112,6 +117,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATABASE': 'Create DB',
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
+		'CONFIGURE_VIEW': 'Configure View',
 		'SHOW_COMMENTS': 'Show Comments',
 		'SHOW_TASKS': 'Show Tasks',
 		'GRID': {
@@ -172,7 +178,8 @@ export const en_DICTIONARY: Object = {
 		'RACK': 'Rack',
 		'DEPENDENCY': 'Dependency',
 		'CABLING': 'Cabling',
-		'COMMENT': 'Comment'
+		'COMMENT': 'Comment',
+		'VIEW': 'Export View'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
@@ -238,6 +245,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project'
 	},
 	'DEPENDENCIES': {
+		'CREATE_DEPENDENCY': 'Create Dependency',
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
@@ -251,7 +259,45 @@ export const en_DICTIONARY: Object = {
 		'LIST': 'Event List',
 		'TITLE_DASHBOARD': 'Event Dashboard',
 		'DASHBOARD': 'Dashboard',
-		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks',
+		'NEWS': 'Event News List'
+	},
+	'INSIGHT': {
+		'INSIGHT': 'Insight',
+		'DASHBOARD': 'Dashboard',
+		'TITLE_DASHBOARD': 'Insight Dashboard',
+		'DATA_BY_PROVIDERS': 'Data by Providers',
+		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Application Grouped by Dependencies',
+		'DEVICES_BY_EVENT': 'Devices By Event',
+		'ASSETS_BY_PROVIDERS_AND_ASSET_TYPE': 'Assets by Providers and Asset Type',
+		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
+	},
+	'ARCHITECTURE': {
+		'ARCHITECTURE_GRAPH': 'Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
+		'CONTROL_PANEL': 'Control Panel',
+		'LEGEND': 'Legend',
+		'FULLSCREEN': 'Fullscreen',
+		'NORMAL_SCREEN': 'Normal Screen',
+		'SELECT_AN_ASSET': 'Select an Asset',
+		'FILTER_LABELS': 'Class filter',
+		'TIERS_ABOVE': 'Tiers above',
+		'TIERS_BELOW': 'Tiers below',
+		'SHOW_CYCLICAL_REFERENCE': 'Show Cyclical Reference',
+		'SHOW_LABELS': 'Show Labels: ',
+		'SPACING': 'Spacing',
+		'REGENERATE_GRAPH': 'Regenerate Graph',
+		'SAVE_PREFERENCES': 'Save Preferences',
+		'RESET_DEFAULTS': 'Reset Default',
+		'ASSET_CLASSES': 'Asset Classes: '
+	},
+	'DEPENDENCY_ANALYZER': {
+		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_GROUPS': 'Dependency Groups',
+		'REGENERATE': 'Regenerate',
+		'BUNDLE': 'Bundle',
+		'TAGS': 'Tags',
+		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
@@ -270,17 +316,20 @@ export const en_DICTIONARY: Object = {
 		'BUNDLES': {
 			'BUNDLES': 'Bundles',
 			'LIST': 'Bundle List',
+			'CREATE_BUNDLE': 'Create Bundle',
 		}
 	},
 	'PROJECT': {
 		'PROJECTS': 'Projects',
+		'CREATE_PROJECT': 'Create Projects',
 		'SELECT_PROJECT': 'Select a Project',
 		'MISSING_PROJECT': 'Your account is missing an active project. Please select one in order to proceed.',
 		'NO_ACTIVE_PROJECTS': 'There are currently no active projects to choose from.  Please contact your administrator for assistance.'
 	},
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
-		'WARNING_VALIDATION_CHANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
+		'WARNING_VALIDATION_CHANGE': `Changing the validation will have adverse effects if existing data falls outside current values. Press confirm to proceed and change the validation`,
+		'WARNING_VALIDATION_CHANGE_RANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
@@ -447,6 +496,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
 		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
 		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.',
+		'CSRF_UNAUTHORIZED_MESSAGE': 'CSRF Verification failed.',
+		'CSRF_INVALID': 'CSRF Token missing or incorrect.',
 		'WHY_THIS': 'Why am I seeing this?',
 		'LICENSE_EXPIRED': 'Your TransitionManager license is missing, expired or is otherwise no longer valid for this project.',
 		'LICENSE_ADMINISTRATOR': 'Your Administrator can manage the license from the Admin Menu, or if you are the Administrator and need assistance, please open a ticket at:'
@@ -460,9 +511,11 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'DELETE_MODEL' : 'Are you sure you want to delete this model? There is no undo for this action',
 	},
 	'TASK_MANAGER': {
+		'BULK_ACTION': 'Bulk Action',
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',
-		'CREATE_TASK': 'Create Task',
+		'CREATE_TASK': 'Task Create',
+		'EDIT_TASK': 'Task Edit',
 		'TASK': 'Task',
 		'TASK_MANAGER': 'Task Manager',
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
@@ -476,5 +529,15 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 			'SELECT_END_DATE': 'Select an end date'
 		},
 		'MY_TASKS': 'My Tasks',
+	},
+	'DASHBOARD': {
+		'INSIGHT_DATA': 'Insight Data',
+		'ASSETS_BY_VENDOR': 'Assets by Vendor',
+		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Applications Grouped by Dependencies',
+		'DEPENDENCIES_BY_VENDOR': 'Dependencies by Vendor',
+		'TOP_TAGS': 'Top Tags'
+	},
+	'MANUFACTURER': {
+		'LIST': 'Manufacturer List'
 	}
 };

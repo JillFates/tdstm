@@ -1,174 +1,297 @@
 <!-- Main content -->
-<div class="content body tds-kendo-grid api-action-list-component">
+<div class="content body tds-kendo-grid export-asset-component">
 	<!-- Main content -->
 	<section>
 		<div>
-			<div class="box-body">
-				<div class="box box-primary">
-					<div class="box-header with-border">
-<!--						<h3 class="box-title">Export</h3>-->
-					</div><!-- /.box-header -->
-				<form id="exportForm" name="exportForm" role="form">
-					<div class="box-body">
-
-						<div class="form-group col-lg-3 col-md-4">
-							<label for="bundleId" class="label-for-export-asset">{{translatePipe.transform('ASSET_EXPORT.SELECT_BUNDLE')}}</label>
-							<select [(ngModel)]="selectedBundles" id="bundleId" (change)="updateError()" name="bundle" multiple="multiple" class="form-control medium-height">
+			<form id="exportForm" name="exportForm" role="form">
+				<div class="export-assets">
+					<div class="export-assets-grid">
+						<div>
+							<label for="bundleId" class="label-for-export-asset"
+								>{{
+									translatePipe.transform(
+										'ASSET_EXPORT.SELECT_BUNDLE'
+									)
+								}}
+							</label>
+							<select
+								clrSelect
+								[(ngModel)]="selectedBundles"
+								id="bundleId"
+								(change)="updateError()"
+								name="bundle"
+								multiple="multiple"
+							>
 								<option value="All">All Bundles</option>
-								<option value="useForPlanning">Planning Bundles</option>
+								<option value="useForPlanning"
+									>Planning Bundles</option
+								>
 								<option value="" disabled>──────────</option>
-								<option *ngFor="let bundle of exportAssetsData.bundles" [ngValue]="bundle['id']">{{bundle['name']}}</option>
+								<option
+									*ngFor="
+										let bundle of exportAssetsData.bundles
+									"
+									[ngValue]="bundle['id']"
+									>{{ bundle['name'] }}</option
+								>
 							</select>
 						</div>
-						<div class="form-group col-lg-3 col-md-4" *ngIf="userPreferences.length > 0">
-							<label for="checkboxGroup" class="label-for-export-asset">{{translatePipe.transform('ASSET_EXPORT.CHOOSE_ITEM')}}</label>
-							<div class="row checkboxGroup" id="checkboxGroup">
-								<div class="col-sm-6">
-									<ul class="list-group sub-set">
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="allItems">
-													<input
-														type="checkbox"
-														id="allItems"
-														name="All"
-														value="all"
-														(change)="selectAll()"
-														[checked]="selectedAll"/>
-													{{translatePipe.transform('ASSET_EXPORT.ALL_ITEMS')}}
-												</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="applicationId">
-													<input
-														type="checkbox"
-														id="applicationId"
-														name="application"
-														value="{{userPreferences[0]['preference']}}"
-														[(ngModel)]="userPreferences[0].selected"
-														(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.APPLICATION')}}
-												</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="assetId">
-													<input
-														type="checkbox"
-														id="assetId"
-														name="asset"
-														value="{{userPreferences[1]['preference']}}"
-														[(ngModel)]="userPreferences[1].selected"
-														(change)="checkIfAllSelected()"/>
-														{{translatePipe.transform('ASSET_EXPORT.DEVICE')}}
-												</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="databaseId"><input
-													type="checkbox"
-													id="databaseId"
-													name="database"
-													value="{{userPreferences[2]['preference']}}"
-													[(ngModel)]="userPreferences[2].selected"
-													(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.DATABASE')}}</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="filesId"><input
-													type="checkbox"
-													id="filesId"
-													name="files"
-													value="{{userPreferences[3]['preference']}}"
-													[(ngModel)]="userPreferences[3].selected"
-													(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.STORAGE')}}</label>
-											</div>
-										</li>
-									</ul>
-								</div>
-								<div class="col-sm-6">
-									<ul class="list-group sub-set">
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="roomId"><input
-													type="checkbox"
-													id="roomId"
-													name="room"
-													value="{{userPreferences[4]['preference']}}"
-													[(ngModel)]="userPreferences[4].selected"
-													(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.ROOM')}}</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="rackId"><input
-													type="checkbox"
-													id="rackId"
-													name="rack"
-													value="{{userPreferences[5]['preference']}}"
-													[(ngModel)]="userPreferences[5].selected"
-													(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.RACK')}}</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="dependencyId"><input
-													type="checkbox"
-													id="dependencyId"
-													name="dependency"
-													value="{{userPreferences[6]['preference']}}"
-													[(ngModel)]="userPreferences[6].selected"
-													(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.DEPENDENCY')}}</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="cablingId"><input
-													type="checkbox"
-													id="cablingId"
-													name="cabling"
-													value="{{userPreferences[7]['preference']}}"
-													[(ngModel)]="userPreferences[7].selected"
-													(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.CABLING')}}</label>
-											</div>
-										</li>
-										<li class="list-group-item">
-											<div class="checkbox">
-												<label for="commentId"><input
-													type="checkbox"
-													id="commentId"
-													name="comment"
-													value="{{userPreferences[8]['preference']}}"
-													[(ngModel)]="userPreferences[8].selected"
-													(change)="checkIfAllSelected()"/>
-													{{translatePipe.transform('ASSET_EXPORT.COMMENT')}}</label>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-						<div class="form-group col-lg-3 col-md-4">
-							<button (click)="exportData()" type="submit" id="exportButton" class="btn btn-primary">{{translatePipe.transform('ASSET_EXPORT.EXPORT_BUTTON')}}&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
-							<div class="form-group error-bundle" *ngIf="this.errorMessage">
-								{{this.errorMessage}}
-							</div>
+						<div class="" *ngIf="userPreferences.length > 0">
+							<label
+								for="checkboxGroup"
+								class="label-for-export-asset"
+								>{{
+									translatePipe.transform(
+										'ASSET_EXPORT.CHOOSE_ITEM'
+									)
+								}}</label
+							>
+
+							<!-- Change value to ngValue? -->
+							<clr-checkbox-container>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="allItems"
+										name="All"
+										value="all"
+										(change)="selectAll()"
+										[checked]="selectedAll"
+									/>
+									<label>
+										{{
+											translatePipe.transform(
+												'ASSET_EXPORT.ALL_ITEMS'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="applicationId"
+										name="application"
+										value="{{
+											userPreferences[0]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[0].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label>
+										{{
+											translatePipe.transform(
+												'ASSET_EXPORT.APPLICATION'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="assetId"
+										name="asset"
+										value="{{
+											userPreferences[1]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[1].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label>
+										{{
+											translatePipe.transform(
+												'ASSET_EXPORT.DEVICE'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="databaseId"
+										name="database"
+										value="{{
+											userPreferences[2]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[2].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label>
+										{{
+											translatePipe.transform(
+												'ASSET_EXPORT.DATABASE'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="filesId"
+										name="files"
+										value="{{
+											userPreferences[3]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[3].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label>
+										{{
+											translatePipe.transform(
+												'ASSET_EXPORT.STORAGE'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="roomId"
+										name="room"
+										value="{{
+											userPreferences[4]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[4].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label
+										>{{
+											translatePipe.transform(
+												'ASSET_EXPORT.ROOM'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="rackId"
+										name="rack"
+										value="{{
+											userPreferences[5]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[5].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label
+										>{{
+											translatePipe.transform(
+												'ASSET_EXPORT.RACK'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="dependencyId"
+										name="dependency"
+										value="{{
+											userPreferences[6]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[6].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label>
+										{{
+											translatePipe.transform(
+												'ASSET_EXPORT.DEPENDENCY'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="cablingId"
+										name="cabling"
+										value="{{
+											userPreferences[7]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[7].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label>
+										{{
+											translatePipe.transform(
+												'ASSET_EXPORT.CABLING'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+								<clr-checkbox-wrapper>
+									<input
+										clrCheckbox
+										type="checkbox"
+										id="commentId"
+										name="comment"
+										value="{{
+											userPreferences[8]['preference']
+										}}"
+										[(ngModel)]="
+											userPreferences[8].selected
+										"
+										(change)="checkIfAllSelected()"
+									/>
+									<label
+										>{{
+											translatePipe.transform(
+												'ASSET_EXPORT.COMMENT'
+											)
+										}}
+									</label>
+								</clr-checkbox-wrapper>
+							</clr-checkbox-container>
 						</div>
 					</div>
-				</form>
+					<div class="pull-right">
+						<tds-button-custom
+							[icon]="'download-cloud'"
+							[theme]="'primary'"
+							[title]="
+								translatePipe.transform(
+									'ASSET_EXPORT.EXPORT_BUTTON'
+								)
+							"
+							(click)="exportData()"
+							[type]="'submit'"
+							id="exportButton"
+							aria-hidden="true"
+						>
+						</tds-button-custom>
+						<div
+							class="form-group error-bundle"
+							*ngIf="this.errorMessage"
+						>
+							{{ this.errorMessage }}
+						</div>
+					</div>
 				</div>
-			</div>
+			</form>
 		</div>
 	</section>
 	<tds-progress-bar [opened]="opened"

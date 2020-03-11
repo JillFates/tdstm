@@ -6,7 +6,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 	var containerTemplate = 
 	'<div class="modal fade" id="globalProgressBar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
 		'<div class="modal-dialog">' +
-			'<div class="modal-content">' +
+			'<div class="tds-modal-content">' +
 				'<div class="modal-header">' +
 					'<h4 id="progressTitle" class="modal-title" id="myModalLabel">Modal title</h4>' +
 				'</div>' +

@@ -1,4 +1,7 @@
+import {FilterType} from 'tds-component-library';
+
 export class ProjectModel {
+	public id: number;
 	public clientId: number;
 	public projectName: string;
 	public description: string;
@@ -25,34 +28,32 @@ export class ProjectColumnModel {
 			{
 				label: 'Project Code',
 				property: 'projectCode',
-				type: 'text',
-				width: '*'
+				filterType: FilterType.text
 			},
 			{
 				label: 'Name',
 				property: 'projectName',
-				type: 'text',
-				width: '*'
+				filterType: FilterType.text
 			},
 			{
 				label: 'Start Date',
+				filterable: true,
 				property: 'startDate',
-				type: 'text',
 				format: dateFormat,
-				width: 'auto'
+				filterType: FilterType.date
 			},
 			{
 				label: 'Completion Date',
+				filterable: true,
 				property: 'completionDate',
-				type: 'text',
 				format: dateFormat,
-				width: 'auto'
+				filterType: FilterType.date
 			},
 			{
 				label: 'Comment',
+				filterable: true,
 				property: 'comment',
-				type: 'text',
-				width: '*'
+				filterType: FilterType.text
 			}
 		];
 	}

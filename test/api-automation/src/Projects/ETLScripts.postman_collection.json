@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "27f63ed4-a826-4c3e-ba6d-a3f5ff41868f",
+		"_postman_id": "63350bb3-1e73-40b3-ac8e-fbdfc105d900",
 		"name": "ETL Script",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -190,6 +197,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -257,6 +269,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -314,6 +331,11 @@
 						"key": "Content-Type",
 						"name": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
 						"type": "text"
 					}
 				],
@@ -375,6 +397,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -435,6 +462,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -488,13 +520,11 @@
 							"*/",
 							"var counter = 0;",
 							"pm.test(\"Check the status of the progress key until it's completed\", function () {",
-							"    if (jsonObject.data.status != \"COMPLETED\" && counter!=20){",
+							"    ",
+							"    while(jsonObject.data.status != \"COMPLETED\" && counter!=20)",
+							"    {",
 							"        postman.setNextRequest(\"Check Progress Completed\");",
 							"        counter++;",
-							"    } ",
-							"        ",
-							"    else {",
-							"        pm.expect(jsonObject.data.status).eql('COMPLETED') ;",
 							"    }",
 							"    ",
 							"    ",
@@ -668,7 +698,9 @@
 							"pm.environment.unset(\"fileName\");",
 							"pm.environment.unset(\"progressKey\");",
 							"pm.environment.unset(\"etlOutputName\");",
-							""
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -696,6 +728,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"url": {

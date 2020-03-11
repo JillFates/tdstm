@@ -8,7 +8,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class RecipeCreationSpec extends GebReportingSpec {
@@ -17,13 +17,13 @@ class RecipeCreationSpec extends GebReportingSpec {
     static recipeText
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
         login()
         at MenuPage
-        tasksModule.goToTasksCookbook()
+        waitFor{tasksModule.goToTasksCookbook()}
     }
 
     def setup() {
@@ -95,14 +95,14 @@ class RecipeCreationSpec extends GebReportingSpec {
             at CookbookPage
 
         then: 'The information that has been added should be displayed'
-            (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[1].text().contains("This is a Geb created recipe")
-            recipeGridRowsCols.getAt(selectedRow*rowSize + 0).text().trim() == "Geb Recipe Test"
-            recipeGridRowsCols.getAt(selectedRow*rowSize+1).text().trim() == "This is a Geb created recipe"
-            recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "e2e_test_user"
+            (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[2].text().contains("This is a Geb created recipe")
+            recipeGridRowsCols.getAt(selectedRow*rowSize + 1).text().trim() == "Geb Recipe Test"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "This is a Geb created recipe"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == "e2e user"
             // TODO next line will check dates for the new recipe. Verify actual local time
             // recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == now()
-            recipeGridRowsCols.getAt(selectedRow*rowSize+4).text().trim() == ""
-            recipeGridRowsCols.getAt(selectedRow*rowSize+5).text().trim() == "yes"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+5).text().trim() == ""
+            recipeGridRowsCols.getAt(selectedRow*rowSize+6).text().trim() == "yes"
     }
 
     def "7. Check 'Editor' tab selected after recipe is created"() {

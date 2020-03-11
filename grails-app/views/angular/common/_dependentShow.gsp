@@ -1,118 +1,126 @@
 <%@page defaultCodec="html" %>
-
-	<td valign="top">
-		<div>
-			<h1>Supports:</h1>
-			<table style="min-width: 400px;" class="planning-application-table table-responsive dialog-container">
-				<thead>
-					<tr>
-						<th>Class</th>
-						<th>Name</th>
-						<th>Bundle</th>
-						<th>Type</th>
-						<th>Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					<g:each in="${supportAssets}" var="support" status="i">
-						<tr class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-							<td class="dep-${support.status}" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
-								${support?.asset?.assetType}
-							</td>
-							<td class="dep-${support.status}" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})" style="min-width:80px">
-								${support?.asset?.assetName}
-							</td>
-							<g:if test="${support?.asset?.moveBundle!=asset.moveBundle && support.status == 'Validated' }">
-								<td style="background-color: lightpink;position:relative;" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
-									<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
-									<div class="text-center" style="position:absolute;right:5px;top:20%;">
-										<asset:image src="icons/error.png" width="19" height="19" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles." />
-									</div>
-								</td>
-							</g:if>
-							<g:elseif test="${support?.asset?.moveBundle!=asset.moveBundle }">
-								<td class="dep-${support.status}" style="position:relative;" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
-									<b>
-										<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
-										<div class="text-center" style="position:absolute;right:5px;top:20%;">
-											<asset:image src="icons/error.png" width="19" height="19" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles." />
-										</div>
-									</b>
-								</td>
-							</g:elseif>
-							<g:else>
-								<td class="dep-${support.status}" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
-									${support?.asset?.moveBundle}
-								</td>
-							</g:else>
-							<td class="dep-${support.status}" nowrap="nowrap" (click)="showDependencyView(${support.asset.id},${support.dependent.id})">
-								${support.type} &nbsp;
-								<g:render template="/angular/common/dependentComment" model="[dependency:support, type:'support', forWhom:'show']"></g:render>
-							</td>
-							<td class="dep-${support.status}" (click)="showDependencyView(${support.asset.id},${support.dependent.id})">
-								${support.status}
-							</td>
-						</tr>
-					</g:each>
-				</tbody>
-			</table>
+<div class="tds-table">
+	<div class="clr-row">
+		<div class="grid-label clr-col-4">
+			<strong>Depends On</strong>
 		</div>
-	</td>
-	<td valign="top">
-		<div>
-			<h1>Is dependent on:</h1>
-			<table style="min-width: 400px;" class="planning-application-table table-responsive dialog-container">
-				<thead>
-					<tr>
-						<th>Class</th>
-						<th>Name</th>
-						<th>Bundle</th>
-						<th>Type</th>
-						<th>Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					<g:each in="${dependentAssets}" var="dependent" status="i">
-						<tr class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-							<td class="dep-${dependent.status}" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
-								${dependent.dependent?.assetType}
-							</td>
-							<td class="dep-${dependent.status}" style="min-width:80px" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
-								${dependent.dependent?.assetName}
-							</td>
-							<g:if test="${dependent.dependent?.moveBundle!=asset.moveBundle && dependent.status == 'Validated' }">
-								<td style="background-color: lightpink;position:relative;" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
-									<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
-									<div class="text-center" style="position:absolute;right:5px;top:20%;">
-										<asset:image src="icons/error.png" width="19" height="19" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles." />
-									</div>
-								</td>
-							</g:if>
-							<g:elseif test="${dependent.dependent?.moveBundle!=asset.moveBundle }">
-								<td class="dep-${dependent.status}" style="position:relative;" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
-									<b>
-										<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
-										<div class="text-center" style="position:absolute;right:5px;top:20%;">
-											<asset:image src="icons/error.png" width="19" height="19" alt="..." data-toggle="popover" data-trigger="hover" data-content="The linked assets have conflicting bundles." />
-										</div>
-									</b>
-								</td>
-							</g:elseif>
-							<g:else>
-								<td class="dep-${dependent.status}" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
-									${dependent.dependent?.moveBundle}
-								</td>
-							</g:else>
-							<td class="dep-${dependent.status}" nowrap="nowrap" (click)="showDependencyView(${assetEntity.id}, ${dependent.dependent.id})">
-								${dependent.type}&nbsp;
-								<g:render template="/angular/common/dependentComment" model="[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
-							</td>
-							<td class="dep-${dependent.status}" (click)="showDependencyView(${assetEntity.id}, ${dependent.dependent.id})">
-								${dependent.status}
-							</td>
-						</tr>
-					</g:each>
-				</tbody>
-			</table>
-		</div>
-	</td>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th style="width: 20%;">Class</th>
+				<th style="width: 20%;">Name</th>
+				<th style="width: 20%;">Bundle</th>
+				<th style="width: 20%;">Type</th>
+				<th style="width: 20%;">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			<g:each in="${dependentAssets}" var="dependent" status="i">
+				<g:set var="dependentRow">${assetEntity.id}${dependent.dependent.id}</g:set>
+				<tr id="${dependentRow}" class="asset-detail-dependent-row">
+					<td (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
+						${dependent.dependent?.assetType}
+					</td>
+					<td (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
+						${dependent.dependent?.assetName}
+					</td>
+					<g:if test="${dependent.dependent?.moveBundle!=asset.moveBundle && dependent.status == 'Validated' }">
+						<td style="position:relative;" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
+							<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+							<div class="text-center" style="position:absolute;right:5px;top:20%;">
+								<span class="status status-Warning">
+									<clr-icon shape="exclamation-triangle" class="is-solid"></clr-icon>									
+								</span>
+							</div>
+						</td>
+					</g:if>
+					<g:elseif test="${dependent.dependent?.moveBundle!=asset.moveBundle }">
+						<td style="position:relative;" (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
+							<strong>
+								<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
+								<div class="text-center" style="position:absolute;right:5px;top:20%;">
+									<span class="status status-Warning">
+										<clr-icon shape="exclamation-triangle" class="is-solid"></clr-icon>
+									</span>
+								</div>
+							</strong>
+						</td>
+					</g:elseif>
+					<g:else>
+						<td (click)="showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
+							${dependent.dependent?.moveBundle}
+						</td>
+					</g:else>
+					<td nowrap="nowrap" (click)="showDependencyView('dependent', ${assetEntity.id}, ${dependent.dependent.id}, ${dependentRow})">
+						${dependent.type}&nbsp;
+						<g:render template="/angular/common/dependentComment" model="[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
+					</td>
+					<td (click)="showDependencyView('dependent',  ${assetEntity.id}, ${dependent.dependent.id}, ${dependentRow})">
+						<g:if test="${dependent.status == 'Validated'}">
+							<span class="status-icon status-Ready">
+								<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Ready'}">
+							<span class="status-icon status-Ready">
+								<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Started'}">
+							<span class="status-icon status-Started">
+								<fa-icon [icon]="['fas', 'circle-notch']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Hold'}">
+							<span class="status-icon status-Hold">
+								<fa-icon [icon]="['fas', 'pause']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Completed'}">
+							<span class="status-icon status-Completed">
+								<fa-icon [icon]="['fas', 'check']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Pending'}">
+							<span class="status-icon status-Pending">
+								<fa-icon [icon]="['fas', 'hourglass-start']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Unknown'}">
+							<span class="status-icon status-Unknown">
+								<fa-icon [icon]="['fas', 'question-circle']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Archived'}">
+							<span class="status-icon status-Archived">
+								<fa-icon [icon]="['fas', 'archive']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Future'}">
+							<span class="status-icon status-Future">
+								<fa-icon [icon]="['far', 'share-square']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Validated_NA'}">
+							<span class="status-icon status-Validated-NA">
+								<fa-icon [icon]="['fas', 'square']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Not Applicable'}">
+							<span class="status-icon status-Not-Applicable">
+								<fa-icon [icon]="['fas', 'ban']" class="status-Not-Applicable"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${dependent.status == 'Questioned'}">
+							<span class="status-icon status-Questioned">
+								<fa-icon [icon]="['fas', 'exclamation-triangle']"></fa-icon>
+							</span>
+						</g:if>
+						${dependent.status}
+					</td>
+				</tr>
+			</g:each>
+		</tbody>
+	</table>
+</div>

@@ -1,208 +1,303 @@
-import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
-import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {GridDataResult} from '@progress/kendo-angular-grid';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute, Event, Params, Router, NavigationEnd} from '@angular/router';
-import {ProjectService} from '../../service/project.service';
+// Angular
+import {
+	AfterContentInit,
+	Component, ComponentFactoryResolver, OnDestroy,
+	OnInit,
+	ViewChild,
+} from '@angular/core';
+import {
+	ActivatedRoute,
+	Params,
+	Router,
+	NavigationEnd,
+} from '@angular/router';
+// Model
+import {ActionType} from '../../../dataScript/model/data-script.model';
+import {
+	ColumnHeaderData, DialogConfirmAction, DialogService,
+	GridComponent,
+	GridModel,
+	GridRowAction,
+	GridSettings,
+	HeaderActionButtonData, ModalSize
+} from 'tds-component-library';
 import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
-import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
+import {Permission} from '../../../../shared/model/permission.model';
+// Component
 import {ProjectCreateComponent} from '../create/project-create.component';
 import {ProjectViewEditComponent} from '../view-edit/project-view-edit.component';
+// Service
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ProjectService} from '../../service/project.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-
-declare var jQuery: any;
+import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: `project-list`,
 	templateUrl: 'project-list.component.html',
 })
-export class ProjectListComponent implements OnInit, AfterContentInit {
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
-		filter: {
-			filters: [],
-			logic: 'and'
-		}
+export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy {
+
+	private gridRowActions: GridRowAction[];
+
+	private headerActions: HeaderActionButtonData[];
+
+	private gridSettings: GridSettings = {
+		defaultSort: [{field: 'name', dir: 'asc'}],
+		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
 	};
-	public skip = 0;
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+
+	private columnModel: ColumnHeaderData[];
+	public gridModel: GridModel;
+	private dateFormat = '';
+
+	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
 	public projectColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public gridData: GridDataResult;
-	public resultSet: ProjectModel[];
-	public canEditProject;
-	public dateFormat = '';
-	public booleanFilterData = BooleanFilterData;
-	public defaultBooleanFilterData = DefaultBooleanFilterData;
+
 	public showActive: boolean;
-	private projectToOpen: number;
-	private pageURL: string;
+	private projectToOpen: string;
 	private projectOpen = false;
 
+	private navigationSubscription;
+
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private projectService: ProjectService,
-		private prompt: UIPromptService,
 		private preferenceService: PreferenceService,
 		private notifierService: NotifierService,
 		private router: Router,
 		private route: ActivatedRoute,
-		private elementRef: ElementRef,
-		private renderer: Renderer2) {
-		this.state.take = this.pageSize;
-		this.state.skip = this.skip;
+		private translateService: TranslatePipe,
+	) {
 		this.showActive = this.route.snapshot.queryParams['active'] !== 'completed';
-		this.resultSet = this.showActive ? this.route.snapshot.data['projects'].activeProjects : this.route.snapshot.data['projects'].completedProjects;
-		this.gridData = process(this.resultSet, this.state);
 	}
 
-	ngOnInit() {
-		this.pageURL = this.router.url;
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
-				this.projectColumnModel = new ProjectColumnModel(`{0:${dateFormat}}`);
-			});
+	async ngOnInit() {
+
+		this.gridRowActions = [
+			{
+				name: 'Edit',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onDelete,
+			},
+		];
+
+		this.headerActions = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateProject,
+			},
+		];
+
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
+
+		this.dateFormat = await this.preferenceService.getUserDatePreferenceAsKendoFormat().toPromise();
+
+		this.columnModel = new ProjectColumnModel(this.dateFormat).columns;
+
+		this.gridModel.columnModel = this.columnModel;
+
 		this.updateBreadcrumbAndTitle();
-		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
 	}
 
 	ngAfterContentInit() {
-		this.projectToOpen = +this.route.snapshot.queryParams['show'];
-
-		this.router.events.subscribe(e => {
-			if (this.pageURL === this.router.url) {
-				if (e instanceof NavigationEnd && this.projectToOpen && !this.projectOpen) {
-					this.projectToOpen = this.projectToOpen;
-					this.showProject(this.projectToOpen);
-				}
-			} else {
-				this.pageURL = '';
+		this.projectToOpen = this.route.snapshot.queryParams['show'];
+		// The following code Listen to any change made on the route to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event && event.state && event.state && event.state.url.indexOf('/project/list') !== -1) {
+				this.projectToOpen = event.state.root.queryParams.show;
+			}
+			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length) {
+				setTimeout(() => {
+					if (!this.projectOpen) {
+						this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+					}
+				}, 500);
 			}
 		});
 
-		this.route.queryParams.subscribe((params) => {
+		this.route.queryParams.subscribe(params => {
 			if (this.projectToOpen && !this.projectOpen) {
-				this.showProject(this.projectToOpen);
+				setTimeout(() => {
+					if (!this.projectOpen) {
+						this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+					}
+				}, 500);
 			}
 		});
 	}
 
-	protected toggleShowActive(): void {
-		this.showActive = !this.showActive;
-		this.projectToOpen = null;
-		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
-		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });
-		this.updateBreadcrumbAndTitle();
-		this.reloadData();
-	}
-
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected onFilter(column: any): void {
-		const root = this.projectService.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
-
-	protected clearValue(column: any): void {
-		this.projectService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
+	protected async setShowActive(to: boolean): Promise<void> {
+		if (this.showActive !== to) {
+			this.showActive = to;
+			this.projectToOpen = null;
+			const queryParams: Params = {
+				active: this.showActive ? 'active' : 'completed',
+			};
+			await this.router.navigate([], {
+				relativeTo: this.route,
+				queryParams: queryParams,
+			});
+			this.updateBreadcrumbAndTitle();
+			await this.gridComponent.reloadData();
+		}
 	}
 
 	protected updateBreadcrumbAndTitle(): void {
 		this.notifierService.broadcast({
 			name: 'notificationHeaderBreadcrumbChange',
-			menu: ['Projects', this.showActive ? 'Active' : 'Completed']
+			menu: ['Projects', this.showActive ? 'Active' : 'Completed'],
 		});
 		this.notifierService.broadcast({
 			name: 'notificationHeaderTitleChange',
-			title: 'Projects' + ' - ' + (this.showActive ? 'Active' : 'Completed')
+			title: 'Projects' + ' - ' + (this.showActive ? 'Active' : 'Completed'),
 		});
 	}
 
-	protected showProject(id): void {
-		if (!this.projectOpen) {
+	/**
+	 * Select the current element and open the Edit Dialog
+	 * @param dataItem
+	 */
+	private onEdit = async (dataItem: ProjectModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				await this.openProject(dataItem.id, ActionType.EDIT, true);
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	/**
+	 * Open The Dialog to Create, View or Edit the Project
+	 * @param {ProjectModel} projectModel
+	 * @param {number} actionType
+	 */
+	private async openProject(projectModelId: number, actionType: ActionType, openFromList = false): Promise<void> {
+		try {
 			this.projectOpen = true;
-			this.dialogService.open(ProjectViewEditComponent,
-				[{provide: 'id', useValue: id}]).then(result => {
-					this.projectOpen = false;
-					this.reloadData();
-			}).catch(result => {
-				this.projectOpen = false;
-				this.reloadData();
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: ProjectViewEditComponent,
+				data: {
+					projectModelId: projectModelId,
+					actionType: actionType,
+					openFromList: openFromList
+				},
+				modalConfiguration: {
+					title: 'Project',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			this.projectOpen = false;
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	/**
+	 * On Create Project
+	 */
+	private onCreateProject = async (): Promise<void> => {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: ProjectCreateComponent,
+				data: {},
+				modalConfiguration: {
+					title: 'Project Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	protected loadData = async (): Promise<ProjectModel[]> => {
+		try {
+			const result = await this.projectService.getProjects().toPromise();
+			return new Promise((resolve) => {
+				let resultSet = this.showActive ? result.activeProjects : result.completedProjects;
+				resolve(resultSet);
 			});
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
-	protected openCreateProject(): void {
-		this.dialogService.open(ProjectCreateComponent,
-			[]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
-		});
-	}
-
-	protected reloadData(): void {
-		this.projectService.getProjects().subscribe(
-			(result) => {
-				this.resultSet = this.showActive ? result.activeProjects : result.completedProjects;
-				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
-			},
-			(err) => console.log(err));
-	}
-
-	/**
-	 * This work as a temporary fix.
-	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
-	 */
-	private forceDisplayLastRowAddedToGrid(): void {
-		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
-		this.renderer.setStyle(target, 'height', '23px');
-	}
-
-	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
-	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
+	public async cellClick(event: CellClickEvent): Promise<void> {
+		if (event.columnIndex > 0 && this.isEditAvailable()) {
+			await this.openProject(event.dataItem.id, ActionType.VIEW);
 		}
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
+	 * Determines if user has the permission to create projects
 	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
-		// Adjusting the locked column(s) height to prevent cut-off issues.
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProjectCreate);
+	}
+
+	private isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProjectEdit);
+	}
+
+	/**
+	 * On Delete Project
+	 */
+	public onDelete = async (dataItem: ProjectModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				const confirmation = await this.dialogService.confirm(
+					'Confirmation Required',
+					'WARNING: Are you sure you want to delete this project? This cannot be undone.'
+				).toPromise();
+				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+					await this.projectService.deleteProject(dataItem.id).toPromise();
+					await this.gridComponent.reloadData();
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 }

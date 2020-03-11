@@ -1,0 +1,95 @@
+.tds-table {
+  .grid-label {
+    font-size: 18px;
+    line-height: 48px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    thead {
+      th {
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 12px;
+        padding: 5px 0 5px 12px;
+        color: #3c8dbc;
+        text-align: left;
+        background: #d9e4ea;
+      }
+    }
+
+    tbody {
+      tr {
+        cursor: pointer;
+
+        td {
+          font-size: 13px;
+          color: #333333;
+          border-style: solid;
+          border-color: #d9e4ea;
+          padding: 5px 0 5px 12px;
+
+          &:first-child {
+            border-width: 1px 0 1px 1px;
+          }
+
+          &:not(:first-child):not(:last-child) {
+            border-width: 1px 0;
+          }
+
+          &:last-child {
+            border-width: 1px 1px 1px 0;
+          }
+        }
+
+        td .status {
+          display: inline-block;
+          width: 16px;
+          height: 16px;
+          text-align: center;
+          line-height: 13px;
+          border: 1px solid $color-icon;
+          border-radius: 3px;
+          background: $color-border;
+          
+          i {
+            color: $color-text-inverse;
+            width: 12px;
+            height: 12px;
+            margin-top: 2px;
+          }
+
+          &.status-Ready {
+            background: $color-status-ready;
+          }
+          &.status-Started {
+            color: $color-status-started;
+          }
+          &.status-Hold {
+            background: $color-status-hold;
+          }
+          &.status-Completed {
+            background: $color-status-completed;
+          }
+          &.status-Pending {
+            color: $color-status-pending;
+          }
+          &.status-Warning {
+            background: $color-warning;
+          }
+          &.status-Unknown {
+            color: $color-status-unknown;
+            background-color: $bg-color-status-unknown;
+          }
+          &.status-Questioned {
+            color: $color-status-questioned;
+            background: $bg-color-status-questioned;
+          }
+          &.status-Future {
+            background: $color-status-future;
+          }
+        }
+      }
+    }
+  }
+}

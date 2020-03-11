@@ -1,29 +1,46 @@
 // Angular
-import {Component} from '@angular/core';
-// Service
-import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {Component, Input, OnInit} from '@angular/core';
 // Model
 import {NoticeModel} from '../../model/notice.model';
-import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
+import {Dialog, DialogButtonType} from 'tds-component-library';
 // Other
 import 'rxjs/add/operator/finally';
+import * as R from 'ramda';
+import {ActionType} from '../../../../shared/model/action-type.enum';
 
 @Component({
 	selector: 'tds-notice-view-html',
 	templateUrl: 'view-html.component.html'
 })
-export class ViewHtmlComponent extends UIExtraDialog {
+export class ViewHtmlComponent extends Dialog implements OnInit {
 
-	protected modalOptions: DecoratorOptions;
+	@Input() data: any;
+	public noticeModel: NoticeModel;
 
-	constructor(
-		private noticeModel: NoticeModel) {
-		super('#noticeViewHtml');
-		this.modalOptions = {isFullScreen: false, isResizable: false};
+	constructor() {
+		super();
 	}
 
-	protected cancelCloseDialog($event): void {
-		this.close();
+	ngOnInit(): void {
+		this.noticeModel = R.clone(this.data.model);
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
 	}
 
+	protected cancelCloseDialog(): void {
+		this.onCancelClose();
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
 }

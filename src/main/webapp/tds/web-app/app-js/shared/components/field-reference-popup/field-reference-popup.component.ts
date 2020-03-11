@@ -66,7 +66,7 @@ export class FieldReferencePopupComponent implements OnInit {
 	@Input ('gridData') private gridData;
 	@Input ('gridGroups') private gridGroups;
 	@Output ('onClose') onCloseEvent: EventEmitter<any> = new EventEmitter();
-	@ViewChild('focusElement') popupEscFocusElement: ElementRef;
+	@ViewChild('focusElement', {static: false}) popupEscFocusElement: ElementRef;
 
 	public margin = {horizontal: 2, vertical: 2};
 	public position = 'fixed';

@@ -1,4 +1,5 @@
 import {ModalType} from '../../../shared/model/constants';
+import {FilterType} from 'tds-component-library';
 
 export class AssetCommentModel {
 	public id?: string;
@@ -27,61 +28,53 @@ export class AssetCommentColumnModel {
 	constructor(dateFormat: string) {
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 52,
-				locked: true
-			},
-			{
 				label: 'Description',
 				property: 'comment',
-				type: 'text',
-				width: 574,
-				locked: true,
+				filterType: FilterType.text,
+				width: 300,
 				class: 'column-cursor-pointer'
 			},
 			{
 				label: 'Asset',
 				property: 'assetName',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 170
 			},
 			{
 				label: 'Asset Type',
 				property: 'assetType',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 170
 			},
 			{
 				label: 'Category',
 				property: 'category',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 170
 			},
 			{
 				label: 'Archived',
 				property: 'isResolved',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 170
 			},
 			{
 				label: 'Created',
 				property: 'dateCreated',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
 				width: 170
 			},
 			{
 				label: 'Created By',
 				property: 'createdBy.name',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 170
 			},
 			{
 				label: 'Updated',
 				property: 'lastUpdated',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
 				width: 170
 			}

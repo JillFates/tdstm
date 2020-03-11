@@ -1,14 +1,14 @@
-/**
- * Created by David Ontiveros on 5/31/2017.
- */
+// Angular
 import {Component, Inject, Input, OnInit, ViewEncapsulation} from '@angular/core';
-import { FieldSettingsModel } from '../../model/field-settings.model';
-import { CustomDomainService } from '../../service/custom-domain.service';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Model
+import {FieldSettingsModel} from '../../model/field-settings.model';
+// Component
 import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
+// Service
+import {CustomDomainService} from '../../service/custom-domain.service';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 
 /**
  *
@@ -19,7 +19,9 @@ import {ConfigurationCommonComponent} from '../configuration-common/configuratio
 	encapsulation: ViewEncapsulation.None,
 	exportAs: 'selectlistConfig',
 	styles: [
-		`.pointer { cursor: pointer; }`
+			`.pointer {
+            cursor: pointer;
+        }`
 	]
 })
 
@@ -35,21 +37,45 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	public ASCENDING_ORDER = 'asc';
 	public DESCENDING_ORDER = 'desc';
 
+	public field: FieldSettingsModel;
+	public domain: string;
+
 	/**
 	 * Class constructor.
 	 * @param customService Service to obtain distinct values.
 	 */
 	constructor(
-		public field: FieldSettingsModel,
-		@Inject('domain') public domain: string,
 		private customService: CustomDomainService,
-		public activeDialog: UIActiveDialogService,
-		public translate: TranslatePipe,
-		public prompt: UIPromptService) {
-		super(field, activeDialog, prompt, translate);
+		public dialogService: DialogService,
+		public translate: TranslatePipe) {
+		super(dialogService, translate);
 	}
 
 	ngOnInit() {
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			disabled: () => this.items.length === 0 || !this.isDirty(),
+			type: DialogButtonType.ACTION,
+			action: this.onSave.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.field = this.data.fieldSettingsModel;
+		this.domain = this.data.domain;
+
+		this.setField(this.field);
+
+		setTimeout(() => {
+			this.setTitle(`List Configuration - ${this.field.field}`);
+		});
+
 		this.load();
 	}
 
@@ -71,7 +97,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 					distinctValues.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === ValidationUtils.NOT_FOUND) { // If NOT REQUIRED and distinctValues have no empty option register it.
 					if (this.field.constraints.values && this.field.constraints.values.indexOf('') === ValidationUtils.NOT_FOUND) { // If it's not yet on current field values add it to items list (not deletable)
-						this.items.splice(0, 0, {deletable: false, value: ''} );
+						this.items.splice(0, 0, {deletable: false, value: ''});
 					}
 				}
 
@@ -80,16 +106,18 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 					for (let option of this.field.constraints.values) {
 						let indexOfDistinctValue = distinctValues.indexOf(option);
 						if (indexOfDistinctValue === ValidationUtils.NOT_FOUND) {
-							this.items.push( {deletable: true, value: option} );
+							this.items.push({deletable: true, value: option});
 						} else {
 							distinctValues.splice(indexOfDistinctValue, 1);
-							this.items.push( {deletable: false, value: option} );
+							this.items.push({deletable: false, value: option});
 						}
 					}
 				}
 
 				// add any distinctValue that was not found on original field.constraint.values at the end.
-				this.items = this.items.concat( distinctValues.map( o => { return {deletable: false, value: o}; }) );
+				this.items = this.items.concat(distinctValues.map(o => {
+					return {deletable: false, value: o};
+				}));
 				this.savedItems = this.items.slice();
 			});
 		this.defaultValue = this.field.default;
@@ -102,7 +130,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	 */
 	public getStyle(index) {
 		if ((index % 2) === 0) {
-			return { 'background-color': '#f6f6f6' };
+			return {'background-color': '#f6f6f6'};
 		}
 	}
 
@@ -111,7 +139,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	 */
 	isDirty(): boolean {
 		return (JSON.stringify(this.items) !== JSON.stringify(this.savedItems) ||
-				this.field.default !== this.defaultValue) || this.newItem.length > 0;
+			this.field.default !== this.defaultValue) || this.newItem.length > 0;
 	}
 
 	/**
@@ -119,7 +147,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	 * Adds a new item to the list.
 	 */
 	public onAdd(): void {
-		if ( this.newItemValid ) {
+		if (this.newItemValid) {
 			this.items.push({
 				deletable: true,
 				value: this.newItem
@@ -150,23 +178,22 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	 * Simply sets current list into the field model and it's default value.
 	 */
 	public onSave(): void {
-		this.displayWarningMessage()
-			.then((confirm: boolean) => {
-				if (confirm) {
-					let fieldModel = { ...this.field };
-					fieldModel.constraints.values = this.items.map(i => i.value);
-					this.customService.checkConstraints(this.domain, fieldModel)
+		this.displayWarningMessage(this.translate.transform('FIELD_SETTINGS.WARNING_VALIDATION_CHANGE')).subscribe((data: any) => {
+			if (data.confirm === DialogConfirmAction.CONFIRM) {
+				let fieldModel = {...this.field};
+				fieldModel.constraints.values = this.items.map(i => i.value);
+				this.customService.checkConstraints(this.domain, fieldModel)
 					.subscribe(res => {
 						if (res) {
 							this.field.constraints.values = this.items.map(i => i.value);
 							if (this.defaultValue != null) {
 								this.field.default = this.defaultValue;
 							}
-							this.activeDialog.close(this.isDirty());
+							this.onAcceptSuccess({isDirty: this.isDirty()});
 						}
 					});
-				}
-			});
+			}
+		});
 	}
 
 	/**

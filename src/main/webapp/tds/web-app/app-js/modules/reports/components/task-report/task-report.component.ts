@@ -60,14 +60,13 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 									</div>
 									<div class="form-group row ">
 										<div class="col-sm-4 col-sm-offset-2 buttons">
-											<tds-button-custom class="btn-primary"
-																				 (click)="onGenerateReport()"
-																				 title="Generate"
-																				 tooltip="Generate"
-																				 icon="table">
+											<tds-button-custom
+													(click)="onGenerateReport()"
+													title="Generate"
+													tooltip="Generate"
+													icon="table">
 											</tds-button-custom>
 											<tds-button-export
-												class="btn-primary"
 												(click)="onGenerateXLSReport()"
 												title="Export to Excel"
 												tooltip="Export to Excel">

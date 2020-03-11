@@ -2,22 +2,13 @@ import { GridColumnModel } from '../../../shared/model/data-list-grid.model';
 
 export const taskListColumnsModel: Array<GridColumnModel> = [
 	{
-		label: '',
-		property: 'actionColumn',
-		type: 'action',
-		width: 30,
-		locked: false,
-		sortable: false,
-		headerClass: ['no-sort-header']
-	},
-	{
 		label: 'Task',
 		property: 'taskNumber',
 		type: 'text',
-		width: 80,
+		width: 180,
 		locked: false,
 		filterable: true,
-		resizable: true
+		cellClass: 'is-grid-link'
 	},
 	{
 		label: 'Description',
@@ -25,8 +16,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 240,
 		locked: false,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol0',
@@ -35,8 +25,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol1',
@@ -45,37 +34,32 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'Updated',
 		property: 'updatedTime',
 		type: 'text',
-		width: 100,
-		locked: false,
-		cellClass: 'task-updated',
-		sortable: false,
-		resizable: true
+		width: 120,
+		filterable: false,
+		locked: false
 	},
 	{
 		label: 'Due Date',
 		property: 'dueDate',
-		type: 'text',
-		width: 100,
+		type: 'date',
+		width: 180,
 		locked: false,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'Status',
 		property: 'status',
 		type: 'text',
-		width: 80,
+		width: 180,
 		locked: false,
 		cellClass: 'task-status',
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol2',
@@ -84,8 +68,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol3',
@@ -94,8 +77,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol4',
@@ -104,23 +86,20 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'Suc.',
-		property: 'successors',
+		property: 'assetName',
 		type: 'number',
-		width: 80,
-		locked: false,
-		resizable: true
+		width: 180,
+		locked: false
 	},
 	{
 		label: 'Score',
 		property: 'score',
 		type: 'number',
-		width: 80,
-		locked: false,
-		resizable: true
+		width: 180,
+		locked: false
 	},
 ];

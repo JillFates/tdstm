@@ -1,10 +1,10 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {DIALOG_SIZE, KEYSTROKE, ModalType} from '../../../../shared/model/constants';
+import {Component, OnInit} from '@angular/core';
+import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
@@ -12,8 +12,6 @@ import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/mo
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
-import {TaskEditComponent} from '../edit/task-edit.component';
-import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {WindowService} from '../../../../shared/services/window.service';
@@ -21,7 +19,7 @@ import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {TaskCreateComponent} from '../create/task-create.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
@@ -69,26 +67,26 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		private userContextService: UserContextService) {
 
 		super('#task-detail-component');
-		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
+		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
-			this.hasChanges = false;
-			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
-			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
-				this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
-			} else {
-				this.currentUserId = this.userContext.user.id;
-			}
-			this.loadTaskDetail();
-			this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
-			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
-			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-		});
+		this.hasChanges = false;
+		this.dateFormat = this.userPreferenceService.getUserDateFormat();
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+
+		if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
+			this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
+		} else {
+			this.currentUserId = this.userContext.user.id;
+		}
+		this.loadTaskDetail();
+		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
+		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
+		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 	}
 
 	/**
@@ -101,7 +99,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 					this.dismiss();
 					return;
 				}
-				this.dateFormat = this.userPreferenceService.getUserDateFormat();
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 				this.taskDetailModel.detail = res;
 
@@ -132,9 +129,12 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 						}
 					});
 			});
-		this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
-			.subscribe((result: TaskActionInfoModel) => {
-			this.taskActionInfoModel = result;
+		const taskId = parseInt(this.taskDetailModel.id, 0);
+		this.taskManagerService.getBulkTaskActionInfo([taskId])
+			.subscribe((result: TaskActionInfoModel[]) => {
+				if (result && result[taskId]) {
+					this.taskActionInfoModel = result[taskId];
+				}
 		});
 	}
 
@@ -162,7 +162,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	deleteTask(): void {
 		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM')	,
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
 			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('GLOBAL.CANCEL'))
@@ -268,7 +268,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				[UIDialogService,
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }
-				], DIALOG_SIZE.LG);
+				], DIALOG_SIZE.XXL);
 
 			this.close();
 		} else {
@@ -287,7 +287,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	public onAddTaskDependency(taskList: any[], gridHelper: any): void {
 		let taskCreateModel: TaskDetailModel = {
-			id: this.model.asset.id, // dataItem.common_id,
+			id: this.model.id,
 			modal: {
 				title: 'Create Task',
 				type: ModalType.CREATE
@@ -296,11 +296,12 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				assetClass: this.model.assetClass,
 				assetEntity: this.model.asset.id,
 				assetName:  this.model.assetName,
-				currentUserId: this.model.assignedTo.id
+				currentUserId: this.model.assignedTo.id,
+				event: this.model.event
 			}
 		};
 
-		this.dialogService.extra(TaskCreateComponent, [
+		this.dialogService.extra(TaskEditCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}
 		], false, false)
 			.then(result => {

@@ -54,7 +54,6 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.ActionInvoke)
 	def actionProgress(Long id) {
 		ActionCommand action = populateCommandObject(ActionCommand)
-		validateCommandObject(action)
 		Person currentPerson = currentPerson()
 
 		taskActionService.actionProgress(action, id, currentPerson)
@@ -72,7 +71,6 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.ActionInvoke)
 	def actionDone(Long id) {
 		ActionCommand action = populateCommandObject(ActionCommand)
-		validateCommandObject(action)
 		Person currentPerson = currentPerson()
 
 		taskActionService.actionDone(action, id, currentPerson)
@@ -90,7 +88,6 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.ActionInvoke)
 	def actionError(Long id) {
 		ActionCommand action = populateCommandObject(ActionCommand)
-		validateCommandObject(action)
 		Person currentPerson = currentPerson()
 
 		taskActionService.actionError(action, id, currentPerson)

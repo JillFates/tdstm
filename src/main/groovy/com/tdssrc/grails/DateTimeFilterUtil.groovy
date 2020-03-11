@@ -28,6 +28,8 @@ class DateTimeFilterUtil {
 				return getFullYearMonth(entry)
 			case ~/^=?\d{4}-(0[1-9]|1[012])-(0[1-9]|[1-2][0-9]|3[01])$/:
 				return getFullYearMonthDay(entry)
+			case ~/^=?\d{4}-(0[1-9]|1[012])-(0[1-9]|[1-2][0-9]|3[01])T(([0-5][0-9]):){2}([0-5][0-9])\.?\d{3}Z$/:
+				return getFullYearMonthDayOffset(entry)
 			case ~/^=?[0-9\-]*<>=?[0-9\-]*$/:
 				return getDateRange(entry)
 			case ~/^[-+]?[0-9]*[dwM]?<>[-+]?[0-9]*[dwM]?$/:
@@ -97,6 +99,12 @@ class DateTimeFilterUtil {
 		String month = sanitizedEntryParts[1]
 		String day = sanitizedEntryParts[2]
 		return new Pair(getFirstInstantOf(year, month, day), getLastInstantOf(year, month, day))
+	}
+
+	private static Pair<Date, Date> getFullYearMonthDayOffset(String entry) {
+		def timezoneName = TimeUtil.parseISO8601Date(entry).toString().substring(20, 23)
+		def result = getFullYearMonthDay(entry.substring(0, 10))
+		return new Pair(TimeUtil.adjustDateFromGMTToTZ(result.getaValue(), timezoneName), TimeUtil.adjustDateFromGMTToTZ(result.getbValue(), timezoneName))
 	}
 
 	private static Pair<Date, Date> getDateRange(String entry) {

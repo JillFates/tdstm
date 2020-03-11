@@ -6,6 +6,17 @@ import {Logout} from '../../action/login.actions';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../model/user-context.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {FormBuilder, FormControl, FormGroup, ValidatorFn} from '@angular/forms';
+
+function passwordMatchValidator(password: string): ValidatorFn {
+	return (control: FormControl) => {
+		if (!control || !control.parent) {
+			return null;
+		}
+
+		return control.parent.get(password).value === control.value ? null : { mismatch: true };
+	};
+}
 
 @Component({
 	selector: 'tds-change-password',
@@ -29,12 +40,20 @@ export class ChangePasswordComponent implements OnInit {
 	public userContext: UserContextModel = null;
 	public error: any;
 	public email: '';
+	changePasswordForm: FormGroup;
 
 	constructor(
 		private loginService: LoginService,
 		private router: Router,
 		private store: Store,
-		private notifierService: NotifierService) {
+		private notifierService: NotifierService,
+		private fb: FormBuilder) {
+		this.changePasswordForm = this.fb.group({
+			newPassword: ['', []],
+			confirmPassword: ['', [
+				passwordMatchValidator('newPassword')
+			]]
+		});
 	}
 
 	ngOnInit(): void {
@@ -54,7 +73,7 @@ export class ChangePasswordComponent implements OnInit {
 			} else if (res.errors && res.errors.length > 0) {
 				this.error = res.errors[0];
 			} else {
-				this.disableGlobalNotification(false);
+				this.disableGlobalNotification(true);
 				this.router.navigate(['project', 'list'], { queryParams: { show: this.userContext.project.id }});
 			}
 		});

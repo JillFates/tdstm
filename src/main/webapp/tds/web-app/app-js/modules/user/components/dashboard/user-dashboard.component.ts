@@ -1,32 +1,34 @@
 // Angular
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 // Services
-import {TaskService} from '../../../taskManager/service/task.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UserService} from '../../service/user.service';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {NotifierService} from '../../../../shared/services/notifier.service';
+import { TaskService } from '../../../taskManager/service/task.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { UserService } from '../../service/user.service';
+import { UserContextService } from '../../../auth/service/user-context.service';
+import { NotifierService } from '../../../../shared/services/notifier.service';
 // Components
-import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
-import {UserManageStaffComponent} from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import { TaskDetailComponent } from '../../../taskManager/components/detail/task-detail.component';
+import { UserManageStaffComponent } from '../../../../shared/modules/header/components/manage-staff/user-manage-staff.component';
+import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 // Model
-import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
-import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
+import { TaskDetailModel } from '../../../taskManager/model/task-detail.model';
+import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {
 	ActivePersonColumnModel,
 	ApplicationColumnModel,
-	EventColumnModel, EventNewsColumnModel, TaskColumnModel
+	EventColumnModel,
+	EventNewsColumnModel,
+	TaskColumnModel,
 } from '../../model/user-dashboard-columns.model';
-import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
-import {GridComponent} from '@progress/kendo-angular-grid';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {Store} from '@ngxs/store';
+import { COLUMN_MIN_WIDTH } from '../../../dataScript/model/data-script.model';
+import { DIALOG_SIZE , ModalType} from '../../../../shared/model/constants';
+import { GridComponent } from '@progress/kendo-angular-grid';
+import { UserContextModel } from '../../../auth/model/user-context.model';
+import { Store } from '@ngxs/store';
 import {SetProject} from '../../../project/actions/project.actions';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {TaskEditComponent} from '../../../taskManager/components/edit/task-edit.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
@@ -34,9 +36,9 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 	selector: 'user-dashboard',
 	templateUrl: 'user-dashboard.component.html'
 })
-
 export class UserDashboardComponent implements OnInit {
 	public currentPerson;
+	public selectedProjectID;
 	public selectedProject;
 	public projectInstance;
 	public projectLogoId;
@@ -55,11 +57,13 @@ export class UserDashboardComponent implements OnInit {
 	public taskColumnModel;
 	public summaryDetail;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public items: any[] = [{
-		text: 'Sample Box'
-	}];
+	public items: any[] = [
+		{
+			text: 'Sample Box',
+		},
+	];
 	public userContext: UserContextModel;
-	@ViewChild('taskGrid') taskGrid: GridComponent;
+	@ViewChild('taskGrid', { static: false }) taskGrid: GridComponent;
 
 	constructor(
 		private userService: UserService,
@@ -82,13 +86,25 @@ export class UserDashboardComponent implements OnInit {
 		this.populateData();
 	}
 
-	public onChangeProject(): void {
-		this.populateData(this.selectedProject.id);
+	public onChangeProject($event ?: any): void {
+		this.selectProjectByID($event.id);
+		this.populateData();
 	}
 
-	private populateData(projId = ''): void {
-		this.userService.fetchModelForUserDashboard(projId)
-			.subscribe((result) => {
+	public selectProjectByID(id): any {
+		// Please disregard linting on the following line, comparison should be '==' (See TM-16490)
+		const project = this.projectList.find(p => id == p.id); // tslint:disable-line
+		if (project) {
+			this.selectedProject = project;
+			return project;
+		}
+		return null;
+	}
+
+	private populateData(): void {
+		this.userService
+			.fetchModelForUserDashboard(this.selectedProject ? this.selectedProject.id : '')
+			.subscribe(result => {
 				this.fetchApplicationsForGrid();
 				this.fetchEventNewsForGrid();
 				this.fetchEventsForGrid();
@@ -100,6 +116,7 @@ export class UserDashboardComponent implements OnInit {
 				this.projectInstance = result.projectInstance;
 				this.projectLogoId = result.projectLogoId;
 				this.selectedProject = this.projectInstance;
+				this.selectedProjectID = this.projectInstance.id;
 				this.store.dispatch(new SetProject({id: this.projectInstance.id, name: this.projectInstance.name, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
 			});
 		this.applicationColumnModel = new ApplicationColumnModel();
@@ -126,10 +143,9 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	changeTimeEst(id, days) {
-		this.taskService.changeTimeEst(id, days)
-			.subscribe(() => {
-				this.fetchTasksForGrid();
-			});
+		this.taskService.changeTimeEst(id, days).subscribe(() => {
+			this.fetchTasksForGrid();
+		});
 	}
 
 	public openTaskDetailView(comment: any): void {
@@ -184,7 +200,7 @@ export class UserDashboardComponent implements OnInit {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditComponent, [
+				this.dialogService.extra(TaskEditCreateComponent, [
 					{ provide: TaskDetailModel, useValue: clone(model) }
 				], false, false)
 					.then(result => {
@@ -196,32 +212,30 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public updateTaskStatus(id, status): void {
-		this.taskService.updateStatus(id, status)
-			.subscribe(() => {
-				this.fetchTasksForGrid();
-			});
+		this.taskService.updateStatus(id, status).subscribe(() => {
+			this.fetchTasksForGrid();
+		});
 	}
 
 	public fetchApplicationsForGrid(): void {
-		this.userService.getAssignedApplications()
-			.subscribe((result) => {
-				this.applicationList = result.applications;
-			});
+		this.userService.getAssignedApplications().subscribe(result => {
+			this.applicationList = result.applications;
+		});
 	}
 
 	public fetchEventsForGrid(): void {
 		let projectId = this.selectedProject ? this.selectedProject.id : 0;
-		this.userService.getAssignedEvents(projectId, this.showActiveEvents)
-			.subscribe((result) => {
+		this.userService
+			.getAssignedEvents(projectId, this.showActiveEvents)
+			.subscribe(result => {
 				this.eventList = result.events;
 			});
 	}
 
 	public fetchEventNewsForGrid(): void {
-		this.userService.getAssignedEventNews()
-			.subscribe((result) => {
-				this.eventNewsList = result.eventNews;
-			});
+		this.userService.getAssignedEventNews().subscribe(result => {
+			this.eventNewsList = result.eventNews;
+		});
 	}
 
 	public fetchTasksForGrid(): void {
@@ -230,21 +244,24 @@ export class UserDashboardComponent implements OnInit {
 				this.taskGrid.collapseRow(i);
 			}
 		}
-		this.userService.getAssignedTasks()
-			.subscribe((result) => {
-				this.taskList = result.tasks;
-				this.summaryDetail = result.summaryDetail === 'No active tasks were found.' ? '' : result.summaryDetail;
-				for (let i = 0; i < this.taskList.length; i++) {
-					this.taskList[i].parsedInstructions = this.getMarkupUrlData(this.taskList[i].instructionsLink);
-				}
-			});
+		this.userService.getAssignedTasks().subscribe(result => {
+			this.taskList = result.tasks;
+			this.summaryDetail =
+				result.summaryDetail === 'No active tasks were found.'
+					? ''
+					: result.summaryDetail;
+			for (let i = 0; i < this.taskList.length; i++) {
+				this.taskList[i].parsedInstructions = this.getMarkupUrlData(
+					this.taskList[i].instructionsLink
+				);
+			}
+		});
 	}
 
 	public fetchPeopleForGrid(): void {
-		this.userService.getAssignedPeople()
-			.subscribe((result) => {
-				this.activePersonList = result.activePeople;
-			});
+		this.userService.getAssignedPeople().subscribe(result => {
+			this.activePersonList = result.activePeople;
+		});
 	}
 
 	private launchManageStaff(id): void {
@@ -270,7 +287,7 @@ export class UserDashboardComponent implements OnInit {
 		this.dialogService.open(AssetShowComponent, [
 			{provide: 'ID', useValue: id},
 			{provide: 'ASSET', useValue: assetClass}
-		], DIALOG_SIZE.LG);
+		], DIALOG_SIZE.XXL);
 	}
 
 	public handlePersonClicked(event): void {

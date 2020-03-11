@@ -7,7 +7,7 @@ class ReportsMenuModule extends Module {
 
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
-        menuBar { menuContainer.find("div#navbar-collapse")}
+        menuBar { menuContainer.find("div#mobile-nav") }
 
         reportsItem { menuBar.find("li.menu-parent-reports")}
         reportsMenu { reportsItem.find("ul",class:"dropdown-menu menu-item-expand")}

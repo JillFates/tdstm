@@ -26,7 +26,6 @@ class TdsUserDetails extends GrailsUser {
 		Collection<GrantedAuthority> authorities,
 		long id,
 		long personId,
-		String salt,
 		Collection<String> permissions)
 	{
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities, id)

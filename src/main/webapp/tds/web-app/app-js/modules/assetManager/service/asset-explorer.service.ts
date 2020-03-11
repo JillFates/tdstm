@@ -9,6 +9,7 @@ import {PermissionService} from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {DateUtils} from '../../../shared/utils/date.utils';
 
 @Injectable()
 export class AssetExplorerService {
@@ -26,27 +27,31 @@ export class AssetExplorerService {
 		return this.http.get(`${this.assetExplorerUrl}/views`)
 			.map((response: any) => {
 				let reportGroupModel: ViewGroupModel[] = Object.keys(response.data).map(key => {
+					response.data[key].createdOn = response.data[key].createdOn ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(response.data[key].createdOn), DateUtils.SERVER_FORMAT_DATE) : '';
+					response.data[key].updatedOn = response.data[key].updatedOn ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(response.data[key].updatedOn), DateUtils.SERVER_FORMAT_DATE) : '';
 					return response.data[key];
 				});
 				let folders = [
 					{
 						name: 'All',
-						items: reportGroupModel,
+						views: reportGroupModel,
 						open: true,
 						type: ViewType.ALL
 					}, {
 						name: 'Favorites',
-						items: reportGroupModel.filter(r => r['isFavorite']),
+						views: reportGroupModel.filter(r => r['isFavorite']),
 						open: false,
 						type: ViewType.FAVORITES
 					}, {
 						name: 'My Views',
-						items: reportGroupModel.filter(r => r['isOwner']),
+						views: reportGroupModel.filter(r => r['isOwner']),
 						open: false,
 						type: ViewType.MY_VIEWS
 					}, {
 						name: 'Shared Views',
-						items: reportGroupModel.filter(r => r['isShared']),
+						views: reportGroupModel.filter(r => r['isShared']),
 						open: false,
 						type: ViewType.SHARED_VIEWS
 					}
@@ -54,7 +59,7 @@ export class AssetExplorerService {
 				if (this.permissionService.hasPermission(Permission.AssetExplorerSystemList)) {
 					folders.push({
 						name: 'System Views',
-						items: reportGroupModel.filter(r => r['isSystem']),
+						views: reportGroupModel.filter(r => r['isSystem']),
 						open: false,
 						type: ViewType.SYSTEM_VIEWS
 					});
@@ -133,7 +138,6 @@ export class AssetExplorerService {
 	}
 
 	hasMaximumFavorites(length: number): boolean {
-		console.log(length);
 		return this.FAVORITES_MAX_SIZE < length;
 	}
 

@@ -1,102 +1,144 @@
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content news-create-edit-component">
-    <div class="modal-header">
-        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-        <h4 class="modal-title">{{ (isCreate() ? 'NEWS.CREATE_NEWS' : 'NEWS.EDIT_NEWS') | translate }}</h4>
-    </div>
-    <div class="modal-body">
-        <form name="newsForm" role="form" class="form-horizontal left-alignment" #newsForm="ngForm">
-            <div class="box-body">
-                <div *ngIf="!isCreate()">
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label required-field">Created At:</label>
-                        <div class="col-sm-8 label-value">
-                            <label>{{model.dtCreated}}</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label required-field">Created By:</label>
-                        <div class="col-sm-8 label-value">
-                            <label>{{model.personCreateObj}}</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label required-field">Comment Type:</label>
-                        <div class="col-sm-8 label-value">
-                            <label>{{commentType}}</label>
-                        </div>
-                    </div>
-                    <div class="form-group" *ngIf="model.assetName">
-                        <label class="col-sm-4 control-label required-field">Asset:</label>
-                        <div class="col-sm-8 label-value">
-                            <label>{{model.assetName}}</label>
-                        </div>
-                    </div>
-                    <div class="form-group" *ngIf="model.commentObject.displayOption">
-                        <label class="col-sm-4 control-label required-field">User/Generic comment:</label>
-                        <div class="col-sm-8 label-value user-generic">
-                            <label class="label-detail">
-                                    <input type="radio" class="radio-aligned" name="displayOption" 
-                                        [value]="optionUser" [(ngModel)]="model.commentObject.displayOption" 
-                                        checked> User Comment 
-                            </label>
-                            <label class="label-detail">
-                                    <input type="radio" class="radio-aligned" name="displayOption" 
-                                        [value]="optionGeneric" [(ngModel)]="model.commentObject.displayOption" 
-                                        checked> Generic Comment 
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-4 control-label required-field">Message:</label>
-                    <div class="col-sm-8 label-value">
-                        <textarea name="message" 
-                            rows="3" 
-                            required
-                            #message="ngModel"
-                            [(ngModel)]="model.commentObject.message">
-                        </textarea>
-                        <div [hidden]="message.valid || message.pristine">
-                            Message is required
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-4 control-label required-field">Resolved / Archived:</label>
-                    <div class="col-sm-8 label-value">
-                        <input type="checkbox" name="isArchived" [(ngModel)]="model.commentObject.isArchived">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-4 control-label required-field">Resolution:</label>
-                    <div class="col-sm-8 label-value">
-                        <textarea name="resolution" 
-                            rows="3" [(ngModel)]="model.commentObject.resolution">
-                        </textarea>
-                    </div>
-                </div>
-                <div *ngIf="!isCreate()">
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label required-field">Resolved At:</label>
-                        <div class="col-sm-8 label-value">
-                            <label>{{model.dtResolved}}</label>
-                        </div>
-                    </div>
+<div class="news-create-edit-component">
+	<form
+		name="newsForm"
+		role="form"
+		class="form-horizontal left-alignment"
+		#newsForm="ngForm"
+	>
+		<div class="box-body">
+			<div *ngIf="!isCreate()">
+				<div class="form-group">
+					<label class="col-sm-4 control-label required-field"
+						>Created At:</label
+					>
+					<div class="col-sm-8 label-value">
+						<label>{{ model.dtCreated }}</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-4 control-label required-field"
+						>Created By:</label
+					>
+					<div class="col-sm-8 label-value">
+						<label>{{ model.personCreateObj }}</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-4 control-label required-field"
+						>Comment Type:</label
+					>
+					<div class="col-sm-8 label-value">
+						<label>{{ commentType }}</label>
+					</div>
+				</div>
+				<div class="form-group" *ngIf="model.assetName">
+					<label class="col-sm-4 control-label required-field"
+						>Asset:</label
+					>
+					<div class="col-sm-8 label-value">
+						<label>{{ model.assetName }}</label>
+					</div>
+				</div>
+				<div
+					class="form-group"
+					*ngIf="model.commentObject.displayOption"
+				>
+					<label class="col-sm-4 control-label required-field"
+						>User/Generic comment:</label
+					>
+					<div class="col-sm-8 label-value user-generic">
+						<label class="label-detail">
+							<input
+								type="radio"
+								class="radio-aligned"
+								name="displayOption"
+								[value]="optionUser"
+								[(ngModel)]="
+									model.commentObject.displayOption
+								"
+								checked
+							/>
+							User Comment
+						</label>
+						<label class="label-detail">
+							<input
+								type="radio"
+								class="radio-aligned"
+								name="displayOption"
+								[value]="optionGeneric"
+								[(ngModel)]="
+									model.commentObject.displayOption
+								"
+								checked
+							/>
+							Generic Comment
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-4 control-label required-field"
+					>Message:</label
+				>
+				<div class="col-sm-8 label-value">
+					<textarea
+						name="message"
+						rows="3"
+						required
+						#message="ngModel"
+						[(ngModel)]="model.commentObject.message"
+					>
+					</textarea>
+					<div [hidden]="message.valid || message.pristine">
+						Message is required
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-4 control-label"
+					>Resolved / Archived:</label
+				>
+				<div class="col-sm-8 label-value">
+					<input
+						type="checkbox"
+						name="isArchived"
+						[(ngModel)]="model.commentObject.isArchived"
+					/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-4 control-label required-field"
+					>Resolution:</label
+				>
+				<div class="col-sm-8 label-value">
+					<textarea
+						name="resolution"
+						rows="3"
+						required
+						[(ngModel)]="model.commentObject.resolution"
+					>
+					</textarea>
+				</div>
+			</div>
+			<div *ngIf="!isCreate()">
+				<div class="form-group">
+					<label class="col-sm-4 control-label required-field"
+						>Resolved At:</label
+					>
+					<div class="col-sm-8 label-value">
+						<label>{{ model.dtResolved }}</label>
+					</div>
+				</div>
 
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label required-field">Resolved By:</label>
-                        <div class="col-sm-8 label-value">
-                            <label>{{model.personResolvedObj}}</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <div class="modal-footer form-group-center">
-        <tds-button-save (click)="onSave()" [disabled]="!newsForm.form.valid || newsForm.form.pristine" class="btn-primary pull-left"></tds-button-save>
-        <tds-button-delete *ngIf="!isCreate()" (click)="onDelete()" [disabled]="!isDeleteAvailable()" class="btn-danger"></tds-button-delete>
-        <tds-button-cancel (click)="cancelCloseDialog()" class="pull-right"></tds-button-cancel>
-    </div>
+				<div class="form-group">
+					<label class="col-sm-4 control-label required-field"
+						>Resolved By:</label
+					>
+					<div class="col-sm-8 label-value">
+						<label>{{ model.personResolvedObj }}</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
 </div>

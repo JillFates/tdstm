@@ -14,7 +14,6 @@
 		<g:javascript src="jqgrid-support.js" />
 
 		<g:javascript src="projectStaff.js" />
-		<asset:stylesheet href="css/tds.css" />
 		<asset:stylesheet href="css/qvga.css" />
 
 		<title>Project Staff</title>

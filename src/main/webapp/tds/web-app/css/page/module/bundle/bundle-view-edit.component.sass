@@ -1,42 +1,50 @@
 .bundle-view-edit-component
   font-size: 12px
-  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif
-  .body
-    margin-left: 15px
-    margin-right: 15px
-    margin-bottom: 10px
-  td
-    line-height: 12px
-    padding: 4px 5px
-    text-align: left
-  .btn
-    margin-top: 5px
-    margin-right: 5px
-  .steps_table
-    height: auto
-    .prop
-      .name
-        text-align: left
-        white-space: nowrap
-        vertical-align: top
-        width: 15%
-        font-weight: bold
-      .value
-        width: 85%
+  font-family: helvetica, arial, sans-serif
+  .clr-form-control
+    margin-top: unset
+  .assetTag
+    display: inline-block
+    margin-top: 2px
+    padding: 5px
+    margin-right: 4px
+  tds-asset-tag-selector
+    .asset-tag-selector-component
+      kendo-multiselect
+        display: block !important
+        width: 172px !important
+  select
+    width: 180px
+  .required
+    float: right
+    font-size: 9px
+    color: red
+  table
+    width: 100%
+    .name
+      white-space: nowrap
+      width: 15%
+      font-weight: bold
+    .value
+      width: 85%
       .k-dateinput-wrap input
         font-size: 12px !important
-    .span
-      position: absolute
-      text-align: center
-      width: auto
-      margin: -17px 0 0 10px
-      padding: 0px 8px
-      background: #ffffff
-    kendo-dropdownlist
-      width: 180px
-    .required
-      float: right
-      font-size: 9px
-      color: red
-    input [type='checkbox']
-      margin: 0 !important
+      input[type=text]
+        width: 180px
+      ul
+        padding-left: 0px
+      .k-switch.asset-tag
+        display: none
+    td
+      line-height: 12px
+      padding: 4px 5px
+      text-align: left
+      vertical-align: top
+      label, ul
+        margin-top: 10px
+      label.api-action-for-planning
+        margin-top: 15px
+  .btn
+    margin-right: 4px
+  input[type=checkbox]
+    margin-top: 0px !important
