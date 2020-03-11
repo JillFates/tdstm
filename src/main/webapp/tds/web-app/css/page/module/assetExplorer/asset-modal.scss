@@ -5,7 +5,7 @@
     .modal-body {
       width: 97%;
       overflow: hidden;
-      min-height: calc(100vh - 300px);
+      min-height: calc(100vh - 136px);
     }
 
     .asset-crud {
@@ -17,11 +17,11 @@
     }
 
     .has-description {
-      max-height: calc(100vh - 300px);
+      max-height: calc(100vh - 136px);
     }
 
     .no-description {
-      max-height: calc(100vh - 255px);
+      max-height: calc(100vh - 136px);
     }
 
     .show-hide-link {

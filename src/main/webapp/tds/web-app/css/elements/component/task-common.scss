@@ -1,7 +1,11 @@
 .custom-task-modal-edit-view-create {
-  width: 51.5rem !important;
+  width: 56rem !important;
   .modal-body {
     padding-right: 8px;
+    min-height: calc(100vh - 136px);
+  }
+  .modal-body.modal-no-context-buttons {
+    min-height: calc(100vh - 90px);
   }
   .task-common {
     .just-task-create-view,

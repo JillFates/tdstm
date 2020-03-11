@@ -84,13 +84,13 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 							case 'DATABASE':
-								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata, this), this.view).subscribe();
+								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 							case 'DEVICE':
-								this.registerAndCreate(DeviceCreateComponent(template, model, metadata, this), this.view).subscribe();
+								this.registerAndCreate(DeviceCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 							case 'STORAGE':
-								this.registerAndCreate(StorageCreateComponent(template, model, metadata, this), this.view).subscribe();
+								this.registerAndCreate(StorageCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 
 						}
