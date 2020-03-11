@@ -2,7 +2,7 @@ package net.transitionmanager.command.task
 
 import net.transitionmanager.command.CommandObject
 
-class TaskSearchCommand implements CommandObject{
+class TaskSearchCommand extends ViewUnpublishedCommand{
 
     /** null = disabled; 0 = unassigned; >0 = specific person */
     Long assignedPersonId
@@ -29,16 +29,14 @@ class TaskSearchCommand implements CommandObject{
     Integer cyclicalPath
 
     /** Set to 1 when selected otherwise 0. */
-    Integer withTmdActions
+    Integer withActions
 
     /** Set to 1 when selected otherwise 0. */
-    Integer viewUnpublished
+    Integer withTmdActions
 
     /** This is the top level input field. Search were task.comment like '%'text'%' */
     String taskText
 
-    /** This will come from the Event selector already in page*/
-    Long eventId
 
     /** This will be set to zero ( 0 ). In the future we may use this to retrieve tasks for other purposes. */
     Integer fullRecord
@@ -60,15 +58,13 @@ class TaskSearchCommand implements CommandObject{
 
         criticalPathMode nullable: true
 
-        cyclicalPath nullable: true
+        cyclicalPath nullable: true, inList: [0, 1]
 
-        withTmdActions nullable: true
+        withActions nullable: true, inList: [0, 1]
 
-        viewUnpublished nullable: true
+        withTmdActions nullable: true, inList: [0, 1]
 
         taskText nullable: true
-
-        eventId nullable: true
 
         fullRecord nullable: true
     }
