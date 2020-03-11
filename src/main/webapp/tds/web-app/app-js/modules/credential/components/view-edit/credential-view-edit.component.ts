@@ -366,6 +366,10 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 			).subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 					// Put back original model
+					this.validExpressionResult = {
+						valid: true,
+						error: '',
+					};
 					this.credentialModel = JSON.parse(this.dataSignature);
 					this.dataSignature = JSON.stringify(this.credentialModel);
 					this.modalType = this.actionTypes.VIEW;
