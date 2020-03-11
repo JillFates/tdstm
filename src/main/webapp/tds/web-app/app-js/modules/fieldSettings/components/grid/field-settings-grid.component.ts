@@ -1,4 +1,14 @@
-import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, OnDestroy} from '@angular/core';
+import {
+	Component,
+	Input,
+	Output,
+	EventEmitter,
+	OnInit,
+	ViewEncapsulation,
+	ViewChild,
+	OnDestroy,
+	HostListener
+} from '@angular/core';
 import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 
@@ -365,6 +375,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 
 	protected reset(): void {
 		this.isEditing = false;
+		localStorage.setItem('formDirty', 'false');
 		this.sortable = { mode: 'single' };
 		this.isFilterDisabled = false;
 		this.state.sort = [{
@@ -678,6 +689,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 */
 	protected setIsDirty(value: boolean): void {
 		this.isDirty = value;
+		localStorage.setItem('formDirty', value.toString());
 	}
 
 	/**
