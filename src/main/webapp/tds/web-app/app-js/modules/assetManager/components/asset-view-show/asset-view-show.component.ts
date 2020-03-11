@@ -26,32 +26,14 @@ import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.compone
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
-import { faLayerPlus, faLayerMinus } from '@fortawesome/pro-solid-svg-icons';
-import { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import {
+	ASSET_NOT_OVERRIDE_STATE,
+	ASSET_OVERRIDE_CHILD_STATE,
+	ASSET_OVERRIDE_PARENT_STATE,
+	OverrideState
+} from '../models/asset-view-override-state.model';
 
 declare var jQuery: any;
-
-interface OverrideState {
-	isOverwritten: boolean;
-	icon?: IconDefinition;
-	color?: string;
-	tooltip?: string;
-};
-const IS_OVERRIDE_CHILD: OverrideState = {
-	icon: faLayerMinus,
-	color: 'green',
-	isOverwritten: true,
-	tooltip: 'Revert to Project View',
-};
-const	IS_OVERRIDE_PARENT: OverrideState = {
-	icon: faLayerPlus,
-	color: 'blue',
-	isOverwritten: false,
-	tooltip: 'Display Personal System View'
-};
-const	IS_NOT_OVERRIDE: OverrideState = {
-	isOverwritten: false
-};
 
 @Component({
 	selector: 'tds-asset-view-show',
@@ -156,11 +138,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	private handleOverrideState({isOverride, hasOverride}: ViewModel): void {
 		if (isOverride) {
-			this.currentOverrideState = IS_OVERRIDE_CHILD;
+			this.currentOverrideState = ASSET_OVERRIDE_CHILD_STATE;
 		} else if (hasOverride) {
-			this.currentOverrideState = IS_OVERRIDE_PARENT;
+			this.currentOverrideState = ASSET_OVERRIDE_PARENT_STATE;
 		} else {
-			this.currentOverrideState = IS_NOT_OVERRIDE;
+			this.currentOverrideState = ASSET_NOT_OVERRIDE_STATE;
 		}
 	}
 
@@ -218,8 +200,14 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	public onEdit(): void {
 		if (this.isEditAvailable()) {
+			let dataViewId;
+			if (this.model.overridesView) {
+				dataViewId = this.model.overridesView.id
+			} else {
+				dataViewId = this.model.id;
+			}
 			const _override = this.queryParams._override;
-			this.router.navigate(['asset', 'views', this.model.id, 'edit'], {
+			this.router.navigate(['asset', 'views', dataViewId, 'edit'], {
 				queryParams: { _override }
 			});
 		}

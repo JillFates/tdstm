@@ -69,6 +69,13 @@
 			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:5px 10px;float:right;">
 				<i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed"></i>
 			</span>
+			<button *ngIf="currentOverrideState.icon && collapsed" type="button"
+							class="view-override-button tds-action-button--just-icon pull-right"
+							[title]="currentOverrideState.tooltip"
+							(click)="toggleAssetView()">
+				<fa-icon [icon]="currentOverrideState.icon">
+				</fa-icon>
+			</button>
 		</div>
 		<br />
 		<div class="nav-tabs-custom" *ngIf="!collapsed">
@@ -96,7 +103,7 @@
 				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn" [disabled]="!isValid()" [ngClass]="{'btn-default':!isValid(),'btn-success':isValid()}" name="btnPreview"
-					 (click)="previewButtonClicked = true;onPreview()">Preview</button>
+					 (click)="onPreview()">Preview</button>
 				</li>
 				<!-- <li class="pull-right" role="presentation">
 					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
@@ -191,15 +198,15 @@
 			</div>
 		</div>
 		<asset-explorer-view-grid [data]="data"
-                                  (modelChange)="onPreview()"
-                                  (justPlanningChange)="onJustPlanningChange($event)"
-                                  [gridState]="gridState"
-                                  (gridStateChange)="onGridStateChange($event)"
+															(reloadGrid)="onPreview()"
+															(justPlanningChange)="onJustPlanningChange($event)"
+                              [gridState]="gridState"
+                              (gridStateChange)="onGridStateChange($event)"
 		                          [fields]="allFields"
-                                  [edit]="true"
-                                  [model]="model.schema"
+                              [edit]="true"
+															[model]="model.schema"
 		                          [viewId]="model.id"
-                                  [metadata]="metadata">
+                              [metadata]="metadata">
         </asset-explorer-view-grid>
 		<!-- /.box-body -->
 		<!-- /.box -->

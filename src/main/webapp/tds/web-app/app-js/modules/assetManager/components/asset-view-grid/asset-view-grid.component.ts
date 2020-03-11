@@ -85,6 +85,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
 	@Output() modelChange = new EventEmitter<void>();
+	@Output() reloadGrid = new EventEmitter<void>();
 	@Output() justPlanningChange = new EventEmitter<boolean>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Output() hiddenFiltersChange = new EventEmitter<boolean>();
@@ -273,6 +274,14 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	hasFilterApplied(): boolean {
 		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0 || this.hiddenFilters;
+	}
+
+	/**
+	 * On Reload Button click event.
+	 */
+	onReloadClick(): void {
+		this.reloadGrid.emit();
+		this.onReload();
 	}
 
 	onReload(): void {
