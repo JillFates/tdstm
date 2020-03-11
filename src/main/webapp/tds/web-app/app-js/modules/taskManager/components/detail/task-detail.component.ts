@@ -55,7 +55,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
 	taskActionInfoModel: TaskActionInfoModel;
-	public ignoreDoubleClickClasses = ['btn', 'actionable-link', 'k-grid'];
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,

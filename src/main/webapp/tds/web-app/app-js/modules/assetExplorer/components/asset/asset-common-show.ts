@@ -24,8 +24,6 @@ export class AssetCommonShow implements OnInit {
 	protected assetType: DOMAIN;
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
-	public ignoreDoubleClickClasses =
-		['btn', 'clickableText', 'table-responsive dialog-container', 'task-comment-component'];
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
