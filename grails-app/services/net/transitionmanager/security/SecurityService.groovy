@@ -64,7 +64,7 @@ import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
-class SecurityService implements InitializingBean {
+class SecurityService implements ServiceMethods, InitializingBean {
 	private static final int ONE_HOUR = 60 * 60 * 1000
 	private static final Collection<String> SECURITY_ROLES = ['USER', 'EDITOR', 'SUPERVISOR']
 
@@ -1454,6 +1454,7 @@ class SecurityService implements InitializingBean {
 		}
 	}
 
+
 	/**
 	 * Overload of hasPermission (userLogin, permission, reportViolation) that is used to determine if a the currently logged in user has a particular permission
 	 * @param A permission tag name
@@ -1487,6 +1488,31 @@ class SecurityService implements InitializingBean {
 			reportViolation("attempted action requiring unallowed permission $permission", principal.username)
 		}
 		return false
+	}
+
+	/**
+	 * Used to validate if the current user does NOT have a given permission
+	 * @parameter permission - the permission to check for
+	 * @return true if the user does NOT has the specified permission
+	 */
+	Boolean notPermitted(String permission) {
+		! hasPermission(permission)
+	}
+
+	/**
+	 * Used to validate if the current user has any of a list of permissions
+	 * @parameter permissions - the list of permissions to check for
+	 * @return true if the user has anyone of the specified permission
+	 */
+	Boolean hasAnyPermission(List<String> permissions) {
+		Boolean permitted = false
+		for (String perm in permissions) {
+			permitted = hasPermission(perm)
+			if (permitted) {
+				break
+			}
+		}
+		return permitted
 	}
 
 	/**

@@ -284,38 +284,4 @@ trait ServiceMethods {
 		}
 		return instance
 	}
-
-	/**
-	 * Used to validate if the current user has a given permission
-	 * @parameter permission - the permission to check for
-	 * @return true if the user has the specified permission
-	 */
-	Boolean hasPermission(String permission) {
-		securityService.hasPermission(permission)
-	}
-
-	/**
-	 * Used to validate if the current user does NOT have a given permission
-	 * @parameter permission - the permission to check for
-	 * @return true if the user does NOT has the specified permission
-	 */
-	Boolean notPermitted(String permission) {
-		! securityService.hasPermission(permission)
-	}
-
-	/**
-	 * Used to validate if the current user has any of a list of permissions
-	 * @parameter permissions - the list of permissions to check for
-	 * @return true if the user has anyone of the specified permission
-	 */
-	Boolean hasAnyPermission(List<String> permissions) {
-		Boolean permitted = false
-		for (String perm in permissions) {
-			permitted = hasPermission(perm)
-			if (permitted) {
-				break
-			}
-		}
-		return permitted
-	}
 }

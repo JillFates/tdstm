@@ -80,7 +80,7 @@ class DataviewService implements ServiceMethods {
 		def query
 		List<Long> favoriteSystemViewIds
 
-		boolean canSeeSystemViews = hasPermission(Permission.AssetExplorerSystemList)
+		boolean canSeeSystemViews = securityService.hasPermission(Permission.AssetExplorerSystemList)
 		if (canSeeSystemViews) {
 			query = Dataview.where {
 				(project == userProject && (isShared == true || person == userPerson)) \
@@ -235,16 +235,70 @@ class DataviewService implements ServiceMethods {
 	 * @return - A list of the save as methods that are available for the dataview.
 	 */
 	Map generateSaveOptions(Project project, Person whom, Dataview dataview) {
-		Set saveAsOptions = []
-		boolean hasGlobalOverridePerm = hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
-		boolean hasProjectOverridePerm = hasPermission(Permission.AssetExplorerOverrideAllUserProject)
 		boolean isDefaultProject = project.isDefaultProject()
+		Set saveAsOptions = []
 
 		// User can always save as My View
-		if (hasPermission(Permission.AssetExplorerSaveAs)){
+		if (securityService.hasPermission(Permission.AssetExplorerSaveAs)){
 			saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
 		}
 
+		// Add the Override options if system view and user has perms
+		saveAsOptions.addAll( overrideOptions(project, whom, dataview))
+
+		// Determine if the person has the ability to share a view
+		boolean canShare = securityService.hasPermission(
+				(isDefaultProject ? Permission.AssetExplorerSystemCreate :  Permission.AssetExplorerPublish) )
+
+		return [
+			canOverride: canViewBeOverridden(project, dataview),
+			canShare: canShare,
+			save: canModifyView(project, whom, dataview),
+			saveAsOptions: saveAsOptions as List
+		]
+	}
+
+	/**
+	 * Used to determine if the dataview presented can be Saved/Modified by the current user
+	 * @param project - the current project
+	 * @param whom - the person whom is trying to make a change
+	 * @param dataview - the view that is being changed
+	 * @return true if the person is allowed to modify the view otherwise false
+	 */
+	boolean canModifyView(Project project, Person whom, Dataview dataview) {
+		boolean hasGlobalOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
+		boolean hasProjectOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)
+		boolean isDefaultProject = project.isDefaultProject()
+
+		boolean canModify = false
+		if (dataview) {
+			if (dataview.personId == whom.id) {
+				canModify = (dataview.projectId == project.id)
+			} else {
+				boolean hasPerm = (isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm)
+				canModify = (hasPerm &&
+						dataview.isShared &&
+						dataview.overridesView &&
+						dataview.projectId == project.id)
+			}
+		}
+		return canModify
+	}
+
+	/**
+	 * Used to get the list of System View Override Save options that a user can do for a given dataview. This will be
+	 * based on the type of view, user permissions and if there are already previously overridden version of the view.
+	 * @param project
+	 * @param whom
+	 * @param dataview
+	 * @return A list that may include the OVERRIDE_FOR_ME and/or OVERRIDE_FOR_ALL
+	 */
+	List<String> overrideOptions(Project project, Person whom, Dataview dataview) {
+		boolean hasGlobalOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
+		boolean hasProjectOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)
+		boolean isDefaultProject = project.isDefaultProject()
+
+		List options = []
 		// Check to see if user already has an overridden version of a system view for themselves and if not
 		// then they get the OVERRIDE_FOR_ME option
 		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
@@ -258,7 +312,7 @@ class DataviewService implements ServiceMethods {
 				person.id == whom.id
 				isShared == false
 			}.count() == 0) {
-				saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+				options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
 			}
 
 			// Check to see if anybody has an overridden version of a system view for ALL users and if not
@@ -270,46 +324,32 @@ class DataviewService implements ServiceMethods {
 						overridesView.id == overriddenViewId
 						isShared == true
 					}.count() == 0) {
-				saveAsOptions << ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
+				options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
 			}
 		}
+		return options
+	}
 
-		// Determine if the user can Save the current view
-		Boolean canSaveCurrentView = false
-		if (dataview) {
-			if (dataview.personId == whom.id) {
-				canSaveCurrentView = (dataview.projectId == project.id)
-			} else {
-				boolean hasPerm = (isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm)
-				canSaveCurrentView = (hasPerm &&
-						dataview.isShared &&
-						dataview.overridesView &&
-						dataview.projectId == project.id)
-			}
-		}
-
-		// Determine if the person has the ability to share a view
-		boolean canShare = hasPermission(
-				(isDefaultProject ? Permission.AssetExplorerSystemCreate :  Permission.AssetExplorerPublish) )
-
+	/**
+	 * Used to determine if the dataview can be overrriden and if the user has permissions to do so
+	 * @param project
+	 * @param dataview
+	 * @return true if the dataview can be overridden
+	 */
+	boolean canViewBeOverridden(Project project, Dataview dataview) {
 		// Determine if the Override options in the Save Modal should appear regardless of options available
 		boolean canOverride = false
-		if ( isOverrideable ) {
-			if (isDefaultProject) {
+		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
+		if (isOverrideable) {
+			if (project.isDefaultProject()) {
 				// If in the Default
-				canOverride = hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
+				canOverride = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
 			} else {
-				canOverride = hasAnyPermission(
+				canOverride = securityService.hasAnyPermission(
 						[Permission.AssetExplorerCreate, Permission.AssetExplorerOverrideAllUserProject])
 			}
 		}
-
-		return [
-			canOverride: canOverride,
-			canShare: canShare,
-			save: canSaveCurrentView,
-			saveAsOptions: saveAsOptions as List
-		]
+		return canOverride
 	}
 
 	/**
@@ -596,14 +636,14 @@ class DataviewService implements ServiceMethods {
 		 * Users in the Default project
 		 */
 		if ( project.isDefaultProject() ) {
-			if ( notPermitted(Permission.AssetExplorerSystemCreate) ) {
+			if ( securityService.notPermitted(Permission.AssetExplorerSystemCreate) ) {
 				throwException(InvalidParameterException,
 						'dataview.validation.saveInDefaultProject',
 						'You do not have the necessary permission to save into the Default project')
 			}
 
 			if (dataviewCommand.overridesView) {
-				if (notPermitted(Permission.AssetExplorerOverrideAllUserGlobal) ) {
+				if (securityService.notPermitted(Permission.AssetExplorerOverrideAllUserGlobal) ) {
 					throwException(InvalidParameterException,
 							'dataview.validate.overrideGlobalPermission',
 							'You do not have the necessary permission to save into the Default project')
@@ -623,7 +663,7 @@ class DataviewService implements ServiceMethods {
 			// Saving into a user project
 			switch (dataviewCommand.saveAsOption) {
 				case ViewSaveAsOptionEnum.MY_VIEW:
-					if (notPermitted(Permission.AssetExplorerCreate)) {
+					if (securityService.notPermitted(Permission.AssetExplorerCreate)) {
 						throwException(UnauthorizedException,
 								'dataview.validate.createPermission',
 								'You do not have the necessary permission to create views')
@@ -631,7 +671,7 @@ class DataviewService implements ServiceMethods {
 					break
 
 				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME:
-					if (notPermitted(Permission.AssetExplorerCreate)) {
+					if (securityService.notPermitted(Permission.AssetExplorerCreate)) {
 						throwException(UnauthorizedException.class,
 								'dataview.validate.createPermission',
 								'You do not have the necessary permission to create views')
@@ -651,7 +691,7 @@ class DataviewService implements ServiceMethods {
 					break
 
 				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL:
-					if (notPermitted(Permission.AssetExplorerOverrideAllUserProject)) {
+					if (securityService.notPermitted(Permission.AssetExplorerOverrideAllUserProject)) {
 						throwException(UnauthorizedException.class,
 								'dataview.validate.overrideAllUsers',
 								'You do not have the necessary permission to save override views for all users')
