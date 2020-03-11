@@ -689,7 +689,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 */
 	protected setIsDirty(value: boolean): void {
 		this.isDirty = value;
-		localStorage.setItem('formDirty', value.toString());
+		const val = this.formHasError === null && value;
+		localStorage.setItem('formDirty', val.toString());
 	}
 
 	/**
