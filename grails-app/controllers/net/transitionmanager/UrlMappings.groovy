@@ -620,7 +620,12 @@ class UrlMappings {
 
 		"/ws/taskGraph/taskHighlightOptions" {
 			controller = "wsTaskGraph"
-			action = [GET: taskHighlightOptions]
+			action = [GET: "taskHighlightOptions"]
+		}
+
+		"/ws/taskGraph/taskSearch" {
+			controller = "wsTaskGraph"
+			action = [GET: "taskSearch"]
 		}
 		
 		/*"/ws/timeline/$id/updateStatus" {
