@@ -239,9 +239,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					personModel: personModel
 				},
 				modalConfiguration: {
-					title: 'TODO: ADD PERSON', // data['common_assetName'] + ' ' + data['common_moveBundle'],
+					title: 'Person Create',
 					draggable: true,
-					modalSize: ModalSize.MD
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-add-person-dialog'
 				}
 			}).subscribe((data: any) => {
 				if (this.model.sourcePersonList && this.model[modelListParameter]) {

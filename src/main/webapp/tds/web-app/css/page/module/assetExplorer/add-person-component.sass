@@ -1,46 +1,41 @@
+.custom-add-person-dialog
+  width: 22rem !important
 .add-person-component
   $initial-width: 390px
-  .modal-dialog
-    width: $initial-width
-    .modal-content
-      width: $initial-width
-    .modal-header
+  padding: 15px 20px
+  .box-body
+    padding: unset
+  .required-field::after
+    content: "*"
+    color: red
+  .box-body .form-group
+    margin-bottom: 6px
+    .label-description
+      font-weight: bold
+      padding-right: 0
+    input
+      width: 100%
+    .person-salary, .person-active, .person-company
+      width: 100%
+      height: 23px
+      .k-input
+        margin-top: -2px
+    span.remove-team
       cursor: pointer
-    .modal-body
-      padding: 15px 20px
-      .box-body
-        padding: unset
-      .required-field::after
-        content: "*"
-        color: red
-      .box-body .form-group
-        margin-bottom: 6px
-        .label-description
-          font-weight: bold
-          padding-right: 0
-        input
-          width: 100%
-        .person-salary, .person-active, .person-company
-          width: 100%
-          height: 23px
-          .k-input
-            margin-top: -2px
-        span.remove-team
-          cursor: pointer
-      p.error-msg
-        color: $color-message-error--red
-      .mandatory
-        color: red
-        text-align: right
-        padding: 0 15px 0 0
-      .teams kendo-dropdownlist
-        margin-top: 6px
-        height: 23px
-        .k-input
-          margin-top: -2px
-      .middle-name, .add-team
-        padding-right: 0
-      .mobile
-        padding-left: 0
-      .active-container
-        padding-left: 0
+  p.error-msg
+    color: $color-message-error--red
+  .mandatory
+    color: red
+    text-align: right
+    padding: 0 15px 0 0
+  .teams kendo-dropdownlist
+    margin-top: 6px
+    height: 23px
+    .k-input
+      margin-top: -2px
+  .middle-name, .add-team
+    padding-right: 0
+  .mobile
+    padding-left: 0
+  .active-container
+    padding-left: 0
