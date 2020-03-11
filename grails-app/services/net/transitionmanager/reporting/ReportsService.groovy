@@ -1194,7 +1194,8 @@ class ReportsService implements ServiceMethods {
                 summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
-                        Task task = findInTasks(cyclicalTask, tasks)
+                        def taskObj = findInTasks(cyclicalTask, tasks)
+                        Task task = taskObj
                         cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
                     cyclicalsRef.append('</ul>')
@@ -1216,7 +1217,8 @@ class ReportsService implements ServiceMethods {
                 startsRef.append('<ul>')
 
                 graph.starts.each { TaskVertex taskVertex ->
-                    Task task = findInTasks(taskVertex, tasks)
+                    def taskObj = findInTasks(taskVertex, tasks)
+                    Task task = Task.get(taskObj.id)
                     startsRef.append(htmlConverter(taskVertex, task))
                 }
                 startsRef.append('</ul>')
@@ -1235,7 +1237,8 @@ class ReportsService implements ServiceMethods {
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
                 graph.sinks.each { TaskVertex taskVertex ->
-                    Task task = findInTasks(taskVertex, tasks)
+                    def taskObj = findInTasks(taskVertex, tasks)
+                    Task task = Task.get(taskObj.id)
                     sinksRef.append(htmlConverter(taskVertex, task))
                 }
                 sinksRef.append('</ul>')
