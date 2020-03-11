@@ -10,7 +10,7 @@ export class UIHandleDoubleClickDirective {
 	 * Listen for double click events, detecting one notify to the host component
 	 * @param event
 	 */
-	@HostListener('dblclick', ['$event']) handleKeyboardEventUp() {
-		this.doubleClick.emit();
+	@HostListener('dblclick', ['$event']) handleKeyboardEventUp(event: KeyboardEvent) {
+		this.doubleClick.emit(event);
 	}
 }
