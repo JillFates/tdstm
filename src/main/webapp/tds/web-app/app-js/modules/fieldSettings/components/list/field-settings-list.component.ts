@@ -188,6 +188,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 			).then(result => {
 					if (result) {
 						this.refresh();
+						localStorage.setItem('formDirty', 'false');
 					} else {
 						callback.failure();
 					}
