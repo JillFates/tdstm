@@ -119,9 +119,7 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex === 1) {
-			if ( this.permissionService.hasPermission(Permission.CommentView) ) {
-				this.openAssetCommentDialogViewEdit(event['dataItem'], ModalType.VIEW);
-			}
+			this.openAssetCommentDialogViewEdit(event['dataItem'], ModalType.VIEW);
 		}
 	}
 

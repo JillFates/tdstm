@@ -54,9 +54,10 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	}
 
 	/**
-	 * Load All Comment Categories
+	 * Load All Comment Categories if we have the permission
 	 */
 	private loadCommentCategories(): void {
+		if ( this.permissionService.hasPermission(Permission.CommentView) ) {
 			this.taskManagerService.getAssetCommentCategories().subscribe((res) => {
 				this.commentCategories = res;
 				if (!this.singleCommentModel.category || this.singleCommentModel.category === null) {
@@ -64,6 +65,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 				}
 				this.dataSignature = JSON.stringify(this.getModelFields());
 			});
+		}
 	}
 
 	/**
