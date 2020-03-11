@@ -27,3 +27,57 @@
   color: #898989;
   background: #898989 !important;
 }
+
+td .status-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  line-height: 13px;
+  border-radius: 3px;
+  background: #fff;
+
+  i {
+    color: $color-text-inverse;
+    width: 12px;
+    height: 12px;
+    margin-top: 2px;
+  }
+
+  &.status-Ready {
+    background: $bg-color-status-ready;
+  }
+  &.status-Started {
+    color: $color-status-started;
+  }
+  &.status-Hold {
+    background: $color-status-hold;
+  }
+  &.status-Completed {
+    background: $color-status-completed;
+  }
+  &.status-Pending {
+    color: $color-status-pending;
+  }
+  &.status-Warning {
+    background: $color-warning;
+  }
+  &.status-Unknown {
+    color: $bg-color-status-unknown;
+  }
+  &.status-Questioned {
+    color: $color-status-questioned;
+  }
+  &.status-Future {
+    color: $color-status-future;
+  }
+  &.status-Validated-NA {
+    color: $color-status-validated-na;
+  }
+  &.status-Not-Applicable {
+    color: $color-status-not-applicable;
+  }
+  &.status-Archived {
+    color: $color-status-archived;
+  }
+}
