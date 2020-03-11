@@ -31,6 +31,11 @@ class TaskSearch {
     String tagQuery
 
     /**
+     * Reference to the ApiAction query if the "With TDM Actions" is set.
+     */
+    String apiActionQuery
+
+    /**
      * The where clauses that should be considered when querying the task table.
      */
     List<String> taskWhereClauses = [ "comment_type = 'issue'" ]
@@ -95,18 +100,21 @@ class TaskSearch {
         // Evaluate all the filter, except for most of the CPA related filters which are handled separately.
         evaluateFilters(moveEvent, viewUnpublished)
 
-        String query = null
+        String query
 
         // Put together the query against the asset_comment table.
         String taskQuery = buildQuery(TASK_QUERY, taskWhereClauses)
 
         String assetQuery
-        // The Assets table needs to be joined if there are asset or tag related filters
-        if (assetWhereClauses || tagQuery) {
+        // The Assets table needs to be joined if there are asset, tag or action related filters
+        if (assetWhereClauses || tagQuery || apiActionQuery) {
             assetQuery = buildQuery(ASSET_QUERY.trim(), assetWhereClauses)
             query = "SELECT ac.taskId AS taskId FROM ($taskQuery) ac INNER JOIN ($assetQuery) ae ON (ac.asset_entity_id = ae.asset_entity_id)"
             if (tagQuery) {
                 query = "$query INNER JOIN ($tagQuery) ta ON(ae.asset_entity_id = ta.asset_id)"
+            }
+            if (apiActionQuery) {
+                query = "$query INNER JOIN ($apiActionQuery) ac ON(ae.api_action_id = ac.id)"
             }
         } else {
             query = taskQuery
@@ -157,7 +165,7 @@ class TaskSearch {
             queryParams['taskText'] = comment
         }
 
-        if (taskSearchCommand.withTmdActions) {
+        if (taskSearchCommand.withActions) {
             taskWhereClauses.add('api_action_id IS NOT NULL')
         }
 
@@ -172,6 +180,7 @@ class TaskSearch {
 
         evaluateOwnerAndSmes()
         evaluateTags()
+        evaluateTmdActions()
     }
 
     /**
@@ -204,9 +213,19 @@ class TaskSearch {
 
 
     /**
+     * Set the query for remote actions if the withTmdActions flag is set.
+     */
+    private void evaluateTmdActions() {
+        if (taskSearchCommand.withTmdActions) {
+            apiActionQuery = REMOTE_ACTIONS_QUERY
+        }
+    }
+
+
+    /**
      * This is the basic query for the AssetComment table.
      */
-    private static final String TASK_QUERY = "SELECT asset_comment_id as taskId, asset_entity_id FROM asset_comment"
+    private static final String TASK_QUERY = "SELECT asset_comment_id as taskId, asset_entity_id, api_action_id FROM asset_comment"
 
     /**
      * Query for retrieving the assets that have any of the tags in a given list.
@@ -217,6 +236,8 @@ class TaskSearch {
      * Query that retrieves the assets that have every tag included in the given list.
      */
     private static final String TAG_ALL_QUERY = "SELECT asset_id FROM tag_asset WHERE tag_id IN (:tagList) GROUP BY asset_id HAVING COUNT(*) = :tagListSize"
+
+    private static final String REMOTE_ACTIONS_QUERY = "SELECT id FROM api_action WHERE is_remote = 1"
 
     /**
      * The query for assets actually does a join with the application table and projects the id, environment, app owner and smes.
