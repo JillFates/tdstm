@@ -138,8 +138,9 @@ class TimelineService implements ServiceMethods {
                            t.assetEntity.id,
                            t.assetEntity.assetName,
                            t.assetEntity.assetType,
-                           t.assetEntity.assetClass
-                                   
+                           t.assetEntity.assetClass,
+                           t.taskSpec
+
                     from Task t
                     left outer join t.apiAction
                     left outer join t.assignedTo
