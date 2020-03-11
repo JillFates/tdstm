@@ -43,6 +43,13 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 
+		/*
+		TODO: This is a Hack!! I Hate this Dialog it does too much!:
+		I believe that this should be splitted in at least 2 different dialogs/Views
+		ticket TM-15968 was solved but introduced a new problem in TM-17288
+		we changed the Permission Type but when viewing we don't need to request this Catalog to the server
+		so we need a way of working with Show Only / Edit dialog
+		*/
 		this.loadCommentCategories();
 	}
 
