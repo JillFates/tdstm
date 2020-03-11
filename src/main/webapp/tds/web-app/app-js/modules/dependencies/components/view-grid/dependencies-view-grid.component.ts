@@ -69,9 +69,8 @@ interface ComponentState {
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
-	@ViewChild('tdsBulkChangeButton', { static: false })
+	@ViewChild('tdsBulkChangeButton', { static: false }) tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
-	tdsBulkChangeButton: BulkChangeButtonComponent;
 	@ViewChild('grid', { static: false }) grid: GridComponent;
 	public dependenciesColumnModel: DependenciesColumnModel;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
@@ -125,6 +124,8 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		// Setup state observables
 		this.setupComponentStateObservable();
 		this.setupTagsFilterStateObservable();
+
+		this.eventListeners();
 	}
 
 	/**
@@ -517,12 +518,21 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.openAssetsHandler(fieldName, assetDependency)
 			.pipe(takeUntil(this.destroySubject))
 			.subscribe(
-				_ => this.changeState(),
+				_ => this.reloadData(),
 				error => {
 					console.log(error);
 					this.changeState();
 				}
 			);
+	}
+
+	/**
+	 * Reload the current Kendo List when an event that requires the changes occurs completely out of the context.
+	 */
+	private eventListeners() {
+		this.notifier.on('reloadCurrentAssetList', (event) => {
+			this.reloadData();
+		});
 	}
 
 	protected isBulkSelectAvailable(): boolean {
