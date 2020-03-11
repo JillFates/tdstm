@@ -1,15 +1,7 @@
 package net.transitionmanager.task.taskgraph
 
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.StringUtil
-import groovy.transform.CompileStatic
-import net.transitionmanager.command.task.TaskHighlightOptionsCommand
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.Project
-import org.springframework.jdbc.core.RowMapper
 
-import java.sql.ResultSet
-import java.sql.SQLException
+import groovy.transform.CompileStatic
 
 @CompileStatic
 class TaskHighlightOptions {
@@ -68,43 +60,42 @@ class TaskHighlightOptions {
         ]
     }
 
-
-    class TaskHighlightOptionsMapper implements RowMapper {
-        def mapRow(ResultSet rs, int rowNum) throws SQLException {[
+    /**
+     * Convert a row from the database into a suitable Map for the front-end.
+     *
+     * @param row - a record from the database query
+     * @return a Map with each column appropriately formatted.
+     */
+    static Map mapRowToHighlightMap(Map row) {
+        return [
                 environment: [
-                        id: rs.getString('environment'),
-                        name: rs.getString('environment')
+                        id: row['environment'],
+                        name: row['environment']
                 ],
                 team: [
-                        id: rs.getString('team_code'),
-                        name: rs.getString('team_label')
+                        id: row['team_code'],
+                        name: row['team_label']
                 ],
                 assignedTo: [
-                        id: rs.getLong('assigned_to'),
-                        name: HtmlUtil.escapePersonFullName(rs.getString('assigned_fn'),
-                                rs.getString('assigned_mn'),
-                                rs.getString('assigned_ln'))
+                        id: row['assigned_to'],
+                        name: row['assigned_to_name']
                 ],
                 sme: [
-                        id: rs.getLong('sme'),
-                        name: HtmlUtil.escapePersonFullName(rs.getString('sme_fn'),
-                                rs.getString('sme_mn'),
-                                rs.getString('sme_ln'))
+                        id: row['sme'],
+                        name: row['sme_name']
                 ],
                 sme2: [
-                        id: rs.getLong('sme2'),
-                        name: HtmlUtil.escapePersonFullName(rs.getString('sme2_fn'),
-                                rs.getString('sme2_mn'),
-                                rs.getString('sme2_ln'))
+                        id: row['sme2'],
+                        name: row['sme2_name']
+
                 ],
                 appOwner: [
-                        id: rs.getLong('app_owner'),
-                        name: HtmlUtil.escapePersonFullName(rs.getString('app_owner_fn'),
-                                rs.getString('app_owner_mn'),
-                                rs.getString('app_owner_ln'))
+                        id: row['app_owner'],
+                        name: row['owner_name']
                 ]
-        ]}
+        ]
     }
+
 
     /**
      * Put together the query for retrieving the info necessary for the task highlight options. The query is mostly
@@ -118,22 +109,14 @@ class TaskHighlightOptions {
                     ae.environment as environment,
                     ro.role_type_code as team_code,
                     ro.description as team_label,
-                    pa.person_id as assigned_to,
-                    pa.first_name as assigned_fn,
-                    pa.middle_name as assigned_mn,
-                    pa.last_name as assigned_ln,
+                    pa.person_id as assigned_to, 
+                    CONCAT_WS(' ', pa.first_name, NULLIF(pa.middle_name, ''), NULLIF(pa.last_name, '')) as assigned_to_name,
                     psme.person_id as sme,
-                    psme.first_name as sme_fn,
-                    psme.middle_name as sme_mn,
-                    psme.last_name as sme_ln,
+                    CONCAT_WS(' ', psme.first_name, NULLIF(psme.middle_name, ''), NULLIF(psme.last_name, '')) as sme_name,
                     psme2.person_id as sme2,
-                    psme2.first_name as sme2_fn,
-                    psme2.middle_name as sme2_mn,
-                    psme2.last_name as sme2_ln,
+                    CONCAT_WS(' ', psme2.first_name, NULLIF(psme2.middle_name, ''), NULLIF(psme2.last_name, '')) as sme2_name,
                     pao.person_id as app_owner,
-                    pao.first_name as app_owner_fn,
-                    pao.middle_name as app_owner_mn,
-                    pao.last_name as app_owner_ln
+                    CONCAT_WS(' ', pao.first_name, NULLIF(pao.middle_name, ''), NULLIF(pao.last_name, '')) as owner_name
                 FROM
                      (
                          SELECT asset_entity_id, role, assigned_to_id

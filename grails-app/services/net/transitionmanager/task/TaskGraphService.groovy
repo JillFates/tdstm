@@ -1,12 +1,8 @@
 package net.transitionmanager.task
 
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.StringUtil
-import grails.gorm.transactions.Transactional
-import net.transitionmanager.command.task.TaskHighlightOptionsCommand
+
+import net.transitionmanager.command.task.ViewUnpublishedCommand
 import net.transitionmanager.command.task.TaskSearchCommand
-import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
@@ -16,13 +12,8 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.taskgraph.TaskHighlightOptions
 import net.transitionmanager.task.taskgraph.TaskSearch
 import net.transitionmanager.task.timeline.CPAResults
-import net.transitionmanager.task.timeline.TaskVertex
 import net.transitionmanager.task.timeline.TimelineService
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
-import java.sql.ResultSet
-import java.sql.SQLException
 
 class TaskGraphService implements ServiceMethods {
 
@@ -44,15 +35,17 @@ class TaskGraphService implements ServiceMethods {
      * @param command
      * @return
      */
-    Map getTaskHighlightOptions(Project project, TaskHighlightOptionsCommand command) {
+    Map getTaskHighlightOptions(Project project, ViewUnpublishedCommand command) {
         // For viewing unpublished tasks, the flag must be set to 1 and the user must have the appropriate permission.
-        boolean viewUnpublished = StringUtil.toBoolean(command.viewUnpublished) && securityService.hasPermission(Permission.TaskViewUnpublished)
+        boolean viewUnpublished = command.viewUnpublishedTasks() && securityService.hasPermission(Permission.TaskViewUnpublished)
         // Get the corresponding event or fail if not found for the project.
         MoveEvent moveEvent = get(MoveEvent, command.eventId, project)
         // Get the query string.
         String query = TaskHighlightOptions.getHighlightOptionsQuery(viewUnpublished)
         // Retrieve all the information in a single query.
-        List<Map> tasks = namedParameterJdbcTemplate.query(query, [moveEventId: moveEvent.id], new TaskHighlightOptions.TaskHighlightOptionsMapper())
+        List<Map> tasks = namedParameterJdbcTemplate.queryForList(query, [moveEventId: moveEvent.id]).collect{ Map row ->
+            TaskHighlightOptions.mapRowToHighlightMap(row)
+        }
 
         return TaskHighlightOptions.getHighlightOptions(tasks)
     }
@@ -81,7 +74,7 @@ class TaskGraphService implements ServiceMethods {
         List<Long> tasks = []
 
         // boolean that tells whether or not unpublished tasks need to be included.
-        boolean viewUnpublished = StringUtil.toBoolean(taskSearchCommand.viewUnpublished)
+        boolean viewUnpublished = taskSearchCommand.viewUnpublishedTasks()
         MoveEvent moveEvent = null
         // If a MoveEvent id is provided, fetch the domain object from the database (fail if the id is invalid or doesn't belong to the project).
         if (taskSearchCommand.eventId) {

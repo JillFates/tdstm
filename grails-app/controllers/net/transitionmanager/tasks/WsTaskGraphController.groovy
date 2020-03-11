@@ -3,7 +3,7 @@ package net.transitionmanager.tasks
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.task.TaskHighlightOptionsCommand
+import net.transitionmanager.command.task.ViewUnpublishedCommand
 import net.transitionmanager.command.task.TaskSearchCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.Project
@@ -24,7 +24,7 @@ class WsTaskGraphController implements ControllerMethods {
     def taskHighlightOptions() {
         Project project = getProjectForWs()
         // Populate and validate the command object.
-        TaskHighlightOptionsCommand command = populateCommandObject(TaskHighlightOptionsCommand)
+        ViewUnpublishedCommand command = populateCommandObject(ViewUnpublishedCommand)
         // Fetch the map with the information (already formatted and sorted).
         Map highlightOptions = taskGraphService.getTaskHighlightOptions(project, command)
 
