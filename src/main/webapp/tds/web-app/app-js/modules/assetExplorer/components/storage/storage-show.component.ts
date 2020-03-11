@@ -30,8 +30,17 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			windowService: WindowService) {
 				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
-				this.mainAsset = DOMAIN.STORAGE;
 				this.assetTags = metadata.assetTags;
+		}
+
+		showAssetEditView(): Promise<any> {
+			const componentParameters = [
+				{ provide: 'ID', useValue: this.mainAsset },
+				{ provide: 'ASSET', useValue: DOMAIN.STORAGE }
+			];
+
+			return this.dialogService
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
 		}
 
 		/**

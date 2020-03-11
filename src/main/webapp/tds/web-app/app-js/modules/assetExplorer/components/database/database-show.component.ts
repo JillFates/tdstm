@@ -30,8 +30,14 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 			windowService: WindowService) {
 				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
-				this.assetType = DOMAIN.DATABASE;
 				this.assetTags = metadata.assetTags;
+		}
+
+		showAssetEditView() {
+			this.dialogService.replace(AssetEditComponent, [
+					{ provide: 'ID', useValue: this.mainAsset },
+					{ provide: 'ASSET', useValue: DOMAIN.DATABASE }],
+				DIALOG_SIZE.LG);
 		}
 
 		/**

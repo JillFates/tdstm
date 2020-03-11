@@ -4,7 +4,7 @@ import {AssetExplorerService} from '../../../assetManager/service/asset-explorer
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependecyService} from '../../service/dependecy.service';
 import {HostListener, OnInit} from '@angular/core';
-import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetShowComponent} from './asset-show.component';
 import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.component';
@@ -12,7 +12,6 @@ import {AssetCommonHelper} from './asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
-import {AssetEditComponent} from './asset-edit.component';
 
 declare var jQuery: any;
 
@@ -21,7 +20,6 @@ export class AssetCommonShow implements OnInit {
 	protected userDateFormat: string;
 	protected userTimeZone: string;
 	protected mainAsset;
-	protected assetType: DOMAIN;
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
 
@@ -49,31 +47,10 @@ export class AssetCommonShow implements OnInit {
 	}
 
 	/**
-	 * Show the asset edit view
-	 */
-	showAssetEditView(): Promise<any> {
-		const componentParameters = [
-			{ provide: 'ID', useValue: this.mainAsset },
-			{ provide: 'ASSET', useValue: this.assetType}
-		];
-
-		return this.dialogService
-			.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
-	}
-
-	/**
 	 * Initiates The Injected Component
 	 */
 	ngOnInit(): void {
 		jQuery('[data-toggle="popover"]').popover();
-	}
-
-	/**
-	 * Handle dobule click events over the view
-	 * @return The corresponding asset edit view based on the main asset and asset type
-	 */
-	onDoubleClick(): Promise<any> {
-		return this.showAssetEditView();
 	}
 
 	cancelCloseDialog(): void {

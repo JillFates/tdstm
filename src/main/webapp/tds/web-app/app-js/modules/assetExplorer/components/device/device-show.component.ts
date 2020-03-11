@@ -45,7 +45,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			windowService: WindowService) {
 				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
-				this.assetType = DOMAIN.DEVICE;
 				this.assetTags = metadata.assetTags;
 				this.manufacturerName = null;
 		}
@@ -108,6 +107,13 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 							}
 						}).catch((error) => console.log(error));
 				});
+		}
+
+		showAssetEditView() {
+			this.dialogService.replace(AssetEditComponent, [
+					{ provide: 'ID', useValue: this.mainAsset },
+					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
+				DIALOG_SIZE.LG);
 		}
 
 		protected isManufacturerLinkAvailable(): boolean {

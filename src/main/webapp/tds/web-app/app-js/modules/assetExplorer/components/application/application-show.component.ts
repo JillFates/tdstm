@@ -33,7 +33,16 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
-				this.assetType = DOMAIN.APPLICATION;
+		}
+
+		showAssetEditView(): Promise<any> {
+			const componentParameters = [
+				{ provide: 'ID', useValue: this.mainAsset },
+				{ provide: 'ASSET', useValue: DOMAIN.APPLICATION }
+			];
+
+			return this.dialogService
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
 		}
 
 		launchManageStaff(id): void {
