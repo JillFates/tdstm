@@ -101,18 +101,26 @@ import * as R from 'ramda';
 					<div class="form-group">
 						<div class="col-md-3 label-description">Team:</div>
 						<div class="col-md-9">
-							<div><button (click)="addTeam()" class="component-action-add-team">Add Team</button></div>
-							<div *ngFor="let team of teams;let index=index;" class="teams">
-								<kendo-dropdownlist
-										name="active"
-										[value]="teams[index].team"
-										(valueChange)="onTeamSelected($event, index)"
-										[textField]="'description'"
-										[valueField]="'id'"
-										[data]="teams[index].data">
-								</kendo-dropdownlist>
-								<span class="glyphicon glyphicon-remove remove-team component-action-remove-team" (click)="removeTeam(index)"></span>
-							</div>
+                            <div *ngFor="let team of teams;let index=index;" class="teams">
+                                <div class="team-container">
+                                    <div class="team-selector">
+                                        <kendo-dropdownlist
+                                                name="active"
+                                                [value]="teams[index].team"
+                                                (valueChange)="onTeamSelected($event, index)"
+                                                [textField]="'description'"
+                                                [valueField]="'id'"
+                                                [data]="teams[index].data">
+                                        </kendo-dropdownlist>
+                                    </div>
+                                    <div class="team-selector-delete">
+                                        <span class="clickable" (click)="removeTeam(index)">X</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="team-selector-to-add">
+                                <span class="clickable" (click)="addTeam()">Add team</span>
+                            </div>
 						</div>
 					</div>
 				</div>
