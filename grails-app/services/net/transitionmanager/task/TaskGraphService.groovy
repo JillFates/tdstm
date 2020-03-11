@@ -1,6 +1,6 @@
 package net.transitionmanager.task
 
-
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import net.transitionmanager.command.task.ViewUnpublishedCommand
 import net.transitionmanager.command.task.TaskSearchCommand
 import net.transitionmanager.person.UserPreferenceService
@@ -8,6 +8,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.taskgraph.TaskHighlightOptions
 import net.transitionmanager.task.taskgraph.TaskSearch
@@ -96,6 +97,10 @@ class TaskGraphService implements ServiceMethods {
 
         tasks.addAll(namedParameterJdbcTemplate.queryForList(queryInfo.query, queryInfo.params)*.taskId)
 
+        // Update the viewUnpublished and event preferences if needed.
+        UserLogin userLogin = securityService.userLogin
+        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.MOVE_EVENT, moveEvent)
+        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
 
         return tasks.unique { Long a, Long b -> a <=> b }
 
