@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "1b589c5c-79d3-4d4f-972e-957feccdadb6",
-		"name": "TM-17073 (TM-16291) Make the ETL process kickoff endpoint accessible from REST (/api)",
+		"name": "ETL Kickoff",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -117,7 +117,7 @@
 			"response": []
 		},
 		{
-			"name": "REST API - Import ETL with dataScriptId",
+			"name": "Import ETL with dataScriptId",
 			"event": [
 				{
 					"listen": "test",
@@ -136,7 +136,7 @@
 							"    var response = JSON.parse(responseBody);",
 							"    var progress = response.data.progress;",
 							"    pm.expect(progress).to.not.eql(null);",
-							"});"
+							"}); "
 						],
 						"type": "text/javascript"
 					}
@@ -192,7 +192,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "/C:/Users/Dell/Desktop/TM-17073.csv"
+							"src": "/C:/Users/Dell/Documents/tdstm/test/api-automation/src/Projects/TM-17073.csv"
 						}
 					]
 				},
@@ -212,7 +212,7 @@
 			"response": []
 		},
 		{
-			"name": "REST API - Import ETL with dataScriptName",
+			"name": "Import ETL with dataScriptName",
 			"event": [
 				{
 					"listen": "test",
@@ -223,13 +223,14 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"App version wa returned\", function () {",
+							"pm.test(\"Progresskey not empty\", function () {",
 							"    var response = JSON.parse(responseBody);",
-							"    var version = response.data.version;",
+							"    var progress = response.data.progress;",
+							"    pm.expect(progress).to.not.eql(null);",
+							"});",
 							"",
-							"  pm.expect(version).to.not.eql(null);",
-							"  ",
-							"",
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -291,7 +292,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "/C:/Users/Dell/Desktop/TM-17073.csv"
+							"src": "/C:/Users/Dell/Documents/tdstm/test/api-automation/src/Projects/TM-17073.csv"
 						}
 					]
 				},
