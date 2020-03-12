@@ -39,7 +39,7 @@ export class ManufacturerColumnModel {
 				label: 'Website',
 				property: 'website',
 				filterType: FilterType.text,
-				width: 150
+				width: 130
 			},
 			{
 				label: 'Models',
@@ -51,7 +51,7 @@ export class ManufacturerColumnModel {
 				label: 'Asset Count',
 				property: 'assetCount',
 				filterType: FilterType.number,
-				width: 100,
+				width: 120,
 			}
 		];
 	}
