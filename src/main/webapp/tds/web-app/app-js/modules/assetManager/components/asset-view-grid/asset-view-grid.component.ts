@@ -64,6 +64,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {TranslatePipe} from "../../../../shared/pipes/translate.pipe";
 // Other
 import {Observable, ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
@@ -94,6 +95,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() metadata: any;
 	@Input() fields: any;
 	@Input() hiddenFilters = false;
+	@Input() gridMessage;
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
@@ -110,7 +112,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
-	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	public showMessage = true;
 	public typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
@@ -154,7 +155,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private userService: UserService,
 		private userContextService: UserContextService,
 		private assetTagUIWrapperService: AssetTagUIWrapperService,
-		private router: Router) {
+		private router: Router,
+		private translateService: TranslatePipe) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -214,6 +216,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	ngOnChanges(changes: SimpleChanges) {
 		const dataChange = changes['data'];
+		this.gridMessage = (changes['gridMessage'] && changes['gridMessage'].currentValue) ? changes['gridMessage'].currentValue : (this.gridMessage) ? this.gridMessage : '';
 
 		if (dataChange && dataChange.currentValue !== dataChange.previousValue) {
 			this.applyData(dataChange.currentValue);
@@ -332,7 +335,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		const {assets = null, pagination = null} = data || {};
 		const total = pagination && pagination.total || 0;
 
-		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.bulkCheckboxService.initializeKeysBulkItems(assets || []);
 
 		this.gridData = {
@@ -350,7 +352,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	private clear(): void {
 		this.showMessage = true;
-		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
+		this.gridMessage = this.translateService.transform('ASSET_EXPLORER.GRID.SCHEMA_CHANGE');
 		this.gridData = null;
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');

@@ -16,7 +16,7 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DropDownButtonComponent} from '@progress/kendo-angular-buttons/dist/es2015/dropdownbutton/dropdownbutton.component';
 
 import {TaskService} from '../../service/task.service';
-import {IGraphTask, TASK_TOOLTIP_FIELDS} from '../../model/graph-task.model';
+import {IGraphTask, ILinkPath, TASK_TOOLTIP_FIELDS} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {IMoveEvent} from '../../model/move-event.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
@@ -32,7 +32,6 @@ import {TaskActionEvents} from '../common/constants/task-action-events.constant'
 import {TaskStatus} from '../../model/task-edit-create.model';
 import {ITaskEvent} from '../../model/task-event.model';
 import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../common/constants/task-icon-path';
-import {ILinkPath} from '../../../../shared/components/diagram-layout/model/legacy-diagram-layout.model';
 import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
@@ -42,8 +41,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {Title} from '@angular/platform-browser';
 import {TaskTeam} from '../common/constants/task-team.constant';
-import {DiagramEventAction} from '../../../../shared/components/diagram-layout/model/legacy-diagram-event.constant';
-import {DiagramLayoutService} from '../../../../shared/services/diagram-layout.service';
+import {DiagramCacheService} from '../../../../shared/services/diagram-cache.service';
 import {SetEvent} from '../../../event/action/event.actions';
 import {Store} from '@ngxs/store';
 import {TaskGraphDiagramHelper} from './task-graph-diagram.helper';
@@ -52,6 +50,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {
 	ITdsContextMenuModel
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
+import {DiagramEventAction} from 'tds-component-library/lib/diagram-layout/model/diagram-event.constant';
 import {DialogService, ModalSize} from 'tds-component-library';
 
 @Component({
@@ -104,6 +103,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	showCycles: boolean;
 	rootId: number;
 	neighborId: any;
+	taskGraphDiagramExtras: any;
 
 	constructor(
 			private componentFactoryResolver: ComponentFactoryResolver,
@@ -117,10 +117,14 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			private location: Location,
 			private translatePipe: TranslatePipe,
 			private titleService: Title,
-			private diagramLayoutService: DiagramLayoutService,
+			private diagramCacheService: DiagramCacheService,
 			private permissionService: PermissionService,
 			private store: Store
 		) {
+				this.taskGraphDiagramExtras = {
+					initialAutoScale: Diagram.Uniform,
+					allowZoom: true
+				};
 				this.activatedRoute.queryParams
 					.pipe(takeUntil(this.unsubscribe$))
 					.subscribe(params => {
@@ -237,8 +241,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	loadTasks(taskId: number): void {
 
 		if (this.isFullView
-			&& this.diagramLayoutService.getRequestId() === taskId
-			&& !this.diagramLayoutService.isCacheFromMoveEvent()
+			&& this.diagramCacheService.getRequestId() === taskId
+			&& !this.diagramCacheService.isCacheFromMoveEvent()
 			&& !this.refreshTriggered
 			&& !this.isNeighbor
 		) {
@@ -269,7 +273,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						this.tasks = data && data.map(r => r.task);
 						if (this.tasks) {
 							if (!this.isNeighbor) {
-								this.diagramLayoutService.clearFullGraphCache();
+								this.diagramCacheService.clearFullGraphCache();
 								this.requestId = taskId;
 								this.isMoveEventReq = false;
 							} else {
@@ -304,8 +308,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if (this.urlParams) { this.urlParams = null; }
 
 		if (this.isFullView
-			&& this.diagramLayoutService.getRequestId() === this.selectedEvent.id
-			&& this.diagramLayoutService.isCacheFromMoveEvent()
+			&& this.diagramCacheService.getRequestId() === this.selectedEvent.id
+			&& this.diagramCacheService.isCacheFromMoveEvent()
 			&& !this.refreshTriggered) {
 			this.generateModelFromCache();
 		} else if (this.selectedEvent && this.selectedEvent.id) {
@@ -321,7 +325,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				.subscribe(res => {
 					this.tasks = res && res.tasks;
 					if (this.tasks) {
-						this.diagramLayoutService.clearFullGraphCache();
+						this.diagramCacheService.clearFullGraphCache();
 						this.requestId = this.selectedEvent.id;
 						this.isMoveEventReq = false;
 						if (res.cycles && res.cycles.length > 0) {
@@ -424,7 +428,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				requestId: this.requestId,
 				isMoveEvent: this.isMoveEventReq,
 				data: nodeDataArray,
-				linksPath: linkDataArray
+				linksPath: linkDataArray,
+				...this.taskGraphDiagramExtras
 			});
 		}
 		this.diagramData$.next(taskGraphHelper.diagramData({
@@ -432,10 +437,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			currentUserId: this.userContext.user.id,
 			nodeDataArray,
 			linkDataArray,
-			extras: {
-				initialAutoScale: Diagram.Uniform,
-				allowZoom: true
-			}
+			extras: this.taskGraphDiagramExtras
 		}));
 	}
 
@@ -481,10 +483,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * generate model to be used by diagram with task specific data
 	 **/
 	generateModelFromCache(): void {
-		if (!this.diagramLayoutService.getRequestId()) { return; }
+		if (!this.diagramCacheService.getRequestId()) { return; }
 		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
 
-		const graphCache = this.diagramLayoutService.getFullGraphCache();
+		const graphCache = this.diagramCacheService.getFullGraphCache();
 
 		// Add tasks to nodeData constant
 		// and create linksPath object from number and successors
@@ -503,8 +505,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * @param data
 	 */
 	cacheFullGraph(data: any): void {
-		if (!this.diagramLayoutService.getFullGraphCache() || !this.diagramLayoutService.getFullGraphCache().data) {
-			this.diagramLayoutService.setFullGraphCache(data);
+		if (!this.diagramCacheService.getFullGraphCache() || !this.diagramCacheService.getFullGraphCache().data) {
+			this.diagramCacheService.setFullGraphCache(data);
 			this.isFullView = true;
 		}
 	}
@@ -814,13 +816,16 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						modalSize: ModalSize.CUSTOM,
 						modalCustomClass: 'custom-task-modal-edit-view-create'
 					}
-				}).subscribe((data: any) => {
-					if (data && data.isDeleted) {
-						const taskId = data.id && data.id.id;
-						return this.taskService.deleteTaskComment(taskId)
-							.subscribe(() => this.removeGraphNode(taskId));
-					} else if (data) {
-						this.updateGraphNode(data.assetComment);
+				}).subscribe((result: any) => {
+					if (result) {
+						const assetComment = result.data && result.data.assetComment;
+						if (result.isDeleted) {
+							const taskId = assetComment && assetComment.id;
+							return this.taskService.deleteTaskComment(taskId)
+								.subscribe(() => this.removeGraphNode(taskId));
+						} else {
+							this.updateGraphNode(assetComment);
+						}
 					}
 				});
 			});
@@ -924,11 +929,12 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	updateGraphCache(data: any): void {
 		if (this.isFullView) {
 			const fullGraph = {
-				requestId: this.diagramLayoutService.getRequestId(),
-				isMoveEvent: this.diagramLayoutService.isCacheFromMoveEvent(),
-				...data
+				requestId: this.diagramCacheService.getRequestId(),
+				isMoveEvent: this.diagramCacheService.isCacheFromMoveEvent(),
+				...data,
+				...this.taskGraphDiagramExtras
 			};
-			this.diagramLayoutService.setFullGraphCache(fullGraph);
+			this.diagramCacheService.setFullGraphCache(fullGraph);
 		}
 
 	}
@@ -950,7 +956,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		this.isFullView = true;
 		this.isNeighbor = false;
 		this.graph.showFullGraphBtn = false;
-		const cache = this.diagramLayoutService.getFullGraphCache();
+		const cache = this.diagramCacheService.getFullGraphCache();
 		const nodeDataArray = cache && cache.data;
 		const linkDataArray = cache && cache.linksPath;
 		this.extractTeams(nodeDataArray);
@@ -962,9 +968,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			currentUserId: this.userContext.user.id,
 			nodeDataArray,
 			linkDataArray,
-			extras: {
-				autoScale: Diagram.Uniform,
-			}
+			extras: this.taskGraphDiagramExtras
 		}));
 	}
 
@@ -1032,7 +1036,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.unsubscribe$.next();
 		this.unsubscribe$.complete();
-		this.diagramLayoutService.clearFullGraphCache();
+		this.diagramCacheService.clearFullGraphCache();
 	}
 
 }

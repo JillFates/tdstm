@@ -66,6 +66,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
 	private TAG_ASSET_COLUMN_WIDTH = 260;
+	protected gridMessage;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -186,7 +187,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public onQuery(): void {
-		// Timeout exists so assetExplorerViewGrid gets created first
+        this.gridMessage = this.translateService.transform('GLOBAL.LOADING_RECORDS');
+        // Timeout exists so assetExplorerViewGrid gets created first
 		setTimeout(() => {
 			let params = {
 				offset: this.gridState.skip,
@@ -213,6 +215,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				params['justPlanning'] = true;
 			}
 
+
 			this.assetExplorerService.query(this.model.id, params).subscribe(result => {
 				this.data = result;
 				this.data.assets.forEach(asset => {
@@ -220,6 +223,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 						asset.common_lastUpdated = new Date(asset.common_lastUpdated);
 					}
 				});
+				this.gridMessage = (this.data.assets.length <= 0) ? this.translateService.transform('GLOBAL.NO_RECORDS') : '';
 				jQuery('[data-toggle="popover"]').popover();
 			}, err => console.log(err));
 		}, 2000);

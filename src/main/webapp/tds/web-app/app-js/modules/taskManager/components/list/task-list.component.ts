@@ -77,7 +77,7 @@ export class TaskListComponent implements OnInit {
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
 	private dashboardFilters = ['filter', 'status', 'role', 'category'];
-	private dateValues = ['actStart', 'actFinish', 'dueDate', 'estStart', 'estFinish', 'latestStart', 'latestFinish'];
+	private dateValues = ['actStart', 'actFinish', 'dueDate', 'dateCreated', 'estStart', 'estFinish', 'lastUpdated', 'latestStart', 'latestFinish', 'statusUpdated'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
@@ -94,6 +94,7 @@ export class TaskListComponent implements OnInit {
 	public allTasksPermission: boolean;
 	private timeZone: string;
 	private dateFormat: string;
+	protected gridMessage;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -763,6 +764,7 @@ export class TaskListComponent implements OnInit {
 				}
 			});
 		}
+		this.gridMessage = this.translate.transform('GLOBAL.LOADING_RECORDS');
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
 				for (let i = 0; i < result.totalCount; i++) {
@@ -782,6 +784,7 @@ export class TaskListComponent implements OnInit {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.loading = false;
 				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+				this.gridMessage = (result.totalCount > 0) ? this.translate.transform('GLOBAL.NO_RECORDS') : '';
 			});
 		this.loaderService.stopProgress();
 
