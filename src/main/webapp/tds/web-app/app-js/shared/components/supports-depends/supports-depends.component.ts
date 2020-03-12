@@ -147,8 +147,7 @@ declare var jQuery: any;
                 *ngIf="dataGridDependsOnHelper"
                 class="tds-table"
                 [data]="dataGridDependsOnHelper.gridData"
-                [sort]="dataGridDependsOnHelper.state.sort"
-                [sortable]="{mode:'single'}"
+                [sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridDependsOnHelper.sortChange($event)">
 
