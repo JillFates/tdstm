@@ -1,17 +1,18 @@
-import {
-	Component
-} from '@angular/core';
-
-import {
-	Observable,
-} from 'rxjs';
-
+// Angular
+import {Component, ComponentFactoryResolver} from '@angular/core';
+// Model
+import {EntityConflict} from '../../model/conflicts.model';
+// Component
+import {ReportComponent} from '../report.component';
+// Service
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../auth/service/user.service';
-import { EntityConflict } from '../../model/conflicts.model';
-import {ReportComponent} from '../report.component';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Other
+import {
+	Observable,
+} from 'rxjs';
+import {DialogService} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-application-conflicts',
@@ -42,11 +43,12 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	applicationConflicts: Array<EntityConflict> = [];
 
 	constructor(
+		protected componentFactoryResolver: ComponentFactoryResolver,
 		private preferenceService: PreferenceService,
 		private userService: UserService,
-		protected dialogService: UIDialogService,
+		protected dialogService: DialogService,
 		protected reportsService: ReportsService) {
-			super(reportsService, dialogService);
+			super(componentFactoryResolver, reportsService, dialogService);
 			this.planningBundles =  {id: 'useForPlanning', name: 'Planning Bundles'};
 			this.load();
 	}

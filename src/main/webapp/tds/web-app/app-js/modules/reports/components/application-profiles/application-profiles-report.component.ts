@@ -1,11 +1,16 @@
-import {ReportsService} from '../../service/reports.service';
-import {Component, ElementRef} from '@angular/core';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+// Angular
+import {Component, ComponentFactoryResolver, ElementRef} from '@angular/core';
+// Component
 import {ReportComponent} from '../report.component';
-import {forkJoin} from 'rxjs';
 import {AssetDependencyComponent} from '../../../assetExplorer/components/asset-dependency/asset-dependency.component';
+// Service
+import {ReportsService} from '../../service/reports.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
+// Other
+import {forkJoin} from 'rxjs';
+import {DialogService, ModalSize} from 'tds-component-library';
+
 declare var jQuery: any;
 
 @Component({
@@ -115,12 +120,13 @@ export class ApplicationProfilesReportComponent extends ReportComponent {
 	private readonly allSmeOption = {id: -1, text: 'All'};
 
 	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
 		reportsService: ReportsService,
-		dialogService: UIDialogService,
+		dialogService: DialogService,
 		private elRef: ElementRef,
 		private userPreferenceService: PreferenceService,
 		private assetService: DependecyService) {
-		super(reportsService, dialogService);
+		super(componentFactoryResolver, reportsService, dialogService);
 		this.onLoad();
 	}
 
@@ -245,10 +251,18 @@ export class ApplicationProfilesReportComponent extends ReportComponent {
 	 * @param assetClass: string
 	 */
 	showDependencyView(assetDependencies: any): void {
-		this.dialogService.extra(AssetDependencyComponent, [
-			{ provide: 'ASSET_DEP_MODEL', useValue: assetDependencies }])
-			.then(res => console.log(res))
-			.catch(res => console.log(res));
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetDependencyComponent,
+			data: {
+				assetDependency: assetDependencies
+			},
+			modalConfiguration: {
+				title: 'Dependency Detail',
+				draggable: true,
+				modalSize: ModalSize.MD,
+			}
+		}).subscribe();
 	}
 
 }
