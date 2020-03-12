@@ -192,7 +192,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "./TM-17073.csv"
+							"src": "src/Projects/TM-17073.csv"
 						}
 					]
 				},
@@ -292,7 +292,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "./TM-17073.csv"
+							"src": "src/Projects/TM-17073.csv"
 						}
 					]
 				},
