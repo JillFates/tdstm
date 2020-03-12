@@ -39,7 +39,6 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
-
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
@@ -64,7 +63,6 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.tools.ant.util.DateUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -1217,7 +1215,7 @@ class ReportsService implements ServiceMethods {
                 startsRef.append('<ul>')
 
                 graph.starts.each { TaskVertex taskVertex ->
-                    Task task = findInTasks(taskVertex, tasks)
+                    TimelineTask task = findInTasks(taskVertex, tasks)
                     startsRef.append(htmlConverter(taskVertex, task))
                 }
                 startsRef.append('</ul>')
@@ -1236,7 +1234,7 @@ class ReportsService implements ServiceMethods {
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
                 graph.sinks.each { TaskVertex taskVertex ->
-                    Task task = findInTasks(taskVertex, tasks)
+                    TimelineTask task = findInTasks(taskVertex, tasks)
                     sinksRef.append(htmlConverter(taskVertex, task))
                 }
                 sinksRef.append('</ul>')
