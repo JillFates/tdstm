@@ -1,4 +1,3 @@
-// Angular
 import {
 	Component,
 	EventEmitter,
@@ -56,7 +55,6 @@ import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag
 import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
 // Service
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UserService} from '../../../auth/service/user.service';
 import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
@@ -64,7 +62,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
-import {TranslatePipe} from "../../../../shared/pipes/translate.pipe";
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
 import {Observable, ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';

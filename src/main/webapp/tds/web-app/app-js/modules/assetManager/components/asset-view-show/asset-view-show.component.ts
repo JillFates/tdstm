@@ -187,8 +187,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public onQuery(): void {
-        this.gridMessage = this.translateService.transform('GLOBAL.LOADING_RECORDS');
-        // Timeout exists so assetExplorerViewGrid gets created first
+		this.gridMessage = this.translateService.transform('GLOBAL.LOADING_RECORDS');
+		// Timeout exists so assetExplorerViewGrid gets created first
 		setTimeout(() => {
 			let params = {
 				offset: this.gridState.skip,
@@ -214,7 +214,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			if (this.justPlanning) {
 				params['justPlanning'] = true;
 			}
-
 
 			this.assetExplorerService.query(this.model.id, params).subscribe(result => {
 				this.data = result;
