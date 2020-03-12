@@ -23,7 +23,7 @@ class ImportProgressCalculator {
     /**
      * Used to track # of rows processed in a iterate loop before actually reporting progress, -1 signifies first row in iterate
      */
-    Integer frequencyCounter = -1
+    Integer frequencyCounter = 0
 
     Integer rowsProcessed = 0
 
@@ -51,23 +51,20 @@ class ImportProgressCalculator {
      */
     void increase() {
 
-        if (frequencyCounter == -1) {
-            frequencyCounter = 0
-            factorStepFrequency = (totalRows / 100).intValue()
-        }
-
-        ++rowsProcessed
-        frequencyCounter += 1
-        if (factorStepFrequency < frequencyCounter) {
+        if (frequencyCounter == factorStepFrequency) {
 
             Integer progress = (rowsProcessed / totalRows * 100).intValue()
+            println "totalRows:$totalRows. rowsProcessed:$rowsProcessed Progress:${progress}%"
             progressService.update(progressKey,
                     progress,
                     ProgressCallback.ProgressStatus.RUNNING.name(),
                     ''
             )
             frequencyCounter = 0
+        } else {
+            frequencyCounter += 1
         }
+        rowsProcessed += 1
     }
 
     /**
