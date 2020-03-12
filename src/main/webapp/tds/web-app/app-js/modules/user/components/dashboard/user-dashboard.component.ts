@@ -1,5 +1,6 @@
 // Angular
 import { Component, OnInit, ViewChild } from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 // Services
 import { TaskService } from '../../../taskManager/service/task.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -26,6 +27,7 @@ import { GridComponent } from '@progress/kendo-angular-grid';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { Store } from '@ngxs/store';
 import {SetProject} from '../../../project/actions/project.actions';
+import {SetEvent} from '../../../event/action/event.actions';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
@@ -64,6 +66,7 @@ export class UserDashboardComponent implements OnInit {
 	];
 	public userContext: UserContextModel;
 	@ViewChild('taskGrid', { static: false }) taskGrid: GridComponent;
+	public selectedEvent = null;
 
 	constructor(
 		private userService: UserService,
@@ -71,6 +74,7 @@ export class UserDashboardComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
 		private translate: TranslatePipe,
+		private route: ActivatedRoute,
 		private store: Store) {
 		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
@@ -102,6 +106,7 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	private populateData(): void {
+		
 		this.userService
 			.fetchModelForUserDashboard(this.selectedProject ? this.selectedProject.id : '')
 			.subscribe(result => {
@@ -124,6 +129,24 @@ export class UserDashboardComponent implements OnInit {
 		this.eventColumnModel = new EventColumnModel();
 		this.eventNewsColumnModel = new EventNewsColumnModel();
 		this.taskColumnModel = new TaskColumnModel();
+	}
+
+	/**
+	 * Passing and event id search for it in the event list, on not found it returns
+	 * the first list element whenever the list has elements, otherwise it returns null
+ 	 * @param {number} id  Event id
+	 * @returns {any} Event found otherwhise null
+	*/
+	private getDefaultEvent(id: string): any {
+		// event ids are integer so we need to cast accordly
+		const selectedId = id ? parseInt(id, 10) : null;
+
+		if (selectedId) {
+			return this.eventList.find((event) => event.id === selectedId) || null;
+		} else if (this.eventList.length)  {
+			return this.eventList[0];
+		}
+		return null;
 	}
 
 	public openLinkInNewTab(url): void {
@@ -228,7 +251,15 @@ export class UserDashboardComponent implements OnInit {
 		this.userService
 			.getAssignedEvents(projectId, this.showActiveEvents)
 			.subscribe(result => {
+				let selectedEventId = null;
 				this.eventList = result.events;
+								if (this.userContext && this.userContext.event) {
+					selectedEventId = this.userContext.event.id;
+				}
+				this.selectedEvent = this.getDefaultEvent(this.route.snapshot.queryParams['moveEvent'] || selectedEventId);
+				if (this.selectedEvent) {
+					this.store.dispatch(new SetEvent({id: this.selectedEvent.eventId, name: this.selectedEvent.name}));
+				}
 			});
 	}
 
