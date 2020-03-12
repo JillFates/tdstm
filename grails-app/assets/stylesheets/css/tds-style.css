@@ -1642,6 +1642,9 @@ div.content-wrapper div.container .body table.asset-summary-table {
   border-spacing: 2px;
   border-collapse: initial; }
 
+div.content-wrapper div.container .indent {
+  padding-left: 30px; }
+
 div.content-wrapper div.container .body table#assetListIdGrid div.ui-jqgrid-bdiv {
   overflow-x: hidden !important; }
 

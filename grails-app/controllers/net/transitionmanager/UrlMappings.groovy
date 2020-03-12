@@ -805,6 +805,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/project/default" {
+			controller = "wsProject"
+			action = [
+					GET: "defaultProject"
+			]
+		}
+
 		"/ws/manufacturer/merge" {
 			controller = "wsManufacturer"
 			action = [POST:"merge"]
@@ -1160,6 +1167,13 @@ class UrlMappings {
 					POST: "createDataview",
 					PUT: "updateDataview",
 					DELETE: "deleteDataview"
+			]
+		}
+
+		"/ws/assetExplorer/saveOptions/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "saveOptions"
 			]
 		}
 

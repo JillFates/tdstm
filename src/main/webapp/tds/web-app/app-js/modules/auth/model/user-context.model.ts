@@ -15,6 +15,7 @@ export class UserContextModel {
 	};
 	error?: string;
 	alternativeProjects?: [];
+	defaultProject?: any;
 }
 
 export enum USER_CONTEXT_REQUEST {

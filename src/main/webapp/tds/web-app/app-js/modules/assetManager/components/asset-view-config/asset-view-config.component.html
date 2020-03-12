@@ -1,25 +1,32 @@
 <div class="content body">
 	<section class="page-asset-explorer-config field-setting-component">
 		<div>
-			<div class="btn-group" *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
-				<button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+			<!-- Save/Save As with dropdown -->
+			<div *ngIf="model.id && !isSystemView() && (model.isOwner || (isSystemView() && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton"
+					 class="btn-group">
+				<button *ngIf="model.isOwner || (isSystemView() && isSystemSaveAvailable(true))"
+								type="button" id="btnSave"
 						[disabled]="!isSaveAvailable() || !isValid()"
 						class="btn"
 						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 						(click)="onSave()">
 					<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
 				</button>
-
-				<button type="button" id="btnSaveAs" *ngIf="!model.isOwner && !model.isSystem"
+				<button *ngIf="!model.isOwner && !isSystemView()"
+								type="button" id="btnSaveAs"
 						[disabled]="!isSaveAsAvailable() || !isValid()"
 						class="btn"
 						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 				 		(click)="onSaveAs()">
 							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}
 				</button>
-
-				<button type="button" class="btn dropdown-toggle" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
-				 [disabled]="!isValid()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<button type="button"
+                        class="btn dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				        [disabled]="!isValid()" >
 					<span class="caret"></span>
 					<span class="sr-only">Toggle Dropdown</span>
 				</button>
@@ -32,15 +39,18 @@
 					</li>
 				</ul>
 			</div>
+			<!-- Simple Save/Save As button -->
 			<ng-template #saveButton>
-				<button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+				<button *ngIf="( (model.id && !isSystemView()) || (model.id && isSystemView() && model.isOwner && isSystemSaveAvailable(true)))"
+								type="button" id="btnSave"
 						[disabled]="!isSaveAvailable() || !isValid()"
 				 		class="btn"
 						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 						(click)="onSave()">
 							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
 				</button>
-				<button type="button" id="btnSaveAs" *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
+				<button *ngIf="((model.id && isSystemView() && isSaveAsAvailable()) || isSaveAsAvailable())"
+								type="button" id="btnSaveAs"
 				 		[disabled]="!isSaveAsAvailable() || !isValid()"
 						class="btn"
 						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
@@ -59,6 +69,13 @@
 			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:5px 10px;float:right;">
 				<i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed"></i>
 			</span>
+			<button *ngIf="currentOverrideState.icon && collapsed" type="button"
+							class="view-override-button tds-action-button--just-icon pull-right"
+							[title]="currentOverrideState.tooltip"
+							(click)="toggleAssetView()">
+				<fa-icon [icon]="currentOverrideState.icon">
+				</fa-icon>
+			</button>
 		</div>
 		<br />
 		<div class="nav-tabs-custom" *ngIf="!collapsed">
@@ -86,7 +103,7 @@
 				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn" [disabled]="!isValid()" [ngClass]="{'btn-default':!isValid(),'btn-success':isValid()}" name="btnPreview"
-					 (click)="previewButtonClicked = true;onPreview()">Preview</button>
+					 (click)="onPreview()">Preview</button>
 				</li>
 				<!-- <li class="pull-right" role="presentation">
 					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
@@ -169,7 +186,7 @@
 												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
 												{{item.label}}
 												<i class="fa fa-thumb-tack pull-right" title="Freeze column / Unfreeze column" [ngClass]="{'freeze-column': item.locked, 'not-freeze-column': !item.locked}" (click)="freezeColumn(item)"></i>
-											</div>
+								`			</div>
 										</div>
 									</ng-template>
 								</kendo-sortable>
@@ -181,15 +198,15 @@
 			</div>
 		</div>
 		<asset-explorer-view-grid [data]="data"
-                                  (modelChange)="onPreview()"
-                                  (justPlanningChange)="onJustPlanningChange($event)"
-                                  [gridState]="gridState"
-                                  (gridStateChange)="onGridStateChange($event)"
+															(reloadGrid)="onPreview()"
+															(justPlanningChange)="onJustPlanningChange($event)"
+                              [gridState]="gridState"
+                              (gridStateChange)="onGridStateChange($event)"
 		                          [fields]="allFields"
-                                  [edit]="true"
-                                  [model]="model.schema"
+                              [edit]="true"
+															[model]="model.schema"
 		                          [viewId]="model.id"
-                                  [metadata]="metadata">
+                              [metadata]="metadata">
         </asset-explorer-view-grid>
 		<!-- /.box-body -->
 		<!-- /.box -->
