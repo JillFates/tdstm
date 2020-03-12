@@ -125,6 +125,7 @@
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
 			>
+                <ng-template kendoGridNoRecordsTemplate>{{this.gridMessage}}</ng-template>
 				<!-- Column Menu -->
 				<ng-template
 					kendoGridColumnMenuTemplate
