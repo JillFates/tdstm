@@ -74,7 +74,7 @@ export class TaskListComponent implements OnInit {
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
 	private dashboardFilters = ['filter', 'status', 'role', 'category'];
-	private dateValues = ['actStart', 'actFinish', 'dueDate', 'estStart', 'estFinish', 'latestStart', 'latestFinish'];
+	private dateValues = ['actStart', 'actFinish', 'dueDate', 'dateCreated', 'estStart', 'estFinish', 'lastUpdated', 'latestStart', 'latestFinish', 'statusUpdated'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
