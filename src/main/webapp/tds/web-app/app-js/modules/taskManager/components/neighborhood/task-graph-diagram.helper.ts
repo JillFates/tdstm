@@ -7,7 +7,7 @@ import {
 	default as go,
 	InputEvent,
 	Layout,
-	Link,
+	Link, Margin,
 	Node,
 	Panel,
 	Placeholder,
@@ -211,6 +211,9 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 
 	lowScaleNodeTemplate(): Node {
 		const node = new go.Node(go.Panel.Horizontal);
+		node.fromEndSegmentLength = 20;
+		node.toEndSegmentLength = 20;
+		node.avoidableMargin = new Margin(6, 6, 6, 6);
 
 		const  shape = new go.Shape();
 		shape.figure = 'Rectangle';
@@ -226,6 +229,9 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 
 	mediumScaleNodeTemplate(): Node {
 		const node = new go.Node(go.Panel.Horizontal);
+		node.fromEndSegmentLength = 20;
+		node.toEndSegmentLength = 20;
+		node.avoidableMargin = new Margin(6, 6, 6, 6);
 
 		node.add(this.iconShape());
 
@@ -239,7 +245,10 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 	nodeTemplate(opts?: any): Node {
 		const node = new Node(Panel.Horizontal);
 		node.selectionAdorned = true;
-		node.padding = new go.Margin(0, 0, 0, 0);
+		node.padding = new Margin(0, 0, 0, 0);
+		node.fromEndSegmentLength = 20;
+		node.toEndSegmentLength = 20;
+		node.avoidableMargin = new Margin(6, 6, 6, 6);
 		node.add(this.containerPanel());
 
 		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
@@ -417,6 +426,7 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.margin = new go.Margin(0, 0, 0, 5);
 		assetIconShape.mouseOver = (e, o) => o.cursor = 'pointer';
 		assetIconShape.mouseLeave = (e, o) => o.cursor = 'none';
+		const removeSpaces = s => s.replace(/ /g, '');
 
 		assetIconShape.bind(new Binding('desiredSize', 'asset',
 			(val: any) => {
@@ -437,8 +447,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('text', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = !!val.assetType ? val.assetType.replace(' ', '').toLowerCase()
-						: val.type && val.type.replace(' ', '').toLowerCase();
+					const type = !!val.assetType ? removeSpaces(val.assetType).toLowerCase()
+						: val.type && removeSpaces(val.type).toLowerCase();
 					return this.getIcon(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.iconAlt;
@@ -448,8 +458,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('stroke', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = !!val.assetType ? val.assetType.replace(' ', '').toLowerCase()
-						: val.type && val.type.replace(' ', '').toLowerCase();
+					const type = !!val.assetType ? removeSpaces(val.assetType).toLowerCase()
+						: val.type && removeSpaces(val.type).toLowerCase();
 					return this.getIconColor(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.color;
@@ -459,8 +469,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('fill', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = !!val.assetType ? val.assetType.replace(' ', '').toLowerCase()
-						: val.type && val.type.replace(' ', '').toLowerCase();
+					const type = !!val.assetType ? removeSpaces(val.assetType).toLowerCase()
+						: val.type && removeSpaces(val.type).toLowerCase();
 					return this.getIconColor(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.color;
@@ -470,8 +480,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		assetIconShape.bind(new Binding('background', 'asset',
 			(val: any) => {
 				if (val) {
-					const type = val.assetType ? val.assetType.replace(' ', '').toLowerCase()
-						: val.type && val.type.replace(' ', '').toLowerCase();
+					const type = val.assetType ? removeSpaces(val.assetType).toLowerCase()
+						: val.type && removeSpaces(val.type).toLowerCase();
 					return this.getBackgroundColor(ASSET_ICONS_PATH[type]);
 				} else {
 					return ASSET_ICONS_PATH.unknown.background;

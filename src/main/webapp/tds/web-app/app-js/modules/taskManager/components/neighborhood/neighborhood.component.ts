@@ -444,7 +444,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	tooltipData(t: IGraphTask): any {
 		const stateIcon = STATE_ICONS_PATH[t.status && t.status.toLowerCase()];
 		const unknownBg = ASSET_ICONS_PATH.unknown.background;
-		const assetIcon = ASSET_ICONS_PATH[(t.asset && t.asset.assetType) && t.asset.assetType.toLowerCase()];
+		const assetType = (t.asset && t.asset.assetType) && t.asset.assetType;
+		const assetIcon = ASSET_ICONS_PATH[assetType && assetType.replace(/ /g, '').toLowerCase()];
 		return {
 			headerText: `${t.number}:${t.name}`,
 				headerBackgroundColor: stateIcon && stateIcon.background || unknownBg,
