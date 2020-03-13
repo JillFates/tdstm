@@ -1,7 +1,10 @@
-import {ReportsService} from '../../service/reports.service';
-import {Component} from '@angular/core';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver} from '@angular/core';
+// Component
 import {ReportComponent} from '../report.component';
+// Service
+import {ReportsService} from '../../service/reports.service';
+import {DialogService} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-activity-metrics-report',
@@ -98,9 +101,10 @@ export class ActivityMetricsReportComponent extends ReportComponent {
 	private readonly allProjectsOption = {id: -1, name: 'All'};
 
 	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
 		reportsService: ReportsService,
-		dialogService: UIDialogService) {
-		super(reportsService, dialogService);
+		dialogService: DialogService) {
+		super(componentFactoryResolver, reportsService, dialogService);
 		this.selectedProjects = [this.allProjectsOption];
 		this.onLoad();
 	}
