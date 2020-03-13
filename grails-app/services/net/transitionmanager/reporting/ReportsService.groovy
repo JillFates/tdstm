@@ -1174,7 +1174,7 @@ class ReportsService implements ServiceMethods {
             return content
         }
 
-        Closure<Task> findInTasks = { TaskVertex taskVertex, List<TimelineTask> taskList ->
+        Closure<TimelineTask> findInTasks = { TaskVertex taskVertex, List<TimelineTask> taskList ->
             return taskList.find { it.id == taskVertex.taskId }
         }
 
@@ -1193,7 +1193,7 @@ class ReportsService implements ServiceMethods {
                 summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
-                        Task task = findInTasks(cyclicalTask, tasks)
+                        TimelineTask task = findInTasks(cyclicalTask, tasks)
                         cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
                     cyclicalsRef.append('</ul>')
