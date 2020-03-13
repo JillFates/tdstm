@@ -64,7 +64,7 @@ import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui
 import {NavigationEnd, Router} from '@angular/router';
 import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
 import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
-import {TranslatePipe} from "../../../../shared/pipes/translate.pipe";
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
