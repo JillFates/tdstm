@@ -8,7 +8,7 @@ import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 
 @Slf4j
-class ETLTestScriptJob {
+class  ETLTestScriptJob {
 	static group = 'tdstm-etl-test-script'
 	static triggers = {}
 

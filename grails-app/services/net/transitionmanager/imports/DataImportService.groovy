@@ -21,7 +21,6 @@ import grails.converters.JSON
 import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
@@ -31,14 +30,11 @@ import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
+import net.transitionmanager.etl.ETLStreamingReader
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.imports.DataScript
-import net.transitionmanager.imports.ImportBatch
-import net.transitionmanager.imports.ImportBatchRecord
-import net.transitionmanager.imports.ScriptProcessorService
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
@@ -51,7 +47,6 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.tag.TagService
-import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
@@ -116,21 +111,43 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	]
 
 	/**
-	 * Used to kick of ETL process that does auto posting
+	 * Schedules an execution of {@link ETLImportDataJob} with correct parameters.
+	 *
 	 * @param project
 	 * @param userLogin
-	 * @param etlProcessorResult
-	 * @param sendResultByEmail
-	 * @return
+	 * @param datasetFileName
+	 * @param sendResultsByEmail
+	 * @return JSON map containing the following:
+	 * 		progressKey: <String> progress key generated
+	 * 		jobTriggerName: <String> Trigger name of the executed.
 	 */
-	@NotTransactional()
-	Map loadETLResultsIntoAutoProcessImportBatch(
+	@NotTransactional
+	Map<String, String> scheduleImportDataJob(
 			Project project,
 			UserLogin userLogin,
-			ETLProcessorResult etlProcessorResult,
-			Boolean sendResultByEmail
+			String filename = null,
+			Boolean isAutoProcess = false,
+			Boolean sendResultsByEmail = false
 	) {
-		return loadETLJsonIntoImportBatch(project, userLogin, etlProcessorResult.properties, true, sendResultByEmail)
+		String key = 'ETL-Import-Data-' + project.id + '-' + StringUtil.generateGuid()
+		progressService.create(key, ProgressService.PENDING)
+
+		def jobTriggerName = 'TM-ImportData-' + project.id + '-' + StringUtil.generateGuid()
+
+		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
+		trigger.jobDataMap.project = project
+		trigger.jobDataMap.filename = filename
+		trigger.jobDataMap.progressKey = key
+		trigger.jobDataMap.isAutoProcess = isAutoProcess
+		trigger.jobDataMap.sendResultsByEmail = sendResultsByEmail
+		trigger.jobDataMap.userLogin = userLogin
+		trigger.setJobName('ETLImportDataJob')
+		trigger.setJobGroup('tdstm-etl-import-data')
+		quartzScheduler.scheduleJob(trigger)
+
+		log.info('scheduleJob() {} kicked of an ETL Import data process for filename ({})', userLogin.username, filename)
+
+		return ['progressKey': key, 'jobTriggerName': jobTriggerName]
 	}
 
 	/**
@@ -142,9 +159,9 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 * The method is marked NonTransactional so that each the domains in the importJsonData can be handled
 	 * as independent transactions.
 	 *
-	 * @param userLogin
 	 * @param project
-	 * @param importJsonData
+	 * @param userLogin
+	 * @param datasetFileName
 	 * @return a Map containing details about the import creation
 	 *      batchesCreated <Integer> - count of the number of batches created
 	 *      domains <List><Map> - a list of each domain that records were created
@@ -156,53 +173,74 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	Map loadETLJsonIntoImportBatch(
 			Project project,
 			UserLogin userLogin,
-			Map importJsonData,
+			String datasetFileName,
 			Boolean isAutoProcess = false,
-			Boolean sendResultsByEmail = false
-	) {
-		// // TODO : JPM 2/2018 : Delete this closure declaration and the following code will just be part of the above function
-		// // This was done because it allows you to save the code repeatedly without having to restart the application every time. It appears
-		// // that the @NotTransactional annotation causes issues. This was a neat trick to get around that since the loadETLJsonIntoImportBatch
-		// // method wasn't being changed. Groovy is more forgiving with Closures...
-		// def localFunction = { Project project, UserLogin userLogin, JSONObject importJsonData ->
+			Boolean sendResultsByEmail = false,
+			String progressKey = null)
+	{
+
+		InputStream datasetInpuStream = fileSystemService.openTemporaryFile(datasetFileName)
+		if (!datasetInpuStream) {
+			throw new InvalidParamException('Specified input file not found')
+		}
+
+		JSONObject importJsonData = null
+		try {
+			importJsonData = JsonUtil.parseFile(datasetInpuStream)
+		} finally {
+			datasetInpuStream.close()
+		}
+
+		if (!importJsonData) {
+			throw new InvalidParamException('Invalid input file not found')
+		}
 
 		// Map which summarizes the results from the import process.
 		Map importResults = [batchesCreated: 0, domains: [], errors: []]
 
 		// A map that contains various objects used throughout the import process
 		Map importContext = [
-			project           : project,
-			userLogin         : userLogin,
-			etlInfo           : importJsonData.ETLInfo,
-			status            : isAutoProcess ? ImportBatchStatusEnum.QUEUED : ImportBatchStatusEnum.PENDING,
-			guid              : StringUtil.generateGuid(),
-			sendResultsByEmail: sendResultsByEmail,
-			// The cache will be used to hold on to domain entity references when found or a String if there
-			// was an error when looking up the domain object. The key will be the md5hex of the query element
-			// of the field.
-			cache             : new DataImportEntityCache(),
+				project           : project,
+				userLogin         : userLogin,
+				etlInfo           : importJsonData.ETLInfo,
+				status            : isAutoProcess ? ImportBatchStatusEnum.QUEUED : ImportBatchStatusEnum.PENDING,
+				guid              : StringUtil.generateGuid(),
+				sendResultsByEmail: sendResultsByEmail,
+				// The cache will be used to hold on to domain entity references when found or a String if there
+				// was an error when looking up the domain object. The key will be the md5hex of the query element
+				// of the field.
+				cache             : new DataImportEntityCache(),
 
-			// The following are reset per domain
-			domainClass       : null,
-			fieldNames        : [],
-			rowsCreated       : 0,
-			rowsSkipped       : 0,
-			rowNumber         : 0,
-			errors            : []
+				// The following are reset per domain
+				domainClass       : null,
+				fieldNames        : [],
+				rowsCreated       : 0,
+				rowsSkipped       : 0,
+				rowNumber         : 0,
+				errors            : []
 		]
+
+		ImportProgressCalculator progressCalculator =
+				new ImportProgressCalculator(
+						progressKey,
+						importJsonData.domains.sum { (it?.dataSize)?:0 },
+						progressService
+				)
+
+		progressCalculator.start()
 
 		// Iterate over the domains and create batches for each
 		for (domainJson in importJsonData.domains) {
-			importContext.domainClass = domainJson.domain
 
+			importContext.domainClass = domainJson.domain
 			log.debug "localFunction() in for loop: importContext=$importContext"
 
-			List<JSONObject> importRows = domainJson.data
-			if (!importRows) {
+			//TODO: John. What we need to do if the import process contains empty results.
+			if (domainJson.dataSize == 0) {
 				importResults.errors << "Domain ${importContext.domainClass} contained no data"
 				importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0]
-			} else {
 
+			} else {
 				// Process each batch in a separate transaction to help with performance and memory
 				ImportBatch.withNewTransaction { session ->
 					// Attach the project to the current transaction
@@ -228,12 +266,14 @@ class DataImportService implements ServiceMethods, EventPublisher {
 						importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0]
 
 					} else {
-						//
-						// Process the rows for the batch
-						//
 
-						// Import the assets for this batch
-						importRowsIntoBatch(session, batch, importRows, importContext)
+						InputStream inputStream = fileSystemService.openTemporaryFile(domainJson.outputFilename)
+						if (!inputStream) {
+							throw new InvalidParamException('Specified input file not found')
+						}
+						// Import the assets for this batch using Streaming process
+						importRowsIntoBatchUsingStreaming(session, batch, inputStream, progressCalculator, importContext)
+
 
 						// Update the batch with information about the import results
 						batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
@@ -246,7 +286,41 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			}
 		}
 
+		if (isAutoProcess && importResults.batchesCreated > 0) {
+			log.debug "Notify ImportBatchJon with importResults:$importResults"
+			notify(ImportBatchJob.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
+		}
+
+		progressCalculator.finish()
 		return importResults
+	}
+
+	/**
+	 * Import all the assets for the given InputStream.
+	 * It reads Map<String, ?> rowData from InputStream parameter.
+	 * For each row read, it creates an new row using {@code DataImportService#importRow}
+	 *
+	 * @param batch - current batch
+	 * @param inputStream - list of assets in an instance of {@code InputStream}
+	 * @param importContext - additional parameters required for logging
+	 * @see ETLStreamingReader#eachRow(groovy.lang.Closure)
+	 */
+	private void importRowsIntoBatchUsingStreaming(session, ImportBatch batch, InputStream inputStream, ImportProgressCalculator progressCalculator, Map importContext) {
+
+		new ETLStreamingReader(inputStream).eachRow { Map<String, ?> rowData ->
+			log.debug "Processing row with content: ${rowData}"
+			// Keep track of the row number for reporting
+			importContext.rowNumber++
+
+			// Do some initialization of the rowData object if necessary
+			if (rowData.errors == null) {
+				rowData.errors = []
+			}
+
+			// Process the fields for this row
+			importRow(session, batch, rowData, importContext)
+			progressCalculator.increase()
+		}
 	}
 
 	/**
@@ -300,29 +374,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		}
 
 		return batch
-	}
-
-	/**
-	 * Import all the assets for the given batch.
-	 *
-	 * @param batch - current batch
-	 * @param assets - list of assets
-	 * @param importContext - additional parameters required for logging
-	 */
-	//@CompileStatic
-	private void importRowsIntoBatch(session, ImportBatch batch, List<JSONObject> importRows, Map importContext) {
-		for (rowData in importRows) {
-			// Keep track of the row number for reporting
-			importContext.rowNumber++
-
-			// Do some initialization of the rowData object if necessary
-			if (rowData.errors == null) {
-				rowData.errors = []
-			}
-
-			// Process the fields for this row
-			importRow(session, batch, rowData, importContext)
-		}
 	}
 
 	private void importRow(session, ImportBatch batch, RowResult rowData, Map importContext) {
@@ -401,18 +452,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			return false
 		}
 		return true
-	}
-
-	/**
-	 *  Check if the field values for row are valid for the given domain class
-	 *
-	 * @param domainId - the validated specified domain id if it exists
-	 * @param rowData - the meta-data object containing all of the row fields
-	 * @param importContext - Map of the import context objects
-	 * @return true: the asset is valid, false otherwise.
-	 */
-	private boolean canRowDataBeImported(JSONObject rowData, Long domainId, Map importContext) {
-		return DataImportHelper.validateRowData(rowData, domainId, importContext)
 	}
 
 	/**
@@ -789,27 +828,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		}
 
 		return error
-	}
-
-	/**
-	 * Used to update the ImportBatch status to COMPLETED if all rows are COMPLETED or IGNORED otherwise
-	 * set the status to PENDING.
-	 * @param batch - the batch that the ImportBatchRecord
-	 */
-	@NotTransactional()
-	private void updateBatchStatus(Long batchId) {
-		Integer count = ImportBatchRecord.where {
-			importBatch.id == batchId
-			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
-		}.count()
-		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
-
-		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batchId, count, status.name()
-
-		ImportBatch.where {
-			id == batchId
-			status != status
-		}.updateAll([status: status])
 	}
 
 	/**
@@ -1914,7 +1932,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		if (!dataScriptId) {
 			errorMsg = 'Missing required dataScriptId parameter'
 		} else if (!filename) {
-			errorMsg = 'Missing filename par	ameter'
+			errorMsg = 'Missing filename parameter'
 		} else if (!fileSystemService.temporaryFileExists(filename)) {
 			errorMsg = 'Specified input file not found'
 		} else {
@@ -1950,31 +1968,23 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
 		log.debug "transformEtlData() calling scriptProcessorService.executeAndRetrieveResults"
 		ETLProcessorResult processorResult = scriptProcessorService.executeAndRetrieveResults(
-			project,
-			dataScript?.id,
-			dataScript.etlSourceCode,
-			inputFilename,
-			updateProgressCallback)
+				project,
+				dataScript?.id,
+				dataScript.etlSourceCode,
+				inputFilename,
+				updateProgressCallback)
 
-		if (!dataScript.isAutoProcess) {
-			result.filename = scriptProcessorService.saveResultsInFile(processorResult)
-
-		} else {
-			Map importResults = loadETLResultsIntoAutoProcessImportBatch(project, userLogin, processorResult, sendResultsByEmail)
-
-			if (importResults.batchesCreated > 0) {
-				log.debug "Notify ImportBatchJon with importResults:$importResults"
-				notify('NEXT_BATCH_READY', new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
-			}
-
-			result.filename = null
-		}
+		result.filename = scriptProcessorService.saveResultsUsingStreaming(processorResult)
 
 		updateProgressCallback.reportProgress(
-			100,
-			true,
-			ProgressCallback.ProgressStatus.COMPLETED,
-			result.filename)
+				100,
+				true,
+				ProgressCallback.ProgressStatus.COMPLETED,
+				result.filename)
+
+		if (dataScript.isAutoProcess) {
+			scheduleImportDataJob(project, userLogin, result.filename, dataScript.isAutoProcess, sendResultsByEmail)
+		}
 
 		return result
 	}

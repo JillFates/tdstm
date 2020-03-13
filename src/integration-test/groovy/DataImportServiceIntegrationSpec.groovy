@@ -1,9 +1,3 @@
-import com.tdssrc.grails.TimeUtil
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetType
-import net.transitionmanager.asset.Database
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
@@ -15,24 +9,28 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.action.Provider
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.dataImport.SearchQueryHelper
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.imports.ImportBatchRecord
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelAlias
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.action.Provider
-import net.transitionmanager.imports.DataImportService
-import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
@@ -751,11 +749,11 @@ class DataImportServiceIntegrationSpec extends Specification {
 			transformJson.domains.size() == 1
 		and: 'the Domain is Dependency'
 			transformJson.domains[0].domain == 'Dependency'
-		and: 'the data has only one element'
-			transformJson.domains[0].data.size() == 1
+		and: 'the data has not element field'
+			!transformJson.domains[0].data
 		cleanup: 'Delete test files'
-			fileSystemService.deleteTemporaryFile(fileUploadName)
-			fileSystemService.deleteTemporaryFile(transformedFileName)
+			if (fileUploadName) fileSystemService.deleteTemporaryFile(fileUploadName)
+			if (transformedFileName) fileSystemService.deleteTemporaryFile(transformedFileName)
 
 	}
 
