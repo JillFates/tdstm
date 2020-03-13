@@ -1,14 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { TaskEditCreateCommonComponent } from '../common/task-edit-create-common.component';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { TaskDetailModel } from '../../model/task-detail.model';
-import { PreferenceService } from '../../../../shared/services/preference.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { TaskService } from '../../service/task.service';
-
-declare var jQuery: any;
+// Angular
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+// Component
+import {TaskEditCreateCommonComponent} from '../common/task-edit-create-common.component';
+// Service
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {TaskService} from '../../service/task.service';
+import {DialogService} from 'tds-component-library';
 
 @Component({
 	selector: `tds-task-edit-create`,
@@ -17,17 +16,17 @@ declare var jQuery: any;
 })
 export class TaskEditCreateComponent extends TaskEditCreateCommonComponent implements OnInit {
 
-	@ViewChild('dueDatePicker', { static: false}) dueDatePicker;
+	@ViewChild('dueDatePicker', {static: false}) dueDatePicker;
+
 	constructor(
-		taskDetailModel: TaskDetailModel,
+		componentFactoryResolver: ComponentFactoryResolver,
 		taskManagerService: TaskService,
-		dialogService: UIDialogService,
-		promptService: UIPromptService,
+		dialogService: DialogService,
 		userPreferenceService: PreferenceService,
 		permissionService: PermissionService,
 		translatePipe: TranslatePipe) {
 
-		super(taskDetailModel, taskManagerService, dialogService, promptService, userPreferenceService, permissionService, translatePipe);
+		super(componentFactoryResolver, taskManagerService, dialogService, userPreferenceService, permissionService, translatePipe);
 
 	}
 
@@ -39,4 +38,5 @@ export class TaskEditCreateComponent extends TaskEditCreateCommonComponent imple
 		event.preventDefault();
 		this.dueDatePicker.toggle();
 	}
+
 }
