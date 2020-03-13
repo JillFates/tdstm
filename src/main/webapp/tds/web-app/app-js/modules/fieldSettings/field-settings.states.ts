@@ -6,6 +6,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {FieldsResolveService} from './resolve/fields-resolve.service';
 // Services
 import {AuthGuardService} from '../auth/service/auth.guard.service';
+import {PreventUrlChangeService} from './service/prevent-url-change.service';
 // Components
 import {FieldSettingsListComponent} from './components/list/field-settings-list.component';
 // Models
@@ -35,7 +36,8 @@ export const FieldSettingsRoute: Routes = [
 		resolve: {
 			fields: FieldsResolveService
 		},
-		canActivate: [AuthGuardService, ModuleResolveService]
+		canActivate: [AuthGuardService, ModuleResolveService],
+		canDeactivate: [PreventUrlChangeService]
 	}
 ];
 

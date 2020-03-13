@@ -80,6 +80,7 @@
 				(pageChange)="onPageChangeHandler($event)"
 				[filterable]="true"
 				[resizable]="true"
+				[reorderable]="true"
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
 				[sortable]="{mode:'single'}"
@@ -178,21 +179,29 @@
 					</ng-template>
 					<!-- task Number -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem>
-						<span class="is-grid-link" (click)="onOpenTaskDetailHandler(dataItem)">{{dataItem.taskNumber}}</span>
+						<span class="is-grid-link" (click)="onOpenTaskDetailHandler(dataItem)" [title]="dataItem.taskNumber">{{dataItem.taskNumber}}</span>
 					</ng-template>
 					<!-- asset name -->
 					<ng-template kendoGridCellTemplate *ngIf="currentCustomColumns[column.property] === 'assetName'"
 											 let-dataItem>
-								<span class="is-grid-link"
+								<span class="is-grid-link" [title]="dataItem[column.property]"
 											(click)="onOpenAssetDetailHandler(dataItem)">{{dataItem[column.property]}}</span>
 					</ng-template>
 					<!-- updated -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
-						<span class="task-updated-cell {{dataItem.updatedClass}} overflow-ellipsis">{{dataItem.updatedTime}}</span>
+						<span class="task-updated-cell {{dataItem.updatedClass}} overflow-ellipsis" [title]="dataItem.updatedTime">{{dataItem.updatedTime}}</span>
 					</ng-template>
 					<!-- status -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-						<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
+						<span class="task-status-cell {{dataItem.taskStatus}}" [title]="dataItem.status">{{dataItem.status}}</span>
+					</ng-template>
+					<!-- successors -->
+					<ng-template kendoGridCellTemplate *ngIf="column.property === 'successors'" let-dataItem>
+						<span *ngIf="dataItem.actionBarInfo">{{dataItem.actionBarInfo.successorsCount}}</span>
+					</ng-template>
+					<!-- default cell template -->
+					<ng-template kendoGridCellTemplate let-dataItem>
+						<span [title]="dataItem[column.property]">{{dataItem[column.property]}}</span>
 					</ng-template>
 					<ng-template kendoGridFilterCellTemplate let-filter>
 						<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">

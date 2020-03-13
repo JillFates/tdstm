@@ -24,7 +24,7 @@ class TeamController implements ControllerMethods {
 	/**
 	 * Renders a list view with just the team roles.
 	 */
-    @HasPermission(Permission.RoleTypeView)
+    @HasPermission(Permission.TaskTimelineView)
     def list() {
 		List teams = roleTypeService.list(RoleType.TYPE_TEAM)
 		if (params.containsKey('json')) {

@@ -1,6 +1,11 @@
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { CompositeFilterDescriptor, process, State } from '@progress/kendo-data-query';
-import { GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS, ModalType } from '../../../../shared/model/constants';
+import {
+	DIALOG_SIZE,
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	ModalType
+} from '../../../../shared/model/constants';
 import { ActionType, COLUMN_MIN_WIDTH } from '../../../dataScript/model/data-script.model';
 import { CellClickEvent, GridDataResult } from '@progress/kendo-angular-grid';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -15,6 +20,7 @@ import { AssetCommentViewEditComponent } from '../view-edit/asset-comment-view-e
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH } from '../../../../shared/constants/common-shrunk-columns';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 
 declare var jQuery: any;
 
@@ -42,6 +48,7 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	public gridData: GridDataResult;
 	public resultSet: AssetCommentModel[];
 	public dateFormat = '';
+	public hasCommentViewPermission: boolean;
 	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
@@ -68,6 +75,7 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 				this.dateFormat = dateFormat;
 				this.assetCommentColumnModel = new AssetCommentColumnModel(`{0:${ dateFormat }}`);
 			});
+		this.hasCommentViewPermission = this.permissionService.hasPermission(Permission.CommentView);
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -114,12 +122,16 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Check the field clicked and if appropriate open the comment view
+	 * Check the field clicked and if appropriate open the comment view or the asset details
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex === 1) {
+		if (event.columnIndex === 1 && this.hasCommentViewPermission) {
 			this.openAssetCommentDialogViewEdit(event['dataItem'], ModalType.VIEW);
+		} else {
+			if (event.columnIndex === 2) {
+				this.openAssetDetails(event.dataItem.assetEntityId, event.dataItem.assetClass.name);
+			}
 		}
 	}
 
@@ -143,6 +155,23 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		const lastIndex = this.gridData.data.length - 1;
 		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${ lastIndex }"]`);
 		this.renderer.setStyle(target, 'height', '36px');
+	}
+
+	/**
+	 * Open the asset show details
+	 * @param assetEntityId
+	 * @param assetType
+	 */
+	private openAssetDetails(assetEntityId: string, assetClassName: string) {
+		this.dialogService.open(AssetShowComponent, [
+				{provide: 'ID', useValue: assetEntityId},
+				{provide: 'ASSET', useValue: assetClassName}
+			], DIALOG_SIZE.LG)
+		.then(result => {
+			// Do nothing
+		}).catch(result => {
+			// Do nothing
+		});
 	}
 
 	/**

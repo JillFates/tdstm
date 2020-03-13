@@ -24,6 +24,7 @@ import {FieldTypeSelectorComponent} from './components/field-type-selector/field
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
 // Services
+import {PreventUrlChangeService} from './service/prevent-url-change.service';
 import {FieldSettingsService} from './service/field-settings.service';
 import {CustomDomainService} from './service/custom-domain.service';
 import {FieldConverterService} from './service/field-converter.service';
@@ -57,6 +58,7 @@ import {ProjectService} from '../project/service/project.service';
 		// Resolve
 		FieldsResolveService,
 		// Services
+		PreventUrlChangeService,
 		ModuleResolveService,
 		FieldSettingsService,
 		CustomDomainService,
