@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
@@ -66,6 +67,9 @@ class ETLIterateSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -506,8 +510,8 @@ class ETLIterateSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 4
 
-					assertWith(data[0], RowResult){
-						assertWith(fields['assetName'], FieldResult){
+					assertWith(data[0]){
+						assertWith(fields['assetName']){
 							init == null
 							value == 'alphadb01'
 							originalValue == 'alphadb01'

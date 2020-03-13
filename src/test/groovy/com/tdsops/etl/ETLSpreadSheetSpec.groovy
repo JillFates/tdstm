@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -41,6 +42,9 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -544,8 +548,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 					iterate {
 						extract 'name' load 'Name'
 					}
-					""".stripIndent(),
-						  ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.finalResult().domains.size() == 2
@@ -802,13 +805,11 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 	static final String ApplicationDataSet = """
 		application id,vendor name,technology,location
 		152254,Microsoft,(xlsx updated),ACME Data Center
-		152255,Mozilla,NGM,ACME Data Center
-		""".stripIndent().trim()
+		152255,Mozilla,NGM,ACME Data Center""".stripIndent().trim()
 
 	static final String DeviceDataSet = """
 		name,mfg,model,type
 		xraysrv01,Dell,PE2950,Server
-		zuludb01,HP,BL380,Blade
-		""".stripIndent().trim()
+		zuludb01,HP,BL380,Blade""".stripIndent().trim()
 
 }

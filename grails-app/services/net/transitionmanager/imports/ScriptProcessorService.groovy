@@ -40,8 +40,8 @@ class ScriptProcessorService {
     Scheduler quartzScheduler
     TagService tagService
 
-    private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
-    private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
+    static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
+    static final String TEST_SCRIPT_PREFIX = 'testETLScript'
 
     /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
@@ -72,12 +72,8 @@ class ScriptProcessorService {
      */
     @CompileStatic
     String saveResultsInJSONFile(ETLProcessorResult processorResult) {
-
-        List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
-        String outputFilename = tmpFile[0]
-        OutputStream os = (OutputStream) tmpFile[1]
-        jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, os)
-        return outputFilename
+        jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, processorResult.outputStream)
+        return processorResult.outputFilename
     }
 
     /**
@@ -93,14 +89,14 @@ class ScriptProcessorService {
     @CompileStatic
     String saveResultsUsingStreaming(ETLProcessorResult processorResult) {
 
-        saveDomainDataUsingStreaming(processorResult)
+        // saveDomainDataUsingStreaming(processorResult)
 
-        List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
-        String outputFilename = tmpFile[0]
-        OutputStream os = (OutputStream) tmpFile[1]
+//        List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+//        String outputFilename = tmpFile[0]
+//        OutputStream os = (OutputStream) tmpFile[1]
 
-        new ETLStreamingWriter(os).writeETLResultsHeader(processorResult)
-        return outputFilename
+        new ETLStreamingWriter(processorResult.outputStream).writeETLResultsHeader(processorResult)
+        return processorResult.outputFilename
     }
 
     /**
@@ -272,7 +268,7 @@ class ScriptProcessorService {
                 updateProgressClosure,
                 includeConsoleLog)
 
-        String outputFilename = saveResultsInJSONFile(processorResult)
+        String outputFilename = saveResultsUsingStreaming(processorResult)
 
         updateProgressClosure.reportProgress(
                 100,

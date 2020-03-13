@@ -20,7 +20,7 @@ import groovy.transform.CompileStatic
  * 	    //}//
  * </pre>
  *
- * @see net.transitionmanager.imports.DataImportService#importRowsIntoBatchUsingStreaming(java.lang.Object, net.transitionmanager.imports.ImportBatch, java.io.InputStream, java.util.Map)
+ * @see net.transitionmanager.imports.DataImportService#importRowsIntoBatchUsingStreaming(java.lang.Object, net.transitionmanager.imports.ImportBatch, java.io.InputStream, net.transitionmanager.imports.ImportProgressCalculator, java.util.Map)
  */
 @CompileStatic
 class ETLStreamingReader {

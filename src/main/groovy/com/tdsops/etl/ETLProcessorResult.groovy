@@ -1,9 +1,14 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.converters.JSON
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.etl.ETLStreamingWriter
+import net.transitionmanager.imports.ScriptProcessorService
 
 /**
  * Results collected from an ETL Processor instance processing an ETL script.
@@ -14,6 +19,8 @@ import groovy.transform.CompileStatic
 class ETLProcessorResult {
 
     static final Integer CURRENT_VERSION = 2
+
+    static final String ETL_FILENAME_EXTENSION = 'json'
     /**
      * ETL Processor used to collect results in a ETL Procesor Result instance.
      */
@@ -37,7 +44,7 @@ class ETLProcessorResult {
     List<DomainResult> domains = (List<DomainResult>) []
     /**
      * Result row index position in the reference.data list
-     * @see DomainResult#data
+     * @see DomainResult#dataSize
      */
     Integer resultIndex = -1
 
@@ -46,11 +53,36 @@ class ETLProcessorResult {
      */
     String consoleLog = ''
 
+    FileSystemService fileSystemService
+
+    String outputFilename
+
+    OutputStream outputStream
+
+    /**
+     * Defines if lookup
+     */
+    Boolean isLookupEnable = false
+
     ETLProcessorResult(ETLProcessor processor) {
         this.processor = processor
         this.ETLInfo = [
                 originalFilename: processor.getFilename()
         ]
+
+        fileSystemService = ApplicationContextHolder.getBean('fileSystemService', FileSystemService)
+        List tmpFile = fileSystemService.createTemporaryFile(ScriptProcessorService.PROCESSED_FILE_PREFIX, ETL_FILENAME_EXTENSION)
+        outputFilename = tmpFile[0]
+        outputStream = (OutputStream) tmpFile[1]
+    }
+
+    /**
+     *
+     */
+    void finish() {
+        for (DomainResult domain in this.domains) {
+            domain.finish()
+        }
     }
 
     /**
@@ -62,17 +94,37 @@ class ETLProcessorResult {
     }
 
     /**
+     *
+     */
+    void enableLookup() {
+        this.isLookupEnable = true
+    }
+
+    /**
      * Adds a new json entry in results list
      * @param domain
      */
     void addCurrentSelectedDomain(ETLDomain domain) {
-        endRow()
+
         reference = domains.find { it.domain == domain.name() }
         if (!reference) {
-            reference = new DomainResult(domain: domain.name())
+
+            if (isLookupEnable) {
+
+                reference = new DomainInMemory(domain.name())
+
+            } else {
+                String filename = outputFilename.replace(".${ETL_FILENAME_EXTENSION}", "_${domain.name()}.$ETL_FILENAME_EXTENSION")
+                OutputStream outputStream = fileSystemService.createTemporaryFileWithGivenName(filename)
+
+                reference = new DomainInDiskResult(
+                        domain.name(),
+                        filename,
+                        new ETLStreamingWriter(outputStream)
+                )
+            }
             domains.add(reference)
         }
-        resultIndex = -1
     }
 
     /**
@@ -231,35 +283,30 @@ class ETLProcessorResult {
      * Restart result index for the next row to be processed in an ETL script iteration
      */
     void startRow() {
-        resultIndex = -1
+        //resultIndex = -1
     }
 
     /**
-     * Mark the end of a row cleaning up the ignored result
+     * Mark the end of a row cleaning up the ignored result.
      */
     void endRow() {
-        // Check first if the scenario with an iterate without defining a domain and read labels
-        if (reference && processor.iterateIndex) {
-            RowResult currentRow = findOrCreateCurrentRow()
-            if (currentRow.ignore) {
-                ignoreCurrentRow()
-            }
+        for (DomainResult domain in domains) {
+            domain.writeCurrentRow()
         }
     }
 
     /**
-     * Remove the current row from results going back the previous row results
+     * Remove the current row from results going back the previous row results.
      */
     void ignoreCurrentRow() {
-        if (resultIndex >= 0) {
-            if (resultIndex >= reference.data.size() + 1) {
-                throw ETLProcessorException.ignoreOnlyAllowOnNewRows()
-            }
-            reference.data.remove(resultIndex)
-            resultIndex = -1
+        if (!reference) {
+            throw ETLProcessorException.ignoreOnlyAllowOnNewRows()
+        }
+
+        if (reference.currentRow) {
+            reference.currentRow.ignore = true
         }
     }
-
     /**
      * <p>Find the current row in ETLProcessorResult#reference</p>
      * If ETLProcessorResult#resultIndex is equals -1,
@@ -270,15 +317,14 @@ class ETLProcessorResult {
      */
     @CompileStatic
     RowResult findOrCreateCurrentRow() {
-        if (resultIndex == -1) {
-            reference.data.add(new RowResult(
+
+        if (!reference.currentRow) {
+            reference.currentRow = new RowResult(
                     fieldsValidator: processor.fieldsValidator,
                     rowNum: processor.currentRowIndex,
                     domain: reference.domain)
-            )
-            resultIndex = reference.data.size() - 1
         }
-        return reference.data[resultIndex]
+        return reference.currentRow // data[resultIndex]
     }
 
     /**
@@ -288,7 +334,7 @@ class ETLProcessorResult {
      */
     @CompileStatic
     RowResult currentRow() {
-        return reference.data[resultIndex]
+        return reference.currentRow
     }
 
     /**
@@ -298,10 +344,8 @@ class ETLProcessorResult {
      */
     @CompileStatic
     Object getFieldValue(String fieldNameOrLabel) {
-        if (resultIndex >= 0) {
-
-            RowResult row = currentRow()
-            FieldResult fieldResult = row.getField(fieldNameOrLabel)
+        if (reference.currentRow) {
+            FieldResult fieldResult = reference.currentRow.getField(fieldNameOrLabel)
             return fieldResult.value
 
         } else {
@@ -316,12 +360,10 @@ class ETLProcessorResult {
      * @return
      */
     Boolean hasColumn(String columnName) {
-        if (resultIndex >= 0) {
-            RowResult row = currentRow()
-            return row.hasField(columnName)
-        } else {
+        if (!reference.currentRow) {
             throw ETLProcessorException.domainOnlyAllowOnNewRows()
         }
+        return reference.currentRow.hasField(columnName)
     }
 
     /**
@@ -473,7 +515,7 @@ class ETLProcessorResult {
  *}* </pre>
  */
 @CompileStatic
-class DomainResult {
+abstract class DomainResult {
 
     /**
      * An instance of {@code DomainResult} is represented as list of {@RowResult}
@@ -492,7 +534,7 @@ class DomainResult {
      *  ....
      * </pre>
      */
-    Set fieldNames = [] as Set
+    Set fieldNames
     /**
      * <p>This map is used to have a map between field label and field name used in an ETL processor results</p>
      * <pre>
@@ -504,20 +546,26 @@ class DomainResult {
      *  ....
      * <pre>
      */
-    Map<String, String> fieldLabelMap = [:]
+    Map<String, String> fieldLabelMap
 
-    List<RowResult> data = new ArrayList<RowResult>()
-    /**
-     * Filename of DomainResult saved on disk using a Streaming solution.
-     * @see net.transitionmanager.etl.ETLStreamingWriter#writeDataArray(java.util.List)
-     */
-    String outputFilename
-    /**
-     * Defines amount of {@code DomainResult#data} list. It used in serialized step
-     * using streaming solution.
-     */
+    RowResult currentRow
+
+    DomainResult(String domain) {
+        this.domain = domain
+        this.fieldNames = [] as Set
+        this.fieldLabelMap = [:]
+    }
+/**
+ * Defines amount of {@code DomainResult#data} list. It used in serialized step
+ * using streaming solution.
+ */
     Integer dataSize = 0
 
+    abstract void finish()
+
+    abstract void writeCurrentRow()
+
+    abstract List<Object> getData()
     /**
      * Add the field name for an instance of Element
      * to the fieldNames Set property
@@ -541,6 +589,86 @@ class DomainResult {
      */
     void setFieldLabelMap(Map<String, String> fieldLabelMap) {
         this.fieldLabelMap = fieldLabelMap
+    }
+
+}
+
+@CompileStatic
+class DomainInDiskResult extends DomainResult {
+
+    /**
+     * Filename of DomainResult saved on disk using a Streaming solution.
+     * @see net.transitionmanager.etl.ETLStreamingWriter#writeDataArray(java.util.List)
+     */
+    String outputFilename
+    /**
+     *
+     */
+    ETLStreamingWriter writer
+    /**
+     *
+     */
+    List<Object> data
+
+
+    DomainInDiskResult(String domain, String outputFilename, ETLStreamingWriter writer) {
+        super(domain)
+        this.outputFilename = outputFilename
+        this.writer = writer
+        this.writer.startDataArray()
+    }
+
+    void finish() {
+        this.writer.endDataArray()
+        this.writer.close()
+    }
+
+    void writeCurrentRow() {
+        if (currentRow && !currentRow.ignore) {
+            this.dataSize++
+            this.writer.writeRowResult(currentRow)
+        }
+        currentRow = null
+    }
+
+    /**
+     *
+     * @return
+     */
+    List<Object> getData() {
+        if (!data) {
+            FileSystemService fileSystemService = ApplicationContextHolder.getBean('fileSystemService', FileSystemService)
+            String fileContent = fileSystemService.openTempFile(outputFilename).text
+            data = (new JsonSlurper().parse(fileContent.getBytes())) as List
+        }
+        return data
+    }
+}
+
+class DomainInMemory extends DomainResult {
+
+    List<RowResult> rows
+
+    DomainInMemory(String domain) {
+        super(domain)
+        this.domain = domain
+        this.rows = []
+    }
+
+    void finish() {
+    }
+
+    void writeCurrentRow() {
+        if (currentRow && !currentRow.ignore) {
+            this.dataSize++
+            this.rows.add(currentRow)
+        }
+        currentRow = null
+    }
+
+    @Override
+    List<Object> getData() {
+        return rows.toList()
     }
 }
 

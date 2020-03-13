@@ -3,6 +3,7 @@ package net.transitionmanager.etl
 import com.fasterxml.jackson.core.JsonEncoding
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
+import com.tdsops.etl.DomainInDiskResult
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.FieldResult
@@ -10,7 +11,10 @@ import com.tdsops.etl.FindResult
 import com.tdsops.etl.QueryResult
 import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
+import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
+
+import java.text.SimpleDateFormat
 
 /**
  * <p>Streaming reader solution for {@link ETLProcessorResult},
@@ -50,11 +54,24 @@ class ETLStreamingWriter {
     OutputStream outputStream
     JsonGenerator generator
 
+    static SimpleDateFormat dateFormat = new SimpleDateFormat('')
+
     ETLStreamingWriter(OutputStream outputStream) {
         this.outputStream = outputStream
         generator = new JsonFactory()
                 .createGenerator(outputStream, JsonEncoding.UTF8)
     }
+
+    void startDataArray() {
+        generator.writeStartArray()
+    }
+
+    void endDataArray() {
+        generator.writeEndArray()
+        close()
+    }
+
+
     /**
      * Writes in {@link ETLStreamingWriter#outputStream} field,
      * the main structure from {@link ETLProcessorResult}.
@@ -73,10 +90,7 @@ class ETLStreamingWriter {
         generator.writeNumberField('version', result.version)
         writeDomains(result.domains)
         generator.writeEndObject()
-        generator.close()
-
-        outputStream.flush()
-        outputStream.close()
+        close()
     }
     /**
      * <p>Writes in {@link ETLStreamingWriter#outputStream} field,
@@ -89,11 +103,14 @@ class ETLStreamingWriter {
      */
     void writeETLResultsData(List<RowResult> data) {
         writeDataArray(data)
+        close()
+    }
+
+    void close() {
         generator.close()
         outputStream.flush()
         outputStream.close()
     }
-
     /**
      * Writes in {@link ETLStreamingWriter#outputStream}
      * fields from {@link DomainResult}.
@@ -105,7 +122,7 @@ class ETLStreamingWriter {
         generator.writeFieldName('domains')
         generator.writeStartArray()
         for (DomainResult domainResult in domains) {
-            writeDomains(domainResult)
+            writeDomains((DomainInDiskResult) domainResult)
         }
         generator.writeEndArray()
     }
@@ -116,7 +133,7 @@ class ETLStreamingWriter {
      *
      * @param domain
      */
-    private void writeDomains(DomainResult domain) {
+    private void writeDomains(DomainInDiskResult domain) {
         generator.writeStartObject()
         generator.writeStringField('domain', domain.domain)
         generator.writeStringField('outputFilename', domain.outputFilename)
@@ -143,9 +160,8 @@ class ETLStreamingWriter {
      *
      * @param rowResult
      */
-    private void writeRowResult(RowResult rowResult) {
+    void writeRowResult(RowResult rowResult) {
         generator.writeStartObject()
-
         writeStringCollectionField('errors', rowResult.errors)
         generator.writeNumberField('rowNum', rowResult.rowNum)
         generator.writeNumberField('errorCount', rowResult.errorCount)
@@ -174,15 +190,35 @@ class ETLStreamingWriter {
         generator.writeBooleanField('warn', fieldResult.warn)
         writeStringCollectionField('errors', fieldResult.errors)
 
-        generator.writeObjectField('init', fieldResult.init)
-        generator.writeObjectField('originalValue', fieldResult.originalValue)
-        generator.writeObjectField('value', fieldResult.value)
+        writeObjectField('init', fieldResult.init)
+        writeObjectField('originalValue', fieldResult.originalValue)
+        writeObjectField('value', fieldResult.value)
 
         if (fieldResult.find) writeFind(fieldResult.find)
         if (fieldResult.create) writeObjectMapField('create', fieldResult.create)
         if (fieldResult.update) writeObjectMapField('update', fieldResult.update)
 
         generator.writeEndObject()
+    }
+
+    /**
+     *
+     * @param fieldName
+     * @param pojo
+     */
+    private void writeObjectField(String fieldName, Object pojo) {
+
+        switch (pojo?.class) {
+            case Date:
+                generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
+                break
+            case Map:
+                JsonObject:
+                    generator.writeStringField(fieldName, pojo.toString())
+                break
+            default:
+                generator.writeObjectField(fieldName, pojo)
+        }
     }
 
     /**
@@ -266,7 +302,6 @@ class ETLStreamingWriter {
         for (Map.Entry<String, FieldResult> fieldResultEntry in fields) {
             writeFieldResult(fieldResultEntry.key, fieldResultEntry.value)
         }
-
         generator.writeEndObject()
     }
 

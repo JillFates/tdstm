@@ -1034,7 +1034,7 @@ class TimeUtil {
 	 * @return String ISO8601
 	 */
 	static String formatToISO8601DateTime(Date date) {
-		DateFormatUtils.formatUTC(date, FORMAT_DATE_TIME_ISO8601)
+		DateFormatUtils.formatUTC(date, FORMAT_DATE_TIME_ISO8601_2)
 	}
 
 	/**

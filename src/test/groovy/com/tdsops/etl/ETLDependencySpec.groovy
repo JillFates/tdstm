@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
@@ -40,6 +41,9 @@ class ETLDependencySpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -497,7 +501,6 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'Results contains the following values'
 			assertWith(etlProcessor.finalResult()) {
-				ETLInfo.originalFilename == fileName
 				domains.size() == 3
 
 				assertWith(domains[0], DomainResult) {
@@ -505,13 +508,13 @@ class ETLDependencySpec extends ETLBaseSpec {
 					fieldNames == ['assetName', 'manufacturer', 'model', 'id'] as Set
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 4
 						assertFieldResult(fields['assetName'], 'xraysrv01', 'xraysrv01')
 						assertFieldResult(fields['manufacturer'], 'Dell', 'Dell')
 						assertFieldResult(fields['model'], 'PE2950', 'PE2950')
 						assertFieldResult(fields['id'], null, null)
-						assertWith(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -531,14 +534,14 @@ class ETLDependencySpec extends ETLBaseSpec {
 					fieldNames == ['appVendor', 'appTech', 'url', 'id'] as Set
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 4
 						assertFieldResult(fields['appVendor'], 'Microsoft', 'Microsoft')
 						assertFieldResult(fields['appTech'], '(xlsx updated)', '(xlsx updated)')
 						assertFieldResult(fields['url'], 'www.microsoft.com', 'www.microsoft.com')
 						assertFieldResult(fields['id'], null, null)
 
-						assertWith(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -557,12 +560,14 @@ class ETLDependencySpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type'] as Set
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 3
 
 						assertFieldResult(fields['asset'])
-						assertWith(fields['asset'].find, FindResult) {
+
+						assertWith(fields['asset'].find) {
 							query.size() == 4
+
 							assertQueryResult(
 								query[0],
 								ETLDomain.Device,
@@ -572,17 +577,17 @@ class ETLDependencySpec extends ETLBaseSpec {
 									['model', FindOperator.eq.name(), 'PE2950']
 								]
 							)
-
-							assertWith(fields['asset'].create) {
+						}
+						assertWith(fields['asset'].create) {
 								!it.containsKey('id')
 								it.'assetName' == 'xraysrv01'
 								it.'manufacturer' == 'Dell'
 								it.'model' == 'PE2950'
 							}
-						}
 
 						assertFieldResult(fields['dependent'])
-						assertWith(fields['dependent'].find, FindResult) {
+
+						assertWith(fields['dependent'].find) {
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -593,13 +598,12 @@ class ETLDependencySpec extends ETLBaseSpec {
 									['url', FindOperator.eq.name(), 'www.microsoft.com']
 								]
 							)
-
-							assertWith(fields['dependent'].create) {
+						}
+                        assertWith(fields['dependent'].create) {
 								!it.containsKey('id')
 								it.'appVendor' == 'Microsoft'
 								it.'appTech' == '(xlsx updated)'
 								it.'url' == 'www.microsoft.com'
-							}
 						}
 
 						assertFieldResult(fields['type'], dependencyType.value, dependencyType.value)
@@ -680,7 +684,6 @@ class ETLDependencySpec extends ETLBaseSpec {
 
 		then: 'Results contains the following values'
 			assertWith(etlProcessor.finalResult()) {
-				ETLInfo.originalFilename == fileName
 				domains.size() == 3
 
 				assertWith(domains[0], DomainResult) {
@@ -688,12 +691,12 @@ class ETLDependencySpec extends ETLBaseSpec {
 					fieldNames == ['assetName', 'appVendor', 'id'] as Set
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 3
 						assertFieldResult(fields['assetName'], 'Exchange', 'Exchange')
 						assertFieldResult(fields['appVendor'], 'Microsoft', 'Microsoft')
 						assertFieldResult(fields['id'], null, null)
-						assertWith(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find) {
 							query.size() == 2
 							assertQueryResult(
 								query[0],
@@ -712,7 +715,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 					fieldNames == ['assetName', 'manufacturer', 'model', 'externalRefId','id'] as Set
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 5
 						assertFieldResult(fields['assetName'], 'exchangedb01', 'exchangedb01')
 						assertFieldResult(fields['manufacturer'], 'VMWare', 'VMWare')
@@ -720,7 +723,7 @@ class ETLDependencySpec extends ETLBaseSpec {
 						assertFieldResult(fields['externalRefId'], '123-abc-456-def', '123-abc-456-def')
 						assertFieldResult(fields['id'], null, null)
 
-						assertWith(fields['id'].find, FindResult) {
+						assertWith(fields['id'].find) {
 							query.size() == 5
 							assertQueryResult(
 								query[0],
@@ -737,11 +740,11 @@ class ETLDependencySpec extends ETLBaseSpec {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'comment'] as Set
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 4
 
 						assertFieldResult(fields['asset'])
-						assertWith(fields['asset'].find, FindResult) {
+						assertWith(fields['asset'].find) {
 							query.size() == 2
 							assertQueryResult(
 								query[0],
@@ -751,16 +754,15 @@ class ETLDependencySpec extends ETLBaseSpec {
 									['appVendor', FindOperator.eq.name(), 'Microsoft'],
 								]
 							)
-
-							assertWith(fields['asset'].create) {
-								!it.containsKey('id')
-								it.'assetName' == 'Exchange'
-								it.'appVendor' == 'Microsoft'
-							}
+						}
+						assertWith(fields['asset'].create) {
+							!it.containsKey('id')
+							it.'assetName' == 'Exchange'
+							it.'appVendor' == 'Microsoft'
 						}
 
 						assertFieldResult(fields['dependent'])
-						assertWith(fields['dependent'].find, FindResult) {
+						assertWith(fields['dependent'].find) {
 							query.size() == 5
 							assertQueryResult(
 								query[0],
@@ -769,15 +771,15 @@ class ETLDependencySpec extends ETLBaseSpec {
 									['externalRefId', FindOperator.eq.name(), '123-abc-456-def']
 								]
 							)
-
-							assertWith(fields['dependent'].create) {
+						}
+						assertWith(fields['dependent'].create) {
 								!it.containsKey('id')
 								it.'assetName' == 'exchangedb01'
 								it.'manufacturer' == 'VMWare'
 								it.'model' == 'VM'
 								it.'externalRefId' == '123-abc-456-def'
 							}
-						}
+
 						assertFieldResult(fields['type'], dependencyType.value, dependencyType.value)
 						assertFieldResult(fields['comment'], 'This is pretty cool eh?', 'This is pretty cool eh?')
 					}

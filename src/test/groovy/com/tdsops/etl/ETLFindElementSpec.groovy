@@ -1,13 +1,16 @@
 package com.tdsops.etl
 
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetOptions
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdssrc.grails.JsonUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.project.Project
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
@@ -19,6 +22,19 @@ class ETLFindElementSpec extends ETLBaseSpec {
 
 	ETLProcessor processor
 	ETLFieldsValidator validator
+
+	static doWithSpring = {
+		coreService(CoreService) {
+			grailsApplication = ref('grailsApplication')
+		}
+		fileSystemService(FileSystemService) {
+			coreService = ref('coreService')
+			transactionManager = ref('transactionManager')
+		}
+		applicationContextHolder(ApplicationContextHolder) { bean ->
+			bean.factoryMethod = 'getInstance'
+		}
+	}
 
 	def setup() {
 		validator = createDomainClassFieldsValidator()

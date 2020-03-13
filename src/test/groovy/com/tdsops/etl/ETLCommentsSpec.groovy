@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
@@ -34,6 +35,9 @@ class ETLCommentsSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	DebugConsole debugConsole
@@ -79,7 +83,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -90,7 +94,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 						comments == ['Description FOOBAR']
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -139,7 +143,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -150,7 +154,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 						comments == ['Description FOOBAR']
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -201,7 +205,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -212,7 +216,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 						comments == ['Description FOOBAR']
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -300,13 +304,13 @@ class ETLCommentsSpec extends ETLBaseSpec {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						comments == ['Description FOOBAR']
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						comments == ['Some description']

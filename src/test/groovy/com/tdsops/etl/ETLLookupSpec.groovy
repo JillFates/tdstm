@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
@@ -44,6 +45,9 @@ class ETLLookupSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -117,6 +121,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 						console on
 						read labels
 						domain Device
+						enable lookup 
 						iterate {
 							extract 'server' load 'Name' set nameVar
 							extract 'model' load 'model'

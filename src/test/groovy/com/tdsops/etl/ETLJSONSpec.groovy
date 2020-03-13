@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -41,6 +42,9 @@ class ETLJSONSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -748,25 +752,25 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				assertWith(data[0], RowResult) {
+				assertWith(data[0]) {
 					rowNum == 1
 
-					assertWith(fields.id, FieldResult) {
+					assertWith(fields.id) {
 						originalValue == 123
 						value == 123
 					}
 
-					assertWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					assertWith(data[0].fields.custom2) {
+					assertWith(fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					assertWith(data[0].fields.custom3) {
+					assertWith(fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}
@@ -828,15 +832,15 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				assertWith(data[0], RowResult) {
+				assertWith(data[0]) {
 					rowNum == 1
 
-					assertWith(fields.id, FieldResult) {
+					assertWith(fields.id) {
 						originalValue == 123
 						value == 123
 					}
 
-					assertWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1) {
 						originalValue == 4096
 						value == 4096
 					}
