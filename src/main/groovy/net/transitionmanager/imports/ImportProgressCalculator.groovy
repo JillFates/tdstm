@@ -27,13 +27,15 @@ class ImportProgressCalculator {
 
     Integer rowsProcessed = 0
 
+    Integer progress = 0
+
     ProgressService progressService
 
     ImportProgressCalculator(String progressKey, Integer totalRows, ProgressService progressService) {
         this.progressKey = progressKey
         this.totalRows = totalRows
         this.progressService = progressService
-        this.factorStepFrequency = (totalRows / 100).intValue()
+        this.factorStepFrequency = totalRows / 100
     }
     /**
      * Starts progressKey with status 'RUNNING'
@@ -47,24 +49,20 @@ class ImportProgressCalculator {
     }
 
     /**
-     * Increase on row processed in an ETL import process, based on {@link ImportProgressCalculator#factorStepFrequency}
+     * Increase on row processed in an ETL import process, based on {@link ImportProgressCalculator#factorStepFrequency}.
      */
     void increase() {
 
-        if (frequencyCounter == factorStepFrequency) {
+        if (frequencyCounter++ == factorStepFrequency) {
 
-            Integer progress = (rowsProcessed / totalRows * 100).intValue()
-            println "totalRows:$totalRows. rowsProcessed:$rowsProcessed Progress:${progress}%"
             progressService.update(progressKey,
                     progress,
                     ProgressCallback.ProgressStatus.RUNNING.name(),
-                    ''
+                    "TotalRows:$totalRows. RowsProcessed:$rowsProcessed. Progress:${progress++}%"
             )
             frequencyCounter = 0
-        } else {
-            frequencyCounter += 1
         }
-        rowsProcessed += 1
+        rowsProcessed++
     }
 
     /**
@@ -74,7 +72,7 @@ class ImportProgressCalculator {
         progressService.update(progressKey,
                 100,
                 ProgressCallback.ProgressStatus.COMPLETED.name(),
-                "Total amount of rows:$totalRows".toString()
+                "Total amount of rows:$totalRows processed"
         )
     }
 
