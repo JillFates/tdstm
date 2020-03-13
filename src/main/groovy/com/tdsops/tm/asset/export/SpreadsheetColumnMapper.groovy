@@ -7,6 +7,8 @@ import net.transitionmanager.common.CustomDomainService
  * Asset export spreadsheet column mapper
  */
 class SpreadsheetColumnMapper {
+    private static final List<String> ignoredFields = ['dependencyGroup','conflict','tbd']
+
     private String sheetName
     private List<String> templateHeaders
     private List<Map<String, ?>> customFields = []
@@ -123,6 +125,10 @@ class SpreadsheetColumnMapper {
      */
     private void setFieldSpecs(List<Map<String, ?>> fieldSpecs) {
         for (Map<String, ?> fieldSpec : fieldSpecs) {
+            if(fieldSpec.field in ignoredFields){
+                continue
+            }
+
             if (fieldSpec["udf"] as int == CustomDomainService.CUSTOM_USER_FIELD) {
                 customFields.add(fieldSpec)
             } else {
