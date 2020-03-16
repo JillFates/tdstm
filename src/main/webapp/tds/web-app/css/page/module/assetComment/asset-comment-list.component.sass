@@ -1,23 +1,6 @@
 .asset-comment-list-component
-  .k-grid-content-locked,
-  .k-grid-header-locked
-    border-right-width: 5px
-    border-right-color: $color--grey2
-  .k-grid tbody tr td
-    overflow: hidden
-    text-overflow: ellipsis
-    white-space: nowrap
-  .tds-kendo-grid.without-selectabe-rows
-      .k-grid-content-locked
-          .k-grid-table tbody td:not(:first-child)
-              cursor: pointer
-  .filters-section
-    margin-top: 4px
-  .kendo-grid-toolbar__refresh-btn
-    i
-      font-size: 22px
-    padding: 5px 11px
-  .column-cursor-pointer
-    cursor: pointer
-  .column-cursor-pointer:hover
-    font-weight: bold
+  .has-comment-view-permission
+    td:nth-child(2)
+      cursor: pointer
+      font-weight: bold
+

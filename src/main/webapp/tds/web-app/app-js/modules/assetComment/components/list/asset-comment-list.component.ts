@@ -84,8 +84,12 @@ export class AssetCommentListComponent implements OnInit {
 		this.gridModel.columnModel = this.columnModel;
 	}
 
+	/**
+	 * Check the field clicked and if appropriate open the comment view
+	 * @param {SelectionEvent} event
+	 */
 	public async cellClick(event: CellClickEvent): Promise<void> {
-		if (event.columnIndex > 0 && this.isEditAvailable()) {
+		if (event.columnIndex === 1 && this.isShowCommentAvailable()) {
 			await this.openComment(event.dataItem, ModalType.VIEW);
 		}
 	}
@@ -164,5 +168,12 @@ export class AssetCommentListComponent implements OnInit {
 	 */
 	protected isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	/**
+	 * Determine if the user has the permission to see comment details
+	 */
+	protected isShowCommentAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentView);
 	}
 }
