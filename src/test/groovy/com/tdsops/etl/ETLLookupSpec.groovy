@@ -119,7 +119,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
-						enable lookUp 
+						enable lookup 
 						read labels
 						domain Device
 						
@@ -204,7 +204,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
-						enable lookUp 
+						enable lookup 
 						read labels
 						domain Device
 
@@ -263,7 +263,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
-						enable lookUp 
+						enable lookup 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -342,7 +342,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
-						enable lookUp
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -425,7 +425,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
-						enable lookUp 
+						enable lookup 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -495,7 +495,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
-						enable lookUp
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -573,7 +573,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						enable lookUp
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -658,7 +658,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
-					enable lookUp
+					enable lookup
 
 					read labels
 					iterate {

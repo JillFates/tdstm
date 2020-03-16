@@ -27,6 +27,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
+import org.codehaus.groovy.runtime.MethodClosure
 
 import static org.codehaus.groovy.syntax.Types.*
 
@@ -206,7 +207,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     static enum ReservedWord {
 
-        labels, with, on, off, record, ControlCharacters, populated, lookUp
+        labels, with, on, off, record, ControlCharacters, populated
     }
 
     /**
@@ -595,7 +596,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * Global replace method given a regex and a replacement content
      * @param regex
      * @param replacement
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor replace(String regex, String replacement) {
         globalTransformation.addReplacer(regex, replacement)
@@ -641,7 +642,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Skip a fixed amount of row for the iterate process
      * @param amount
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor skip(Integer amount) {
         currentRowIndex += amount
@@ -658,7 +659,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Defines the sheet name to be used in an ETl script
      * @param sheetName
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor sheet(String sheetName) {
         currentRowIndex = 0
@@ -669,7 +670,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Defines the sheetNumber to be used in an ETl script
      * @param sheetNumber
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor sheet(Integer sheetNumber) {
         currentRowIndex = 0
@@ -680,7 +681,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Defines the rootNode XPath to be used in an ETl script and a JSON dataset
      * @param sheetName
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor rootNode(String rootNode) {
         currentRowIndex = 0
@@ -919,12 +920,22 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     }
 
     /**
-     *
-     * @param reservedWord
-     * @return
+     * Enable lookup command.
+     * <pre>
+     *  enable lookup
+     *  read labels
+     *  iterate { //
+     *      domain Device
+     *      ...
+     *      lookup 'assetName' with dependsOnVar
+     *  //}//
+     * </pre>
+     * @param methodClosure an instance of {@link MethodClosure}
+     * @return the instance of ETLProcessor who received this message
+     * @see ETLProcessor#lookup(java.lang.Object)
      */
-    ETLProcessor enable(ReservedWord reservedWord){
-        if (reservedWord != ReservedWord.lookUp) {
+    ETLProcessor enable(MethodClosure methodClosure) {
+        if (methodClosure.method != 'lookup') {
             throw ETLProcessorException.incorrectWhenCommandStructure()
         }
 

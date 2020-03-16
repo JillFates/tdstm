@@ -117,7 +117,7 @@ class ETLProcessorResult {
                 String filename = outputFilename.replace(".${ETL_FILENAME_EXTENSION}", "_${domain.name()}.$ETL_FILENAME_EXTENSION")
                 OutputStream outputStream = fileSystemService.createTemporaryFileWithGivenName(filename)
 
-                reference = new DomainInDiskResult(
+                reference = new DomainOnDisk(
                         domain.name(),
                         filename,
                         new ETLStreamingWriter(outputStream)
@@ -486,8 +486,15 @@ class ETLProcessorResult {
         if (size > 1) {
             throw ETLProcessorException.lookupFoundMultipleResults()
         } else if (size == 1) {
+            /**
+             * Once the lookup command found a coincidence,
+             * It is necessary first, to save in current row with
+             * all its fields. After that, we can change the pointer of
+             * current row to a found RowResult.
+             */
+            this.reference.writeCurrentRow()
             Integer position = positions[0]
-            this.reference.currentRow = (RowResult)this.reference.data[position]
+            this.reference.currentRow = (RowResult) this.reference.data[position]
         }
 
         return (size == 1)
@@ -593,9 +600,12 @@ abstract class DomainResult {
     }
 
 }
-
+/**
+ * <p>{@link DomainResult} class extension. It serialized ETL results
+ * on FileSystem using an instance of {@link ETLStreamingWriter}.</p>
+ */
 @CompileStatic
-class DomainInDiskResult extends DomainResult {
+class DomainOnDisk extends DomainResult {
 
     /**
      * Filename of DomainResult saved on disk using a Streaming solution.
@@ -612,7 +622,7 @@ class DomainInDiskResult extends DomainResult {
     List<Object> data
 
 
-    DomainInDiskResult(String domain, String outputFilename, ETLStreamingWriter writer) {
+    DomainOnDisk(String domain, String outputFilename, ETLStreamingWriter writer) {
         super(domain)
         this.outputFilename = outputFilename
         this.writer = writer
@@ -645,9 +655,20 @@ class DomainInDiskResult extends DomainResult {
         return data
     }
 }
-
+/**
+ * <p>This class extends {@link DomainResult} collecting {@link RowResult}
+ * in {@link DomainInMemory#rows} field.</p>
+ * <p>Once an ETL script enable lookup command, {@link ETLProcessorResult}
+ * collects {@link RowResult} in a list in memory instead of flushing each row on disk
+ * as {@link DomainOnDisk} implementation.</p>
+ * @see ETLProcessor#enable(org.codehaus.groovy.runtime.MethodClosure)
+ */
 class DomainInMemory extends DomainResult {
 
+    /**
+     * Collection of {@link RowResult} saved in memory
+     * during an ETL script evaluation.
+     */
     List<RowResult> rows
 
     DomainInMemory(String domain) {
@@ -656,17 +677,37 @@ class DomainInMemory extends DomainResult {
         this.rows = []
     }
 
+    /**
+     *
+     */
     void finish() {
     }
-
+    /**
+     * <p>This method adds {@link DomainResult#currentRow} in
+     * {@link DomainInMemory#rows} List.</p>
+     * There are 3 possible scenarios where current row
+     * should not be added in {@link DomainInMemory#rows} List:
+     * <p>1) If {@link DomainResult#currentRow} is null.
+     * It only happends in lookup command scenario.</p>
+     * <p>2) If the {@link DomainResult#currentRow} needs to be ignored.</p>
+     * <p>3)If {@link DomainResult#currentRow} was already added in
+     * {@link DomainInMemory#rows} List.</p>
+     */
     void writeCurrentRow() {
-        if (currentRow && !currentRow.ignore) {
+        if (currentRow
+                && !currentRow.ignore
+                && (rows.size() <= (currentRow.rowNum - 1))
+        ) {
             this.dataSize++
             this.rows.add(currentRow)
         }
         currentRow = null
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     List<Object> getData() {
         return rows.toList()
@@ -677,12 +718,15 @@ class DomainInMemory extends DomainResult {
  * Init a row data map.
  * <pre>
  * 	"data": [
- *{* 		    "op": "I",
+ *      //{ //
+ *          op": "I",
  * 		    "errorCount": 0,
  * 		    "warn": true,
  * 		    "duplicate": true,
  * 		    "errors": [],
- * 		    "fields": {}*}* </pre>
+ * 		    "fields": {}//
+ * 		  //}//
+ * </pre>
  */
 @CompileStatic
 class RowResult {

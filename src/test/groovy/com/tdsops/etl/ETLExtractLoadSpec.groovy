@@ -2788,7 +2788,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor
 				.evaluate("""
-						enable lookUp
+						enable lookup
 						read labels
 						iterate {
 							domain Device

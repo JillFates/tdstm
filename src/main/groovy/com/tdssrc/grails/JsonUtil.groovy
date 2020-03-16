@@ -162,6 +162,20 @@ class JsonUtil {
     }
 
     /**
+     * Parse the given inputStream of text into an JSONObject instance
+     * @param inputStream
+     * @return JSON
+     */
+    static Object parseInputStream(InputStream inputStream) {
+        try {
+            return new JsonSlurper().parse(inputStream)
+        } catch (Exception e) {
+            logger.error(e.message)
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
+        }
+    }
+
+    /**
      * Used to transform a JSON string into an object of a particular class
      *
      * @param json - Some JSON text

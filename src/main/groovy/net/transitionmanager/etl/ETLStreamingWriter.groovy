@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonEncoding
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
 import com.google.gson.JsonObject
-import com.tdsops.etl.DomainInDiskResult
+import com.tdsops.etl.DomainOnDisk
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.FieldResult
@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat
  * </pre>
  * <p>At the same time, it populates 2 fields in {@link ETLProcessorResult}:</p>
  *  <ul>
- *      <li>{@link DomainInDiskResult#outputFilename}: defines where {@link ETLStreamingWriter}
+ *      <li>{@link DomainOnDisk#outputFilename}: defines where {@link ETLStreamingWriter}
  *          saves each {@link DomainResult#getData()} list.
  *      <li>{@link DomainResult#dataSize}: defines the amount of rows from {@link DomainResult#getData()}
  *          were saved
@@ -123,7 +123,7 @@ class ETLStreamingWriter {
         generator.writeFieldName('domains')
         generator.writeStartArray()
         for (DomainResult domainResult in domains) {
-            writeDomains((DomainInDiskResult) domainResult)
+            writeDomains((DomainOnDisk) domainResult)
         }
         generator.writeEndArray()
     }
@@ -134,7 +134,7 @@ class ETLStreamingWriter {
      *
      * @param domain
      */
-    private void writeDomains(DomainInDiskResult domain) {
+    private void writeDomains(DomainOnDisk domain) {
         generator.writeStartObject()
         generator.writeStringField('domain', domain.domain)
         generator.writeStringField('outputFilename', domain.outputFilename)
