@@ -33,9 +33,9 @@ import java.text.SimpleDateFormat
  * </pre>
  * <p>At the same time, it populates 2 fields in {@link ETLProcessorResult}:</p>
  *  <ul>
- *      <li>{@link DomainResult#outputFilename}: defines where {@link ETLStreamingWriter}
- *          saves each {@link DomainResult#data} list.
- *      <li>{@link DomainResult#dataSize}: defines the amount of rows from {@link DomainResult#data}
+ *      <li>{@link DomainInDiskResult#outputFilename}: defines where {@link ETLStreamingWriter}
+ *          saves each {@link DomainResult#getData()} list.
+ *      <li>{@link DomainResult#dataSize}: defines the amount of rows from {@link DomainResult#getData()}
  *          were saved
  *  </ul
  * <BR>
@@ -203,9 +203,14 @@ class ETLStreamingWriter {
     }
 
     /**
+     * <p>Overrides {@link JsonGenerator#writeObjectField(java.lang.String, java.lang.Object)} for not supported data types.</p>
+     * <p>At the moment we are serializing {@link FieldResult#init}, {@link FieldResult#value} and {@link FieldResult#originalValue}
+     * we need to detect if data type is supported by {@link JsonGenerator}.
+     * If that is not the case we are converting Object field using toString() method.
+     * After that, DataImport can detect and convert it smartly based on Domain data types.</p>
      *
-     * @param fieldName
-     * @param pojo
+     * @param fieldName a field name
+     * @param pojo an Object to be serialized.
      */
     private void writeObjectField(String fieldName, Object pojo) {
 
@@ -216,6 +221,7 @@ class ETLStreamingWriter {
             case Map:
             case JsonObject:
             case List:
+            case Set:
                 generator.writeStringField(fieldName, pojo.toString())
                 break
             default:
