@@ -95,7 +95,7 @@ export class DynamicComponent extends Dialog {
 	}
 
 	/**
-	 * On double click
+	 * On double click notify to the base class
 	 */
 	public onDoubleClick(event: MouseEvent): void {
 		super.onDoubleClick(event);
