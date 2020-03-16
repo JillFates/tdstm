@@ -14,6 +14,7 @@ export const PROMPT_CONFIRM = 'GLOBAL.CONFIRM';
 export const PROMPT_CANCEL = 'GLOBAL.CANCEL';
 export const LOADER_IDLE_PERIOD = 150;
 export const PROGRESSBAR_INTERVAL_TIME = 1 * 1000; // Seconds
+export const ESCAPE_KEYCODE = 27;
 // Pagination
 export const GRID_DEFAULT_PAGINATION_OPTIONS = [25, 50, 100];
 export const GRID_DEFAULT_PAGE_SIZE = 25;
