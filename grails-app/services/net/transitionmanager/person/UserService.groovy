@@ -481,7 +481,11 @@ class UserService implements ServiceMethods {
 	}
 
 	List getEventNews(Project project) {
-		List comingEvents = getEvents(getSelectedProject(project), TimeUtil.nowGMT()).keySet().asList()
+		List comingEvents
+		def events = getEvents(getSelectedProject(project), TimeUtil.nowGMT())
+		if(events) {
+			comingEvents = events.keySet().asList()
+		}
 		// log.debug "getEventNews() comingEvents=$comingEvents"
 		if (comingEvents) {
 			MoveEventNews.executeQuery(
