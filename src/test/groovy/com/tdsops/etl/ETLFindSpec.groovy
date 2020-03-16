@@ -2438,6 +2438,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
+            enable lookUp
 			read labels
 			iterate {
 				extract 'Primary App' set primaryAppVar

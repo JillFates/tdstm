@@ -3,6 +3,7 @@ package net.transitionmanager.etl
 import com.fasterxml.jackson.core.JsonEncoding
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
+import com.google.gson.JsonObject
 import com.tdsops.etl.DomainInDiskResult
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLProcessorResult
@@ -213,8 +214,9 @@ class ETLStreamingWriter {
                 generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
                 break
             case Map:
-                JsonObject:
-                    generator.writeStringField(fieldName, pojo.toString())
+            case JsonObject:
+            case List:
+                generator.writeStringField(fieldName, pojo.toString())
                 break
             default:
                 generator.writeObjectField(fieldName, pojo)

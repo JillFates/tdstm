@@ -2343,7 +2343,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							}
 
 							assertWith(custom1) {
-								Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+								Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601_2)
 								//assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
 							}
 						}
@@ -2788,6 +2788,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor
 				.evaluate("""
+						enable lookUp
 						read labels
 						iterate {
 							domain Device

@@ -152,6 +152,7 @@ class ETLStreamingWriterSpec extends ETLBaseSpec {
             TimeUtil.parseISO8601DateTime("1978-06-22T17:05:22Z") || '1978-06-22T17:05:22Z'
             JSON.parse('{"key": "value"}')                        || '[key:value]'
             [key: 'value']                                        || '[key:value]'
+            ['key', 'value']                                      || '[key, value]'
     }
 
     void 'test can write ETLProcessorResult as header in an OutputStream'() {

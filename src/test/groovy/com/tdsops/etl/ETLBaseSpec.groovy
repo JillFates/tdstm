@@ -493,7 +493,7 @@ abstract class ETLBaseSpec extends Specification {
      * @param domain
      * @param values
      */
-    def assertQueryResult(Map<String, ?> queryResult, ETLDomain domain, List<List<Object>> values) {
+    def assertQueryResult(Object queryResult, ETLDomain domain, List<List<Object>> values) {
         assert queryResult.domain == domain.name()
         queryResult.criteria.eachWithIndex { Map map, int i ->
             assert map['propertyName'] == values[i][0]

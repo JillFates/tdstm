@@ -486,7 +486,8 @@ class ETLProcessorResult {
         if (size > 1) {
             throw ETLProcessorException.lookupFoundMultipleResults()
         } else if (size == 1) {
-            this.resultIndex = positions[0]
+            Integer position = positions[0]
+            this.reference.currentRow = (RowResult)this.reference.data[position]
         }
 
         return (size == 1)

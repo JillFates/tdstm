@@ -206,7 +206,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     static enum ReservedWord {
 
-        labels, with, on, off, record, ControlCharacters, populated, lookup
+        labels, with, on, off, record, ControlCharacters, populated, lookUp
     }
 
     /**
@@ -924,7 +924,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return
      */
     ETLProcessor enable(ReservedWord reservedWord){
-        if (reservedWord != ReservedWord.lookup) {
+        if (reservedWord != ReservedWord.lookUp) {
             throw ETLProcessorException.incorrectWhenCommandStructure()
         }
 

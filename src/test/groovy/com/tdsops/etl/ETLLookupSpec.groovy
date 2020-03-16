@@ -119,9 +119,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookUp 
 						read labels
 						domain Device
-						enable lookup 
+						
 						iterate {
 							extract 'server' load 'Name' set nameVar
 							extract 'model' load 'model'
@@ -203,6 +204,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookUp 
 						read labels
 						domain Device
 
@@ -261,6 +263,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookUp 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -339,6 +342,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookUp
 						read labels
 						domain Device
 						iterate {
@@ -421,6 +425,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookUp 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -490,6 +495,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookUp
 						read labels
 						domain Device
 						iterate {
@@ -567,7 +573,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						
+						enable lookUp
 						read labels
 						domain Device
 						iterate {
@@ -652,6 +658,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
+					enable lookUp
 
 					read labels
 					iterate {
@@ -754,6 +761,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 			String firstAssetName = 'xraysrv01'
 			String secondAssetName = 'zuludb01'
+			etlProcessor.result.isLookupEnable = true
 			ETLDomain domain = ETLDomain.Device
 			etlProcessor.result.addCurrentSelectedDomain(domain)
 			etlProcessor.iterateIndex = new IterateIndex(3)
@@ -769,8 +777,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 			createResultReference(etlProcessor, domain, [assetName: secondAssetName])
 		then: 'calling lookupInReference for the 2nd server name should find a result'
 			etlProcessor.result.lookupInReference(['assetName'], [secondAssetName])
-		and: 'the resultIndex in the process should be pointing to the 2nd asset'
-			1 == etlProcessor.result.resultIndex
 
 		when: 'there is another result that has the same name as the first with a different assetType'
 			createResultReference(etlProcessor, domain, [assetName: firstAssetName, assetType: 'Blade'])

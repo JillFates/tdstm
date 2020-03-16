@@ -533,8 +533,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					sheet 'Applications'
 					read labels
 					domain Application

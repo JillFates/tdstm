@@ -411,13 +411,13 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				assertWith(data[0].fields.appVendor) {
-					originalValue.value == 'Microsoft'
-					value.value == 'Microsoft'
+					originalValue == '[value:Microsoft]'
+					value == '[value:Microsoft]'
 				}
 
 				assertWith(data[1].fields.appVendor) {
-					originalValue.value == 'Mozilla'
-					value.value == 'Mozilla'
+					originalValue == '[value:Mozilla]'
+					value == '[value:Mozilla]'
 				}
 			}
 
@@ -569,8 +569,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					rootNode 'Applications'
 					read labels
 					domain Application
@@ -584,8 +583,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 					iterate {
 						extract 'name' load 'Name'
 					}
-					""".stripIndent(),
-						  ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
 			etlProcessor.finalResult().domains.size() == 2
@@ -845,12 +843,12 @@ class ETLJSONSpec extends ETLBaseSpec {
 						value == 4096
 					}
 
-					assertWith(data[0].fields.custom2) {
+					assertWith(fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					assertWith(data[0].fields.custom3) {
+					assertWith(fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}
