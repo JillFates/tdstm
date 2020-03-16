@@ -162,8 +162,8 @@
                                 </button>
                             </label>
                             <div class="col-md-12 collapse in collapsible">
-                                <kendo-tabstrip>
-                                    <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
+                                <kendo-tabstrip (tabSelect)="onDomainTabSelected($event)">
+                                    <kendo-tabstrip-tab [title]="getDomainTabTitle(domain)" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
                                         <ng-template kendoTabContent>
                                             <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
                                                 <!-- Fields Info Popup -->
