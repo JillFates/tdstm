@@ -58,6 +58,7 @@
 							<span *ngIf="dataItem.status === licenseStatus.PENDING">{{ 'GLOBAL.PENDING' | translate }}</span>
 							<span *ngIf="dataItem.status === licenseStatus.ACTIVE">{{ 'GLOBAL.ACTIVE' | translate }}</span>
 							<span *ngIf="dataItem.status === licenseStatus.CORRUPT">{{ 'GLOBAL.CORRUPT' | translate }}</span>
+							<span *ngIf="dataItem.status === licenseStatus.EXPIRED">{{ 'GLOBAL.EXPIRED' | translate }}</span>
 						</ng-template>
 
 						<ng-template kendoGridCellTemplate *ngIf="column.property === 'environment'" let-dataItem>

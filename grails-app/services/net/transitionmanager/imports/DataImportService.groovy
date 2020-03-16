@@ -145,7 +145,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		trigger.setJobGroup('tdstm-etl-import-data')
 		quartzScheduler.scheduleJob(trigger)
 
-		log.info('scheduleJob() {} kicked of an ETL Import data process for filename ({})', securityService.currentUsername, filename)
+		log.info('scheduleJob() {} kicked of an ETL Import data process for filename ({})', userLogin.username, filename)
 
 		return ['progressKey': key, 'jobTriggerName': jobTriggerName]
 	}
@@ -288,7 +288,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 		if (isAutoProcess && importResults.batchesCreated > 0) {
 			log.debug "Notify ImportBatchJon with importResults:$importResults"
-			notify('NEXT_BATCH_READY', new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
+			notify(ImportBatchJob.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
 		}
 
 		progressCalculator.finish()
@@ -1976,15 +1976,15 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 		result.filename = scriptProcessorService.saveResultsUsingStreaming(processorResult)
 
-		if (dataScript.isAutoProcess) {
-			scheduleImportDataJob(project, userLogin, result.filename, dataScript.isAutoProcess, sendResultsByEmail)
-		}
-
 		updateProgressCallback.reportProgress(
 				100,
 				true,
 				ProgressCallback.ProgressStatus.COMPLETED,
 				result.filename)
+
+		if (dataScript.isAutoProcess) {
+			scheduleImportDataJob(project, userLogin, result.filename, dataScript.isAutoProcess, sendResultsByEmail)
+		}
 
 		return result
 	}

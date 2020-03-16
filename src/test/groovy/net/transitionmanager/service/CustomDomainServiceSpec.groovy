@@ -106,7 +106,7 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			service.metaClass.dataDateTimeToDate = { String fieldName -> dataDateTimeToDateCalled = true; return ""; }
 			service.metaClass.dataToYesNo = { String fieldName -> dataToYesNoCalled = true; return ""; }
 			service.metaClass.dataToString = { String fieldName, Integer maxLength -> dataToStringCalled = true; return ""; }
-			service.metaClass.anyTypeToNull = { List<String> fieldNames -> clearCustomFieldsCalled = true; return ""; }
+			service.metaClass.anyTypeToNull = { String fieldName -> clearCustomFieldsCalled = true; return ""; }
 
 		expect: 'when updateFieldData is called the flags are set appropriately'
 			String updateString = service.updateFieldData(oldFieldSpec, newFieldSpec)
