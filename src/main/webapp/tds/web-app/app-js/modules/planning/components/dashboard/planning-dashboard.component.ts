@@ -1,6 +1,6 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {PlanningDashboardModel} from '../../models/planning-dashboard.model';
-
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {PlanningService} from '../../service/planning.service';
 
 @Component({
@@ -8,11 +8,14 @@ import {PlanningService} from '../../service/planning.service';
 	templateUrl: 'planning-dashboard.component.html'
 })
 
-export class PlanningDashboardComponent {
+export class PlanningDashboardComponent implements OnInit {
 	public percentage;
 	public planningDashboardModel = new PlanningDashboardModel;
+	protected userDateFormat: string;
 
-	constructor(private planningService: PlanningService) {
+	constructor(
+		private planningService: PlanningService,
+		private preferenceService: PreferenceService) {
 		const defaultModel = {
 			discovery: {
 				appsValidatedPercentage: 0,
@@ -175,5 +178,12 @@ export class PlanningDashboardComponent {
 					}
 				}
 			});
+	}
+
+	ngOnInit() {
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+			.subscribe((preferences) => {
+				this.userDateFormat = preferences.CURR_DT_FORMAT || this.preferenceService.getUserDateFormat();
+		});
 	}
 }

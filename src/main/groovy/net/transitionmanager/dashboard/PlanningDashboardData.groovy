@@ -208,7 +208,7 @@ class PlanningDashboardData {
 		static final String selectCount = 'SELECT count(ae)'
 		static final String baseWhere = 'WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)'
 		static final String deviceWhere = "$baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
-		static final String otherDeviceWhere = "$baseWhere AND ae.assetType NOT IN (:type) AND ae.assetClass=:assetClass"
+		static final String otherDeviceWhere = "$baseWhere AND ae.assetClass=:assetClass AND (ae.assetType NOT IN (:type) OR ae.assetType IS NULL)"
 		protected PlanningDashboardData planningDashboardData
 
 		/**

@@ -44,10 +44,10 @@
 								</div>
 								<div class="col-md-12 asset-comment-date-container" *ngIf="assetCommentModel.modal.type === modalType.VIEW">
 									<div class="col-md-6 pad-left-0">
-										<label class="control-label label-detail text-capitalize">Date created: {{assetCommentModel.dateCreated | date: dateFormatTime}}</label>
+										<label class="control-label label-detail text-capitalize">Date created: {{assetCommentModel.dateCreated | tdsDateTime: dateFormatTime}}</label>
 									</div>
 									<div class="col-md-6">
-										<label class="control-label label-detail text-capitalize pull-right">Last updated: {{assetCommentModel.lastUpdated | date: dateFormatTime}}</label>
+										<label class="control-label label-detail text-capitalize pull-right">Last updated: {{assetCommentModel.lastUpdated | tdsDateTime: dateFormatTime}}</label>
 									</div>
 								</div>
 							</div>
