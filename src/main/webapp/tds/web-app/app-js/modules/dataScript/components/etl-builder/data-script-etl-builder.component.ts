@@ -226,6 +226,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
 					domain.data = result.data;
 				});
+		} else {
+			this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(domain.data ? domain.data : []);
 		}
 	}
 
