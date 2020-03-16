@@ -42,11 +42,6 @@ class ETLProcessorResult {
      * Collection of results with their data fields map
      */
     List<DomainResult> domains = (List<DomainResult>) []
-    /**
-     * Result row index position in the reference.data list
-     * @see DomainResult#dataSize
-     */
-    Integer resultIndex = -1
 
     /**
      * Debug Console content filed used to create the final result
@@ -77,9 +72,10 @@ class ETLProcessorResult {
     }
 
     /**
-     *
+     * Defines when an ETL script was finished in its evaluation step.
+     * @see ETLProcessor#evaluate(java.lang.String)
      */
-    void finish() {
+    void scriptFinished() {
         for (DomainResult domain in this.domains) {
             domain.finish()
         }
@@ -291,7 +287,7 @@ class ETLProcessorResult {
      */
     void endRow() {
         for (DomainResult domain in domains) {
-            domain.writeCurrentRow()
+            domain.endCurrentRow()
         }
     }
 
@@ -492,7 +488,7 @@ class ETLProcessorResult {
              * all its fields. After that, we can change the pointer of
              * current row to a found RowResult.
              */
-            this.reference.writeCurrentRow()
+            this.reference.endCurrentRow()
             Integer position = positions[0]
             this.reference.currentRow = (RowResult) this.reference.data[position]
         }
@@ -510,17 +506,20 @@ class ETLProcessorResult {
 
 /**
  * <pre>
- *  "domains": {*    "domain": "Device",
+ *  "domains": { //
+ *    "domain": "Device",
  *    "fieldNames": [
  *      "assetName",
  *      "externalRefId"
  *    ],
- * 	  "fieldLabelMap": {* 		"asset": "asset",
+ * 	  "fieldLabelMap": { //
+ * 	    "asset": "asset",
  *      "dependent": "dependent",
  *      "c1": "c1"
- *},
+ *     //}, //
  *    "data": [ list of RowResult instances]
- *}* </pre>
+ *  //}//
+ *  </pre>
  */
 @CompileStatic
 abstract class DomainResult {
@@ -547,15 +546,23 @@ abstract class DomainResult {
      * <p>This map is used to have a map between field label and field name used in an ETL processor results</p>
      * <pre>
      *  ....
-     *  "fieldLabelMap": {*  	"asset": "asset",
+     *  "fieldLabelMap": {//
+     *      "asset": "asset",
      *      "dependent": "dependent",
      *      "c1": "c1"
-     *},
+     *  //},
      *  ....
      * <pre>
      */
     Map<String, String> fieldLabelMap
-
+    /**
+     * During an iteration of an ETL script,
+     * each {@link RowResult} collected is pointed
+     * to this variable.
+     * After finishing each iteration, it is saved
+     * in memory {@link DomainInMemory} or on disk
+     * {@link DomainOnDisk}
+     */
     RowResult currentRow
 
     DomainResult(String domain) {
@@ -563,16 +570,31 @@ abstract class DomainResult {
         this.fieldNames = [] as Set
         this.fieldLabelMap = [:]
     }
-/**
- * Defines amount of {@code DomainResult#data} list. It used in serialized step
- * using streaming solution.
- */
-    Integer dataSize = 0
 
+    /**
+     * In an iterate command, at the end of each row process,
+     * ETLProcessor invokes this method to complete progress
+     * saving data in disk or collecting them in memory.
+     */
+    abstract void endCurrentRow()
+    /**
+     * Finishes the ETL script evaluation.
+     * This method is necessary to cleanup resources.
+     */
     abstract void finish()
-
-    abstract void writeCurrentRow()
-
+    /**
+     * Defines amount of {@code DomainResult#data} list. It used in serialized step
+     * using streaming solution.
+     */
+    Integer dataSize = 0
+    /**
+     * Returns data collected during an ETL script evaluation.
+     *
+     * @return a List of results. It could be a List of {@link RowResult}
+     *      or a List<Map>.
+     * @see DomainInMemory#getData()
+     * @see DomainOnDisk#getData()
+     */
     abstract List<Object> getData()
     /**
      * Add the field name for an instance of Element
@@ -613,11 +635,12 @@ class DomainOnDisk extends DomainResult {
      */
     String outputFilename
     /**
-     *
+     * Writer of {@link RowResult} on Disk.
      */
     ETLStreamingWriter writer
     /**
-     *
+     * A list of data saved in disk and collected.
+     * NOTE: This method should be used only in a test environment.
      */
     List<Object> data
 
@@ -629,12 +652,23 @@ class DomainOnDisk extends DomainResult {
         this.writer.startDataArray()
     }
 
+    /**
+     * Completes the process of an Iterate execution.
+     * For this particular implementation, it is necessary
+     * to finish the array of data in disk and finally,
+     * flush all the content on disk.
+     *
+     * @see ETLProcessorResult#scriptFinished()
+     */
     void finish() {
         this.writer.endDataArray()
         this.writer.close()
     }
 
-    void writeCurrentRow() {
+    /**
+     *
+     */
+    void endCurrentRow() {
         if (currentRow && !currentRow.ignore) {
             this.dataSize++
             this.writer.writeRowResult(currentRow)
@@ -678,11 +712,6 @@ class DomainInMemory extends DomainResult {
     }
 
     /**
-     *
-     */
-    void finish() {
-    }
-    /**
      * <p>This method adds {@link DomainResult#currentRow} in
      * {@link DomainInMemory#rows} List.</p>
      * There are 3 possible scenarios where current row
@@ -693,7 +722,7 @@ class DomainInMemory extends DomainResult {
      * <p>3)If {@link DomainResult#currentRow} was already added in
      * {@link DomainInMemory#rows} List.</p>
      */
-    void writeCurrentRow() {
+    void endCurrentRow() {
         if (currentRow
                 && !currentRow.ignore
                 && (rows.size() <= (currentRow.rowNum - 1))
@@ -704,9 +733,21 @@ class DomainInMemory extends DomainResult {
         currentRow = null
     }
 
+
     /**
+     * Completes the process of an Iterate execution.
      *
-     * @return
+     * @see ETLProcessorResult#scriptFinished()
+     * @see DomainResult#finish()
+     */
+    void finish() {
+    }
+
+    /**
+     * Returns all the {@link RowResult} collected
+     * in an ETL script execution with lookup command enabled.
+     *
+     * @return a List of {@link RowResult}
      */
     @Override
     List<Object> getData() {

@@ -1878,8 +1878,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         // if there is an element found after a lookup invokation,
         // let's return that element so the commands like append has access
         // to the found elemnts
-        if (result.resultIndex >= 0) {
-            rr = result.currentRow()
+        rr = result.currentRow()
+        if (rr) {
             if (rr.fields.containsKey(fieldDefinition.name)) {
                 FieldResult fieldResult = rr.fields[fieldDefinition.name]
                 currentElement = new Element(
@@ -2201,7 +2201,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
                 configuration
         ).evaluate(script, ETLScriptName)
 
-        result.finish()
+        result.scriptFinished()
 
         logMeasurements(this.stopWatch.lap(tag))
         return evaluationResult

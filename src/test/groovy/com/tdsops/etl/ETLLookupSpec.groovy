@@ -790,9 +790,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 			found = etlProcessor.result.lookupInReference(['assetName', 'assetType'], [firstAssetName, 'Blade'])
 		then: 'one should be found'
 			found
-		and: 'the resultIndex should be pointing to the 3rd result'
-			2 == etlProcessor.result.resultIndex
-
 	}
 
 	void 'test setting a variable at ETLProcessor level'() {
@@ -905,6 +902,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	 */
 	private void createResultReference(ETLProcessor etlProcessor, ETLDomain domain, Map fieldValueMap) {
 		etlProcessor.result.startRow()
+        etlProcessor.currentRowIndex++
 		etlProcessor.result.findOrCreateCurrentRow()
 		// Add each element
 		fieldValueMap.each { String fieldName, Object value ->

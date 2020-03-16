@@ -2555,30 +2555,6 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 
 					}
-					assertWith(data[1]){
-						op == ImportOperationEnum.INSERT.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 1
-						assertWith(fields.id) {
-							originalValue == null
-							value == null
-							init == null
-							errors == []
-							warn == false
-							assertWith(find) {
-								results == []
-								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'Oracle7-Cluster']])
-							}
-							assertWith(create){
-								assetName == 'Oracle7-Cluster'
-
-							}
-						}
-
-					}
 				}
 				assertWith(domains[1]) {
 					domain == ETLDomain.Device.name()
@@ -2608,35 +2584,11 @@ class ETLFindSpec extends ETLBaseSpec {
 						}
 
 					}
-					assertWith(data[1]){
-						op == ImportOperationEnum.INSERT.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 1
-						assertWith(fields.id) {
-							originalValue == null
-							value == null
-							init == null
-							//errors == []
-							warn == false
-							assertWith(find) {
-								results == []
-								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'zuludb01']])
-							}
-							assertWith(create){
-								assetName == 'zuludb01'
-
-							}
-						}
-
-					}
 				}
 				assertWith(domains[2]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq'] as Set
-					data.size() == 3
+					data.size() == 1
 				}
 			}
 
