@@ -137,6 +137,7 @@
 							[showDelayActions]="true"
 							[showDetails]="true"
 							[buttonClass]="'btn-primary'"
+							[showInstructionsLink]="true"
 							[taskActionInfoModel]="getTaskActionInfoModel(dataItem.id)"
 							(start)="updateTaskStatus(dataItem.id, TaskStatus.STARTED)"
 							(done)="updateTaskStatus(dataItem.id, TaskStatus.COMPLETED)"
@@ -145,14 +146,10 @@
 							(assignToMe)="onAssignToMeHandler(dataItem)"
 							(neighborhood)="onViewTaskNeighborHandler(dataItem)"
 							(delay)="changeTimeEst(dataItem, $event)"
-							(details)="onOpenTaskDetailHandler(dataItem)">
+							(details)="onOpenTaskDetailHandler(dataItem)"
+							(instructionsLink)="openLinkInNewTab($event)">
 						</tds-task-actions>
 					</div>
-					<button *ngIf="dataItem.parsedInstructions"
-									class="btn btn-primary btn-xs"
-									(click)="openLinkInNewTab(dataItem.parsedInstructions[1])">
-						{{dataItem.parsedInstructions[0]}}
-					</button>
 				</div>
 				<kendo-grid-column *ngFor="let column of columnsModel"
 													 [resizable]="column.resizable"
