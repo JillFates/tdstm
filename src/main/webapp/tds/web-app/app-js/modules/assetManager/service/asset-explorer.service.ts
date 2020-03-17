@@ -18,6 +18,7 @@ export class AssetExplorerService {
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
 	private ALL_ASSETS = 'All Assets';
+	private readonly ALL_ASSETS_SYSTEM_VIEW_ID = 1;
 	private assetEntitySearch = 'assetEntity';
 
 	constructor(private http: HttpClient, private permissionService: PermissionService) {}
@@ -64,11 +65,12 @@ export class AssetExplorerService {
 			.catch((error: any) => error);
 	}
 
-	getReport(id: number): Observable<ViewModel> {
-		return this.http.get(`${this.assetExplorerUrl}/view/${id}`)
+	getReport(id: number, { queryParamsObj }: any = {}): Observable<ViewModel> {
+		const queryParams = Object.entries(queryParamsObj).map( ([key, value]) => `${key}=${value}`).join('&');
+		return this.http.get(`${this.assetExplorerUrl}/view/${id}?${queryParams}`)
 			.map((response: any) => {
 				if (response && response.status === 'success' && response.data) {
-					return response.data.dataView;
+					return response.data;
 				} else {
 					throw new Error(response.errors.join(';'));
 				}
@@ -166,8 +168,12 @@ export class AssetExplorerService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Check if model is All Assets based on the ID also, since now we support Overwritting..
+	 * @param model: ViewModel
+	 */
 	isAllAssets(model: ViewModel): boolean {
-		return model.name === this.ALL_ASSETS;
+		return model.name === this.ALL_ASSETS && model.id === this.ALL_ASSETS_SYSTEM_VIEW_ID;
 	}
 
 	isSaveAvailable(model: ViewModel): boolean {
@@ -420,5 +426,14 @@ export class AssetExplorerService {
 		}
 
 		return dependencies;
+	}
+
+	/**
+	 * GET - Returns the default save options configuration for a view.
+	 */
+	getSaveOptions(): Observable<any> {
+		return this.http.get(`${this.assetExplorerUrl}/saveOptions`)
+			.map((response: any) => response.saveOptions)
+			.catch((error: any) => error);
 	}
 }

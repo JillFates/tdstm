@@ -54,7 +54,13 @@
     "ramda": "0.25.0",
     "rxjs": "6.4.0",
     "rxjs-compat": "6.4.0",
-    "zone.js": "0.10.0"
+    "zone.js": "0.10.0",
+    "@fortawesome/angular-fontawesome": "0.3.0",
+    "@fortawesome/fontawesome-svg-core": "1.2.27",
+    "@fortawesome/fontawesome-pro": "5.12.1",
+    "@fortawesome/free-solid-svg-icons": "5.12.1",
+    "@fortawesome/pro-solid-svg-icons": "5.12.1",
+    "@fortawesome/free-brands-svg-icons": "5.12.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.9",

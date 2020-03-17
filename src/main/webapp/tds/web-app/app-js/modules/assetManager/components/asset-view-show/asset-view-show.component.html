@@ -1,18 +1,23 @@
 <div class="asset-explorer-view-show-component content body">
     <section class="page-asset-explorer-config" *ngIf="getDynamicConfiguration(); let config">
         <div>
-            <div class="btn-group"
-                 *ngIf="config.canShowSaveButton">
+            <div class="btn-group">
                 <tds-button-save
+                        [title]="config.canSaveAs && !config.canSave? translateService.transform('GLOBAL.SAVE_AS') : translateService.transform('GLOBAL.SAVE')"
                         (click)="save(config.saveButtonId)"
                         [ngClass]="{'btn-default':!config.isDirty,'btn-success':config.isDirty}"
-                        [title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
+                        [disabled] = "config.disableSaveButton"
                         [attr.id]="config.saveButtonId">
                 </tds-button-save>
 
-                <button type="button" class="btn dropdown-toggle"
+                <button type="button"
+                        class="btn dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        *ngIf="config.canSave && config.canSaveAs"
                         [ngClass]="{'btn': true, 'btn-default': !config.isDirty,'btn-success': config.isDirty, 'pull-right': true }"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        >
                     <span class="caret asset-view-show-caret"></span>
                     <span class="sr-only">Toggle Dropdown</span>
                 </button>
@@ -46,15 +51,24 @@
                         icon="cog"
                         tooltip="Configure"
                         class="pull-right"
-                        (click)="onEdit()">
+                        (click)="onEdit()"
+                        >
             </tds-button-custom>
+
+					<button *ngIf="currentOverrideState.icon" type="button"
+									class="view-override-button tds-action-button--just-icon pull-right"
+									[title]="currentOverrideState.tooltip"
+									(click)="toggleAssetView()">
+						<fa-icon [icon]="currentOverrideState.icon">
+						</fa-icon>
+					</button>
         </div>
         <div class="box-body">
             <asset-explorer-view-grid
                     #assetExplorerViewGrid
+                    (modelChange)="onQuery()"
                     [hiddenFilters]="hiddenFilters"
                     [data]=data
-                    (modelChange)="onQuery()"
                     (justPlanningChange)="onJustPlanningChange($event)"
                     (hiddenFiltersChange)="onHiddenFiltersChange($event)"
                     [gridState]="gridState"

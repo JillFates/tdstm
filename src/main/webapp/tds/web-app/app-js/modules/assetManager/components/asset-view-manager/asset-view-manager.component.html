@@ -83,7 +83,7 @@
 											</tds-button-custom>
 										</td>
 										<td>
-											<a [routerLink]="['/asset','views',report.id,'show']">{{report.name}}</a>
+											<a [routerLink]="['/asset','views', report.id,'show']" [queryParams]="report.queryParams">{{report.name}}</a>
 										</td>
 										<td>
 											{{report.createdBy}}
@@ -99,7 +99,15 @@
 										</td>
 
 										<td class="text-center">
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isGlobal"></span>
+										</td>
+
+										<td class="text-center">
 											<span class="glyphicon glyphicon-ok" *ngIf="report.isSystem"></span>
+										</td>
+
+										<td class="text-center">
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isOverride"></span>
 										</td>
 										<!-- <td class="text-center"><span class="glyphicon glyphicon-ok" *ngIf="report.subscribe"></span></td> -->
 									</tr>

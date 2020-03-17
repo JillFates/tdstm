@@ -189,4 +189,9 @@ class WsProjectController implements ControllerMethods {
 
 		renderSuccessJson("Project $project.name deleted")
 	}
+
+	@HasPermission(Permission.ProjectView)
+	def defaultProject() {
+		renderSuccessJson(id: Project.defaultProject.id)
+	}
 }

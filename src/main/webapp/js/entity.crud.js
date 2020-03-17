@@ -4,7 +4,9 @@
 var EntityCrud = (function ($) {
 
 	// Overrides the default select2-input matcher.
-	$.fn.select2.defaults.matcher = matchStart
+	if ($.fn.select2) {
+		$.fn.select2.defaults.matcher = matchStart
+	}
 
 	var pub = {};	// public methods
 

@@ -1,22 +1,35 @@
 // Angular
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {Store} from '@ngxs/store';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs';
 import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list-grid.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
-import {ProjectModel} from '../model/project.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
+import {SetDefaultProject} from '../actions/project.actions';
 
 @Injectable()
 export class ProjectService {
 
 	private jobProgressUrl = '../ws/progress';
 
-	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService, private store: Store) {
 		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
+	}
+
+	getDefaultProject(): Observable<any> {
+		return this.http.get(`../ws/project/default`)
+			.map((response: any) => {
+				this.store.dispatch(new SetDefaultProject(response.data));
+				return response.data;
+			})
+			.catch((error: any) => {
+				this.store.dispatch(new SetDefaultProject(null));
+				return error
+			});
 	}
 
 	getProjects(): Observable<any> {
