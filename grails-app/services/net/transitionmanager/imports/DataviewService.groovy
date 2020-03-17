@@ -415,12 +415,17 @@ class DataviewService implements ServiceMethods {
 
 		// If the user is overriding a System View, they may be overriding their own override or
 		// a shared override so it's important to get the root system view being overridden
-		if (dataviewCommand.overridesView) {
+		if (dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW) {
+			validateViewNameUniqueness(currentProject, whom, dataviewCommand)
+		} else {
+			if (! dataviewCommand.overridesView) {
+				throwException(InvalidParamException.class, 'dataview.validate.missingViewForOverride',
+						'The request to create override view was missing the view id to be overridden')
+			}
 			dataviewCommand.overridesView = getRootSystemView(dataviewCommand.overridesView)
 			// use the name from the view that is being overridden
 			dataviewCommand.name = dataviewCommand.overridesView.name
 		}
-		validateViewNameUniqueness(currentProject, whom, dataviewCommand)
 
 		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
 
