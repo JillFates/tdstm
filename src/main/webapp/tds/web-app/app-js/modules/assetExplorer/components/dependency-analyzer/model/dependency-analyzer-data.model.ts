@@ -9,6 +9,7 @@ export class DependencyAnalyzerDataModel {
 	moveBundle: [];
 	allMoveBundles: [];
 	planStatusOptions: [];
+	dependencyStatus: [];
 	gridStats: [];
 	isAssigned: [];
 	moveBundleList: [];

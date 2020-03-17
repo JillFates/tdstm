@@ -4,6 +4,8 @@ import {GridModel} from 'tds-component-library';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DependencyAnalyzerService} from './service/dependency-analyzer.service';
 import {DependencyAnalyzerDataModel} from './model/dependency-analyzer-data.model';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {TagModel} from '../../../assetTags/model/tag.model';
 declare var jQuery: any;
 
 @Component({
@@ -17,22 +19,41 @@ export class DependencyAnalyzerComponent implements OnInit {
 	icons = FA_ICONS;
 	selectedBundle;
 	teamHighlights$;
-	selectedTags;
-	bundleList;
+	selectedTags: number[];
+	allMoveBundles;
+	dependencyStatus;
+	dependencyType;
+	allTags;
 
 	constructor(
 		private userContextService: UserContextService,
-		private dependencyAnalyzerService: DependencyAnalyzerService
+		private dependencyAnalyzerService: DependencyAnalyzerService,
+		private tagService: TagService
 	) {
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
 
 	ngOnInit(): void {
-		console.log('hello world');
-		this.dependencyAnalyzerService.getDependencyAnalyzerData().subscribe(( res: DependencyAnalyzerDataModel) => {
-			this.bundleList = res;
+		this.getInitialData();
+	}
 
-		})
+	getInitialData() {
+		this.dependencyAnalyzerService.getDependencyAnalyzerData().subscribe(( res: DependencyAnalyzerDataModel) => {
+			this.allMoveBundles = res.allMoveBundles;
+			this.dependencyType = res.dependencyType;
+			this.dependencyStatus = res.dependencyStatus;
+		});
+		this.tagService.getTags().subscribe((res: any) => {
+			this.allTags = res.data;
+		});
+	}
+
+	onBundleSelect(event) {
+		console.log('bundle selected: ', event);
+	}
+
+	onAssetTagChange(event) {
+		console.log(event);
 	}
 
 	onShowOnlyWIPChange(event) {
@@ -40,7 +61,7 @@ export class DependencyAnalyzerComponent implements OnInit {
 	}
 
 	onRefeshData() {
-		console.log('on refresh data');
+		this.getInitialData();
 	}
 
 	cellClick(event) {

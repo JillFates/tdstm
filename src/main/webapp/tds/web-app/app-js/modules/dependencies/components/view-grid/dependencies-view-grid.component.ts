@@ -192,7 +192,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 			tagList: pathOr([], ['snapshot', 'data', 'tagList'], this.route),
 			gridState: this.getInitialGridState(),
 			gridData: { data: [], total: 0 },
-		};
+		};F
 	}
 
 	/**
