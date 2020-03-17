@@ -76,6 +76,16 @@ class ScriptProcessorService {
         return processorResult.outputFilename
     }
 
+    @CompileStatic
+    String saveResultsInFile(ETLProcessorResult processorResult){
+        if (processorResult.isLookupEnable){
+            return saveResultsInJSONFile(processorResult)
+        } else {
+            return saveResultsUsingStreaming(processorResult)
+        }
+    }
+
+
     /**
      * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using Streaming format
      * from Fast Jackson library.
@@ -268,7 +278,7 @@ class ScriptProcessorService {
                 updateProgressClosure,
                 includeConsoleLog)
 
-        String outputFilename = saveResultsUsingStreaming(processorResult)
+        String outputFilename = saveResultsInFile(processorResult)
 
         updateProgressClosure.reportProgress(
                 100,
