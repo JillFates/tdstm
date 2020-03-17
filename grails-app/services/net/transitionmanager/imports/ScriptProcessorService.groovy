@@ -64,29 +64,6 @@ class ScriptProcessorService {
     }
 
     /**
-     * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using JSON format
-     *
-     * @param processorResult an instance of {@code ETLProcessorResult}
-     * @return file name created and saved in a temporary directory
-     * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
-     */
-    @CompileStatic
-    String saveResultsInJSONFile(ETLProcessorResult processorResult) {
-        jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, processorResult.outputStream)
-        return processorResult.outputFilename
-    }
-
-    @CompileStatic
-    String saveResultsInFile(ETLProcessorResult processorResult){
-        if (processorResult.isLookupEnable){
-            return saveResultsInJSONFile(processorResult)
-        } else {
-            return saveResultsUsingStreaming(processorResult)
-        }
-    }
-
-
-    /**
      * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using Streaming format
      * from Fast Jackson library.
      *
@@ -101,27 +78,6 @@ class ScriptProcessorService {
         new ETLStreamingWriter(processorResult.outputStream).writeETLResultsHeader(processorResult)
         return processorResult.outputFilename
     }
-
-    /**
-     * Saves each {@code ETLProcessor#domains} in an new File using {@code JsonSerializer} class.
-     * It also saves each new output file name in {@code DomainResult#outputFilename}. It is used
-     * in deserialization step, reading each file with domain data.
-     *
-     * @param processorResult an instance of {@code ETLProcessorResult}
-     * @see ETLStreamingWriter#writeETLResultsData(java.util.List)
-     */
-    private void saveDomainDataUsingStreaming(ETLProcessorResult processorResult) {
-
-        for (DomainResult domain in processorResult.domains) {
-            List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
-            String outputFilename = tmpFile[0]
-            OutputStream outputStream = (OutputStream) tmpFile[1]
-            new ETLStreamingWriter(outputStream).writeETLResultsData(domain.data)
-            domain.outputFilename = outputFilename
-            domain.dataSize = domain.data.size()
-        }
-    }
-
 
     /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
@@ -271,7 +227,7 @@ class ScriptProcessorService {
                 updateProgressClosure,
                 includeConsoleLog)
 
-        String outputFilename = saveResultsInFile(processorResult)
+        String outputFilename = saveResultsUsingStreaming(processorResult)
 
         updateProgressClosure.reportProgress(
                 100,

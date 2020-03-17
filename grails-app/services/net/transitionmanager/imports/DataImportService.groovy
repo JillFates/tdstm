@@ -2010,7 +2010,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				inputFilename,
 				updateProgressCallback)
 
-		result.filename = scriptProcessorService.saveResultsInFile(processorResult)
+		result.filename = scriptProcessorService.saveResultsUsingStreaming(processorResult)
 
 		updateProgressCallback.reportProgress(
 				100,

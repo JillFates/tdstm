@@ -104,20 +104,13 @@ class ETLProcessorResult {
 
         reference = domains.find { it.domain == domain.name() }
         if (!reference) {
+            String filename = outputFilename.replace(".${ETL_FILENAME_EXTENSION}", "_${domain.name()}.$ETL_FILENAME_EXTENSION")
+            ETLStreamingWriter writer = new ETLStreamingWriter(fileSystemService.createTemporaryFileWithGivenName(filename))
 
             if (isLookupEnable) {
-
-                reference = new DomainInMemory(domain.name())
-
+                reference = new DomainInMemory(domain.name(), filename, writer)
             } else {
-                String filename = outputFilename.replace(".${ETL_FILENAME_EXTENSION}", "_${domain.name()}.$ETL_FILENAME_EXTENSION")
-                OutputStream outputStream = fileSystemService.createTemporaryFileWithGivenName(filename)
-
-                reference = new DomainOnDisk(
-                        domain.name(),
-                        filename,
-                        new ETLStreamingWriter(outputStream)
-                )
+                reference = new DomainOnDisk(domain.name(), filename, writer)
             }
             domains.add(reference)
         }
@@ -401,8 +394,6 @@ class ETLProcessorResult {
             }
         }
     }
-
-
     /**
      * Look up a field name that contain a value equals to the value and if found then the current
      * result reference will be move back to a previously processed row for the domain. This is done
@@ -530,6 +521,15 @@ abstract class DomainResult {
      */
     String domain
     /**
+     * Filename of DomainResult saved on disk using a Streaming solution.
+     * @see net.transitionmanager.etl.ETLStreamingWriter#writeDataArray(java.util.List)
+     */
+    String outputFilename
+    /**
+     * Writer of {@link RowResult} on Disk.
+     */
+    ETLStreamingWriter writer
+    /**
      * <p>Saves a list of fields used during a ETL script executions for this particular domain</p>
      * <pre>
      *  ...,
@@ -565,8 +565,10 @@ abstract class DomainResult {
      */
     RowResult currentRow
 
-    DomainResult(String domain) {
+    DomainResult(String domain, String outputFilename, ETLStreamingWriter writer) {
         this.domain = domain
+        this.outputFilename = outputFilename
+        this.writer = writer
         this.fieldNames = [] as Set
         this.fieldLabelMap = [:]
     }
@@ -630,25 +632,13 @@ abstract class DomainResult {
 class DomainOnDisk extends DomainResult {
 
     /**
-     * Filename of DomainResult saved on disk using a Streaming solution.
-     * @see net.transitionmanager.etl.ETLStreamingWriter#writeDataArray(java.util.List)
-     */
-    String outputFilename
-    /**
-     * Writer of {@link RowResult} on Disk.
-     */
-    ETLStreamingWriter writer
-    /**
      * A list of data saved in disk and collected.
      * NOTE: This method should be used only in a test environment.
      */
     List<Object> data
 
-
     DomainOnDisk(String domain, String outputFilename, ETLStreamingWriter writer) {
-        super(domain)
-        this.outputFilename = outputFilename
-        this.writer = writer
+        super(domain, outputFilename, writer)
         this.writer.startDataArray()
     }
 
@@ -675,10 +665,11 @@ class DomainOnDisk extends DomainResult {
         }
         currentRow = null
     }
-
     /**
+     * Returns data collected during an ETL script evaluation.
      *
-     * @return
+     * @return a List of results. It could be a List of {@link RowResult}
+     *      or a List<Map>.
      */
     List<Object> getData() {
         if (!data) {
@@ -705,9 +696,8 @@ class DomainInMemory extends DomainResult {
      */
     List<RowResult> rows
 
-    DomainInMemory(String domain) {
-        super(domain)
-        this.domain = domain
+    DomainInMemory(String domain, String outputFilename, ETLStreamingWriter writer) {
+        super(domain, outputFilename, writer)
         this.rows = []
     }
 
@@ -733,7 +723,6 @@ class DomainInMemory extends DomainResult {
         currentRow = null
     }
 
-
     /**
      * Completes the process of an Iterate execution.
      *
@@ -741,6 +730,12 @@ class DomainInMemory extends DomainResult {
      * @see DomainResult#finish()
      */
     void finish() {
+        this.writer.startDataArray()
+        for(RowResult row in rows){
+            this.writer.writeRowResult(row)
+        }
+        this.writer.endDataArray()
+        this.writer.close()
     }
 
     /**
