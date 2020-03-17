@@ -636,14 +636,14 @@ class DataviewService implements ServiceMethods {
 		 */
 		if ( project.isDefaultProject() ) {
 			if ( securityService.notPermitted(Permission.AssetExplorerSystemCreate) ) {
-				throwException(InvalidParameterException,
+				throwException(InvalidParamException.class,
 						'dataview.validation.saveInDefaultProject',
-						'You do not have the necessary permission to save into the Default project')
+						'You do not have the necessary permission to save views into the Default project')
 			}
 
 			if (dataviewCommand.overridesView) {
 				if (securityService.notPermitted(Permission.AssetExplorerOverrideAllUserGlobal) ) {
-					throwException(InvalidParameterException,
+					throwException(InvalidParamException.class,
 							'dataview.validate.overrideGlobalPermission',
 							'You do not have the necessary permission to save into the Default project')
 				}
@@ -653,7 +653,7 @@ class DataviewService implements ServiceMethods {
 					project == project
 					overridesView == dataviewCommand.overridesView
 				}.count() > 0 ) {
-					throwException(InvalidParameterException,
+					throwException(InvalidParamException.class,
 							'dataview.validate.overrideAlreadyExists',
 							'An override for this system view already exists in the project')
 				}
@@ -683,7 +683,7 @@ class DataviewService implements ServiceMethods {
 						person.id == whom.id
 						isShared == false
 					}.count() > 0) {
-						throwException(InvalidParameterException.class,
+						throwException(InvalidParamException.class,
 								'dataview.validate.overrideAlreadyExists',
 								'An override for this system view already exists in the project')
 					}
@@ -702,7 +702,7 @@ class DataviewService implements ServiceMethods {
 						overridesView.id == dataviewCommand.overridesView.id
 						isShared == true
 					}.count() > 0) {
-						throwException(InvalidParameterException,
+						throwException(InvalidParamException,
 								'dataview.validate.overrideAlreadyExists',
 								'An override for this system view already exists in the project')
 					}
