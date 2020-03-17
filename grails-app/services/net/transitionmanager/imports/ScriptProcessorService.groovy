@@ -98,13 +98,6 @@ class ScriptProcessorService {
      */
     @CompileStatic
     String saveResultsUsingStreaming(ETLProcessorResult processorResult) {
-
-        // saveDomainDataUsingStreaming(processorResult)
-
-//        List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
-//        String outputFilename = tmpFile[0]
-//        OutputStream os = (OutputStream) tmpFile[1]
-
         new ETLStreamingWriter(processorResult.outputStream).writeETLResultsHeader(processorResult)
         return processorResult.outputFilename
     }
