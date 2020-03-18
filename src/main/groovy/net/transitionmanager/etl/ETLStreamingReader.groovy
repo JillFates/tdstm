@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
+
+import java.util.function.Supplier
 
 /**
  * Reader class takes ETL output data array in an input stream data,
@@ -29,50 +30,73 @@ class ETLStreamingReader {
     JsonParser parser
 
     // Define the Map when the Reader is constructed
-    final Map<String, MethodClosure> fieldMethods = [:]
+    final Map<String, Supplier> fieldMethods = [:]
 
+    /**
+     * <p>Constructor prepares a Map of String keys and {@link Supplier} java Functional Interface.
+     * This maps is used as a pointer to the correct function in an instance of {@link ETLStreamingReader}.
+     * For each field, it needs to invoke a particular method inside {@link ETLStreamingReader}</p>
+     * For example:
+     * <pre>
+     *  fieldMethods.'comments' = this.&readStringList as Supplier
+     * </pre>
+     * <p>When an instance of {@link ETLStreamingReader} is deserializing comments field
+     * from {@link com.tdsops.etl.RowResult#comments} the following method is applied:</p>
+     * <pre>
+     *      private List<String> readStringList() {//
+     *          List<String> stringList = []
+     *         startArray()
+     *         while (nextToken() != JsonToken.END_ARRAY) { //
+     *              stringList.add(parser.getValueAsString())
+     *         //} //
+     *         return stringList
+     *     //}//
+     * </pre>
+     * @param inputStream
+     */
     ETLStreamingReader(InputStream inputStream) {
         this.parser = new JsonFactory().createParser(inputStream)
-        fieldMethods.'comments' = (MethodClosure) this.&readStringList
-        fieldMethods.'duplicate' = (MethodClosure) this.&readBooleanField
-        fieldMethods.'errorCount' = (MethodClosure) this.&readIntegerField
-        fieldMethods.'errors' = (MethodClosure) this.&readStringList
-        fieldMethods.'fields' = (MethodClosure) this.&readFields
-        fieldMethods.'domain' = (MethodClosure) this.&readStringField
-        fieldMethods.'op' = (MethodClosure) this.&readStringField
-        fieldMethods.'rowNum' = (MethodClosure) this.&readIntegerField
-        fieldMethods.'warn' = (MethodClosure) this.&readBooleanField
-        fieldMethods.'tags' = (MethodClosure) this.&readTagsField
 
-        fieldMethods.'fieldOrder' = (MethodClosure) this.&readIntegerField
-        fieldMethods.'warn' = (MethodClosure) this.&readBooleanField
+        fieldMethods.'comments' = this.&readStringList as Supplier
+        fieldMethods.'duplicate' = this.&readBooleanField as Supplier
+        fieldMethods.'errorCount' = this.&readIntegerField as Supplier
+        fieldMethods.'errors' = this.&readStringList as Supplier
+        fieldMethods.'fields' = this.&readFields as Supplier
+        fieldMethods.'domain' = this.&readStringField as Supplier
+        fieldMethods.'op' = this.&readStringField as Supplier
+        fieldMethods.'rowNum' = this.&readIntegerField as Supplier
+        fieldMethods.'warn' = this.&readBooleanField as Supplier
+        fieldMethods.'tags' = this.&readTagsField as Supplier
+
+        fieldMethods.'fieldOrder' = this.&readIntegerField as Supplier
+        fieldMethods.'warn' = this.&readBooleanField as Supplier
         // errors
-        fieldMethods.'init' = (MethodClosure) this.&readObjectField
-        fieldMethods.'originalValue' = (MethodClosure) this.&readObjectField
-        fieldMethods.'value' = (MethodClosure) this.&readObjectField
-        fieldMethods.'find' = (MethodClosure) this.&readFindField
-        fieldMethods.'create' = (MethodClosure) this.&readStringMap
-        fieldMethods.'update' = (MethodClosure) this.&readStringMap
+        fieldMethods.'init' = this.&readObjectField as Supplier
+        fieldMethods.'originalValue' = this.&readObjectField as Supplier
+        fieldMethods.'value' = this.&readObjectField as Supplier
+        fieldMethods.'find' = this.&readFindField as Supplier
+        fieldMethods.'create' = this.&readStringMap as Supplier
+        fieldMethods.'update' = this.&readStringMap as Supplier
 
         // Fields for readFindField method
-        fieldMethods.'matchOn' = (MethodClosure) this.&readIntegerField
-        fieldMethods.'results' = (MethodClosure) this.&readLongList
-        fieldMethods.'size' = (MethodClosure) this.&readIntegerField
-        fieldMethods.'query' = (MethodClosure) this.&readQueryList
+        fieldMethods.'matchOn' = this.&readIntegerField as Supplier
+        fieldMethods.'results' = this.&readLongList as Supplier
+        fieldMethods.'size' = this.&readIntegerField as Supplier
+        fieldMethods.'query' = this.&readQueryList as Supplier
 
         // Methods for readQueryField
-        fieldMethods.'domain' = (MethodClosure) this.&readStringField
-        fieldMethods.'criteria' = (MethodClosure) this.&readCriteriaList
+        fieldMethods.'domain' = this.&readStringField as Supplier
+        fieldMethods.'criteria' = this.&readCriteriaList as Supplier
 
         // Fields for readCriteriaField method
-        fieldMethods.'propertyName' = (MethodClosure) this.&readStringField
-        fieldMethods.'operator' = (MethodClosure) this.&readStringField
-        fieldMethods.'value' = (MethodClosure) this.&readObjectField
+        fieldMethods.'propertyName' = this.&readStringField as Supplier
+        fieldMethods.'operator' = this.&readStringField as Supplier
+        fieldMethods.'value' = this.&readObjectField as Supplier
 
-        // Fields for readTagsField method
-        fieldMethods.'add' = (MethodClosure) this.&readStringList
-        fieldMethods.'remove' = (MethodClosure) this.&readStringList
-        fieldMethods.'replace' = (MethodClosure) this.&readStringMap
+        /** Fields for {@link  } method */
+        fieldMethods.'add' = this.&readStringList as Supplier
+        fieldMethods.'remove' = this.&readStringList as Supplier
+        fieldMethods.'replace' = this.&readStringMap as Supplier
     }
 
     /**
@@ -108,12 +132,16 @@ class ETLStreamingReader {
         parser.close()
     }
 
+    /**
+     *
+     * @return
+     */
     Map<String, ?> parseRow() {
         Map<String, ?> row = [:]
 
         while (nextToken() != JsonToken.END_OBJECT) {
             String currentName = parser.currentName()
-            row[currentName] = fieldMethods[currentName]()
+            row[currentName] = fieldMethods[currentName].get()
         }
         return row
     }
@@ -171,7 +199,7 @@ class ETLStreamingReader {
         startObject()
         while (nextToken() != JsonToken.END_OBJECT) {
             String currentName = parser.currentName()
-            fieldResult[currentName] = fieldMethods[currentName]()
+            fieldResult[currentName] = fieldMethods[currentName].get()
         }
         return fieldResult
     }
@@ -182,7 +210,7 @@ class ETLStreamingReader {
         startObject()
         while (nextToken() != JsonToken.END_OBJECT) {
             String currentName = parser.currentName()
-            find[currentName] = fieldMethods[currentName]()
+            find[currentName] = fieldMethods[currentName].get()
         }
         return find
     }
@@ -207,7 +235,7 @@ class ETLStreamingReader {
         Map<String, ?> query = [:]
         while (nextToken() != JsonToken.END_OBJECT) {
             String currentName = parser.currentName()
-            query[currentName] = fieldMethods[currentName]()
+            query[currentName] = fieldMethods[currentName].get()
         }
         return query
     }
@@ -232,7 +260,7 @@ class ETLStreamingReader {
         Map<String, ?> query = [:]
         while (nextToken() != JsonToken.END_OBJECT) {
             String currentName = parser.currentName()
-            query[currentName] = fieldMethods[currentName]()
+            query[currentName] = fieldMethods[currentName].get()
         }
         return query
     }
@@ -267,7 +295,7 @@ class ETLStreamingReader {
         while (nextToken() != JsonToken.END_OBJECT) {
 
             String currentName = parser.currentName()
-            tags[currentName] = fieldMethods[currentName]()
+            tags[currentName] = fieldMethods[currentName].get()
         }
         return tags
     }
