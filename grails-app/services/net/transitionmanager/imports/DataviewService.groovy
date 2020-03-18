@@ -304,14 +304,16 @@ class DataviewService implements ServiceMethods {
 		if ( isOverrideable ) {
 			Long overriddenViewId = (dataview.overridesView ? dataview.overridesView.id : dataview.id)
 
-			if (Dataview.where {
-				project.id == project.id
-				// Make sure we're querying on the root system view id
-				overridesView.id == overriddenViewId
-				person.id == whom.id
-				isShared == false
-			}.count() == 0) {
-				options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+			if (securityService.hasPermission(Permission.AssetExplorerCreate)) {
+				if (Dataview.where {
+					project.id == project.id
+					// Make sure we're querying on the root system view id
+					overridesView.id == overriddenViewId
+					person.id == whom.id
+					isShared == false
+				}.count() == 0) {
+					options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+				}
 			}
 
 			// Check to see if anybody has an overridden version of a system view for ALL users and if not
