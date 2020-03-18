@@ -26,7 +26,7 @@
 		<g:render template="/assetEntity/dependentShow" model="[assetEntity:applicationInstance]" ></g:render>
 	</tr>
 	<tr id="commentListId">
-		<g:render template="/assetEntity/commentList" model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
+		<g:render template="/assetEntity/commentList" model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, 'hasEditTaskPermission':hasEditTaskPermission, 'hasCreateTaskPermission':hasCreateTaskPermission]" ></g:render>
 	</tr>
 	<tr>
 		<td colspan="2">
