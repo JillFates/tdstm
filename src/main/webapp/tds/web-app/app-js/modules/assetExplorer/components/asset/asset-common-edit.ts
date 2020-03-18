@@ -206,23 +206,25 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	protected showAssetDetailView(assetClass: string, id: number) {
-		// Close current dialog before open new one
-		this.cancelCloseDialog();
+		setTimeout(() => {
+			// Close current dialog before open new one
+			this.cancelCloseDialog();
 
-		this.dialogService.open({
-			componentFactoryResolver: this.componentFactoryResolver,
-			component: AssetShowComponent,
-			data: {
-				assetId: id,
-				assetClass: assetClass
-			},
-			modalConfiguration: {
-				title: 'Asset',
-				draggable: true,
-				modalSize: ModalSize.CUSTOM,
-				modalCustomClass: 'custom-asset-modal-dialog'
-			}
-		}).subscribe();
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetShowComponent,
+				data: {
+					assetId: id,
+					assetClass: assetClass
+				},
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe();
+		});
 	}
 
 	/***
@@ -230,7 +232,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	protected cancelCloseDialog(): void {
 		const assetEditComponent = <AssetEditComponent>this.parentDialog;
-		assetEditComponent.onDismiss();
+		assetEditComponent.onCancelClose();
 	}
 
 	/**

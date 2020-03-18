@@ -13,7 +13,7 @@
     <g:javascript src="entity.crud.js"/>
     <g:javascript src="model.manufacturer.js"/>
     <g:render template="/layouts/responsiveAngularResources"/>
-    <asset:javascript src="select2.js"/>
+    <asset:javascript src="assets/select2.js"/>
 
     <title>Rack View</title>
 
