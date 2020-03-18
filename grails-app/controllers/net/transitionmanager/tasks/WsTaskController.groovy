@@ -9,6 +9,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.task.Task
 import org.grails.web.json.JSONArray
 import net.transitionmanager.action.ApiActionService
@@ -391,7 +392,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	Map createTaskActionBarMap(Task task) {
 		Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
-        Map instructionsLinkMap = assetEntityService.parseInstructionsLink(task.instructionsLink)
+        List<String> instructionsLinkList = AssetUtils.parseInstructionsLink(task.instructionsLink)
 		return [
 				taskId: task.id,
 				apiActionId: task.apiAction?.id,
@@ -404,8 +405,8 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 				predecessorsCount: task.taskDependencies.size(),
 				status: task.status,
 				successorsCount: TaskDependency.countByPredecessor(task),
-                instructionsLinkURL: instructionsLinkMap.instructionsLinkURL,
-                instructionsLinkLabel: instructionsLinkMap.instructionsLinkLabel
+                instructionsLinkURL: instructionsLinkList[1],
+                instructionsLinkLabel: instructionsLinkList[0]
 		]
 	}
 

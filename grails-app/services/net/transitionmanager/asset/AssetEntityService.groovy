@@ -3218,29 +3218,4 @@ class AssetEntityService implements ServiceMethods {
 			totalFiles: totalFiles
 		]
 	}
-
-    /**
-     * Parses the instructionLink and extracts the URL and label as separate strings.
-     * @param instructionsLink
-     * @return [instructionsLinkURL, instructionsLinkLabel]
-     */
-    Map parseInstructionsLink(String instructionsLink) {
-        String instructionsLinkURL
-        String instructionsLinkLabel
-
-        if (instructionsLink) {
-            List<String> instructionsLinkInfo = HtmlUtil.parseMarkupURL(instructionsLink)
-            if (instructionsLinkInfo) {
-                if (instructionsLinkInfo.size() > 1) {
-                    instructionsLinkURL = HtmlUtil.parseMarkupURL(instructionsLink)[1]
-                    instructionsLinkLabel = HtmlUtil.parseMarkupURL(instructionsLink)[0]
-                }
-                else {
-                    instructionsLinkURL = HtmlUtil.parseMarkupURL(instructionsLink)[0]
-                }
-            }
-        }
-        return [instructionsLinkURL: instructionsLinkURL, instructionsLinkLabel: instructionsLinkLabel]
-    }
-
 }
