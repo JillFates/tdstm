@@ -415,7 +415,8 @@ class DataviewService implements ServiceMethods {
 
 		// If the user is overriding a System View, they may be overriding their own override or
 		// a shared override so it's important to get the root system view being overridden
-		if (dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW) {
+		Boolean saveAsMyView = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW
+		if (saveAsMyView) {
 			validateViewNameUniqueness(currentProject, whom, dataviewCommand)
 		} else {
 			if (! dataviewCommand.overridesView) {
@@ -431,7 +432,7 @@ class DataviewService implements ServiceMethods {
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			if (dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW) {
+			if (saveAsMyView) {
 				isShared = dataviewCommand.isShared
 			} else {
 				isShared = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL
@@ -440,7 +441,8 @@ class DataviewService implements ServiceMethods {
 			person = whom
             project = currentProject
 			reportSchema = schema
-			overridesView = dataviewCommand.overridesView
+			overridesView = (saveAsMyView ? null : dataviewCommand.overridesView)
+			isSystem = false
 		}
 
 		dataview.save()
@@ -632,10 +634,6 @@ class DataviewService implements ServiceMethods {
 	 * @throws UnauthorizedException
 	 */
 	void validateDataviewCreateAccessOrException(DataviewCrudCommand dataviewCommand, Project project, Person whom) {
-		if (dataviewCommand.id?.isSystem) {
-			throwException(InvalidParamException.class, 'dataview.validate.createSystemView', 'Creation of System views is not permitted.')
-		}
-
 		/*
 		 * Users in the Default project
 		 */
