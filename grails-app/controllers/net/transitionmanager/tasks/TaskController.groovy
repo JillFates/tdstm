@@ -693,21 +693,16 @@ class TaskController implements ControllerMethods {
 			}
 
 			def moveEventId = params.moveEventId
+			MoveEvent moveEvent = null
 			if (! moveEventId || ! moveEventId.isNumber()) {
 				errorMessage = "Please select an event to view the graph"
 				break
+			} else {
+				moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
+				userPreferenceService.setMoveEventId(moveEventId)
+				log.debug "**** $project.id / $moveEvent.project.id - $project / $moveEvent "
 			}
 
-			def moveEvent = MoveEvent.read(moveEventId)
-			if (! moveEvent || moveEvent.project.id != project.id) {
-				errorMessage = "The event specified was not found"
-				if (moveEvent)
-					log.warn "SECURITY : User $securityService.currentUsername attempted to access graph of event ($moveEventId) not associated to current project ($project)"
-				break
-			}
-			userPreferenceService.setMoveEventId(moveEventId)
-
-			log.debug "**** $project.id / $moveEvent.project.id - $project / $moveEvent "
 
 			def mode = params.mode ?: ''
 			if (mode && ! "s".contains(mode)) {
