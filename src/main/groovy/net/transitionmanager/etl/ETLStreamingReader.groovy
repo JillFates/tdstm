@@ -279,8 +279,7 @@ class ETLStreamingReader {
 
     private String readStringField() {
         nextToken()
-        String res = parser.getValueAsString()
-        return res
+        return parser.getValueAsString()
     }
 
     private Integer readIntegerField() {
@@ -290,7 +289,6 @@ class ETLStreamingReader {
         } else {
             return parser.getIntValue()
         }
-
     }
 
     private Object readObjectField() {
