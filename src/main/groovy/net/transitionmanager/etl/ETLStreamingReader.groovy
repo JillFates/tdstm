@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 
 /**
  * Reader class takes ETL output data array in an input stream data,
@@ -27,8 +28,51 @@ class ETLStreamingReader {
 
     JsonParser parser
 
+    // Define the Map when the Reader is constructed
+    final Map<String, MethodClosure> fieldMethods = [:]
+
     ETLStreamingReader(InputStream inputStream) {
         this.parser = new JsonFactory().createParser(inputStream)
+        fieldMethods.'comments' = (MethodClosure) this.&readStringList
+        fieldMethods.'duplicate' = (MethodClosure) this.&readBooleanField
+        fieldMethods.'errorCount' = (MethodClosure) this.&readIntegerField
+        fieldMethods.'errors' = (MethodClosure) this.&readStringList
+        fieldMethods.'fields' = (MethodClosure) this.&readFields
+        fieldMethods.'domain' = (MethodClosure) this.&readStringField
+        fieldMethods.'op' = (MethodClosure) this.&readStringField
+        fieldMethods.'rowNum' = (MethodClosure) this.&readIntegerField
+        fieldMethods.'warn' = (MethodClosure) this.&readBooleanField
+        fieldMethods.'tags' = (MethodClosure) this.&readTagsField
+
+        fieldMethods.'fieldOrder' = (MethodClosure) this.&readIntegerField
+        fieldMethods.'warn' = (MethodClosure) this.&readBooleanField
+        // errors
+        fieldMethods.'init' = (MethodClosure) this.&readObjectField
+        fieldMethods.'originalValue' = (MethodClosure) this.&readObjectField
+        fieldMethods.'value' = (MethodClosure) this.&readObjectField
+        fieldMethods.'find' = (MethodClosure) this.&readFindField
+        fieldMethods.'create' = (MethodClosure) this.&readStringMap
+        fieldMethods.'update' = (MethodClosure) this.&readStringMap
+
+        // Fields for readFindField method
+        fieldMethods.'matchOn' = (MethodClosure) this.&readIntegerField
+        fieldMethods.'results' = (MethodClosure) this.&readLongList
+        fieldMethods.'size' = (MethodClosure) this.&readIntegerField
+        fieldMethods.'query' = (MethodClosure) this.&readQueryList
+
+        // Methods for readQueryField
+        fieldMethods.'domain' = (MethodClosure) this.&readStringField
+        fieldMethods.'criteria' = (MethodClosure) this.&readCriteriaList
+
+        // Fields for readCriteriaField method
+        fieldMethods.'propertyName' = (MethodClosure) this.&readStringField
+        fieldMethods.'operator' = (MethodClosure) this.&readStringField
+        fieldMethods.'value' = (MethodClosure) this.&readObjectField
+
+        // Fields for readTagsField method
+        fieldMethods.'add' = (MethodClosure) this.&readStringList
+        fieldMethods.'remove' = (MethodClosure) this.&readStringList
+        fieldMethods.'replace' = (MethodClosure) this.&readStringMap
     }
 
     /**
@@ -68,43 +112,8 @@ class ETLStreamingReader {
         Map<String, ?> row = [:]
 
         while (nextToken() != JsonToken.END_OBJECT) {
-
             String currentName = parser.currentName()
-            switch (currentName) {
-                case 'comments':
-                    row.comments = readStringList()
-                    break
-                case 'duplicate':
-                    row.duplicate = readBooleanField()
-                    break
-                case 'errorCount':
-                    row.errorCount = readIntegerField()
-                    break
-                case 'errors':
-                    row.errors = readStringList()
-                    break
-                case 'fields':
-                    row.fields = readFields()
-                    break
-                case 'domain':
-                    row.domain = readStringField()
-                    break
-                case 'op':
-                    row.op = readStringField()
-                    break
-                case 'rowNum':
-                    row.rowNum = readIntegerField()
-                    break
-                case 'warn':
-                    row.warn = readBooleanField()
-                    break
-                case 'tags':
-                    row.tags = readTagsField()
-                    break
-                default:
-                    throw new IllegalStateException("Unexpected field for domain row: '$currentName'")
-            }
-
+            row[currentName] = fieldMethods[currentName]()
         }
         return row
     }
@@ -161,39 +170,8 @@ class ETLStreamingReader {
         Map<String, ?> fieldResult = [:]
         startObject()
         while (nextToken() != JsonToken.END_OBJECT) {
-
             String currentName = parser.currentName()
-            switch (currentName) {
-                case 'fieldOrder':
-                    fieldResult.fieldOrder = readIntegerField()
-                    break
-                case 'warn':
-                    fieldResult.warn = readBooleanField()
-                    break
-                case 'errors':
-                    fieldResult.errors = readStringList()
-                    break
-                case 'init':
-                    fieldResult.init = readObjectField()
-                    break
-                case 'originalValue':
-                    fieldResult.originalValue = readObjectField()
-                    break
-                case 'value':
-                    fieldResult.value = readObjectField()
-                    break
-                case 'find':
-                    fieldResult.find = readFindField()
-                    break
-                case 'create':
-                    fieldResult.create = readStringMap()
-                    break
-                case 'update':
-                    fieldResult.update = readStringMap()
-                    break
-                default:
-                    throw new IllegalStateException("Unexpected field for domain row field result: '$currentName'")
-            }
+            fieldResult[currentName] = fieldMethods[currentName]()
         }
         return fieldResult
     }
@@ -203,32 +181,16 @@ class ETLStreamingReader {
         Map<String, ?> find = [:]
         startObject()
         while (nextToken() != JsonToken.END_OBJECT) {
-
             String currentName = parser.currentName()
-            switch (currentName) {
-                case 'matchOn':
-                    find.matchOn = readIntegerField()
-                    break
-                case 'results':
-                    find.results = readLongList()
-                    break
-                case 'size':
-                    find.size = readIntegerField()
-                    break
-                case 'query':
-                    find.query = readQueryList()
-                    break
-                default:
-                    throw new IllegalStateException("Unexpected field for find: '${currentName}'")
-            }
+            find[currentName] = fieldMethods[currentName]()
         }
         return find
     }
 
-/**
- *
- * @return
- */
+    /**
+     *
+     * @return
+     */
     private List<Map<String, ?>> readQueryList() {
 
         List<Map<String, ?>> queryList = []
@@ -244,26 +206,16 @@ class ETLStreamingReader {
 
         Map<String, ?> query = [:]
         while (nextToken() != JsonToken.END_OBJECT) {
-
             String currentName = parser.currentName()
-            switch (currentName) {
-                case 'domain':
-                    query.domain = readStringField()
-                    break
-                case 'criteria':
-                    query.criteria = readCriteriaList()
-                    break
-                default:
-                    throw new IllegalStateException("Unexpected field for query: '${currentName}'")
-            }
+            query[currentName] = fieldMethods[currentName]()
         }
         return query
     }
 
-/**
- *
- * @return
- */
+    /**
+     *
+     * @return
+     */
     private List<Map<String, ?>> readCriteriaList() {
 
         List<Map<String, ?>> criteriaList = []
@@ -279,21 +231,8 @@ class ETLStreamingReader {
 
         Map<String, ?> query = [:]
         while (nextToken() != JsonToken.END_OBJECT) {
-
             String currentName = parser.currentName()
-            switch (currentName) {
-                case 'propertyName':
-                    query.propertyName = readStringField()
-                    break
-                case 'operator':
-                    query.operator = readStringField()
-                    break
-                case 'value':
-                    query.value = readObjectField()
-                    break
-                default:
-                    throw new IllegalStateException("Unexpected field for criteria: '${currentName}'")
-            }
+            query[currentName] = fieldMethods[currentName]()
         }
         return query
     }
@@ -328,24 +267,7 @@ class ETLStreamingReader {
         while (nextToken() != JsonToken.END_OBJECT) {
 
             String currentName = parser.currentName()
-            switch (currentName) {
-                case 'tags':
-                    if (!(parser.currentToken() in [JsonToken.START_OBJECT, JsonToken.VALUE_NULL])) {
-                        throw new IllegalStateException("Unexpected current token for tags parsing: ${parser.currentToken()}")
-                    }
-                    break
-                case 'add':
-                    tags.add = readStringList()
-                    break
-                case 'remove':
-                    tags.remove = readStringList()
-                    break
-                case 'replace':
-                    tags.replace = readStringMap()
-                    break
-                default:
-                    throw new IllegalStateException("Unexpected field for domain row")
-            }
+            tags[currentName] = fieldMethods[currentName]()
         }
         return tags
     }
@@ -357,7 +279,8 @@ class ETLStreamingReader {
 
     private String readStringField() {
         nextToken()
-        return parser.getValueAsString()
+        String res = parser.getValueAsString()
+        return res
     }
 
     private Integer readIntegerField() {
@@ -461,6 +384,4 @@ class ETLStreamingReader {
             throw new IllegalStateException("Unexpected end of Array")
         }
     }
-
-
 }
