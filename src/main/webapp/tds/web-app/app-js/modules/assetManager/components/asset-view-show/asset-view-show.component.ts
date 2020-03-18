@@ -40,7 +40,7 @@ declare var jQuery: any;
 	templateUrl: 'asset-view-show.component.html'
 })
 export class AssetViewShowComponent implements OnInit, OnDestroy {
-	private currentId;
+	private lastViewId;
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
 	public model: ViewModel = new ViewModel();
@@ -123,10 +123,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			}
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
-				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
-					this.initResolveData();
-					this.initialiseComponent();
-				}
+				this.initResolveData();
+				this.initialiseComponent();
 			}
 		});
 	}
@@ -151,7 +149,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	private initialiseComponent(): void {
 		this.justPlanning = false;
-		this.currentId = this.model.id;
 		this.notifier.broadcast({
 			name: 'notificationHeaderTitleChange',
 			title: this.model.name
@@ -200,29 +197,23 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	public onEdit(): void {
 		if (this.isEditAvailable()) {
-			let dataViewId;
-			if (this.model.overridesView) {
-				dataViewId = this.model.overridesView.id
-			} else {
-				dataViewId = this.model.id;
-			}
 			const _override = this.queryParams._override;
-			this.router.navigate(['asset', 'views', dataViewId, 'edit'], {
+			this.router.navigate(['asset', 'views', this.model.id, 'edit'], {
 				queryParams: { _override }
 			});
 		}
 	}
 
 	public toggleAssetView() {
-		let dataViewId;
+		let navigateToViewId = this.model.id;
 		const _override = !this.queryParams._override;
-
-		if (this.model.overridesView) {
-			dataViewId = this.model.overridesView.id
-		} else {
-			dataViewId = this.model.id;
+		if (!_override && this.model.overridesView) {
+			navigateToViewId = this.model.overridesView.id
+		} else if (this.lastViewId) {
+			navigateToViewId = this.lastViewId;
 		}
-		return this.router.navigate(['/asset', 'views', dataViewId, 'show'], {
+		this.lastViewId = this.model.id;
+		return this.router.navigate(['/asset', 'views', navigateToViewId, 'show'], {
 			queryParams: { _override }
 		});
 	}
