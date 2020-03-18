@@ -332,20 +332,7 @@ function validateComment(objId){
 			if (typeof data.error !== 'undefined') {
 				alert(data.error);
 			} else {
-				$('#myTaskList').html(data)
-				$('#showStatusId_'+objId).show()
-				$('#issueTrId_'+objId).each(function(){
-					$(this).removeAttr('onclick')
-					$(this).unbind("click").bind("click", function(){
-						hideStatus(objId,status)
-					});
-				})
-				if (status=='Started') {
-					$('#started_'+objId).hide()
-				}
-
-				if (typeof timerBar !== 'undefined')
-					timerBar.Restart();
+				$('.refresh-button').click();
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
