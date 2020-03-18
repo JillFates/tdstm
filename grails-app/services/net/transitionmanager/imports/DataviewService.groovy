@@ -304,7 +304,7 @@ class DataviewService implements ServiceMethods {
 		if ( isOverrideable ) {
 			Long overriddenViewId = (dataview.overridesView ? dataview.overridesView.id : dataview.id)
 
-			if (securityService.hasPermission(Permission.AssetExplorerCreate)) {
+			if (securityService.hasPermission(Permission.AssetExplorerSaveAs)) {
 				if (Dataview.where {
 					project.id == project.id
 					// Make sure we're querying on the root system view id
