@@ -1,4 +1,4 @@
-<div class="clr-col-12">
+<div class="clr-col-12 table-data-section">
 	<task-comment
 			[show-comment]="${showComment}"
 			[show-task]="${showTask}"

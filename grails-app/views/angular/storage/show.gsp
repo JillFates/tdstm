@@ -111,7 +111,7 @@
 			</div>
 		</div>
 		<div tdsScrollSection class="clr-row">
-			<div class="clr-col-12">
+			<div class="clr-col-12 table-data-section">
 				<g:render 
 					template="/angular/common/supportShow" 
 					model="[supportAssets:supportAssets]" >
@@ -119,7 +119,7 @@
 			</div>
 		</div>
 		<div tdsScrollSection class="clr-row">
-			<div class="clr-col-12">
+			<div class="clr-col-12 table-data-section">
 				<g:render template="/angular/common/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
 			</div>
 		</div>
