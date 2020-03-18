@@ -1,32 +1,21 @@
 .bulk-change-edit-component
-  .full-height
-    height: 100%
-  .modal-content
-    margin: 0 auto
-    width: 870px
-  .modal-body
-    font-size: 13px
-    height: 380px
-    padding: 10px 15px
-    .add-button
-      button
-        margin-right: 0
-    .remove-field-button
-      position: relative
-      left: -15px
-      .tds-button
-        margin: 0
-    input[type="text"]
-      width: 98%
-    kendo-dropdownlist
+  .bulk-instructions
+    padding-top: 7px
+  .add-button
+    button
+      margin-right: 0
+  .remove-field-button
+    position: relative
+    left: -15px
+    .tds-button
+      margin: 0
+  input[type="text"]
+    width: 98%
+  kendo-dropdownlist
+    width: 100%
+  tds-date-control
+    kendo-datepicker
       width: 100%
-    tds-date-control
-      kendo-datepicker
-        width: 100%
-  .modal-footer
-    padding: 15px 30px
-  .modal-header
-    padding-left: 22px
   label
     cursor: pointer
     font-weight: normal
@@ -39,5 +28,6 @@
   .k-grid
     min-height: 95%
     max-height: 95%
+    margin-bottom: 20px
     td
       vertical-align: top

@@ -7,6 +7,7 @@ import { PopupModule } from '@progress/kendo-angular-popup';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { InputsModule } from '@progress/kendo-angular-inputs';
 import { GridModule } from '@progress/kendo-angular-grid';
+import { EditorModule } from '@progress/kendo-angular-editor';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { UploadModule } from '@progress/kendo-angular-upload';
 import { IntlModule } from '@progress/kendo-angular-intl';
@@ -135,6 +136,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		PopupModule,
 		DropDownsModule,
 		GridModule,
+		EditorModule,
 		UploadModule,
 		DateInputsModule,
 		IntlModule,

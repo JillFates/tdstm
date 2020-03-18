@@ -1,7 +1,10 @@
-import {Component, ElementRef} from '@angular/core';
-import {ReportsService} from '../../service/reports.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver, ElementRef} from '@angular/core';
+// Component
 import {ReportComponent} from '../report.component';
+// Service
+import {ReportsService} from '../../service/reports.service';
+import {DialogService} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-server-conflicts-report',
@@ -106,10 +109,11 @@ export class ServerConflictsReportComponent extends ReportComponent {
 	maxAssetsToReport = 100;
 
 	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
 		reportsService: ReportsService,
-		dialogService: UIDialogService,
+		dialogService: DialogService,
 		private elRef: ElementRef) {
-		super(reportsService, dialogService);
+		super(componentFactoryResolver, reportsService, dialogService);
 		this.onLoad();
 	}
 

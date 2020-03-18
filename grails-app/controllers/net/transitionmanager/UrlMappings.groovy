@@ -18,6 +18,11 @@ class UrlMappings {
 			}
 		}
 
+		"/recipes/index" {
+			controller = "recipe"
+			action = [GET:"index"]
+		}
+
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */
@@ -830,6 +835,11 @@ class UrlMappings {
 		"/auth/resetPassword/$token" {
 			controller = "auth"
 			action = [GET:"resetPassword"]
+		}
+
+		"/auth/applyNewPassword" {
+			controller = "auth"
+			action = [POST:"applyNewPassword"]
 		}
 
 		"/ws/admin/unlockAccount" {

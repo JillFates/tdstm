@@ -1,27 +1,18 @@
-import {
-	Component,
-	OnInit
-} from '@angular/core';
-
+// Angular
+import { Component, ComponentFactoryResolver, OnInit} from '@angular/core';
+import {SafeHtml} from '@angular/platform-browser';
+// Model
 import {AlertType} from '../../../../shared/model/alert.model';
-
-import {
-	SafeHtml
-} from '@angular/platform-browser';
-
-import {
-	Observable,
-} from 'rxjs';
-
-import {
-	pathOr,
-} from 'ramda';
-
+// Component
 import {ReportComponent} from '../report.component';
+// Service
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ReportsService} from '../../service/reports.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DialogService} from 'tds-component-library';
+// Other
+import {Observable} from 'rxjs';
+import {pathOr} from 'ramda';
 
 declare var jQuery: any;
 
@@ -91,11 +82,12 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 	includeUnpublished = false;
 
 	constructor(
-		dialogService: UIDialogService,
+		componentFactoryResolver: ComponentFactoryResolver,
+		dialogService: DialogService,
 		reportsService: ReportsService,
 		private notifierService: NotifierService,
 		private translatePipe: TranslatePipe) {
-			super(reportsService, dialogService);
+			super(componentFactoryResolver, reportsService, dialogService);
 	}
 
 	ngOnInit() {

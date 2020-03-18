@@ -437,7 +437,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
     /**
      * Return a list with all the AssetCommentCategory values.
      */
-    @HasPermission(Permission.TaskBatchView)
+    @HasPermission(Permission.CommentView)
     def assetCommentCategories() {
         renderSuccessJson(AssetCommentCategory.list)
     }

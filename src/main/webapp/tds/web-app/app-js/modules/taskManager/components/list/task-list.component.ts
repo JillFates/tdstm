@@ -1,52 +1,55 @@
-import { ActivatedRoute } from '@angular/router';
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
-import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
-import { Observable } from 'rxjs/Observable';
-import { map } from 'rxjs/operators';
-import {pathOr} from 'ramda';
-import {
-	CellClickEvent,
-	DetailCollapseEvent,
-	DetailExpandEvent,
-	GridComponent,
-	GridDataResult, PageChangeEvent
-} from '@progress/kendo-angular-grid';
-import { ReportsService } from '../../../reports/service/reports.service';
-import { TaskService } from '../../service/task.service';
+// Angular
+import {ActivatedRoute} from '@angular/router';
+import {Component, ComponentFactoryResolver, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
+// Model
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS, LOADER_IDLE_PERIOD,
 	ModalType
 } from '../../../../shared/model/constants';
-import { forkJoin } from 'rxjs';
-import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
-import { ColumnMenuService } from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
-import { SortUtils } from '../../../../shared/utils/sort.utils';
-import { taskListColumnsModel } from '../../model/task-list-columns.model';
-import { TaskDetailModel } from '../../model/task-detail.model';
-import { TaskDetailComponent } from '../detail/task-detail.component';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { ObjectUtils } from '../../../../shared/utils/object.utils';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { clone, hasIn } from 'ramda';
-import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
-import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
-import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
-import { HeaderActionButtonData } from 'tds-component-library';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { Store } from '@ngxs/store';
-import { SetEvent } from '../../../event/action/event.actions';
-import { TaskStatus } from '../../model/task-edit-create.model';
-import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
-import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { TaskActionInfoModel } from '../../model/task-action-info.model';
-import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {taskListColumnsModel} from '../../model/task-list-columns.model';
+import {TaskDetailModel} from '../../model/task-detail.model';
+import {SetEvent} from '../../../event/action/event.actions';
+import {TaskStatus} from '../../model/task-edit-create.model';
+import {TaskActionInfoModel} from '../../model/task-action-info.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+// Component
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
+import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
+// Service
+import {DataGridOperationsHelper, fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
+import {ReportsService} from '../../../reports/service/reports.service';
+import {TaskService} from '../../service/task.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {ColumnMenuService} from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+// Other
+import {Observable} from 'rxjs/Observable';
+import {map} from 'rxjs/operators';
+import {pathOr} from 'ramda';
+import {
+	DetailCollapseEvent,
+	DetailExpandEvent,
+	GridComponent,
+	GridDataResult, PageChangeEvent
+} from '@progress/kendo-angular-grid';
+import {forkJoin} from 'rxjs';
+import {hasIn} from 'ramda';
+import {Store} from '@ngxs/store';
+import {FilterDescriptor, SortDescriptor} from '@progress/kendo-data-query';
 
 @Component({
 	selector: 'task-list',
@@ -74,7 +77,7 @@ export class TaskListComponent implements OnInit {
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
 	private dashboardFilters = ['filter', 'status', 'role', 'category'];
-	private dateValues = ['actStart', 'actFinish', 'dueDate', 'estStart', 'estFinish', 'latestStart', 'latestFinish'];
+	private dateValues = ['actStart', 'actFinish', 'dueDate', 'dateCreated', 'estStart', 'estFinish', 'lastUpdated', 'latestStart', 'latestFinish', 'statusUpdated'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
@@ -91,15 +94,17 @@ export class TaskListComponent implements OnInit {
 	public allTasksPermission: boolean;
 	private timeZone: string;
 	private dateFormat: string;
+	protected gridMessage;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
 		private loaderService: UILoaderService,
 		private store: Store,
 		private permissionService: PermissionService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute,
@@ -213,16 +218,20 @@ export class TaskListComponent implements OnInit {
 				currentUserId: this.userContext.user.id
 			}
 		};
-		this.dialogService.extra(TaskEditCreateComponent, [
-			{ provide: TaskDetailModel, useValue: taskCreateModel }
-		]).then((result) => {
-			if (result) {
-				this.search();
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskEditCreateComponent,
+			data: {
+				taskDetailModel: taskCreateModel
+			},
+			modalConfiguration: {
+				title: 'Create Task',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
-		}).catch(result => {
-			if (result) {
-				// nothing
-			}
+		}).subscribe((data: any) => {
+			this.search();
 		});
 	}
 
@@ -237,24 +246,28 @@ export class TaskListComponent implements OnInit {
 				title: 'Task Detail'
 			}
 		};
-		this.dialogService.extra(TaskDetailComponent, [
-			{ provide: TaskDetailModel, useValue: taskDetailModel }
-		]).then((result) => {
-			if (result) {
-				if (result.isDeleted) {
-					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-						this.search();
-					});
-				} else if (result.shouldOpenTask) {
-					this.onOpenTaskDetailHandler(result.commentInstance);
-				} else if (result.shouldEdit) {
-					this.onOpenTaskEditHandler(result.id);
-				} else {
-					this.search(parseInt(taskRow.id, 10));
-				}
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskDetailComponent,
+			data: {
+				taskDetailModel: taskDetailModel
+			},
+			modalConfiguration: {
+				title: 'Task Detail',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
-		}).catch(result => {
-			if (result) {
+		}).subscribe((data: any) => {
+			if (data.isDeleted) {
+				this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+					this.search();
+				});
+			} else if (data.shouldOpenTask) {
+				this.onOpenTaskDetailHandler(data.commentInstance);
+			} else if (data.shouldEdit) {
+				this.onOpenTaskEditHandler(data.id);
+			} else {
 				this.search(parseInt(taskRow.id, 10));
 			}
 		});
@@ -269,7 +282,8 @@ export class TaskListComponent implements OnInit {
 					this.userContext.dateFormat,
 					this.taskService,
 					this.dialogService,
-					this.translate);
+					this.translate,
+					this.componentFactoryResolver);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',
@@ -279,21 +293,27 @@ export class TaskListComponent implements OnInit {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditCreateComponent, [
-					{ provide: TaskDetailModel, useValue: clone(model) }
-				], false, false)
-					.then(result => {
-						if (result) {
-							if (result.isDeleted) {
-								this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-									this.search();
-								});
-							} else {
-								this.search(parseInt(taskRow.id, 10));
-							}
-						}
-					}).catch(result => {
-					// do nothing.
+
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: TaskEditCreateComponent,
+					data: {
+						taskDetailModel: model
+					},
+					modalConfiguration: {
+						title: 'Task Edit',
+						draggable: true,
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
+					}
+				}).subscribe((data: any) => {
+					if (data.isDeleted) {
+						this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+							this.search();
+						});
+					} else {
+						this.search(parseInt(taskRow.id, 10));
+					}
 				});
 			});
 	}
@@ -346,16 +366,22 @@ export class TaskListComponent implements OnInit {
 	 * @param assetClass: string
 	 */
 	onOpenAssetDetailHandler(taskRow: any): void {
-		this.dialogService.open(AssetShowComponent,
-			[UIDialogService,
-				{ provide: 'ID', useValue: taskRow.assetEntityId },
-				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
-				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.XXL).then(result => {
-				// nothing
-		}).catch(result => {
-			console.error('rejected: ' + result);
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: taskRow.assetEntityId,
+				assetClass: taskRow.assetEntityAssetClass,
+				assetExplorerModule: AssetExplorerModule
+			},
+			modalConfiguration: {
+				title: 'Asset',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe();
+
 	}
 
 	/**
@@ -738,6 +764,7 @@ export class TaskListComponent implements OnInit {
 				}
 			});
 		}
+		this.gridMessage = this.translate.transform('GLOBAL.LOADING_RECORDS');
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
 				for (let i = 0; i < result.totalCount; i++) {
@@ -757,6 +784,7 @@ export class TaskListComponent implements OnInit {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.loading = false;
 				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+				this.gridMessage = (result.totalCount > 0) ? this.translate.transform('GLOBAL.NO_RECORDS') : '';
 			});
 		this.loaderService.stopProgress();
 

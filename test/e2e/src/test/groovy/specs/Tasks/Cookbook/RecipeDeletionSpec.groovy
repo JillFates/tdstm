@@ -25,7 +25,7 @@ class RecipeDeletionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        tasksModule.goToTasksCookbook()
+        waitFor { tasksModule.goToTasksCookbook() }
     }
 
     def setup() {

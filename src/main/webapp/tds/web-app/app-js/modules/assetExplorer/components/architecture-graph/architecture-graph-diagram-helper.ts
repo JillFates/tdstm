@@ -10,7 +10,8 @@ import {
 	Size,
 	Spot,
 	TextBlock,
-	TreeLayout
+	TreeLayout,
+	LayeredDigraphLayout
 } from 'gojs';
 import {
 	ITdsContextMenuOption
@@ -184,11 +185,10 @@ export class ArchitectureGraphDiagramHelper {
 	}
 
 	layout(): Layout {
-		const treeLayout = new TreeLayout();
-		treeLayout.angle = 90;
-		treeLayout.nodeSpacing = 200;
-		treeLayout.layerSpacing = 200;
-		return treeLayout;
+		const diagraph = new LayeredDigraphLayout();
+		diagraph.direction = 90;
+		diagraph.layerSpacing = 100;
+		return diagraph;
 	}
 
 	lowScaleNodeTemplate(): Node {

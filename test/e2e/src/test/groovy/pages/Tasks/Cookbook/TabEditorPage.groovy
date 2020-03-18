@@ -9,13 +9,13 @@ class TabEditorPage extends Page {
         //TODO check when tab is active and verify the recipe name first on the list
         //      edTabRecipeName == recipeName:
         //      edTabRecipeLabel == "Recipe:"
-        edTabEditorBtn.text() == "Edit"
-        edTabSaveWipBtn.text()  == "Save WIP"
-        edTabUndoBtn.text() == "Undo"
-        edTabReleaseBtn.text() == "Release"
-        edTabDiscardWipBtn.text() == "Discard WIP"
-        edTabDiffBtn.text() == "Diff"
-        edTabCheckSyntaxBtn.text() == "Check Syntax"
+        edTabEditorBtn.text() == "EDIT"
+        edTabSaveWipBtn.text()  == "SAVE WIP"
+        edTabUndoBtn.text() == "UNDO"
+        edTabReleaseBtn.text() == "RELEASE"
+        edTabDiscardWipBtn.text() == "DISCARD WIP"
+        edTabDiffBtn.text() == "DIFF"
+        edTabCheckSyntaxBtn.text() == "CHECK SYNTAX"
     }
 
     static content = {

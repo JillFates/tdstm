@@ -8,8 +8,62 @@ import {
 	OnChanges,
 	SimpleChanges,
 	ChangeDetectionStrategy,
-	OnDestroy, HostListener
+	OnDestroy, HostListener, ComponentFactoryResolver
 } from '@angular/core';
+import {NavigationEnd, Router} from '@angular/router';
+// Model
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
+import {
+	DIALOG_SIZE,
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	ModalType,
+} from '../../../../shared/model/constants';
+import {
+	CUSTOM_FIELD_CONTROL_TYPE,
+	FIELD_NOT_FOUND,
+	FieldSettingsModel
+} from '../../../fieldSettings/model/field-settings.model';
+import {TagModel} from '../../../assetTags/model/tag.model';
+import {BulkActionResult, BulkChangeType} from '../../../../shared/components/bulk-change/model/bulk-change.model';
+import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
+import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
+import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
+import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
+import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
+const {
+	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
+	ASSET_LIST_SIZE: PREFERENCE_LIST_SIZE,
+	WRAP_TAGS_COLUMN: PREFERENCE_WRAP_TAGS_COLUMN,
+} = PREFERENCES_LIST;
+import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../../assetExplorer/model/asset-entity.model';
+import {AssetModalModel} from '../../../assetExplorer/model/asset-modal.model';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {DialogService, ModalSize} from 'tds-component-library';
+// Component
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {TaskCommentDialogComponent} from '../../../assetExplorer/components/task-comment/dialog/task-comment-dialog.component';
+import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-edit.component';
+import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';
+import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
+import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
+import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
+// Service
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {UserService} from '../../../auth/service/user.service';
+import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
 import {Observable, ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {State} from '@progress/kendo-data-query';
@@ -19,57 +73,6 @@ import {
 	RowClassArgs
 } from '@progress/kendo-angular-grid';
 
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {
-	DIALOG_SIZE,
-	GRID_DEFAULT_PAGE_SIZE,
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-	ModalType,
-} from '../../../../shared/model/constants';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
-import {
-	CUSTOM_FIELD_CONTROL_TYPE,
-	FIELD_NOT_FOUND,
-	FieldSettingsModel
-} from '../../../fieldSettings/model/field-settings.model';
-import {NotifierService} from '../../../../shared/services/notifier.service';
-import {TagModel} from '../../../assetTags/model/tag.model';
-import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {BulkActionResult, BulkChangeType} from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
-import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
-import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {Permission} from '../../../../shared/model/permission.model';
-import {ASSET_ENTITY_DIALOG_TYPES} from '../../../assetExplorer/model/asset-entity.model';
-import {TaskCommentDialogComponent} from '../../../assetExplorer/components/task-comment/dialog/task-comment-dialog.component';
-import {AssetModalModel} from '../../../assetExplorer/model/asset-modal.model';
-import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-edit.component';
-import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';
-import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
-import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
-import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
-import {UserService} from '../../../auth/service/user.service';
-import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
-import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
-import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
-import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
-import {NavigationEnd, Router} from '@angular/router';
-import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
-import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
-
-const {
-	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
-	ASSET_LIST_SIZE: PREFERENCE_LIST_SIZE,
-	WRAP_TAGS_COLUMN: PREFERENCE_WRAP_TAGS_COLUMN,
-} = PREFERENCES_LIST;
 declare var jQuery: any;
 
 @Component({
@@ -90,6 +93,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() metadata: any;
 	@Input() fields: any;
 	@Input() hiddenFilters = false;
+	@Input() gridMessage;
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
@@ -106,7 +110,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
-	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	public showMessage = true;
 	public typingTimeout: any;
 	ASSET_ENTITY_MENU = ASSET_ENTITY_MENU;
@@ -140,16 +143,18 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,
 		private notifier: NotifierService,
-		private dialog: UIDialogService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
 		private userContextService: UserContextService,
 		private assetTagUIWrapperService: AssetTagUIWrapperService,
-		private router: Router) {
+		private router: Router,
+		private translateService: TranslatePipe) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -209,6 +214,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	ngOnChanges(changes: SimpleChanges) {
 		const dataChange = changes['data'];
+		this.gridMessage = (changes['gridMessage'] && changes['gridMessage'].currentValue) ? changes['gridMessage'].currentValue : (this.gridMessage) ? this.gridMessage : '';
 
 		if (dataChange && dataChange.currentValue !== dataChange.previousValue) {
 			this.applyData(dataChange.currentValue);
@@ -327,7 +333,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		const {assets = null, pagination = null} = data || {};
 		const total = pagination && pagination.total || 0;
 
-		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.bulkCheckboxService.initializeKeysBulkItems(assets || []);
 
 		this.gridData = {
@@ -345,7 +350,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	private clear(): void {
 		this.showMessage = true;
-		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
+		this.gridMessage = this.translateService.transform('ASSET_EXPLORER.GRID.SCHEMA_CHANGE');
 		this.gridData = null;
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
@@ -374,14 +379,22 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	protected createDependencyPromise(assetClass: string, id: number) {
 		setTimeout(() => {
-			this.dialog.open(AssetShowComponent, [
-				{ provide: 'ID', useValue: id },
-				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.XXL).then(x => {
-					this.createDependencyPromise(x.assetClass, x.id);
-				}).catch(x => {
-					console.log(x);
-				});
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetShowComponent,
+				data: {
+					assetId: id,
+					assetClass: assetClass
+				},
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe( (data: any) => {
+				this.createDependencyPromise(data.assetClass, data.id);
+			});
 		}, 500);
 	}
 
@@ -390,19 +403,25 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 * @param data
 	 */
 	protected onShow(data: any) {
-		this.dialog.open(AssetShowComponent, [
-			{ provide: 'ID', useValue: data['common_id'] },
-			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.XXL, false)
-			.then(asset => {
-				if (asset) {
-					this.createDependencyPromise(asset.assetClass, asset.id);
-				}
-				this.onReload();
-			}).catch(error => {
-				console.log('Error:', error);
-				this.onReload();
-			});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: data['common_id'],
+				assetClass: data['common_assetClass']
+			},
+			modalConfiguration: {
+				title: data['common_assetName'] + ' ' + data['common_moveBundle'],
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe( (data: any) => {
+			if (data.asset) {
+				this.createDependencyPromise(data.asset.assetClass, data.asset.id);
+			}
+			this.onReload();
+		});
 	}
 
 	/**
@@ -412,14 +431,24 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		if (!assetEntityType) {
 			return;
 		}
-		this.dialog.open(AssetCreateComponent, [
-				{provide: 'ASSET', useValue: assetEntityType}],
-			DIALOG_SIZE.XXL, false).then(x => {
-			if (x) {
-				this.createDependencyPromise(x.assetClass, 0);
+
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetCreateComponent,
+			data: {
+				assetClass: assetEntityType,
+				openFromList: true
+			},
+			modalConfiguration: {
+				title: 'Create',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
 			}
-		}).catch(x => {
-			console.log(x);
+		}).subscribe( (data: any) => {
+			if (data.assetClass) {
+				this.createDependencyPromise(data.assetClass, 0);
+			}
 		});
 	}
 
@@ -456,17 +485,19 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			modalType: 'TASK'
 		}
 
-		this.dialog.open(TaskCommentDialogComponent, [
-			{provide: AssetModalModel, useValue: assetModalModel},
-			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.LG, true).then(result => {
-			if (result) {
-				console.log('Show Task Result',  result);
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskCommentDialogComponent,
+			data: {
+				assetModalModel: assetModalModel,
+				currentUserId: this.currentUser.id
+			},
+			modalConfiguration: {
+				title: 'Create',
+				draggable: true,
+				modalSize: ModalSize.LG
 			}
-		}).catch(result => {
-			console.log(result);
-		});
-
+		}).subscribe();
 	}
 
 	/**
@@ -489,17 +520,22 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
-		this.dialog.extra(TaskEditCreateComponent, [
-			{provide: TaskDetailModel, useValue: taskCreateModel}
-		], false, false)
-			.then(result => {
-				if (result) {
-					this.onReload();
-				}
-
-			}).catch(result => {
-			console.log('Cancel:', result);
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskEditCreateComponent,
+			data: {
+				taskDetailModel: taskCreateModel
+			},
+			modalConfiguration: {
+				title: 'Task',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
+			}
+		}).subscribe((data: any) => {
+			this.onReload();
 		});
+
 		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 
 	}
@@ -513,16 +549,19 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			modalType: 'COMMENT'
 		}
 
-		this.dialog.open(TaskCommentDialogComponent, [
-			{provide: AssetModalModel, useValue: assetModalModel},
-			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.LG, true).then(result => {
-			if (result) {
-				console.log('Show Comment Result',  result);
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskCommentDialogComponent,
+			data: {
+				assetModalModel: assetModalModel,
+				currentUserId: this.currentUser.id
+			},
+			modalConfiguration: {
+				title: 'Create',
+				draggable: true,
+				modalSize: ModalSize.LG
 			}
-		}).catch(result => {
-			console.log(result);
-		});
+		}).subscribe();
 	}
 
 	protected createComment(dataItem: any, rowIndex: number) {
@@ -544,29 +583,43 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
-		this.dialog.extra(AssetCommentViewEditComponent, [
-			{provide: AssetCommentModel, useValue: assetCommentModel}
-		], false, false).then(result => {
-			console.log('RESULT SINGLE COMMENT', result);
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetCommentViewEditComponent,
+			data: {
+				assetCommentModel: assetCommentModel
+			},
+			modalConfiguration: {
+				title: 'Comment',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((data: any) => {
 			this.onReload();
-		}).catch(result => {
-			console.log(result);
 		});
 	}
 
 	protected showAssetEditView(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
-		const componentParameters = [
-			{ provide: 'ID', useValue: dataItem.common_id },
-			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
-		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL)
-			.then(() => {
-				this.onReload();
-				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
-			})
-			.catch((err) => this.onReload() );
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetEditComponent,
+			data: {
+				assetId: dataItem.common_id,
+				assetClass: dataItem.common_assetClass,
+				openFromList: true
+			},
+			modalConfiguration: {
+				title: 'Asset',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe((data) => {
+			this.onReload();
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		});
 	}
 
 	/**
@@ -575,21 +628,36 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	protected showAssetCloneView(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
 
-		const cloneModalModel: AssetModalModel = {
-			assetType: dataItem.common_assetClass,
-			assetId: dataItem.common_id
-		}
-		this.dialog.extra(AssetCloneComponent, [
-			{provide: AssetModalModel, useValue: cloneModalModel}
-		], false, false).then( (result: CloneCLoseModel)  => {
-
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetCloneComponent,
+			data: {
+				cloneModalModel: {
+					assetId:  dataItem.common_id,
+					assetType: dataItem.common_assetClass,
+				}
+			},
+			modalConfiguration: {
+				title: 'Clone Asset',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((result: any) => {
 			if (result.clonedAsset && result.showEditView) {
-				const componentParameters = [
-					{ provide: 'ID', useValue: result.assetId },
-					{ provide: 'ASSET', useValue: dataItem.common_assetClass }
-				];
-
-				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: AssetEditComponent,
+					data: {
+						assetId: result.assetId,
+						assetClass: dataItem.common_assetClass
+					},
+					modalConfiguration: {
+						title: 'Asset',
+						draggable: true,
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-asset-modal-dialog'
+					}
+				}).subscribe();
 			} else if (!result.clonedAsset && result.showView) {
 				const data: any = {
 					common_id: result.assetId,
@@ -598,7 +666,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				this.onShow(data);
 			}
 			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
-		}).catch( error => console.log('error', error));
+		});
+
 	}
 
 	public setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {

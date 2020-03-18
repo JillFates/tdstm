@@ -1,23 +1,26 @@
+// Angular
+import {OnInit, ComponentFactoryResolver} from '@angular/core';
+// Service
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependecyService} from '../../service/dependecy.service';
-import {HostListener, OnInit, AfterContentInit } from '@angular/core';
-import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {WindowService} from '../../../../shared/services/window.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
+import {ModelService} from '../../service/model.service';
+// Model
 import {TagModel} from '../../../assetTags/model/tag.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
+import {DialogService, ModalSize} from 'tds-component-library';
+// Component
 import {AssetShowComponent} from './asset-show.component';
 import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.component';
 import {AssetCommonHelper} from './asset-common-helper';
-import {WindowService} from '../../../../shared/services/window.service';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+// Other
 import {ReplaySubject} from 'rxjs';
-import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link, Spot} from 'gojs';
-import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
-import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {Layout, Link} from 'gojs';
 
 declare var jQuery: any;
 
@@ -38,16 +41,15 @@ export class AssetCommonShow implements OnInit {
 	protected linkTemplate$: ReplaySubject<Link> = new ReplaySubject(1);
 
 	constructor(
-		protected activeDialog: UIActiveDialogService,
-		protected dialogService: UIDialogService,
+		protected componentFactoryResolver: ComponentFactoryResolver,
+		protected dialogService: DialogService,
 		protected assetService: DependecyService,
-		protected prompt: UIPromptService,
 		protected assetExplorerService: AssetExplorerService,
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
 		protected windowService: WindowService,
 		protected architectureGraphService: ArchitectureGraphService,
-		private assetTagUIWrapperService?: AssetTagUIWrapperService
+		private parentDialog: any
 	) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
@@ -58,12 +60,6 @@ export class AssetCommonShow implements OnInit {
 				});
 	}
 
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
-	}
-
 	/**
 	 * Initiates The Injected Component
 	 */
@@ -71,29 +67,32 @@ export class AssetCommonShow implements OnInit {
 		jQuery('[data-toggle="popover"]').popover();
 	}
 
-	ngAfterContentInit(): void {
-		setTimeout(() => {
-			let tagsDiv = <HTMLElement>document.querySelector('.tags-container');
-			let tableRow = <HTMLElement>document.querySelector('.one-column');
-			let tableRowSiblingWidth = <HTMLElement>(<HTMLElement>document.querySelector('.fit-tags-to-view')).previousSibling;
-			tagsDiv.style.width = (tableRow.offsetWidth - tableRowSiblingWidth.offsetWidth) + 'px';
-			if (this.assetTagUIWrapperService) {
-				this.assetTagUIWrapperService.updateTagsWidthForAssetShowView('.tags-container', 'span.dots-for-tags', '.one-column');
+	/***
+	 * Close the Active Dialog
+	 */
+	protected cancelCloseDialog(): void {
+		const assetShowComponent = <AssetShowComponent>this.parentDialog;
+		assetShowComponent.onDismiss();
+	}
+
+	protected showAssetDetailView(assetClass: string, id: number) {
+		// Close current dialog before open new one
+		this.cancelCloseDialog();
+
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: id,
+				assetClass: assetClass
+			},
+			modalConfiguration: {
+				title: 'Asset',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
 			}
-		}, 500);
-	}
-
-	cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
-		jQuery('body').removeClass('modal-open');
-	}
-
-	showAssetDetailView(assetClass: string, id: number) {
-		this.dialogService.replace(AssetShowComponent, [
-				{provide: 'ID', useValue: id},
-				{provide: 'ASSET', useValue: assetClass}],
-			DIALOG_SIZE.XXL);
-		jQuery('body').addClass('modal-open');
+		}).subscribe();
 	}
 
 	/**
@@ -106,18 +105,23 @@ export class AssetCommonShow implements OnInit {
 	showDependencyView(type: string, assetId: number, dependencyAsset: number, rowId = '') {
 		this.assetService.getDependencies(assetId, dependencyAsset)
 			.subscribe((result) => {
-				jQuery('body').addClass('modal-open');
-				this.dialogService.extra(AssetDependencyComponent, [
-					{ provide: 'ASSET_DEP_MODEL', useValue: result }])
-					.then(res => {
-						// if the dependency was deleted remove it from the grid
-						if (res && res.delete) {
-							this.deleteDependencyRowUpdateCounter(type, rowId)
-						}
-					})
-					.catch(res => {
-						console.log(res);
-					});
+
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: AssetDependencyComponent,
+					data: {
+						assetDependency: result
+					},
+					modalConfiguration: {
+						title: 'Dependency Detail',
+						draggable: true,
+						modalSize: ModalSize.MD,
+					}
+				}).subscribe( (data) => {
+					if (data && data.delete) {
+						this.deleteDependencyRowUpdateCounter(type, rowId)
+					}
+				});
 			}, (error) => console.log(error));
 	}
 
@@ -138,30 +142,6 @@ export class AssetCommonShow implements OnInit {
 				counter.text(currentRows.length > 99 ? '99+' : currentRows.length);
 			}
 		}
-	}
-
-	/**
-	 allows to delete the application assets
-	 */
-	onDeleteAsset() {
-
-		this.prompt.open('Confirmation Required',
-			'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-			'OK', 'Cancel')
-			.then( success => {
-				if (success) {
-					this.assetExplorerService.deleteAssets([this.mainAsset.toString()]).subscribe( res => {
-						if (res) {
-							this.notifierService.broadcast({
-								name: 'reloadCurrentAssetList'
-							});
-							this.activeDialog.dismiss();
-							jQuery('body').removeClass('modal-open');
-						}
-					}, (error) => console.log(error));
-				}
-			})
-			.catch((error) => console.log(error));
 	}
 
 	getGoJsGraphUrl(): string {

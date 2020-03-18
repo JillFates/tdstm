@@ -82,7 +82,9 @@ export const en_DICTIONARY: Object = {
 		'TOTAL': 'Total',
 		'TIMEZONE': 'Time Zone Select',
 		'DATE_TIMEZONE': 'Date and Timezone',
-		'DATE_FORMAT': 'Date Format'
+		'DATE_FORMAT': 'Date Format',
+		'LOADING_RECORDS': 'Loading records...',
+		'NO_RECORDS': 'No records found'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -259,7 +261,8 @@ export const en_DICTIONARY: Object = {
 		'LIST': 'Event List',
 		'TITLE_DASHBOARD': 'Event Dashboard',
 		'DASHBOARD': 'Dashboard',
-		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks',
+		'NEWS': 'Event News List'
 	},
 	'INSIGHT': {
 		'INSIGHT': 'Insight',
@@ -538,5 +541,5 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 	},
 	'MANUFACTURER': {
 		'LIST': 'Manufacturer List'
-	}
+	},
 };

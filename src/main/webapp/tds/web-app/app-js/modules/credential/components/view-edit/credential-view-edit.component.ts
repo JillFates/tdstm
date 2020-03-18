@@ -39,7 +39,11 @@ import {Observable} from 'rxjs';
             .radio-aligned {
                 margin: 4px 4px 0;
                 vertical-align: top;
-            }
+			}
+
+			.syntax-errors-box {
+				max-height: 200px;
+			}
 
             .label-detail {
                 font-weight: normal;
@@ -362,6 +366,10 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 			).subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 					// Put back original model
+					this.validExpressionResult = {
+						valid: true,
+						error: '',
+					};
 					this.credentialModel = JSON.parse(this.dataSignature);
 					this.dataSignature = JSON.stringify(this.credentialModel);
 					this.modalType = this.actionTypes.VIEW;
