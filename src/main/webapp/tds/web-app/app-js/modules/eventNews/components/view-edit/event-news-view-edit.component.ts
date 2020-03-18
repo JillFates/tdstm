@@ -1,5 +1,12 @@
 // Angular
-import {Component, ComponentFactoryResolver, Input, OnInit, ViewChild} from '@angular/core';
+import {
+	AfterViewInit,
+	Component,
+	ComponentFactoryResolver,
+	Input,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {EventsService} from '../../../event/service/events.service';
@@ -13,12 +20,13 @@ import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-
 import {EventNewsModel} from '../../model/event-news.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {UserContextModel} from '../../../auth/model/user-context.model';
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-news-create-edit',
 	templateUrl: 'event-news-view-edit.component.html'
 })
-export class EventNewsViewEditComponent extends Dialog implements OnInit {
+export class EventNewsViewEditComponent extends Dialog implements AfterViewInit, OnInit {
 	@Input() data: any;
 	@ViewChild('eventNewsForm', {read: NgForm, static: true}) eventNewsForm: NgForm;
 	public eventNewsModel: EventNewsModel;
@@ -66,15 +74,6 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 			action: this.onSaveEventNews.bind(this)
 		});
 
-		/*this.buttons.push({
-			name: 'delete',
-			icon: 'trash',
-			show: () => this.modalType !== this.actionTypes.CREATE,
-			disabled: () => !this.permissionService.hasPermission(Permission.ProviderDelete),
-			type: DialogButtonType.ACTION,
-			action: null
-		});*/
-
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
@@ -89,6 +88,17 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
+		});
+	}
+
+	ngAfterViewInit(): void {
+		const modalElement = document.getElementsByClassName('modal-content');
+		const modalContent = jQuery(modalElement).find('a, button, :input, [tabindex]');
+		modalElement[0].addEventListener('focusout', e => {
+			const validElement = Array.from(modalContent).find(element => element === e['relatedTarget']);
+			if (!validElement && e['relatedTarget'].type !== 'button') {
+				modalContent.first()[0].focus();
+			}
 		});
 	}
 
@@ -184,22 +194,6 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	}
 
 	/**
-	 * On delete news shows the confirmation dialog
-	 * if the user decides continue call the endpoint to delete the record
-	 */
-	/*public onDelete(): void {
-		this.promptService.open('Confirmation Required', 'You are about to delete the selected item. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.eventsService.deleteNews(this.getPayloadFromModel())
-						.subscribe(
-							res => this.activeDialog.close(),
-							error => console.error(error));
-				}
-			});
-	}*/
-
-	/**
 	 * Determines if all the field forms comply with the validation rules
 	 */
 	public formValid(): boolean {
@@ -228,7 +222,11 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	 * Verify the Object has not changed
 	 * @returns {boolean}
 	 */
-	public isDirty(): boolean {
-		return false;
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	protected isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify(this.eventNewsModel);
 	}
 }
