@@ -60,7 +60,7 @@
 		</div>
     </div>
 
-    <div class="asset-crud" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
+    <div class="asset-crud" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
 			<div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
 				<g:if test="${errors}">

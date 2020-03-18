@@ -101,11 +101,13 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
-				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}))
+				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}),
+				this.http.get(`../ws/asset/assetForDependencyGroup?assetId=${this.modelId}`))
 				.subscribe((response: any) => {
 					let template = response[0];
+					const templateTitleData = response[1];
 
-					// this.setTitle(this.getModalTitle(model));
+					this.setTitle(this.getModalTitle(templateTitleData.data));
 
 					const additionalImports = [AssetExplorerModule];
 					switch (this.asset) {
@@ -256,13 +258,23 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		return this.permissionService.hasPermission(Permission.AssetEdit);
 	}
 
-	private getModalTitle(assetModel: any): string {
-		return `<div class="modal-title-container">
-			<div class="badge modal-badge" style="">A</div>
-			<h4 class="modal-title">${assetModel.asset.assetName}</h4>
-			<div class="modal-subtitle">${assetModel.moveBundle}</div>
-			<div class="badge modal-subbadge"></div>
-		</div>`;
+	private getModalTitle(titleData: any): string {
+		let htmlModalTitle = '<div class="modal-title-container">';
+		htmlModalTitle += `<div class="badge modal-badge">A</div>`;
+		if (titleData.name !== null) {
+			htmlModalTitle += `<h4 class="modal-title">${titleData.name}</h4>`;
+		}
+		if (titleData.moveBundle !== null) {
+			htmlModalTitle += `<div class="modal-subtitle">${titleData.moveBundle}</div>`;
+		}
+		if (titleData.depGroup !== null) {
+			htmlModalTitle += `<a href="../moveBundle/dependencyConsole/map/${titleData.depGroup}?assetName=${titleData.name}"><div class="badge modal-subbadge">${titleData.depGroup}</div></a>`;
+		}
+		htmlModalTitle += `</div>`;
+		if (titleData.description !== null) {
+			htmlModalTitle += `<div class="modal-description">${titleData.description}</div>`;
+		}
+		return htmlModalTitle;
 	}
 
 	/**
