@@ -587,7 +587,7 @@ class DataviewService implements ServiceMethods {
 		}
 
         boolean canAccess =
-			(dataview.project.id == Project.DEFAULT_PROJECT_ID && (dataview.isSystem || dataview.isShared)) \
+			(dataview.project.id == Project.DEFAULT_PROJECT_ID && (dataview.isSystem || dataview.isShared || dataview.personId == whom.id)) \
 			|| \
 			(dataview.project.id == project.id && (dataview.personId == whom.id || dataview.isShared))
 
