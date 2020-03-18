@@ -391,7 +391,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	Map createTaskActionBarMap(Task task) {
 		Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
-        def instructionsLinkMap = assetEntityService.parseInstructionsLink(task.instructionsLink)
+        Map instructionsLinkMap = assetEntityService.parseInstructionsLink(task.instructionsLink)
 		return [
 				taskId: task.id,
 				apiActionId: task.apiAction?.id,
