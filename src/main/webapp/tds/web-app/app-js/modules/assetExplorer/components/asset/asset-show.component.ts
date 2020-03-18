@@ -172,7 +172,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 				assetClass: assetClass
 			},
 			modalConfiguration: {
-				title: 'Asset',
+				title: '&nbsp;',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
@@ -221,7 +221,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 				assetClass: assetClass
 			},
 			modalConfiguration: {
-				title: 'Asset',
+				title: '&nbsp;',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
@@ -267,8 +267,8 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		if (titleData.moveBundle !== null) {
 			htmlModalTitle += `<div class="modal-subtitle">${titleData.moveBundle}</div>`;
 		}
-		if (titleData.depGroup !== null) {
-			htmlModalTitle += `<a href="../moveBundle/dependencyConsole/map/${titleData.depGroup}?assetName=${titleData.name}"><div class="badge modal-subbadge">${titleData.depGroup}</div></a>`;
+		if (titleData.depGroup !== null && titleData.depGroup > 0) {
+			htmlModalTitle += `<a href="${encodeURI('../moveBundle/dependencyConsole/map/' + titleData.depGroup + '?assetName=' + titleData.name)}"><div class="badge modal-subbadge">${titleData.depGroup}</div></a>`;
 		}
 		htmlModalTitle += `</div>`;
 		if (titleData.description !== null) {

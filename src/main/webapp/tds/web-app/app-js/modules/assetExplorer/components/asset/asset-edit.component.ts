@@ -97,10 +97,14 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
 				this.http.get(`../ws/asset/editTemplate/${this.modelId}`, {responseType: 'text'}),
-				this.http.get(`../ws/asset/editModel/${this.modelId}`))
+				this.http.get(`../ws/asset/editModel/${this.modelId}`),
+				this.http.get(`../ws/asset/assetForDependencyGroup?assetId=${this.modelId}`))
 				.subscribe((response: any) => {
 					let template = response[0];
 					let model = response[1];
+					const templateTitleData = response[2];
+
+					this.setTitle(this.getModalTitle(templateTitleData.data));
 
 					switch (this.asset) {
 						case 'APPLICATION':
@@ -226,6 +230,25 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 
 	private isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetEdit);
+	}
+
+	private getModalTitle(titleData: any): string {
+		let htmlModalTitle = '<div class="modal-title-container">';
+		htmlModalTitle += `<div class="badge modal-badge">A</div>`;
+		if (titleData.name !== null) {
+			htmlModalTitle += `<h4 class="modal-title">${titleData.name}</h4>`;
+		}
+		if (titleData.moveBundle !== null) {
+			htmlModalTitle += `<div class="modal-subtitle">${titleData.moveBundle}</div>`;
+		}
+		if (titleData.depGroup !== null && titleData.depGroup > 0) {
+			htmlModalTitle += `<a href="${encodeURI('../moveBundle/dependencyConsole/map/' + titleData.depGroup + '?assetName=' + titleData.name)}"><div class="badge modal-subbadge">${titleData.depGroup}</div></a>`;
+		}
+		htmlModalTitle += `</div>`;
+		if (titleData.description !== null) {
+			htmlModalTitle += `<div class="modal-description">${titleData.description}</div>`;
+		}
+		return htmlModalTitle;
 	}
 
 	/**

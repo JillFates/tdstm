@@ -4,7 +4,7 @@
 
     .tab-scroll-container {
       &.has-description {
-        margin-top: 32px;
+        margin-top: 38px;
       }
     }
 
@@ -35,6 +35,9 @@
       font-size: 22px;
       line-height: 26px;
       margin-right: 10px;
+      a:hover {
+        text-decoration: none;
+      }
     }
 
     .modal-subtitle {
@@ -59,7 +62,7 @@
       font-weight: 500;
       font-size: 14px;
       color: black;
-      word-break: break-all;
+      color: #818181;
     }
 
     // TITLE ENDS ---------
