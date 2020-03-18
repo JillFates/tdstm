@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {ViewModel, ViewGroupModel} from '../../../assetExplorer/model/view.model';
@@ -7,6 +7,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
 import { ActivatedRoute } from '@angular/router';
+import { KEYSTROKE } from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -19,8 +20,8 @@ import { ActivatedRoute } from '@angular/router';
                 <h4 class="modal-title">Save List View</h4>
             </div>
             <div class="modal-body">
-                <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
-                      #noticeForm='ngForm'>
+                <form name="saveForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
+                      #saveForm='ngForm'>
                     <div class="box-body">
                         <div class="form-group save-views-container">
                             <div>
@@ -40,10 +41,11 @@ import { ActivatedRoute } from '@angular/router';
                                         <label for="name" style="padding: 0;font-weight: bold">
                                             {{ 'GLOBAL.VIEW_NAME' | translate }}:*
                                         </label>
-                                        <input type="text"
+                                        <input #inputText type="text"
                                                name="name"
                                                id="name"
                                                class="form-control"
+																							 autofocus
                                                placeholder="Enter a name for the view"
                                                [disabled]="!isSaveInMyViewMode()"
                                                (keyup)="onNameChanged()"
@@ -113,6 +115,7 @@ import { ActivatedRoute } from '@angular/router';
 	`
 })
 export class AssetViewSaveComponent implements AfterViewInit {
+	@ViewChild('inputText') inputText: ElementRef;
 	public model: ViewModel;
 	public saveOptions: SaveOptions;
 	private preModel: ViewModel;
@@ -150,11 +153,22 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		this.setDisabling();
 	}
 
-	ngAfterViewInit(): void {
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
+	}
 
+	ngAfterViewInit(): void {
 		if (this.model.name) {
 			this.validateUniquenessDataViewByName(this.model.name);
 		}
+		// focus form to enable the exit on ESC key event.
+		setTimeout(() => this.inputText.nativeElement.focus(), 500);
 	}
 
 	public cancelCloseDialog(): void {
