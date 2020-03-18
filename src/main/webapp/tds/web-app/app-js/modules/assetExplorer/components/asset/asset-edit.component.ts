@@ -22,7 +22,7 @@ import {DeviceEditComponent} from '../device/device-edit.component';
 import {ApplicationEditComponent} from '../application/application-edit.component';
 // Service
 import {TagService} from '../../../assetTags/service/tag.service';
-import {DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import {DialogButtonModel, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
@@ -255,6 +255,7 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 	 * User Dismiss Changes
 	 */
 	public onDismiss(): void {
-		super.onCancelClose();
+		const cancelEdit = this.buttons.find((button: DialogButtonModel) => button.name === 'cancelEdit');
+		cancelEdit.action();
 	}
 }
