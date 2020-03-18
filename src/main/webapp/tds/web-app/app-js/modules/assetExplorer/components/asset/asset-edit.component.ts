@@ -234,7 +234,8 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 
 	private getModalTitle(titleData: any): string {
 		let htmlModalTitle = '<div class="modal-title-container">';
-		htmlModalTitle += `<div class="badge modal-badge">A</div>`;
+		const assetChar = this.asset.charAt(0).toUpperCase();
+		htmlModalTitle += `<div class="badge modal-badge">${assetChar}</div>`;
 		if (titleData.name !== null) {
 			htmlModalTitle += `<h4 class="modal-title">${titleData.name}</h4>`;
 		}
