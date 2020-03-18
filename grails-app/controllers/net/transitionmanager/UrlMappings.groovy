@@ -103,6 +103,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/assetForDependencyGroup" {
+			controller = "wsAsset"
+			action = [
+			        GET: "getAssetForDependencyGroup"
+			]
+		}
+
 		"/ws/apiAction/$id" {
 			controller = "wsApiAction"
 			action = [
