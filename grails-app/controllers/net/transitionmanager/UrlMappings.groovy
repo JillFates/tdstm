@@ -844,6 +844,11 @@ class UrlMappings {
 			action = [GET:"resetPassword"]
 		}
 
+		"/auth/applyNewPassword" {
+			controller = "auth"
+			action = [POST:"applyNewPassword"]
+		}
+
 		"/ws/admin/unlockAccount" {
 			controller = "wsAdmin"
 			action = [PUT:"unlockAccount"]

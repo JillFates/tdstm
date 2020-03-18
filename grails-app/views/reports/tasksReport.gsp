@@ -38,7 +38,7 @@
                     ${task.taskNumber}
                 </td>
                 <td>
-                    <div style="max-height: 100px; max-width: 150px; overflow: auto;">
+                    <div style="max-height: 100px; max-width: 150px;">
                         ${task.comment}
                     </div>
                 </td>
