@@ -87,7 +87,7 @@ export class AssetCommonShow implements OnInit {
 				assetClass: assetClass
 			},
 			modalConfiguration: {
-				title: 'Asset',
+				title: '&nbsp;',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'

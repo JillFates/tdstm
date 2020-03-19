@@ -2,6 +2,71 @@
   &.modal-dialog {
     width: 56rem !important;
 
+    .tab-scroll-container {
+      &.has-description {
+        margin-top: 38px;
+      }
+    }
+
+    // TITLE START --------
+    .modal-title-container {
+      display: flex;
+      align-items: center;
+
+      a {
+        color: white;
+
+        &:hover {
+          color: #0077b8;
+        }
+      }
+    }
+
+    .modal-badge {
+      height: 23px;
+      width: 23px;
+      border-radius: 100%;
+      font-size: 13px;
+    }
+
+    .modal-title {
+      font-style: normal;
+      font-weight: 500;
+      font-size: 22px;
+      line-height: 26px;
+      margin-right: 10px;
+      a:hover {
+        text-decoration: none;
+      }
+    }
+
+    .modal-subtitle {
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 16px;
+      color: $color-icon;
+      margin-right: 10px;
+    }
+
+    .modal-subbadge {
+      min-width: unset;
+      width: 20px;
+      height: 20px;
+      background-color: #f38b00;
+    }
+
+    .modal-description {
+      padding-top: 5px;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 14px;
+      color: black;
+      color: #818181;
+    }
+
+    // TITLE ENDS ---------
+
     .modal-body {
       width: 97%;
       overflow: hidden;
@@ -14,14 +79,23 @@
       padding-bottom: 40px;
       overflow-y: auto;
       overflow-x: hidden;
-    }
-
-    .has-description {
       max-height: calc(100vh - 136px);
-    }
+      &.has-description {
+        max-height: calc(100vh - 190px);
+      }
 
-    .no-description {
-      max-height: calc(100vh - 136px);
+      .table-data-section {
+        margin-bottom: 10px;
+        .tool-bar-wrapper {
+          height: 45px;
+          .grid-actions {
+            padding-top: 8px;
+            .btn-sm {
+              padding-top: 0px;
+            }
+          }
+        }
+      }
     }
 
     .show-hide-link {
