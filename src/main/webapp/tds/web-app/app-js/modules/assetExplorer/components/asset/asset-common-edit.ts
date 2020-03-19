@@ -218,7 +218,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 					assetClass: assetClass
 				},
 				modalConfiguration: {
-					title: 'Asset',
+					title: '&nbsp;',
 					draggable: true,
 					modalSize: ModalSize.CUSTOM,
 					modalCustomClass: 'custom-asset-modal-dialog'

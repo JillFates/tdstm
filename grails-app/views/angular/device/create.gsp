@@ -22,7 +22,7 @@
             </div>
         </div>
     </div>
-    <div class="asset-crud no-description" tdsScrollContainer style="position: relative">
+    <div class="asset-crud" tdsScrollContainer style="position: relative">
         <form 
             name="form"
             (ngSubmit)="form.form.valid && onCreate()"
