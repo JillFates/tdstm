@@ -55,7 +55,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.ModelList)
 	def listJson() {
 
-		// This map contains all the possible fileds that the user could be sorting or filtering on
+		// This map contains all the possible fields that the user could be sorting or filtering on
 		Map<String, String> filterParams = [
 			modelName: params.modelName, manufacturer: params.manufacturer, description: params.description,
 			assetType: params.assetType, powerUse: params.powerUse, modelConnectors: params.modelConnectors,
@@ -86,15 +86,26 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		modelInstanceList = (totalRows > 0) ? modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)] : []
 
 		// Reformat the list to allow jqgrid to use it
-		def results = modelInstanceList?.collect {[
+		/*def results = modelInstanceList?.collect {[
 			id: it.modelId,
 			cell: [it.modelName, it.manufacturer, displayModelValues(modelPref["1"], it),
 			       displayModelValues(modelPref["2"], it), displayModelValues(modelPref["3"], it),
 			       displayModelValues(modelPref["4"], it), it.assetsCount, it.sourceTDSVersion,
 			       it.sourceTDS, it.modelStatus]
-		]}
+		]}*/
 
-		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
+        def results = modelInstanceList?.collect {
+            Map<String, Object> data = [id: it.modelId, name: it.modelName, manufacturer: it.manufacturer,
+                    description: displayModelValues(modelPref["1"], it),
+                    assetType: displayModelValues(modelPref["2"], it),
+                    lastModified: displayModelValues(modelPref["3"], it),
+                    connectors: displayModelValues(modelPref["4"], it),
+                    assetsCount:  it.assetsCount, sourceTDSVersion:  it.sourceTDSVersion,
+                    sourceTDS:  it.sourceTDS, modelStatus: it.modelStatus]
+            data
+        }
+
+            renderSuccessJson([rows: results])
 	}
 
 	@HasPermission(Permission.ModelCreate)
