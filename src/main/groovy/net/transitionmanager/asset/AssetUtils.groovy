@@ -2,6 +2,7 @@ package net.transitionmanager.asset
 
 
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.HtmlUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import net.transitionmanager.project.MoveBundle
@@ -232,5 +233,17 @@ class AssetUtils {
 			}.count().toInteger()
 		}
 	}
+
+    /**
+     * Parses the instructionLink and extracts the URL and label as separate list of strings.
+     * @param instructionsLink
+     * @return List<String> - [instructionsLinkLabel, instructionsLinkURL]
+     */
+    public static List<String> parseInstructionsLink(String instructionsLink) {
+        if (instructionsLink) {
+            return HtmlUtil.parseMarkupURL(instructionsLink)
+        }
+        return []
+    }
 
 }

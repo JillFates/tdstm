@@ -20,6 +20,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.AssetOptionsCommand
@@ -495,23 +496,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
 
-			def instructionsLinkURL
-			def instructionsLinkLabel
+            List<String> instructionsLinkList = AssetUtils.parseInstructionsLink(assetComment.instructionsLink)
+            String instructionsLinkURL = instructionsLinkList[1] ?: null
+			String instructionsLinkLabel = instructionsLinkList[0] ?: null
 
-			if (assetComment.instructionsLink) {
-				List<String> instructionsLinkInfo = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)
-				if (instructionsLinkInfo) {
-					if (instructionsLinkInfo.size() > 1) {
-						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
-						instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
-					}
-					else {
-						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
-					}
-				}
-			}
-
-			StringBuilder predecessorTable
+            StringBuilder predecessorTable
 			def predecessorList = []
 			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {
