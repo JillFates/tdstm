@@ -65,11 +65,11 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				read labels
 				domain Application
 				iterate {
-					set columnVar with 'name'
-					extract columnVar transform with lowercase() set nameVar
-					if (nameVar){
-						nameVar transform with uppercase() set upperNameVar
-						load 'Name' with upperNameVar
+					set column with 'name'
+					extract column transform with lowercase() set name
+					if (name){
+						element name transform with uppercase() set upperName
+						load 'Name' with upperName
 					}
 				}
 			""".stripIndent())
@@ -111,9 +111,9 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				read labels
 				domain Application
 				iterate {
-					extract 'name' set nameVar
-					nameVar transform with middle(3, 2) uppercase() set upperNameVar 
-					load 'Name' with upperNameVar
+					extract 'name' set name
+					element name transform with middle(3, 2) uppercase() set upperName 
+					load 'Name' with upperName
 				}
 			""".stripIndent())
 

@@ -835,7 +835,8 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * Create a local variable using variableName parameter.
 	 * It's used in following ETL script command
 	 * <pre>
-	 * 	iterate {* 	    ...
+	 * 	iterate { //
+	 * 		...
 	 * 		extract 3 transform with lowercase() set myLocalVariable
 	 * 		.....
 	 *} </pre>
@@ -854,8 +855,8 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * @see LocalVariableFacade
 	 */
 	private Element doSet(String variableName) {
-		LocalVariableFacade localVariableFacade = new LocalVariableFacade(this.value, this.processor)
-		processor.addLocalVariableInBinding(variableName, localVariableFacade)
+		//LocalVariableFacade localVariableFacade = new LocalVariableFacade(this.value, this.processor)
+		processor.addLocalVariableInBinding(variableName, this.value)
 		return this
 	}
 

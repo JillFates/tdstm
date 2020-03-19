@@ -77,7 +77,7 @@ class ETLFieldLookupCommandSpec extends Specification implements FieldSpecValida
 				    extract 'name' load 'assetName' set name
 				    fieldLookup Device with 'Cost Basis' set costField
 				    extract 'cost' transform with toLong() load costField set cost
-				    assert costField.wrappedObject == 'custom3'
+				    assert costField == 'custom3'
 				}
 				
 			""".stripIndent())

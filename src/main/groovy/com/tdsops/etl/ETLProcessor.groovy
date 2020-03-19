@@ -711,6 +711,26 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         doExtract(index)
     }
 
+    /**
+     * Converts a local variable in an instance of {@link Element}
+     * enabling user to evaluate transformations on that variable.
+     * <pre>
+     *  extract 'name' set name
+     *  assert (name instanceof String)
+     *  element name transform with left(3) set shortName
+     *  assert shortName.size() == 3
+     * </pre>
+     * @param value
+     * @return an instance of {@link Element}
+     */
+    Element element(Object value) {
+        return bindCurrentElement(new Element(
+                originalValue: value,
+                value: value,
+                processor: this)
+        )
+    }
+
     @Deprecated
     @CompileStatic
     private Element extractWithGETL(String columnName) {
@@ -1980,12 +2000,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         return columnNamePartsCache[columnName]
     }
 
-    Column column(String columnName) {
+    Column getColumnByName(String columnName) {
         return columnsMap[columnName]
     }
 
-    Column column(Integer columnName) {
-        return columns[columnName]
+    Column getColumnByPosition(Integer ordinalPosition) {
+        return columns[ordinalPosition]
     }
 
     Row getCurrentRow() {

@@ -46,8 +46,8 @@ class FieldLookupCommand {
      * @param localVariable
      */
     void set(LocalVariableDefinition localVariable) {
-        LocalVariableFacade localVariableFacade = new LocalVariableFacade(fieldDefinition.name, this.processor)
-        processor.addLocalVariableInBinding(localVariable.name, localVariableFacade)
+        // LocalVariableFacade localVariableFacade = new LocalVariableFacade(fieldDefinition.name, this.processor)
+        processor.addLocalVariableInBinding(localVariable.name, fieldDefinition.name)
     }
 
 }

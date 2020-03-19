@@ -65,16 +65,16 @@ class CSVDatasetSpec extends ETLBaseSpec {
 			""".stripIndent())
 
         then: 'A column map is created'
-            etlProcessor.column('name').index == 0
-            etlProcessor.column(0).label == 'name'
+            etlProcessor.getColumnByName('name').index == 0
+            etlProcessor.getColumnByPosition(0).label == 'name'
 
         and:
-            etlProcessor.column('cpu').index == 1
-            etlProcessor.column(1).label == 'cpu'
+            etlProcessor.getColumnByName('cpu').index == 1
+            etlProcessor.getColumnByPosition(1).label == 'cpu'
 
         and:
-            etlProcessor.column('description').index == 2
-            etlProcessor.column(2).label == 'description'
+            etlProcessor.getColumnByName('description').index == 2
+            etlProcessor.getColumnByPosition(2).label == 'description'
 
         and:
             etlProcessor.currentRowIndex == 1
@@ -113,16 +113,16 @@ class CSVDatasetSpec extends ETLBaseSpec {
 			""".stripIndent())
 
         then: 'A column map is created'
-            etlProcessor.column('name').index == 0
-            etlProcessor.column(0).label == 'name'
+            etlProcessor.getColumnByName('name').index == 0
+            etlProcessor.getColumnByPosition(0).label == 'name'
 
         and:
-            etlProcessor.column('cpu').index == 1
-            etlProcessor.column(1).label == 'cpu'
+            etlProcessor.getColumnByName('cpu').index == 1
+            etlProcessor.getColumnByPosition(1).label == 'cpu'
 
         and:
-            etlProcessor.column('description').index == 2
-            etlProcessor.column(2).label == 'description'
+            etlProcessor.getColumnByName('description').index == 2
+            etlProcessor.getColumnByPosition(2).label == 'description'
 
         and:
             etlProcessor.currentRowIndex == 3

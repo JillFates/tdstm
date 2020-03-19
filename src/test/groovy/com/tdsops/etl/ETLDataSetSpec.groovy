@@ -178,16 +178,16 @@ class ETLDataSetSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'A column map is created'
-			etlProcessor.column('device id').index == 0
-			etlProcessor.column(0).label == 'device id'
+			etlProcessor.getColumnByName('device id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'device id'
 
 		and:
-			etlProcessor.column('model name').index == 1
-			etlProcessor.column(1).label == 'model name'
+			etlProcessor.getColumnByName('model name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'model name'
 
 		and:
-			etlProcessor.column('manufacturer name').index == 2
-			etlProcessor.column(2).label == 'manufacturer name'
+			etlProcessor.getColumnByName('manufacturer name').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'manufacturer name'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -216,15 +216,15 @@ class ETLDataSetSpec extends ETLBaseSpec {
 
 			// Auto detecting JSON headers.
 		and : 'A column map is created in alphanumeric order (Json Map)'
-			etlProcessor.column('device id').index == 0
-			etlProcessor.column(0).label == 'device id'
+			etlProcessor.getColumnByName('device id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'device id'
 
 		and:
-			etlProcessor.column('manufacturer name').index == 1
-			etlProcessor.column(1).label == 'manufacturer name'
+			etlProcessor.getColumnByName('manufacturer name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'manufacturer name'
 
 		and:
-			etlProcessor.column('model name').index == 2
-			etlProcessor.column(2).label == 'model name'
+			etlProcessor.getColumnByName('model name').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'model name'
 	}
 }
