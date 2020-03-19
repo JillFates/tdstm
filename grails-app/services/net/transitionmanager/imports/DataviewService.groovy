@@ -236,21 +236,28 @@ class DataviewService implements ServiceMethods {
 	Map generateSaveOptions(Project project, Person whom, Dataview dataview) {
 		boolean isDefaultProject = project.isDefaultProject()
 		Set saveAsOptions = []
+		boolean canShare = false
+		boolean canOverride = false
 
-		// User can always save as My View
-		if (securityService.hasPermission(Permission.AssetExplorerSaveAs)){
-			saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
-		}
+		if ( securityService.hasPermission(Permission.AssetExplorerCreate) ) {
+			// User can always save as My View if they have the Create perm
+			if ( securityService.hasPermission(Permission.AssetExplorerSaveAs) ) {
+				saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
+			}
 
-		// Add the Override options if system view and user has perms
-		saveAsOptions.addAll( overrideOptions(project, whom, dataview))
+			// Add the Override options if system view and user has perms
+			saveAsOptions.addAll( overrideOptions(project, whom, dataview ) )
 
-		// Determine if the person has the ability to share a view
-		boolean canShare = securityService.hasPermission(
+			// Determine if the person has the ability to share a view
+			canShare = securityService.hasPermission(
 				(isDefaultProject ? Permission.AssetExplorerSystemCreate :  Permission.AssetExplorerPublish) )
 
+			// User can always save as My View
+			canOverride = canViewBeOverridden(project, dataview)
+		}
+
 		return [
-			canOverride: canViewBeOverridden(project, dataview),
+			canOverride: canOverride,
 			canShare: canShare,
 			save: canModifyView(project, whom, dataview),
 			saveAsOptions: saveAsOptions as List
