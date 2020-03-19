@@ -140,7 +140,8 @@
 												>
 											</td>
 											<td class="valueNW">
-												<a
+												<span class="actionable-link">
+													<a
 													(click)="
 														openTaskActionSummaryDetailHandler()
 													"
@@ -152,6 +153,7 @@
 															''
 													}}</a
 												>
+												</span>
 											</td>
 										</tr>
 
@@ -201,7 +203,8 @@
 												<label>Asset</label>
 											</td>
 											<td class="valueNW">
-												<a
+												<span class="actionable-link">
+													<a
 													(click)="
 														onOpenLinkAsset()
 													"
@@ -212,6 +215,7 @@
 																.text
 													}}</a
 												>
+												</span>
 											</td>
 										</tr>
 
@@ -231,7 +235,7 @@
 												>
 											</td>
 											<td class="valueNW">
-												<span
+												<span class="actionable-link"
 													><tds-url-viewer
 														*ngIf="
 															model.instructionLink
