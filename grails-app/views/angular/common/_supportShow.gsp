@@ -103,7 +103,7 @@
 							</span>
 						</g:if>
 						<g:if test="${support.status == 'Validated_NA'}">
-							<span class="status-icon status-Validated_NA">
+							<span class="status-icon status-Validated-NA">
 								<fa-icon [icon]="['fas', 'square']"></fa-icon>
 							</span>
 						</g:if>

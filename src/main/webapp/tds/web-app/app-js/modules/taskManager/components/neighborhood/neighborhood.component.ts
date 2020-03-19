@@ -45,7 +45,7 @@ import {DiagramCacheService} from '../../../../shared/services/diagram-cache.ser
 import {SetEvent} from '../../../event/action/event.actions';
 import {Store} from '@ngxs/store';
 import {TaskGraphDiagramHelper} from './task-graph-diagram.helper';
-import {Diagram, Node} from 'gojs';
+import {Diagram, Node, Point, Rect, Spot} from 'gojs';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {
 	ITdsContextMenuModel
@@ -104,6 +104,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	rootId: number;
 	neighborId: any;
 	taskGraphDiagramExtras: any;
+	lastDiagramPos: any;
 
 	constructor(
 			private componentFactoryResolver: ComponentFactoryResolver,
@@ -121,16 +122,20 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			private permissionService: PermissionService,
 			private store: Store
 		) {
-				this.taskGraphDiagramExtras = {
-					initialAutoScale: Diagram.Uniform,
-					allowZoom: true
-				};
+				this.setTaskGraphDiagramExtras();
 				this.activatedRoute.queryParams
 					.pipe(takeUntil(this.unsubscribe$))
 					.subscribe(params => {
 					if (params) { this.urlParams = Object.assign({}, params); }
 				});
 				this.subscribeToNotifications();
+	}
+
+	setTaskGraphDiagramExtras(): void {
+		this.taskGraphDiagramExtras = {
+			initialAutoScale: Diagram.Uniform,
+			allowZoom: true
+		};
 	}
 
 	ngOnInit() {
@@ -149,7 +154,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 *  subscribe to notifications from the Notifier Service
 	 */
 	subscribeToNotifications(): void {
-		this.notifierService.on(DiagramEventAction.ANIMATION_FINISHED, () => this.highlightNeighbor(this.neighborId));
+		this.notifierService.on('NodeMoveAnimationFinished', () => this.highlightNeighbor(this.neighborId));
+		this.notifierService.on(DiagramEventAction.ANIMATION_FINISHED, () => {
+			if (this.refreshTriggered && this.lastDiagramPos) {
+				this.graph.diagram.position = this.lastDiagramPos;
+				this.refreshTriggered = false;
+			}
+		});
 	}
 
 	/**
@@ -287,7 +298,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
-		this.refreshTriggered = false;
 	}
 
 	/**
@@ -337,7 +347,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
-		this.refreshTriggered = false;
 	}
 
 	/**
@@ -390,13 +399,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	generateModel(): void {
 		if (!this.tasks) { return; }
-		const taskGraphHelper = new TaskGraphDiagramHelper(
-				this.permissionService,
-	{
-					currentUser: this.userContext.person,
-					taskCount: this.tasks.length
-				}
-			);
 		const nodeDataArray = [];
 		const linkDataArray = [];
 		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
@@ -432,13 +434,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				...this.taskGraphDiagramExtras
 			});
 		}
-		this.diagramData$.next(taskGraphHelper.diagramData({
-			rootNode: this.rootId,
-			currentUserId: this.userContext.user.id,
-			nodeDataArray,
-			linkDataArray,
-			extras: this.taskGraphDiagramExtras
-		}));
+		this.updateDiagramData(nodeDataArray, linkDataArray);
 	}
 
 	tooltipData(t: IGraphTask): any {
@@ -892,7 +888,14 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Diagram Animation Finished output handler
 	 */
 	onDiagramAnimationFinished(): void {
-		this.notifierService.broadcast(DiagramEventAction.ANIMATION_FINISHED);
+		this.notifierService.broadcast({ name: DiagramEventAction.ANIMATION_FINISHED });
+	}
+
+	/**
+	 * Node Move Diagram Animation Finished output handler
+	 */
+	onNodeMoveDiagramAnimationFinished(): void {
+		this.notifierService.broadcast({ name: 'NodeMoveDiagramAnimationFinished' });
 	}
 
 	/**
@@ -961,16 +964,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		const nodeDataArray = cache && cache.data;
 		const linkDataArray = cache && cache.linksPath;
 		this.extractTeams(nodeDataArray);
-		const taskGraphHelper = new TaskGraphDiagramHelper(this.permissionService, {
-			taskCount: nodeDataArray.length
-		});
-		this.diagramData$.next(taskGraphHelper.diagramData({
-			rootNode: this.rootId,
-			currentUserId: this.userContext.user.id,
-			nodeDataArray,
-			linkDataArray,
-			extras: this.taskGraphDiagramExtras
-		}));
+		this.updateDiagramData(nodeDataArray, linkDataArray);
 	}
 
 	/**
@@ -1017,6 +1011,35 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				d.centerRect(node.actualBounds);
 			}
 		});
+	}
+
+	/**
+	 * update diagram data
+	 */
+	updateDiagramData(nodeDataArray, linkDataArray): void {
+		const taskGraphHelper = new TaskGraphDiagramHelper(
+			this.permissionService,
+			{
+				currentUser: this.userContext.person,
+				taskCount: this.tasks.length
+			}
+		);
+		if (this.refreshTriggered) {
+			this.taskGraphDiagramExtras.contentAlignment = Spot.None;
+			this.taskGraphDiagramExtras.initialAutoScale = Diagram.None;
+			this.taskGraphDiagramExtras.initialScale = (this.graph && this.graph.diagram) && this.graph.diagram.scale;
+			this.lastDiagramPos = Object.assign({}, (this.graph && this.graph.diagram) && this.graph.diagram.position);
+		} else {
+			this.setTaskGraphDiagramExtras();
+		}
+
+		this.diagramData$.next(taskGraphHelper.diagramData({
+			rootNode: this.rootId,
+			currentUserId: this.userContext.user.id,
+			nodeDataArray,
+			linkDataArray,
+			extras: this.taskGraphDiagramExtras
+		}));
 	}
 
 	/**
