@@ -33,6 +33,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {DOMAIN} from '../../../../shared/model/constants';
 import {Observable} from 'rxjs';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: `tds-asset-all-show`,
@@ -270,5 +271,25 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 	 */
 	public onDismiss(): void {
 		super.onCancelClose();
+	}
+
+	/**
+	 * On double click
+	 */
+	public onDoubleClick(event: MouseEvent): void {
+		this.changeToEditViewOnDoubleClick(event);
+		super.onDoubleClick(event);
+	}
+
+	/**
+	 * Change the view to edit view if the click was made over a not banned css class
+	 * @param event MouseEvent info where the double click was made
+	 */
+	private changeToEditViewOnDoubleClick(event: MouseEvent): void {
+		const bannedClasses = ['btn', 'clickable-text', 'show-hide-link', 'diagram-layout', 'task-comment-component'];
+		if (!ValidationUtils.isBannedClass(bannedClasses, event)) {
+			// move to edit mode
+			this.showAssetEditView(this.data.assetId, this.asset);
+		}
 	}
 }

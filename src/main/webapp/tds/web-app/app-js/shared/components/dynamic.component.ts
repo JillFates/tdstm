@@ -93,4 +93,11 @@ export class DynamicComponent extends Dialog {
 	public onDismiss(): void {
 		super.onCancelClose();
 	}
+
+	/**
+	 * On double click notify to the base class
+	 */
+	public onDoubleClick(event: MouseEvent): void {
+		super.onDoubleClick(event);
+	}
 }

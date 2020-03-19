@@ -81,10 +81,12 @@
                     <tr style="order: 3">
                         <tds:clrInputLabel field="${standardFieldSpecs.manufacturer}" value="${asset.manufacturer}"/>
                         <td>
-                            <a *ngIf="isManufacturerLinkAvailable()"
-                               (click)="showManufacturer('${assetEntity.manufacturer?.id}')">
-                                {{getManufacturer('${assetEntity.manufacturer}')}}
-                            </a>
+                            <span class="clickable-text">
+                                <a *ngIf="isManufacturerLinkAvailable()"
+                                   (click)="showManufacturer('${assetEntity.manufacturer?.id}')">
+                                    {{getManufacturer('${assetEntity.manufacturer}')}}
+                                </a>
+                            </span>
                             <span *ngIf="!isManufacturerLinkAvailable()">{{getManufacturer('${assetEntity.manufacturer}')}}</span>
                         </td>
                     </tr>
@@ -115,9 +117,11 @@
                     <tr style="order: 9">
                         <tds:clrInputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
                         <td>
-                            <a *ngIf="isModelLinkAvailable()"
-                               (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')"
-                               [innerText]="getModelName('${assetEntity.model}')"></a>
+                            <span class="clickable-text">
+                                <a *ngIf="isModelLinkAvailable()"
+                                   (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')"
+                                   [innerText]="getModelName('${assetEntity.model}')"></a>
+                            </span>
                             <span *ngIf="!isModelLinkAvailable()">${assetEntity.model}</span>
                         </td>
                     </tr>

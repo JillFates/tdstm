@@ -35,6 +35,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import * as R from 'ramda';
 import {TaskStatus} from '../../model/task-edit-create.model';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: `task-detail`,
@@ -517,4 +518,25 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 	public onDismiss(): void {
 		this.cancelCloseDialog();
 	}
+
+	/**
+	 * On double click
+	 */
+	public onDoubleClick(event: MouseEvent): void {
+		this.changeToEditViewOnDoubleClick(event);
+		super.onDoubleClick(event);
+	}
+
+	/**
+	 * Change the view to edit view if the click was made over a not banned css class
+	 * @param event MouseEvent info where the double click was made
+	 */
+	private changeToEditViewOnDoubleClick(event: MouseEvent): void {
+		const bannedClasses = ['btn', 'actionable-link', 'k-grid'];
+		if (!ValidationUtils.isBannedClass(bannedClasses, event)) {
+			// move to edit mode
+			this.editTaskDetail();
+		}
+	}
+
 }
