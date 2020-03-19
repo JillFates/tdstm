@@ -55,7 +55,6 @@ class ModelConnector {
 			executeUpdate('delete AssetCableMap where assetFromPort=?0', [this])
 			executeUpdate('update AssetCableMap set cableStatus=?0, assetTo=null, assetToPort=null ' +
 			              'where assetToPort=?1', [UNKNOWN, this])
-		}
 	}
 
 	List<AssetCableMap> getFromConnectorCableMaps() {
