@@ -415,6 +415,6 @@ class NumberUtil {
 	 * @return
 	 */
 	static int percentage(Long total, Long value, int defaultIfZero = 0) {
-		return total ? Math.round((value /  total) * 100) : defaultIfZero
+		return total ? Math.ceil((value /  total) * 100) : defaultIfZero
 	}
 }
