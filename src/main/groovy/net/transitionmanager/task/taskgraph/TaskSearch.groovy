@@ -109,7 +109,7 @@ class TaskSearch {
         // The Assets table needs to be joined if there are asset, tag or action related filters
         if (assetWhereClauses || tagQuery || apiActionQuery) {
             assetQuery = buildQuery(ASSET_QUERY.trim(), assetWhereClauses)
-            query = "SELECT ac.taskId AS taskId FROM ($taskQuery) ac INNER JOIN ($assetQuery) ae ON (ac.asset_entity_id = ae.asset_entity_id)"
+            query = "SELECT DISTINCT(ac.taskId) AS taskId FROM ($taskQuery) ac INNER JOIN ($assetQuery) ae ON (ac.asset_entity_id = ae.asset_entity_id)"
             if (tagQuery) {
                 query = "$query INNER JOIN ($tagQuery) ta ON(ae.asset_entity_id = ta.asset_id)"
             }

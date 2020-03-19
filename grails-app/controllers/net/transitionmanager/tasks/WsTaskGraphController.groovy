@@ -41,7 +41,7 @@ class WsTaskGraphController implements ControllerMethods {
         // Populate and validate the command object.
         TaskSearchCommand command = populateCommandObject(TaskSearchCommand)
         // List the tasks
-        List tasks = taskGraphService.searchTasks(project, command)
+        List<Long> tasks = taskGraphService.filterForTaskIds(project, command)
 
         renderSuccessJson(taskIds: tasks)
     }

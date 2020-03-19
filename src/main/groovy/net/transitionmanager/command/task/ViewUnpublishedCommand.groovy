@@ -14,9 +14,10 @@ class ViewUnpublishedCommand implements CommandObject{
 
     /**
      * Convert the viewUnpublished from 0 or 1 into the appropriate boolean.
-     * @return
+     * @param hasViewUnpublishedPermission - whether or not the user has permission to view unpublished tasks.
+     * @return whether or not unpublished tasks should be included (considering the parameter in the request and the permission).
      */
-    boolean viewUnpublishedTasks() {
-        return StringUtil.toBoolean(viewUnpublished)
+    boolean viewUnpublishedTasks(boolean hasViewUnpublishedPermission) {
+        return hasViewUnpublishedPermission && StringUtil.toBoolean(viewUnpublished)
     }
 }

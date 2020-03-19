@@ -7,7 +7,6 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.taskgraph.TaskHighlightOptions
@@ -36,7 +35,7 @@ class TaskGraphService implements ServiceMethods {
      */
     Map getTaskHighlightOptions(Project project, ViewUnpublishedCommand command) {
         // For viewing unpublished tasks, the flag must be set to 1 and the user must have the appropriate permission.
-        boolean viewUnpublished = command.viewUnpublishedTasks() && securityService.hasPermission(Permission.TaskViewUnpublished)
+        boolean viewUnpublished = command.viewUnpublishedTasks(securityService.hasPermission(Permission.TaskViewUnpublished))
         // Get the corresponding event or fail if not found for the project.
         MoveEvent moveEvent = get(MoveEvent, command.eventId, project)
         // Get the query string.
@@ -45,9 +44,6 @@ class TaskGraphService implements ServiceMethods {
         List<Map> tasks = namedParameterJdbcTemplate.queryForList(query, [moveEventId: moveEvent.id]).collect{ Map row ->
             TaskHighlightOptions.mapRowToHighlightMap(row)
         }
-
-        // Update the viewUnpublished and event preferences if needed.
-        updateEventAndViewUnpublishedPreferences(moveEvent, viewUnpublished)
 
         return TaskHighlightOptions.getHighlightOptions(tasks)
     }
@@ -67,17 +63,22 @@ class TaskGraphService implements ServiceMethods {
      * - An intersection of all three queries (should all of them be executed) is calculated.
      * @param moveEvent - the MoveEvent to filter by -- if any
      * @param viewUnpublished - whether or not to include unpublished tasks.
-     * @return a list of tasks matching the filter options.
+     * @return a list with the id of tasks matching the filter options.
      */
 
-    List<Long> searchTasks(Project project, TaskSearchCommand taskSearchCommand) {
+    List<Long> filterForTaskIds(Project project, TaskSearchCommand taskSearchCommand) {
 
         TaskSearch taskSearch = new TaskSearch(project, taskSearchCommand)
 
-        List<Long> tasks = []
+        // List of task ids from the CPA
+        List<Long> cpaTasks
+        // List of task ids fetched with the query.
+        List<Long> queryTasks
+        // This is the list of ids that will be returned.
+        List<Long> taskIds
 
         // boolean that tells whether or not unpublished tasks need to be included.
-        boolean viewUnpublished = taskSearchCommand.viewUnpublishedTasks()
+        boolean viewUnpublished = taskSearchCommand.viewUnpublishedTasks(securityService.hasPermission(Permission.TaskViewUnpublished))
         MoveEvent moveEvent = null
         // If a MoveEvent id is provided, fetch the domain object from the database (fail if the id is invalid or doesn't belong to the project).
         if (taskSearchCommand.eventId) {
@@ -89,32 +90,27 @@ class TaskGraphService implements ServiceMethods {
            // Calculate the CPA.
             CPAResults cpaResults = timelineService.calculateCPA(moveEvent, viewUnpublished)
             // Get a unique list of tasks based on the CPA results and the command object.
-            tasks = taskSearch.getCPATasks(cpaResults)
-            if (!tasks) {
-                return tasks
+            cpaTasks = taskSearch.getCPATasks(cpaResults)
+            if (!cpaTasks) {
+                return []
             }
         }
 
         Map queryInfo = taskSearch.buildSearchQuery(moveEvent, viewUnpublished)
 
-        tasks.addAll(namedParameterJdbcTemplate.queryForList(queryInfo.query, queryInfo.params)*.taskId)
+        queryTasks = namedParameterJdbcTemplate.queryForList(queryInfo.query, queryInfo.params)*.taskId
 
-        // Update the viewUnpublished and event preferences if needed.
-        updateEventAndViewUnpublishedPreferences(moveEvent, viewUnpublished)
+        // If there were tasks retrieved by CPA, then, do the intersect with the queryTasks
+        if (cpaTasks) {
+            taskIds = cpaTasks.intersect(queryTasks)
+        } else {
+            /* If needed there was no need for CPA (the cpaTasks list is empty, otherwise it short-circuited before),
+            the results are the tasks fetched from the database. */
+            taskIds = queryTasks
+        }
 
-        return tasks.unique { Long a, Long b -> a <=> b }
-
+        return taskIds
     }
 
-    /**
-     * Update the viewUnpublished and move event preferences if they've changed.
-     * @param moveEvent
-     * @param viewUnpublished
-     */
-    private void updateEventAndViewUnpublishedPreferences(MoveEvent moveEvent, boolean viewUnpublished) {
-        UserLogin userLogin = securityService.userLogin
-        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.MOVE_EVENT, moveEvent)
-        userPreferenceService.updatePreferenceIfNecessary(userLogin, UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
-    }
 
 }

@@ -766,20 +766,4 @@ class UserPreferenceService {
 		springSecurityService.loggedIn
 	}
 
-	/**
-	 * Update the given UserPreference if a given value doesn't match the match the preference's.
-	 * @param userLogin - current user
-	 * @param preferenceCode - the preference to look up.
-	 * @param newValue - the value to compare the preference against.
-	 * @return whether or not the preference was updated.
-	 */
-	boolean updatePreferenceIfNecessary(UserLogin userLogin, PREF preferenceCode, Object newValue) {
-		boolean updated = false
-		if (getPreference(userLogin, preferenceCode) != newValue) {
-			updated = true
-			setPreference(userLogin, preferenceCode, newValue)
-		}
-		return updated
-	}
-
 }

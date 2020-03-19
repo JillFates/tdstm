@@ -1,6 +1,6 @@
 package net.transitionmanager.task.taskgraph
 
-
+import com.tdsops.common.sql.SqlUtil
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -29,7 +29,7 @@ class TaskHighlightOptions {
         /*
             Create a list with all the values in the map (sorted by name) and with the 'firstEntry' at the beginning.
             firstEntry is optional but it can't have a default value because, if only the first map is provided,
-            it will try to map its keys as individual parameters and throw a kind, throwing a compilation error.
+            it will try to map its keys as individual parameters and throw a compilation error.
          */
         Closure toList = { Map collection, Map firstEntry ->
             List<Map> values = collection.values().toList()
@@ -109,14 +109,14 @@ class TaskHighlightOptions {
                     ae.environment as environment,
                     ro.role_type_code as team_code,
                     ro.description as team_label,
-                    pa.person_id as assigned_to, 
-                    CONCAT_WS(' ', pa.first_name, NULLIF(pa.middle_name, ''), NULLIF(pa.last_name, '')) as assigned_to_name,
+                    pa.person_id as assigned_to,
+                    ${SqlUtil.personFullNameSql('pa')} AS assigned_to_name,
                     psme.person_id as sme,
-                    CONCAT_WS(' ', psme.first_name, NULLIF(psme.middle_name, ''), NULLIF(psme.last_name, '')) as sme_name,
+                    ${SqlUtil.personFullNameSql('psme')} AS sme_name,
                     psme2.person_id as sme2,
-                    CONCAT_WS(' ', psme2.first_name, NULLIF(psme2.middle_name, ''), NULLIF(psme2.last_name, '')) as sme2_name,
+                    ${SqlUtil.personFullNameSql('psme2')} AS sme2_name,
                     pao.person_id as app_owner,
-                    CONCAT_WS(' ', pao.first_name, NULLIF(pao.middle_name, ''), NULLIF(pao.last_name, '')) as owner_name
+                    ${SqlUtil.personFullNameSql('pao')} AS owner_name
                 FROM
                      (
                          SELECT asset_entity_id, role, assigned_to_id
