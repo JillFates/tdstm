@@ -1,11 +1,17 @@
 package net.transitionmanager.license
 
 import com.github.icedrake.jsmaz.Smaz
+import com.tdsops.common.security.AESCodec
+import com.tdssrc.grails.TimeUtil
+
 import groovy.json.JsonBuilder
+import groovy.time.TimeCategory
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import org.apache.commons.codec.binary.Base64
 import grails.core.GrailsApplication
+
+import java.security.GeneralSecurityException
 
 /**
  * Created by octavio on 9/20/16.
@@ -36,8 +42,11 @@ class License {
 	String      bannerMessage
 
 	/** Date when the change was performed */
-	Date dateCreated
-	Date lastUpdated
+	Date 		dateCreated
+	Date 		lastUpdated
+
+	/** Last time that we saw this License in compliance (number of servers or other constraints) */
+	String 		lastComplianceHash = encodeDate(complianceShiftDate())
 
 	static mapping = {
 		id 			generator: 'assigned'
@@ -50,18 +59,70 @@ class License {
 	}
 
 	static constraints = {
-		method 			nullable:true
-		activationDate 	nullable:true
-		expirationDate 	nullable:true
-		requestNote 	nullable:true
-		hash 			nullable:true
-		bannerMessage	nullable:true
+		method 				nullable:true
+		activationDate		nullable:true
+		expirationDate		nullable:true
+		requestNote 		nullable:true
+		hash 				nullable:true
+		bannerMessage		nullable:true
+		lastComplianceHash	nullable:false, blank: false
 	}
 
 	static transients = [ 'projectInstance' ]
 
 	boolean isActive(){
 		return (hash)? true : false
+	}
+
+	/**
+	 * Apply logic to resolve the compliance of the license Date
+	 * @author oluna
+	 */
+	void settleCompliance() {
+		lastComplianceDate( complianceShiftDate() )
+	}
+
+	/**
+	 * Return future compliance date applying the logic of 1 hour in the future
+	 * @return Date Now + 1 hour
+	 */
+	static Date complianceShiftDate() {
+		use( TimeCategory ) {
+			return TimeUtil.nowGMT() + 1.hour
+		}
+	}
+
+	/*
+	 * Encodes a Date passed to the function
+	 * @param date to encode
+	 * @return AES encoded String
+	 */
+	private String encodeDate( Date date ) {
+		long epochTime = date.time
+		String epochStr = "${epochTime}"
+		return AESCodec.getInstance().encode(epochStr, id)
+	}
+
+	/**
+	 * Returns the decripted form of the las seen compliance Date
+	 * If is set in the past, and the number of licenses is below permitted then we assume it was the last time that the license was valid
+	 * if it's in the future (a constrainted ammount) it's a shift date to avoid people messing with values
+	 * If the data is corrupted we can believe somebody tryed to hack it so we return a GeneralSecurityException
+	 * @return Date last compliance of the license
+	 * @throws GeneralSecurityException
+	 */
+	Date lastComplianceDate() throws GeneralSecurityException {
+		String epochStr = AESCodec.getInstance().decode(lastComplianceHash ?: '', id)
+		return new Date(epochStr.toLong())
+	}
+
+	/**
+	 * Establish a fix date as the last compliance date and encrypt it
+	 * @param date to set
+	 */
+	void lastComplianceDate( Date date ) {
+		String encodedDate = encodeDate( date )
+		setLastComplianceHash( encodedDate )
 	}
 
 	PartyGroup getClient(){

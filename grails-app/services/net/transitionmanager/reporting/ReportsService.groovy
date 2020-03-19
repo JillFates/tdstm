@@ -58,6 +58,7 @@ import net.transitionmanager.task.timeline.TaskTimeLineGraph
 import net.transitionmanager.task.timeline.TaskVertex
 import net.transitionmanager.task.timeline.TimelineService
 import net.transitionmanager.task.timeline.TimelineSummary
+import net.transitionmanager.task.timeline.TimelineTask
 import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -1167,7 +1168,7 @@ class ReportsService implements ServiceMethods {
             exceptionString += "No Tasks"
         }
 
-        Closure<String> htmlConverter = { TaskVertex taskVertex, Task task ->
+        Closure<String> htmlConverter = { TaskVertex taskVertex, TimelineTask task ->
             String content = "<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()}"
             if (task.taskSpec) {
                 content += " [TaskSpec ${task.taskSpec}]"
@@ -1175,7 +1176,7 @@ class ReportsService implements ServiceMethods {
             return content
         }
 
-        Closure<Task> findInTasks = { TaskVertex taskVertex, List<Task> taskList ->
+        Closure<Task> findInTasks = { TaskVertex taskVertex, List<TimelineTask> taskList ->
             return taskList.find { it.id == taskVertex.taskId }
         }
 
@@ -1183,7 +1184,7 @@ class ReportsService implements ServiceMethods {
 
             TaskTimeLineGraph graph = cpaResults.graph
             TimelineSummary summary = cpaResults.summary
-            List<Task> tasks = cpaResults.tasks
+            List<TimelineTask> tasks = cpaResults.tasks
 
             if (!summary.hasCycles()) {
                 cyclicalsError = greenSpan('Cyclical References: OK')
@@ -1194,7 +1195,8 @@ class ReportsService implements ServiceMethods {
                 summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
-                        Task task = findInTasks(cyclicalTask, tasks)
+                        def taskObj = findInTasks(cyclicalTask, tasks)
+                        Task task = taskObj
                         cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
                     cyclicalsRef.append('</ul>')
@@ -1216,7 +1218,8 @@ class ReportsService implements ServiceMethods {
                 startsRef.append('<ul>')
 
                 graph.starts.each { TaskVertex taskVertex ->
-                    Task task = findInTasks(taskVertex, tasks)
+                    def taskObj = findInTasks(taskVertex, tasks)
+                    Task task = Task.get(taskObj.id)
                     startsRef.append(htmlConverter(taskVertex, task))
                 }
                 startsRef.append('</ul>')
@@ -1235,7 +1238,8 @@ class ReportsService implements ServiceMethods {
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
                 graph.sinks.each { TaskVertex taskVertex ->
-                    Task task = findInTasks(taskVertex, tasks)
+                    def taskObj = findInTasks(taskVertex, tasks)
+                    Task task = Task.get(taskObj.id)
                     sinksRef.append(htmlConverter(taskVertex, task))
                 }
                 sinksRef.append('</ul>')

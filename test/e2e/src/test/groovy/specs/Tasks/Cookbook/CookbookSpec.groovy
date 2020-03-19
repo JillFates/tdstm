@@ -36,7 +36,7 @@ class CookbookSpec extends GebReportingSpec {
         given: 'The User is at the Menu Page'
             at MenuPage
         when: 'The User Goes to the Tasks > Cookbook Section'
-            tasksModule.goToTasksCookbook()
+            waitFor { tasksModule.goToTasksCookbook() }
 
         then: 'Cookbook Section should be displayed'
             at CookbookPage
@@ -50,12 +50,12 @@ class CookbookSpec extends GebReportingSpec {
         then: 'Active Elements should be present'
             pageTitle.text().trim() == "Cookbook"
             taskGenerationTab.parent(".active")
-            recipeGridHeaderCols.getAt(0).text().trim() == "Recipe"
-            recipeGridHeaderCols.getAt(1).text().trim() == "Description"
-            recipeGridHeaderCols.getAt(2).text().trim() == "Editor"
-            recipeGridHeaderCols.getAt(3).text().trim() == "Last Updated"
-            recipeGridHeaderCols.getAt(4).text().trim() == "Version"
-            recipeGridHeaderCols.getAt(5).text().trim() == "WIP"
-            recipeGridHeaderCols.getAt(6).text().trim() == "Actions"
+            recipeGridHeaderCols.getAt(0).text().trim() == "Actions"
+            recipeGridHeaderCols.getAt(1).text().trim() == "Recipe"
+            recipeGridHeaderCols.getAt(2).text().trim() == "Description"
+            recipeGridHeaderCols.getAt(3).text().trim() == "Editor"
+            recipeGridHeaderCols.getAt(4).text().trim() == "Last Updated"
+            recipeGridHeaderCols.getAt(5).text().trim() == "Version"
+            recipeGridHeaderCols.getAt(6).text().trim() == "WIP"
     }
 }

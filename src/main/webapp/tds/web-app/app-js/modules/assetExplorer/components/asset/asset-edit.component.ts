@@ -1,3 +1,4 @@
+// Angular
 import {
 	Component,
 	AfterViewInit,
@@ -6,37 +7,90 @@ import {
 	Injector,
 	Compiler,
 	NgModuleRef,
-	Inject
+	Input, ComponentFactoryResolver, OnInit
 } from '@angular/core';
-
-import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+// Model
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {Permission} from '../../../../shared/model/permission.model';
+// Component
 import {DynamicComponent} from '../../../../shared/components/dynamic.component';
-
+import {AssetCommonEdit} from './asset-common-edit';
 import {DatabaseEditComponent} from '../database/database-edit.component';
 import {StorageEditComponent} from '../storage/storage-edit.component';
 import {DeviceEditComponent} from '../device/device-edit.component';
 import {ApplicationEditComponent} from '../application/application-edit.component';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+// Service
 import {TagService} from '../../../assetTags/service/tag.service';
+import {DialogButtonModel, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+// Other
+import {Observable} from 'rxjs';
 
 @Component({
 	selector: `tds-asset-all-edit`,
 	template: `<div #view></div>`
 })
-export class AssetEditComponent extends DynamicComponent implements AfterViewInit {
+export class AssetEditComponent extends DynamicComponent implements OnInit, AfterViewInit {
+	@Input() data: any;
+
+	public modelId;
+	public asset;
 
 	@ViewChild('view', {read: ViewContainerRef, static: true}) view: ViewContainerRef;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
+		private translatePipe: TranslatePipe,
+		private assetExplorerService: AssetExplorerService,
+		private notifierService: NotifierService,
+		private permissionService: PermissionService,
 		inj: Injector,
 		comp: Compiler,
 		mod: NgModuleRef<any>,
 		private http: HttpClient,
-		private tagService: TagService,
-		@Inject('ID') private modelId: number,
-		@Inject('ASSET') private asset: 'APPLICATION' | 'DATABASE' | 'DEVICE' | 'STORAGE') {
+		private tagService: TagService) {
 		super(inj, comp, mod);
+	}
+
+	ngOnInit(): void {
+		this.modelId = this.data.assetId;
+		this.asset = this.data.assetClass;
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.isEditAvailable(),
+			active: () => true,
+			type: DialogButtonType.ACTION
+		});
+
+		this.buttons.push({
+			name: 'saveAsset',
+			icon: 'floppy',
+			show: () => this.isEditAvailable(),
+			type: DialogButtonType.ACTION
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.isDeleteAvailable(),
+			type: DialogButtonType.ACTION,
+			action: this.onDeleteAsset.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancelEdit',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.onDismiss.bind(this)
+		});
 	}
 
 	ngAfterViewInit() {
@@ -50,23 +104,38 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 
 					switch (this.asset) {
 						case 'APPLICATION':
-							this.registerAndCreate(ApplicationEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(ApplicationEditComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 							break;
 						case 'DATABASE':
-							this.registerAndCreate(DatabaseEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(DatabaseEditComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 							break;
 						case 'DEVICE':
-							this.registerAndCreate(DeviceEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(DeviceEditComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 							break;
 						case 'STORAGE':
-							this.registerAndCreate(StorageEditComponent(template, model, metadata), this.view);
+							this.registerAndCreate(StorageEditComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 							break;
-
 					}
 				});
 		}, (error) => {
 			console.error('Error: ');
 			console.error(error);
+		});
+	}
+
+	/**
+	 * Prepare the Dialog to map the buttons, with this all buttons are the same for every Dialog
+	 * @param componentRef
+	 */
+	private prepareButtonsReference(componentRef: any): void {
+		// @ts-ignore
+		const lastComponent = <AssetCommonEdit>componentRef.instance;
+		this.changeButton('saveAsset', {
+			action: lastComponent.submitForm,
+			disabled: () => (!(lastComponent.isDirty() && lastComponent.form.valid) || !lastComponent.isDependenciesValidForm),
+		});
+		this.changeButton('cancelEdit', {
+			action: lastComponent.onCancelEdit
 		});
 	}
 
@@ -130,4 +199,40 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 		console.log(error);
 	}
 
+	/**
+	 * Allows to delete the application assets
+	 */
+	private onDeleteAsset() {
+		this.dialogService.confirm(
+			'Confirmation Required',
+			'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+		).subscribe((data: any) => {
+			if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
+				this.assetExplorerService.deleteAssets([this.modelId.toString()]).subscribe(res => {
+					if (res) {
+						this.notifierService.broadcast({
+							name: 'reloadCurrentAssetList'
+						});
+						this.onCancelClose();
+					}
+				}, (error) => console.log(error));
+			}
+		});
+	}
+
+	private isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetDelete);
+	}
+
+	private isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetEdit);
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		const cancelEdit = this.buttons.find((button: DialogButtonModel) => button.name === 'cancelEdit');
+		cancelEdit.action();
+	}
 }

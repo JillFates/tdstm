@@ -57,7 +57,7 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 			startTime: '',
 			completionTime: '',
 			operationalOrder: 1,
-			useForPlanning: false,
+			useForPlanning: true,
 		};
 		this.bundleModel = Object.assign({}, this.defaultModel, this.bundleModel);
 	}

@@ -18,7 +18,7 @@ class CookbookPage extends Page {
         pageBreadcrumb { $("o1", class:"legacy-breadcrumb").find("li a")}
         loadingIndicator(required:false, wait:true){ $("#cookbookRecipesEditor").find("loading-indicator").find("div","ng-show":"isLoading")}
         successMessage { $("#cookbookRecipesEditor").find("div.alert.alert-success.animateShow")}
-        createRecipeButton { $("a#generateRecipe")}
+        createRecipeButton { $("#generateRecipe")}
 
         createRecipeModal (required: false, wait:true) {$ ("div", class:"modal fade in")}
         taskDetailsModal (required: false, wait:true)  { $("div", "window-class":"modal-task")}
@@ -39,7 +39,7 @@ class CookbookPage extends Page {
         recipeGridRowsActions { recipeGridRows.find("a", class:"actions")}
         gridSize { recipeGridRows.size()}
         rowSize { recipeGridHeaderCols.size()}
-        gebRecipes (required: false) { recipeGridRows.find("div.ngCellText.col0")}
+        gebRecipes (required: false) { recipeGridRows.find("div.ngCellText.col1")}
         taskGenerationTabContent { $("div[ui-view=taskBatchStart]")}
         taskGenerationTabRecipeName { taskGenerationTabContent.find("p")}
         commonsModule { module CommonsModule }
@@ -73,10 +73,10 @@ class CookbookPage extends Page {
 
     def deleteRecipeByGivenSelector(recipeNameSelector){
         def recipeName = recipeNameSelector.text().trim()
-        def recipeDeleteButton = recipeNameSelector.parents("div.ngCell").nextAll().find("a.actions.remove")
+        def recipeDeleteButton = recipeNameSelector.parents("div.ng-scope.ngRow").find("a.actions.remove")
         def recipeId = recipeDeleteButton.attr("recipe-id")
         withConfirm(wait: true) {
-            recipeDeleteButton.click()
+        recipeDeleteButton.click()
         }
         waitForSuccessMessage()
         assert getRecipeById(recipeId) == null, "${recipeName} recipe with id ${recipeId} still displayed"

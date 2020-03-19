@@ -1,2 +1,5 @@
-<tds-grid [gridModel]="gridModel"
-		  (cellClick)="cellClick($event)"></tds-grid>
+<div class="asset-comment-list-component">
+	<tds-grid [gridModel]="gridModel"
+			  [ngClass]="{'has-comment-view-permission': isShowCommentAvailable()}"
+			  (cellClick)="cellClick($event)"></tds-grid>
+</div>

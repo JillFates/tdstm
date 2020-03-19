@@ -1,27 +1,32 @@
-import {Component, ViewChild, OnInit} from '@angular/core';
-import {State} from '@progress/kendo-data-query';
-
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
+// Angular
+import {Component, ViewChild, OnInit, ComponentFactoryResolver} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+// Model
 import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
-import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
+import {ViewModel} from '../../../assetExplorer/model/view.model';
 import {ViewColumn, QueryColumn} from '../../../assetExplorer/model/view-spec.model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {AssetViewSelectorComponent} from '../../../assetManager/components/asset-view-selector/asset-view-selector.component';
-import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
-import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
 import {VIEW_COLUMN_MIN_WIDTH} from '../../../assetExplorer/model/view-spec.model';
 import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params';
 import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
-import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {ActivatedRoute, Router} from '@angular/router';
-import {clone} from 'ramda';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
+// Component
 import {AssetViewShowComponent} from '../asset-view-show/asset-view-show.component';
+import {AssetViewSelectorComponent} from '../../../assetManager/components/asset-view-selector/asset-view-selector.component';
+import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
+import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+// Service
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+// Other
+import {State} from '@progress/kendo-data-query';
+import {clone} from 'ramda';
 
 declare var jQuery: any;
+
 @Component({
 	selector: 'tds-asset-view-config',
 	templateUrl: 'asset-view-config.component.html'
@@ -68,10 +73,11 @@ export class AssetViewConfigComponent implements OnInit {
 	public metadata: any = {};
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private route: ActivatedRoute,
 		private router: Router,
 		private assetExplorerService: AssetExplorerService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService) {
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
@@ -221,17 +227,26 @@ export class AssetViewConfigComponent implements OnInit {
 
 	protected openSaveDialog(): void {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
-		this.dialogService.open(AssetViewSaveComponent, [
-			{ provide: ViewModel, useValue: this.model },
-			{ provide: ViewGroupModel, useValue: selectedData }
-		]).then(result => {
-			this.model = result;
-			this.dataSignature = JSON.stringify(this.model);
-			setTimeout(() => {
-				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
-			});
-		}).catch(result => {
-			console.log('error');
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetViewSaveComponent,
+			data: {
+				viewModel: this.model,
+				viewGroupModel: selectedData
+			},
+			modalConfiguration: {
+				title: 'Save List View',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe( (data: any) => {
+			if (data.status === DialogExit.ACCEPT) {
+				this.model = data;
+				this.dataSignature = JSON.stringify(this.model);
+				setTimeout(() => {
+					this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+				});
+			}
 		});
 	}
 
@@ -307,13 +322,18 @@ export class AssetViewConfigComponent implements OnInit {
 			viewName: this.model.name
 		};
 
-		this.dialogService.open(AssetViewExportComponent, [
-			{ provide: AssetExportModel, useValue: assetExportModel }
-		]).then(result => {
-			console.log(result);
-		}).catch(result => {
-			console.log('error');
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetViewExportComponent,
+			data: {
+				assetExportModel: assetExportModel
+			},
+			modalConfiguration: {
+				title: 'Export to Excel',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe( );
 	}
 
 	protected onFieldSelection(field: FieldSettingsModel) {

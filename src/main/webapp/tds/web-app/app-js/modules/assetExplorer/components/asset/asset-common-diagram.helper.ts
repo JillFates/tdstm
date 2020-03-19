@@ -1,5 +1,5 @@
 import {
-	Binding, GraphObject,
+	Binding, GraphObject, LayeredDigraphLayout,
 	Layout,
 	Link,
 	Margin,
@@ -189,11 +189,10 @@ export class AssetCommonDiagramHelper {
 	}
 
 	layout(): Layout {
-		const treeLayout = new TreeLayout();
-		treeLayout.angle = 90;
-		treeLayout.nodeSpacing = 80;
-		treeLayout.layerSpacing = 80;
-		return treeLayout;
+		const diagraph = new LayeredDigraphLayout();
+		diagraph.direction = 90;
+		diagraph.layerSpacing = 100;
+		return diagraph;
 	}
 
 	lowScaleNodeTemplate(): Node {

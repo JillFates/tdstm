@@ -1,24 +1,35 @@
-import {Component, OnInit} from '@angular/core';
-import {UIExtraDialog} from '../../../../services/ui-dialog.service';
-import {TranslatePipe} from '../../../../pipes/translate.pipe';
-
+// Angular
+import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
+// Model
 import {BulkChangeModel, BulkChangeType} from '../../model/bulk-change.model';
-import {UIPromptService} from '../../../../directives/ui-prompt.directive';
-import {UIDialogService} from '../../../../services/ui-dialog.service';
 import {BulkActions, BulkActionResult} from '../../model/bulk-change.model';
-import {BulkChangeService} from '../../../../services/bulk-change.service';
 import {Permission} from '../../../../model/permission.model';
-import {PermissionService} from '../../../../services/permission.service';
+import {AlertType} from '../../../../model/alert.model';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
+// Component
 import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.component';
+// Service
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {BulkChangeService} from '../../../../services/bulk-change.service';
+import {PermissionService} from '../../../../services/permission.service';
 import { APIActionService } from '../../../../../modules/apiAction/service/api-action.service';
 import { NotifierService } from '../../../../services/notifier.service';
-import {AlertType} from '../../../../model/alert.model';
+// Other
+import * as R from 'ramda';
+
 @Component({
 	selector: 'tds-bulk-change-actions',
 	templateUrl: 'bulk-change-actions.component.html',
 	providers: [TranslatePipe, APIActionService]
 })
-export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit {
+export class BulkChangeActionsComponent extends Dialog implements OnInit {
 	private readonly SELECT_DATA_MODEL = {
 		id: -1,
 		name: 'GLOBAL.PLEASE_SELECT',
@@ -37,44 +48,65 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 	public sendEmailNotification = false;
 	public dataScriptOptions: Array<any> = [this.SELECT_DATA_MODEL];
 	public selectedScriptOption = this.dataScriptOptions[0];
+	private bulkChangeModel: BulkChangeModel;
 
 	constructor(
-		private bulkChangeModel: BulkChangeModel,
-		private promptService: UIPromptService,
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private bulkChangeService: BulkChangeService,
 		private permissionService: PermissionService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private apiActionService: APIActionService,
 		private notifier: NotifierService,
 		private translatePipe: TranslatePipe) {
-			super('#bulk-change-action-component');
-			this.selectedItems = this.bulkChangeModel.selectedItems || [];
-			this.affected = this.bulkChangeModel.affected;
-			this.selectedAction = this.bulkChangeModel.showEdit ? this.ACTION.Edit : this.ACTION.Delete;
-			this.showDelete = this.bulkChangeModel.showDelete;
-			this.showEdit = this.bulkChangeModel.showEdit;
-			this.bulkChangeType = this.bulkChangeModel.bulkChangeType;
-			this.itemType =  this.bulkChangeType === BulkChangeType.Assets ?
-				this.getSinglePluralAssetName() : this.getSinglePluralDependenceName()
+			super();
 	}
 
 	ngOnInit() {
-		this.apiActionService.getDataScripts({useWithAssetActions: true, isAutoProcess: true}).subscribe(result => {
-			if (Array.isArray(result) && result.length > 0) {
-				this.showRun = true;
-				this.dataScriptOptions = [this.SELECT_DATA_MODEL, ...result];
-			} else {
-				this.showRun = false;
-			}
+		this.bulkChangeModel = R.clone(this.data.bulkChangeModel);
+
+		this.selectedItems = this.bulkChangeModel.selectedItems || [];
+		this.affected = this.bulkChangeModel.affected;
+		this.selectedAction = this.bulkChangeModel.showEdit ? this.ACTION.Edit : this.ACTION.Delete;
+		this.showDelete = this.bulkChangeModel.showDelete;
+		this.showEdit = this.bulkChangeModel.showEdit;
+		this.bulkChangeType = this.bulkChangeModel.bulkChangeType;
+		this.itemType =  this.bulkChangeType === BulkChangeType.Assets ? this.getSinglePluralAssetName() : this.getSinglePluralDependenceName()
+
+		this.buttons.push({
+			name: 'stepForward',
+			icon: 'step-forward-2',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.onNext.bind(this)
 		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		// Enable ETL options just for Assets
+		if (this.bulkChangeType === BulkChangeType.Assets) {
+			this.apiActionService.getDataScripts({useWithAssetActions: true, isAutoProcess: true}).subscribe(result => {
+				if (Array.isArray(result) && result.length > 0) {
+					this.showRun = true;
+					this.dataScriptOptions = [this.SELECT_DATA_MODEL, ...result];
+				} else {
+					this.showRun = false;
+				}
+			});
+		}
 	}
 
 	public cancelCloseDialog(bulkOperationResult: BulkActionResult): void {
-		this.dismiss(bulkOperationResult || {action: null, success: false});
+		super.onCancelClose(bulkOperationResult || {action: null, success: false});
 	}
 
 	public closeDialog(bulkOperationResult: BulkActionResult): void {
-		this.close(bulkOperationResult);
+		super.onCancelClose( bulkOperationResult);
 	}
 
 	onNext(): void {
@@ -98,13 +130,21 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 			affected: this.bulkChangeModel.affected
 		};
 
-		this.dialogService.extra(BulkChangeEditComponent, [
-			UIDialogService,
-			{provide: BulkChangeModel, useValue: bulkChangeModel}
-		], true, false).then(bulkOperationResult => {
-			this.closeDialog(bulkOperationResult);
-		}).catch(err => {
-			this.cancelCloseDialog(err);
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: BulkChangeEditComponent,
+			data: {
+				bulkChangeModel: bulkChangeModel
+			},
+			modalConfiguration: {
+				title: 'Bulk Change > Edit',
+				draggable: true,
+				modalSize: ModalSize.LG
+			}
+		}).subscribe( (bulkOperationResult: any) => {
+			if (bulkOperationResult.status === DialogExit.ACCEPT) {
+				this.closeDialog(bulkOperationResult);
+			}
 		});
 	}
 
@@ -133,12 +173,16 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 		const message = this.translatePipe.transform(translationKey,
 			[this.affected, singleOrPluralName, singleOrPluralName]);
 		return new Promise((resolve, reject) =>  {
-			this.promptService.open(this.translatePipe.transform(
-				'GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
-				message,
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'))
-				.then((result) => result ? resolve() : reject({action: BulkActions.Delete, success: false, message: 'canceled'}))
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'
+				),
+				message
+			).subscribe((data: any) => (data.confirm === DialogConfirmAction.CONFIRM) ? resolve() : reject({
+				action: BulkActions.Delete,
+				success: false,
+				message: 'canceled'
+			}));
 		})
 	}
 
@@ -157,23 +201,18 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 			singleOrPluralName
 		]);
 		return new Promise((resolve, reject) => {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					message,
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
-					)
-				.then(result =>
-					result
-						? resolve()
-						: reject({
-							action: BulkActions.Run,
-							success: false,
-							message: 'canceled'
-						})
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				message
+			)
+				.subscribe(
+					(data: any) => data.confirm === DialogConfirmAction.CONFIRM ? resolve() : reject({
+						action: BulkActions.Run,
+						success: false,
+						message: 'canceled'
+					})
 				);
 			});
 	}
@@ -267,4 +306,10 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 		return this.translatePipe.transform(targetKey);
 	}
 
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog(null);
+	}
 }
