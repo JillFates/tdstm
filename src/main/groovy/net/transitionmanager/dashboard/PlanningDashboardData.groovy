@@ -313,9 +313,7 @@ class PlanningDashboardData {
 				SUM(CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END)  AS allUnassigned2,
 				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END)     AS allMoveded3,
 				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END) AS allConfirmed4,
-				SUM(CASE WHEN ae.planStatus=:lockedStatus THEN 1 ELSE 0 END) AS allLocked5,
-				SUM(CASE WHEN ae.planStatus=:assignedStatus THEN 1 ELSE 0 END)  AS allAssigned6,
-				SUM(CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END)  AS allConfirmed7
+				SUM(CASE WHEN ae.planStatus=:lockedStatus THEN 1 ELSE 0 END) AS allLocked5
 			FROM AssetEntity ae
 			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)
 			GROUP BY ae.assetClass"""
@@ -326,8 +324,7 @@ class PlanningDashboardData {
 				unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
 				movedStatus: AssetEntityPlanStatus.MOVED,
 				confirmedStatus: AssetEntityPlanStatus.CONFIRMED,
-				lockedStatus: AssetEntityPlanStatus.LOCKED,
-				assignedStatus: AssetEntityPlanStatus.ASSIGNED]
+				lockedStatus: AssetEntityPlanStatus.LOCKED]
 
 			List basicCountsResults = AssetEntity.executeQuery(basicCountsQuery, basicCountsParams)
 			basicCountsResults.each { ua ->
@@ -335,10 +332,10 @@ class PlanningDashboardData {
 					case AssetClass.APPLICATION:
 						applicationCount = ua[1]
 						unassignedApplicationCount = ua[2]
-						assignedApplicationCount = ua[6]
+						assignedApplicationCount = applicationCount - unassignedApplicationCount
 						movedApplicationCount = ua[3]
 						lockedApplicationCount = ua[5]
-						confirmedApplicationCount = ua[4]
+						confirmedApplicationCount = movedApplicationCount + ua[4] + lockedApplicationCount
 						break
 					case AssetClass.DATABASE:
 						unassignedDatabaseCount = ua[2]
