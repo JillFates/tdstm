@@ -45,7 +45,7 @@ class Dataview {
 		Map data = [
 			id           : id,
 			name         : name,
-			hasOverride  : hasOverride(project),
+			hasOverride  : hasOverride(project, whom),
 			isGlobal     : this.project.isDefaultProject(),
 			isSystem     : isSystem,
 			isShared     : isShared,
@@ -98,18 +98,24 @@ class Dataview {
 
 	/**
 	 * Used to determine if the current view has an override
-	 * @param project
+	 * @param project - the user's current project
+	 * @param whom - the person that is viewing the dataview
 	 * @return returns true if the current view is a system and there is one or more overridden versions of the view
 	 * in the default project and/or in the project referenced.
 	 */
-	boolean hasOverride(Project project) {
+	boolean hasOverride(Project project, Person whom) {
 		boolean overridden = false
 		if (id && isSystem && project) {
 			// Note that the where closure didn't work correctly reference id directly, hence the dvId variable
-			Long dvId = this.id		
+			Long dvId = this.id
+			List<Long> projectIds = [Project.DEFAULT_PROJECT_ID]
+			if (! project.isDefaultProject()) {
+				projectIds << project.id
+			}
 			overridden = Dataview.where {
-					project.id in [project.id, Project.DEFAULT_PROJECT_ID]
+					project.id in projectIds
 					overridesView.id == dvId
+					(isShared == true || person == whom)
 				}.count() > 0
 		}
 		return overridden
