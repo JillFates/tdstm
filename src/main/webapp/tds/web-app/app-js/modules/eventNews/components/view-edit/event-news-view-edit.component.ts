@@ -1,6 +1,5 @@
 // Angular
 import {
-	AfterViewInit,
 	Component,
 	ComponentFactoryResolver,
 	Input,
@@ -20,13 +19,12 @@ import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-
 import {EventNewsModel} from '../../model/event-news.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {UserContextModel} from '../../../auth/model/user-context.model';
-declare var jQuery: any;
 
 @Component({
 	selector: 'tds-news-create-edit',
 	templateUrl: 'event-news-view-edit.component.html'
 })
-export class EventNewsViewEditComponent extends Dialog implements AfterViewInit, OnInit {
+export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
 	@ViewChild('eventNewsForm', {read: NgForm, static: true}) eventNewsForm: NgForm;
 	public eventNewsModel: EventNewsModel;
@@ -88,17 +86,6 @@ export class EventNewsViewEditComponent extends Dialog implements AfterViewInit,
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
-		});
-	}
-
-	ngAfterViewInit(): void {
-		const modalElement = document.getElementsByClassName('modal-content');
-		const modalContent = jQuery(modalElement).find('a, button, :input, [tabindex]');
-		modalElement[0].addEventListener('focusout', e => {
-			const validElement = Array.from(modalContent).find(element => element === e['relatedTarget']);
-			if (!validElement && e['relatedTarget'].type !== 'button') {
-				modalContent.first()[0].focus();
-			}
 		});
 	}
 
