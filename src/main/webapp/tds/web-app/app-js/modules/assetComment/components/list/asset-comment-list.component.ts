@@ -106,13 +106,9 @@ export class AssetCommentListComponent implements OnInit {
 	 * @param {SelectionEvent} event
 	 */
 	// TODO: sam, please test this funcionality.
-	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex === 1 && this.hasCommentViewPermission) {
-			this.openAssetCommentDialogViewEdit(event['dataItem'], ModalType.VIEW);
-		} else {
-			if (event.columnIndex === 2) {
-				this.openAssetDetails(event.dataItem.assetEntityId, event.dataItem.assetClass.name);
-			}
+	protected async cellClick(event: CellClickEvent) {
+		if (event.columnIndex === 1 && this.isShowCommentAvailable()) {
+			await this.openComment(event.dataItem, ModalType.VIEW);
 		}
 	}
 
@@ -190,23 +186,6 @@ export class AssetCommentListComponent implements OnInit {
 				console.error(error);
 			}
 		}
-	}
-
-	/**
-	 * Open the asset show details
-	 * @param assetEntityId
-	 * @param assetType
-	 */
-	private openAssetDetails(assetEntityId: string, assetClassName: string) {
-		this.dialogService.open(AssetShowComponent, [
-			{provide: 'ID', useValue: assetEntityId},
-			{provide: 'ASSET', useValue: assetClassName}
-		], DIALOG_SIZE.LG)
-			.then(result => {
-				// Do nothing
-			}).catch(result => {
-			// Do nothing
-		});
 	}
 
 	/**
