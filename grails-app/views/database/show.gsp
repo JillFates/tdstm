@@ -128,7 +128,7 @@
                   model="['asset'                  : databaseInstance,
                           'prefValue'              : prefValue,
                           'viewUnpublishedValue'   : viewUnpublishedValue,
-                          'hasEditTaskPermission'  : hasEditTaskPermission,
+                          'hasTaskManagerViewPermission'  : hasTaskManagerViewPermission,
                           'hasCreateTaskPermission': hasCreateTaskPermission]">
         </g:render>
     </tr>
