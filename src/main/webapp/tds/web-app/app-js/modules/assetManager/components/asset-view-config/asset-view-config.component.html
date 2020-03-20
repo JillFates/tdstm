@@ -48,6 +48,13 @@
 													 (click)="onToggleConfig()"
 													 [tooltip]="'Open Configuration'">
 				</tds-button-custom>
+				<button *ngIf="currentOverrideState.icon && collapsed" type="button"
+								class="view-override-button tds-action-button--just-icon pull-right"
+								[title]="currentOverrideState.tooltip"
+								(click)="toggleAssetView()">
+					<fa-icon [icon]="currentOverrideState.icon">
+					</fa-icon>
+				</button>
 			</div>
 		</div>
 
@@ -57,7 +64,7 @@
 									class="preview"
 									[disabled]="!isValid()"
 									[ngClass]="{'btn-secondary':!isValid(),'btn-success':isValid()}"
-									(click)="previewButtonClicked = true; onPreview()">
+									(click)="onPreview()">
 				Preview
 			</tds-button>
 			<tds-button-custom [icon]="'angle down'"

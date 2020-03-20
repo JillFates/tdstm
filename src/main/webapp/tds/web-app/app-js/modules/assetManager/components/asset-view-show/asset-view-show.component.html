@@ -12,8 +12,7 @@
 				<tds-asset-show-save-button
 					[config]="config"
 					(save)="onSave()"
-					(saveAs)="onSaveAs()"
-				>
+					(saveAs)="onSaveAs()">
 				</tds-asset-show-save-button>
 
 				<!-- Favorite button -->
@@ -54,6 +53,13 @@
 			</div>
 
 			<div class="float-right header-buttons">
+				<button *ngIf="currentOverrideState.icon" type="button"
+								class="view-override-button tds-action-button--just-icon pull-right"
+								[title]="currentOverrideState.tooltip"
+								(click)="toggleAssetView()">
+					<fa-icon [icon]="currentOverrideState.icon">
+					</fa-icon>
+				</button>
 				<!-- Create button -->
 				<tds-asset-show-create-button
 					*ngIf="assetExplorerViewGrid"

@@ -1,6 +1,6 @@
 // Angular
-import {Component, ViewChild, OnInit, ComponentFactoryResolver} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import { Component, ViewChild, OnInit, ComponentFactoryResolver, OnDestroy } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 // Model
 import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
@@ -24,6 +24,11 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 // Other
 import {State} from '@progress/kendo-data-query';
 import {clone} from 'ramda';
+import {
+	ASSET_NOT_OVERRIDE_STATE,
+	ASSET_OVERRIDE_CHILD_STATE,
+	ASSET_OVERRIDE_PARENT_STATE, OverrideState
+} from '../../models/asset-view-override-state.model';
 
 declare var jQuery: any;
 
@@ -31,7 +36,7 @@ declare var jQuery: any;
 	selector: 'tds-asset-view-config',
 	templateUrl: 'asset-view-config.component.html'
 })
-export class AssetViewConfigComponent implements OnInit {
+export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 
 	public data: any = null;
@@ -69,8 +74,13 @@ export class AssetViewConfigComponent implements OnInit {
 	allFields: FieldSettingsModel[] = [];
 	position: any[] = [];
 	currentTab = 0;
-	previewButtonClicked = false;
 	public metadata: any = {};
+	saveOptions: any;
+	private queryParams: any = {};
+	currentOverrideState: OverrideState;
+	private navigationSubscription: any;
+	private lastSnapshot: any;
+	private lastViewId;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -80,11 +90,14 @@ export class AssetViewConfigComponent implements OnInit {
 		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService) {
+		this.initResolveData();
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.allFields = this.route.snapshot.data['fields'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
-		this.model = {...this.route.snapshot.data['report']};
+		const {dataView, saveOptions} = this.route.snapshot.data['report'];
+		this.model = dataView || this.route.snapshot.data['report'];
+		this.saveOptions = saveOptions;
 		this.dataSignature = JSON.stringify(this.model);
 		this.draggableColumns = [];
 		if (this.model.id) {
@@ -96,14 +109,92 @@ export class AssetViewConfigComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.justPlanning = false;
-		if (this.model.id) {
+		if (this.model && this.model.id) {
 			this.notifier.broadcast({
 				name: 'notificationHeaderTitleChange',
 				title: this.model.name
 			});
-			this.previewButtonClicked = true;
 			this.onPreview();
 		}
+		this.reloadStrategy();
+	}
+
+	/**
+	 * After Report Resolver has finished initialize models/variables of the component.
+	 */
+	initResolveData(isReload = false): void {
+		this.justPlanning = false;
+		this.metadata.tagList = this.route.snapshot.data['tagList'];
+		this.allFields = this.route.snapshot.data['fields'];
+		this.fields = this.route.snapshot.data['fields'];
+		this.domains = this.route.snapshot.data['fields'];
+		this.model = { ...this.route.snapshot.data['report'] };
+		const { dataView, saveOptions } = this.route.snapshot.data['report'];
+		this.model = dataView || this.route.snapshot.data['report'];
+		this.saveOptions = saveOptions;
+		this.dataSignature = JSON.stringify(this.model);
+		this.draggableColumns = [];
+		this.handleQueryParams();
+		if (this.model && this.model.id) {
+			this.updateFilterbyModel();
+			this.currentTab = 1;
+			this.draggableColumns = this.model.schema.columns.slice();
+			this.handleOverrideState(this.model);
+			if (isReload) {
+				this.onPreview();
+			}
+		} else {
+			this.currentOverrideState = ASSET_NOT_OVERRIDE_STATE;
+		}
+	}
+
+	/**
+	 * Reload Strategy keep listen To change to the route so we can reload whatever is inside the component
+	 * Increase dramatically the Performance
+	 */
+	private reloadStrategy(): void {
+		// The following code Listen to any change made on the rout to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event.snapshot && event.snapshot.data && event.snapshot.data.fields) {
+				this.lastSnapshot = event.snapshot;
+			}
+			// If it is a NavigationEnd event re-initalise the component
+			if (event instanceof NavigationEnd) {
+				this.initResolveData(true);
+			}
+		});
+	}
+
+	/**
+	 * Set the override state object.
+	 * @param isOverride
+	 * @param hasOverride
+	 */
+	private handleOverrideState({isOverride, hasOverride}: ViewModel): void {
+		if (isOverride) {
+			this.currentOverrideState = ASSET_OVERRIDE_CHILD_STATE;
+		} else if (hasOverride) {
+			this.currentOverrideState = ASSET_OVERRIDE_PARENT_STATE;
+		} else {
+			this.currentOverrideState = ASSET_NOT_OVERRIDE_STATE;
+		}
+	}
+
+	/**
+	 * Switches the current view to non-override system view or override system view.
+	 */
+	toggleAssetView() {
+		let navigateToViewId = this.model.id;
+		const _override = !this.queryParams._override;
+		if (!_override && this.model.overridesView) {
+			navigateToViewId = this.model.overridesView.id
+		} else if (this.lastViewId) {
+			navigateToViewId = this.lastViewId;
+		}
+		this.lastViewId = this.model.id;
+		return this.router.navigate(['/asset', 'views', navigateToViewId, 'edit'], {
+			queryParams: { _override }
+		});
 	}
 
 	protected updateFilterbyModel() {
@@ -132,7 +223,6 @@ export class AssetViewConfigComponent implements OnInit {
 			.forEach(x => delete x['selected']);
 		this.applyFilters();
 		this.data = null;
-		this.previewButtonClicked = false;
 	}
 
 	/** Filter Methods */
@@ -232,7 +322,8 @@ export class AssetViewConfigComponent implements OnInit {
 			component: AssetViewSaveComponent,
 			data: {
 				viewModel: this.model,
-				viewGroupModel: selectedData
+				viewGroupModel: selectedData,
+				saveOptions: this.saveOptions
 			},
 			modalConfiguration: {
 				title: 'Save List View',
@@ -288,7 +379,9 @@ export class AssetViewConfigComponent implements OnInit {
 	/** Dialog and view Actions methods */
 	public onCancel() {
 		if (this.model && this.model.id) {
-			this.router.navigate(['asset', 'views', this.model.id, 'show']);
+			const _override = this.queryParams._override;
+			this.router.navigate(['asset', 'views', this.model.id, 'show'],
+				{ queryParams: { _override } });
 		} else {
 			this.router.navigate(['asset', 'views']);
 		}
@@ -382,7 +475,6 @@ export class AssetViewConfigComponent implements OnInit {
 		this.draggableColumns = this.model.schema.columns.slice();
 		this.data = null;
 		this.model.schema = clone(this.model.schema);
-		this.previewButtonClicked = false;
 	}
 
 	/**
@@ -431,7 +523,7 @@ export class AssetViewConfigComponent implements OnInit {
 	}
 
 	public onPreview(): void {
-		if (this.isValid() && this.previewButtonClicked) {
+		if (this.isValid()) {
 			let params = this.getQueryParams();
 			this.assetExplorerService.previewQuery(params)
 				.subscribe(result => {
@@ -562,6 +654,25 @@ export class AssetViewConfigComponent implements OnInit {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Store query params from url.
+	 */
+	private handleQueryParams() {
+		this.route.queryParams.subscribe((params) => {
+			const _override = !params._override || params._override === 'true' || params._override === true;
+			this.queryParams = { _override };
+		});
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 
 }

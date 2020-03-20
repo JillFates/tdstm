@@ -120,16 +120,13 @@ import { PowerComponent } from './components/power/power.component';
 import { TaskStatusIndicatorComponent } from './components/task-status-indicator/task-status-indicator.component';
 import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
 // Dictionary
-import {DictionaryService} from './services/dictionary.service';
-import {en_DICTIONARY} from './i18n/en.dictionary';
-import {PreferencesResolveService} from './resolves/preferences-resolve.service';
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
 import { PreferencesResolveService } from './resolves/preferences-resolve.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CircleCountdownComponent } from './components/circle-countdown/circle-countdown.component';
-import {MenusModule} from '@progress/kendo-angular-menu';
-import {TooltipModule} from '@progress/kendo-angular-tooltip';
+import { MenusModule } from '@progress/kendo-angular-menu';
+import { TooltipModule } from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [

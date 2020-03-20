@@ -31,6 +31,11 @@ import { takeUntil } from 'rxjs/operators';
 import { Observable, ReplaySubject } from 'rxjs';
 import { fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 import { ViewColumn, ViewSpec } from '../../../assetExplorer/model/view-spec.model';
+import {
+	ASSET_NOT_OVERRIDE_STATE,
+	ASSET_OVERRIDE_CHILD_STATE,
+	ASSET_OVERRIDE_PARENT_STATE, OverrideState
+} from '../../models/asset-view-override-state.model';
 
 declare var jQuery: any;
 
@@ -42,14 +47,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
 
-	private currentId;
+	private lastViewId;
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
 	public model: ViewModel = new ViewModel();
 	protected domains: DomainModel[] = [];
 	public metadata: any = {};
-	private lastSnapshot;
-	protected navigationSubscription;
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
@@ -67,6 +70,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
 	private TAG_ASSET_COLUMN_WIDTH = 260;
 	protected gridMessage;
+	saveOptions: any;
+	private lastSnapshot: any;
+	navigationSubscription: any;
+	public currentOverrideState: OverrideState;
+	private queryParams: any = {};
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -80,13 +88,21 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
 		private assetTagUIWrapperService: AssetTagUIWrapperService,
 		private preferenceService: PreferenceService) {
+		this.initResolveData();
+	}
 
+	/**
+	 * After Report Resolver has finished initialize models/variables of the component.
+	 */
+	initResolveData(): void {
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
-		this.model = this.route.snapshot.data['report'];
-		this.prepareView(this.model);
+		const {dataView, saveOptions} = this.route.snapshot.data['report'];
+		this.model = dataView;
+		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
+		this.handleOverrideState(this.model);
 	}
 
 	ngOnInit(): void {
@@ -106,13 +122,21 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				onClick: this.onEdit.bind(this),
 			},
 		];
-
-		// Get all Query Params
-		this.route.queryParams.subscribe(map => map);
+		this.handleQueryParams();
 		this.globalQueryParams = this.route.snapshot.queryParams;
 		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
 		this.reloadStrategy();
 		this.initialiseComponent();
+	}
+
+	/**
+	 * Get all query params.
+	 */
+	private handleQueryParams() {
+		this.route.queryParams.subscribe((params) => {
+			const _override = !params._override || params._override === 'true' || params._override === true;
+			this.queryParams = { _override };
+		});
 	}
 
 	/**
@@ -149,16 +173,25 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			}
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
-				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
-					this.metadata.tagList = this.lastSnapshot.data['tagList'];
-					this.fields = this.lastSnapshot.data['fields'];
-					this.domains = this.lastSnapshot.data['fields'];
-					this.model = this.lastSnapshot.data['report'];
-					this.dataSignature = this.stringifyCopyOfModel(this.model);
-					this.initialiseComponent();
-				}
+				this.initResolveData();
+				this.initialiseComponent();
 			}
 		});
+	}
+
+	/**
+	 * Set the override state object.
+	 * @param isOverride
+	 * @param hasOverride
+	 */
+	private handleOverrideState({isOverride, hasOverride}: ViewModel): void {
+		if (isOverride) {
+			this.currentOverrideState = ASSET_OVERRIDE_CHILD_STATE;
+		} else if (hasOverride) {
+			this.currentOverrideState = ASSET_OVERRIDE_PARENT_STATE;
+		} else {
+			this.currentOverrideState = ASSET_NOT_OVERRIDE_STATE;
+		}
 	}
 
 	/**
@@ -166,7 +199,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	private initialiseComponent(): void {
 		this.justPlanning = false;
-		this.currentId = this.model.id;
 		this.notifier.broadcast({
 			name: 'notificationHeaderTitleChange',
 			title: this.model.name
@@ -225,13 +257,33 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				this.gridMessage = (this.data.assets.length <= 0) ? this.translateService.transform('GLOBAL.NO_RECORDS') : '';
 				jQuery('[data-toggle="popover"]').popover();
 			}, err => console.log(err));
-		}, 2000);
+		}, 500);
 	}
 
 	public onEdit(): void {
 		if (this.isEditAvailable()) {
-			this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+			const _override = this.queryParams._override;
+			this.router.navigate(['asset', 'views', this.model.id, 'edit'], {
+				queryParams: { _override }
+			});
 		}
+	}
+
+	/**
+	 * Switches the current view to non-override system view or override system view.
+	 */
+	toggleAssetView() {
+		let navigateToViewId;
+		const _override = !this.queryParams._override;
+		if (!_override && this.model.overridesView) {
+			navigateToViewId = this.model.overridesView.id
+		} else if (this.lastViewId) {
+			navigateToViewId = this.lastViewId;
+		}
+		this.lastViewId = this.model.id;
+		return this.router.navigate(['/asset', 'views', navigateToViewId, 'show'], {
+			queryParams: { _override }
+		});
 	}
 
 	public onSave() {
@@ -248,7 +300,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			component: AssetViewSaveComponent,
 			data: {
 				viewModel: this.model,
-				viewGroupModel: selectedData
+				viewGroupModel: selectedData,
+				saveOptions: this.saveOptions
 			},
 			modalConfiguration: {
 				title: 'Save List View',
@@ -258,6 +311,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		}).subscribe( (data: any) => {
 			if (data.status === DialogExit.ACCEPT) {
 				this.model = data;
+				this.select.loadData();
 				this.dataSignature = this.stringifyCopyOfModel(this.model);
 				setTimeout(() => {
 					this.router.navigate(['asset', 'views', this.model.id, 'edit']);
@@ -379,18 +433,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * @returns {boolean}
 	 */
 	public canSave(): boolean {
-		// If it's all assets view then don't Save is allowed.
-		if (this.assetExplorerService.isAllAssets(this.model)) {
-			return false;
-		}
-		// If it's a system view
-		if (this.model.isSystem) {
-			return this.permissionService.hasPermission(Permission.AssetExplorerEdit) &&
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit);
-		} else {
-			// If it's not a system view.
-			return this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerEdit);
-		}
+		return this.saveOptions.save;
 	}
 
 	/**
@@ -398,15 +441,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * @returns {boolean}
 	 */
 	public canSaveAs(): boolean {
-		// If it's a system view
-		if (this.model.isSystem) {
-			return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) &&
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
-		} else {
-			// If it's not a system view
-			return this.permissionService.hasPermission(Permission.AssetExplorerCreate) &&
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
-		}
+		return (
+			this.saveOptions &&
+			Array.isArray(this.saveOptions.saveAsOptions) &&
+			this.saveOptions.saveAsOptions.length > 0
+		);
 	}
 
 	public isEditAvailable(): boolean {
@@ -451,8 +490,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			saveButtonId: this.getSaveButtonId(),
 			canSave: this.canSave(),
 			canSaveAs: this.canSaveAs(),
+			saveButtonLabel: this.getSaveButtonLabel(),
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
+			disableSaveButton: this.isSaveButtonDisabled()
 		}
 	}
 
@@ -511,5 +552,29 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	private onDisableClearFilter(): boolean {
 		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Determines if show we can show Save/Save All buttons at all.
+	 * @returns {boolean}
+	 */
+	public isOverrideView(): boolean {
+		return this.model.isOverride;
+	}
+
+	/**
+	 * Determines determines the string of the save button label.
+	 * @returns {string}
+	 */
+	public getSaveButtonLabel() {
+		if (!this.canSave() && this.canSaveAs()) {
+			return 'GLOBAL.SAVE_AS'
+		} else {
+			return 'GLOBAL.SAVE'
+		}
+	}
+
+	public isSaveButtonDisabled(): boolean {
+		return !this.canSave() && !this.canSaveAs();
 	}
 }
