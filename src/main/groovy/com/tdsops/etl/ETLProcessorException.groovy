@@ -216,10 +216,6 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("${methodName} function only supported for String values (${value} : ${value.class})")
     }
 
-    static ETLProcessorException ignoreOnlyAllowOnNewRows() {
-        new ETLProcessorException('ignore command only when processing new rows')
-    }
-
     static ETLProcessorException domainOnlyAllowOnNewRows() {
         new ETLProcessorException('DOMAIN variable only available after load commands')
     }

@@ -65,10 +65,10 @@ class ETLProcessorResult {
                 originalFilename: processor.getFilename()
         ]
 
-        fileSystemService = ApplicationContextHolder.getBean('fileSystemService', FileSystemService)
-        List tmpFile = fileSystemService.createTemporaryFile(ScriptProcessorService.PROCESSED_FILE_PREFIX, ETL_FILENAME_EXTENSION)
-        outputFilename = tmpFile[0]
-        outputStream = (OutputStream) tmpFile[1]
+        this.fileSystemService = ApplicationContextHolder.getBean('fileSystemService', FileSystemService)
+        List tmpFile = this.fileSystemService.createTemporaryFile(ScriptProcessorService.PROCESSED_FILE_PREFIX, ETL_FILENAME_EXTENSION)
+        this.outputFilename = tmpFile[0]
+        this.outputStream = (OutputStream) tmpFile[1]
     }
 
     /**
@@ -90,7 +90,8 @@ class ETLProcessorResult {
     }
 
     /**
-     *
+     * Used to allow the script to use the 'lookup' command. This will cause the ETL process to retain
+     * the processed records in memory and stream them to disk at the end of the process.
      */
     void enableLookup() {
         this.isLookupEnable = true
@@ -288,10 +289,6 @@ class ETLProcessorResult {
      * Remove the current row from results going back the previous row results.
      */
     void ignoreCurrentRow() {
-        if (!reference) {
-            throw ETLProcessorException.ignoreOnlyAllowOnNewRows()
-        }
-
         if (reference.currentRow) {
             reference.currentRow.ignore = true
         }
@@ -633,7 +630,6 @@ class DomainOnDisk extends DomainResult {
 
     /**
      * A list of data saved in disk and collected.
-     * NOTE: This method should be used only in a test environment.
      */
     List<Object> data
 
@@ -656,7 +652,9 @@ class DomainOnDisk extends DomainResult {
     }
 
     /**
-     *
+     * At the end of each row, iterate command is calling this method
+     * for collecting a row. For an instance of {@link DomainOnDisk}
+     * it also save results in {@link DomainOnDisk#writer}
      */
     void endCurrentRow() {
         if (currentRow && !currentRow.ignore) {
@@ -724,14 +722,16 @@ class DomainInMemory extends DomainResult {
     }
 
     /**
-     * Completes the process of an Iterate execution.
+     * After {@link ETLProcessor#evaluate(java.lang.String)} method,
+     * an instance of {@link DomainInMemory} saves all rows collected
+     * in {@link DomainInMemory#rows} using Streaming solution.
      *
      * @see ETLProcessorResult#scriptFinished()
      * @see DomainResult#finish()
      */
     void finish() {
         this.writer.startDataArray()
-        for(RowResult row in rows){
+        for (RowResult row in rows) {
             this.writer.writeRowResult(row)
         }
         this.writer.endDataArray()
