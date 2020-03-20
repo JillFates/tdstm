@@ -570,7 +570,16 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 					}
 				});
 		} else {
-			super.onCancelClose();
+			this.dialogService.activatedDropdown.subscribe(res => {
+				if (res) {
+					this.dialogService.activatedDropdown.next(false);
+					return;
+				}
+				else {
+					super.onCancelClose();
+				}
+			});
+
 		}
 	}
 
