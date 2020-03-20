@@ -1,4 +1,5 @@
 export class UserContextModel {
+	logged: false;
 	bundle?: any;
 	dateFormat?: string;
 	event?: any;
@@ -15,7 +16,12 @@ export class UserContextModel {
 	};
 	error?: string;
 	alternativeProjects?: [];
-	defaultProject?: any;
+	csrf?: CSRF;
+}
+
+export class CSRF {
+	tokenHeaderName: string;
+	token: string;
 }
 
 export enum USER_CONTEXT_REQUEST {

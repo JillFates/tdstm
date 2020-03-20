@@ -127,9 +127,9 @@ class WsUserController implements ControllerMethods {
 		}
 
 		renderSuccessJson(
-				person: person,
-				projects: projects,
-				projectInstance: project,
+				person: person.toMap(),
+				projects: projects*.toMap(),
+				projectInstance: project.toMap(),
 				projectLogoId: projectLogo?.id,
 				movedayCategories: AssetComment.moveDayCategories
 		)
@@ -298,10 +298,10 @@ class WsUserController implements ControllerMethods {
 	* @param value - the value to set the preference to
 	*/
 	@HasPermission(Permission.UserGeneralAccess)
-	def savePreference(SavePreferenceCommand savePreference) {
-		validateCommandObject(savePreference)
+	def savePreference() {
+    	SavePreferenceCommand savePreference = populateCommandObject(SavePreferenceCommand)
 		userPreferenceService.setPreference(savePreference.code, savePreference.value)
-		renderSuccessJson()
+    	renderSuccessJson()
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)
@@ -402,7 +402,7 @@ class WsUserController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserResetOwnPassword)
 	def updatePassword() {
-		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand)
+		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand, false)
 		securityService.updatePassword(securityService.userLogin, command)
 		renderSuccessJson("Your password has been updated successfully.")
 	}

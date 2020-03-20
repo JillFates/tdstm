@@ -28,7 +28,7 @@
 	</g:else>
 
 	<!-- Blue Skin -->
-	<link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
+	<%-- <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}"> --%>
 
 	<!-- jQuery -->
 	<script src="${resource(dir: 'dist/js/vendors/jquery/dist', file: 'jquery.min.js')}"></script>
@@ -45,10 +45,10 @@
 						<i class="fa fa-bars"></i>
 					</button>
 					<g:if test="${isLicenseManagerEnabled}">
-						<asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
+						<asset:image id="logo-header" src="/../tds/web-app/assets/images/transitionLogo.svg" alt="TransitionManager" border="0" />
 					</g:if>
 					<g:else>
-						<asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
+						<asset:image id="logo-header" src="/../tds/web-app/assets/images/transitionLogo.svg" alt="TransitionManager" border="0" />
 					</g:else>
 				</div>
 			</div><!-- /.container-fluid -->

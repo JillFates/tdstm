@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "f8e0562f-d1cb-4a27-82f9-dee316541c04",
-		"name": "TM-15951 - Task Edition EP",
+		"_postman_id": "78e70206-f3ce-439a-97fe-bc09603cf294",
+		"name": "Task Edition",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Login - Task Creation",
+			"name": "Login - Task Edition",
 			"event": [
 				{
 					"listen": "test",
@@ -22,7 +22,14 @@
 							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
 							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
 							"    pm.expect(pm.response.text()).to.include(\"notices\");",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -157,6 +164,56 @@
 			"response": []
 		},
 		{
+			"name": "List Events",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "049e3830-bb5f-416f-a034-e408875b1317",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Events have been listed.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.globals.set(\"event1\", jsonData.data[0].id);",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/moveEvent/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"moveEvent",
+						"list"
+					]
+				},
+				"description": "This EP will bring a list of events. Some event ids will be saved in order to add the created tags to them."
+			},
+			"response": []
+		},
+		{
 			"name": "List Providers",
 			"event": [
 				{
@@ -240,6 +297,11 @@
 						"key": "Content-Type",
 						"name": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
 						"type": "text"
 					}
 				],
@@ -338,108 +400,16 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"348\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}"
-				},
-				"url": {
-					"raw": "{{host}}/tdstm/assetEntity/saveComment",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"assetEntity",
-						"saveComment"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Task Copy",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "a8d26a13-2feb-4a02-907d-0e3e33a1765a",
-						"exec": [
-							"",
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Task Creation\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"QA API Created Task\");",
-							"});",
-							"",
-							"",
-							"var jsonObject = JSON.parse(responseBody);",
-							"var taskName = jsonObject.assetComment.comment; ",
-							"var taskID = jsonObject.assetComment.id;",
-							"",
-							"pm.environment.set(\"taskName\", taskName);",
-							"pm.environment.set(\"taskID\", taskID);",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "sec-fetch-mode",
-						"value": "cors"
-					},
-					{
-						"key": "origin",
-						"value": "https://tmqa02.transitionmanager.net"
-					},
-					{
-						"key": "accept-encoding",
-						"value": "gzip, deflate, br"
-					},
-					{
-						"key": "accept-language",
-						"value": "es-419,es;q=0.9,en;q=0.8"
-					},
-					{
-						"key": "user-agent",
-						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
-					},
-					{
-						"key": "content-type",
-						"value": "application/json"
-					},
-					{
-						"key": "accept",
-						"value": "application/json, text/plain, */*"
-					},
-					{
-						"key": "referer",
-						"value": "https://tmqa02.transitionmanager.net/tdstm/module/taskManager/list"
-					},
-					{
-						"key": "authority",
-						"value": "tmqa02.transitionmanager.net"
-					},
-					{
-						"key": "cookie",
-						"value": "JSESSIONID=0A3D168F815FE33B941042E315B6DC3A"
-					},
-					{
-						"key": "sec-fetch-site",
-						"value": "same-origin"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"348\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}"
+					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"{{event1}}\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/saveComment",
@@ -521,11 +491,16 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"assetClass\": \"APPLICATION\",\n    \"assetEntity\": \"\",\n    \"assetType\": \"\",\n    \"assignedTo\": \"6434\",\n    \"category\": \"general\",\n    \"apiAction\": 50,\n    \"apiActionId\": \"50\",\n    \"actionInvocable\": \"\",\n    \"actionMode\": \"\",\n    \"comment\": \"{{taskName}}\",\n    \"commentFromId\": \"\",\n    \"commentId\": \"{{taskID}}\",\n    \"commentType\": \"issue\",\n    \"deletePredId\": \"\",\n    \"dueDate\": \"\",\n    \"duration\": \"0\",\n    \"durationScale\": \"M\",\n    \"estFinish\": \"\",\n    \"estStart\": \"\",\n    \"forWhom\": \"\",\n    \"hardAssigned\": \"0\",\n    \"sendNotification\": \"1\",\n    \"isResolved\": \"0\",\n    \"instructionsLink\": \"\",\n    \"moveEvent\": \"348\",\n    \"mustVerify\": \"0\",\n    \"override\": \"0\",\n    \"predCount\": \"-1\",\n    \"predecessorCategory\": \"\",\n    \"prevAsset\": \"\",\n    \"priority\": \"3\",\n    \"resolution\": \"\",\n    \"role\": \"\",\n    \"status\": \"Started\",\n    \"percentageComplete\": 0,\n    \"manageDependency\": \"1\",\n    \"taskDependency\": [],\n    \"taskSuccessor\": [],\n    \"deletedPreds\": \"\",\n    \"workflowTransition\": \"\",\n    \"canEdit\": true,\n    \"durationLocked\": \"0\",\n    \"durationText\": \"0 days 0 hrs 0 mins\",\n    \"taskNumber\": \"11572\",\n    \"note\": \"\",\n    \"id\": {{taskID}}\n}"
+					"raw": "{\r\n    \"assetClass\": \"APPLICATION\",\r\n    \"assetEntity\": \"\",\r\n    \"assetType\": \"\",\r\n    \"assignedTo\": \"0\",\r\n    \"category\": \"general\",\r\n    \"apiAction\":\"{{apiActionId}}\",\r\n    \"apiActionId\":\"{{apiActionId}}\",\r\n    \"actionInvocable\": \"\",\r\n    \"actionMode\": \"\",\r\n    \"comment\": \"{{taskName}}\",\r\n    \"commentFromId\": \"\",\r\n    \"commentId\": \"{{taskID}}\",\r\n    \"commentType\": \"issue\",\r\n    \"deletePredId\": \"\",\r\n    \"dueDate\": \"\",\r\n    \"duration\": \"0\",\r\n    \"durationScale\": \"M\",\r\n    \"estFinish\": \"\",\r\n    \"estStart\": \"\",\r\n    \"forWhom\": \"\",\r\n    \"hardAssigned\": \"0\",\r\n    \"sendNotification\": \"1\",\r\n    \"isResolved\": \"0\",\r\n    \"instructionsLink\": \"\",\r\n    \"moveEvent\":\"{{event1}}\",\r\n    \"mustVerify\": \"0\",\r\n    \"override\": \"0\",\r\n    \"predCount\": \"-1\",\r\n    \"predecessorCategory\": \"\",\r\n    \"prevAsset\": \"\",\r\n    \"priority\": \"3\",\r\n    \"resolution\": \"\",\r\n    \"role\": \"\",\r\n    \"status\": \"Started\",\r\n    \"percentageComplete\": 0,\r\n    \"manageDependency\": \"1\",\r\n    \"taskDependency\": [],\r\n    \"taskSuccessor\": [],\r\n    \"deletedPreds\": \"\",\r\n    \"workflowTransition\": \"\",\r\n    \"canEdit\": true,\r\n    \"durationLocked\": \"0\",\r\n    \"durationText\": \"0 days 0 hrs 0 mins\",\r\n    \"taskNumber\": \"0\",\r\n    \"note\": \"\",\r\n    \"id\": {{taskID}}\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/updateComment",
@@ -607,11 +582,16 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"assetClass\": \"APPLICATION\",\n    \"assetEntity\": \"\",\n    \"assetType\": \"\",\n    \"assignedTo\": \"6434\",\n    \"category\": \"general\",\n    \"apiAction\": 50,\n    \"apiActionId\": \"50\",\n    \"actionInvocable\": \"\",\n    \"actionMode\": \"\",\n    \"comment\": \"{{taskName}}\",\n    \"commentFromId\": \"\",\n    \"commentId\": \"{{taskID}}\",\n    \"commentType\": \"issue\",\n    \"deletePredId\": \"\",\n    \"dueDate\": \"\",\n    \"duration\": \"0\",\n    \"durationScale\": \"M\",\n    \"estFinish\": \"\",\n    \"estStart\": \"\",\n    \"forWhom\": \"\",\n    \"hardAssigned\": \"0\",\n    \"sendNotification\": \"1\",\n    \"isResolved\": \"0\",\n    \"instructionsLink\": \"\",\n    \"moveEvent\": \"348\",\n    \"mustVerify\": \"0\",\n    \"override\": \"0\",\n    \"predCount\": \"-1\",\n    \"predecessorCategory\": \"\",\n    \"prevAsset\": \"\",\n    \"priority\": \"3\",\n    \"resolution\": \"\",\n    \"role\": \"\",\n    \"status\": \"Started\",\n    \"percentageComplete\": 50,\n    \"manageDependency\": \"1\",\n    \"taskDependency\": [],\n    \"taskSuccessor\": [],\n    \"deletedPreds\": \"\",\n    \"workflowTransition\": \"\",\n    \"canEdit\": true,\n    \"durationLocked\": \"0\",\n    \"durationText\": \"0 days 0 hrs 0 mins\",\n    \"taskNumber\": \"11572\",\n    \"note\": \"\",\n    \"id\": {{taskID}}\n}"
+					"raw": "{\r\n    \"assetClass\": \"APPLICATION\",\r\n    \"assetEntity\": \"\",\r\n    \"assetType\": \"\",\r\n    \"assignedTo\": \"0\",\r\n    \"category\": \"general\",\r\n    \"apiAction\":\"{{apiActionId}}\",\r\n    \"apiActionId\":\"{{apiActionId}}\",\r\n    \"actionInvocable\": \"\",\r\n    \"actionMode\": \"\",\r\n    \"comment\": \"{{taskName}}\",\r\n    \"commentFromId\": \"\",\r\n    \"commentId\": \"{{taskID}}\",\r\n    \"commentType\": \"issue\",\r\n    \"deletePredId\": \"\",\r\n    \"dueDate\": \"\",\r\n    \"duration\": \"0\",\r\n    \"durationScale\": \"M\",\r\n    \"estFinish\": \"\",\r\n    \"estStart\": \"\",\r\n    \"forWhom\": \"\",\r\n    \"hardAssigned\": \"0\",\r\n    \"sendNotification\": \"1\",\r\n    \"isResolved\": \"0\",\r\n    \"instructionsLink\": \"\",\r\n    \"moveEvent\":\"{{event1}}\",\r\n    \"mustVerify\": \"0\",\r\n    \"override\": \"0\",\r\n    \"predCount\": \"-1\",\r\n    \"predecessorCategory\": \"\",\r\n    \"prevAsset\": \"\",\r\n    \"priority\": \"3\",\r\n    \"resolution\": \"\",\r\n    \"role\": \"\",\r\n    \"status\": \"Started\",\r\n    \"percentageComplete\": 50,\r\n    \"manageDependency\": \"1\",\r\n    \"taskDependency\": [],\r\n    \"taskSuccessor\": [],\r\n    \"deletedPreds\": \"\",\r\n    \"workflowTransition\": \"\",\r\n    \"canEdit\": true,\r\n    \"durationLocked\": \"0\",\r\n    \"durationText\": \"0 days 0 hrs 0 mins\",\r\n    \"taskNumber\": \"0\",\r\n    \"note\": \"\",\r\n    \"id\": {{taskID}}\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/updateComment",
@@ -695,11 +675,16 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"assetClass\": \"APPLICATION\",\n    \"assetEntity\": \"\",\n    \"assetType\": \"\",\n    \"assignedTo\": \"6434\",\n    \"category\": \"general\",\n    \"apiAction\": 50,\n    \"apiActionId\": \"50\",\n    \"actionInvocable\": \"\",\n    \"actionMode\": \"\",\n    \"comment\": \"{{taskName}}\",\n    \"commentFromId\": \"\",\n    \"commentId\": \"{{taskID}}\",\n    \"commentType\": \"issue\",\n    \"deletePredId\": \"\",\n    \"dueDate\": \"\",\n    \"duration\": \"0\",\n    \"durationScale\": \"M\",\n    \"estFinish\": \"\",\n    \"estStart\": \"\",\n    \"forWhom\": \"\",\n    \"hardAssigned\": \"0\",\n    \"sendNotification\": \"1\",\n    \"isResolved\": \"0\",\n    \"instructionsLink\": \"\",\n    \"moveEvent\": \"348\",\n    \"mustVerify\": \"0\",\n    \"override\": \"0\",\n    \"predCount\": \"-1\",\n    \"predecessorCategory\": \"\",\n    \"prevAsset\": \"\",\n    \"priority\": \"3\",\n    \"resolution\": \"\",\n    \"role\": \"\",\n    \"status\": \"Completed\",\n    \"percentageComplete\": 100,\n    \"manageDependency\": \"1\",\n    \"taskDependency\": [],\n    \"taskSuccessor\": [],\n    \"deletedPreds\": \"\",\n    \"workflowTransition\": \"\",\n    \"canEdit\": true,\n    \"durationLocked\": \"0\",\n    \"durationText\": \"0 days 0 hrs 0 mins\",\n    \"taskNumber\": \"11572\",\n    \"note\": \"\",\n    \"id\": {{taskID}}\n}"
+					"raw": "{\r\n    \"assetClass\": \"APPLICATION\",\r\n    \"assetEntity\": \"\",\r\n    \"assetType\": \"\",\r\n    \"assignedTo\": \"0\",\r\n    \"category\": \"general\",\r\n    \"apiAction\":\"{{apiActionId}}\",\r\n    \"apiActionId\":\"{{apiActionId}}\",\r\n    \"actionInvocable\": \"\",\r\n    \"actionMode\": \"\",\r\n    \"comment\": \"{{taskName}}\",\r\n    \"commentFromId\": \"\",\r\n    \"commentId\": \"{{taskID}}\",\r\n    \"commentType\": \"issue\",\r\n    \"deletePredId\": \"\",\r\n    \"dueDate\": \"\",\r\n    \"duration\": \"0\",\r\n    \"durationScale\": \"M\",\r\n    \"estFinish\": \"\",\r\n    \"estStart\": \"\",\r\n    \"forWhom\": \"\",\r\n    \"hardAssigned\": \"0\",\r\n    \"sendNotification\": \"1\",\r\n    \"isResolved\": \"0\",\r\n    \"instructionsLink\": \"\",\r\n    \"moveEvent\":\"{{event1}}\",\r\n    \"mustVerify\": \"0\",\r\n    \"override\": \"0\",\r\n    \"predCount\": \"-1\",\r\n    \"predecessorCategory\": \"\",\r\n    \"prevAsset\": \"\",\r\n    \"priority\": \"3\",\r\n    \"resolution\": \"\",\r\n    \"role\": \"\",\r\n    \"status\": \"Completed\",\r\n    \"percentageComplete\": 100,\r\n    \"manageDependency\": \"1\",\r\n    \"taskDependency\": [],\r\n    \"taskSuccessor\": [],\r\n    \"deletedPreds\": \"\",\r\n    \"workflowTransition\": \"\",\r\n    \"canEdit\": true,\r\n    \"durationLocked\": \"0\",\r\n    \"durationText\": \"0 days 0 hrs 0 mins\",\r\n    \"taskNumber\": \"0\",\r\n    \"note\": \"\",\r\n    \"id\": {{taskID}}\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/updateComment",
@@ -781,11 +766,16 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"assetClass\": \"APPLICATION\",\n    \"assetEntity\": \"\",\n    \"assetType\": \"\",\n    \"assignedTo\": \"6434\",\n    \"category\": \"general\",\n    \"apiAction\": 50,\n    \"apiActionId\": \"50\",\n    \"actionInvocable\": \"\",\n    \"actionMode\": \"\",\n    \"comment\": \"{{taskName}}\",\n    \"commentFromId\": \"\",\n    \"commentId\": \"{{taskID}}\",\n    \"commentType\": \"issue\",\n    \"deletePredId\": \"\",\n    \"dueDate\": \"\",\n    \"duration\": \"0\",\n    \"durationScale\": \"M\",\n    \"estFinish\": \"\",\n    \"estStart\": \"\",\n    \"forWhom\": \"\",\n    \"hardAssigned\": \"0\",\n    \"sendNotification\": \"1\",\n    \"isResolved\": \"0\",\n    \"instructionsLink\": \"\",\n    \"moveEvent\": \"348\",\n    \"mustVerify\": \"0\",\n    \"override\": \"0\",\n    \"predCount\": \"-1\",\n    \"predecessorCategory\": \"\",\n    \"prevAsset\": \"\",\n    \"priority\": \"3\",\n    \"resolution\": \"\",\n    \"role\": \"\",\n    \"status\": \"Hold\",\n    \"percentageComplete\": 50,\n    \"manageDependency\": \"1\",\n    \"taskDependency\": [],\n    \"taskSuccessor\": [],\n    \"deletedPreds\": \"\",\n    \"workflowTransition\": \"\",\n    \"canEdit\": true,\n    \"durationLocked\": \"0\",\n    \"durationText\": \"0 days 0 hrs 0 mins\",\n    \"taskNumber\": \"11572\",\n    \"note\": \"\",\n    \"id\": {{taskID}}\n}"
+					"raw": "{\r\n    \"assetClass\": \"APPLICATION\",\r\n    \"assetEntity\": \"\",\r\n    \"assetType\": \"\",\r\n    \"assignedTo\": \"0\",\r\n    \"category\": \"general\",\r\n    \"apiAction\":\"{{apiActionId}}\",\r\n    \"apiActionId\":\"{{apiActionId}}\",\r\n    \"actionInvocable\": \"\",\r\n    \"actionMode\": \"\",\r\n    \"comment\": \"{{taskName}}\",\r\n    \"commentFromId\": \"\",\r\n    \"commentId\": \"{{taskID}}\",\r\n    \"commentType\": \"issue\",\r\n    \"deletePredId\": \"\",\r\n    \"dueDate\": \"\",\r\n    \"duration\": \"0\",\r\n    \"durationScale\": \"M\",\r\n    \"estFinish\": \"\",\r\n    \"estStart\": \"\",\r\n    \"forWhom\": \"\",\r\n    \"hardAssigned\": \"0\",\r\n    \"sendNotification\": \"1\",\r\n    \"isResolved\": \"0\",\r\n    \"instructionsLink\": \"\",\r\n    \"moveEvent\":\"{{event1}}\",\r\n    \"mustVerify\": \"0\",\r\n    \"override\": \"0\",\r\n    \"predCount\": \"-1\",\r\n    \"predecessorCategory\": \"\",\r\n    \"prevAsset\": \"\",\r\n    \"priority\": \"3\",\r\n    \"resolution\": \"\",\r\n    \"role\": \"\",\r\n    \"status\": \"Hold\",\r\n    \"percentageComplete\": 50,\r\n    \"manageDependency\": \"1\",\r\n    \"taskDependency\": [],\r\n    \"taskSuccessor\": [],\r\n    \"deletedPreds\": \"\",\r\n    \"workflowTransition\": \"\",\r\n    \"canEdit\": true,\r\n    \"durationLocked\": \"0\",\r\n    \"durationText\": \"0 days 0 hrs 0 mins\",\r\n    \"taskNumber\": \"0\",\r\n    \"note\": \"\",\r\n    \"id\": {{taskID}}\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/updateComment",
@@ -802,7 +792,7 @@
 			"response": []
 		},
 		{
-			"name": "resetAction",
+			"name": "Reset Action",
 			"event": [
 				{
 					"listen": "test",
@@ -817,7 +807,7 @@
 							"    pm.expect(jsonData.assetComment.status).to.eql(\"Ready\");",
 							"});",
 							"",
-							"pm.test(\"Task restet, percentage is 0 \", function () {",
+							"pm.test(\"Task reset, percentage is 0 \", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.assetComment.percentageComplete).to.eql(0);",
 							"});"
@@ -876,6 +866,11 @@
 					{
 						"key": "content-length",
 						"value": "0"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"url": {
@@ -924,6 +919,11 @@
 						"name": "Content-Type",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -945,7 +945,7 @@
 			"response": []
 		},
 		{
-			"name": "Negative - error: invalid status value and length",
+			"name": "Negative - error: invalid status",
 			"event": [
 				{
 					"listen": "test",
@@ -960,14 +960,23 @@
 							"    pm.expect(jsonData.status).to.eql(\"error\");",
 							"});",
 							"",
-							"pm.test(\"Message validation - length \", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"not within required length range of 0 and 9\");",
-							"});",
-							"",
 							"pm.test(\"Message validation - value not in list \", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"not within the list [Planned, Pending, Ready, Started, Completed, Hold]\");",
 							"});",
-							""
+							"",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");",
+							"pm.environment.unset(\"event1\");",
+							"pm.environment.unset(\"dictionaryName\");",
+							"pm.environment.unset(\"dictionaryID\");",
+							"pm.environment.unset(\"dictionaryMethod\");",
+							"pm.environment.unset(\"dictionaryEndpointUrld\");",
+							"pm.environment.unset(\"dictionaryDocUrl\");",
+							"pm.environment.unset(\"apiActionName\");",
+							"pm.environment.unset(\"providerId\");",
+							"pm.environment.unset(\"taskName\");",
+							"pm.environment.unset(\"taskID\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1019,11 +1028,16 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"assetClass\": \"APPLICATION\",\n    \"assetEntity\": \"\",\n    \"assetType\": \"\",\n    \"assignedTo\": \"6434\",\n    \"category\": \"general\",\n    \"apiAction\": 50,\n    \"apiActionId\": \"50\",\n    \"actionInvocable\": \"\",\n    \"actionMode\": \"\",\n    \"comment\": \"{{taskName}}\",\n    \"commentFromId\": \"\",\n    \"commentId\": \"{{taskID}}\",\n    \"commentType\": \"issue\",\n    \"deletePredId\": \"\",\n    \"dueDate\": \"\",\n    \"duration\": \"0\",\n    \"durationScale\": \"M\",\n    \"estFinish\": \"\",\n    \"estStart\": \"\",\n    \"forWhom\": \"\",\n    \"hardAssigned\": \"0\",\n    \"sendNotification\": \"1\",\n    \"isResolved\": \"0\",\n    \"instructionsLink\": \"\",\n    \"moveEvent\": \"348\",\n    \"mustVerify\": \"0\",\n    \"override\": \"0\",\n    \"predCount\": \"-1\",\n    \"predecessorCategory\": \"\",\n    \"prevAsset\": \"\",\n    \"priority\": \"3\",\n    \"resolution\": \"\",\n    \"role\": \"\",\n    \"status\": \"not a valid value\",\n    \"percentageComplete\": 0,\n    \"manageDependency\": \"1\",\n    \"taskDependency\": [],\n    \"taskSuccessor\": [],\n    \"deletedPreds\": \"\",\n    \"workflowTransition\": \"\",\n    \"canEdit\": true,\n    \"durationLocked\": \"0\",\n    \"durationText\": \"0 days 0 hrs 0 mins\",\n    \"taskNumber\": \"11572\",\n    \"note\": \"\",\n    \"id\": {{taskID}}\n}"
+					"raw": "{\r\n    \"assetClass\": \"APPLICATION\",\r\n    \"assetEntity\": \"\",\r\n    \"assetType\": \"\",\r\n    \"assignedTo\": \"0\",\r\n    \"category\": \"general\",\r\n    \"apiAction\":\"{{apiActionId}}\",\r\n    \"apiActionId\":\"{{apiActionId}}\",\r\n    \"actionInvocable\": \"\",\r\n    \"actionMode\": \"\",\r\n    \"comment\": \"{{taskName}}\",\r\n    \"commentFromId\": \"\",\r\n    \"commentId\": \"{{taskID}}\",\r\n    \"commentType\": \"issue\",\r\n    \"deletePredId\": \"\",\r\n    \"dueDate\": \"\",\r\n    \"duration\": \"0\",\r\n    \"durationScale\": \"M\",\r\n    \"estFinish\": \"\",\r\n    \"estStart\": \"\",\r\n    \"forWhom\": \"\",\r\n    \"hardAssigned\": \"0\",\r\n    \"sendNotification\": \"1\",\r\n    \"isResolved\": \"0\",\r\n    \"instructionsLink\": \"\",\r\n    \"moveEvent\":\"{{event1}}\",\r\n    \"mustVerify\": \"0\",\r\n    \"override\": \"0\",\r\n    \"predCount\": \"-1\",\r\n    \"predecessorCategory\": \"\",\r\n    \"prevAsset\": \"\",\r\n    \"priority\": \"3\",\r\n    \"resolution\": \"\",\r\n    \"role\": \"\",\r\n    \"status\": \"not valid\",\r\n    \"percentageComplete\": 0,\r\n    \"manageDependency\": \"1\",\r\n    \"taskDependency\": [],\r\n    \"taskSuccessor\": [],\r\n    \"deletedPreds\": \"\",\r\n    \"workflowTransition\": \"\",\r\n    \"canEdit\": true,\r\n    \"durationLocked\": \"0\",\r\n    \"durationText\": \"0 days 0 hrs 0 mins\",\r\n    \"taskNumber\": \"0\",\r\n    \"note\": \"\",\r\n    \"id\": {{taskID}}\r\n}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/updateComment",
@@ -1061,5 +1075,6 @@
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

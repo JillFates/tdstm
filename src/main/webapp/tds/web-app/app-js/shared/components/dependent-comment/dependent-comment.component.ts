@@ -2,22 +2,34 @@ import {Component, ViewChild, ElementRef} from '@angular/core';
 
 import { UIExtraDialog} from '../../../shared/services/ui-dialog.service';
 import {AssetComment} from './model/asset-coment.model';
+import {UIPromptService} from '../../directives/ui-prompt.directive';
+import {NgForm} from '@angular/forms';
+import {TranslatePipe} from '../../pipes/translate.pipe';
 
 @Component({
 	selector: 'dependent-comment',
 	template: `
-        <div class="modal fade in" id="dependent-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content resizable" [style.width.px]="500">
+        <div class="modal fade in" id="dependent-comment-component"
+             tds-handle-escape (escPressed)="cancelCloseDialog()"
+             data-backdrop="static" tabindex="-1" role="dialog">
+            <div class="modal-dialog tds-modal-content with-box-shadow has-side-nav modal-md" role="document">
                     <div class="modal-header">
-                        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                        <h4 class="modal-title">Comment for {{assetCommentModel.dialogTitle}}</h4>
+                        <tds-button-custom
+                                class="close"
+                                [icon]="'close'"
+                                (click)="cancelCloseDialog()"
+                                [displayLabel]="false"
+                                [flat]="true">
+                        </tds-button-custom>
+                        <div class="modal-title-container">
+                            <div class="modal-title">
+                                Comment for {{assetCommentModel.dialogTitle}}
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-body">
                         <div class="modal-body-container">
-                            <form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment">
+                            <form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm'>
                                 <div class="box-body">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -30,25 +42,15 @@ import {AssetComment} from './model/asset-coment.model';
                             </form>
                         </div>
                     </div>
-                    <div class="modal-footer form-group-center">
-                        <button type="button" (click)="onUpdateComment()" class="btn btn-primary pull-left"><span
-                                class="fa fa-fw fa-floppy-o"></span> Save
-                        </button>
-                        <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-                            <span class="glyphicon glyphicon-ban-circle"></span>
-                            <span>Cancel</span>
-                        </button>
+                    <div class="modal-sidenav btn-link">
+	                    <tds-button-edit class="selected-button"></tds-button-edit>
+						<tds-button-save (click)="onUpdateComment()" [disabled]="dependentForm && !dependentForm.dirty"></tds-button-save>
+						<tds-button-cancel (click)="cancelCloseDialog()" data-dismiss="modal"></tds-button-cancel>
                     </div>
-                </div>
             </div>
         </div>
 	`,
 	styles: [`
-			div.modal-body,
-			div.box-body
-			{
-				padding-bottom: 0px;
-            }
 			div.modal-title {
                 width: 453px;
                 white-space: nowrap;
@@ -58,8 +60,11 @@ import {AssetComment} from './model/asset-coment.model';
 	`]
 })
 export class DependentCommentComponent extends UIExtraDialog {
+	@ViewChild('dependentForm', {static: false}) dependentForm: NgForm;
 
 	constructor(
+		private translatePipe: TranslatePipe,
+		private promptService: UIPromptService,
 		public assetCommentModel: AssetComment) {
 		super('#dependent-comment-component');
 	}
@@ -72,7 +77,22 @@ export class DependentCommentComponent extends UIExtraDialog {
 	}
 
 	public cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.dependentForm.dirty) {
+			this.promptService.open(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
+				.then(confirm => {
+					if (confirm) {
+						this.dismiss();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.dismiss();
+		}
 	}
 
 	public onUpdateComment(): void {

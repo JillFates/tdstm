@@ -8,11 +8,15 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
-	DIALOG_SIZE, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
+	DIALOG_SIZE, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
 	PROMPT_DELETE_ITEMS_CONFIRMATION
 } from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {
+	COLUMN_MIN_WIDTH,
+	GridColumnModel,
+	SELECT_ALL_COLUMN_WIDTH
+} from '../../../../shared/model/data-list-grid.model';
 import {IMPORT_BATCH_PREFERENCES, PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -32,7 +36,8 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 export class ImportBatchListComponent implements OnDestroy {
 
 	public userTimeZone: string;
-
+	SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
+	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected BatchStatus = BatchStatus;
 	protected columnsModel: ImportBatchColumnsModel;
 	protected importBatchPreferences = {};
@@ -57,6 +62,8 @@ export class ImportBatchListComponent implements OnDestroy {
 	private readonly UNARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEMS_CONFIRMATION';
 	private runningBatches: Array<ImportBatchModel> = [];
 	private queuedBatches: Array<ImportBatchModel> = [];
+	showFilters: boolean;
+	disableClearFilters: () => {};
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -68,7 +75,6 @@ export class ImportBatchListComponent implements OnDestroy {
 		private userPreferenceService: PreferenceService,
 		private userContextService: UserContextService,
 		private route: ActivatedRoute) {
-
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
 				this.userTimeZone = userContext.timezone;
@@ -95,11 +101,19 @@ export class ImportBatchListComponent implements OnDestroy {
 					pageSize = GRID_DEFAULT_PAGE_SIZE;
 				}
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig, pageSize);
+				this.disableClearFilters = this.noFilterApplied.bind(this);
 				this.preSelectBatch();
 				this.setRunningLoop();
 				this.setQueuedLoop();
 			});
 		});
+	}
+
+	/**
+	 * Check if no filter has been applied.
+	 */
+	noFilterApplied(): boolean {
+		return !this.dataGridOperationsHelper.hasFilterApplied();
 	}
 
 	/**
@@ -219,7 +233,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	private confirmArchive(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
 		this.promptService.open(
-			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(ids.length === 1 ? this.ARCHIVE_ITEM_CONFIRMATION : this.ARCHIVE_ITEMS_CONFIRMATION),
 			'Confirm', 'Cancel').then(result => {
 			if (result) {
@@ -251,7 +265,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	private confirmUnarchive(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
 		this.promptService.open(
-			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(ids.length === 1 ? this.UNARCHIVE_ITEM_CONFIRMATION : this.UNARCHIVE_ITEMS_CONFIRMATION),
 			'Confirm', 'Cancel').then(result => {
 			if (result) {
@@ -617,6 +631,13 @@ export class ImportBatchListComponent implements OnDestroy {
 			// nothing to do here ..
 		});
 		this.dataGridOperationsHelper.pageChange($event)
+	}
+
+	/**
+	 * Show/Hide column filters
+	 */
+	toggleFilter(): void {
+		this.showFilters = !this.showFilters;
 	}
 
 	ngOnDestroy(): void {

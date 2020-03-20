@@ -32,7 +32,7 @@ export const AssetTagsRoute: Routes = [
 				title: 'ASSET_TAGS.MANAGE_TAGS',
 				instruction: '',
 				menu: ['GLOBAL.PROJECT', 'ASSET_TAGS.MANAGE_TAGS'],
-				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
+				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-projects-tags', subMenu: true}
 			},
 			requiresAuth: true,
 			requiresPermissions: [Permission.TagView],

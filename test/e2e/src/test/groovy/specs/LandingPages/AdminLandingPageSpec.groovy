@@ -13,7 +13,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class AdminLandingPageSpec extends GebReportingSpec {
@@ -21,7 +21,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
     static testCount
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage
@@ -41,13 +41,13 @@ class AdminLandingPageSpec extends GebReportingSpec {
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The User Clicks in the Admin > Menu'
-            adminModule.goToAdminMenu()
+            waitFor(30){adminModule.goToAdminMenu()}
 
         then: 'The number of elements displayed matches'
-        //We set the number of elements as 21 because we need to take into account the divisions among items
+        //We set the number of elements as 16 because we need to take into account the divisions among items
         //We could also do the assertion comparing the length of the text
         //adminModule.adminMenu.text().length() == x
-            adminModule.adminMenu.children().size() == 21
+            adminModule.adminMenu.children().size() == 16
             at MenuPage
     }
 
@@ -126,7 +126,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "11. Verify the Export Accounts Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>Export Accounts option'
             adminModule.goToExportAccounts()
 
@@ -134,15 +133,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             at ExportAccountsPage
     }
 
-    def "12. Verify the List Workflows Landing Page"() {
-        when: 'The User Clicks in the Admin>List Workflows option'
-            adminModule.goToListWorkflows()
-
-        then: 'We verify the List Workflows page loads fine'
-            at ListWorkflowsPage
-    }
-
-    def "13. Verify the List Manufacturers Landing Page"() {
+    def "12. Verify the List Manufacturers Landing Page"() {
         when: 'The User Clicks in the Admin>List Workflows option'
             adminModule.goToListManufacturers()
 
@@ -150,7 +141,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             at ListManufacturersPage
     }
 
-    def "14. Verify the List Models Landing Page"() {
+    def "13. Verify the List Models Landing Page"() {
         when: 'The User Clicks in the Admin>List Models option'
             adminModule.goToListModels()
 
@@ -158,7 +149,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
             at ListModelsPage
     }
 
-    def "15. Verify the Export Mfg & Models Landing Page"() {
+    def "14. Verify the Export Mfg & Models Landing Page"() {
         when: 'The User Clicks in the Admin>Export Mfg & Models option'
             adminModule.goToExportModels()
 

@@ -443,7 +443,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.UserResetOwnPassword)
 	def updatePassword() {
-		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand)
+		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand, false)
 		UserLogin userLogin = securityService.userLogin
 		try {
 			securityService.updatePassword(userLogin, command)

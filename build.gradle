@@ -5,10 +5,11 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-		classpath "org.grails.plugins:hibernate5:${gormVersion - ".RELEASE"}"
-		classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.14.8"
-		classpath 'org.grails.plugins:database-migration:3.0.4'
-		classpath 'org.grails.plugins:views-gradle:1.3.0'
+		classpath "org.grails.plugins:views-gradle:2.0.0.RC2"
+		classpath "org.grails.plugins:hibernate5:7.0.0"
+		classpath 'org.grails.plugins:database-migration:3.1.0.RC1'
+		classpath "gradle.plugin.com.github.erdi.webdriver-binaries:webdriver-binaries-gradle-plugin:2.0"
+		classpath "com.bertramlabs.plugins:asset-pipeline-gradle:3.0.11"
 	}
 }
 
@@ -17,18 +18,20 @@ plugins {
 	id "org.asciidoctor.convert"              version "1.5.3"
 }
 
-version "4.7.2-RC6"
+version "5.0.0-alpha"
 group "tdstm"
 
 apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "war"
 apply plugin: "org.grails.grails-web"
-apply plugin: "asset-pipeline"
-apply plugin: "org.grails.grails-gsp"
 apply plugin: "org.grails.plugins.views-json"
+apply plugin:"com.github.erdi.webdriver-binaries"
+apply plugin: "org.grails.grails-gsp"
+apply plugin:"com.bertramlabs.asset-pipeline"
 
 war {
+	enabled = true
     archiveName = "tdstm-${version}.war"
 	exclude '*/node_modules/*'
 }
@@ -42,6 +45,11 @@ repositories {
 }
 
 configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+
 	all {
 		exclude group: 'org.slf4j', module: 'slf4j-log4j12'
 		exclude module: 'bcmail-jdk14'
@@ -51,7 +59,16 @@ configurations {
 
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
+}
+
 dependencies {
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 	compile "org.springframework.boot:spring-boot-starter-logging"
 	compile "org.springframework.boot:spring-boot-autoconfigure"
 	compile "org.grails:grails-core"
@@ -68,13 +85,38 @@ dependencies {
 	compile "org.grails.plugins:cache"
 	compile "org.grails.plugins:async"
 	compile "org.grails.plugins:scaffolding"
+	compile "org.grails.plugins:views-json:2.0.0.RC2"
+	compile "org.grails.plugins:views-json-templates:2.0.0.RC2"
 	compile "org.grails.plugins:events"
 	compile "org.grails.plugins:hibernate5"
-	compile "org.hibernate:hibernate-core:5.1.5.Final"
+	compile "org.hibernate:hibernate-core:5.4.0.Final"
 	compile "org.hibernate:hibernate-ehcache"
 	compile "org.grails.plugins:gsp"
-	compile "org.grails.plugins:views-json:1.3.0"
-	compile 'org.grails:grails-datastore-rest-client:5.0.0.RC2'
+	compileOnly "io.micronaut:micronaut-inject-groovy"
+	compile 'org.codehaus.groovy:groovy-dateutil:2.5.6'
+
+	compile("org.quartz-scheduler:quartz:2.2.3") {
+		exclude group: 'slf4j-api', module: 'c3p0'
+	}
+	String springSecurityVersion = '5.1.2.RELEASE'
+	compile "org.springframework.security:spring-security-ldap:$springSecurityVersion", {
+		['apacheds-core', 'apacheds-core-entry', 'apacheds-protocol-ldap', 'apacheds-protocol-shared',
+		 'apacheds-server-jndi', 'commons-logging', 'fest-assert', 'jcl-over-slf4j', 'junit',
+		 'ldapsdk', 'logback-classic', 'mockito-core', 'shared-ldap', 'slf4j-api', 'spring-beans',
+		 'spring-context', 'spring-core', 'spring-ldap-core', 'spring-security-core',
+		 'spring-test', 'spring-tx'].each { exclude module: it }
+	}
+	compile 'org.springframework.ldap:spring-ldap-core:2.0.4.RELEASE', {
+		['commons-lang', 'gsbase', 'junit', 'mockito-core', 'powermock-api-mockito',
+		 'powermock-api-support', 'powermock-core', 'powermock-module-junit4',
+		 'powermock-module-junit4-common', 'powermock-reflect', 'slf4j-log4j12', 'spring-beans',
+		 'spring-core', 'spring-data-commons', 'spring-test', 'spring-tx'].each { exclude module: it }
+	}
+
+	compile('org.grails:grails-datastore-rest-client:6.1.9.RELEASE'){
+		exclude group:'org.grails', module:'grails-plugin-converters'
+	}
+
 	compile 'org.apache.httpcomponents:httpclient:4.5.5'
 	compile 'org.apache.commons:commons-lang3:3.8.1'
 	compile 'com.google.guava:guava:19.0'
@@ -104,7 +146,9 @@ dependencies {
 	runtime 'commons-httpclient:commons-httpclient:3.1'
 
 	// CSV Parser - https://github.com/xlson/groovycsv
-	compile 'com.xlson.groovycsv:groovycsv:1.2'
+	compile ('com.xlson.groovycsv:groovycsv:1.2'){
+		exclude group: 'org.codehaus.groovy', module:'groovy-all'
+	}
 
 	/*
 	 * GETL Groovy ETL - https://github.com/ascrus/getl/
@@ -114,21 +158,22 @@ dependencies {
 	compile('net.sourceforge.getl:getl:1.2.11') {
 		exclude group: 'org.apache.hadoop:hadoop-hdfs'
 		exclude group: 'org.apache.hadoop:hadoop-common'
+		exclude group: 'org.codehaus.groovy', module:'groovy-all'
 	}
 
 	testCompile 'com.stehno.ersatz:ersatz:1.9.0:safe@jar'
 
 	compile 'org.grails.plugins:ajax-tags:1.0.0.RC1' //TODO remove once we remove the GSP UI 2018-12-1
-	compile "org.grails.plugins:converters"
-	compile 'org.grails.plugins:external-config:1.2.2'
+	compile 'org.grails.plugins:converters:4.0.0'
+	compile 'org.grails.plugins:external-config:2.0.0'
 
 	compile 'org.grails.plugins:jasper:2.1.0.RC1'
 	compile 'org.grails.plugins:quartz:2.0.13'
-	compile 'org.grails.plugins:spring-security-core:3.2.3'
+	compile 'org.grails.plugins:spring-security-core:4.0.0.RC2'
 	compile 'org.grails.plugins:spring-security-ldap:3.0.2'
 
 
-	compile ('org.grails.plugins:spring-security-rest:2.0.0.RC1') {
+	compile ('org.grails.plugins:spring-security-rest:3.0.0.RC1') {
 		// Remove old Guava files packed in spring-security-rest plugin
 		exclude group: 'guava-io'
 		/*
@@ -142,7 +187,7 @@ dependencies {
 	//compile 'org.grails.plugins:cascade-validation:2.0.2'
 	compile 'org.grails.plugins:command:4.0.0'
 
-	compile 'org.grails.plugins:database-migration:3.0.4'
+	compile 'org.grails.plugins:database-migration:3.1.0.RC1'
 	compile 'org.grails.plugins:mail:2.0.0'
 	compile 'org.grails.plugins:grails-melody-plugin:1.74.0'
 
@@ -160,14 +205,16 @@ dependencies {
 	runtime "org.glassfish.web:el-impl:2.1.2-b03"
 	runtime "com.h2database:h2"
 	runtime "org.apache.tomcat:tomcat-jdbc"
-	runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.8"
+	runtime "javax.xml.bind:jaxb-api:2.3.0"
+	compile "com.bertramlabs.plugins:asset-pipeline-grails:3.0.11"
 
-	testCompile "org.grails:grails-test-mixins:3.3.0"
 	testCompile "org.grails:grails-gorm-testing-support"
+	testCompile "org.mockito:mockito-core"
+	testCompile "org.grails:grails-test-mixins:3.3.0"
 	testCompile "org.grails:grails-web-testing-support"
-	testCompile "org.grails.plugins:geb:1.1.2"
-	testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:2.47.1"
-	testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
+	testCompile "org.grails.plugins:geb:2.0.0.RC1"
+	testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.14.0"
+	testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.14.0"
 	testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
 	/*
 		Greenmail Plugin:
@@ -179,10 +226,27 @@ dependencies {
 }
 
 bootRun {
-	jvmArgs('-Dspring.output.ansi.enabled=always')
-	addResources = true
+	jvmArgs(
+        '-Dspring.output.ansi.enabled=always',
+        '-noverify',
+        '-XX:TieredStopAtLevel=1',
+        '-Xmx1024m')
+    sourceResources sourceSets.main
 	String springProfilesActive = 'spring.profiles.active'
 	systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+}
+
+tasks.withType(GroovyCompile) {
+   configure(groovyOptions.forkOptions) {
+       memoryMaximumSize = '3g'
+       jvmArgs = ['-Xms1024m', '-Xmx3g']
+   }
+}
+
+
+webdriverBinaries {
+    chromedriver '2.45.0'
+    geckodriver '0.24.0'
 }
 
 tasks.withType(Test) {
@@ -197,18 +261,12 @@ assets {
 	minifyCss = true
 }
 
-[bootRun, test, integrationTest, runScript, dbmUpdate, console].each { runTask ->
-	configure(runTask) {
-		systemProperties System.properties
-	}
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDir 'grails-app/migrations'
-        }
-    }
+// The run task added by the application plugin
+// is also of type JavaExec.
+tasks.withType(JavaExec) {
+	// Assign all Java system properties from
+	// the command line to the JavaExec task.
+	systemProperties System.properties
 }
 
 // Customize Git properties plugin.

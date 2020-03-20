@@ -1,4 +1,5 @@
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SettingType
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
@@ -6,8 +7,11 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.Setting
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject
@@ -20,7 +24,8 @@ import spock.lang.Stepwise
 class CustomDomainServiceTests extends Specification {
 
     CustomDomainService customDomainService
-    ProjectService projectService
+    ProjectService      projectService
+    SecurityService     securityService
 
     // Note that this JSON file is managed by the /misc/generateDomainFieldSpecs.groovy script
     // After generating the file it needs to be copied to the /grails-app/conf/ directory so it can be read
@@ -31,6 +36,7 @@ class CustomDomainServiceTests extends Specification {
     private AssetTestHelper assetHelper
     private CustomDomainTestHelper customDomainTestHelper
     private ProjectTestHelper projectHelper
+    private PersonTestHelper personHelper
 
     void setup(){
         assetHelper = new AssetTestHelper()
@@ -356,7 +362,23 @@ class CustomDomainServiceTests extends Specification {
             Project.withNewTransaction {
                 project = projectHelper.createProjectWithDefaultBundle()
                 Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
-                projectService.cloneDefaultSettings(project)
+
+                personHelper = new PersonTestHelper()
+
+                project = projectHelper.createProject()
+
+                Person adminPerson = personHelper.createStaff(projectService.getOwner(project))
+                assert adminPerson
+
+                // projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
+                UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
+                assert adminUser
+                assert adminUser.username
+
+                // logs the admin user into the system
+                securityService.assumeUserIdentity(adminUser.username, false)
+                // println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
+                assert securityService.isLoggedIn()
                 createAssets(project)
             }
 

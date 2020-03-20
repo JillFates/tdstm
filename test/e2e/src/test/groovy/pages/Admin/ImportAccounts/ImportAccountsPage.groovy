@@ -12,7 +12,7 @@ class ImportAccountsPage extends Page{
 
     static content = {
         adminModule { module AdminModule}
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
         step1Container { $("div", class:"account-import-step1")}
         importOptions { $("select#importOption option")}
         uploadButton { step1Container.find("button[type=submit]")}

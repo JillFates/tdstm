@@ -6,9 +6,9 @@ class TabHistoryTabActionsPage extends Page {
 
     static at = {
         hisTabActTab.parent(".active")
-        hisTabActTabResetBtn.text() == "Reset"
-        hisTabActTabRefreshBtn.text() == "Refresh"
-        hisTabActTabDeleteBtn.text() == "Delete"
+        hisTabActTabResetBtn.text() == "RESET"
+        hisTabActTabRefreshBtn.text() == "REFRESH"
+        hisTabActTabDeleteBtn.text() == "DELETE"
     }
 
     static content = {

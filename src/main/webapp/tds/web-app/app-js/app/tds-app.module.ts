@@ -25,7 +25,7 @@ import { ProjectService } from '../modules/project/service/project.service';
 	imports: [
 	NgxsModule.forRoot([TDSAppState, UserContextState]),
 		NgxsReduxDevtoolsPluginModule.forRoot(),
-		NgxsLoggerPluginModule.forRoot(),
+		NgxsLoggerPluginModule.forRoot({disabled: true}),
 		// Angular Modules
 		BrowserModule,
 		HttpClientModule,

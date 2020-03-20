@@ -14,8 +14,8 @@ class ActivityMetricsPage extends Page {
     }
 
     static content = {
-        activityMetricsPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        activityMetricsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
+        activityMetricsPageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        activityMetricsPageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         reportsModule { module ReportsMenuModule}
         commonsModule { module CommonsModule }
     }

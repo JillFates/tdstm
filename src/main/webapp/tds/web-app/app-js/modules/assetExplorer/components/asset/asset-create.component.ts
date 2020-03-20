@@ -8,26 +8,34 @@ import {
 	Injector,
 	Compiler,
 	NgModuleRef,
-	Inject
+	Inject, OnInit
 } from '@angular/core';
-
-import {Observable} from 'rxjs';
+// Model
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {Permission} from '../../../../shared/model/permission.model';
+// Component
 import {DynamicComponent} from '../../../../shared/components/dynamic.component';
-
 import {DatabaseCreateComponent} from '../database/database-create.component';
 import {StorageCreateComponent} from '../storage/storage-create.component';
 import {DeviceCreateComponent} from '../device/device-create.component';
 import {ApplicationCreateComponent} from '../application/application-create.component';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+// Service
 import {TagService} from '../../../assetTags/service/tag.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+// Other
+import {Observable} from 'rxjs';
+import {DialogButtonType} from 'tds-component-library';
+import {AssetCommonEdit} from './asset-common-edit';
 
 @Component({
 	selector: `tds-asset-all-create`,
 	template: `<div #view></div>`
 })
-export class AssetCreateComponent extends DynamicComponent implements AfterViewInit {
+export class AssetCreateComponent extends DynamicComponent implements OnInit, AfterViewInit {
 
-	@ViewChild('view', {read: ViewContainerRef}) view: ViewContainerRef;
+	@ViewChild('view', {read: ViewContainerRef, static: true}) view: ViewContainerRef;
+
+	public asset;
 
 	constructor(
 		inj: Injector,
@@ -35,8 +43,27 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 		mod: NgModuleRef<any>,
 		private http: HttpClient,
 		private tagService: TagService,
-		@Inject('ASSET') private asset: 'APPLICATION' | 'DATABASE' | 'DEVICE' | 'STORAGE') {
+		private permissionService: PermissionService) {
 		super(inj, comp, mod);
+	}
+
+	ngOnInit(): void {
+		this.asset = this.data.assetClass;
+
+		this.buttons.push({
+			name: 'saveAsset',
+			icon: 'floppy',
+			show: () => this.isEditAvailable(),
+			type: DialogButtonType.ACTION,
+		});
+
+		this.buttons.push({
+			name: 'cancelEdit',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.onDismiss.bind(this)
+		});
 	}
 
 	ngAfterViewInit() {
@@ -54,16 +81,16 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 					setTimeout( () => {
 						switch (this.asset) {
 							case 'APPLICATION':
-								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 							case 'DATABASE':
-								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 							case 'DEVICE':
-								this.registerAndCreate(DeviceCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(DeviceCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 							case 'STORAGE':
-								this.registerAndCreate(StorageCreateComponent(template, model, metadata), this.view);
+								this.registerAndCreate(StorageCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
 								break;
 
 						}
@@ -72,6 +99,22 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 					console.error('Error: ');
 					console.error(error);
 				});
+		});
+	}
+
+	/**
+	 * Prepare the Dialog to map the buttons, with this all buttons are the same for every Dialog
+	 * @param componentRef
+	 */
+	private prepareButtonsReference(componentRef: any): void {
+		// @ts-ignore
+		const lastComponent = <AssetCommonEdit>componentRef.instance;
+		this.changeButton('saveAsset', {
+			action: lastComponent.submitForm,
+			disabled: () => (!lastComponent.isDependenciesValidForm),
+		});
+		this.changeButton('cancelEdit', {
+			action: lastComponent.onCancelEdit
 		});
 	}
 
@@ -109,6 +152,10 @@ export class AssetCreateComponent extends DynamicComponent implements AfterViewI
 			});
 		});
 		return promise;
+	}
+
+	private isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetEdit);
 	}
 
 	private handleError(error: string): void {

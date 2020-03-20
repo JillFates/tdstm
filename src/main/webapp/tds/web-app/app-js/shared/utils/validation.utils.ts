@@ -4,6 +4,7 @@
 
 import {Injectable} from '@angular/core';
 
+declare var jQuery: any;
 /**
  * Intended to be a helper validation class that can be used
  * across all components in order to make common validations.
@@ -81,4 +82,24 @@ export class ValidationUtils {
 		return pattern.test(url);
 	}
 
+	/**
+	 * Determines if the class or one of its parents belongs to a banned class
+	 * @param bannedClasses
+	 * @param event
+	 * @return Boolean
+	 */
+	static isBannedClass(bannedClasses: string[], event: MouseEvent): boolean {
+		const isChildOfBannedClass = bannedClasses.find((className: string) => {
+			const name = event.target && event.target['className'] || '';
+
+			// banned by parent
+			const counter =  jQuery(event.target).parents(`.${className}`).length;
+			// banned by class
+			const isBannedClass = bannedClasses.find((item: string) => name.indexOf(item) !== -1);
+
+			return counter > 0 || Boolean(isBannedClass);
+		});
+
+		return Boolean(isChildOfBannedClass);
+	}
 }

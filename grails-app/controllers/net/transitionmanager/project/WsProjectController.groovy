@@ -17,7 +17,6 @@ import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
-
 /**
  * Handles WS calls of the ProjectsService
  */
@@ -88,6 +87,7 @@ class WsProjectController implements ControllerMethods {
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 		// Copy plan methodology field from the default project
 		Project defaultProject = Project.defaultProject
+
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 
@@ -147,7 +147,7 @@ class WsProjectController implements ControllerMethods {
 
 		renderSuccessJson([
 				  clients              : projectDetails.clients,
-				  projectInstance      : project,
+				  projectInstance      : project.toMap(),
 				  timezone             : project.timezone?.label ?: '',
 				  client               : project.client,
 				  defaultBundle        : project.defaultBundle.toMap(),
@@ -167,8 +167,6 @@ class WsProjectController implements ControllerMethods {
 	@HasPermission(Permission.ProjectEdit)
 	def saveProject(String projectId) {
 		ProjectCommand projectCommand = populateCommandObject(ProjectCommand)
-
-		validateCommandObject(projectCommand)
 
 		if (projectId) {
 			projectCommand.id = projectId.toLong()

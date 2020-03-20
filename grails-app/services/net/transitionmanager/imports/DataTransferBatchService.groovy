@@ -13,7 +13,7 @@ class DataTransferBatchService {
 	 * @return
 	 */
 	void delete(DataTransferBatch dataTransferBatch) {
-		DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?", [dataTransferBatch])
+		DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?0", [dataTransferBatch])
 		dataTransferBatch.delete()
 	}
 

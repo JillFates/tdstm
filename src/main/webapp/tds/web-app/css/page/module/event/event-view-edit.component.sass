@@ -1,37 +1,49 @@
 .event-view-edit-component
   font-size: 12px
   font-family: helvetica, arial, sans-serif
-  .modal-body-container
-    .assetTag
-      padding: 5px
-      margin-right: 4px
-    select
-      width: 180px
-    .required
-      float: right
-      font-size: 9px
-      color: red
-    table
-      width: 100%
-      .name
-        white-space: nowrap
-        width: 15%
-        font-weight: bold
-      .value
-        width: 85%
-        .k-dateinput-wrap input
-          font-size: 12px !important
-        input[type=text]
-          width: 180px
-        ul
-          padding-left: 0px
-        .k-switch.asset-tag
-          display: none
-      td
-        line-height: 12px
-        padding: 4px 5px
-        text-align: left
-        vertical-align: top
+  .clr-form-control
+    margin-top: unset
+  .assetTag
+    display: inline-block
+    margin-top: 2px
+    padding: 5px
+    margin-right: 4px
+  tds-asset-tag-selector
+    .asset-tag-selector-component
+      kendo-multiselect
+        display: block !important
+        width: 172px !important
+  select
+    width: 180px
+  .required
+    float: right
+    font-size: 9px
+    color: red
+  table
+    width: 100%
+    .name
+      white-space: nowrap
+      width: 15%
+      font-weight: bold
+    .value
+      width: 85%
+      .k-dateinput-wrap input
+        font-size: 12px !important
+      input[type=text]
+        width: 180px
+      ul
+        padding-left: 0px
+      .k-switch.asset-tag
+        display: none
+    td
+      line-height: 12px
+      padding: 4px 5px
+      text-align: left
+      vertical-align: top
+      label, ul
+        margin-top: 10px
+      label.api-action-bypass
+        margin-top: 15px
   .btn
     margin-right: 4px
   input[type=checkbox]

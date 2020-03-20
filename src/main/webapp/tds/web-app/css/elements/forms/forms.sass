@@ -1,14 +1,20 @@
 // Some elements are not always inside a form, this allow to workaround some scenarios
 
 /* Applicable to All Forms */
+@import "invalid-input"
+
 form
-    .form-horizontal
+  .form-horizontal
     &.left-alignment
         div.form-group
             label
                 text-align: left
             &.sub-option-50
                 padding-left: 50px
+  .required-field::after
+    content: "*"
+    color: $color-danger--red
+    margin-left: 4px
 
 .form-group
   label.label-detail
@@ -111,6 +117,8 @@ form
   height: 100%
 .element-height-100-per-i
   height: 100% !important
+.float-left
+  float: left
 .float-right
   float: right
 
@@ -151,9 +159,6 @@ i.red
 div.error, span.error
   color: $color--red
 
-.is-grid-link, .is-link, .is-clickeable
-  cursor: pointer
-  font-weight: bold
 .pointer
   cursor: pointer
 
@@ -187,11 +192,6 @@ div.error, span.error
   font-size: 12px
   align-items: flex-start
 
-kendo-dropdownlist
-  &.form-control
-    &.error, &.has-error
-      border: 1px #f00 solid
-
 // invisible button style for exit on esc key help.
 button.invisible-button
   background-color: transparent
@@ -212,3 +212,12 @@ button.invisible-button:focus
 .hide, .invisible
   visibility: hidden !important
   display: none !important
+
+.inline
+  display: inline-block
+
+input[type="text"]
+  padding-left: 5px
+
+.overflow-visible
+  overflow: visible !important

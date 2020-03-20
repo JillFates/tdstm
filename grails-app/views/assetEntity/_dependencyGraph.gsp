@@ -147,13 +147,11 @@ function listCheck () {
 $('#tabTypeId').val('graph')
 
 </script>
-<div class="tabs">
-	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
-	<div class="tabInner">
-		<input type="hidden" id="assetTypesId" name="assetType" value="${asset}" />
-		<div id="item1" style="float: left;" class="graphContainer">
-			<g:render template="map" model="${pageScope.variables}"/>
-		</div>
+<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
+<div class="tabInner">
+	<input type="hidden" id="assetTypesId" name="assetType" value="${asset}" />
+	<div id="item1" style="float: left;" class="graphContainer">
+		<g:render template="map" model="${pageScope.variables}"/>
 	</div>
 </div>
 

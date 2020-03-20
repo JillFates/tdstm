@@ -1,41 +1,31 @@
-import {AfterViewInit, Component, Inject} from '@angular/core';
-import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
+import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {ScriptConsoleSettingsModel} from '../../model/script-result.models';
-import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
-
-declare var jQuery: any;
-const DIALOG_ID = '#viewConsole';
+import {Dialog} from 'tds-component-library';
 
 @Component({
 	selector: 'data-script-console',
-	templateUrl: 'data-script-console.component.html'
+	templateUrl: 'data-script-console.component.html',
 })
-export class DataScriptConsoleComponent extends UIExtraDialog implements AfterViewInit {
-	public isWindowMaximized = false;
-	public initialWindowStyle = null;
-	public modalOptions: DecoratorOptions;
-	constructor(public consoleSettings: ScriptConsoleSettingsModel) {
-		super(DIALOG_ID);
-		this.modalOptions = { isFullScreen: true, isResizable: true };
-	}
+export class DataScriptConsoleComponent extends Dialog implements OnInit {
+	@Input() data: any;
+	public consoleSettings;
 
-	ngAfterViewInit(): void {
-		console.log('after view init');
+	ngOnInit(): void {
+		this.consoleSettings = Object.assign({}, this.data.consoleSettingsModel);
 	}
 
 	/**
 	 * On close dialog store position/size settings.
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss();
+		this.onCancelClose();
 	}
 
-	protected maximizeWindow() {
-		this.isWindowMaximized = true;
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
-
-	protected restoreWindow() {
-		this.isWindowMaximized = false;
-	}
-
 }

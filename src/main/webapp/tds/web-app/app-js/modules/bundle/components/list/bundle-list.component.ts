@@ -1,169 +1,280 @@
-import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
-import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
+// Angular
+import {AfterContentInit, Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 // Store
 import {Store} from '@ngxs/store';
+import {UserContextState} from '../../../auth/state/user-context.state';
 // Actions
 import {SetBundle} from '../../action/bundle.actions';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {GridDataResult} from '@progress/kendo-angular-grid';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute} from '@angular/router';
-import {BundleService} from '../../service/bundle.service';
-import {BundleColumnModel, BundleModel} from '../../model/bundle.model';
-import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
-import {BundleCreateComponent} from '../create/bundle-create.component';
+// Component
 import {BundleViewEditComponent} from '../view-edit/bundle-view-edit.component';
-
-declare var jQuery: any;
+// Model
+import {ActionType} from '../../../dataScript/model/data-script.model';
+import {BundleColumnModel, BundleModel} from '../../model/bundle.model';
+import {
+	ColumnHeaderData, DialogConfirmAction, DialogService,
+	GridComponent,
+	GridModel,
+	GridRowAction,
+	GridSettings,
+	HeaderActionButtonData, ModalSize
+} from 'tds-component-library';
+import {Permission} from '../../../../shared/model/permission.model';
+import {EventModel} from '../../../event/model/event.model';
+import {ProviderModel} from '../../../provider/model/provider.model';
+// Component
+import {BundleCreateComponent} from '../create/bundle-create.component';
+// Service
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {BundleService} from '../../service/bundle.service';
+// Other
+import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: `bundle-list`,
 	templateUrl: 'bundle-list.component.html',
 })
-export class BundleListComponent implements OnInit, AfterContentInit {
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
-		filter: {
-			filters: [],
-			logic: 'and'
-		}
+export class BundleListComponent implements OnInit, AfterContentInit, OnDestroy {
+	public gridRowActions: GridRowAction[];
+
+	public headerActions: HeaderActionButtonData[];
+
+	public gridSettings: GridSettings = {
+		defaultSort: [{field: 'title', dir: 'asc'}],
+		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
 	};
-	public skip = 0;
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
-	public bundleColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public gridData: GridDataResult;
-	public resultSet: BundleModel[];
-	public canEditBundle;
-	public dateFormat = '';
-	public booleanFilterData = BooleanFilterData;
-	public defaultBooleanFilterData = DefaultBooleanFilterData;
+
+	protected columnModel: ColumnHeaderData[];
+
+	protected gridModel: GridModel;
+	protected dateFormat = '';
+
+	private navigationSubscription;
+	private bundleToOpen: string;
+	private bundleOpen = false;
+
+	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
 
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
-		private bundleService: BundleService,
-		private prompt: UIPromptService,
 		private preferenceService: PreferenceService,
-		private route: ActivatedRoute,
-		private elementRef: ElementRef,
+		private bundleService: BundleService,
+		private translateService: TranslatePipe,
 		private store: Store,
-		private renderer: Renderer2) {
-		this.state.take = this.pageSize;
-		this.state.skip = this.skip;
-		this.resultSet = this.route.snapshot.data['bundles'];
-		this.gridData = process(this.resultSet, this.state);
+		private router: Router,
+		private route: ActivatedRoute
+	) {
 	}
 
-	ngOnInit() {
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
-				this.dateFormat = dateFormat;
-				this.bundleColumnModel = new BundleColumnModel(`{0:${dateFormat}}`);
-			});
-		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
+	/**
+	 * Initialize the grid settings.
+	 */
+	async ngOnInit() {
+		this.gridRowActions = [
+			{
+				name: 'Edit',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onDelete,
+			},
+		];
+
+		this.headerActions = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateBundle,
+			}];
+
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
+
+		this.dateFormat = await this.preferenceService
+			.getUserDatePreferenceAsKendoFormat()
+			.toPromise();
+
+		this.columnModel = new BundleColumnModel(
+			this.dateFormat
+		).columns;
+
+		this.gridModel.columnModel = this.columnModel;
 	}
 
 	ngAfterContentInit() {
-		if (this.route.snapshot.queryParams['show']) {
-			let {id, name} = this.resultSet.find((bundle: any) => {
-				return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0);
-			});
-			setTimeout(() => {
-				this.showBundle(id, name);
-			});
-		}
-	}
+		this.bundleToOpen = this.route.snapshot.queryParams['show'];
+		// The following code Listen to any change made on the route to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event && event.state && event.state && event.state.url.indexOf('/bundle/list') !== -1) {
+				this.bundleToOpen = event.state.root.queryParams.show;
+			}
+			if (event instanceof NavigationEnd && this.bundleToOpen && this.bundleToOpen.length) {
+				setTimeout(() => {
+					if (!this.bundleOpen) {
+						this.openBundle({id: parseInt(this.bundleToOpen, 10)}, ActionType.VIEW);
+					}
+				}, 500);
+			}
+		});
 
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected onFilter(column: any): void {
-		const root = this.bundleService.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
-
-	protected clearValue(column: any): void {
-		this.bundleService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
-	}
-
-	protected showBundle(id, name): void {
-		this.store.dispatch(new SetBundle({id: id, name: name}));
-		this.dialogService.open(BundleViewEditComponent,
-			[{provide: 'id', useValue: id}]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
+		this.route.queryParams.subscribe(params => {
+			if (this.bundleToOpen) {
+				setTimeout(() => {
+					if (!this.bundleOpen) {
+						this.openBundle({id: parseInt(this.bundleToOpen, 10)}, ActionType.VIEW);
+					}
+				}, 500);
+			}
 		});
 	}
 
-	protected openCreateBundle(): void {
-		this.dialogService.open(BundleCreateComponent,
-			[]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
-		});
+	public async cellClick(event: CellClickEvent): Promise<void> {
+		if (event.columnIndex > 0 && this.isEditAvailable()) {
+			await this.openBundle(event.dataItem, ActionType.VIEW, false);
+		}
 	}
 
-	protected reloadData(): void {
-		this.bundleService.getBundles().subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
-			},
-			(err) => console.log(err));
-	}
+	public loadData = async (): Promise<BundleModel[]> => {
+		try {
+			return await this.bundleService.getBundles().toPromise();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	};
+
+	public onCreateBundle = async (): Promise<void> => {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: BundleCreateComponent,
+				data: {},
+				modalConfiguration: {
+					title: 'Bundle Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	};
 
 	/**
-	 * This work as a temporary fix.
-	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
+	 * Select the current element and open the Edit Dialog
+	 * @param dataItem
 	 */
-	private forceDisplayLastRowAddedToGrid(): void {
-		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
-		this.renderer.setStyle(target, 'height', '36px');
-	}
-
-	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
-	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
+	private onEdit = async (dataItem: ProviderModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				await this.openBundle(dataItem, ActionType.EDIT, true);
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
+	 * On Delete Event
 	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
-		// Adjusting the locked column(s) height to prevent cut-off issues.
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	public onDelete = async (dataItem: EventModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				const confirmation = await this.dialogService.confirm(
+					'Confirmation Required',
+					'WARNING: Deleting this bundle will remove any teams and any related step data'
+				).toPromise();
+				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+					this.bundleService.deleteBundle(dataItem.id).toPromise();
+					await this.gridComponent.reloadData();
+					setTimeout(() => {
+						// If the Delete Item is the one selected, remove it from the Storage
+						const bundle = this.store.selectSnapshot(UserContextState.getUserBundle);
+						if (bundle.id === dataItem.id) {
+							this.store.dispatch(new SetBundle(null));
+						}
+					});
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	public async openBundle(bundle: any, actionType: ActionType, openFromList = false): Promise<void> {
+		try {
+			if (bundle.name) {
+				this.store.dispatch(new SetBundle({id: bundle.id, name: bundle.name}));
+			}
+			this.bundleOpen = true;
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: BundleViewEditComponent,
+				data: {
+					bundleId: bundle.id,
+					actionType: actionType,
+					openFromList: openFromList
+				},
+				modalConfiguration: {
+					title: 'Bundle',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			this.bundleOpen = false;
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	}
+
+	/**
+	 * Determine if the user has the permission to edit bundles
+	 */
+	protected isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.BundleEdit);
+	}
+
+	/**
+	 * Determine if the user has the permission to create bundles
+	 */
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.BundleCreate);
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 }

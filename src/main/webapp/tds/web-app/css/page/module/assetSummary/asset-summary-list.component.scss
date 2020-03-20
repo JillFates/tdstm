@@ -1,21 +1,19 @@
 .asset-summary-list-component {
-  div.just-planning {
-    display: inline;
-    label {
-      margin-top: 2px;
-    }
-    .component-action-just-planning {
-      margin-left: 5px;
-      margin-top: 5px;
-    }
-    .just-planing-label {
-      margin-left: 4px;
-    }
+  .clr-checkbox-wrapper {
+    padding-top: 13px;
+  }
+  .box-with-empty-header {
+    padding-top: 4px !important;
+    padding-left: 0px !important;
   }
   kendo-grid {
     thead {
+      th {
+        top: 3px;
+      }
       th:not(:first-child) {
         cursor: pointer;
+        text-align: center;
         label {
           cursor: pointer;
         }
@@ -34,7 +32,7 @@
             cursor: pointer;
           }
           td:not(:first-child) {
-            text-align: right;
+            text-align: center;
             padding-right: 8px;
             color: $color--black3;
             font-weight: bold;
@@ -45,9 +43,11 @@
     }
     tfoot {
       tr {
-        td {
+        td:not(:first-child) {
+          text-align: center;
+        }
+        td:first-child {
           text-align: right;
-          padding-right: 8px;
         }
       }
     }

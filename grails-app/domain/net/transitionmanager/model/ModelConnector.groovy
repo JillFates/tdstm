@@ -52,12 +52,9 @@ class ModelConnector {
 	}
 
 	def beforeDelete = {
-		withNewSession {
-			executeUpdate('delete AssetCableMap where assetFromPort=?', [this])
-			GormUtil.flushAndClearSession()
-			executeUpdate('update AssetCableMap set cableStatus=?, assetTo=null, assetToPort=null ' +
-			              'where assetToPort=?', [UNKNOWN, this])
-		}
+			executeUpdate('delete AssetCableMap where assetFromPort=?0', [this])
+			executeUpdate('update AssetCableMap set cableStatus=?0, assetTo=null, assetToPort=null ' +
+			              'where assetToPort=?1', [UNKNOWN, this])
 	}
 
 	List<AssetCableMap> getFromConnectorCableMaps() {

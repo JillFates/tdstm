@@ -7,7 +7,7 @@ import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class ETLScriptsEditionSpec extends GebReportingSpec{
@@ -23,7 +23,7 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
     static datascriptInfo
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

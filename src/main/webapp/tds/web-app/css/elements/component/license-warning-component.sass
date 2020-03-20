@@ -1,43 +1,72 @@
+.content-middle
+	display: flex
+	align-items: center
+	h2
+		margin-top: 0
+.breadcrumb-container
+	cursor: default
+	padding: 0 5px
+	list-style: none
+	border-radius: 4px
+	li
+		display: inline-block
+		color: $color--black3
+		font-weight: bold
+	li + li:before
+		padding: 0 5px
+		color: #ccc
+		content: "\003E"
+	> .licensing-banner-message
+		&.breadcumb-1
+			right: 7%
+		&.breadcumb-2
+			right: 9%
+		&.breadcumb-3
+			right: 10%
+		&.breadcumb-4
+			right: 12%
 div.license-warning-component
-  .btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus
-    outline: none
-    outline: none
-    box-shadow: none
-  a.licensing-error-warning
-    i
+.btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus
+	outline: none
+	box-shadow: none
+a.licensing-error-warning
+	i
       margin-top: 8px
+	border: 0px
 
 i.licensing-error-warning
-  color: $warningLicense
-  font-size: 18px
+	color: $warningLicense
+	font-size: 18px
 
 div.license-warning-message-button
   text-align: center
   margin-top: 10px
 
-.licensing-banner-message
-  text-align: center
-  .callout
-    color: #DB8700
-    background: none
-    padding: 4px 12px 4px 12px
-    font-size: 14px
-    position: absolute
-    left: 0
-    right: 0
-    margin: auto
 
+.breadcrumb-container.licensing-banner-message
+	background: none !important
+
+.licensing-banner-message
+	text-align: center
+	.callout
+		line-height: 25px
+		font-size: 12px
+		color: $color-text
+		background: $color-active-light4
+		border: 1px solid $color-active-light3
+		padding: 2px
+		position: relative
+		margin: 0
 @media(min-width: 992px)
-  .licensing-banner-message
-    float: initial !important
-    max-width: 400px
-    margin: 0 auto
-    position: relative !important
-    top: -25px !important
+	.licensing-banner-message
+		float: initial !important
+		max-width: 400px
+		margin: 0 auto
+		position: relative !important
 
 @media (max-width: 991px)
-  .content-header>.breadcrumb.licensing-banner-message
-    background: none
-    .callout
-      margin-right: 0px
-      position: initial !important
+	.breadcrumb.licensing-banner-message
+		background: none
+		.callout
+			margin-right: 0px
+			position: initial !important

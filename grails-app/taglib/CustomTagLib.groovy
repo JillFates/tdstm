@@ -353,8 +353,8 @@ class CustomTagLib implements InitializingBean {
 		Boolean justPlanningOptIn = BooleanUtils.toBoolean(attrs.justPlanningOptIn as String)
 
 		out << "<!-- Content Header (Page header) -->"
-		out << "<section class=\"content-header\">"
-		out << "<h1> " << title
+		out << "<section class=\"content-header\"><div class=\"clr-row\">"
+		out << "<div class=\"clr-col-4 clr-align-content-center\"><div class=\"legacy-content-middle\"><h2> " << title
 		if (justPlanningOptIn) {
 			Boolean justPlanning  = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING))
 			out << " <span style=\"margin-left: 15px; font-size: 15px;\"><input type=\"checkbox\" id=\"justPlanning\" onclick=\"toggleJustPlanning(\$(this))\" "
@@ -363,26 +363,26 @@ class CustomTagLib implements InitializingBean {
 			}
 			out << '/><label style="font-weight: 600 !important;" for="justPlanning">&nbsp;Just Planning</label></span>'
 		}
-		out << '</h1>'
+		out << '</h2></div></div>'
 
 		Map licenseInfo = licenseAdminService.licenseInfo(securityService.getUserCurrentProject())
 
+		out <<	'<div class="clr-col-4 clr-align-content-center legacy-licensing-banner-message-container">'
 		if(licenseInfo.banner) {
 			out << """
-				<div class="breadcrumb licensing-banner-message breadcrumb-${crumbs.size}">
-					<div class="callout">
-						<p><strong>${licenseInfo.banner}</strong></p>
-					</div>
+				<div class="legacy-licensing-banner-message breadcrumb-${crumbs.size}">
+					<div class="callout">${licenseInfo.banner}</div>
 				</div>"""
 		}
+		out << '</div>'
 
-		out << '<ol class="breadcrumb">'
+		out << '<div class="clr-col-4 clr-align-content-center legacy-breadcrumb-container"><ol class="legacy-breadcrumb">'
 			crumbs.each {
 				out << '<li><a href="#">' << it << '</a></li>'
 			}
-		out << '</ol>'
+		out << '</ol></div>'
 
-		out << '</section>'
+		out << '</div></section>'
 	}
 
 	/**
@@ -397,7 +397,7 @@ class CustomTagLib implements InitializingBean {
 			if(stateMessage) {
 				// Bootstrap converts the html entities into real elements
 				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/module/license/admin/list&apos;&quot;"
-				out << "<a class='licensing-error-warning btn' href=\"#\" data-html=\"true\" data-toggle=\"popover\" tabindex=\"0\"  data-trigger=\"focus\" data-content=\" <div class='license-warning-message' style='word-wrap: break-word;'> <p>" << stateMessage << "</p> </div><div class='license-warning-message-button'><button type='button' class='btn btn-primary' " <<  administerLicenseButtonURL << "  >Administer License</button></div> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
+				out << "<a class='licensing-error-warning btn' href=\"#\" data-html=\"true\" data-toggle=\"popover\" tabindex=\"0\"  data-trigger=\"focus\" data-content=\" <div class='license-warning-message' style='word-wrap: break-word;'> <p>" << stateMessage << "</p> </div><div class='license-warning-message-button'><button type='button' class='btn btn-primary' " <<  administerLicenseButtonURL << "  >Administer License</button></div> \"><i class=\"fa fa-fw fa-exclamation-triangle licensing-error-warning\"></i></a>"
 			}
 		}
 	}
@@ -568,12 +568,12 @@ class CustomTagLib implements InitializingBean {
 	 */
 	def showDependencyGroup = { attrs ->
 		if (!attrs.groupId) {
-			out << " "
+			out << ""
 		} else {
 			def value = dependencyGroupValueWithTooltip(attrs.groupId)
 			def tabName = attrs.tab ?: 'map'
-			def url = g.link( mapping: "dependencyConsoleMap", params: [subsection: tabName, groupId:attrs.groupId, assetName: attrs.assetName], value)
-			out << ':' + url
+			def url = g.link( mapping: "dependencyConsoleMap", params: [subsection: tabName, groupId:attrs.groupId, assetName: attrs.assetName], value,  target: "_blank")
+			out << '' + url
 		}
 	}
 

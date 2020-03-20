@@ -14,14 +14,16 @@ class LoginPage extends Page {
         title == "Login"
         waitFor(8){username.displayed}
         waitFor(8){password.displayed}
-        waitFor(8){submitButton.displayed}
+        //waitFor(8){submitButton.displayed}
     }
 
     static content = {
+        domain {$("select", name:"authority")}
+        domainSelectorValues(wait:true, required:false) { $("option")}
         username { $("#usernameid") }
         password { $("input", name:"password") }
-        submitButton { $("#submitButton") }
-        errorMessage { $("div", class:"message")}
+        submitButton { $("tds-button#loginBtn") }
+        errorMessage { $("span", class:"alert-text")}
         commonsModule { module CommonsModule }
     }
 
@@ -37,6 +39,7 @@ class LoginPage extends Page {
          * The following two lines will use the credentials in the testData.txt file unless
          * different credentials are provided when executing.
          */
+        selectDomain()
         username = System.properties['tm.creds.username']?: userCredentials.user
         password =  System.properties['tm.creds.password'] ?: userCredentials.pass
         submitButton.click()
@@ -47,6 +50,7 @@ class LoginPage extends Page {
     @param: numAttempts  set the number of attempts, after the 3rd one the user gets locked so we use 2 by default
      */
     def loginWrongPass(Integer numAttempts = 2) {
+        selectDomain()
         def log=new Login()
         def credentials=log.readCredentials()
 
@@ -66,25 +70,29 @@ class LoginPage extends Page {
     @param: numAttempts  set the number of attempts
      */
     def loginWrongUser(Integer numAttempts = 2) {
+        selectDomain()
         while (numAttempts != 0) {
             username = CommonActions.getRandomString(10)
             password = CommonActions.getRandomString(8)
             submitButton.click()
             verifyWrongUserError()
             numAttempts--
-            commonsModule.waitForLoader(5)
+            commonsModule.waitForLoader(10)
         }
     }
 
     def verifyWrongPassError(){
-        errorMessage.text() == "Username and password are required"
+        waitFor(2){errorMessage.displayed}
+        errorMessage.text() == "Username and password are invalid"
     }
 
     def verifyWrongUserError(){
+        waitFor(2){errorMessage.displayed}
         errorMessage.text() == "Invalid username and/or password"
     }
 
     def verifyLockedUserError(){
+        waitFor(2){errorMessage.displayed}
         errorMessage.text().contains("Your account is presently locked")
     }
 
@@ -101,5 +109,11 @@ class LoginPage extends Page {
             true //We break once the user is locked
         } else if(verifyLockedUserError()) //This is the scenario where the username is already locked, so we do nothing
             true
+    }
+
+    def selectDomain(){
+        domain.click()
+        waitFor { domainSelectorValues.size() > 0 }
+        domainSelectorValues[1].click()
     }
 }

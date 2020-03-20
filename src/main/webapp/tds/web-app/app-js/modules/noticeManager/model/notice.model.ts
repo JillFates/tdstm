@@ -1,50 +1,78 @@
-export class NoticeColumnModel {
-	columns: any[];
+import {
+	ColumnHeaderData,
+	FilterType,
+	DropdownFilterData,
+} from 'tds-component-library';
 
-	constructor(dateFormat: string) {
+export class NoticeColumnModel {
+	public columns: ColumnHeaderData[];
+
+	constructor(dateFormat: string, typeDropdownData: DropdownFilterData) {
 		this.columns = [
 			{
 				label: 'Title',
 				property: 'title',
-				type: 'text',
-				width: 250,
-			}, {
+				filterType: FilterType.text
+			},
+			{
 				label: 'Type',
 				property: 'typeId',
-				type: 'text',
-				width: 270,
-			}, {
+				filterType: FilterType.dropdown,
+				filterInputData: typeDropdownData
+			},
+			{
 				label: 'Active',
 				property: 'active',
-				type: 'boolean',
-				width: 120,
+				filterType: FilterType.boolean,
+				filterInputData: {
+					data: [
+						{
+							text: 'Yes',
+							value: true,
+						},
+						{
+							text: 'No',
+							value: false,
+						},
+					],
+					defaultItem: { text: '', value: null },
+				}
 			},
 			{
 				label: 'Activation Date',
 				property: 'activationDate',
 				format: dateFormat,
-				type: 'date',
-				width: 140
+				filterType: FilterType.date
 			},
 			{
 				label: 'Expiration Date',
 				property: 'expirationDate',
 				format: dateFormat,
-				type: 'date',
-				width: 140
+				filterType: FilterType.date
 			},
 			{
 				label: 'Sequence',
 				property: 'sequence',
-				type: 'number',
-				width: 120
+				filterType: FilterType.text
 			},
 			{
 				label: 'Locked',
 				property: 'locked',
-				type: 'boolean',
-				width: 120
-			}
+				filterType: FilterType.boolean,
+				filterInputData: {
+					data: [
+						{
+							text: 'Yes',
+							value: true,
+						},
+						{
+							text: 'No',
+							value: false,
+						},
+					],
+					defaultItem: { text: '', value: null },
+				}
+			},
 		];
 	}
 }
@@ -83,7 +111,7 @@ export const NOTICE_TYPE_POST_LOGIN = 'POST_LOGIN';
 export const NOTICE_TYPE_MANDATORY = 'MANDATORY';
 
 export const NoticeTypes = [
-	{typeId: NOTICE_TYPE_PRE_LOGIN, name: 'Prelogin'},
-	{typeId: NOTICE_TYPE_POST_LOGIN, name: 'Postlogin'},
-	{typeId: NOTICE_TYPE_MANDATORY, name: 'Mandatory Acknowledgment Message'},
+	{ typeId: NOTICE_TYPE_PRE_LOGIN, name: 'Prelogin' },
+	{ typeId: NOTICE_TYPE_POST_LOGIN, name: 'Postlogin' },
+	{ typeId: NOTICE_TYPE_MANDATORY, name: 'Mandatory Acknowledgment Message' },
 ];

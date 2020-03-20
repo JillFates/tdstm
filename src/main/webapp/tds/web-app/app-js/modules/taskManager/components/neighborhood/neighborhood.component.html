@@ -1,0 +1,128 @@
+<div class="neighborhood-container content body">
+  <div class="row task-manager-header">
+    <div class="col-md-4 k-align-self-center">
+    </div>
+    <div class="col-md-4 text-center k-align-self-center">
+      <tds-task-view-toggle></tds-task-view-toggle>
+    </div>
+    
+    <div class="col-md-2 k-align-self-center">
+    </div>
+
+    <div class="col-md-2 task-options k-align-self-center text-right">
+      <button class="refresh-container-btn btn" (click)="refreshDiagram()">
+        <fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
+      </button>
+      <div class="neighborhood-pie-countdown-container">
+        <tds-circle-countdown (timeout)="refreshDiagram()"></tds-circle-countdown>
+      </div>
+    </div>
+  </div>
+
+  <div class="row task-manager-sub-header">
+    <div class="col-md-2  k-align-self-center">
+      <label class="neighborhood-control-label" for="neighborhood-events-dropdown">Event:</label>
+      <kendo-dropdownlist
+        id="neighborhood-events-dropdown"
+        textField="name"
+        valueField="id"
+        [ngClass]="'neighborhood-custom-dropdown'"
+        [data]="eventList$ | async"
+        (selectionChange)="onEventSelect($event)"
+        [(ngModel)]="selectedEvent"
+        [value]="selectedEvent"
+        #eventsDropdown>
+      </kendo-dropdownlist>
+    </div>
+    <div class="col-md-2  k-align-self-center">
+      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Team:</label>
+      <kendo-dropdownlist
+        id="neighborhood-teams-dropdown"
+        textField="label"
+        valueField="label"
+        [ngClass]="'neighborhood-custom-dropdown'"
+        [value]="selectedTeam"
+        [data]="teamHighlights$ | async"
+        (selectionChange)="highlightByTeam($event)"
+        [(ngModel)]="selectedTeam"
+        #teamHighlightDropdown>
+      </kendo-dropdownlist>
+    </div>
+    <div class="col-md-2">
+      <div class="highlight-filter-container">
+        <div class="disp-table-cell">
+          <input
+            type="text"
+            class="form-control highlight-filter-control"
+            placeholder="Highlight filter"
+            [(ngModel)]="filterText"
+            (ngModelChange)="highlightFilterChange()"
+            #highlightFilterText
+          />
+        </div>
+        <div class="disp-table-cell">
+          <fa-icon
+            [icon]="icons.faWindowClose"
+            (click)="clearTextFilter()"
+            [ngClass]="['clear-icon-button']"
+            [hidden]="!filterText || filterText.length < 1"></fa-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 chk-filter-container">
+      <label class="task-chk-container">
+        <input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />
+        <span class="checkmark"></span>
+        Minimize Auto Tasks
+      </label>
+
+      <label class="task-chk-container">
+        <input name="myTasks" type="checkbox" [(ngModel)]="myTasks" (ngModelChange)="onMyTasksFilterChange()" />
+        <span class="checkmark"></span>
+        My Tasks
+      </label>
+
+      <label class="task-chk-container">
+        <input  type="checkbox" [(ngModel)]="viewUnpublished" (ngModelChange)="onViewUnpublishedFilterChange()" />
+        <span class="checkmark"></span>
+        View Unpublished
+      </label>
+
+      <label class="task-chk-container" [ngClass]="{'disabled': !hasCycles}">
+        <input
+                type="checkbox"
+                [(ngModel)]="showCycles"
+                (ngModelChange)="highlightCycles()"
+                [disabled]="!hasCycles"/>
+        <span class="checkmark"></span>
+        Cycles
+      </label>
+    </div>
+
+  </div>
+  <div class="clr-row task-graph-diagram-container">
+    <tds-lib-diagram-layout
+          [style.width]="'100%'"
+          [data]="diagramData$ | async"
+          (nodeClicked)="onNeighborhood($event)"
+          (backToFullGraph)="viewFullGraphFromCache()"
+          (diagramAnimationFinished)="onDiagramAnimationFinished()"
+          (nodeMoveDiagramAnimationFinished)="onNodeMoveDiagramAnimationFinished()"
+          (ctxMenuActionDispatched)="onActionDispatched($event)"
+          (nodeUpdated)="updateGraphCache($event)"
+          (diagramClicked)="diagramClicked()"
+          #graph
+    ></tds-lib-diagram-layout>
+<!--    <tds-diagram-layout-->
+<!--		[nodeData]="nodeData$ | async"-->
+<!--    [currentUser]="currentUser$ | async"-->
+<!--    [contextMenuOptions]="ctxMenuOpts$ | async"-->
+<!--    (nodeClicked)="onNeighborhood($event)"-->
+<!--    (backTofullGraph)="viewFullGraphFromCache()"-->
+<!--    (nodeUpdated)="updateGraphCache($event)"-->
+<!--    (diagramClicked)="diagramClicked()"-->
+<!--    #graph></tds-diagram-layout>-->
+  </div>
+
+</div>

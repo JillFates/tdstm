@@ -1,5 +1,6 @@
 package net.transitionmanager.asset
 
+import grails.testing.gorm.DataTest
 import net.transitionmanager.dataview.FieldSpec
 import org.hibernate.type.DateType
 import org.hibernate.type.LongType
@@ -10,7 +11,7 @@ import spock.lang.Unroll
 
 import java.sql.Timestamp
 
-class FieldSpecSpec extends Specification {
+class FieldSpecSpec extends Specification implements DataTest {
 
 	private Integer setUdfProperty(String fieldName) {
 		return (fieldName.startsWith('custom') ? 1 : 0)

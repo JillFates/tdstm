@@ -6,6 +6,9 @@ import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {PermissionService} from '../../../../services/permission.service';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {SetUserContextPerson} from '../../../../../modules/auth/action/user-context-person.actions';
+import {Store} from '@ngxs/store';
+import {NotifierService} from '../../../../services/notifier.service';
 
 @Component({
 	selector: 'user-edit-person',
@@ -26,7 +29,9 @@ export class UserEditPersonComponent {
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService) {
+		public activeDialog: UIActiveDialogService,
+		private notifierService: NotifierService,
+		private store: Store) {
 		this.startPageOptions = [];
 		this.editableUserPreferences = [];
 		this.savedPersonModel = {};
@@ -148,6 +153,9 @@ export class UserEditPersonComponent {
 			this.headerService.updateAccount(preferences).subscribe(
 				(result: any) => {
 					this.savedPersonModel = this.personModel;
+					// update user context state to show updated initials icon
+					this.store.dispatch(new SetUserContextPerson())
+						.subscribe(() => this.notifierService.broadcast('userDetailsUpdated'));
 					this.cancelCloseDialog();
 				},
 				(err) => {

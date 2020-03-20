@@ -7,18 +7,20 @@ import modules.ProjectsMenuModule
 class ProjectEditPage extends Page {
 
     static at = {
-        pdHeaderTitle.text().trim() == "Edit Project"
+        pdHeaderTitle.text().trim() == "Project Edit"
 
     }
 
     static content = {
-        pdHeaderTitle { $("section", class: "content-header").find("h1")}
-        pjctName { $("input#name") }
+        pdHeaderTitle { $("div", class: "modal-title")}
+        pjctName { $("input#projectName") }
+        pjctCode {$("input#projectCode")}
         pjctDescription { $("textarea#description") }
         pjctSartDate { $("input#startDateId") }
-        pjctCompletionDate { $("input#completionDateId") }
-        updateBtn { $("input.save") }
-        cancelBtn { $("input.cancel") }
+        //pjctCompletionDate { $("input#completionDateId") }
+        updateBtn { $("button", title: "Save") }
+        cancelBtn { $("button", title: "Cancel") }
+        deleteBtn { $("button", title: "Delete") }
         projectsModule { module ProjectsMenuModule }
 
     }

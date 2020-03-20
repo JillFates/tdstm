@@ -13,10 +13,10 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 		tds-handle-escape (escPressed)="cancelCloseDialog()"
 		id="modal-page-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-lg" role="document">
-			<div class="modal-content" [ngStyle]="{'visibility': isVisible ? 'visible' : 'hidden'}">
+			<div class="tds-modal-content" [ngStyle]="{'visibility': isVisible ? 'visible' : 'hidden'}">
 				<div class="modal-header">
 					<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-						<span aria-hidden="true">×</span>
+						<clr-icon aria-hidden="true" shape="close"></clr-icon>
 					</button>
 					<h4 class="modal-title">{{title}}</h4>
 				</div>
@@ -41,7 +41,7 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 export class TDSModalPageWrapperComponent extends UIExtraDialog implements AfterViewInit {
 	public isVisible = false;
 	private hasBeenSubmited = false;
-	@ViewChild('targetFrame') targetFrame: ElementRef;
+	@ViewChild('targetFrame', {static: false}) targetFrame: ElementRef;
 	constructor(
 		@Inject('title') public title: string,
 		@Inject('url') public url: string,

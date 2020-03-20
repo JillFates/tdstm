@@ -68,19 +68,6 @@ class ElementSpec extends Specification {
 			new Element(value: dateValue).getTime() == new Element(value: dateValue.getTime())
 	}
 
-	void 'test Exception if String function applied to Non String Element'() {
-		given:
-			int value = 100
-			Element element = new Element(value: value)
-
-		when:
-			element.left(4)
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "left function only supported for String values (${value} : ${value.class})"
-	}
-
 	@Unroll
 	void 'test can use java.lang.Math.round transformation on Element.value=#value'() {
 
@@ -421,4 +408,18 @@ class ElementSpec extends Specification {
 			'FOO'     | 3         | null         || 'FOO'            | ['Unable to transform value to Decimal']
 			'Yes'     | 3         | null         || 'Yes'            | ['Unable to transform value to Decimal']
 	}
+
+  void 'test Exception if String function applied to Non String Element'() {
+    given:
+    int value = 100
+    Element element = new Element(value: value)
+
+    when:
+    element.left(4)
+
+    then: 'An ETLProcessorException is thrown'
+    ETLProcessorException e = thrown ETLProcessorException
+    e.message == "left function only supported for String values (${value} : ${value.class})"
+  }
+
 }

@@ -14,8 +14,8 @@ class ManageImportBatchesETLPage extends Page {
     }
 
     static content = {
-        manageImportBatchPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        manageImportBatchBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
+        manageImportBatchPageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        manageImportBatchBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }

@@ -9,6 +9,12 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {APIActionListComponent} from './components/list/api-action-list.component';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_PROJECT = 'menu-parent-project';
+
 export class APIActionStates {
 	public static readonly API_ACTION_LIST = {
 		url: 'list'
@@ -23,7 +29,8 @@ export const APIActionRoute: Routes = [
 			page: {
 				title: 'API_ACTION.API_ACTIONS',
 				instruction: '',
-				menu: ['GLOBAL.PROJECT', 'API_ACTION.API_ACTIONS']
+				menu: ['GLOBAL.PROJECT', 'API_ACTION.API_ACTIONS'],
+				topMenu: { parent: TOP_MENU_PARENT_PROJECT, child: 'menu-parent-projects-api-actions', subMenu: true}
 			},
 			requiresAuth: true,
 		},

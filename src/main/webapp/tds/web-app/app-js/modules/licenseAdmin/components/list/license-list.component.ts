@@ -1,120 +1,115 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 // Component
 import {RequestLicenseComponent} from '../request/request-license.component';
 import {CreatedLicenseComponent} from '../created-license/created-license.component';
 import {LicenseDetailComponent} from '../detail/license-detail.component';
+import {
+	ColumnHeaderData, DialogConfirmAction, DialogService,
+	GridComponent,
+	GridModel,
+	GridRowAction,
+	GridSettings,
+	HeaderActionButtonData, ModalSize
+} from 'tds-component-library';
 // Service
 import {LicenseAdminService} from '../../service/license-admin.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UserContextService} from '../../../auth/service/user-context.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {Permission} from '../../../../shared/model/permission.model';
 // Model
-import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, DIALOG_SIZE} from '../../../../shared/model/constants';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 import {
 	LicenseColumnModel,
-	LicenseType,
-	LicenseStatus,
-	LicenseEnvironment,
-	LicenseModel, RequestLicenseModel
+	LicenseModel
 } from '../../model/license.model';
-// Kendo
-import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {DateUtils} from '../../../../shared/utils/date.utils';
-declare var jQuery: any;
+// Other
+import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'tds-license-list',
-	templateUrl: 'license-list.component.html'
+	templateUrl: 'license-list.component.html',
 })
 export class LicenseListComponent implements OnInit {
+	private gridRowActions: GridRowAction[];
 
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
-		filter: {
-			filters: [],
-			logic: 'and'
-		}
+	private headerActions: HeaderActionButtonData[];
+
+	private gridSettings: GridSettings = {
+		defaultSort: [{field: 'name', dir: 'asc'}],
+		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
 	};
-	public skip = 0;
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
-	public licenseColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public gridData: GridDataResult;
-	public resultSet: any[];
-	public dateFormat = '';
-	public licenseType = LicenseType;
-	public licenseStatus = LicenseStatus;
-	public licenseEnvironment = LicenseEnvironment;
+
+	private columnModel: ColumnHeaderData[];
+	public gridModel: GridModel;
+	private dateFormat = '';
+
+	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
 
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private licenseAdminService: LicenseAdminService,
 		private preferenceService: PreferenceService,
-		private prompt: UIPromptService,
-		private route: ActivatedRoute,
-		private userContextService: UserContextService) {
-		this.resultSet = this.route.snapshot.data['licenses'];
-		this.gridData = process(this.resultSet, this.state);
+		private translateService: TranslatePipe
+	) {
 	}
 
-	ngOnInit() {
-		this.userContextService.getUserContext()
-			.subscribe((userContext: UserContextModel) => {
-				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
-				this.licenseColumnModel = new LicenseColumnModel(`{0:${this.dateFormat}}`);
-			});
-	}
+	async ngOnInit() {
+		this.gridRowActions = [
+			{
+				name: 'Edit',
+				show: true,
+				disabled: !this.isCreateAvailable(),
+				onClick: this.onEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isCreateAvailable(),
+				onClick: this.onDelete,
+			},
+		];
 
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
-	}
+		this.headerActions = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateLicense,
+			},
+		];
 
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
-	}
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
 
-	protected onFilter(column: any): void {
-		const root = this.licenseAdminService.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
+		this.dateFormat = await this.preferenceService.getUserDatePreferenceAsKendoFormat().toPromise();
 
-	protected clearValue(column: any): void {
-		this.licenseAdminService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
+		this.columnModel = new LicenseColumnModel(this.dateFormat).columns;
+
+		this.gridModel.columnModel = this.columnModel;
 	}
 
 	/**
-	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * Open the License
+	 * @param event
 	 */
-	protected cellClick(event: CellClickEvent): void {
+	public async cellClick(event: CellClickEvent): Promise<void> {
 		if (event.columnIndex > 0) {
-			this.openLicenseViewEdit(event['dataItem']);
-		}
-	}
-
-	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
-	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
+			await this.openLicenseViewEdit(event.dataItem, ActionType.VIEW);
 		}
 	}
 
@@ -122,88 +117,108 @@ export class LicenseListComponent implements OnInit {
 	 * Delete the selected License
 	 * @param dataItem
 	 */
-	protected onDelete(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'You are about to delete the selected license. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.licenseAdminService.deleteLicense(dataItem.id).subscribe(
-						(result) => {
-							this.reloadData();
-						},
-						(err) => console.log(err));
+	public onDelete = async (dataItem: LicenseModel): Promise<void> => {
+		try {
+			if (this.isCreateAvailable()) {
+				const confirmation = await this.dialogService.confirm(
+					'Confirmation Required',
+					'You are about to delete the selected license. Do you want to proceed?'
+				).toPromise();
+				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+					this.licenseAdminService.deleteLicense(dataItem.id).toPromise();
+					await this.gridComponent.reloadData();
 				}
-			});
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Request a New License
 	 */
-	protected onCreateLicense(): void {
-		this.dialogService.open(RequestLicenseComponent, []).then((requestLicenseModel: RequestLicenseModel) => {
-			setTimeout(() => {
-				this.openCreatedLicenseDialog(requestLicenseModel);
-			}, 500);
-			if (requestLicenseModel) {
-				this.reloadData();
+	private onCreateLicense = async (): Promise<void> => {
+		try {
+			const data = await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: RequestLicenseComponent,
+				data: {},
+				modalConfiguration: {
+					title: 'Request New License',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+			if (data.requestLicense) {
+				await this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: CreatedLicenseComponent,
+					data: {
+						requestLicenseModel: data.requestLicense
+					},
+					modalConfiguration: {
+						title: 'License Request Completed',
+						draggable: true,
+						modalSize: ModalSize.MD
+					}
+				}).toPromise();
 			}
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
-	 * Opens a dialog to show to the user that the request has been created and next steps to follow
+	 * Select the current element and open the Edit Dialog
+	 * @param dataItem
 	 */
-	private openCreatedLicenseDialog(requestLicenseModel: RequestLicenseModel): void {
-		this.dialogService.open(CreatedLicenseComponent, [
-			{provide: RequestLicenseModel, useValue: requestLicenseModel}
-		]).then(() => {
-			console.log('Dismissed Dialog');
-		}).catch(() => {
-			console.log('Dismissed Dialog');
-		});
+	private onEdit = async (dataItem: LicenseModel): Promise<void> => {
+		try {
+			if (this.isCreateAvailable()) {
+				await this.openLicenseViewEdit(dataItem, ActionType.EDIT, true);
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
-	/**
-	 * Reload the list with the latest created/edited license
-	 */
-	protected reloadData(): void {
-		this.licenseAdminService.getLicenses().subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-				jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-			},
-			(err) => console.log(err));
+	private loadData = async (): Promise<LicenseModel[]> => {
+		try {
+			return await this.licenseAdminService.getLicenses().toPromise();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Opens the selected License View
 	 * @param licenseModel
 	 */
-	private openLicenseViewEdit(licenseModel: LicenseModel): void {
-		this.dialogService.open(LicenseDetailComponent, [
-			{ provide: LicenseModel, useValue: licenseModel }
-		], DIALOG_SIZE.LG, false).then( (result: LicenseModel) => {
-			if (result && result.id) {
-				//
-			}
-		}).catch(result => {
-			this.reloadData();
-			console.log('Dismissed Dialog');
-		});
+	private async openLicenseViewEdit(licenseModel: LicenseModel, actionType: ActionType, openFromList = false): Promise<void> {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: LicenseDetailComponent,
+				data: {
+					licenseModel: licenseModel
+				},
+				modalConfiguration: {
+					title: 'License Detail',
+					draggable: true,
+					modalSize: ModalSize.LG
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
+	 * Determines if user has the permission to create licences
 	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.LicenseAdministration);
 	}
 }

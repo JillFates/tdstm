@@ -6,9 +6,11 @@
 			<div class="col-sm-6 col-md-3 col-lg-3">
 				<div class="form-group">
 					<label class="col-title" for="eventSelect">Event:</label>
-					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
-						<option value="">Please select</option>
-					</select>
+					<div class="clr-select-wrapper">
+						<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
+							<option value="">Please select</option>
+						</select>
+					</div>
 				</div>
 			</div>
 			<div class="col-sm-6 col-md-6 col-lg-6 tm-asset-tag-selector-container">
@@ -40,11 +42,10 @@
 	</div>	
 	<div class="generateWrapper">
 		<label for="generateTask">
-			<a class="btn btn-default has-spinner component-action-generate-tasks" id="generateTask" ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
-				<span class="spinner"><i class="icon-spin icon-refresh"></i></span>
-				<img ng-src="{{applyRootPath('/assets/icons/table_gear.png')}}" />
-				Generate Tasks
-			</a>
+            <button type="button" class="btn"  id="generateTask"  ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
+                <img ng-src="{{applyRootPath('/assets/icons/svg/file-settings-line.svg')}}" height="20px" />
+                Generate Tasks
+            </button>
 		</label>
 	</div>
 </form>
