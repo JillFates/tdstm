@@ -220,14 +220,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private loadDataForDomain(tabIndex: number): void {
 		const domain: any = this.scriptTestResult.domains[tabIndex];
-		if (!domain.data && domain.outputFilename) {
+		if (!domain.data) {
 			this.importAssetsService.getFileContent(domain.outputFilename)
 				.subscribe((result: any) => {
 					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
 					domain.data = result.data;
 				});
-		} else {
-			this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(domain.data ? domain.data : []);
 		}
 	}
 

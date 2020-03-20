@@ -123,7 +123,7 @@ class ETLStreamingWriter {
         generator.writeFieldName('domains')
         generator.writeStartArray()
         for (DomainResult domainResult in domains) {
-            writeDomains((DomainOnDisk) domainResult)
+            writeDomains(domainResult)
         }
         generator.writeEndArray()
     }
@@ -134,7 +134,7 @@ class ETLStreamingWriter {
      *
      * @param domain
      */
-    private void writeDomains(DomainOnDisk domain) {
+    private void writeDomains(DomainResult domain) {
         generator.writeStartObject()
         generator.writeStringField('domain', domain.domain)
         generator.writeStringField('outputFilename', domain.outputFilename)
