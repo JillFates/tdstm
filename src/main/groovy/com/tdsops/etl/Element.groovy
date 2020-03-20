@@ -130,22 +130,6 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	}
 
 	/**
-	 * Loads a field using fields spec based on domain validation
-	 * in and instance of {@link LocalVariableFacade}.
-	 * It uses directly {@linke Element#load} with
-	 * {@link LocalVariableFacade#wrappedObject} value.
-	 * Use in an ETL script command
-	 * <code>
-	 *     extract 3 transform with lowercase() load 'description'
-	 * </code>
-	 * @param fieldName
-	 * @return the element instance that received this command
-	 */
-	ETLCommand load(LocalVariableFacade localVariable) {
-		return this.load(localVariable.wrappedObject?.toString())
-	}
-
-	/**
 	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
 	 * 	extract 1 load aNotPreviouslyDefinedVariable
@@ -852,10 +836,8 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	 * <p>It also add {@code LocalVariableFacade} behaviour in the bound object.</p>
 	 * @param variableName
 	 * @return current instance of {@code Element}
-	 * @see LocalVariableFacade
 	 */
 	private Element doSet(String variableName) {
-		//LocalVariableFacade localVariableFacade = new LocalVariableFacade(this.value, this.processor)
 		processor.addLocalVariableInBinding(variableName, this.value)
 		return this
 	}
