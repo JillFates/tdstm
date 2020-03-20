@@ -267,25 +267,17 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 					} else {
 
-						/**
-						 * Detects if ETL script was with `enable lookup` command.
-						 * It defines if row results were saved in memory
-						 * or flushed on disk by a streaming solution.
-						 */
-						if (domainJson.outputFilename) {
-							// Streaming solution splits each domain data.
-							InputStream inputStream = fileSystemService.openTemporaryFile(domainJson.outputFilename)
-							if (!inputStream) {
-								throw new InvalidParamException('Specified input file not found')
-							}
-							// Import the assets for this batch using Streaming process
-							importRowsIntoBatchUsingStreaming(session, batch, inputStream, progressCalculator, importContext)
-
-						} else {
-							List<JSONObject> importRows = domainJson.data
-							// Import the assets for this batch
-							importRowsIntoBatch(session, batch, importRows, progressCalculator, importContext)
+						if (!domainJson.outputFilename){
+							throw new InvalidParamException('outputFilename field not specified')
 						}
+
+						// Streaming solution splits each domain data.
+						InputStream inputStream = fileSystemService.openTemporaryFile(domainJson.outputFilename)
+						if (!inputStream) {
+							throw new InvalidParamException('Specified input file not found')
+						}
+						// Import the assets for this batch using Streaming process
+						importRowsIntoBatchUsingStreaming(session, batch, inputStream, progressCalculator, importContext)
 
 						// Update the batch with information about the import results
 						batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
@@ -305,30 +297,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 		progressCalculator.finish()
 		return importResults
-	}
-
-	/**
-	 * Import all the assets for the given batch.
-	 *
-	 * @param session - current database session.
-	 * @param batch - an instance of {@link }
-	 * @param importContext - additional parameters required for logging
-	 */
-	//@CompileStatic
-	private void importRowsIntoBatch(session, ImportBatch batch, List<JSONObject> importRows, ImportProgressCalculator progressCalculator, Map importContext) {
-		for (rowData in importRows) {
-			// Keep track of the row number for reporting
-			importContext.rowNumber++
-
-			// Do some initialization of the rowData object if necessary
-			if (rowData.errors == null) {
-				rowData.errors = []
-			}
-
-			// Process the fields for this row
-			importRow(session, batch, rowData, importContext)
-			progressCalculator.increase()
-		}
 	}
 
 	/**
