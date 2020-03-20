@@ -420,8 +420,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Aborts processing of the current row for the domain in the context
      * <pre>
-     *  if (SOURCE.Env == 'Development) {*  	ignore record
-     *}* </pre>
+     *  if (SOURCE.Env == 'Development) { //
+     *      ignore record
+     *  //} //
+     * </pre>
      * @param label just a label to detect if the command was used with 'row' label
      * @return current instance of ETLProcessor
      */
@@ -430,7 +432,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         validateStack()
 
         if (reservedWord != ReservedWord.record) {
-            throw ETLProcessorException.invalidReadCommand()
+            throw ETLProcessorException.invalidIgnoreCommand()
         }
 
         if (!hasSelectedDomain()) {
@@ -937,7 +939,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     ETLProcessor enable(MethodClosure methodClosure) {
         if (methodClosure.method != 'lookup') {
-            throw ETLProcessorException.incorrectWhenCommandStructure()
+            throw ETLProcessorException.invalidEnableLookupCommand()
         }
 
         this.result.enableLookup()
