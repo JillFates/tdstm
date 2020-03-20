@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ComponentFactoryResolver, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
 import {NgForm} from '@angular/forms';
 import {ModelModel} from '../model/model.model';
@@ -23,6 +23,23 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	public modalType = ActionType.VIEW;
 	public manufacturerList;
 	public assetTypeList;
+	public sourceTDS = false;
+	public modelConnectors: any[] = [];
+	public modelAkas: any[] = [];
+	public powerTypes = ['Amp', 'Watts'];
+	public modelAkasDisplay: string;
+	public manufacturerName: string;
+	public usizeList: number[] = [];
+	public userList: any[] = [];
+	// AKA
+	public aliasControls = [];
+	public aliasDeleted = [];
+	public aliasUpdated = [];
+	public aliasAdded = [];
+	public displayedAliasErrorSpans = [];
+	@ViewChildren('aliasSpan') aliasSpanElements: QueryList<any>;
+	protected hasOnlyUniqueAlias = true;
+
 	private dataSignature: string;
 	protected isUnique = true;
 
@@ -39,10 +56,10 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	ngOnInit(): void {
 		this.modelModel = Object.assign({}, this.data.modelModel);
 		this.manufacturerList = this.data.manufacturerList;
-		this.assetTypeList = this.data.assetTypeList;
 		this.modalType = this.data.actionType;
 		this.modalTitle = this.getModalTitle(this.modalType);
-		this.dataSignature = JSON.stringify(this.modelModel);
+
+		this.getModelDetails();
 
 		this.buttons.push({
 			name: 'edit',
@@ -106,6 +123,68 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		}
 	}
 
+	private getModelDetails(): void {
+		this.modelService.getModelDetails(this.modelModel.id)
+			.subscribe((response: any) => {
+				console.log(`Model Detail response ${response}`);
+				this.modelModel = response.data.modelInstance;
+				this.modelConnectors = response.data.modelConnectors;
+				this.modelAkas = response.data.modelAkas;
+				this.modelAkasDisplay = (this.modelAkas.length > 0) ? this.modelAkas.join(',') : '';
+				this.sourceTDS = this.modelModel.sourceTDS === 1;
+				this.manufacturerName = this.manufacturerList.find(m => m.id === this.modelModel.manufacturer['id']).name;
+				this.usizeList = response.data.usizeList;
+				this.assetTypeList = response.data.assetTypes;
+				this.aliasControls = (this.modalType === this.actionTypes.EDIT) ? (this.modelAkas) ? this.modelAkas : [] : [];
+				this.dataSignature = JSON.stringify(this.modelModel);
+				this.userList = response.data.userList;
+			});
+	}
+
+	/**
+	 * Add alias to collection
+	 */
+	public addAlias(): void {
+		this.aliasControls.push('');
+	}
+
+	/**
+	 * Remove alias from collection
+	 */
+	public removeAlias(index: number, itemId: number): void {
+		this.modelForm.form.markAsDirty();
+		this.aliasDeleted.push(itemId);
+		this.aliasControls.splice(index, 1);
+
+		this.aliasSpanElements.toArray().splice(index, 1);
+		this.displayedAliasErrorSpans.splice(index, 1);
+		this.hasOnlyUniqueAlias = (this.displayedAliasErrorSpans.length === 0);
+	}
+
+	/**
+	 * Add alias value to collection
+	 */
+	public focusOutAlias(event: any, item: any, index: number): void {
+		this.modelForm.form.markAsDirty();
+		if (item) {
+			if (event.target.value !== item.name) {
+				this.aliasUpdated.push({id: item.id, name: event.target.value});
+			} else {
+				const arrayItem = this.aliasAdded.find(i => i === event.target.value);
+				if (!arrayItem) {
+					this.aliasAdded.push(event.target.value);
+				}
+			}
+		} else {
+			const alreadyAdded = this.aliasAdded.find(i => i.index === index);
+			if (alreadyAdded) {
+				this.aliasAdded[index].name = event.target.value;
+			} else {
+				this.aliasAdded.push({index, name: event.target.value});
+			}
+		}
+	}
+
 	/**
 	 * Based on modalType action returns the corresponding title
 	 * @param {ActionType} modalType
@@ -149,8 +228,8 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	 */
 	protected isEmptyValue(): boolean {
 		let term = '';
-		if (this.modelModel.name) {
-			term = this.modelModel.name.trim();
+		if (this.modelModel.modelName) {
+			term = this.modelModel.modelName.trim();
 		}
 		return term === '';
 	}

@@ -33,6 +33,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
 	static defaultAction = 'list'
 	static final OK_CONTENTS = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+	private final static DELETE_OK_MESSAGE = "Model deleted successfully."
+	private final static DELETE_ERROR_MESSAGE = "Model not found."
 
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	AssetEntityService                assetEntityService
@@ -95,7 +97,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		]}*/
 
         def results = modelInstanceList?.collect {
-            Map<String, Object> data = [id: it.modelId, name: it.modelName, manufacturer: it.manufacturer,
+            Map<String, Object> data = [id: it.modelId, modelName: it.modelName, manufacturer: it.manufacturer,
                     description: displayModelValues(modelPref["1"], it),
                     assetType: displayModelValues(modelPref["2"], it),
                     lastModified: displayModelValues(modelPref["3"], it),
@@ -264,16 +266,23 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				flash.message = "Model not found with Id $params.id"
 				redirect(action: "list")
 			} else {
+				def userList = Person.getAll()
 				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
 
+				def usizeList = com.tdssrc.grails.GormUtil.getConstrainedProperties(model.class).usize.inList
+				def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+
+
 				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas,
 				                 modelHasPermission: securityService.hasPermission(Permission.ModelValidate),
-				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model)]
+				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model),
+								 usizeList: usizeList, assetTypes: assetTypes, userList: userList]
 
 				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
 
-				render(view: view, model: paramsMap)
+				// render(view: view, model: paramsMap)
+				renderSuccessJson(paramsMap)
 			}
 		} else {
 			if (params.redirectTo == "assetAudit") {
@@ -445,11 +454,11 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		try {
 			modelService.delete(model)
 			flash.message = "${model} deleted"
-			redirect(action: "list")
+			renderSuccessJson([status: DELETE_OK_MESSAGE] )
 		} catch (DataIntegrityViolationException e) {
 			//log.error(e.message, e)
 			flash.message = "${model} not deleted"
-			redirect(action: "show", id: params.id)
+			renderSuccessJson([status: DELETE_ERROR_MESSAGE] )
 		} catch (ServiceException e) {
 			//log.error(e.message, e)
 			redirect(action: "list")

@@ -18,6 +18,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {ProviderModel} from '../../../provider/model/provider.model';
 import {ModelService} from '../../service/model.service';
 import {ModelViewEditComponent} from '../../view-edit/model-view-edit.component';
+import {ManufacturerModel} from "../../../manufacturer/model/manufacturer.model";
 
 @Component({
 	selector: 'model-list',
@@ -202,33 +203,25 @@ export class ModelListComponent implements OnInit {
 	 * Delete the selected Provider
 	 * @param dataItem
 	 */
-	private onDelete = async (dataItem: ProviderModel): Promise<void> => {
-		/*try {
+	/**
+	 * Delete the selected Provider
+	 * @param dataItem
+	 */
+	private onDelete = async (dataItem: ModelModel): Promise<void> => {
+		try {
 			if (this.isDeleteAvailable()) {
-				const context = await this.providerService.deleteContext(dataItem.id).toPromise();
-
-				const confirmation = await this.dialogService.open({
-					componentFactoryResolver: this.componentFactoryResolver,
-					component: ProviderAssociatedComponent,
-					data: {
-						providerAssociatedModel: context,
-					},
-					modalConfiguration: {
-						title: 'Confirmation Required',
-						draggable: true,
-						modalSize: ModalSize.MD
+				this.dialogService.confirm(
+					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION')
+				).subscribe((result: any) => {
+					if (result.confirm === DialogConfirmAction.CONFIRM) {
+						this.modelService.deleteModel(dataItem.id).toPromise().finally(() => this.gridComponent.reloadData());
 					}
-				}).toPromise();
-				if (confirmation) {
-					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
-						await this.providerService.deleteProvider(dataItem.id).toPromise();
-						await this.gridComponent.reloadData();
-					}
-				}
+				});
 			}
 		} catch (error) {
 			console.error(error);
-		}*/
+		}
 	};
 
 	private isCreateAvailable(): boolean {

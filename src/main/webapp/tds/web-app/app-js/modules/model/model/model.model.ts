@@ -7,7 +7,7 @@ export class ModelColumnModel {
 		this.columns = [
 			{
 				label: 'Name',
-				property: 'name',
+				property: 'modelName',
 				filterType: FilterType.text,
 				width: 246,
 			},
@@ -72,7 +72,7 @@ export class ModelColumnModel {
 
 export class ModelModel {
 	id?: number;
-	name: string;
+	modelName: string;
 	manufacturer?: string;
 	description?: string;
 	assetType?: string;
@@ -100,4 +100,8 @@ export class ModelModel {
 	powerNameplate?: number;
 	powerDesign?: number;
 	roomObject?: boolean;
+	validatedBy?: string;
+	usize = 1;
+	updatedBy?: string;
+	createdBy?: string;
 }

@@ -22,9 +22,28 @@ export class ModelService {
 			.catch((error: any) => error);
 	}
 
+	getModelDetails(modelId: number): Observable<ModelModel> {
+		return this.http.get(`${this.modelUrl}/show?id=${modelId}`)
+			.map((response: any) => {
+				return response;
+			})
+			.catch((error: any) => error);
+	}
+
+	deleteModel(id: number): Observable<string> {
+		const body = {
+			id
+		}
+		return this.http.post(`${this.modelUrl}/delete/${id}`, body)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
 	saveModel(model: ModelModel): Observable<ModelModel> {
 		const postRequest = {
-			name: model.name,
+			name: model.modelName,
 		};
 		if (!model.id) {
 			return this.http.post(`${this.modelUrl}/save`, JSON.stringify(postRequest))
