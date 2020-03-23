@@ -1,8 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {ReportsService} from '../../service/reports.service';
-import {Observable} from 'rxjs';
+// Angular
+import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
+// Component
 import {ReportComponent} from '../report.component';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Service
+import {ReportsService} from '../../service/reports.service';
+import {DialogService} from 'tds-component-library';
+// Other
+import {Observable} from 'rxjs';
 
 @Component({
 	selector: 'tds-task-report',
@@ -93,8 +97,12 @@ export class TaskReportComponent extends ReportComponent {
 	includeUnpublished = true;
 	private readonly allEventsOption = {id: -1, name: 'All Events'};
 
-	constructor(reportsService: ReportsService, dialogService: UIDialogService) {
-		super(reportsService, dialogService);
+	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
+		reportsService: ReportsService,
+		dialogService: DialogService
+	) {
+		super(componentFactoryResolver, reportsService, dialogService);
 		this.selectedEvents = [this.allEventsOption];
 		this.onLoad();
 	}

@@ -1,21 +1,27 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+// Angular
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+// Model
 import {ModalType} from '../../../../shared/model/constants';
-import {CellClickEvent} from '@progress/kendo-angular-grid';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {AssetCommentService} from '../../service/asset-comment.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetCommentColumnModel, AssetCommentModel} from '../../model/asset-comment.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {
-	ColumnHeaderData,
+	ColumnHeaderData, DialogConfirmAction, DialogService,
 	GridComponent,
 	GridModel,
 	GridRowAction,
 	GridSettings,
-	HeaderActionButtonData
+	HeaderActionButtonData, ModalSize
 } from 'tds-component-library';
+// Component
 import {AssetCommentViewEditComponent} from '../view-edit/asset-comment-view-edit.component';
+// Service
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetCommentService} from '../../service/asset-comment.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
+import {CellClickEvent} from '@progress/kendo-angular-grid';
+import {TaskService} from '../../../taskManager/service/task.service';
 
 declare var jQuery: any;
 
@@ -31,6 +37,7 @@ export class AssetCommentListComponent implements OnInit {
 	public gridSettings: GridSettings = {
 		defaultSort: [{ field: 'title', dir: 'asc' }],
 		sortSettings: { mode: 'single' },
+		selectableSettings: {enabled: true, mode: 'single'},
 		filterable: true,
 		pageable: true,
 		resizable: true,
@@ -43,10 +50,13 @@ export class AssetCommentListComponent implements OnInit {
 
 	@ViewChild(GridComponent, { static: false }) gridComponent: GridComponent;
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
+		public taskManagerService: TaskService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
-		private assetCommentService: AssetCommentService
+		private assetCommentService: AssetCommentService,
+		private translatePipe: TranslatePipe
 	) {
 	}
 
@@ -60,6 +70,12 @@ export class AssetCommentListComponent implements OnInit {
 				show: true,
 				disabled: !this.isEditAvailable(),
 				onClick: this.openEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isCommentDeleteAvailable(),
+				onClick: this.onDelete,
 			}
 		];
 
@@ -84,8 +100,12 @@ export class AssetCommentListComponent implements OnInit {
 		this.gridModel.columnModel = this.columnModel;
 	}
 
+	/**
+	 * Check the field clicked and if appropriate open the comment view
+	 * @param {SelectionEvent} event
+	 */
 	public async cellClick(event: CellClickEvent): Promise<void> {
-		if (event.columnIndex > 0 && this.isEditAvailable()) {
+		if (event.columnIndex === 1 && this.isShowCommentAvailable()) {
 			await this.openComment(event.dataItem, ModalType.VIEW);
 		}
 	}
@@ -145,12 +165,19 @@ export class AssetCommentListComponent implements OnInit {
 				lastUpdated: comment.lastUpdated,
 				dateCreated: comment.dateCreated,
 			};
-			await this.dialogService.extra(AssetCommentViewEditComponent, [
-				{
-					provide: AssetCommentModel,
-					useValue: commentModel,
+
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetCommentViewEditComponent,
+				data: {
+					assetCommentModel: commentModel
+				},
+				modalConfiguration: {
+					title: 'Comment',
+					draggable: true,
+					modalSize: ModalSize.MD
 				}
-			]);
+			}).toPromise();
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			if (error) {
@@ -160,9 +187,39 @@ export class AssetCommentListComponent implements OnInit {
 	}
 
 	/**
+	 * Delete the Asset Comment
+	 */
+	public onDelete = async (dataItem: AssetCommentModel): Promise<void> => {
+		if (this.isCommentDeleteAvailable()) {
+			const confirmation = await this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				'Confirm deletion of this record. There is no undo for this action.'
+			)
+				.toPromise();
+			if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+				await this.taskManagerService.deleteTaskComment(dataItem.id).toPromise();
+				await this.gridComponent.reloadData();
+			}
+		}
+	}
+
+	/**
 	 * Determine if the user has the permission to edit comments
 	 */
 	protected isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	/**
+	 * Determine if the user has the permission to see comment details
+	 */
+	protected isShowCommentAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentView);
+	}
+
+	protected isCommentDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentDelete);
 	}
 }

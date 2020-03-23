@@ -9,6 +9,9 @@ import {SingleNoteModel} from '../../../assetExplorer/components/single-note/mod
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskService} from '../../service/task.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {ComponentFactoryResolver} from '@angular/core';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -24,8 +27,9 @@ export class TaskEditCreateModelHelper {
 		userTimeZone: string,
 		userCurrentDateFormat: string,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService,
-		private translate: TranslatePipe) {
+		private dialogService: DialogService,
+		private translate: TranslatePipe,
+		private componentFactoryResolver: ComponentFactoryResolver) {
 		this.model = {};
 
 		this.userTimeZone = userTimeZone;
@@ -738,18 +742,25 @@ export class TaskEditCreateModelHelper {
 				note: ''
 			};
 
-			this.dialogService.extra(SingleNoteComponent, [
-				{provide: SingleNoteModel, useValue: singleNoteModel}
-			], false, false)
-				.then(addedNote => {
-					this.createNote(this.model.id, addedNote)
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: SingleNoteComponent,
+				data: {
+					singleNoteModel: singleNoteModel
+				},
+				modalConfiguration: {
+					title: 'Note Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).subscribe((data: any) => {
+				if (data.status === DialogExit.ACCEPT) {
+					this.createNote(this.model.id, data.note)
 						.subscribe((result) => {
 							console.log('The result is:', result);
 							observer.next(result);
 						});
-				}).catch(result => {
-				console.log(result);
-				observer.next(null);
+				}
 			});
 		});
 	}

@@ -1,207 +1,132 @@
-<div
-	tds-handle-escape
-	(escPressed)="closeDialog()"
-	class="asset-comment-view-edit-component modal fade in"
-	id="asset-comment-view-edit-component"
-	data-backdrop="static"
-	tabindex="-1"
-	role="dialog"
->
-	<div
-		class="modal-dialog tds-modal-content with-box-shadow has-side-nav modal-md"
-		role="document"
+<div class="asset-comment-view-edit-component">
+	<form
+		name="dependentForm"
+		role="form"
+		data-toggle="validator"
+		#dependentForm="ngForm"
+		class="left-alignment"
 	>
-		<div class="modal-header">
-			<tds-button-custom
-				class="close"
-				[icon]="'close'"
-				(click)="closeDialog()"
-				[displayLabel]="false"
-				[flat]="true"
-			></tds-button-custom>
-			<div class="modal-title-container">
-				<div class="modal-title">
-					{{ getModalTitle(assetCommentModel.modal.type) }}
+		<div class="box-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group asset-component">
+						<textarea
+							clrTextarea
+							required
+							rows="8"
+							id="assetComment"
+							name="assetComment"
+							class="form-control"
+							[(ngModel)]="assetCommentModel.comment"
+							*ngIf="
+								assetCommentModel.modal.type !==
+								modalType.VIEW
+							"
+							tds-autofocus
+						></textarea>
+						<div
+							class="comment-text"
+							*ngIf="
+								assetCommentModel.modal.type ===
+								modalType.VIEW
+							"
+						>
+							{{ assetCommentModel.comment }}
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div class="modal-body">
-			<div class="modal-body-container">
-				<form
-					name="dependentForm"
-					role="form"
-					data-toggle="validator"
-					#dependentForm="ngForm"
-					class="form-horizontal left-alignment"
-				>
-					<div class="box-body">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="form-group asset-component">
-									<textarea
-										clrTextarea
-                                        required
-										rows="8"
-										id="assetComment"
-										name="assetComment"
-										class="form-control"
-										[(ngModel)]="assetCommentModel.comment"
-										*ngIf="
-											assetCommentModel.modal.type !==
-											modalType.VIEW
-										"
-										tds-autofocus
-									></textarea>
-									<div
-										class="comment-text"
-										*ngIf="
-											assetCommentModel.modal.type ===
-											modalType.VIEW
-										"
-									>
-										{{ assetCommentModel.comment }}
-									</div>
-								</div>
-							</div>
-							<div class="col-md-8">
-								<div class="form-group">
-									<label class="col-sm-3 control-label"
-										>Category:</label
-									>
-									<div
-										class="col-sm-8"
-										*ngIf="
-											assetCommentModel.modal.type !==
-											modalType.VIEW
-										"
-									>
-										<kendo-dropdownlist
-											id="assetCommentCategory"
-											name="assetCommentCategory"
-											class="form-control asset-comment-dropdown"
-											[data]="commentCategories"
-											[(ngModel)]="
-												assetCommentModel.category
-											"
-										>
-										</kendo-dropdownlist>
-									</div>
-									<div
-										class="col-sm-8"
-										*ngIf="
-											assetCommentModel.modal.type ===
-											modalType.VIEW
-										"
-									>
-										<label
-											class="control-label label-detail"
-											>{{
-												assetCommentModel.category
-											}}</label
-										>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-4">
-								<clr-checkbox-container
-									*ngIf="
-										assetCommentModel.modal.type !==
-										modalType.CREATE
-									"
-								>
-									<clr-checkbox-wrapper>
-										<input
-											clrCheckbox
-											type="checkbox"
-											id="assetCommentArchive"
-											name="assetCommentArchive"
-											[(ngModel)]="
-												assetCommentModel.archive
-											"
-											[disabled]="
-												assetCommentModel.modal.type ===
-												modalType.VIEW
-											"
-										/>
-										<label>Archived</label>
-									</clr-checkbox-wrapper>
-								</clr-checkbox-container>
-							</div>
-							<div
-								class="col-md-12 asset-comment-date-container"
-								*ngIf="
+				<div class="col-md-8">
+					<div class="form-group">
+						<label class="col-sm-3 control-label"
+							>Category:</label
+						>
+						<div
+							class="col-sm-8"
+							*ngIf="
+								assetCommentModel.modal.type !==
+								modalType.VIEW
+							"
+						>
+							<kendo-dropdownlist
+								id="assetCommentCategory"
+								name="assetCommentCategory"
+								class="form-control asset-comment-dropdown"
+								[data]="commentCategories"
+								[(ngModel)]="
+									assetCommentModel.category
+								"
+							>
+							</kendo-dropdownlist>
+						</div>
+						<div
+							class="col-sm-8"
+							*ngIf="
+								assetCommentModel.modal.type ===
+								modalType.VIEW
+							"
+						>
+							<label
+								class="control-label label-detail"
+								>{{
+									assetCommentModel.category
+								}}</label
+							>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<clr-checkbox-container
+						*ngIf="
+							assetCommentModel.modal.type !==
+							modalType.CREATE
+						"
+					>
+						<clr-checkbox-wrapper>
+							<input
+								clrCheckbox
+								type="checkbox"
+								id="assetCommentArchive"
+								name="assetCommentArchive"
+								[(ngModel)]="
+									assetCommentModel.archive
+								"
+								[disabled]="
 									assetCommentModel.modal.type ===
 									modalType.VIEW
 								"
-							>
-								<div class="col-md-6 pad-left-0">
-									<label
-										class="control-label label-detail text-capitalize"
-										>Date created:
-										{{
-											assetCommentModel.dateCreated
-												| tdsDateTime: dateFormatTime
-										}}</label
-									>
-								</div>
-								<div class="col-md-6">
-									<label
-										class="control-label label-detail text-capitalize pull-right"
-										>Last updated:
-										{{
-											assetCommentModel.lastUpdated
-												| tdsDateTime: dateFormatTime
-										}}</label
-									>
-								</div>
-							</div>
-						</div>
+							/>
+							<label>Archived</label>
+						</clr-checkbox-wrapper>
+					</clr-checkbox-container>
+				</div>
+				<div
+					class="col-md-12 asset-comment-date-container"
+					*ngIf="
+						assetCommentModel.modal.type ===
+						modalType.VIEW
+					"
+				>
+					<div class="col-md-6 pad-left-0">
+						<label
+							class="control-label label-detail text-capitalize"
+							>Date created:
+							{{
+								assetCommentModel?.dateCreated | tdsDateTime: userTimeZone:userDateTimeFormat
+							}}</label
+						>
 					</div>
-				</form>
+					<div class="col-md-6">
+						<label
+							class="control-label label-detail text-capitalize pull-right"
+							>Last updated:
+							{{
+								assetCommentModel?.lastUpdated | tdsDateTime: userTimeZone:userDateTimeFormat
+							}}</label
+						>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="modal-sidenav btn-link">
-			<tds-button-edit
-				*ngIf="assetCommentModel.modal.type === modalType.EDIT"
-				class="selected-button"
-			>
-			</tds-button-edit>
-
-			<tds-button-edit
-				(click)="onEdit()"
-				[disabled]="!isCommentEditAvailable()"
-				*ngIf="assetCommentModel.modal.type === modalType.VIEW"
-			>
-			</tds-button-edit>
-
-			<tds-button-save
-				(click)="onSave()"
-				*ngIf="assetCommentModel.modal.type !== modalType.VIEW"
-				[disabled]="!dependentForm.dirty || !dependentForm.valid"
-			>
-			</tds-button-save>
-
-			<tds-button-delete
-				(click)="onDelete()"
-				[disabled]="!isCommentDeleteAvailable()"
-				*ngIf="assetCommentModel.modal.type !== modalType.CREATE"
-			>
-			</tds-button-delete>
-
-			<tds-button-close
-				*ngIf="
-					assetCommentModel.modal.type === modalType.VIEW ||
-						assetCommentModel.modal.type === modalType.CREATE;
-					else cancelButton
-				"
-				(click)="closeDialog()"
-			>
-			</tds-button-close>
-
-			<ng-template #cancelButton>
-				<tds-button-cancel (click)="closeDialog()">
-				</tds-button-cancel>
-			</ng-template>
-		</div>
-	</div>
+	</form>
 </div>
+

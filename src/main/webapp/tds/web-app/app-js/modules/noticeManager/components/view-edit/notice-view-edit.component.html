@@ -266,21 +266,34 @@
 					class="clr-col-12"
 					[ngClass]="{ 'readonly-control': noticeIsLocked }"
 				>
-					<rich-text-editor
-						[readonly]="
-							noticeIsLocked || action === EnumActionType.View
-						"
-						#htmlTextField
-						[elementId]="'htmlText'"
-						[required]="true"
-						[name]="'htmlText'"
-						(valueChange)="onValueChange($event)"
-						(rawValueChange)="onRawValueChange($event)"
-						(escHandler)="cancelHTMLInputDialog()"
-						[rawValue]="model.rawText"
-						[value]="model.htmlText"
+					<kendo-editor
+							[value]="model.htmlText"
+							(valueChange)="onValueChange($event)"
+							[readonly]="(noticeIsLocked || action === EnumActionType.View)"
 					>
-					</rich-text-editor>
+						<kendo-toolbar>
+							<kendo-toolbar-buttongroup>
+								<kendo-toolbar-button kendoEditorUndoButton></kendo-toolbar-button>
+								<kendo-toolbar-button kendoEditorRedoButton></kendo-toolbar-button>
+							</kendo-toolbar-buttongroup>
+							<kendo-toolbar-dropdownlist kendoEditorFormat></kendo-toolbar-dropdownlist>
+							<kendo-toolbar-buttongroup>
+								<kendo-toolbar-button kendoEditorBoldButton></kendo-toolbar-button>
+								<kendo-toolbar-button kendoEditorItalicButton></kendo-toolbar-button>
+								<kendo-toolbar-button kendoEditorUnderlineButton></kendo-toolbar-button>
+							</kendo-toolbar-buttongroup>
+							<kendo-toolbar-buttongroup>
+								<kendo-toolbar-button kendoEditorAlignLeftButton></kendo-toolbar-button>
+								<kendo-toolbar-button kendoEditorAlignCenterButton></kendo-toolbar-button>
+								<kendo-toolbar-button kendoEditorAlignRightButton></kendo-toolbar-button>
+								<kendo-toolbar-button kendoEditorAlignJustifyButton></kendo-toolbar-button>
+							</kendo-toolbar-buttongroup>
+							<kendo-toolbar-buttongroup>
+								<kendo-toolbar-button kendoEditorIndentButton></kendo-toolbar-button>
+								<kendo-toolbar-button kendoEditorOutdentButton></kendo-toolbar-button>
+							</kendo-toolbar-buttongroup>
+						</kendo-toolbar>
+					</kendo-editor>
 				</div>
 			</div>
 			<!-- Post Message Text -->

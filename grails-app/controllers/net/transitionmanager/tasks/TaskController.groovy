@@ -693,20 +693,16 @@ class TaskController implements ControllerMethods {
 			}
 
 			def moveEventId = params.moveEventId
+			MoveEvent moveEvent = null
 			if (! moveEventId || ! moveEventId.isNumber()) {
 				errorMessage = "Please select an event to view the graph"
 				break
+			} else {
+				moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
+				userPreferenceService.setMoveEventId(moveEventId)
+				log.debug "**** $project.id / $moveEvent.project.id - $project / $moveEvent "
 			}
 
-			def moveEvent = MoveEvent.read(moveEventId)
-			if (! moveEvent || moveEvent.project.id != project.id) {
-				errorMessage = "The event specified was not found"
-				if (moveEvent)
-					log.warn "SECURITY : User $securityService.currentUsername attempted to access graph of event ($moveEventId) not associated to current project ($project)"
-				break
-			}
-
-			log.debug "**** $project.id / $moveEvent.project.id - $project / $moveEvent "
 
 			def mode = params.mode ?: ''
 			if (mode && ! "s".contains(mode)) {
@@ -716,7 +712,6 @@ class TaskController implements ControllerMethods {
 
 			def viewUnpublished = securityService.hasPermission(Permission.TaskPublish) && params.viewUnpublished == '1'
 			userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, viewUnpublished)
-			userPreferenceService.setPreference(PREF.MOVE_EVENT, moveEventId)
 
 			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
 

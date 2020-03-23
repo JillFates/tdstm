@@ -103,6 +103,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/assetForDependencyGroup" {
+			controller = "wsAsset"
+			action = [
+			        GET: "getAssetForDependencyGroup"
+			]
+		}
+
 		"/ws/apiAction/$id" {
 			controller = "wsApiAction"
 			action = [
@@ -835,6 +842,11 @@ class UrlMappings {
 		"/auth/resetPassword/$token" {
 			controller = "auth"
 			action = [GET:"resetPassword"]
+		}
+
+		"/auth/applyNewPassword" {
+			controller = "auth"
+			action = [POST:"applyNewPassword"]
 		}
 
 		"/ws/admin/unlockAccount" {
