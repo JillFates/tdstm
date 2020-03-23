@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs';
 // Angular
 import {
 	Component,
@@ -570,16 +571,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 					}
 				});
 		} else {
-			this.dialogService.activatedDropdown.subscribe(res => {
-				if (res) {
-					this.dialogService.activatedDropdown.next(false);
-					return;
-				}
-				else {
-					super.onCancelClose();
-				}
-			});
-
+			super.onCancelClose();
 		}
 	}
 
@@ -589,7 +581,29 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 	 */
 	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
+			let subscr: Subscription;
+			let acti = false;			
+			subscr = this.dialogService
+				.activatedDropdown
+				.subscribe(res => { 
+					// console.log('theRes:', res);
+					// console.log('istrue:' + (res === true));
+					if ((res === true)) {
+						subscr.unsubscribe();
+						acti = true;
+						return;
+					} else {
+						subscr.unsubscribe();
+						acti = false;
+					}
+
+				});
+			setTimeout(() => {
+				if (acti === false) {
+					this.cancelCloseDialog();
+				}				
+			}, 1000);
+			
 		}
 	}
 
