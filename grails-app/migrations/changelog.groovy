@@ -92,6 +92,7 @@ databaseChangeLog = {
 	include file: 'version/v5_0_0/20200110-add-tbd-conflict-depdency-group-columns-to-common-columns-view.groovy'
 	include file: 'version/v5_0_0/20200114-drop-depdencyBundle-column.groovy'
 	include file: 'version/v4_7_2/20200127-fix-empty-shared-field-specs.groovy'
-	include file: 'version/v4_7_2/20200206-add-license-lastcompliance-column.groovy', include file: 'version/v4_7_2/20200129-remove-null-fields.groovy'
-	include file: 'version/v4_7_2/20200218-drop-dataview-unique-index.groovy',
+	include file: 'version/v4_7_2/20200206-add-license-lastcompliance-column.groovy'
+    include file: 'version/v4_7_2/20200129-remove-null-fields.groovy'
+	include file: 'version/v4_7_2/20200218-drop-dataview-unique-index.groovy'
 }
