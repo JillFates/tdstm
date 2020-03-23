@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.CSVDataset
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.ImportOperationEnum
@@ -38,6 +39,9 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -431,7 +435,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 					domain == ETLDomain.Device.name()
 					data.size() == 3
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -439,7 +443,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 							value == 'x'
 						}
 					}
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -447,7 +451,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 							value == 'y'
 						}
 					}
-					assertWith(data[2], RowResult) {
+					assertWith(data[2]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 3
 						assertWith(fields.assetName) {

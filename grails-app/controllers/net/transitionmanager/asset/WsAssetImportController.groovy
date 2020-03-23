@@ -240,7 +240,7 @@ class WsAssetImportController implements ControllerMethods {
 		}
 
 		if(FilenameUtils.getExtension(filename) == 'json') { // TODO: Add support for Excel/CSV file JSON responses in WS.
-			renderSuccessJson(JsonUtil.parseFile(is))
+			renderSuccessJson(JsonUtil.parseInputStream(is))
 		} else {
 			renderErrorJson("Error: Preview must be in JSON format.")
 		}

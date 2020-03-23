@@ -3,6 +3,8 @@ package net.transitionmanager.etl
 import com.fasterxml.jackson.core.JsonEncoding
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
+import com.google.gson.JsonObject
+import com.tdsops.etl.DomainOnDisk
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.FieldResult
@@ -10,7 +12,10 @@ import com.tdsops.etl.FindResult
 import com.tdsops.etl.QueryResult
 import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
+import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
+
+import java.text.SimpleDateFormat
 
 /**
  * <p>Streaming reader solution for {@link ETLProcessorResult},
@@ -28,9 +33,9 @@ import groovy.transform.CompileStatic
  * </pre>
  * <p>At the same time, it populates 2 fields in {@link ETLProcessorResult}:</p>
  *  <ul>
- *      <li>{@link DomainResult#outputFilename}: defines where {@link ETLStreamingWriter}
- *          saves each {@link DomainResult#data} list.
- *      <li>{@link DomainResult#dataSize}: defines the amount of rows from {@link DomainResult#data}
+ *      <li>{@link DomainOnDisk#outputFilename}: defines where {@link ETLStreamingWriter}
+ *          saves each {@link DomainResult#getData()} list.
+ *      <li>{@link DomainResult#dataSize}: defines the amount of rows from {@link DomainResult#getData()}
  *          were saved
  *  </ul
  * <BR>
@@ -50,11 +55,24 @@ class ETLStreamingWriter {
     OutputStream outputStream
     JsonGenerator generator
 
+    static SimpleDateFormat dateFormat = new SimpleDateFormat('')
+
     ETLStreamingWriter(OutputStream outputStream) {
         this.outputStream = outputStream
         generator = new JsonFactory()
                 .createGenerator(outputStream, JsonEncoding.UTF8)
     }
+
+    void startDataArray() {
+        generator.writeStartArray()
+    }
+
+    void endDataArray() {
+        generator.writeEndArray()
+        close()
+    }
+
+
     /**
      * Writes in {@link ETLStreamingWriter#outputStream} field,
      * the main structure from {@link ETLProcessorResult}.
@@ -73,10 +91,7 @@ class ETLStreamingWriter {
         generator.writeNumberField('version', result.version)
         writeDomains(result.domains)
         generator.writeEndObject()
-        generator.close()
-
-        outputStream.flush()
-        outputStream.close()
+        close()
     }
     /**
      * <p>Writes in {@link ETLStreamingWriter#outputStream} field,
@@ -89,11 +104,14 @@ class ETLStreamingWriter {
      */
     void writeETLResultsData(List<RowResult> data) {
         writeDataArray(data)
+        close()
+    }
+
+    void close() {
         generator.close()
         outputStream.flush()
         outputStream.close()
     }
-
     /**
      * Writes in {@link ETLStreamingWriter#outputStream}
      * fields from {@link DomainResult}.
@@ -143,9 +161,8 @@ class ETLStreamingWriter {
      *
      * @param rowResult
      */
-    private void writeRowResult(RowResult rowResult) {
+    void writeRowResult(RowResult rowResult) {
         generator.writeStartObject()
-
         writeStringCollectionField('errors', rowResult.errors)
         generator.writeNumberField('rowNum', rowResult.rowNum)
         generator.writeNumberField('errorCount', rowResult.errorCount)
@@ -174,15 +191,42 @@ class ETLStreamingWriter {
         generator.writeBooleanField('warn', fieldResult.warn)
         writeStringCollectionField('errors', fieldResult.errors)
 
-        generator.writeObjectField('init', fieldResult.init)
-        generator.writeObjectField('originalValue', fieldResult.originalValue)
-        generator.writeObjectField('value', fieldResult.value)
+        writeObjectField('init', fieldResult.init)
+        writeObjectField('originalValue', fieldResult.originalValue)
+        writeObjectField('value', fieldResult.value)
 
         if (fieldResult.find) writeFind(fieldResult.find)
         if (fieldResult.create) writeObjectMapField('create', fieldResult.create)
         if (fieldResult.update) writeObjectMapField('update', fieldResult.update)
 
         generator.writeEndObject()
+    }
+
+    /**
+     * <p>Overrides {@link JsonGenerator#writeObjectField(java.lang.String, java.lang.Object)} for not supported data types.</p>
+     * <p>At the moment we are serializing {@link FieldResult#init}, {@link FieldResult#value} and {@link FieldResult#originalValue}
+     * we need to detect if data type is supported by {@link JsonGenerator}.
+     * If that is not the case we are converting Object field using toString() method.
+     * After that, DataImport can detect and convert it smartly based on Domain data types.</p>
+     *
+     * @param fieldName a field name
+     * @param pojo an Object to be serialized.
+     */
+    private void writeObjectField(String fieldName, Object pojo) {
+
+        switch (pojo?.class) {
+            case Date:
+                generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
+                break
+            case Map:
+            case JsonObject:
+            case List:
+            case Set:
+                generator.writeStringField(fieldName, pojo.toString())
+                break
+            default:
+                generator.writeObjectField(fieldName, pojo)
+        }
     }
 
     /**
@@ -266,7 +310,6 @@ class ETLStreamingWriter {
         for (Map.Entry<String, FieldResult> fieldResultEntry in fields) {
             writeFieldResult(fieldResultEntry.key, fieldResultEntry.value)
         }
-
         generator.writeEndObject()
     }
 

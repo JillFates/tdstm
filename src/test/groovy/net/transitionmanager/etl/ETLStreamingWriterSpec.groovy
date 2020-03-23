@@ -1,100 +1,86 @@
 package net.transitionmanager.etl
 
-import com.tdsops.etl.DomainResult
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.ETLBaseSpec
-import com.tdsops.etl.ETLProcessor
-import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.FieldResult
 import com.tdsops.etl.RowResult
-import com.tdsops.etl.TagResults
 import com.tdsops.tm.enums.domain.ImportOperationEnum
-import spock.lang.Shared
+import com.tdssrc.grails.TimeUtil
+import grails.converters.JSON
+import grails.test.mixin.Mock
+import groovy.json.JsonSlurper
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
+import spock.lang.Unroll
 
+@Mock([AssetEntity])
 class ETLStreamingWriterSpec extends ETLBaseSpec {
 
-    @Shared
-    ETLProcessorResult processorResult
-
-    def setupSpec() {
-
-        processorResult = new ETLProcessorResult(
-                Mock(ETLProcessor) {
-                    getFilename() >> '/tmp/filename.csv'
-                })
-
-        processorResult.with {
-            consoleLog = ''
-            version = 1
-            domains = [
-                    new DomainResult(
-                            domain: 'Application',
-                            fieldLabelMap: ['id': 'Id', 'assetName': 'Name'],
-                            fieldNames: ['id', 'assetName'].toSet(),
-                            data: [
-                                    new RowResult(
-                                            op: ImportOperationEnum.INSERT,
-                                            rowNum: 1,
-                                            errorCount: 0,
-                                            warn: false,
-                                            duplicate: false,
-                                            errors: [],
-                                            fields: [
-                                                    id: new FieldResult(
-                                                            originalValue: '123456789',
-                                                            value: 123456789,
-                                                            init: null,
-                                                            fieldOrder: 1,
-                                                            errors: [],
-                                                            warn: false,
-                                                            find: null,
-                                                            create: null,
-                                                            update: null
-                                                    )
-                                            ],
-                                            domain: 'Application',
-                                            comments: [],
-                                            tags: new TagResults(add: ['FUBAR', 'SNAFU'])
-                                    )
-                            ]
-                    )
-            ]
+    static doWithSpring = {
+        coreService(CoreService) {
+            grailsApplication = ref('grailsApplication')
+        }
+        fileSystemService(FileSystemService) {
+            coreService = ref('coreService')
+        }
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
         }
     }
 
-    void 'test can write DomainResult List in an OutputStream'() {
+    @Unroll
+    void 'test can write DomainResult with an instance of RowResult with value:(#value) serialized in serializedValue:(#serializedValue) '() {
 
-        given: 'an outputStream and an ETLProcessResult'
+        setup: 'an outputStream and an ETLProcessResult'
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+            ETLStreamingWriter streamingWriter = new ETLStreamingWriter(byteArrayOutputStream)
 
-        when: 'ETLStreamingWriter serialized ETLProcessResult in the outputStream'
-            new ETLStreamingWriter(byteArrayOutputStream).writeETLResultsData(processorResult.domains[0].data)
-            String results = new String(byteArrayOutputStream.toByteArray(), 'UTF-8')
+        and: 'ETLStreamingWriter serialized ETLProcessResult in the outputStream'
+            streamingWriter.writeRowResult(
+                    new RowResult(
+                            op: ImportOperationEnum.INSERT,
+                            rowNum: 1,
+                            errorCount: 0,
+                            warn: false,
+                            duplicate: false,
+                            errors: [],
+                            fields: [
+                                    description: new FieldResult(
+                                            originalValue: '',
+                                            value: value,
+                                            init: null,
+                                            fieldOrder: 1,
+                                            errors: [],
+                                            warn: false,
+                                            find: null,
+                                            create: null,
+                                            update: null
+                                    )
+                            ],
+                            domain: 'Application',
+                            comments: [],
+                            tags: null
+                    )
+            )
 
-        then: 'OutputStream results in String format contains JSON serialized content'
-            results.contains('"tags":{"add":["FUBAR","SNAFU"],"remove":[],"replace":{}}')
-            results.contains('{"errors":[],"rowNum":1,"errorCount":0,"warn":false,"duplicate":false,"op":"Insert"')
-            results.contains('"fields":{"id":{"fieldOrder":1,"warn":false,"errors":[],"init":null,"originalValue":"123456789","value":123456789}}')
-            results.contains('"domain":"Application"')
-            results.contains('"comments":[]')
+            streamingWriter.close()
+
+            Map<String, ?> result = new JsonSlurper().parse(byteArrayOutputStream.toByteArray())
+
+        expect: 'OutputStream results in String format contains JSON serialized content'
+            result.fields.description.value == serializedValue
+
+        where:
+            value                                                 || serializedValue
+            new Integer('123')                                    || 123
+            new BigDecimal('12.30')                               || new BigDecimal('12.30')
+            123456789                                             || 123456789
+            '123456789'                                           || '123456789'
+            TimeUtil.parseISO8601DateTime("1978-06-22T17:05:22Z") || '1978-06-22T17:05:22Z'
+            JSON.parse('{"key": "value"}')                        || '[key:value]'
+            [key: 'value']                                        || '[key:value]'
+            ['key', 'value']                                      || '[key, value]'
+            ['key', 'value'] as Set                               || '[key, value]'
     }
-
-    void 'test can write ETLProcessorResult as header in an OutputStream'() {
-
-        given: 'an outputStream and an ETLProcessResult'
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
-
-        when: 'ETLStreamingWriter serialized ETLProcessResult in the outputStream'
-            new ETLStreamingWriter(byteArrayOutputStream).writeETLResultsHeader(processorResult)
-            String results = new String(byteArrayOutputStream.toByteArray(), 'UTF-8')
-
-        then: 'OutputStream results in String format contains JSON serialized content'
-            results.contains('{"ETLInfo":{"originalFilename":"/tmp/filename.csv"}')
-            results.contains('"domain":"Application"')
-            results.contains('"consoleLog":""')
-            results.contains('"version":1')
-            results.contains('"fieldNames":["assetName","id"]')
-            results.contains('"fieldLabelMap":{"id":"Id","assetName":"Name"}')
-    }
-
-
 }

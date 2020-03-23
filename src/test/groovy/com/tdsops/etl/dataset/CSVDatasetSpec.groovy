@@ -1,5 +1,6 @@
 package com.tdsops.etl.dataset
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.*
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
@@ -22,6 +23,9 @@ class CSVDatasetSpec extends ETLBaseSpec {
         fileSystemService(FileSystemService) {
             coreService = ref('coreService')
             transactionManager = ref('transactionManager')
+        }
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
         }
     }
 
@@ -249,31 +253,31 @@ class CSVDatasetSpec extends ETLBaseSpec {
                     }
 
                     data.size() == 2
-                    assertWith(data[0], RowResult) {
+                    assertWith(data[0]) {
                         op == ImportOperationEnum.INSERT.toString()
                         rowNum == 1
                         fields.keySet().size() == 2
-                        assertWith(fields.appVendor, FieldResult) {
+                        assertWith(fields.appVendor) {
                             value == 'Microsoft'
                             originalValue == 'Microsoft'
                             init == null
                         }
-                        assertWith(fields.appTech, FieldResult) {
+                        assertWith(fields.appTech) {
                             value == '(xlsx updated)'
                             originalValue == '(xlsx updated)'
                             init == null
                         }
                     }
 
-                    assertWith(data[1], RowResult) {
+                    assertWith(data[1]) {
                         op == ImportOperationEnum.INSERT.toString()
                         rowNum == 2
                         fields.keySet().size() == 2
-                        assertWith(fields.appVendor, FieldResult) {
+                        assertWith(fields.appVendor) {
                             value == 'Mozilla'
                             originalValue == 'Mozilla'
                         }
-                        assertWith(fields.appTech, FieldResult) {
+                        assertWith(fields.appTech) {
                             value == 'NGM'
                             originalValue == 'NGM'
                             init == null
@@ -321,26 +325,26 @@ class CSVDatasetSpec extends ETLBaseSpec {
                     fieldNames == ['id', 'assetName', 'description', 'sme'] as Set
 
                     data.size() == 2
-                    assertWith(data[0], RowResult) {
+                    assertWith(data[0]) {
                         op == ImportOperationEnum.INSERT.toString()
                         rowNum == 1
                         fields.keySet().size() == 2
-                        assertWith(fields.id, FieldResult) {
+                        assertWith(fields.id) {
                             value == '123'
                             originalValue == '123'
                             init == null
                         }
-                        assertWith(fields.assetName, FieldResult) {
+                        assertWith(fields.assetName) {
                             value == 'Foo'
                             originalValue == 'Foo'
                             init == null
                         }
-                        assertWith(fields.description, FieldResult) {
+                        assertWith(fields.description) {
                             value == 'This, That, and the other'
                             originalValue == 'This, That, and the other'
                             init == null
                         }
-                        assertWith(fields.sme, FieldResult) {
+                        assertWith(fields.sme) {
                             value == 'Jim Beam'
                             originalValue == 'Jim Beam'
                             init == null

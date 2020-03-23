@@ -1,9 +1,14 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.converters.JSON
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.etl.ETLStreamingWriter
+import net.transitionmanager.imports.ScriptProcessorService
 
 /**
  * Results collected from an ETL Processor instance processing an ETL script.
@@ -14,6 +19,8 @@ import groovy.transform.CompileStatic
 class ETLProcessorResult {
 
     static final Integer CURRENT_VERSION = 2
+
+    static final String ETL_FILENAME_EXTENSION = 'json'
     /**
      * ETL Processor used to collect results in a ETL Procesor Result instance.
      */
@@ -35,22 +42,43 @@ class ETLProcessorResult {
      * Collection of results with their data fields map
      */
     List<DomainResult> domains = (List<DomainResult>) []
-    /**
-     * Result row index position in the reference.data list
-     * @see DomainResult#data
-     */
-    Integer resultIndex = -1
 
     /**
      * Debug Console content filed used to create the final result
      */
     String consoleLog = ''
 
+    FileSystemService fileSystemService
+
+    String outputFilename
+
+    OutputStream outputStream
+
+    /**
+     * Defines if lookup
+     */
+    Boolean isLookupEnable = false
+
     ETLProcessorResult(ETLProcessor processor) {
         this.processor = processor
         this.ETLInfo = [
                 originalFilename: processor.getFilename()
         ]
+
+        this.fileSystemService = ApplicationContextHolder.getBean('fileSystemService', FileSystemService)
+        List tmpFile = this.fileSystemService.createTemporaryFile(ScriptProcessorService.PROCESSED_FILE_PREFIX, ETL_FILENAME_EXTENSION)
+        this.outputFilename = tmpFile[0]
+        this.outputStream = (OutputStream) tmpFile[1]
+    }
+
+    /**
+     * Defines when an ETL script was finished in its evaluation step.
+     * @see ETLProcessor#evaluate(java.lang.String)
+     */
+    void scriptFinished() {
+        for (DomainResult domain in this.domains) {
+            domain.finish()
+        }
     }
 
     /**
@@ -62,17 +90,31 @@ class ETLProcessorResult {
     }
 
     /**
+     * Used to allow the script to use the 'lookup' command. This will cause the ETL process to retain
+     * the processed records in memory and stream them to disk at the end of the process.
+     */
+    void enableLookup() {
+        this.isLookupEnable = true
+    }
+
+    /**
      * Adds a new json entry in results list
      * @param domain
      */
     void addCurrentSelectedDomain(ETLDomain domain) {
-        endRow()
+
         reference = domains.find { it.domain == domain.name() }
         if (!reference) {
-            reference = new DomainResult(domain: domain.name())
+            String filename = outputFilename.replace(".${ETL_FILENAME_EXTENSION}", "_${domain.name()}.$ETL_FILENAME_EXTENSION")
+            ETLStreamingWriter writer = new ETLStreamingWriter(fileSystemService.createTemporaryFileWithGivenName(filename))
+
+            if (isLookupEnable) {
+                reference = new DomainInMemory(domain.name(), filename, writer)
+            } else {
+                reference = new DomainOnDisk(domain.name(), filename, writer)
+            }
             domains.add(reference)
         }
-        resultIndex = -1
     }
 
     /**
@@ -231,35 +273,26 @@ class ETLProcessorResult {
      * Restart result index for the next row to be processed in an ETL script iteration
      */
     void startRow() {
-        resultIndex = -1
+        //resultIndex = -1
     }
 
     /**
-     * Mark the end of a row cleaning up the ignored result
+     * Mark the end of a row cleaning up the ignored result.
      */
     void endRow() {
-        // Check first if the scenario with an iterate without defining a domain and read labels
-        if (reference && processor.iterateIndex) {
-            RowResult currentRow = findOrCreateCurrentRow()
-            if (currentRow.ignore) {
-                ignoreCurrentRow()
-            }
+        for (DomainResult domain in domains) {
+            domain.endCurrentRow()
         }
     }
 
     /**
-     * Remove the current row from results going back the previous row results
+     * Remove the current row from results going back the previous row results.
      */
     void ignoreCurrentRow() {
-        if (resultIndex >= 0) {
-            if (resultIndex >= reference.data.size() + 1) {
-                throw ETLProcessorException.ignoreOnlyAllowOnNewRows()
-            }
-            reference.data.remove(resultIndex)
-            resultIndex = -1
+        if (reference.currentRow) {
+            reference.currentRow.ignore = true
         }
     }
-
     /**
      * <p>Find the current row in ETLProcessorResult#reference</p>
      * If ETLProcessorResult#resultIndex is equals -1,
@@ -270,15 +303,14 @@ class ETLProcessorResult {
      */
     @CompileStatic
     RowResult findOrCreateCurrentRow() {
-        if (resultIndex == -1) {
-            reference.data.add(new RowResult(
+
+        if (!reference.currentRow) {
+            reference.currentRow = new RowResult(
                     fieldsValidator: processor.fieldsValidator,
                     rowNum: processor.currentRowIndex,
                     domain: reference.domain)
-            )
-            resultIndex = reference.data.size() - 1
         }
-        return reference.data[resultIndex]
+        return reference.currentRow // data[resultIndex]
     }
 
     /**
@@ -288,7 +320,7 @@ class ETLProcessorResult {
      */
     @CompileStatic
     RowResult currentRow() {
-        return reference.data[resultIndex]
+        return reference.currentRow
     }
 
     /**
@@ -298,10 +330,8 @@ class ETLProcessorResult {
      */
     @CompileStatic
     Object getFieldValue(String fieldNameOrLabel) {
-        if (resultIndex >= 0) {
-
-            RowResult row = currentRow()
-            FieldResult fieldResult = row.getField(fieldNameOrLabel)
+        if (reference.currentRow) {
+            FieldResult fieldResult = reference.currentRow.getField(fieldNameOrLabel)
             return fieldResult.value
 
         } else {
@@ -316,12 +346,10 @@ class ETLProcessorResult {
      * @return
      */
     Boolean hasColumn(String columnName) {
-        if (resultIndex >= 0) {
-            RowResult row = currentRow()
-            return row.hasField(columnName)
-        } else {
+        if (!reference.currentRow) {
             throw ETLProcessorException.domainOnlyAllowOnNewRows()
         }
+        return reference.currentRow.hasField(columnName)
     }
 
     /**
@@ -363,8 +391,6 @@ class ETLProcessorResult {
             }
         }
     }
-
-
     /**
      * Look up a field name that contain a value equals to the value and if found then the current
      * result reference will be move back to a previously processed row for the domain. This is done
@@ -444,7 +470,15 @@ class ETLProcessorResult {
         if (size > 1) {
             throw ETLProcessorException.lookupFoundMultipleResults()
         } else if (size == 1) {
-            this.resultIndex = positions[0]
+            /**
+             * Once the lookup command found a coincidence,
+             * It is necessary first, to save in current row with
+             * all its fields. After that, we can change the pointer of
+             * current row to a found RowResult.
+             */
+            this.reference.endCurrentRow()
+            Integer position = positions[0]
+            this.reference.currentRow = (RowResult) this.reference.data[position]
         }
 
         return (size == 1)
@@ -460,26 +494,38 @@ class ETLProcessorResult {
 
 /**
  * <pre>
- *  "domains": {*    "domain": "Device",
+ *  "domains": { //
+ *    "domain": "Device",
  *    "fieldNames": [
  *      "assetName",
  *      "externalRefId"
  *    ],
- * 	  "fieldLabelMap": {* 		"asset": "asset",
+ * 	  "fieldLabelMap": { //
+ * 	    "asset": "asset",
  *      "dependent": "dependent",
  *      "c1": "c1"
- *},
+ *     //}, //
  *    "data": [ list of RowResult instances]
- *}* </pre>
+ *  //}//
+ *  </pre>
  */
 @CompileStatic
-class DomainResult {
+abstract class DomainResult {
 
     /**
      * An instance of {@code DomainResult} is represented as list of {@RowResult}
      * that are defined by a {@code ETLDomain}. This field saves that value as String.
      */
     String domain
+    /**
+     * Filename of DomainResult saved on disk using a Streaming solution.
+     * @see net.transitionmanager.etl.ETLStreamingWriter#writeDataArray(java.util.List)
+     */
+    String outputFilename
+    /**
+     * Writer of {@link RowResult} on Disk.
+     */
+    ETLStreamingWriter writer
     /**
      * <p>Saves a list of fields used during a ETL script executions for this particular domain</p>
      * <pre>
@@ -492,32 +538,63 @@ class DomainResult {
      *  ....
      * </pre>
      */
-    Set fieldNames = [] as Set
+    Set fieldNames
     /**
      * <p>This map is used to have a map between field label and field name used in an ETL processor results</p>
      * <pre>
      *  ....
-     *  "fieldLabelMap": {*  	"asset": "asset",
+     *  "fieldLabelMap": {//
+     *      "asset": "asset",
      *      "dependent": "dependent",
      *      "c1": "c1"
-     *},
+     *  //},
      *  ....
      * <pre>
      */
-    Map<String, String> fieldLabelMap = [:]
-
-    List<RowResult> data = new ArrayList<RowResult>()
+    Map<String, String> fieldLabelMap
     /**
-     * Filename of DomainResult saved on disk using a Streaming solution.
-     * @see net.transitionmanager.etl.ETLStreamingWriter#writeDataArray(java.util.List)
+     * During an iteration of an ETL script,
+     * each {@link RowResult} collected is pointed
+     * to this variable.
+     * After finishing each iteration, it is saved
+     * in memory {@link DomainInMemory} or on disk
+     * {@link DomainOnDisk}
      */
-    String outputFilename
+    RowResult currentRow
+
+    DomainResult(String domain, String outputFilename, ETLStreamingWriter writer) {
+        this.domain = domain
+        this.outputFilename = outputFilename
+        this.writer = writer
+        this.fieldNames = [] as Set
+        this.fieldLabelMap = [:]
+    }
+
+    /**
+     * In an iterate command, at the end of each row process,
+     * ETLProcessor invokes this method to complete progress
+     * saving data in disk or collecting them in memory.
+     */
+    abstract void endCurrentRow()
+    /**
+     * Finishes the ETL script evaluation.
+     * This method is necessary to cleanup resources.
+     */
+    abstract void finish()
     /**
      * Defines amount of {@code DomainResult#data} list. It used in serialized step
      * using streaming solution.
      */
     Integer dataSize = 0
-
+    /**
+     * Returns data collected during an ETL script evaluation.
+     *
+     * @return a List of results. It could be a List of {@link RowResult}
+     *      or a List<Map>.
+     * @see DomainInMemory#getData()
+     * @see DomainOnDisk#getData()
+     */
+    abstract List<Object> getData()
     /**
      * Add the field name for an instance of Element
      * to the fieldNames Set property
@@ -542,18 +619,150 @@ class DomainResult {
     void setFieldLabelMap(Map<String, String> fieldLabelMap) {
         this.fieldLabelMap = fieldLabelMap
     }
+
+}
+/**
+ * <p>{@link DomainResult} class extension. It serialized ETL results
+ * on FileSystem using an instance of {@link ETLStreamingWriter}.</p>
+ */
+@CompileStatic
+class DomainOnDisk extends DomainResult {
+
+    /**
+     * A list of data saved in disk and collected.
+     */
+    List<Object> data
+
+    DomainOnDisk(String domain, String outputFilename, ETLStreamingWriter writer) {
+        super(domain, outputFilename, writer)
+        this.writer.startDataArray()
+    }
+
+    /**
+     * Completes the process of an Iterate execution.
+     * For this particular implementation, it is necessary
+     * to finish the array of data in disk and finally,
+     * flush all the content on disk.
+     *
+     * @see ETLProcessorResult#scriptFinished()
+     */
+    void finish() {
+        this.writer.endDataArray()
+        this.writer.close()
+    }
+
+    /**
+     * At the end of each row, iterate command is calling this method
+     * for collecting a row. For an instance of {@link DomainOnDisk}
+     * it also save results in {@link DomainOnDisk#writer}
+     */
+    void endCurrentRow() {
+        if (currentRow && !currentRow.ignore) {
+            this.dataSize++
+            this.writer.writeRowResult(currentRow)
+        }
+        currentRow = null
+    }
+    /**
+     * Returns data collected during an ETL script evaluation.
+     *
+     * @return a List of results. It could be a List of {@link RowResult}
+     *      or a List<Map>.
+     */
+    List<Object> getData() {
+        if (!data) {
+            FileSystemService fileSystemService = ApplicationContextHolder.getBean('fileSystemService', FileSystemService)
+            String fileContent = fileSystemService.openTempFile(outputFilename).text
+            data = (new JsonSlurper().parse(fileContent.getBytes())) as List
+        }
+        return data
+    }
+}
+/**
+ * <p>This class extends {@link DomainResult} collecting {@link RowResult}
+ * in {@link DomainInMemory#rows} field.</p>
+ * <p>Once an ETL script enable lookup command, {@link ETLProcessorResult}
+ * collects {@link RowResult} in a list in memory instead of flushing each row on disk
+ * as {@link DomainOnDisk} implementation.</p>
+ * @see ETLProcessor#enable(org.codehaus.groovy.runtime.MethodClosure)
+ */
+class DomainInMemory extends DomainResult {
+
+    /**
+     * Collection of {@link RowResult} saved in memory
+     * during an ETL script evaluation.
+     */
+    List<RowResult> rows
+
+    DomainInMemory(String domain, String outputFilename, ETLStreamingWriter writer) {
+        super(domain, outputFilename, writer)
+        this.rows = []
+    }
+
+    /**
+     * <p>This method adds {@link DomainResult#currentRow} in
+     * {@link DomainInMemory#rows} List.</p>
+     * There are 3 possible scenarios where current row
+     * should not be added in {@link DomainInMemory#rows} List:
+     * <p>1) If {@link DomainResult#currentRow} is null.
+     * It only happends in lookup command scenario.</p>
+     * <p>2) If the {@link DomainResult#currentRow} needs to be ignored.</p>
+     * <p>3)If {@link DomainResult#currentRow} was already added in
+     * {@link DomainInMemory#rows} List.</p>
+     */
+    void endCurrentRow() {
+        if (currentRow
+                && !currentRow.ignore
+                && (rows.size() <= (currentRow.rowNum - 1))
+        ) {
+            this.dataSize++
+            this.rows.add(currentRow)
+        }
+        currentRow = null
+    }
+
+    /**
+     * After {@link ETLProcessor#evaluate(java.lang.String)} method,
+     * an instance of {@link DomainInMemory} saves all rows collected
+     * in {@link DomainInMemory#rows} using Streaming solution.
+     *
+     * @see ETLProcessorResult#scriptFinished()
+     * @see DomainResult#finish()
+     */
+    void finish() {
+        this.writer.startDataArray()
+        for (RowResult row in rows) {
+            this.writer.writeRowResult(row)
+        }
+        this.writer.endDataArray()
+        this.writer.close()
+    }
+
+    /**
+     * Returns all the {@link RowResult} collected
+     * in an ETL script execution with lookup command enabled.
+     *
+     * @return a List of {@link RowResult}
+     */
+    @Override
+    List<Object> getData() {
+        return rows.toList()
+    }
 }
 
 /**
  * Init a row data map.
  * <pre>
  * 	"data": [
- *{* 		    "op": "I",
+ *      //{ //
+ *          op": "I",
  * 		    "errorCount": 0,
  * 		    "warn": true,
  * 		    "duplicate": true,
  * 		    "errors": [],
- * 		    "fields": {}*}* </pre>
+ * 		    "fields": {}//
+ * 		  //}//
+ * </pre>
  */
 @CompileStatic
 class RowResult {

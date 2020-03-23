@@ -4,6 +4,8 @@ package com.tdsops.event
  * A job scheduler event details used to trigger application events of ImportBatch type
  */
 class ImportBatchJobSchedulerEventDetails implements Serializable {
+
+	static final String NEXT_BATCH_READY = 'NEXT_BATCH_READY'
 	// contains the import batch job project
 	Long projectId
 

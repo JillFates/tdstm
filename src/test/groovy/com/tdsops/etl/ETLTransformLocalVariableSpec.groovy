@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
@@ -18,6 +19,9 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			fileSystemService(FileSystemService) {
 				coreService = ref('coreService')
 			}
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
 		}
 	}
 
@@ -75,7 +79,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['assetName'], 'ACMEVMPROD01', 'ACMEVMPROD01')
 					}
@@ -118,7 +122,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['assetName'], 'ME', 'ME')
 					}

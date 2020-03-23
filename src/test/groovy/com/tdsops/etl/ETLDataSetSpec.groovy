@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -57,6 +58,9 @@ class ETLDataSetSpec extends ETLBaseSpec {
 		fileSystemService(FileSystemService) {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
+		}
+		applicationContextHolder(ApplicationContextHolder) { bean ->
+			bean.factoryMethod = 'getInstance'
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
@@ -61,6 +62,9 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {

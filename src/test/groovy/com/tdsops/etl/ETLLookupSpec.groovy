@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
@@ -44,6 +45,9 @@ class ETLLookupSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -115,8 +119,10 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
+						
 						iterate {
 							extract 'server' load 'Name' set nameVar
 							extract 'model' load 'model'
@@ -198,6 +204,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
 
@@ -256,6 +263,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -334,6 +342,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -416,6 +425,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -485,6 +495,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -562,7 +573,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -647,6 +658,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
+					enable lookup
 
 					read labels
 					iterate {
@@ -749,6 +761,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 			String firstAssetName = 'xraysrv01'
 			String secondAssetName = 'zuludb01'
+			etlProcessor.result.isLookupEnable = true
 			ETLDomain domain = ETLDomain.Device
 			etlProcessor.result.addCurrentSelectedDomain(domain)
 			etlProcessor.iterateIndex = new IterateIndex(3)
@@ -764,8 +777,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 			createResultReference(etlProcessor, domain, [assetName: secondAssetName])
 		then: 'calling lookupInReference for the 2nd server name should find a result'
 			etlProcessor.result.lookupInReference(['assetName'], [secondAssetName])
-		and: 'the resultIndex in the process should be pointing to the 2nd asset'
-			1 == etlProcessor.result.resultIndex
 
 		when: 'there is another result that has the same name as the first with a different assetType'
 			createResultReference(etlProcessor, domain, [assetName: firstAssetName, assetType: 'Blade'])
@@ -779,9 +790,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 			found = etlProcessor.result.lookupInReference(['assetName', 'assetType'], [firstAssetName, 'Blade'])
 		then: 'one should be found'
 			found
-		and: 'the resultIndex should be pointing to the 3rd result'
-			2 == etlProcessor.result.resultIndex
-
 	}
 
 	void 'test setting a variable at ETLProcessor level'() {
@@ -894,6 +902,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	 */
 	private void createResultReference(ETLProcessor etlProcessor, ETLDomain domain, Map fieldValueMap) {
 		etlProcessor.result.startRow()
+        etlProcessor.currentRowIndex++
 		etlProcessor.result.findOrCreateCurrentRow()
 		// Add each element
 		fieldValueMap.each { String fieldName, Object value ->

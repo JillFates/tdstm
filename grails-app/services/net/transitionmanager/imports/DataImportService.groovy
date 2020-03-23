@@ -267,13 +267,17 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 					} else {
 
+						if (!domainJson.outputFilename){
+							throw new InvalidParamException('outputFilename field not specified')
+						}
+
+						// Streaming solution splits each domain data.
 						InputStream inputStream = fileSystemService.openTemporaryFile(domainJson.outputFilename)
 						if (!inputStream) {
 							throw new InvalidParamException('Specified input file not found')
 						}
 						// Import the assets for this batch using Streaming process
 						importRowsIntoBatchUsingStreaming(session, batch, inputStream, progressCalculator, importContext)
-
 
 						// Update the batch with information about the import results
 						batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
@@ -288,7 +292,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 		if (isAutoProcess && importResults.batchesCreated > 0) {
 			log.debug "Notify ImportBatchJon with importResults:$importResults"
-			notify(ImportBatchJob.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
+			notify(ImportBatchJobSchedulerEventDetails.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
 		}
 
 		progressCalculator.finish()

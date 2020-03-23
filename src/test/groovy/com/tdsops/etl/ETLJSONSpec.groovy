@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -41,6 +42,9 @@ class ETLJSONSpec extends ETLBaseSpec {
 			coreService = ref('coreService')
 			transactionManager = ref('transactionManager')
 		}
+        applicationContextHolder(ApplicationContextHolder) { bean ->
+            bean.factoryMethod = 'getInstance'
+        }
 	}
 
 	def setupSpec() {
@@ -407,13 +411,13 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				assertWith(data[0].fields.appVendor) {
-					originalValue.value == 'Microsoft'
-					value.value == 'Microsoft'
+					originalValue == '[value:Microsoft]'
+					value == '[value:Microsoft]'
 				}
 
 				assertWith(data[1].fields.appVendor) {
-					originalValue.value == 'Mozilla'
-					value.value == 'Mozilla'
+					originalValue == '[value:Mozilla]'
+					value == '[value:Mozilla]'
 				}
 			}
 
@@ -565,8 +569,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					rootNode 'Applications'
 					read labels
 					domain Application
@@ -580,8 +583,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 					iterate {
 						extract 'name' load 'Name'
 					}
-					""".stripIndent(),
-						  ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
 			etlProcessor.finalResult().domains.size() == 2
@@ -748,25 +750,25 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				assertWith(data[0], RowResult) {
+				assertWith(data[0]) {
 					rowNum == 1
 
-					assertWith(fields.id, FieldResult) {
+					assertWith(fields.id) {
 						originalValue == 123
 						value == 123
 					}
 
-					assertWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					assertWith(data[0].fields.custom2) {
+					assertWith(fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					assertWith(data[0].fields.custom3) {
+					assertWith(fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}
@@ -828,25 +830,25 @@ class ETLJSONSpec extends ETLBaseSpec {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				assertWith(data[0], RowResult) {
+				assertWith(data[0]) {
 					rowNum == 1
 
-					assertWith(fields.id, FieldResult) {
+					assertWith(fields.id) {
 						originalValue == 123
 						value == 123
 					}
 
-					assertWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					assertWith(data[0].fields.custom2) {
+					assertWith(fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					assertWith(data[0].fields.custom3) {
+					assertWith(fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}

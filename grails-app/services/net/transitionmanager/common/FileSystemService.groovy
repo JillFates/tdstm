@@ -207,6 +207,20 @@ class FileSystemService implements ServiceMethods {
         return [filename, os]
     }
 
+	/**
+	 * Creates a temporary file given a filename argument.
+	 *
+	 * @param filename
+	 * @return Calling the method returns a FileOutputStream
+	 */
+	OutputStream createTemporaryFileWithGivenName(String filename) {
+		// Validate if file does not have slashes '/'
+		if (filename.contains(File.separator)) {
+			throw new InvalidParamException('filename parameters can not have file separator')
+		}
+		return new File(temporaryDirectory + filename).newOutputStream()
+	}
+
     /**
      * Used to get a temporary filename where the name will consist of fully qualified path + prefix + random + extension
      * @param prefix

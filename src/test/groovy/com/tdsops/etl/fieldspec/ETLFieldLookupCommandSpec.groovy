@@ -1,5 +1,6 @@
 package com.tdsops.etl.fieldspec
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLAssertTrait
@@ -8,11 +9,7 @@ import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLFileSystemTrait
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
-import com.tdsops.etl.FieldResult
 import com.tdsops.etl.FieldSpecValidateableTrait
-import com.tdsops.etl.FindOperator
-import com.tdsops.etl.FindResult
-import com.tdsops.etl.RowResult
 import com.tdsops.etl.dataset.ETLDataset
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
@@ -30,6 +27,9 @@ class ETLFieldLookupCommandSpec extends Specification implements FieldSpecValida
             }
             fileSystemService(FileSystemService) {
                 coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
             }
         }
     }
@@ -88,9 +88,9 @@ class ETLFieldLookupCommandSpec extends Specification implements FieldSpecValida
 					domain == ETLDomain.Device.name()
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						errorCount == 0
-						assertWith(fields['custom3'], FieldResult) {
+						assertWith(fields['custom3']) {
 							value == 1234l
 							originalValue = '1234'
 						}

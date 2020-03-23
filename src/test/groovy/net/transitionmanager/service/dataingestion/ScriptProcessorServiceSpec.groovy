@@ -1,3 +1,4 @@
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetOptions
@@ -67,6 +68,9 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 			}
 			settingService(SettingService)
 			tagService(TagService)
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
 		}
 
 		fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
@@ -730,7 +734,7 @@ application id,vendor name,technology,location
 	 * @param domain
 	 * @param values
 	 */
-	static boolean assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+	static boolean assertQueryResult(Map<String, ?> queryResult, ETLDomain domain, List<List<Object>> values) {
 		assert queryResult.domain == domain.name()
 
 		queryResult.criteria.eachWithIndex { Map map, int i ->
