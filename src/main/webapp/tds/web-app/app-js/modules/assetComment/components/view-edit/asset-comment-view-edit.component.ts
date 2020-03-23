@@ -26,7 +26,8 @@ export class AssetCommentViewEditComponent extends Dialog implements OnInit {
 	@ViewChild('dependentForm', {static: false}) dependentForm: NgForm;
 
 	public modalType = ModalType;
-	public dateFormatTime: string;
+	public userDateTimeFormat: string;
+	public userTimeZone: string;
 	public assetClassOptions: any[];
 	public commentCategories: string[];
 	public assetCommentModel: AssetCommentModel;
@@ -88,7 +89,8 @@ export class AssetCommentViewEditComponent extends Dialog implements OnInit {
 			action: this.closeDialog.bind(this)
 		});
 
-		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+		this.userDateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
 		// ModalType.VIEW doesn't need the categories,
 		// in fact we need not to load them in that case for permission issues
 		if (this.assetCommentModel.modal.type !== ModalType.VIEW) {
