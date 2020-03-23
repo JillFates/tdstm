@@ -215,6 +215,9 @@ class ETLStreamingWriter {
     private void writeObjectField(String fieldName, Object pojo) {
 
         switch (pojo?.class) {
+            case String:
+                generator.writeStringField(fieldName, pojo.toString())
+                break
             case Date:
                 generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
                 break
