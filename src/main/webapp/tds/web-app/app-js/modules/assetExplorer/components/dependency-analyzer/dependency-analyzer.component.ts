@@ -24,6 +24,7 @@ export class DependencyAnalyzerComponent implements OnInit {
 	dependencyStatus;
 	dependencyType;
 	allTags;
+	gridStats;
 
 	constructor(
 		private userContextService: UserContextService,
@@ -42,6 +43,7 @@ export class DependencyAnalyzerComponent implements OnInit {
 			this.allMoveBundles = res.allMoveBundles;
 			this.dependencyType = res.dependencyType;
 			this.dependencyStatus = res.dependencyStatus;
+			this.gridStats = res.gridStats;
 		});
 		this.tagService.getTags().subscribe((res: any) => {
 			this.allTags = res.data;
