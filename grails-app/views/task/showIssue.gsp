@@ -46,24 +46,29 @@
 					<div id="predDivId_${assetComment.id}" ${predCount > 5 || sucCount > 5 ? 'style="display:none;"' : ''}>
 					<div style="width:400px; float:left">
 						<fieldset>
-						<legend>Predecessors</legend>
-						<g:each in="${assetComment.taskDependencies}" var="task">
-							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.predecessor.id})">
-							${task.predecessor.taskNumber}:${task.predecessor.comment} (${task.predecessor.category})
-							</span>
-							<br/>
-						</g:each>
+							<div style="margin-bottom: 10px; border-bottom: 1px solid black">
+								<label>Predecessors</label>
+							</div>
+							<g:each in="${assetComment.taskDependencies}" var="task">
+								<div style="font-weight: normal; padding: 5px" class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.predecessor.id})">
+								${task.predecessor.taskNumber}: ${task.predecessor.comment} (${task.predecessor.category})
+								</div>
+								<br/>
+							</g:each>
 						</fieldset>
 					</div>
 					<div style="width:400px; float:left; margin-left:30px;">
 						<fieldset>
-						<legend>Successors</legend>
-						<g:each in="${successor}" var="task">
-							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
-							${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
-							</span>
-							<br/>
-						</g:each>
+							<div style="margin-bottom: 10px; border-bottom: 1px solid black">
+								<label>Successors</label>
+								<br/>
+							</div>
+							<g:each in="${successor}" var="task">
+								<div style="font-weight: normal; padding: 5px" class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
+								${task.assetComment.taskNumber}: ${task.assetComment.comment} (${task.assetComment.category})
+								</div>
+								<br/>
+							</g:each>
 						</fieldset>
 					</div>
 					</div>
