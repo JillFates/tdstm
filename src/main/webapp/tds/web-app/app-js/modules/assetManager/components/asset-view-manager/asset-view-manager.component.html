@@ -136,7 +136,7 @@
 									</ng-template>
 									<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem>
 										<a class="link-text" [title]="dataItem.name"
-											 [routerLink]="['/asset','views',dataItem.id,'show']" [queryParams]="report.queryParams">
+											 [routerLink]="['/asset','views',dataItem.id,'show']" [queryParams]="dataItem.queryParams">
 											{{dataItem.name}}
 										</a>
 									</ng-template>
