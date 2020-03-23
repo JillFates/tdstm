@@ -50,10 +50,12 @@
 								<label>Predecessors</label>
 							</div>
 							<g:each in="${assetComment.taskDependencies}" var="task">
-								<div style="font-weight: normal; padding: 5px" class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.predecessor.id})">
-								${task.predecessor.taskNumber}: ${task.predecessor.comment} (${task.predecessor.category})
+								<div style="font-weight: normal; padding: 5px"
+									 class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}"
+									 onclick="showAssetCommentMyTasks(${task.predecessor.id})">
+
+									${task.predecessor.taskNumber}: ${task.predecessor.comment} (${task.predecessor.category})
 								</div>
-								<br/>
 							</g:each>
 						</fieldset>
 					</div>
@@ -67,7 +69,6 @@
 								<div style="font-weight: normal; padding: 5px" class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
 								${task.assetComment.taskNumber}: ${task.assetComment.comment} (${task.assetComment.category})
 								</div>
-								<br/>
 							</g:each>
 						</fieldset>
 					</div>
