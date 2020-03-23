@@ -122,7 +122,13 @@ export class UserDashboardComponent implements OnInit {
 				this.projectLogoId = result.projectLogoId;
 				this.selectedProject = this.projectInstance;
 				this.selectedProjectID = this.projectInstance.id;
-				this.store.dispatch(new SetProject({id: this.projectInstance.id, name: this.projectInstance.name, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
+
+				const payload = {
+					id: this.projectInstance.id,
+					name: this.projectInstance.name,
+					logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''
+				};
+				this.store.dispatch(new SetProject(payload));
 			});
 		this.applicationColumnModel = new ApplicationColumnModel();
 		this.activePersonColumnModel = new ActivePersonColumnModel();
@@ -142,7 +148,7 @@ export class UserDashboardComponent implements OnInit {
 		const selectedId = id ? parseInt(id, 10) : null;
 
 		if (selectedId) {
-			return this.eventList.find((event) => event.id === selectedId) || null;
+			return this.eventList.find((event) => event.eventId === selectedId) || null;
 		} else if (this.eventList.length)  {
 			return this.eventList[0];
 		}
@@ -256,11 +262,19 @@ export class UserDashboardComponent implements OnInit {
 								if (this.userContext && this.userContext.event) {
 					selectedEventId = this.userContext.event.id;
 				}
-				this.selectedEvent = this.getDefaultEvent(this.route.snapshot.queryParams['moveEvent'] || selectedEventId);
-				if (this.selectedEvent) {
-					this.store.dispatch(new SetEvent({id: this.selectedEvent.eventId, name: this.selectedEvent.name}));
-				}
+				this.updateEvent(selectedEventId);
 			});
+	}
+
+	updateEvent(selectedEventId: number) {
+		this.selectedEvent = this.getDefaultEvent(this.route.snapshot.queryParams['moveEvent'] || selectedEventId);
+		if (this.selectedEvent) {
+			const payload = {
+				id: this.selectedEvent.eventId,
+				name: this.selectedEvent.name
+			};
+			this.store.dispatch(new SetEvent(payload));
+		}
 	}
 
 	public fetchEventNewsForGrid(): void {
