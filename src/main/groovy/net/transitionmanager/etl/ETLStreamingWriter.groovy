@@ -222,9 +222,6 @@ class ETLStreamingWriter {
             case GStringImpl:
                 generator.writeStringField(fieldName, pojo.toString())
                 break
-            case CharSequence:
-                generator.writeStringField(fieldName, pojo.toString())
-                break
             case Date:
                 generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
                 break
