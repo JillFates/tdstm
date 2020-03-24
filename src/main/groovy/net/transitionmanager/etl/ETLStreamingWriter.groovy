@@ -14,6 +14,7 @@ import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
 import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.GStringImpl
 
 import java.text.SimpleDateFormat
 
@@ -218,6 +219,12 @@ class ETLStreamingWriter {
             case String:
                 generator.writeStringField(fieldName, pojo.toString())
                 break
+            case GStringImpl:
+                generator.writeStringField(fieldName, pojo.toString())
+                break
+            case CharSequence:
+                generator.writeStringField(fieldName, pojo.toString())
+                break
             case Date:
                 generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
                 break
@@ -229,7 +236,7 @@ class ETLStreamingWriter {
                 break
             default:
                 generator.writeObjectField(fieldName, pojo)
-        }
+        }       
     }
 
     /**
