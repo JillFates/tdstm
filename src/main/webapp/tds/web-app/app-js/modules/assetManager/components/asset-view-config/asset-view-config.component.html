@@ -49,7 +49,7 @@
 						(click)="onSave()">
 							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
 				</button>
-				<button *ngIf="((model.id && isSystemView() && isSaveAsAvailable()) || isSaveAsAvailable())"
+				<button *ngIf="(model.id && isSystemView() && isSaveAsAvailable()) || isSaveAsAvailable()"
 								type="button" id="btnSaveAs"
 				 		[disabled]="!isSaveAsAvailable() || !isValid()"
 						class="btn"
