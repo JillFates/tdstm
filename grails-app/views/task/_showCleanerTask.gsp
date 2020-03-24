@@ -60,7 +60,7 @@
 							<g:each in="${assetComment.taskDependencies}" var="task">
 								<div style="font-weight: normal; padding: 5px; width: 100%; margin: 1px;"
 								     class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}"
-								     onclick="showAssetCommentMyTasks(${task.predecessor.id})">
+								     onclick="showAssetComment(${task.predecessor.id})">
 									${task.predecessor.taskNumber}: ${task.predecessor.comment} (${task.predecessor.category})
 								</div>
 							</g:each>
@@ -73,7 +73,7 @@
 							<g:each in="${successor}" var="task">
 								<div style="font-weight: normal; padding: 5px; width: 100%; margin: 1px;"
 								     class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}"
-								     onclick="showAssetCommentMyTasks(${task.assetComment.id})">
+								     onclick="showAssetComment(${task.assetComment.id})">
 									${task.assetComment.taskNumber}: ${task.assetComment.comment} (${task.assetComment.category})
 								</div>
 							</g:each>
