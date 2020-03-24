@@ -233,7 +233,7 @@ class ETLStreamingWriter {
                 break
             default:
                 generator.writeObjectField(fieldName, pojo)
-        }       
+        }
     }
 
     /**
