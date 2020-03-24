@@ -1,6 +1,7 @@
 // Angular
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import {tap} from 'rxjs/operators';
 // Services
 import { TaskService } from '../../../taskManager/service/task.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -87,12 +88,33 @@ export class UserDashboardComponent implements OnInit {
 			title: 'User Dashboard for ' + this.userContext.person.fullName
 		});
 
-		this.populateData();
+		this.applicationColumnModel = new ApplicationColumnModel();
+		this.activePersonColumnModel = new ActivePersonColumnModel();
+		this.eventColumnModel = new EventColumnModel();
+		this.eventNewsColumnModel = new EventNewsColumnModel();
+		this.taskColumnModel = new TaskColumnModel();
+
+		this.populateData()
+			.subscribe((result) => {
+				this.selectProjectByID(this.projectInstance && this.projectInstance.id || null);
+			})
 	}
 
 	public onChangeProject($event ?: any): void {
-		this.selectProjectByID($event.id);
-		this.populateData();
+		const projectId = $event.id;
+
+		this.selectProjectByID(projectId);
+		this.populateData()
+			.subscribe((result) => {
+				console.log(result);
+				const payload = {
+					id: this.projectInstance.id,
+					name: this.projectInstance.name,
+					logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''
+				};
+				this.store.dispatch(new SetProject(payload));
+				setTimeout(() => this.updateEvent(), 500);
+			});
 	}
 
 	public selectProjectByID(id): any {
@@ -105,36 +127,25 @@ export class UserDashboardComponent implements OnInit {
 		return null;
 	}
 
-	private populateData(): void {
-		
-		this.userService
+	private populateData(): any {
+		return this.userService
 			.fetchModelForUserDashboard(this.selectedProject ? this.selectedProject.id : '')
-			.subscribe(result => {
-				this.fetchApplicationsForGrid();
-				this.fetchEventNewsForGrid();
-				this.fetchEventsForGrid();
-				this.fetchPeopleForGrid();
-				this.fetchTasksForGrid();
-				this.projectList = result.projects;
-				this.currentPerson = result.person;
-				this.movedayCategories = result.movedayCategories;
-				this.projectInstance = result.projectInstance;
-				this.projectLogoId = result.projectLogoId;
-				this.selectedProject = this.projectInstance;
-				this.selectedProjectID = this.projectInstance.id;
-
-				const payload = {
-					id: this.projectInstance.id,
-					name: this.projectInstance.name,
-					logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''
-				};
-				this.store.dispatch(new SetProject(payload));
-			});
-		this.applicationColumnModel = new ApplicationColumnModel();
-		this.activePersonColumnModel = new ActivePersonColumnModel();
-		this.eventColumnModel = new EventColumnModel();
-		this.eventNewsColumnModel = new EventNewsColumnModel();
-		this.taskColumnModel = new TaskColumnModel();
+			.pipe(
+				tap((result) => {
+					this.fetchApplicationsForGrid();
+					this.fetchEventNewsForGrid();
+					this.fetchEventsForGrid();
+					this.fetchPeopleForGrid();
+					this.fetchTasksForGrid();
+					this.projectList = result.projects;
+					this.currentPerson = result.person;
+					this.movedayCategories = result.movedayCategories;
+					this.projectInstance = result.projectInstance;
+					this.projectLogoId = result.projectLogoId;
+					this.selectedProject = this.projectInstance;
+					this.selectedProjectID = this.projectInstance.id;
+				})
+			);
 	}
 
 	/**
@@ -257,23 +268,24 @@ export class UserDashboardComponent implements OnInit {
 		this.userService
 			.getAssignedEvents(projectId, this.showActiveEvents)
 			.subscribe(result => {
-				let selectedEventId = null;
 				this.eventList = result.events;
-								if (this.userContext && this.userContext.event) {
-					selectedEventId = this.userContext.event.id;
-				}
-				this.updateEvent(selectedEventId);
 			});
 	}
 
-	updateEvent(selectedEventId: number) {
+	updateEvent() {
+		let selectedEventId = null;
+
+		if (this.userContext && this.userContext.event) {
+			selectedEventId = this.userContext.event.id;
+		}
 		this.selectedEvent = this.getDefaultEvent(this.route.snapshot.queryParams['moveEvent'] || selectedEventId);
 		if (this.selectedEvent) {
-			const payload = {
-				id: this.selectedEvent.eventId,
-				name: this.selectedEvent.name
-			};
-			this.store.dispatch(new SetEvent(payload));
+			// const payload = {
+			// 	id: this.selectedEvent.eventId,
+			// 	name: this.selectedEvent.name
+			// };
+			this.store.dispatch(new SetEvent({id: this.selectedEvent.eventId, name: this.selectedEvent.name}));
+			// this.store.dispatch(new SetEvent(payload));
 		}
 	}
 
