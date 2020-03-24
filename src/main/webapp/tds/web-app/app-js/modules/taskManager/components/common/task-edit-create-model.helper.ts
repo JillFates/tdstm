@@ -309,7 +309,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: hardAssigned === No ? '0' : '1',
 			sendNotification: sendNotification ===  No ? '0' : '1',
 			isResolved: '0', /* ? */
-			instructionsLink: this.addProtocolToLabelURL(instructionLink),
+			instructionsLink: instructionLink,
 			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
 			mustVerify: '0',
 			override: '0',
@@ -394,7 +394,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: hardAssigned === No ? '0' : '1',
 			sendNotification: sendNotification ===  No ? '0' : '1',
 			isResolved: '0', /* ? */
-			instructionsLink: this.addProtocolToLabelURL(instructionLink),
+			instructionsLink: instructionLink,
 			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
 			mustVerify: '0',
 			override: '0',
@@ -488,28 +488,6 @@ export class TaskEditCreateModelHelper {
 		});
 
 		return ids;
-	}
-
-	/**
-	 * Add protocol in case is not present
-	 * @param {string} labelURL
-	 * @returns {string}
-	 */
-	private addProtocolToLabelURL(labelURL = ''): string {
-		const separator = '|';
-		let isJustURL = false;
-		let [label, url] = labelURL.split(separator);
-
-		if (!url) {
-			isJustURL = true;
-			url = label;
-		}
-		url = url.toLowerCase().trim();
-		if (url && !url.startsWith('http://') && !url.startsWith('https://') ) {
-			url = 'http://' + url;
-		}
-
-		return isJustURL ? url : [label, url].join(separator);
 	}
 
 	/**
