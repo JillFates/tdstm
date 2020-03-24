@@ -450,7 +450,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderAsJson assetCommentsList
 	}
 
-	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
+	/**
+	 * Used to access the content of a comment/task
+	 * @return
+	 */
+	@HasPermission([Permission.CommentView, Permission.TaskView])
 	def showComment() {
 		def commentList = []
 		def personResolvedObj
