@@ -323,7 +323,7 @@
 				ac = ac.assetComment;
 				$('#statusShowId').attr("class","task_"+ac.status.toLowerCase())
 				$('#showCommentTable #statusShowId').attr("class","task_"+ac.status.toLowerCase())
-				$('#commentTdId_myTasks').html(ac.taskNumber+":"+ac.comment)
+				$('#commentTdId_myTasks').html(ac.taskNumber+":"+ac.title)
 				$('#commentTdId1').html(ac.comment)
 				$('#statusShowId').html(ac.status)
 				$('#showCommentTable #statusShowId').html(ac.status)

@@ -236,21 +236,28 @@ class DataviewService implements ServiceMethods {
 	Map generateSaveOptions(Project project, Person whom, Dataview dataview) {
 		boolean isDefaultProject = project.isDefaultProject()
 		Set saveAsOptions = []
+		boolean canShare = false
+		boolean canOverride = false
 
-		// User can always save as My View
-		if (securityService.hasPermission(Permission.AssetExplorerSaveAs)){
-			saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
-		}
+		if ( securityService.hasPermission(Permission.AssetExplorerCreate) ) {
+			// User can always save as My View if they have the Create perm
+			if ( securityService.hasPermission(Permission.AssetExplorerSaveAs) ) {
+				saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
+			}
 
-		// Add the Override options if system view and user has perms
-		saveAsOptions.addAll( overrideOptions(project, whom, dataview))
+			// Add the Override options if system view and user has perms
+			saveAsOptions.addAll( overrideOptions(project, whom, dataview ) )
 
-		// Determine if the person has the ability to share a view
-		boolean canShare = securityService.hasPermission(
+			// Determine if the person has the ability to share a view
+			canShare = securityService.hasPermission(
 				(isDefaultProject ? Permission.AssetExplorerSystemCreate :  Permission.AssetExplorerPublish) )
 
+			// User can always save as My View
+			canOverride = canViewBeOverridden(project, dataview)
+		}
+
 		return [
-			canOverride: canViewBeOverridden(project, dataview),
+			canOverride: canOverride,
 			canShare: canShare,
 			save: canModifyView(project, whom, dataview),
 			saveAsOptions: saveAsOptions as List
@@ -304,14 +311,16 @@ class DataviewService implements ServiceMethods {
 		if ( isOverrideable ) {
 			Long overriddenViewId = (dataview.overridesView ? dataview.overridesView.id : dataview.id)
 
-			if (Dataview.where {
-				project.id == project.id
-				// Make sure we're querying on the root system view id
-				overridesView.id == overriddenViewId
-				person.id == whom.id
-				isShared == false
-			}.count() == 0) {
-				options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+			if (securityService.hasPermission(Permission.AssetExplorerSaveAs)) {
+				if (Dataview.where {
+					project.id == project.id
+					// Make sure we're querying on the root system view id
+					overridesView.id == overriddenViewId
+					person.id == whom.id
+					isShared == false
+				}.count() == 0) {
+					options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+				}
 			}
 
 			// Check to see if anybody has an overridden version of a system view for ALL users and if not
@@ -415,18 +424,24 @@ class DataviewService implements ServiceMethods {
 
 		// If the user is overriding a System View, they may be overriding their own override or
 		// a shared override so it's important to get the root system view being overridden
-		if (dataviewCommand.overridesView) {
+		Boolean saveAsMyView = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW
+		if (saveAsMyView) {
+			validateViewNameUniqueness(currentProject, whom, dataviewCommand)
+		} else {
+			if (! dataviewCommand.overridesView) {
+				throwException(InvalidParamException.class, 'dataview.validate.missingViewForOverride',
+						'The request to create override view was missing the view id to be overridden')
+			}
 			dataviewCommand.overridesView = getRootSystemView(dataviewCommand.overridesView)
 			// use the name from the view that is being overridden
 			dataviewCommand.name = dataviewCommand.overridesView.name
 		}
-		validateViewNameUniqueness(currentProject, whom, dataviewCommand)
 
 		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			if (dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW) {
+			if (saveAsMyView) {
 				isShared = dataviewCommand.isShared
 			} else {
 				isShared = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL
@@ -435,7 +450,8 @@ class DataviewService implements ServiceMethods {
 			person = whom
             project = currentProject
 			reportSchema = schema
-			overridesView = dataviewCommand.overridesView
+			overridesView = (saveAsMyView ? null : dataviewCommand.overridesView)
+			isSystem = false
 		}
 
 		dataview.save()
@@ -578,7 +594,7 @@ class DataviewService implements ServiceMethods {
 		}
 
         boolean canAccess =
-			(dataview.project.id == Project.DEFAULT_PROJECT_ID && (dataview.isSystem || dataview.isShared)) \
+			(dataview.project.id == Project.DEFAULT_PROJECT_ID && (dataview.isSystem || dataview.isShared || dataview.personId == whom.id)) \
 			|| \
 			(dataview.project.id == project.id && (dataview.personId == whom.id || dataview.isShared))
 
@@ -627,23 +643,19 @@ class DataviewService implements ServiceMethods {
 	 * @throws UnauthorizedException
 	 */
 	void validateDataviewCreateAccessOrException(DataviewCrudCommand dataviewCommand, Project project, Person whom) {
-		if (dataviewCommand.id?.isSystem) {
-			throwException(InvalidParamException.class, 'dataview.validate.createSystemView', 'Creation of System views is not permitted.')
-		}
-
 		/*
 		 * Users in the Default project
 		 */
 		if ( project.isDefaultProject() ) {
 			if ( securityService.notPermitted(Permission.AssetExplorerSystemCreate) ) {
-				throwException(InvalidParameterException,
+				throwException(InvalidParamException.class,
 						'dataview.validation.saveInDefaultProject',
-						'You do not have the necessary permission to save into the Default project')
+						'You do not have the necessary permission to save views into the Default project')
 			}
 
 			if (dataviewCommand.overridesView) {
 				if (securityService.notPermitted(Permission.AssetExplorerOverrideAllUserGlobal) ) {
-					throwException(InvalidParameterException,
+					throwException(InvalidParamException.class,
 							'dataview.validate.overrideGlobalPermission',
 							'You do not have the necessary permission to save into the Default project')
 				}
@@ -653,7 +665,7 @@ class DataviewService implements ServiceMethods {
 					project == project
 					overridesView == dataviewCommand.overridesView
 				}.count() > 0 ) {
-					throwException(InvalidParameterException,
+					throwException(InvalidParamException.class,
 							'dataview.validate.overrideAlreadyExists',
 							'An override for this system view already exists in the project')
 				}
@@ -683,7 +695,7 @@ class DataviewService implements ServiceMethods {
 						person.id == whom.id
 						isShared == false
 					}.count() > 0) {
-						throwException(InvalidParameterException.class,
+						throwException(InvalidParamException.class,
 								'dataview.validate.overrideAlreadyExists',
 								'An override for this system view already exists in the project')
 					}
@@ -702,7 +714,7 @@ class DataviewService implements ServiceMethods {
 						overridesView.id == dataviewCommand.overridesView.id
 						isShared == true
 					}.count() > 0) {
-						throwException(InvalidParameterException,
+						throwException(InvalidParamException,
 								'dataview.validate.overrideAlreadyExists',
 								'An override for this system view already exists in the project')
 					}

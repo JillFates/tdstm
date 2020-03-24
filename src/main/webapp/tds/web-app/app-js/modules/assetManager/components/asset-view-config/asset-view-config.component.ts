@@ -76,7 +76,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	currentOverrideState: OverrideState;
 	private navigationSubscription: any;
 	private lastSnapshot: any;
-	private currentId;
+	private lastViewId;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -94,7 +94,6 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 				name: 'notificationHeaderTitleChange',
 				title: this.model.name
 			});
-			this.currentId = this.model.id;
 			this.onPreview();
 		}
 		this.reloadStrategy();
@@ -116,7 +115,6 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		this.draggableColumns = [];
 		this.handleQueryParams();
 		if (this.model && this.model.id) {
-			this.currentId = this.model.id;
 			this.updateFilterbyModel();
 			this.currentTab = 1;
 			this.draggableColumns = this.model.schema.columns.slice();
@@ -141,9 +139,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 			}
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
-				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
-					this.initResolveData(true);
-				}
+				this.initResolveData(true);
 			}
 		});
 	}
@@ -164,14 +160,15 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	}
 
 	toggleAssetView() {
-		let dataViewId;
+		let navigateToViewId = this.model.id;
 		const _override = !this.queryParams._override;
-		if (this.model.overridesView) {
-			dataViewId = this.model.overridesView.id
-		} else {
-			dataViewId = this.model.id;
+		if (!_override && this.model.overridesView) {
+			navigateToViewId = this.model.overridesView.id
+		} else if (this.lastViewId) {
+			navigateToViewId = this.lastViewId;
 		}
-		return this.router.navigate(['/asset', 'views', dataViewId, 'edit'], {
+		this.lastViewId = this.model.id;
+		return this.router.navigate(['/asset', 'views', navigateToViewId, 'edit'], {
 			queryParams: { _override }
 		});
 	}
@@ -345,10 +342,18 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 
 	protected isSaveAsAvailable(): boolean {
 		return this.model.id ?
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) :
-			this.isSaveAvailable();
+			(	this.model.isSystem ?
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) && this.canCreateViews() :
+				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) && this.canCreateViews()
+			)
+			: this.isSaveAvailable();
+	}
+
+	/**
+	 * Check if user has AssetExplorerCreate permission.
+	 */
+	canCreateViews(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
 	public isSystemSaveAvailable(edit): boolean {

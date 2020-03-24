@@ -108,7 +108,7 @@
                             </div>
                         </ng-template>
                         <ng-template kendoGridCellTemplate let-dataItem let-column="column">
-                            <span *ngIf="column.field == 'event'"><a [href]="'/tdstm/dashboard/index?moveEvent=' + dataItem['eventId']">{{dataItem[column.field]}}</a></span>
+                            <span *ngIf="column.field == 'event'"><a [href]="'/tdstm/module/event/dashboard?moveEvent=' + dataItem['eventId']">{{dataItem[column.field]}}</a></span>
                             <span *ngIf="column.field != 'event'">{{ dataItem[column.field] }}</span>
                         </ng-template>
                     </kendo-grid-column>

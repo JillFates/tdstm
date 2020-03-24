@@ -12,6 +12,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -1476,6 +1477,8 @@ class AssetEntityService implements ServiceMethods {
 			supportAssets: supportAssets,
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
+			hasCreateTaskPermission: securityService.hasPermission(Permission.TaskCreate),
+			hasTaskManagerViewPermission: securityService.hasPermission(Permission.TaskManagerView),
 			customs: customFields,
 			dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.dateCreated, formatter),
 			lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),
@@ -3217,5 +3220,4 @@ class AssetEntityService implements ServiceMethods {
 			totalFiles: totalFiles
 		]
 	}
-
 }

@@ -57,6 +57,10 @@ export interface TaskActionsOptions {
 							class="btn" [ngClass]="buttonClass" type="button" title="Neighborhood">
 				<i class="fa fa-med fa-align-left"></i> <span>Neighborhood</span>
 			</button>
+			<button *ngIf="showInstructionsLink && taskActionInfoModel.instructionsLinkURL" (click)="onInstructionsLink()"
+							class="btn" [ngClass]="buttonClass" type="button" title="Instructions">
+				<i class="fa fa-file"></i> <span>{{taskActionInfoModel.instructionsLinkLabel ? taskActionInfoModel.instructionsLinkLabel : 'Instruction Link'}}</span>
+			</button>
 			<div *ngIf="showDelayActions && showDelay()"
 					 class="task-action-buttons">
 				<span style="margin-right:16px">Delay for:</span>
@@ -83,6 +87,7 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	@Input() taskStatus: string;
 	@Input() showDelayActions: boolean;
 	@Input() showDetails: boolean;
+	@Input() showInstructionsLink: boolean;
 	@Input() buttonClass: string;
 	@Input() taskActionInfoModel: TaskActionInfoModel;
 	@Output() start: EventEmitter<void> = new EventEmitter<void>();
@@ -90,6 +95,7 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	@Output() invoke: EventEmitter<void> = new EventEmitter<void>();
 	@Output() assignToMe: EventEmitter<void> = new EventEmitter<void>();
 	@Output() neighborhood: EventEmitter<void> = new EventEmitter<void>();
+	@Output() instructionsLink: EventEmitter<string> = new EventEmitter<string>();
 	@Output() reset: EventEmitter<void> = new EventEmitter<void>();
 	@Output() delay: EventEmitter<any> = new EventEmitter<any>();
 	@Output() details: EventEmitter<any> = new EventEmitter<any>();
@@ -213,6 +219,13 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	 */
 	onNeighborhood(): void {
 		this.neighborhood.emit();
+	}
+
+	/**
+	 * Emit the Instructions LInk event
+	 */
+	onInstructionsLink(): void {
+		this.instructionsLink.emit(this.taskActionInfoModel.instructionsLinkURL);
 	}
 
 	/**
