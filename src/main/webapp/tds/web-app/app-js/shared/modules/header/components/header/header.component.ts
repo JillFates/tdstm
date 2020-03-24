@@ -115,7 +115,7 @@ export class HeaderComponent {
 				defaultTimeZone: ''
 			},
 			modalConfiguration: {
-				title: 'Time Zone Select',
+				title: 'Date and Time Zone Select',
 				draggable: true,
 				modalCustomClass: 'custom-time-zone-dialog',
 				modalSize: ModalSize.CUSTOM

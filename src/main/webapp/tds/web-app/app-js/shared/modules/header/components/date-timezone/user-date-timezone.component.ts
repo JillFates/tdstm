@@ -76,6 +76,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 			name: 'save',
 			icon: 'floppy',
 			show: () => true,
+			disabled: () => !this.isDirty(),
 			type: DialogButtonType.ACTION,
 			action: this.onSave.bind(this)
 		});
@@ -95,10 +96,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 * Close the Dialog
 	 */
 	public cancelCloseDialog(): void {
-		if (this.dataSignature !== JSON.stringify({
-			timezone: this.selectedTimezone,
-			datetimeFormat: this.selectedTimeFormat
-		})) {
+		if (this.isDirty()) {
 			this.dialogService.confirm(
 				this.translatePipe.transform(
 					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
@@ -134,10 +132,6 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 					this.timezonePinShow = true;
 					setTimeout(() => {
 						jQuery(areaElement).triggerHandler('click');
-						this.dataSignature = JSON.stringify({
-							timezone: this.selectedTimezone,
-							datetimeFormat: this.selectedTimeFormat,
-						});
 					});
 				}
 			});
@@ -256,6 +250,16 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 				},
 				err => console.log(err)
 			);
+		});
+	}
+
+	/**
+	 * Verify if the data has changed
+	 */
+	private isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify({
+			timezone: this.selectedTimezone,
+			datetimeFormat: this.selectedTimeFormat
 		});
 	}
 
