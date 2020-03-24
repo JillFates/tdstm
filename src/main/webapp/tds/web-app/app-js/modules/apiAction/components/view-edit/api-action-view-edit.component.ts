@@ -602,8 +602,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 				if (acti === false) {
 					this.cancelCloseDialog();
 				}				
-			}, 1000);
-			
+			}, 900);			
 		}
 	}
 

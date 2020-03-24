@@ -212,7 +212,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			subscr = this.mainDialogService
 				.activatedDropdown
 				.subscribe(res => {
-					console.log('res:', res);
+					console.log('The RES:', res);
 					if (res === true) {
 						console.log(event);
 						event.name = 'dialog.open';
