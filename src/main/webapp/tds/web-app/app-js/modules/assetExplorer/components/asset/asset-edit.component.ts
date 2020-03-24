@@ -209,7 +209,7 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 	private onDeleteAsset() {
 		this.dialogService.confirm(
 			'Confirmation Required',
-			'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+			'You are about to delete the selected asset for which there is no undo. Are you sure? Click Confirm to delete otherwise press Cancel'
 		).subscribe((data: any) => {
 			if (data.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
 				this.assetExplorerService.deleteAssets([this.modelId.toString()]).subscribe(res => {
