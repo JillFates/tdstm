@@ -272,12 +272,13 @@ class DataviewService implements ServiceMethods {
 	 * @return true if the person is allowed to modify the view otherwise false
 	 */
 	boolean canModifyView(Project project, Person whom, Dataview dataview) {
+		boolean hasEditPerm = securityService.hasPermission(Permission.AssetExplorerEdit)
 		boolean hasGlobalOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
 		boolean hasProjectOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)
 		boolean isDefaultProject = project.isDefaultProject()
 
 		boolean canModify = false
-		if (dataview) {
+		if (hasEditPerm && dataview) {
 			if (dataview.personId == whom.id) {
 				canModify = (dataview.projectId == project.id)
 			} else {
