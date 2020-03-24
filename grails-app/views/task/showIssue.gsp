@@ -50,7 +50,7 @@
 								<label>Predecessors</label>
 							</div>
 							<g:each in="${assetComment.taskDependencies}" var="task">
-								<div style="font-weight: normal; padding: 5px"
+								<div style="font-weight: normal; padding: 5px;cursor: pointer;"
 									 class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}"
 									 onclick="showAssetCommentMyTasks(${task.predecessor.id})">
 
