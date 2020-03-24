@@ -28,7 +28,7 @@ export const AssetViewManagerColumnsHelper = {
 			label: 'ASSET_EXPLORER.INDEX.FAVORITE',
 			resizable: false,
 			type: 'boolean',
-			width: 30,
+			width: 110,
 			cellClass: ['text-center']
 		});
 		addColumn({
@@ -46,7 +46,7 @@ export const AssetViewManagerColumnsHelper = {
 			resizable: true,
 			type: 'text',
 			filterable: true,
-			width: 100
+			width: 150
 		});
 		addColumn({
 			property: 'createdOn',
@@ -55,7 +55,7 @@ export const AssetViewManagerColumnsHelper = {
 			type: 'date',
 			filterable: true,
 			format: dateFormat,
-			width: 60
+			width: 130
 		});
 		addColumn({
 			property: 'updatedOn',
@@ -64,14 +64,14 @@ export const AssetViewManagerColumnsHelper = {
 			type: 'date',
 			filterable: true,
 			format: dateFormat,
-			width: 60
+			width: 130
 		});
 		addColumn({
 			property: 'isShared',
 			label: 'ASSET_EXPLORER.INDEX.SHARED',
 			resizable: false,
 			type: 'boolean',
-			width: 50,
+			width: 100,
 			cellClass: ['text-center']
 		});
 		addColumn({
@@ -79,7 +79,7 @@ export const AssetViewManagerColumnsHelper = {
 			label: 'ASSET_EXPLORER.INDEX.GLOBAL',
 			sort: { isSorting: false, isAscending: false },
 			type: 'boolean',
-			width: 50,
+			width: 100,
 			cellClass: 'text-center'
 		});
 		addColumn({
@@ -87,7 +87,7 @@ export const AssetViewManagerColumnsHelper = {
 			label: 'ASSET_EXPLORER.INDEX.SYSTEM',
 			resizable: false,
 			type: 'boolean',
-			width: 110,
+			width: 100,
 			cellClass: ['text-center']
 		});
 		addColumn({
@@ -95,7 +95,7 @@ export const AssetViewManagerColumnsHelper = {
 			label: 'ASSET_EXPLORER.INDEX.OVERRIDE',
 			sort: { isSorting: false, isAscending: false },
 			type: 'boolean',
-			width: 50,
+			width: 100,
 			cellClass: 'text-center'
 		});
 		return columns;

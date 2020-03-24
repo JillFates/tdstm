@@ -69,7 +69,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 			.getUserDatePreferenceAsKendoFormat()
 			.subscribe(dateFormat => {
 				this.dateFormat = dateFormat;
-				this.gridColumns = AssetViewManagerColumnsHelper.createColumns(`{0:${dateFormat}}`);
+				this.gridColumns = AssetViewManagerColumnsHelper.createColumns(dateFormat	);
 			});
 		const preferencesCodes = `${ PREFERENCES_LIST.CURRENT_DATE_FORMAT },${ PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT }`;
 		this.preferenceService.getPreferences(preferencesCodes)
@@ -200,7 +200,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		this.assetExpService.getReports()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(result => {
-				this.reportGroupModels = result as ViewGroupModel[];
+				this.reportGroupModels = this.reportResolveService.populateReport(result) as ViewGroupModel[];
 				this.reportGroupModels.forEach((folder: ViewGroupModel) => {
 					folder.open = false;
 					if (folder.name === selectedFolder.name) {

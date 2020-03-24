@@ -37,16 +37,17 @@ import { AssetViewSaveOptions } from '../../models/asset-view-save-options.model
 								</clr-radio-wrapper>
 							</div>
 						</div>
-						<label for="name" class="col-sm-3 control-label">View Name:
+						<label for="name" class="col-sm-4 control-label">View Name:
 							<span class="required_field">*</span>
 						</label>
-						<div class="col-sm-9">
+						<div class="col-sm-8">
 							<input #inputText type="text" (keyup)="onNameChanged()" name="name" id="name" class="form-control"
+										 [disabled]="!isSaveInMyViewMode()"
 										 placeholder="View Name" [(ngModel)]="model.name" required>
 							<span *ngIf="!isUnique" class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }}
 								name must be unique</span>
 						</div>
-						<div class="col-sm-9 col-sm-offset-3">
+						<div class="col-sm-8 col-sm-offset-4">
 							<div class="checkbox">
 								<clr-checkbox-wrapper class="inline">
 									<input clrCheckbox type="checkbox"
@@ -59,7 +60,7 @@ import { AssetViewSaveOptions } from '../../models/asset-view-save-options.model
 								</clr-checkbox-wrapper>
 							</div>
 						</div>
-						<div class="col-sm-9 col-sm-offset-3">
+						<div class="col-sm-8 col-sm-offset-4">
 							<div class="checkbox favorite inline"
 									 (click)="onFavorite()">
 								<i class="fa fa-star-o text-yellow"
@@ -75,30 +76,31 @@ import { AssetViewSaveOptions } from '../../models/asset-view-save-options.model
 							</div>
 						</div>
 					</div>
-					<div class="form-group" *ngIf="saveOptions.canOverride">
+					<div class="form-group save-views-container no-margin-bottom" *ngIf="saveOptions.canOverride">
 						<div class="col-sm-12">
 							<div class="checkbox">
-								<clr-radio-wrapper class="inline">
+								<clr-radio-wrapper class="inline"
+																	 [ngClass]="{'disabled': saveAsOptions.OVERRIDE_FOR_ME.disabled || null}">
 									<input clrRadio type="radio"
 												 [value]="saveAsOptions.OVERRIDE_FOR_ME.value"
 												 [name]="'radio-mode'"
-												 [disabled]="saveAsOptions.OVERRIDE_FOR_ME.disabled || null"
+												 [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ME.disabled || null"
 												 [(ngModel)]="model.saveAsOption">
 									<label class="clr-control-label inline">
-										{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}
+										{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}
 									</label>
 								</clr-radio-wrapper>
 							</div>
 						</div>
 					</div>
-					<div class="form-group" *ngIf="saveOptions.canOverride">
+					<div class="form-group save-views-container" *ngIf="saveOptions.canOverride">
 						<div class="col-sm-12">
 							<div class="checkbox">
-								<clr-radio-wrapper class="inline">
+								<clr-radio-wrapper class="inline"
+																	 [ngClass]="{'disabled': saveAsOptions.OVERRIDE_FOR_ALL.disabled || null}">
 									<input clrRadio type="radio"
 												 [value]="saveAsOptions.OVERRIDE_FOR_ALL.value"
 												 [name]="'radio-mode'"
-												 [disabled]="saveAsOptions.OVERRIDE_FOR_ALL.disabled || null"
 												 [(ngModel)]="model.saveAsOption">
 									<label class="clr-control-label inline">
 										{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}
@@ -133,7 +135,6 @@ export class AssetViewSaveComponent extends Dialog implements OnInit, AfterViewI
 
 	constructor(
 		private assetExpService: AssetExplorerService,
-		saveOptions: AssetViewSaveOptions,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService,
@@ -168,7 +169,7 @@ export class AssetViewSaveComponent extends Dialog implements OnInit, AfterViewI
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});
-		this.preModel = this.data.model;
+		this.preModel = this.data.viewModel;
 		if (!this.data.saveOptions) {
 			this.saveOptions = this.defaultSaveOptions;
 		} else {

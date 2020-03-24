@@ -91,20 +91,6 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private notifier: NotifierService) {
 		this.initResolveData();
-		this.metadata.tagList = this.route.snapshot.data['tagList'];
-		this.allFields = this.route.snapshot.data['fields'];
-		this.fields = this.route.snapshot.data['fields'];
-		this.domains = this.route.snapshot.data['fields'];
-		const {dataView, saveOptions} = this.route.snapshot.data['report'];
-		this.model = dataView || this.route.snapshot.data['report'];
-		this.saveOptions = saveOptions;
-		this.dataSignature = JSON.stringify(this.model);
-		this.draggableColumns = [];
-		if (this.model.id) {
-			this.updateFilterbyModel();
-			this.currentTab = 1;
-			this.draggableColumns = this.model.schema.columns.slice();
-		}
 	}
 
 	ngOnInit(): void {

@@ -36,6 +36,14 @@
 			</div>
 
 			<div class="inline float-right">
+				<tds-button *ngIf="currentOverrideState.icon && collapsed"
+										[type]="'button'"
+										(click)="toggleAssetView()"
+										class="view-override-button"
+										[title]="currentOverrideState.tooltip">
+					<fa-icon [icon]="currentOverrideState.icon">
+					</fa-icon>
+				</tds-button>
 				<!-- Export button -->
 				<tds-button-custom [id]="'btnExport'"
 													 [icon]="'download-cloud'"
@@ -48,13 +56,6 @@
 													 (click)="onToggleConfig()"
 													 [tooltip]="'Open Configuration'">
 				</tds-button-custom>
-				<button *ngIf="currentOverrideState.icon && collapsed" type="button"
-								class="view-override-button tds-action-button--just-icon pull-right"
-								[title]="currentOverrideState.tooltip"
-								(click)="toggleAssetView()">
-					<fa-icon [icon]="currentOverrideState.icon">
-					</fa-icon>
-				</button>
 			</div>
 		</div>
 

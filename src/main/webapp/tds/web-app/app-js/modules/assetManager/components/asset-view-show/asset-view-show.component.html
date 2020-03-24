@@ -53,13 +53,13 @@
 			</div>
 
 			<div class="float-right header-buttons">
-				<button *ngIf="currentOverrideState.icon" type="button"
-								class="view-override-button tds-action-button--just-icon pull-right"
-								[title]="currentOverrideState.tooltip"
-								(click)="toggleAssetView()">
+				<tds-button [type]="'button'"
+										(click)="toggleAssetView()"
+										class="view-override-button"
+										[title]="currentOverrideState.tooltip">
 					<fa-icon [icon]="currentOverrideState.icon">
 					</fa-icon>
-				</button>
+				</tds-button>
 				<!-- Create button -->
 				<tds-asset-show-create-button
 					*ngIf="assetExplorerViewGrid"
