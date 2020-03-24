@@ -55,9 +55,27 @@ class Dataview {
 			schema       : schemaAsJSONObject(),
 			createdBy    : getOwnerName(),
 			createdOn    : TimeUtil.formatDate(dateCreated),
-			overridesView: overridesView,
 			updatedOn    : TimeUtil.formatDate(lastModified)
 		]
+
+		if (overridesView) {
+			data['overridesView'] = [
+				id         : overridesView.id,
+				name       : overridesView.name,
+				hasOverride: overridesView.hasOverride(project, whom),
+				isGlobal   : overridesView.project.isDefaultProject(),
+				isSystem   : overridesView.isSystem,
+				isShared   : overridesView.isShared,
+				isOwner    : overridesView.isOwner(whom.id),
+				isFavorite : overridesView.isFavorite(whom.id),
+				isOverride : overridesView.isOverrideView(),
+				schema     : overridesView.schemaAsJSONObject(),
+				createdBy  : overridesView.getOwnerName(),
+				createdOn: TimeUtil.formatDate(overridesView.dateCreated),
+				updatedOn: TimeUtil.formatDate(overridesView.lastModified)
+			]
+		}
+
 		return data
 	}
 
