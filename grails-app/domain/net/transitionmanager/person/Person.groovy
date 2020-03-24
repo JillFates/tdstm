@@ -302,7 +302,7 @@ class Person extends Party {
 	 * Converts this person object to a map
 	 * @return
 	 */
-	Map toMap(Project project) {
+	Map toMap() {
 		def teams = getTeamsCanParticipateIn()
 		Map data = [
 				id: id,

@@ -40,9 +40,9 @@ class Dataview {
 	 * @param currentPersonId current person in session.
 	 * @return
 	 */
-	Map toMap(Project project, Person whom) {
+	Map toMap(Project project, Person whom, Boolean ignoreOverrideView=false) {
 
-		Map data = [
+		return [
 			id           : id,
 			name         : name,
 			hasOverride  : hasOverride(project, whom),
@@ -53,12 +53,11 @@ class Dataview {
 			isFavorite   : isFavorite(whom.id),
 			isOverride   : isOverrideView(),
 			schema       : schemaAsJSONObject(),
+			overridesView: ignoreOverrideView ? null : toMap(project, whom, true),
 			createdBy    : getOwnerName(),
 			createdOn    : TimeUtil.formatDate(dateCreated),
-			overridesView: overridesView,
 			updatedOn    : TimeUtil.formatDate(lastModified)
 		]
-		return data
 	}
 
 	/**
