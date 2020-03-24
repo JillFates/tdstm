@@ -48,28 +48,40 @@
 				<td colspan="3">
 				  <input type="text"  title="Edit Comment..." id="editComment_${assetComment.id}" name="comment" value="${assetComment.comment}" style="width: 500px"/>
 				</td>
-			</tr>	
+			</tr>
 			<tr>
 				<td valign="middle" class="name"><label>Dependencies:</label></td>
-				<td valign="top" class="name" colspan="3"><label>Predecessors:</label>&nbsp;&nbsp;
-				<span style="width: 50%">
+				<td colspan="3">
+					<div style="display: flex">
+						<div style="width: 45%;">
+							<div style="margin-bottom: 10px; border-bottom: 1px solid black">
+								<label>Predecessors</label>
+							</div>
 							<g:each in="${assetComment.taskDependencies}" var="task">
-							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.predecessor.id})">
-								${task.predecessor.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.predecessor}
-							</span>
-							</g:each>&nbsp;&nbsp;
-				</span>
-				<label>Successors:</label>
-				<span  style="width: 50%">
-							<g:each in="${successor}" var="task">
-							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetComment(${task.assetComment.id})">
-								${task.assetComment.category}&nbsp;&nbsp;&nbsp;&nbsp;${task.assetComment}
-							</span>
+								<div style="font-weight: normal; padding: 5px; width: 100%; margin: 1px;"
+								     class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}"
+								     onclick="showAssetCommentMyTasks(${task.predecessor.id})">
+									${task.predecessor.taskNumber}: ${task.predecessor.comment} (${task.predecessor.category})
+								</div>
 							</g:each>
-				</span>
+						</div>
+						<div style="width: 8%"></div>
+						<div style="width: 45%">
+							<div style="margin-bottom: 10px; border-bottom: 1px solid black">
+								<label>Successors</label>
+							</div>
+							<g:each in="${successor}" var="task">
+								<div style="font-weight: normal; padding: 5px; width: 100%; margin: 1px;"
+								     class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}"
+								     onclick="showAssetCommentMyTasks(${task.assetComment.id})">
+									${task.assetComment.taskNumber}: ${task.assetComment.comment} (${task.assetComment.category})
+								</div>
+							</g:each>
+						</div>
+					</div>
 				</td>
 			</tr>
-		 	
+
 			<tr class="prop issue" id="assignedToTrEditId" >
 				<td valign="top" class="name"><label for="assignedTo">Assigned:</label></td>
 				<td valign="top" id="assignedToEditTdId" style="width: 20%;" colspan="3" >
