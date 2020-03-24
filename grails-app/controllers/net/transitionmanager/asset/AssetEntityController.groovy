@@ -500,9 +500,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
 
-            List<String> instructionsLinkList = AssetUtils.parseInstructionsLink(assetComment.instructionsLink)
-            String instructionsLinkURL = instructionsLinkList[1] ?: null
-			String instructionsLinkLabel = instructionsLinkList[0] ?: null
+			Map instructionsLinkMap = AssetUtils.parseInstructionsLink(assetComment.instructionsLink)
+
+            String instructionsLinkURL = instructionsLinkMap? instructionsLinkMap.url: null
+			String instructionsLinkLabel = instructionsLinkMap? instructionsLinkMap.label: null
 
             StringBuilder predecessorTable
 			def predecessorList = []

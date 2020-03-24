@@ -504,7 +504,7 @@ export class TaskEditCreateModelHelper {
 			isJustURL = true;
 			url = label;
 		}
-		url = url.toLowerCase();
+		url = url.toLowerCase().trim();
 		if (url && !url.startsWith('http://') && !url.startsWith('https://') ) {
 			url = 'http://' + url;
 		}

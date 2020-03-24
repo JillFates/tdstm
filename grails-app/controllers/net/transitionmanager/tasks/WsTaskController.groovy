@@ -392,7 +392,12 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	Map createTaskActionBarMap(Task task) {
 		Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
-        List<String> instructionsLinkList = AssetUtils.parseInstructionsLink(task.instructionsLink)
+
+		Map instructionLinkMap = AssetUtils.parseInstructionsLink(task.instructionsLink)
+
+		String instructionsLinkURL = instructionLinkMap? instructionLinkMap.url: null
+		String instructionsLinkLabel = instructionLinkMap? instructionLinkMap.label: null
+
 		return [
 				taskId: task.id,
 				apiActionId: task.apiAction?.id,
@@ -405,8 +410,8 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 				predecessorsCount: task.taskDependencies.size(),
 				status: task.status,
 				successorsCount: TaskDependency.countByPredecessor(task),
-                instructionsLinkURL: instructionsLinkList[1],
-                instructionsLinkLabel: instructionsLinkList[0]
+                instructionsLinkURL: instructionsLinkURL,
+                instructionsLinkLabel: instructionsLinkLabel
 		]
 	}
 
