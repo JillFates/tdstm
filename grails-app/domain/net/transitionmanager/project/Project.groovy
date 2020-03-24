@@ -147,22 +147,23 @@ class Project extends PartyGroup {
 	Map toMap() {
 		ProjectLogo logo = ProjectLogo.findByProject(this)
 		Map projectLogoMap = null
-		if(logo) {
+		if (logo) {
 			projectLogoMap = [
-			    id: logo.id,
-				name: logo.name,
+				id          : logo.id,
+				name        : logo.name,
 				partnerImage: logo.partnerImage
 			]
 		}
 		return [
-		    id: id,
-			projectCode: projectCode,
-			defaultBundle: [
-			    id: defaultBundle.id,
+			id                   : id,
+			name                 : name,
+			projectCode          : projectCode,
+			defaultBundle        : [
+				id  : defaultBundle.id,
 				name: defaultBundle.name
 			],
-			timezone: timezone.label,
-		    projectLogoForProject: projectLogoMap
+			timezone             : timezone.label,
+			projectLogoForProject: projectLogoMap
 		]
 	}
 

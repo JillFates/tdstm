@@ -488,7 +488,9 @@ export class TaskService {
 			apiActionCompletedAt: actionBarInfo.apiActionCompletedAt,
 			apiActionInvokedAt: actionBarInfo.apiActionInvokedAt,
 			category: actionBarInfo.category,
-			status: actionBarInfo.status
+			status: actionBarInfo.status,
+			instructionsLinkURL: actionBarInfo.instructionsLinkURL,
+			instructionsLinkLabel: actionBarInfo.instructionsLinkLabel
 		};
 		if (actionBarInfo.invokeActionDetails) {
 			result.invokeButton = { ...actionBarInfo.invokeActionDetails };

@@ -33,7 +33,7 @@ class WsApiActionController implements ControllerMethods {
      * List all available ApiActions for the user's project.
      * @return
      */
-    @HasPermission(Permission.ActionViewScript)
+    // @HasPermission(Permission.ActionViewScript)
     def list(){
         Project project = securityService.getUserCurrentProjectOrException()
         List<Map> apiActions = apiActionService.list(project, true, params)
@@ -44,7 +44,7 @@ class WsApiActionController implements ControllerMethods {
      * Fetch the ApiAction with this id, if it belongs to the user's project.
      * @return
      */
-    @HasPermission(Permission.ActionViewScript)
+    // @HasPermission(Permission.ActionViewScript)
     def fetch(Long id) {
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.find(id, project, true)

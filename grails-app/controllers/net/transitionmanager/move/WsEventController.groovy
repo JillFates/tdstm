@@ -6,30 +6,24 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
-import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.command.tag.ListCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.EventService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
 import net.transitionmanager.reporting.DashboardService
 import net.transitionmanager.security.Permission
-import net.transitionmanager.project.EventService
-import net.transitionmanager.project.MoveEventService
-import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagEvent
 import net.transitionmanager.tag.TagEventService
 import net.transitionmanager.tag.TagService
 import org.springframework.jdbc.core.JdbcTemplate
-import com.tdssrc.grails.TimeUtil
-
 /**
  * Handles WS calls of the EventService.
  *
@@ -99,17 +93,24 @@ class WsEventController implements ControllerMethods {
 		}
 
 		renderSuccessJson([
-			moveEventInstance: moveEvent,
+			moveEventInstance: moveEvent.toMap(),
 			availableBundles: moveBundleService.lookupList(project),
 			selectedBundles: moveEvent.moveBundles.collect { MoveBundle moveBundle ->
 				[id: moveBundle.id, name: moveBundle.name]
 			},
 			runbookStatuses: GormUtil.getConstrainedProperties(MoveEvent).runbookStatus.inList,
 			selectedTags: moveEvent.tagEvents.collect { TagEvent tagEvent ->
-				tagEvent.tag
+				tagEvent.tag.toMap()
 			},
-			tags: tagService.list(project, filter.name, filter.description, filter.dateCreated, filter.lastUpdated,
-				filter.bundleId ?[filter.bundleId] : [], filter.eventId)
+			tags: tagService.list(
+				project,
+				filter.name,
+				filter.description,
+				filter.dateCreated,
+				filter.lastUpdated,
+				filter.bundleId ?[filter.bundleId] : [],
+				filter.eventId
+			)
 		])
 	}
 
