@@ -121,11 +121,14 @@
 			</tr>
 			<tr>
 				<g:if test="${assetComment.assetEntity}">
-		   			<td>Asset:</td><td><span class="assetLink" onclick="EntityCrud.showAssetDetailView('${assetComment.assetEntity?.assetClass}','${assetComment?.assetEntity.id}')">&nbsp;${assetComment?.assetEntity.assetName}</span></td>
+		   			<td>Asset:</td>
+					<td>
+					<span class="assetLink" onclick="EntityCrud.showAssetDetailView('${assetComment.assetEntity?.assetClass}','${assetComment?.assetEntity.id}')">&nbsp;${assetComment?.assetEntity.assetName}</span>
+					</td>
 		   		</g:if>
 		   	</tr>
 			<tr>
-		   		  <td>Instructions Link:</td><td style="width: 1%"><tds:textAsLink text="${assetComment?.instructionsLink}" target="instructions"/></td>
+		   		  <td>Instructions Link:</td><td style=""><tds:textAsLink text="${assetComment?.instructionsLink}" target="instructions"/></td>
 		   	</tr>
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
