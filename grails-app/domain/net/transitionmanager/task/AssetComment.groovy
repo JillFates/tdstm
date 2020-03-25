@@ -648,6 +648,7 @@ class AssetComment {
 			assignedTo   : assignedTo?.toString() ?: '',
 			isResolved   : dateResolved ? 'Yes' : 'No',
 			isPublished  : isPublished,
+			assetClass	 : assetEntity?.assetClass,
 		]
 		return dataMap
 	}
