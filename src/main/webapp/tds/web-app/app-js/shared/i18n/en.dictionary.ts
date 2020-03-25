@@ -65,7 +65,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
 			'CONFIRMATION_TITLE': 'Confirmation Required',
-			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click Confirm to delete otherwise press Cancel'
 		},
 		'SELECT_PLACEHOLDER': 'Select...',
 		'ARTIFACTS': {
