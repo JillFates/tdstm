@@ -310,7 +310,12 @@ class DataviewService implements ServiceMethods {
 		// then they get the OVERRIDE_FOR_ME option
 		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
 		if ( isOverrideable ) {
-			Long overriddenViewId = (dataview.overridesView ? dataview.overridesView.id : dataview.id)
+			Long overriddenViewId
+			if (dataview.overridesView) {
+				overriddenViewId = dataview.overridesView.id
+			} else {
+				overriddenViewId = dataview.id
+			}
 
 			if (securityService.hasPermission(Permission.AssetExplorerSaveAs)) {
 				if (Dataview.where {
