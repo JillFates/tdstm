@@ -82,6 +82,6 @@ class ETLStreamingWriterSpec extends ETLBaseSpec {
             [key: 'value']                                        || '[key:value]'
             ['key', 'value']                                      || '[key, value]'
             ['key', 'value'] as Set                               || '[key, value]'
-            "${'Hello World'}"                                    || 'Hello World'
+            "${'test a GString'}"                                 || 'test a GString'
     }
 }
