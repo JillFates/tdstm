@@ -7,4 +7,6 @@ export class Connector {
 	public connectorPosY?: number;
 	public xPosition?: number;
 	public yPosition?: number;
+	public connector?: number;
+	public status?: string;
 }

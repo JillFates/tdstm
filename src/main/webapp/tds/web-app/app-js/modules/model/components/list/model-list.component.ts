@@ -15,10 +15,8 @@ import {CellClickEvent} from '@progress/kendo-angular-grid';
 import {ActionType} from '../../../dataScript/model/data-script.model';
 import {ModelColumnModel, ModelModel} from '../../model/model.model';
 import {Permission} from '../../../../shared/model/permission.model';
-import {ProviderModel} from '../../../provider/model/provider.model';
 import {ModelService} from '../../service/model.service';
 import {ModelViewEditComponent} from '../../view-edit/model-view-edit.component';
-import {ManufacturerModel} from "../../../manufacturer/model/manufacturer.model";
 
 @Component({
 	selector: 'model-list',
@@ -124,30 +122,34 @@ export class ModelListComponent implements OnInit {
 	};
 
 	private onCreateModel = async (): Promise<void> => {
-		/*try {
-			let providerModel: ProviderModel = {
-				name: '',
+		try {
+			let modelModel: ModelModel = {
+				modelName: '',
 				description: '',
-				comment: '',
+				usize: 1,
+				manufacturer: '0',
+				modelStatus: 'new',
+				modelConnectors: []
 			};
 			await this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
-				component: ProviderViewEditComponent,
+				component: ModelViewEditComponent,
 				data: {
-					providerModel: providerModel,
+					modelModel: modelModel,
 					actionType: ActionType.CREATE,
-					openFromList: false
+					manufacturerList: this.manufacturerList,
+					openFromList: true
 				},
 				modalConfiguration: {
-					title: 'Provider',
+					title: 'Model',
 					draggable: true,
-					modalSize: ModalSize.MD
+					modalSize: ModalSize.LG
 				}
 			}).toPromise();
 			await this.gridComponent.reloadData();
 		} catch (error) {
 			console.error(error);
-		}*/
+		}
 	};
 
 	public async cellClick(event: CellClickEvent): Promise<void> {
@@ -170,8 +172,8 @@ export class ModelListComponent implements OnInit {
 					modelModel,
 					manufacturerList: this.manufacturerList,
 					assetTypeList: this.assetTypeList,
-					actionType,
-					openFromList
+					actionType: actionType,
+					openFromList: openFromList
 				},
 				modalConfiguration: {
 					title: 'Model',
@@ -189,14 +191,14 @@ export class ModelListComponent implements OnInit {
 	 * Select the current element and open the Edit Dialog
 	 * @param dataItem
 	 */
-	private onEdit = async (dataItem: ProviderModel): Promise<void> => {
-		/*try {
+	private onEdit = async (dataItem: ModelModel): Promise<void> => {
+		try {
 			if (this.isEditAvailable()) {
-				await this.openProvider(dataItem, ActionType.EDIT, true);
+			await this.openModel(dataItem, ActionType.EDIT, true);
 			}
 		} catch (error) {
 			console.error(error);
-		}*/
+		}
 	};
 
 	/**

@@ -43,7 +43,34 @@ export class ModelService {
 
 	saveModel(model: ModelModel): Observable<ModelModel> {
 		const postRequest = {
-			name: model.modelName,
+			modelName: model.modelName,
+			manufacturer: { id: model.manufacturer },
+			assetType: { id: model.assetType },
+			usize: model.usize,
+			weight: model.weight,
+			productLine: model.productLine,
+			endOfLifeDate: model.endOfLifeDate,
+			cpuType: model.cpuType,
+			cpuCount: model.cpuCount,
+			powerNameplate: model.powerNameplate,
+			powerDesign: model.powerDesign,
+			powerUse: model.powerUse,
+			roomObject: model.roomObject,
+			height: model.height,
+			width: model.width,
+			depth: model.depth,
+			layoutStyle: model.layoutStyle,
+			endOfLifeStatus: model.endOfLifeStatus,
+			modelFamily: model.modelFamily,
+			memorySize: model.memorySize,
+			storageSize: model.storageSize,
+			description: model.description,
+			sourceTDS: (model.sourceTDS) ? 1 : 0,
+			sourceURL: model.sourceURL,
+			modelStatus: model.modelStatus,
+			modelConnectors: model.modelConnectors,
+			connectorCount: model.connectorCount,
+			akaChanges: model.akaChanges
 		};
 		if (!model.id) {
 			return this.http.post(`${this.modelUrl}/save`, JSON.stringify(postRequest))
@@ -52,11 +79,19 @@ export class ModelService {
 				})
 				.catch((error: any) => error);
 		} else {
-			return this.http.put(`${this.modelUrl}/update/${model.id}`, JSON.stringify(postRequest))
+			return this.http.post(`${this.modelUrl}/update/${model.id}`, JSON.stringify(postRequest))
 				.map((response: any) => {
 					return response && response.status === 'success' && response.data;
 				})
 				.catch((error: any) => error);
 		}
+	}
+
+	getPreData(): Observable<any> {
+		return this.http.get(`${this.modelUrl}/create`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
 	}
 }

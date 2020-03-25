@@ -111,7 +111,7 @@ class Model {
 	}
 
 	static transients = ['aliases', 'assetsCount', 'manufacturerName',
-	                     'noOfConnectors', 'source', 'valid']
+	                     'noOfConnectors', 'source', 'valid', 'createdByName', 'updatedByName', 'validatedByName']
 
 	static mapping = {
 		autoTimestamp false
@@ -182,6 +182,18 @@ class Model {
 
 	String getManufacturerName() {
 		manufacturer?.name
+	}
+
+	String getCreatedByName() {
+		createdBy?.firstName + ' ' + createdBy?.lastName
+	}
+
+	String getUpdatedByName() {
+		updatedBy?.firstName + ' ' + updatedBy?.lastName
+	}
+
+	String getValidatedByName() {
+		validatedBy?.firstName + ' ' + validatedBy?.lastName
 	}
 
 	// alias records for the manufacturer

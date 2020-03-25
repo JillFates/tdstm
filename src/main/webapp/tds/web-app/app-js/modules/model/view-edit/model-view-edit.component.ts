@@ -1,5 +1,14 @@
-import {Component, ComponentFactoryResolver, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {
+	Component,
+	ComponentFactoryResolver, ElementRef,
+	Input,
+	OnInit,
+	QueryList,
+	Renderer2,
+	ViewChild,
+	ViewChildren
+} from '@angular/core';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 import {NgForm} from '@angular/forms';
 import {ModelModel} from '../model/model.model';
 import {ActionType} from '../../dataScript/model/data-script.model';
@@ -7,6 +16,8 @@ import {TranslatePipe} from '../../../shared/pipes/translate.pipe';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {ModelService} from '../service/model.service';
 import {Permission} from '../../../shared/model/permission.model';
+import {Connector} from "../../../shared/components/connector/model/connector.model";
+import {Aka, AkaChanges} from "../../../shared/components/aka/model/aka.model";
 
 @Component({
 	selector: 'model-view-edit',
@@ -16,6 +27,7 @@ import {Permission} from '../../../shared/model/permission.model';
 export class ModelViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
 	@ViewChild('modelForm', {read: NgForm, static: true}) modelForm: NgForm;
+	@ViewChild('modelConnectorTableBody', { static: false }) d1: ElementRef;
 
 	public modelModel: ModelModel;
 	public modalTitle: string;
@@ -24,8 +36,9 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	public manufacturerList;
 	public assetTypeList;
 	public sourceTDS = false;
-	public modelConnectors: any[] = [];
+	public modelConnectors: Connector[] = [];
 	public modelAkas: any[] = [];
+	public powerType: string;
 	public powerTypes = ['Amp', 'Watts'];
 	public modelAkasDisplay: string;
 	public manufacturerName: string;
@@ -35,10 +48,19 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	public aliasControls = [];
 	public aliasDeleted = [];
 	public aliasUpdated = [];
-	public aliasAdded = [];
+	public aliasAdded: Aka[] = [];
+	public akaChanges: AkaChanges;
 	public displayedAliasErrorSpans = [];
+	public modelCreatedBy: string;
+	public modelUpdatedBy: string;
+	public modelValidatedBy: string;
 	@ViewChildren('aliasSpan') aliasSpanElements: QueryList<any>;
 	protected hasOnlyUniqueAlias = true;
+	private modelControllerTypes = [ 'Ether', 'Serial', 'Power', 'Fiber', 'SCSI', 'USB', 'KVM', 'ILO', 'Management',
+		'SAS',
+		'Other'];
+	private modelControllerLabelPositions = [ 'Right', 'Left', 'Top', 'Bottom'];
+	private modelConnectorCount = 0;
 
 	private dataSignature: string;
 	protected isUnique = true;
@@ -48,7 +70,8 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		private dialogService: DialogService,
 		private translatePipe: TranslatePipe,
 		private modelService: ModelService,
-		private permissionService: PermissionService
+		private permissionService: PermissionService,
+		private renderer: Renderer2
 	) {
 		super();
 	}
@@ -59,7 +82,8 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modalType = this.data.actionType;
 		this.modalTitle = this.getModalTitle(this.modalType);
 
-		this.getModelDetails();
+		if (this.modalType !== ActionType.CREATE) this.getModelDetails();
+		if (this.modalType === ActionType.CREATE) this.preLoadData();
 
 		this.buttons.push({
 			name: 'edit',
@@ -95,6 +119,10 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
 		});
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle(this.modalType));
+		});
 	}
 
 	public cancelEditDialog(): void {
@@ -123,6 +151,15 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		}
 	}
 
+	private preLoadData(): void {
+		this.modelService.getPreData()
+			.subscribe((response: any) => {
+				this.assetTypeList = response.assetTypes;
+				this.powerType = response.powerType;
+				this.usizeList = response.usizeList;
+			})
+	}
+
 	private getModelDetails(): void {
 		this.modelService.getModelDetails(this.modelModel.id)
 			.subscribe((response: any) => {
@@ -130,7 +167,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 				this.modelModel = response.data.modelInstance;
 				this.modelConnectors = response.data.modelConnectors;
 				this.modelAkas = response.data.modelAkas;
-				this.modelAkasDisplay = (this.modelAkas.length > 0) ? this.modelAkas.join(',') : '';
+				this.modelAkasDisplay = response.data.modelAkas;
 				this.sourceTDS = this.modelModel.sourceTDS === 1;
 				this.manufacturerName = this.manufacturerList.find(m => m.id === this.modelModel.manufacturer['id']).name;
 				this.usizeList = response.data.usizeList;
@@ -138,7 +175,105 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 				this.aliasControls = (this.modalType === this.actionTypes.EDIT) ? (this.modelAkas) ? this.modelAkas : [] : [];
 				this.dataSignature = JSON.stringify(this.modelModel);
 				this.userList = response.data.userList;
+				this.modelCreatedBy = response.data.modelCreatedBy
 			});
+	}
+
+	public addConnector(): void {
+		this.modelConnectorCount++;
+		const tr = this.renderer.createElement('tr');
+
+		const tdSelect = this.renderer.createElement('td');
+		const tdLabel = this.renderer.createElement('td');
+		const tdLabelPosition = this.renderer.createElement('td');
+		const tdPosX = this.renderer.createElement('td');
+		const tdPosY = this.renderer.createElement('td');
+
+		const selectTypeDiv = this.renderer.createElement('div');
+		const selectType = this.renderer.createElement('select');
+		const inputLabel = this.renderer.createElement('input');
+		const selectLabelPositionDiv = this.renderer.createElement('div');
+		const selectLabelPosition = this.renderer.createElement('select');
+		const inputPosX = this.renderer.createElement('input');
+		const inputPosY = this.renderer.createElement('input');
+
+		this.renderer.addClass(selectTypeDiv, 'clr-select-wrapper');
+		this.renderer.addClass(selectType, 'clr-select');
+		this.renderer.addClass(selectLabelPositionDiv, 'clr-select-wrapper');
+		this.renderer.addClass(selectLabelPosition, 'clr-select');
+		this.renderer.addClass(inputLabel, 'clr-input');
+		this.renderer.addClass(inputPosX, 'clr-input');
+		this.renderer.addClass(inputPosY, 'clr-input');
+
+		this.renderer.setAttribute(inputLabel, 'value', `Connector${this.modelConnectorCount}`);
+		this.renderer.setAttribute(inputPosX, 'type', 'number');
+		this.renderer.setAttribute(inputPosY, 'type', 'number');
+
+		// Values
+		this.modelControllerTypes.forEach(type => {
+			const option = this.renderer.createElement('option');
+			const text = this.renderer.createText(type);
+			this.renderer.setProperty(option, 'value', type);
+			this.renderer.appendChild(option, text);
+			this.renderer.appendChild(selectType, option);
+		});
+
+		this.modelControllerLabelPositions.forEach(type => {
+			const option = this.renderer.createElement('option');
+			const text = this.renderer.createText(type);
+			this.renderer.setProperty(option, 'value', type);
+			this.renderer.appendChild(option, text);
+			this.renderer.appendChild(selectLabelPosition, option);
+		})
+
+		this.renderer.appendChild(selectTypeDiv, selectType);
+		this.renderer.appendChild(tr, tdSelect);
+		this.renderer.appendChild(tdSelect, selectTypeDiv);
+
+		this.renderer.appendChild(tr, tdLabel);
+		this.renderer.appendChild(tdLabel, inputLabel);
+
+		this.renderer.appendChild(selectLabelPositionDiv, selectLabelPosition);
+		this.renderer.appendChild(tr, tdLabelPosition);
+		this.renderer.appendChild(tdLabelPosition, selectLabelPositionDiv);
+
+		this.renderer.appendChild(tr, tdPosX);
+		this.renderer.appendChild(tdPosX, inputPosX);
+
+		this.renderer.appendChild(tr, tdPosY);
+		this.renderer.appendChild(tdPosY, inputPosY);
+
+		this.renderer.appendChild(this.d1.nativeElement, tr);
+
+
+		/*<tr id="connectorTr1" style="display: none;">
+		<td><select id="typeId1" name="type">
+		<option value="Ether">Ether</option>
+			<option value="Serial">Serial</option>
+			<option value="Power">Power</option>
+			<option value="Fiber">Fiber</option>
+			<option value="SCSI">SCSI</option>
+			<option value="USB">USB</option>
+			<option value="KVM">KVM</option>
+			<option value="ILO">ILO</option>
+			<option value="Management">Management</option>
+			<option value="SAS">SAS</option>
+			<option value="Other">Other</option>
+			</select></td>
+		<td><input id="labelId1" type="text" onchange="changeLabel(1, this.value)"></td>
+		<td><select id="labelPositionId1" name="labelPosition" onchange="changeLabelPosition(1, this.value)">
+		<option value="Right">Right</option>
+			<option value="Left">Left</option>
+			<option value="Top">Top</option>
+			<option value="Bottom">Bottom</option>
+			</select></td>
+		<td><input id="connectorPosXId1" maxlength="3" style="width: 35px;" type="number" min="0" value="0"></td>
+		<td>
+		<input id="connectorId1" maxlength="5" style="width: 35px;" type="hidden" value="1">
+		<input id="connectorPosYId1" maxlength="3" style="width: 35px;" type="number" min="0" value="360">
+		<input id="statusId1" type="hidden">
+			</td>
+			</tr>*/
 	}
 
 	/**
@@ -176,11 +311,11 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 				}
 			}
 		} else {
-			const alreadyAdded = this.aliasAdded.find(i => i.index === index);
+			const alreadyAdded = this.aliasAdded.find(i => i.id === index);
 			if (alreadyAdded) {
 				this.aliasAdded[index].name = event.target.value;
 			} else {
-				this.aliasAdded.push({index, name: event.target.value});
+				this.aliasAdded.push({id: index, name: event.target.value});
 			}
 		}
 	}
@@ -211,8 +346,11 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	 * Create Edit a Manufacturer
 	 */
 	protected onSaveModel(): void {
-		// this.modelModel.alias = this.alias.join(',');
-		// const aliasAddedMap = this.aliasAdded.map(i => i.name);
+		this.getModelConnectors();
+		this.modelModel.connectorCount = this.modelConnectorCount;
+		this.modelModel.modelConnectors = this.modelConnectors;
+		this.modelModel.sourceTDS = (this.sourceTDS) ? 1 : 0;
+		this.modelModel.akaChanges = { added: this.aliasAdded, deleted: this.aliasDeleted, edited: this.aliasUpdated };
 		this.modelService.saveModel(this.modelModel)
 			.subscribe(
 			(result: any) => {
@@ -265,5 +403,36 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	 */
 	public onDismiss(): void {
 		this.cancelCloseDialog();
+	}
+
+	private getModelConnectors(): void {
+		const ele = this.d1.nativeElement;
+		let connectorNumber = 0;
+		for (let child of ele.children) {
+			connectorNumber++;
+			const connector = new Connector();
+			connector.connector = connectorNumber;
+			connector.status = 'missing';
+			connector.type = child.children[0].children[0].children[0].value;
+			connector.label = child.children[1].children[0].value;
+			connector.labelPosition = child.children[2].children[0].children[0].value;
+			connector.connectorPosX = child.children[3].children[0].value;
+			connector.connectorPosY = child.children[4].children[0].value;
+
+			this.modelConnectors.push(connector);
+			/*for (let g of child.children) {
+				if (g.children[0].value) {
+					console.log('Inputs: ' + g.children[0].value);
+				} else {
+					if (g.children[0].children[0].value) {
+						console.log('Selects: ' + g.children[0].children[0].value);
+					}
+				}
+			}*/
+		}
+	}
+
+	public onChangeManufacturer(event: any): void {
+		this.modelModel.manufacturer = event.target.value;
 	}
 }

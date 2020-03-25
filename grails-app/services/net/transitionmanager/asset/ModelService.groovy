@@ -319,19 +319,19 @@ class ModelService implements ServiceMethods {
 	}
 
 	@Transactional
-	boolean save(Model model, GrailsParameterMap params) {
-		if (isValidName(model.modelName, model.id, model.manufacturerId) && model.save(flush: true, failOnError: false)) {
-			int connectorCount = params.int("connectorCount", 0)
+	boolean save(Model model, Map params) {
+		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true, failOnError: true)) {
+			int connectorCount = params.connectorCount
 			if (connectorCount > 0) {
-				for (int i = 1; i <= connectorCount; i++) {
+				for (int i = 0; i <= connectorCount; i++) {
 					def modelConnector = new ModelConnector(model: model,
-							connector: params['connector' + i],
-							label: params['label' + i],
-							type: params['type' + i],
-							labelPosition: params['labelPosition' + i],
-							connectorPosX: params.int("connectorPosX${i}", 0),
-							connectorPosY: params.int("connectorPosY${i}", 0),
-							status: params['status' + i])
+							connector: model.modelConnectors[i].connector,
+							label: model.modelConnectors[i].label,
+							type: model.modelConnectors[i].type,
+							labelPosition: model.modelConnectors[i].labelPosition,
+							connectorPosX: model.modelConnectors[i].connectorPosX,
+							connectorPosY: model.modelConnectors[i].connectorPosY,
+							status: model.modelConnectors[i].status)
 
 					if (!modelConnector.hasErrors()) {
 						modelConnector.save(flush: true)
@@ -353,10 +353,10 @@ class ModelService implements ServiceMethods {
 
 			model.sourceTDSVersion = 1
 			model.save(flush: true)
-			List<String> akaNames = params.list('aka')
+			List akaNames = params.akaChanges.added
 			akaNames.each { aka ->
-				if (!StringUtil.isBlank(aka)) {
-					findOrCreateAliasByName(model, aka, true)
+				if (!StringUtil.isBlank(aka.name)) {
+					findOrCreateAliasByName(model, aka.name, true)
 				}
 			}
 			return true
@@ -366,9 +366,9 @@ class ModelService implements ServiceMethods {
 	}
 
 	@Transactional
-	boolean update(Model model, GrailsParameterMap params) {
+	boolean update(Model model, Map params) {
 		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true)) {
-			String deletedAka = params.deletedAka
+			/*String deletedAka = params.deletedAka
 			if (deletedAka) {
 				List<Long> maIds = deletedAka.split(",").collect() { it as Long }
 				ModelAlias.executeUpdate("delete ModelAlias where id in :maIds", [maIds: maIds])
@@ -459,7 +459,7 @@ class ModelService implements ServiceMethods {
 			}
 
 			// <SL> should we use AssetEntityService?
-			AssetEntity.executeUpdate("update AssetEntity ae set ae.assetType = :at where ae.model.id = :mId", [at: model.assetType, mId: model.id])
+			AssetEntity.executeUpdate("update AssetEntity ae set ae.assetType = :at where ae.model.id = :mId", [at: model.assetType, mId: model.id])*/
 
 			if (model.sourceTDSVersion) {
 				model.sourceTDSVersion ++

@@ -1,4 +1,6 @@
 import {FilterType} from 'tds-component-library';
+import {Connector} from "../../../shared/components/connector/model/connector.model";
+import {Aka, AkaChanges} from "../../../shared/components/aka/model/aka.model";
 
 export class ModelColumnModel {
 	columns: any[];
@@ -101,7 +103,10 @@ export class ModelModel {
 	powerDesign?: number;
 	roomObject?: boolean;
 	validatedBy?: string;
-	usize = 1;
+	usize?: number;
 	updatedBy?: string;
 	createdBy?: string;
+	modelConnectors: Connector[] = [];
+	connectorCount?: number;
+	akaChanges?: AkaChanges;
 }

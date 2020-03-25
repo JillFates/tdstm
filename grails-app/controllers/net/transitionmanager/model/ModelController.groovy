@@ -85,7 +85,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		Integer numberOfPages = Math.ceil(totalRows / maxRows)
 
 		// Get the subset of all records based on the pagination
-		modelInstanceList = (totalRows > 0) ? modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)] : []
+		// modelInstanceList = (totalRows > 0) ? modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)] : []
 
 		// Reformat the list to allow jqgrid to use it
 		/*def results = modelInstanceList?.collect {[
@@ -128,15 +128,15 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	}
 
 	@HasPermission(Permission.ModelCreate)
-	def create(String modelId) {
+	def create() {
 		List<ModelConnector> modelConnectors
 		Model modelTemplate
 
 
-		if (modelId) {
+		/*if (modelId) {
 			modelTemplate = Model.get(modelId)
 			modelConnectors = ModelConnector.findAllByModel(modelTemplate)
-		}
+		}*/
 
 		List<Integer> otherConnectors = []
 		int existingConnectors = modelConnectors ? modelConnectors.size() + 1 : 1
@@ -145,14 +145,20 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			otherConnectors << i
 		}
 
-		[
-			modelInstance  : new Model(),
+		Model modelInstance = new Model()
+		def usizeList = com.tdssrc.grails.GormUtil.getConstrainedProperties(modelInstance.class).usize.inList
+
+		def paramsMap = [
+			modelInstance  : modelInstance,
 			modelConnectors: modelConnectors,
 			otherConnectors: otherConnectors,
 			modelTemplate  : modelTemplate,
 			powerType      : userPreferenceService.getPreference(PREF.CURR_POWER_TYPE),
-			assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+			assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value,
+			usizeList      : usizeList
 		]
+
+		renderSuccessJson(paramsMap)
 	}
 
 	private boolean isValidImage(MultipartFile file) {
@@ -165,17 +171,18 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.ModelEdit)
 	def save() {
 		try {
-			def modelId = params.modelId
-			def powerNameplate = params.float("powerNameplate", 0f)
-			def powerDesign = params.float("powerDesign", 0f)
-			def powerUsed = params.float("powerUse", 0f)
-			def powerType = params.powerType
-			def endOfLifeDate = params.endOfLifeDate
-			def memorySize = params.double("memorySize", 0f)
-			def storageSize = params.double("storageSize", 0f)
+			Map modelRequest = request.JSON
+			def modelId = modelRequest.modelId
+			def powerNameplate = modelRequest.powerNameplate?.toFloat()
+			def powerDesign = modelRequest.powerDesign?.toFloat()
+			def powerUsed = modelRequest.powerUse?.toFloat()
+			def powerType = modelRequest.powerType
+			def memorySize = modelRequest.memorySize?.toFloat()
+			def storageSize = modelRequest.storageSize?.toFloat()
+			def endOfLifeDate = modelRequest.endOfLifeDate
 
 			if (endOfLifeDate) {
-				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
+				modelRequest.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
 			}
 
 			if (powerType == "Amps") {
@@ -185,23 +192,22 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			}
 
 			Model modelTemplate = modelId ? Model.get(modelId) : null
-			params.useImage = params.boolean("useImage", false) ? 1 : 0
-			params.sourceTDS = params.boolean("sourceTDS", false) ? 1 : 0
-			params.roomObject = params.boolean("roomObject", false)
-			params.powerUse = powerUsed
+			// params.useImage = params.boolean("useImage", false) ? 1 : 0
+			// modelRequest.sourceTDS = params.boolean("sourceTDS", false) ? 1 : 0
+			modelRequest.powerUse = powerUsed
 
-			def modelInstance = new Model(params)
+			def modelInstance = new Model(modelRequest)
 			modelInstance.powerUse = powerUsed
 			modelInstance.powerDesign = powerDesign
 			modelInstance.powerNameplate = powerNameplate
 			modelInstance.memorySize = memorySize
 			modelInstance.storageSize = storageSize
 
-			if (params.modelStatus == 'valid') {
+			if (modelRequest.modelStatus == 'valid') {
 				modelInstance.validatedBy = securityService.loadCurrentPerson()
 			}
 
-			def frontImage = request.getFile('frontImage')
+			/*def frontImage = request.getFile('frontImage')
 			if (frontImage && frontImage?.bytes?.size() > 0) {
 				if (!isValidImage(frontImage)) {
 					flash.message = "Front Image must be one of: ${OK_CONTENTS}"
@@ -225,11 +231,10 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				modelInstance.rearImage = modelTemplate.rearImage
 			} else {
 				modelInstance.rearImage = null
-			}
+			}*/
 
-			if (modelService.save(modelInstance, params)) {
-				flash.message = "${modelInstance.modelName} created"
-				redirect(action: "list", id: modelInstance.id)
+			if (modelService.save(modelInstance, modelRequest)) {
+				renderSuccessJson([status: "${modelInstance.modelName} created"])
 			} else {
 				modelInstance.errors.allErrors.each {  log.error it }
 
@@ -277,9 +282,11 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas,
 				                 modelHasPermission: securityService.hasPermission(Permission.ModelValidate),
 				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model),
-								 usizeList: usizeList, assetTypes: assetTypes, userList: userList]
+								 usizeList: usizeList, assetTypes: assetTypes, userList: userList,
+								 modelCreatedBy: model.getCreatedByName(), modelUpdatedBy: model.getUpdatedByName(),
+								 modelValidatedBy: model.getValidatedByName()]
 
-				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
+				// def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
 
 				// render(view: view, model: paramsMap)
 				renderSuccessJson(paramsMap)
@@ -344,9 +351,10 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.ModelEdit)
 	def update() {
 		try{
+			Map modelRequest = request.JSON
 			def modelInstance = Model.get(params.id)
 			def modelStatus = modelInstance?.modelStatus
-			def endOfLifeDate = params.endOfLifeDate
+			def endOfLifeDate = modelRequest.endOfLifeDate
 
 			Person person = null
 			if (securityService.loggedIn) {
@@ -354,32 +362,38 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			}
 
 			if (endOfLifeDate) {
-				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
+				modelRequest.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
 			}
 
 			if (modelInstance) {
-				def powerNameplate = params.float("powerNameplate", 0f)
+				/*def powerNameplate = params.float("powerNameplate", 0f)
 				def powerDesign = params.float("powerDesign", 0f)
 				def powerUsed = params.float("powerUse", 0f)
 				def powerType = params.powerType
 				def memorySize = params.double("memorySize", 0f)
-				def storageSize = params.double("storageSize", 0f)
+				def storageSize = params.double("storageSize", 0f)*/
 
-				if (powerType == "Amps") {
+				def powerNameplate = modelRequest.powerNameplate?.toFloat()
+				def powerDesign = modelRequest.powerDesign?.toFloat()
+				def powerUsed = modelRequest.powerUse?.toFloat()
+				def powerType = modelRequest.powerType
+				def memorySize = modelRequest.memorySize?.toFloat()
+				def storageSize = modelRequest.storageSize?.toFloat()
+
+				if (modelRequest.powerType== "Amps") {
 					powerNameplate = powerNameplate * 120
 					powerDesign = powerDesign * 120
 					powerUsed = powerUsed * 120
 				}
 
 				params.useImage = params.boolean("useImage", false) ? 1 : 0
-				params.sourceTDS = params.boolean("sourceTDS", false) ? 1 : 0
-				params.powerNameplate = powerNameplate
-				params.powerDesign = powerDesign
-				params.powerUse = powerUsed
-				params.memorySize = memorySize
-				params.storageSize = storageSize
+				modelRequest.powerNameplate = powerNameplate
+				modelRequest.powerDesign = powerDesign
+				modelRequest.powerUse = powerUsed
+				modelRequest.memorySize = memorySize
+				modelRequest.storageSize = storageSize
 
-				def frontImage = request.getFile("frontImage")
+				/*def frontImage = request.getFile("frontImage")
 				if (frontImage && frontImage?.getBytes()?.getSize() > 0) {
 					if (!isValidImage(frontImage)) {
 						flash.message = "Front Image must be one of: ${OK_CONTENTS}"
@@ -401,26 +415,26 @@ class ModelController implements ControllerMethods, PaginationMethods {
 						rearImage = rearImage.bytes
 				} else {
 					rearImage = modelInstance.rearImage
-				}
+				}*/
 
-				modelInstance.height = params.double("modelHeight", 0).round()
-				modelInstance.weight = params.double("modelWeight", 0).round()
-				modelInstance.depth = params.double("modelDepth", 0).round()
-				modelInstance.width = params.double("modelWidth", 0).round()
+				modelInstance.height = modelRequest.height?.toDouble().round()
+				modelInstance.weight = modelRequest.weight?.toDouble().round()
+				modelInstance.depth = modelRequest.depth?.toDouble().round()
+				modelInstance.width = modelRequest.width?.toDouble().round()
 
-				if (params.modelStatus == 'valid' && modelStatus == 'full') {
+				if (modelRequest.modelStatus == 'valid' && modelStatus == 'full') {
 					modelInstance.validatedBy = person
 					modelInstance.updatedBy = modelInstance.updatedBy
 				} else {
 					modelInstance.updatedBy = person
 				}
 
-				modelInstance.properties = params
-				modelInstance.rearImage = rearImage
-				modelInstance.frontImage = frontImage
+				modelInstance.properties = modelRequest
+				// modelInstance.rearImage = rearImage
+				// modelInstance.frontImage = frontImage
 
 				try {
-					if (modelService.update(modelInstance, params)) {
+					if (modelService.update(modelInstance, modelRequest)) {
 						flash.message = "$modelInstance.modelName Updated"
 						if (params.redirectTo == "assetAudit") {
 							render(template: "modelAuditView", model: [modelInstance: modelInstance])
@@ -453,15 +467,11 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		Model model = Model.get(params.id)
 		try {
 			modelService.delete(model)
-			flash.message = "${model} deleted"
-			renderSuccessJson([status: DELETE_OK_MESSAGE] )
+			renderSuccessJson(DELETE_OK_MESSAGE)
 		} catch (DataIntegrityViolationException e) {
-			//log.error(e.message, e)
-			flash.message = "${model} not deleted"
-			renderSuccessJson([status: DELETE_ERROR_MESSAGE] )
+			renderErrorJson(e.messge)
 		} catch (ServiceException e) {
-			//log.error(e.message, e)
-			redirect(action: "list")
+			renderErrorJson(e.message)
 		}
 	}
 
