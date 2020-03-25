@@ -11,7 +11,7 @@
                             <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.discovery.appsValidatedPercentage+'%'"></div>
                             <div class="percentage-bar-text">
                                 <b> {{planningDashboardModel.discovery.appsValidatedPercentage}}% </b>
-                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated',  _ufp: 'true'}">
+                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'-Unknown',  _ufp: 'true'}">
                                     Applications Validated
                                 </a>
                             </div>

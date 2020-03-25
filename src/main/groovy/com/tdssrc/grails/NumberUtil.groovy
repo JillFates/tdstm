@@ -418,7 +418,7 @@ class NumberUtil {
 	 * @return
 	 */
 	static int percentage(Long total, Long value, int defaultIfZero = 0) {
-		int percentage = total ? Math.ceil((value /  total) * 100) : defaultIfZero
+		int percentage = total ? Math.round((value /  total) * 100) : defaultIfZero
 		// Prevent values very close to 100% to be converted to 100%.
 		if (percentage == 100 && total > value) {
 			percentage = 99
