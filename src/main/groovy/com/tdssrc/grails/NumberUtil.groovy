@@ -418,11 +418,22 @@ class NumberUtil {
 	 * @return
 	 */
 	static int percentage(Long total, Long value, int defaultIfZero = 0) {
-		int percentage = total ? Math.round((value /  total) * 100) : defaultIfZero
-		// Prevent values very close to 100% to be converted to 100%.
-		if (percentage == 100 && total > value) {
-			percentage = 99
+		int percentage
+		if (total > 0) {
+			// Calculate the percentage with the correct handling.
+			percentage = Math.round((value /  total) * 100)
+
+			// Prevent values very close to 0% to be converted to 0%. Making them 1 instead.
+			if (percentage == 0 && value > 0) {
+				percentage = 1
+			// Prevent values very close to 100% to be converted to 100%. Making them 99 instead.
+			} else if (percentage == 100 && total > value){
+				percentage = 99
+			}
+		} else {
+			percentage = defaultIfZero
 		}
+
 		return percentage
 	}
 }
