@@ -586,8 +586,6 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 			subscr = this.dialogService
 				.activatedDropdown
 				.subscribe(res => { 
-					// console.log('theRes:', res);
-					// console.log('istrue:' + (res === true));
 					if ((res === true)) {
 						subscr.unsubscribe();
 						acti = true;
