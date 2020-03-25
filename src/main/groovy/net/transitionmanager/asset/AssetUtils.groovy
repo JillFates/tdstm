@@ -237,13 +237,20 @@ class AssetUtils {
     /**
      * Parses the instructionLink and extracts the URL and label as separate list of strings.
      * @param instructionsLink
-     * @return List<String> - [instructionsLinkLabel, instructionsLinkURL]
+     * @return Map<String, String> - [label: instructionsLinkLabel, url: instructionsLinkURL]
      */
-    public static List<String> parseInstructionsLink(String instructionsLink) {
+    static Map<String, String> parseInstructionsLink(String instructionsLink) {
+		Map result
         if (instructionsLink) {
-            return HtmlUtil.parseMarkupURL(instructionsLink)
+			List<String> markupUrlParts = HtmlUtil.parseMarkupURL(instructionsLink)
+			if (markupUrlParts?.size() == 2) {
+				result = [
+						label: markupUrlParts[0],
+						url: markupUrlParts[1]
+				]
+			}
         }
-        return []
+        return result
     }
 
 }
