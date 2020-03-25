@@ -219,6 +219,7 @@
                                                                         title="Create"
                                                                         [tooltip]="modelHelper.CREATE_PREDECESSOR"
                                                                         [id]="'btnAddPredecessor'"
+                                                                        [disabled]="!hasCreateTaskPermission"
                                                                         (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
                                                         </tds-button-add>
                                                     </ng-template>
@@ -264,6 +265,7 @@
                                                                     title="Create"
                                                                     [tooltip]="modelHelper.CREATE_SUCCESSOR"
                                                                     [id]="'btnAddSuccessor'"
+                                                                    [disabled]="!hasCreateTaskPermission"
                                                                     (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
                                                     </tds-button-add>
                                                 </ng-template>
