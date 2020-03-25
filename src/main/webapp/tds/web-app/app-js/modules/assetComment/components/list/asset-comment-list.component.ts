@@ -196,7 +196,7 @@ export class AssetCommentListComponent implements OnInit {
 	 * @param assetEntityId
 	 * @param assetType
 	 */
-	private async openAssetDetails(assetEntityId: string, assetClassName: string) {
+	private async openAssetDetails(assetEntityId: string, assetClassName: string): Promise<void> {
 		await this.dialogService.open({
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: AssetShowComponent,
