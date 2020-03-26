@@ -889,6 +889,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 */
 	onDiagramAnimationFinished(): void {
 		this.notifierService.broadcast({ name: DiagramEventAction.ANIMATION_FINISHED });
+		this.hideLoader();
 	}
 
 	/**
@@ -1054,6 +1055,26 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				d.remove(node);
 			}
 		})
+	}
+
+	/**
+	 * Show loader
+	 */
+	showLoader(): void {
+		console.log('gif init');
+		this.notifierService.broadcast({
+			name: 'httpRequestInitial'
+		});
+	}
+
+	/**
+	 * Hide loader
+	 */
+	hideLoader(): void {
+		console.log('gif completed');
+		this.notifierService.broadcast({
+			name: 'httpRequestCompleted'
+		});
 	}
 
 	@HostListener('window:beforeunload', ['$event'])
