@@ -66,54 +66,70 @@ export class ArchitectureGraphComponent implements OnInit {
 	public toggleFullScreen = true;
 
 	public assetItem;
+	private TAG_APPLICATION = 'appLbl';
+	private TAG_DATABASE = 'dbLbl';
+	private TAG_PHYSICAL_SERVER = 'svrLbl';
+	private TAG_VIRTUAL_SERVER = 'svrLbl';
+	private TAG_STORAGE_LOGICAL = 'slLbl';
+	private TAG_STORAGE_DEVICE = 'slpLbl';
+	private TAG_NETWORK_LOGICAl = 'netLbl';
+	private TAG_OTHER_DEVICES = 'oLbl';
 
 	public graphLabels = [
 		{
 			icon: 'application',
 			label: 'Application',
 			value: 'APPLICATION',
+			tagLabel: this.TAG_APPLICATION,
 			checked: false
 		},
 		{
 			icon: 'database',
 			label: 'Database',
 			value: 'DATABASE',
+			tagLabel: this.TAG_DATABASE,
 			checked: false
 		},
 		{
 			icon: 'serverPhysical',
 			label: 'Physical Server',
 			value: 'physical server',
+			tagLabel: this.TAG_PHYSICAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'serverVirtual',
 			label: 'Virtual Server',
 			value: 'Device',
+			tagLabel: this.TAG_VIRTUAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'storageLogical',
 			label: 'Logical Storage',
 			value: 'Logical Storage',
+			tagLabel: this.TAG_STORAGE_LOGICAL,
 			checked: false
 		},
 		{
 			icon: 'storagePhysical',
 			label: 'Storage Device',
 			value: 'Storage Device',
+			tagLabel: this.TAG_STORAGE_DEVICE,
 			checked: false
 		},
 		{
 			icon: 'networkLogical',
 			label: 'Network Device',
 			value: 'Network Device',
+			tagLabel: this.TAG_NETWORK_LOGICAl,
 			checked: false
 		},
 		{
 			icon: 'other',
 			label: 'Other Device',
 			value: 'DEVICE',
+			tagLabel: this.TAG_OTHER_DEVICES,
 			checked: false
 		}
 	];
@@ -167,7 +183,31 @@ export class ArchitectureGraphComponent implements OnInit {
 				this.appLbl = res.graphPrefs.appLbl;
 				this.labelOffset = res.graphPrefs.labelOffset;
 				this.assetClasses = res.graphPrefs.assetClasses;
+
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_DATABASE);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_PHYSICAL_SERVER);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_VIRTUAL_SERVER);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_STORAGE_LOGICAL);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_STORAGE_DEVICE);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_NETWORK_LOGICAl);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_OTHER_DEVICES);
 		});
+	}
+
+	/**
+	 * Based on the preference value, check/uncheck the label item
+	 * @param preferences current preference array
+	 * @param label  Label of the preference being evaluated
+	 */
+	markAsPreferenceChecked(preferences: any, label: string): void {
+		if (preferences[label] === 'true') {
+			this.graphLabels.forEach((item: any) => {
+				if (item.tagLabel === label) {
+					item.checked = true;
+				}
+			});
+		}
 	}
 
 	/**
