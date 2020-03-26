@@ -160,7 +160,11 @@ tds-ui-dialog {
             }
           }
 
-          .tdr-detail-list {
+          .tag-list-edit,
+          .tag-list-view {
+            display: block;
+          }
+            .tdr-detail-list {
             tbody {
               display: flex;
               flex-wrap: wrap;
@@ -264,37 +268,14 @@ tds-ui-dialog {
               }
             }
           }
-
           .fit-tags-to-view {
-              height: 30px;
-            .tags-container {
-              height: 25px;
-              overflow: hidden;
-            }
-            .dots-for-tags {
-              display: inline-block;
-              margin: 2px;
-              vertical-align: baseline;
-              text-align: center;
-              width: auto;
-              font-weight: 600;
-              font-size: 11px;
-              padding-right: 30px;
-            }
+            overflow: hidden;
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             &:hover {
-            .tags-container {
-              height: auto;
               overflow: unset;
-            }
-            .label.tag {
-              margin-bottom: 3px;
-              width: auto;
-              display: inline-block;
-            }
-            .dots-for-tags {
-              display: none;
-              padding-right: 10px;
-            }
+              white-space: unset;
             }
           }
 
@@ -309,10 +290,14 @@ tds-ui-dialog {
           }
 
           .label.tag {
+            padding: 5px 7px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 2px;
             border-radius: 2px;
+            height: 20px;
+            line-height: 10px;
             border: 0;
-            font-weight: 500;
-            margin-bottom: 3px;
             width: auto;
             display: inline-block;
           }

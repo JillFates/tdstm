@@ -1,6 +1,6 @@
 <%@page defaultCodec="html" %>
 <div class="tds-table">
-	<div class="clr-row">
+	<div class="clr-row tool-bar-wrapper">
 		<div class="grid-label clr-col-4">
 			<strong>Supports</strong>
 		</div>
@@ -58,39 +58,74 @@
 					</td>
 					<td (click)="showDependencyView('support',  ${support.asset.id},${support.dependent.id}, ${supportRow})">
 						<g:if test="${support.status == 'Validated'}">
-							<span class="status status-Ready">
-								<clr-icon shape="thumbs-up" class="is-solid"></clr-icon>
+							<span class="status-icon status-Ready">
+								<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
 							</span>
 						</g:if>
 						<g:if test="${support.status == 'Ready'}">
-							<span class="status status-Ready">
-								<clr-icon shape="thumbs-up" class="is-solid"></clr-icon>
+							<span class="status-icon status-Ready">
+								<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
 							</span>
 						</g:if>
 						<g:if test="${support.status == 'Started'}">
-							<span class="status status-Started">
-								<clr-spinner clrInline class="static"></clr-spinner>
+							<span class="status-icon status-Started">
+								<fa-icon [icon]="['fas', 'circle-notch']"></fa-icon>
 							</span>
 						</g:if>
 						<g:if test="${support.status == 'Hold'}">
-							<span class="status status-Hold">
-								<clr-icon shape="pause" class="is-solid"></clr-icon>
+							<span class="status-icon status-Hold">
+								<fa-icon [icon]="['fas', 'pause']"></fa-icon>
 							</span>
 						</g:if>
 						<g:if test="${support.status == 'Completed'}">
-							<span class="status status-Completed">
-								<clr-icon shape="check" class="is-solid"></clr-icon>
+							<span class="status-icon status-Completed">
+								<fa-icon [icon]="['fas', 'check']"></fa-icon>
 							</span>
 						</g:if>
 						<g:if test="${support.status == 'Pending'}">
-							<span class="status status-Pending">
-								<clr-icon shape="minus" class="is-solid"></clr-icon>
+							<span class="status-icon status-Pending">
+								<fa-icon [icon]="['fas', 'hourglass-start']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${support.status == 'Unknown'}">
+							<span class="status-icon status-Unknown">
+								<fa-icon [icon]="['fas', 'question-circle']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${support.status == 'Archived'}">
+							<span class="status-icon status-Archived">
+								<fa-icon [icon]="['fas', 'archive']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${support.status == 'Future'}">
+							<span class="status-icon status-Future">
+								<fa-icon [icon]="['far', 'share-square']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${support.status == 'Validated_NA'}">
+							<span class="status-icon status-Validated-NA">
+								<fa-icon [icon]="['fas', 'square']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${support.status == 'Not Applicable'}">
+							<span class="status-icon status-Not-Applicable">
+								<fa-icon [icon]="['fas', 'ban']"></fa-icon>
+							</span>
+						</g:if>
+						<g:if test="${support.status == 'Questioned'}">
+							<span class="status-icon status-Questioned">
+								<fa-icon [icon]="['fas', 'exclamation-triangle']"></fa-icon>
 							</span>
 						</g:if>
 						${support.status}
 					</td>
 				</tr>
 			</g:each>
+			<g:if test="${supportAssets.size == 0}">
+				<tr class="k-grid-norecords">
+					<td colspan="5" align="center">There are no records to display.</td>
+				</tr>
+			</g:if>
 		</tbody>
 	</table>
 </div>

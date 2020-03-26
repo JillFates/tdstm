@@ -15,6 +15,7 @@
 		(cellClick)="cellClick($event)"
 		[ngClass]="{ 'hide-filter': !showAssetsFilter }"
 		class="">
+        <ng-template kendoGridNoRecordsTemplate>{{this.gridMessage}}</ng-template>
 		<!-- Select all -->
 		<kendo-grid-column
 			*ngIf="model && model.columns && model.columns.length > 0"
@@ -198,7 +199,7 @@
 					<tds-grid-filter-input
 						name="{{ column.domain }}.{{ column.property }}"
 						[value]="column.filter"
-						[filterType]="column.property === 'lastUpdated' ? 'datetime' : column.type || 'text'"
+						[filterType]="column.property === 'lastUpdated' ? 'datetime' : (getType(column) || 'text')"
 						[placeholder]="'GLOBAL.FILTER' | translate"
 						(filter)="setFilter($event, column)">
 					</tds-grid-filter-input>

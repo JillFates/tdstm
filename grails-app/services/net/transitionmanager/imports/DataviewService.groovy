@@ -50,10 +50,12 @@ import static com.tdsops.tm.enums.domain.AssetDependencyStatus.VALIDATED
  */
 class DataviewService implements ServiceMethods {
 
-	static         ProjectService        projectService
-				   UserPreferenceService userPreferenceService
 	@Lazy
-	private static CustomDomainService   customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
+	static ProjectService projectService = { -> ApplicationContextHolder.getBean('projectService', ProjectService) }()
+	@Lazy
+	private static CustomDomainService customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
+
+	UserPreferenceService userPreferenceService
 
 	// Properties used in validating the JSON Create and Update functions
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
@@ -1098,7 +1100,6 @@ class DataviewService implements ServiceMethods {
 
 		return results
 	}
-
 
 	/**
 	 * Mixed fields are those, such as startupBy, shutdownBy and testingBy that may

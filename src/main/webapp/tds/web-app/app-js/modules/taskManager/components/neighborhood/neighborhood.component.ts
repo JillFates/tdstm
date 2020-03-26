@@ -1,4 +1,12 @@
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+	Component,
+	ComponentFactoryResolver,
+	ElementRef,
+	HostListener,
+	OnDestroy,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {distinctUntilChanged, map, skip, takeUntil, timeout} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -8,7 +16,7 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DropDownButtonComponent} from '@progress/kendo-angular-buttons/dist/es2015/dropdownbutton/dropdownbutton.component';
 
 import {TaskService} from '../../service/task.service';
-import {IGraphTask, TASK_TOOLTIP_FIELDS} from '../../model/graph-task.model';
+import {IGraphTask, ILinkPath, TASK_TOOLTIP_FIELDS} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {IMoveEvent} from '../../model/move-event.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
@@ -24,7 +32,6 @@ import {TaskActionEvents} from '../common/constants/task-action-events.constant'
 import {TaskStatus} from '../../model/task-edit-create.model';
 import {ITaskEvent} from '../../model/task-event.model';
 import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../common/constants/task-icon-path';
-import {ILinkPath} from '../../../../shared/components/diagram-layout/model/legacy-diagram-layout.model';
 import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
@@ -34,16 +41,17 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {Title} from '@angular/platform-browser';
 import {TaskTeam} from '../common/constants/task-team.constant';
-import {DiagramEventAction} from '../../../../shared/components/diagram-layout/model/legacy-diagram-event.constant';
-import {DiagramLayoutService} from '../../../../shared/services/diagram-layout.service';
+import {DiagramCacheService} from '../../../../shared/services/diagram-cache.service';
 import {SetEvent} from '../../../event/action/event.actions';
 import {Store} from '@ngxs/store';
 import {TaskGraphDiagramHelper} from './task-graph-diagram.helper';
-import {Diagram, Node} from 'gojs';
+import {Diagram, Node, Point, Rect, Spot} from 'gojs';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {
 	ITdsContextMenuModel
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
+import {DiagramEventAction} from 'tds-component-library/lib/diagram-layout/model/diagram-event.constant';
+import {DialogService, ModalSize} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -95,28 +103,39 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	showCycles: boolean;
 	rootId: number;
 	neighborId: any;
+	taskGraphDiagramExtras: any;
+	lastDiagramPos: any;
 
 	constructor(
+			private componentFactoryResolver: ComponentFactoryResolver,
 			private taskService: TaskService,
 			private activatedRoute: ActivatedRoute,
 			private userContextService: UserContextService,
 			private reportService: ReportsService,
 			private preferenceService: PreferenceService,
-			private dialogService: UIDialogService,
+			private dialogService: DialogService,
 			private notifierService: NotifierService,
 			private location: Location,
 			private translatePipe: TranslatePipe,
 			private titleService: Title,
-			private diagramLayoutService: DiagramLayoutService,
+			private diagramCacheService: DiagramCacheService,
 			private permissionService: PermissionService,
 			private store: Store
 		) {
+				this.setTaskGraphDiagramExtras();
 				this.activatedRoute.queryParams
 					.pipe(takeUntil(this.unsubscribe$))
 					.subscribe(params => {
 					if (params) { this.urlParams = Object.assign({}, params); }
 				});
 				this.subscribeToNotifications();
+	}
+
+	setTaskGraphDiagramExtras(): void {
+		this.taskGraphDiagramExtras = {
+			initialAutoScale: Diagram.Uniform,
+			allowZoom: true
+		};
 	}
 
 	ngOnInit() {
@@ -135,7 +154,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 *  subscribe to notifications from the Notifier Service
 	 */
 	subscribeToNotifications(): void {
-		this.notifierService.on(DiagramEventAction.ANIMATION_FINISHED, () => this.highlightNeighbor(this.neighborId));
+		this.notifierService.on('NodeMoveAnimationFinished', () => this.highlightNeighbor(this.neighborId));
+		this.notifierService.on(DiagramEventAction.ANIMATION_FINISHED, () => {
+			if (this.refreshTriggered && this.lastDiagramPos) {
+				this.graph.diagram.position = this.lastDiagramPos;
+				this.refreshTriggered = false;
+			}
+		});
 	}
 
 	/**
@@ -227,8 +252,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	loadTasks(taskId: number): void {
 
 		if (this.isFullView
-			&& this.diagramLayoutService.getRequestId() === taskId
-			&& !this.diagramLayoutService.isCacheFromMoveEvent()
+			&& this.diagramCacheService.getRequestId() === taskId
+			&& !this.diagramCacheService.isCacheFromMoveEvent()
 			&& !this.refreshTriggered
 			&& !this.isNeighbor
 		) {
@@ -259,7 +284,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						this.tasks = data && data.map(r => r.task);
 						if (this.tasks) {
 							if (!this.isNeighbor) {
-								this.diagramLayoutService.clearFullGraphCache();
+								this.diagramCacheService.clearFullGraphCache();
 								this.requestId = taskId;
 								this.isMoveEventReq = false;
 							} else {
@@ -273,7 +298,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
-		this.refreshTriggered = false;
 	}
 
 	/**
@@ -294,8 +318,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if (this.urlParams) { this.urlParams = null; }
 
 		if (this.isFullView
-			&& this.diagramLayoutService.getRequestId() === this.selectedEvent.id
-			&& this.diagramLayoutService.isCacheFromMoveEvent()
+			&& this.diagramCacheService.getRequestId() === this.selectedEvent.id
+			&& this.diagramCacheService.isCacheFromMoveEvent()
 			&& !this.refreshTriggered) {
 			this.generateModelFromCache();
 		} else if (this.selectedEvent && this.selectedEvent.id) {
@@ -311,7 +335,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				.subscribe(res => {
 					this.tasks = res && res.tasks;
 					if (this.tasks) {
-						this.diagramLayoutService.clearFullGraphCache();
+						this.diagramCacheService.clearFullGraphCache();
 						this.requestId = this.selectedEvent.id;
 						this.isMoveEventReq = false;
 						if (res.cycles && res.cycles.length > 0) {
@@ -323,7 +347,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
-		this.refreshTriggered = false;
 	}
 
 	/**
@@ -376,13 +399,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	generateModel(): void {
 		if (!this.tasks) { return; }
-		const taskGraphHelper = new TaskGraphDiagramHelper(
-				this.permissionService,
-	{
-					currentUser: this.userContext.person,
-					taskCount: this.tasks.length
-				}
-			);
 		const nodeDataArray = [];
 		const linkDataArray = [];
 		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
@@ -414,28 +430,18 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				requestId: this.requestId,
 				isMoveEvent: this.isMoveEventReq,
 				data: nodeDataArray,
-				linksPath: linkDataArray
+				linksPath: linkDataArray,
+				...this.taskGraphDiagramExtras
 			});
 		}
-		this.diagramData$.next(taskGraphHelper.diagramData({
-			rootNode: this.rootId,
-			currentUserId: this.userContext.user.id,
-			nodeDataArray,
-			linkDataArray,
-			extras: {
-				diagramOpts: {
-					initialAutoScale: Diagram.Uniform,
-					allowZoom: true
-				},
-				isExpandable: false
-			}
-		}));
+		this.updateDiagramData(nodeDataArray, linkDataArray);
 	}
 
 	tooltipData(t: IGraphTask): any {
 		const stateIcon = STATE_ICONS_PATH[t.status && t.status.toLowerCase()];
 		const unknownBg = ASSET_ICONS_PATH.unknown.background;
-		const assetIcon = ASSET_ICONS_PATH[(t.asset && t.asset.assetType) && t.asset.assetType.toLowerCase()];
+		const assetType = (t.asset && t.asset.assetType) && t.asset.assetType;
+		const assetIcon = ASSET_ICONS_PATH[assetType && assetType.replace(/ /g, '').toLowerCase()];
 		return {
 			headerText: `${t.number}:${t.name}`,
 				headerBackgroundColor: stateIcon && stateIcon.background || unknownBg,
@@ -474,10 +480,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * generate model to be used by diagram with task specific data
 	 **/
 	generateModelFromCache(): void {
-		if (!this.diagramLayoutService.getRequestId()) { return; }
+		if (!this.diagramCacheService.getRequestId()) { return; }
 		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
 
-		const graphCache = this.diagramLayoutService.getFullGraphCache();
+		const graphCache = this.diagramCacheService.getFullGraphCache();
 
 		// Add tasks to nodeData constant
 		// and create linksPath object from number and successors
@@ -496,8 +502,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * @param data
 	 */
 	cacheFullGraph(data: any): void {
-		if (!this.diagramLayoutService.getFullGraphCache() || !this.diagramLayoutService.getFullGraphCache().data) {
-			this.diagramLayoutService.setFullGraphCache(data);
+		if (!this.diagramCacheService.getFullGraphCache() || !this.diagramCacheService.getFullGraphCache().data) {
+			this.diagramCacheService.setFullGraphCache(data);
 			this.isFullView = true;
 		}
 	}
@@ -744,21 +750,26 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			}
 		};
 
-		this.dialogService.extra(TaskDetailComponent, [
-			{provide: TaskDetailModel, useValue: taskDetailModel}
-		], false, false)
-			.then(result => {
-				if (result && result.shouldEdit) {
-					return this.editTask({task: {id: result.id && result.id.id}});
-				}
-				if (result && result.isDeleted) {
-					const taskId = result.id && result.id.id;
-					return this.taskService.deleteTaskComment(taskId)
-						.subscribe(() => this.removeGraphNode(taskId));
-				}
-			}).catch(result => {
-			if (result) {
-				console.error('catch: ', result);
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskDetailComponent,
+			data: {
+				taskDetailModel: taskDetailModel
+			},
+			modalConfiguration: {
+				title: 'Task Detail',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
+			}
+		}).subscribe((data: any) => {
+			if (data && data.shouldEdit) {
+				return this.editTask({task: {id: data.id && data.id.id}});
+			}
+			if (data && data.isDeleted) {
+				const taskId = data.id && data.id.id;
+				return this.taskService.deleteTaskComment(taskId)
+					.subscribe(() => this.removeGraphNode(taskId));
 			}
 		});
 	}
@@ -777,7 +788,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					this.userContext.user,
 					this.userContext.dateFormat,
 					this.taskService, this.dialogService,
-					this.translatePipe);
+					this.translatePipe,
+					this.componentFactoryResolver);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',
@@ -789,24 +801,30 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
 
-				this.dialogService.extra(TaskEditCreateComponent, [
-					{provide: TaskDetailModel, useValue: clone(model)}
-				], false, false)
-					.then(result => {
-						if (result && result.isDeleted) {
-							const taskId = result.id && result.id.id;
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: TaskEditCreateComponent,
+					data: {
+						taskDetailModel: taskDetailModel
+					},
+					modalConfiguration: {
+						title: 'Task Edit',
+						draggable: true,
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
+					}
+				}).subscribe((result: any) => {
+					if (result) {
+						const assetComment = result.data && result.data.assetComment;
+						if (result.isDeleted) {
+							const taskId = assetComment && assetComment.id;
 							return this.taskService.deleteTaskComment(taskId)
 								.subscribe(() => this.removeGraphNode(taskId));
-						} else if (result) {
-							this.updateGraphNode(result.assetComment);
+						} else {
+							this.updateGraphNode(assetComment);
 						}
-
-					}).catch(result => {
-					if (result) {
-						console.error('Error: ', result)
 					}
 				});
-
 			});
 	}
 
@@ -821,14 +839,21 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				.pipe(takeUntil(this.unsubscribe$))
 				.subscribe(res => {
 				if (res.assetClass) {
-					this.dialogService.open(AssetShowComponent,
-						[UIDialogService,
-							{ provide: 'ID', useValue: asset.id },
-							{ provide: 'ASSET', useValue: res.assetClass },
-							{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-						], DIALOG_SIZE.LG).catch(result => {
-						console.error('rejected: ' + result);
-					});
+					this.dialogService.open({
+						componentFactoryResolver: this.componentFactoryResolver,
+						component: AssetShowComponent,
+						data: {
+							assetId: asset.id,
+							assetClass: res.assetClass,
+							assetExplorerModule: AssetExplorerModule
+						},
+						modalConfiguration: {
+							title: 'Asset',
+							draggable: true,
+							modalSize: ModalSize.CUSTOM,
+							modalCustomClass: 'custom-asset-modal-dialog'
+						}
+					}).subscribe();
 				} else {
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
@@ -863,7 +888,15 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Diagram Animation Finished output handler
 	 */
 	onDiagramAnimationFinished(): void {
-		this.notifierService.broadcast(DiagramEventAction.ANIMATION_FINISHED);
+		this.notifierService.broadcast({ name: DiagramEventAction.ANIMATION_FINISHED });
+		this.hideLoader();
+	}
+
+	/**
+	 * Node Move Diagram Animation Finished output handler
+	 */
+	onNodeMoveDiagramAnimationFinished(): void {
+		this.notifierService.broadcast({ name: 'NodeMoveDiagramAnimationFinished' });
 	}
 
 	/**
@@ -901,12 +934,14 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	updateGraphCache(data: any): void {
 		if (this.isFullView) {
 			const fullGraph = {
-				requestId: this.diagramLayoutService.getRequestId(),
-				isMoveEvent: this.diagramLayoutService.isCacheFromMoveEvent(),
-				...data
+				requestId: this.diagramCacheService.getRequestId(),
+				isMoveEvent: this.diagramCacheService.isCacheFromMoveEvent(),
+				...data,
+				...this.taskGraphDiagramExtras
 			};
-			this.diagramLayoutService.setFullGraphCache(fullGraph);
+			this.diagramCacheService.setFullGraphCache(fullGraph);
 		}
+
 	}
 
 	/**
@@ -926,26 +961,11 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		this.isFullView = true;
 		this.isNeighbor = false;
 		this.graph.showFullGraphBtn = false;
-		const cache = this.diagramLayoutService.getFullGraphCache();
+		const cache = this.diagramCacheService.getFullGraphCache();
 		const nodeDataArray = cache && cache.data;
 		const linkDataArray = cache && cache.linksPath;
 		this.extractTeams(nodeDataArray);
-		const taskGraphHelper = new TaskGraphDiagramHelper(this.permissionService, {
-			taskCount: nodeDataArray.length
-		});
-		this.diagramData$.next(taskGraphHelper.diagramData({
-			rootNode: this.rootId,
-			currentUserId: this.userContext.user.id,
-			nodeDataArray,
-			linkDataArray,
-			extras: {
-				diagramOpts: {
-					autoScale: Diagram.Uniform,
-					allowZoom: false
-				},
-				isExpandable: false
-			}
-		}));
+		this.updateDiagramData(nodeDataArray, linkDataArray);
 	}
 
 	/**
@@ -995,6 +1015,35 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * update diagram data
+	 */
+	updateDiagramData(nodeDataArray, linkDataArray): void {
+		const taskGraphHelper = new TaskGraphDiagramHelper(
+			this.permissionService,
+			{
+				currentUser: this.userContext.person,
+				taskCount: this.tasks.length
+			}
+		);
+		if (this.refreshTriggered) {
+			this.taskGraphDiagramExtras.contentAlignment = Spot.None;
+			this.taskGraphDiagramExtras.initialAutoScale = Diagram.None;
+			this.taskGraphDiagramExtras.initialScale = (this.graph && this.graph.diagram) && this.graph.diagram.scale;
+			this.lastDiagramPos = Object.assign({}, (this.graph && this.graph.diagram) && this.graph.diagram.position);
+		} else {
+			this.setTaskGraphDiagramExtras();
+		}
+
+		this.diagramData$.next(taskGraphHelper.diagramData({
+			rootNode: this.rootId,
+			currentUserId: this.userContext.user.id,
+			nodeDataArray,
+			linkDataArray,
+			extras: this.taskGraphDiagramExtras
+		}));
+	}
+
+	/**
 	 * remove node from the diagram
 	 * @param {any} taskId
 	 */
@@ -1008,11 +1057,31 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		})
 	}
 
+	/**
+	 * Show loader
+	 */
+	showLoader(): void {
+		console.log('gif init');
+		this.notifierService.broadcast({
+			name: 'httpRequestInitial'
+		});
+	}
+
+	/**
+	 * Hide loader
+	 */
+	hideLoader(): void {
+		console.log('gif completed');
+		this.notifierService.broadcast({
+			name: 'httpRequestCompleted'
+		});
+	}
+
 	@HostListener('window:beforeunload', ['$event'])
 	ngOnDestroy(): void {
 		this.unsubscribe$.next();
 		this.unsubscribe$.complete();
-		this.diagramLayoutService.clearFullGraphCache();
+		this.diagramCacheService.clearFullGraphCache();
 	}
 
 }

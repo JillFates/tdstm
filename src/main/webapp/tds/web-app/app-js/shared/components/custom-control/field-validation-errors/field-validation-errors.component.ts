@@ -17,7 +17,7 @@ interface ErrorConstraints {
 	selector: 'tds-custom-validation-errors',
 	template: `
 		<div class="error" *ngIf="hasErrors">
-			<div *ngIf="errors.isRequired">* {{label}} is required</div>
+			<div *ngIf="errors.isRequired">* <ng-content></ng-content> is required</div>
 			<div *ngIf="errors.range; let range">
 				<span>* Invalid range number</span>
 				<div>Min: {{range.min}} Max: {{range.max}}</div>
@@ -33,7 +33,6 @@ interface ErrorConstraints {
 	`
 })
 export class TDSCustomValidationErrorsComponent {
-	@Input() label = 'Field';
 	@Input() submitted = false;
 	@Input() touched = false;
 	@Input() valid = false;

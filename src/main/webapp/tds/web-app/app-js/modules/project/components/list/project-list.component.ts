@@ -283,7 +283,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy
 					'WARNING: Are you sure you want to delete this project? This cannot be undone.'
 				).toPromise();
 				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
-					this.projectService.deleteProject(dataItem.id).toPromise();
+					await this.projectService.deleteProject(dataItem.id).toPromise();
 					await this.gridComponent.reloadData();
 				}
 			}

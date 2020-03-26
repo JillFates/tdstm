@@ -41,7 +41,8 @@ class RequireCsrfProtectionMatcher implements RequestMatcher {
 		/^\/tdstm\/task\/.*$/,	 // Remove when My Task get Angularized
 		/^\/tdstm\/ws\/depAnalyzer\/.*$/, // Remove when DA get Angularized
 		/^\/tdstm\/application\/.*$/, // Remove when DA get Angularized
-		/^\/tdstm\/api\/.*$/
+		/^\/tdstm\/api\/.*$/,
+		/^\/tdstm\/auth\/applyNewPassword/
 	]
 
 	/**

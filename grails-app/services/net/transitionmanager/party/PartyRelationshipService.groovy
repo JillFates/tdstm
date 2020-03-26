@@ -2,6 +2,7 @@ package net.transitionmanager.party
 
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -1115,7 +1116,7 @@ class PartyRelationshipService implements ServiceMethods {
 			SELECT * FROM (
 			 (
 				SELECT pr.party_id_to_id AS personId,
-					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
+					${SqlUtil.personFullNameSql('p')} AS fullName
 				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
@@ -1137,7 +1138,7 @@ class PartyRelationshipService implements ServiceMethods {
 		query.append("""
 			(
 				SELECT pr.party_id_to_id AS personId,
-					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
+					${SqlUtil.personFullNameSql('p')} AS fullName
 				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id

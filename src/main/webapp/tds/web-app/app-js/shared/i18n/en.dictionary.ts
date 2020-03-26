@@ -51,6 +51,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
 		'CORRUPT': 'Corrupt',
+		'EXPIRED': 'Expired',
 		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
@@ -64,7 +65,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
 			'CONFIRMATION_TITLE': 'Confirmation Required',
-			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click Confirm to delete otherwise press Cancel'
 		},
 		'SELECT_PLACEHOLDER': 'Select...',
 		'ARTIFACTS': {
@@ -81,7 +82,9 @@ export const en_DICTIONARY: Object = {
 		'TOTAL': 'Total',
 		'TIMEZONE': 'Time Zone Select',
 		'DATE_TIMEZONE': 'Date and Timezone',
-		'DATE_FORMAT': 'Date Format'
+		'DATE_FORMAT': 'Date Format',
+		'LOADING_RECORDS': 'Loading records...',
+		'NO_RECORDS': 'No records found'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -258,7 +261,8 @@ export const en_DICTIONARY: Object = {
 		'LIST': 'Event List',
 		'TITLE_DASHBOARD': 'Event Dashboard',
 		'DASHBOARD': 'Dashboard',
-		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks',
+		'NEWS': 'Event News List'
 	},
 	'INSIGHT': {
 		'INSIGHT': 'Insight',
@@ -272,6 +276,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'ARCHITECTURE': {
 		'ARCHITECTURE_GRAPH': 'Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
@@ -287,6 +292,14 @@ export const en_DICTIONARY: Object = {
 		'SAVE_PREFERENCES': 'Save Preferences',
 		'RESET_DEFAULTS': 'Reset Default',
 		'ASSET_CLASSES': 'Asset Classes: '
+	},
+	'DEPENDENCY_ANALYZER': {
+		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_GROUPS': 'Dependency Groups',
+		'REGENERATE': 'Regenerate',
+		'BUNDLE': 'Bundle',
+		'TAGS': 'Tags',
+		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
@@ -525,5 +538,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Applications Grouped by Dependencies',
 		'DEPENDENCIES_BY_VENDOR': 'Dependencies by Vendor',
 		'TOP_TAGS': 'Top Tags'
-	}
+	},
+	'MANUFACTURER': {
+		'LIST': 'Manufacturer List'
+	},
 };

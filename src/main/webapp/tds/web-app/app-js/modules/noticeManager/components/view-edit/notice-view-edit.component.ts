@@ -1,7 +1,6 @@
 // Angular
 import {AfterViewInit, Component, ComponentFactoryResolver, Input, OnInit, ViewChild} from '@angular/core';
 // Component
-import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
 import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
 import {NoticeService} from '../../service/notice.service';
@@ -16,9 +15,12 @@ import {NOTICE_TYPE_MANDATORY, NOTICE_TYPE_POST_LOGIN, NoticeModel, NoticeTypes}
 import {Permission} from '../../../../shared/model/permission.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {ESCAPE_KEYCODE} from '../../../../shared/model/constants';
 // Other
 import * as R from 'ramda';
 import {NgForm} from '@angular/forms';
+
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-notice-view-edit',
@@ -29,7 +31,6 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 
 	@ViewChild('form', {read: NgForm, static: true}) form: NgForm;
 
-	@ViewChild('htmlTextField', {static: false}) htmlText: RichTextEditorComponent;
 	@ViewChild('typeIdField', {static: false}) typeId: DropDownListComponent;
 
 	public EnumActionType = ActionType;
@@ -148,13 +149,21 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 		});
 	}
 
-	ngAfterViewInit() {
-		setTimeout(
-			() =>
-				(this.htmlText.editor.editorContainer.title = this.translatePipe.transform(
-					'NOTICE.TOOLTIP_MESSAGE'
-				))
-		);
+	/**
+	 * Editor is outside the Browser Main Frame
+	 * This code helps to catch Escape Button coming from the Editor iFrame
+	 */
+	ngAfterViewInit(): void {
+		setTimeout(() => {
+			const editorFrame = jQuery('.k-iframe');
+			if (editorFrame) {
+				jQuery(jQuery(editorFrame).get(0).contentWindow.document).on('keyup', (event: any) => {
+					if (event.keyCode === ESCAPE_KEYCODE) {
+						this.cancelHTMLInputDialog();
+					}
+				});
+			}
+		});
 	}
 
 	public cancelEditDialog(): void {
@@ -189,8 +198,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 	public cancelHTMLInputDialog(): void {
 		if (this.action === ActionType.Create || this.action === ActionType.View) {
 			this.cancelCloseDialog();
-		}
-		if (this.action === ActionType.Edit) {
+		} else if (this.action === ActionType.Edit) {
 			this.cancelEditDialog();
 		}
 	}
@@ -243,6 +251,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 		payload.locked = payload.locked || false;
 		// remove esc sequences
 		payload.htmlText = payload.htmlText.replace(new RegExp('\\n', 'g'), '');
+		payload.rawText = payload.htmlText.replace(/<[^>]*>/g, '');
 
 		// use zero for empty sequences
 		payload.sequence =
@@ -317,10 +326,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 
 	private isValidHtmlText(): boolean {
 		return (
-			this.htmlText &&
-			this.htmlText.value &&
-			this.htmlText.value.trim() &&
-			this.htmlText.valid()
+			this.model.htmlText && this.model.htmlText.trim().length > 0
 		);
 	}
 
@@ -355,13 +361,6 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 	 */
 	onValueChange(value: string) {
 		this.model.htmlText = value;
-	}
-
-	/**
-	 * Grab the current raw value emitted by rich text editor
-	 */
-	onRawValueChange(value: string) {
-		this.model.rawText = value;
 	}
 
 	/**

@@ -43,7 +43,6 @@
 						>
 							<option
 								*ngFor="let event of eventList"
-								[attr.selected]="selectedEventId === event.id"
 								[value]="event.id"
 							>{{ event.name }}</option
 							>
@@ -118,6 +117,7 @@
 				(pageChange)="onPageChangeHandler($event)"
 				[filterable]="true"
 				[resizable]="true"
+				[reorderable]="true"
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
 				[sortable]="{ mode: 'single', allowUnsort: false }"
@@ -125,6 +125,7 @@
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
 			>
+                <ng-template kendoGridNoRecordsTemplate>{{this.gridMessage}}</ng-template>
 				<!-- Column Menu -->
 				<ng-template
 					kendoGridColumnMenuTemplate
@@ -295,7 +296,7 @@
 						*ngIf="column.property === 'taskNumber'"
 						let-dataItem
 					>
-						<span (click)="onOpenTaskDetailHandler(dataItem)">
+						<span (click)="onOpenTaskDetailHandler(dataItem)" [title]="dataItem.taskNumber">
 							{{ dataItem.taskNumber }}
 						</span>
 					</ng-template>
@@ -310,6 +311,7 @@
 					>
 						<span
 							[title]="dataItem[column.property]"
+							[title]="dataItem[column.property]"
 							class="is-grid-link"
 							(click)="onOpenAssetDetailHandler(dataItem)"
 						>{{ dataItem[column.property] }}</span
@@ -322,20 +324,27 @@
 						let-dataItem
 					>
 						<div class="updated-status">
-							<div class="task-updated-cell {{ dataItem.updatedClass }} overflow-ellipsis">
+							<div [title]="dataItem.updatedTime" class="task-updated-cell {{ dataItem.updatedClass }} overflow-ellipsis">
 								{{ dataItem.updatedTime }}
 							</div>
 						</div>
 					</ng-template>
-					<!-- default -->
+					<!-- status -->
 					<ng-template
 						kendoGridCellTemplate
-						*ngIf="column.type !== 'action'"
+						*ngIf="column.property === 'status'"
 						let-dataItem>
 						<tds-task-status-indicator
 							[propertyName]="column.property"
 							[value]="dataItem[column.property]"
 						></tds-task-status-indicator>
+					</ng-template>
+					<ng-template kendoGridCellTemplate *ngIf="column.property === 'successors'" let-dataItem>
+						<span *ngIf="dataItem.actionBarInfo">{{dataItem.actionBarInfo.successorsCount}}</span>
+					</ng-template>
+					<!-- default cell template -->
+					<ng-template kendoGridCellTemplate let-dataItem>
+						<span [title]="dataItem[column.property]">{{dataItem[column.property]}}</span>
 					</ng-template>
 
 					<!-- Filter Inputs -->

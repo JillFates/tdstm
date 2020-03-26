@@ -10,7 +10,8 @@ import {
 	Size,
 	Spot,
 	TextBlock,
-	TreeLayout
+	TreeLayout,
+	LayeredDigraphLayout
 } from 'gojs';
 import {
 	ITdsContextMenuOption
@@ -101,12 +102,6 @@ export class ArchitectureGraphDiagramHelper {
 		panel.background = '#fff';
 		panel.padding = new Margin(0, 0, 0, 0);
 
-		const nodeShape = new Shape();
-		nodeShape.figure = 'RoundedRectangle';
-		nodeShape.strokeWidth = 2;
-		nodeShape.stroke = '#3c8dbc';
-		nodeShape.fill = '#3c8dbc';
-
 		const panelBody = new Panel(Panel.Vertical);
 		panel.padding = new Margin(0, 0, 0, 0);
 		panel.margin = new Margin(0, 0, 0, 0);
@@ -120,15 +115,13 @@ export class ArchitectureGraphDiagramHelper {
 
 		// TextBlock
 		const textBlock = new TextBlock();
-		textBlock.stroke = '#fff';
+		textBlock.stroke = '#000';
 		textBlock.bind(new Binding('text', 'name'));
 
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
-		panel.add(nodeShape);
 		panel.add(panelBody);
-
 		node.add(panel);
 
 		if (opts.isExpandable) {
@@ -192,11 +185,10 @@ export class ArchitectureGraphDiagramHelper {
 	}
 
 	layout(): Layout {
-		const treeLayout = new TreeLayout();
-		treeLayout.angle = 90;
-		treeLayout.nodeSpacing = 200;
-		treeLayout.layerSpacing = 200;
-		return treeLayout;
+		const diagraph = new LayeredDigraphLayout();
+		diagraph.direction = 90;
+		diagraph.layerSpacing = 100;
+		return diagraph;
 	}
 
 	lowScaleNodeTemplate(): Node {

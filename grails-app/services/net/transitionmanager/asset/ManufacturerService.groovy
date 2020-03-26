@@ -88,13 +88,11 @@ class ManufacturerService implements ServiceMethods {
 			if (count == 0) {
 				return true
 			} else {
-				String error = "Manufacturer name (${name}) duplicates an existing AKA."
-				throw new ServiceException(error)
+				return false
 			}
 
 		} else {
-			String error = "Manufacturer name (${name}) is not unique."
-			throw new ServiceException(error)
+            return false
 		}
 	}
 
@@ -161,11 +159,13 @@ class ManufacturerService implements ServiceMethods {
 			List<Long> maIds = deletedAka.split(",").collect() { it as Long }
 			ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.id in :maIds", [maIds: maIds])
 		}
-		def manufacturerAliasList = ManufacturerAlias.findAllByManufacturer(manufacturer)
-		manufacturerAliasList.each { manufacturerAlias ->
-			manufacturerAlias.name = akaToUpdate["aka_${manufacturerAlias.id}"]
-			manufacturerAlias.save(flush:true)
-		}
+        if (akaToUpdate.size() > 0) {
+            ManufacturerAlias manufacturerAliasList = ManufacturerAlias.findAllByManufacturer(manufacturer)
+            manufacturerAliasList.each { manufacturerAlias ->
+                manufacturerAlias.name = akaToUpdate[manufacturerAlias.id]
+                manufacturerAlias.save(flush:true)
+            }
+        }
 		akaToSave.each { aka ->
 			findOrCreateAliasByName(manufacturer, aka, true)
 		}

@@ -1,38 +1,39 @@
-import { TagModel } from '../../../assetTags/model/tag.model';
-import { AssetExplorerService } from '../../../assetManager/service/asset-explorer.service';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import {
-	UIActiveDialogService,
-	UIDialogService,
-} from '../../../../shared/services/ui-dialog.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+// Angular
 import {
 	OnInit,
 	AfterViewInit,
 	OnDestroy,
 	ViewChildren,
 	ViewChild,
-	QueryList,
+	QueryList, ComponentFactoryResolver,
 } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { TagService } from '../../../assetTags/service/tag.service';
-import { DIALOG_SIZE } from '../../../../shared/model/constants';
-import { AssetShowComponent } from './asset-show.component';
-import { equals as ramdaEquals, clone as ramdaClone } from 'ramda';
-import { AssetCommonHelper } from './asset-common-helper';
-import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { UIHandleEscapeDirective as EscapeHandler } from '../../../../shared/directives/handle-escape-directive';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {NgForm} from '@angular/forms';
+// Model
+import {TagModel} from '../../../assetTags/model/tag.model';
+import {DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+// Component
+import {AssetShowComponent} from './asset-show.component';
+import {AssetEditComponent} from './asset-edit.component';
+// Service
+import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {TagService} from '../../../assetTags/service/tag.service';
+import {AssetCommonHelper} from './asset-common-helper';
+import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
+import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 
 export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
-	@ViewChild('form', { static: false }) protected form: NgForm;
+	@ViewChild('form', { static: false }) public form: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<
 		DropDownListComponent
 	>;
@@ -44,7 +45,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	protected tagList: Array<TagModel> = [];
 	protected dateFormat: string;
 	protected readMore = false;
-	protected isDependenciesValidForm = true;
+	public isDependenciesValidForm = true;
 	protected defaultSelectOption = 'Please Select';
 	protected defaultPlanStatus = 'Unassigned';
 	protected defaultValidation = 'Unknown';
@@ -52,17 +53,17 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	private initialModel: any = null;
 
 	constructor(
+		protected componentFactoryResolver: ComponentFactoryResolver,
 		protected model: any,
-		protected activeDialog: UIActiveDialogService,
 		protected userContextService: UserContextService,
 		protected permissionService: PermissionService,
 		protected assetExplorerService: AssetExplorerService,
-		protected dialogService: UIDialogService,
+		protected dialogService: DialogService,
 		protected notifierService: NotifierService,
 		protected tagService: TagService,
 		protected metadata: any,
-		private promptService: UIPromptService,
-		private translatePipe: TranslatePipe
+		private translatePipe: TranslatePipe,
+		private parentDialog: any
 	) {
 		this.assetTagsModel = { tags: metadata.assetTags };
 		this.tagList = metadata.tagList;
@@ -136,10 +137,10 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	/**
 	 * Used to check if the form is dirty
 	 */
-
-	protected isDirty(): boolean {
+	public isDirty = (): boolean => {
 		return !ramdaEquals(this.initialModel, this.model) || this.assetTagsDirty;
 	}
+
 	/**
 	 * Used on Create Asset view.
 	 * Creates the tag associations if configured.
@@ -159,10 +160,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			)
 			.subscribe(
 				result => {
-					this.showAssetDetailView(
-						this.model.asset.assetClass.name,
-						assetId
-					);
+					this.showAssetDetailView(this.model.asset.assetClass.name, assetId);
 				},
 				error => console.error('Error while saving asset tags', error)
 			);
@@ -190,10 +188,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			!this.assetTagsDirty ||
 			(tagsToAdd.tags.length === 0 && tagsToDelete.tags.length === 0)
 		) {
-			this.showAssetDetailView(
-				this.model.asset.assetClass.name,
-				this.model.assetId
-			);
+			this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 		} else {
 			this.tagService
 				.createAndDeleteAssetTags(
@@ -203,10 +198,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 				)
 				.subscribe(
 					result => {
-						this.showAssetDetailView(
-							this.model.asset.assetClass.name,
-							this.model.assetId
-						);
+						this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 					},
 					error => console.log('error when saving asset tags', error)
 				);
@@ -214,21 +206,33 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	protected showAssetDetailView(assetClass: string, id: number) {
-		this.dialogService.replace(
-			AssetShowComponent,
-			[
-				{ provide: 'ID', useValue: id },
-				{ provide: 'ASSET', useValue: assetClass },
-			],
-			DIALOG_SIZE.XXL
-		);
+		setTimeout(() => {
+			// Close current dialog before open new one
+			this.cancelCloseDialog();
+
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetShowComponent,
+				data: {
+					assetId: id,
+					assetClass: assetClass
+				},
+				modalConfiguration: {
+					title: '&nbsp;',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe();
+		});
 	}
 
 	/***
 	 * Close the Active Dialog
 	 */
 	protected cancelCloseDialog(): void {
-		this.activeDialog.close();
+		const assetEditComponent = <AssetEditComponent>this.parentDialog;
+		assetEditComponent.onCancelClose();
 	}
 
 	/**
@@ -244,48 +248,36 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	 * @param {boolean} closeModal - specify as true if the modal should be closed (as opposed to reopening the asset summary modal)
 	 */
 	protected promptSaveChanges(closeModal: boolean): void {
-		this.promptService
-			.open(
-				this.translatePipe.transform(
-					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-				),
-				this.translatePipe.transform(
-					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-				),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL')
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+			),
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
 			)
-			.then(result => {
-				if (result) {
-					if (closeModal) {
-						this.cancelCloseDialog();
-					} else {
-						this.showAssetDetailView(
-							this.model.asset.assetClass.name,
-							this.model.assetId
-						);
-					}
+		).subscribe((data: any) => {
+			if (data.confirm === DialogConfirmAction.CONFIRM) {
+				if (closeModal) {
+					this.cancelCloseDialog();
 				} else {
-					this.focusAssetModal();
+					this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 				}
-			});
+			} else {
+				this.focusAssetModal();
+			}
+		});
 	}
 
 	/**
 	 * On Cancel if there is changes notify user
 	 */
-	protected onCancelEdit(): void {
-		if (
-			this.assetTagsDirty ||
-			!ramdaEquals(this.initialModel, this.model)
-		) {
+	public onCancelEdit = (): void => {
+		if (this.assetTagsDirty || !ramdaEquals(this.initialModel, this.model)) {
 			this.promptSaveChanges(this.model.assetId === undefined);
 		} else {
-			if (this.model.assetId) {
-				this.showAssetDetailView(
-					this.model.asset.assetClass.name,
-					this.model.assetId
-				);
+			const assetEditComponent = <AssetEditComponent>this.parentDialog;
+			if (this.model.assetId && !assetEditComponent.data.openFromList) {
+				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 			} else {
 				this.cancelCloseDialog();
 			}
@@ -309,7 +301,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	/**
 	 * Submit the form in case errors select the first invalid field
 	 */
-	protected submitForm(event): void {
+	public submitForm = (event) => {
 		if (!this.form.onSubmit(event)) {
 			this.focusFirstInvalidFieldInput();
 		}
@@ -325,32 +317,30 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	/**
-	 allows to delete the application assets
+	 * Allows to delete the application assets
 	 */
 	deleteAsset(assetId) {
-		this.promptService
-			.open(
-				'Confirmation Required',
-				'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel',
-				'OK',
-				'Cancel'
-			)
-			.then(success => {
-				if (success) {
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+			),
+			'You are about to delete the selected asset for which there is no undo. Are you sure? Click Confirm to delete otherwise press Cancel'
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.assetExplorerService.deleteAssets([assetId]).subscribe(
 						res => {
 							if (res) {
 								this.notifierService.broadcast({
 									name: 'reloadCurrentAssetList',
 								});
-								this.activeDialog.dismiss();
+								this.cancelCloseDialog();
 							}
 						},
 						error => console.log(error)
 					);
 				}
-			})
-			.catch(error => console.log(error));
+			});
 	}
 
 	protected focusAssetModal(): void {
