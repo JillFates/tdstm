@@ -38,6 +38,7 @@ export class AssetCommentColumnModel {
 				label: 'Asset',
 				property: 'assetName',
 				filterType: FilterType.text,
+				class: 'column-cursor-pointer',
 				width: 170
 			},
 			{
