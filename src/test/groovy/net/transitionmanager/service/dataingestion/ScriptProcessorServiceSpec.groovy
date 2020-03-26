@@ -32,6 +32,7 @@ import net.transitionmanager.security.SecurityService
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFRow
+import org.junit.Ignore
 import spock.lang.Specification
 
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.COMPLETED
@@ -258,67 +259,6 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 			result.data.domains[0].data[1].fields.environment.value == 'Production'
 			result.data.domains[0].data[1].fields.environment.originalValue == 'Production'
 			!result.data.domains[0].data[1].fields.environment.find.query
-	}
-
-	void 'test can test a script content can have blank lines at the top without failing the line number in error messages'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', """
-application id,vendor name,technology,location
-152254,Microsoft,(xlsx updated),ACME Data Center
-152255,Mozilla,NGM,ACME Data Center""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
-		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
-				[]
-			}
-
-		and:
-			String script = """
-			
-			
-			// Make sure to include the above blank lines
-			skip 1
-			read labels
-			domain Application
-			iterate {
-				extract 'vendor name' set nameVar
-				extract 'vendor name' set nameVar
-			}
-            """.stripIndent()
-
-		when: 'Service executes the script with incorrect syntax'
-			Map<String, ?> result = service.testScript(
-				GMDEMO,
-				script,
-				fileSystemService.getTemporaryFullFilename(fileName)
-			)
-
-		then: 'Service result has validSyntax equals false and a list of errors'
-			with(result) {
-				!validSyntax
-				with(error) {
-					startLine == 10
-					endLine == 10
-					startColumn == null
-					endColumn == null
-					fatal
-					message == 'Invalid variable name specified for \'set\' command. Variable can not be null and can not be reassigned within iterate loop. at line 10'
-				}
-			}
-
-		cleanup:
-			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
-			}
 	}
 
 	void 'test can test a script content for Application domain Asset using a excel dataSet'() {

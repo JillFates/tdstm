@@ -5,7 +5,6 @@ import com.tdsops.etl.ETLFieldDefinition
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.LocalVariableDefinition
-import com.tdsops.etl.LocalVariableFacade
 
 /**
  * This Class interprets the following ETL command:
@@ -46,8 +45,7 @@ class FieldLookupCommand {
      * @param localVariable
      */
     void set(LocalVariableDefinition localVariable) {
-        LocalVariableFacade localVariableFacade = new LocalVariableFacade(fieldDefinition.name, this.processor)
-        processor.addLocalVariableInBinding(localVariable.name, localVariableFacade)
+        processor.addLocalVariableInBinding(localVariable.name, fieldDefinition.name)
     }
 
 }

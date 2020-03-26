@@ -144,20 +144,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -190,20 +190,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -233,20 +233,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -353,20 +353,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -399,20 +399,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -448,20 +448,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 2
@@ -608,20 +608,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		cleanup:
 			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
@@ -654,20 +654,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		cleanup:
 			if (fileName) fileSystemService.deleteTemporaryFile(fileName)

@@ -139,16 +139,16 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name').index != null
+			etlProcessor.getColumnByName('vendor name').index != null
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -181,16 +181,16 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name') != null
+			etlProcessor.getColumnByName('vendor name') != null
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -298,16 +298,16 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name') != null
+			etlProcessor.getColumnByName('vendor name') != null
 
 		and:
 			etlProcessor.currentRowIndex == 2
@@ -644,16 +644,16 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name') != null
+			etlProcessor.getColumnByName('vendor name') != null
 
 		cleanup:
 			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
