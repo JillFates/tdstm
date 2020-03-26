@@ -170,7 +170,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		AssetComment task = taskService.invokeLocalAction(id, currentPerson())
 
 		Map results = [
-			assetComment: task,
+			// assetComment: task,
 			task: task.taskToMap(),
 			status: task.status,
 			statusCss: taskService.getCssClassForStatus(task.status)

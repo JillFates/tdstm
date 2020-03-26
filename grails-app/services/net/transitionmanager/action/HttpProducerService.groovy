@@ -13,15 +13,20 @@ import com.tdssrc.grails.XmlUtil
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.exception.ApiActionException
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.http.HostnameVerifier
-import net.transitionmanager.integration.*
+import net.transitionmanager.integration.ActionHttpRequestElements
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ActionThreadLocalVariable
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ReactionHttpStatus
+import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.security.CredentialService
-import net.transitionmanager.common.FileSystemService
-import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.TaskFacade
+import net.transitionmanager.task.TaskService
 import org.apache.commons.io.IOUtils
 import org.apache.http.Consts
 import org.apache.http.Header
@@ -122,7 +127,7 @@ class HttpProducerService {
 
     /**
      * Executes a HTTP request for the given action request
-     * @see <code>HttpAgent.executeCall()</code>
+     * @see HttpAgent#executeCall()
      *
      * @param actionRequest - the action request
      * @return the ApiActionResponse
@@ -130,20 +135,11 @@ class HttpProducerService {
     ApiActionResponse executeCall(ActionRequest actionRequest) {
         try {
             return reaction(invokeActionRequest(actionRequest))
-        } catch (Exception e) {
-            log.error('Error when executing HTTP request. {}', ExceptionUtil.stackTraceToString(e))
-            String errorMessage = translateHttpException(e)
+        } catch (Throwable throwable) {
+            log.error('Error when executing HTTP request. {}', ExceptionUtil.stackTraceToString(throwable))
+            String errorMessage = translateHttpException(throwable)
 
-            // this is used to notify tasks when something went wrong by adding a task note
-            if (actionRequest.options.hasProperty('taskId')) {
-                Long taskId = actionRequest.options.taskId
-                taskService.updateTaskStateByMessage([taskId: taskId, status: 'error', cause: errorMessage])
-            }
-            ApiActionResponse errorApiActionResponse = new ApiActionResponse()
-            errorApiActionResponse.error = errorMessage
-			errorApiActionResponse.stderr = errorMessage
-            errorApiActionResponse.successful = false
-            return errorApiActionResponse.asImmutable()
+            return new ApiActionResponse(error: errorMessage,stderr: errorMessage, successful: false).asImmutable()
         }
     }
 
@@ -200,7 +196,7 @@ class HttpProducerService {
 
         if (!apiActionResponse.successful) {
             apiActionResponse.error = getHttpResponseError(apiActionResponse.status)
-            apiActionResponse.stderr = getHttpResponseError(apiActionResponse.status)
+            apiActionResponse.stderr = apiActionResponse.error
             apiActionResponse.data = null
         } else {
             InputStream is = httpResponse?.entity?.content
@@ -221,128 +217,70 @@ class HttpProducerService {
 
         // if there is a task facade and reaction scripts, process and execute them accordingly
         if (taskFacade && reactionScripts) {
-            // reaction scripts
-            String statusScript = reactionScripts[ReactionScriptCode.STATUS.name()]
-            String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
-            String defaultScript = reactionScripts[ReactionScriptCode.DEFAULT.name()]
-            String finalizeScript = reactionScripts[ReactionScriptCode.FINAL.name()]
-            String successScript = reactionScripts[ReactionScriptCode.SUCCESS.name()]
-            String failScript = reactionScripts[ReactionScriptCode.FAILED.name()]
+
+            ReactionScriptInvocationParams invocationParams = new ReactionScriptInvocationParams(reactionScripts, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
 
             if (apiActionResponse.successful) {
-                try {
-                    Map<String, ?> statusResult = apiActionService.invokeReactionScript(ReactionScriptCode.STATUS, statusScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                    log.debug('{} script execution result: {}', ReactionScriptCode.STATUS, statusResult.result)
-                    if (statusResult.result == ReactionScriptCode.SUCCESS) {
-                        assetFacade.setReadonly(false)
-                        try {
-                            Map<String, ?> successResult = apiActionService.invokeReactionScript(ReactionScriptCode.SUCCESS, successScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                            log.debug('{} script execution result: {}', ReactionScriptCode.SUCCESS, successResult.result)
-                            if (successResult.result == ReactionScriptCode.ERROR) {
-                                // execute ERROR or DEFAULT scripts if present
-                                if (errorScript) {
-                                    try {
-                                        apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                                    } catch (ApiActionException errorScriptException) {
-                                        addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
-                                    }
-                                } else if (defaultScript) {
-                                    try {
-                                        apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                                    } catch (ApiActionException defaultScriptException) {
-                                        addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
-                                    }
-                                }
-                            }
-                        } catch (ApiActionException successScriptException) {
-                            addTaskScriptInvocationError(taskFacade, ReactionScriptCode.SUCCESS, successScriptException)
-                            // execute ERROR or DEFAULT scripts if present when SUCCESS script execution fails
-                            if (errorScript) {
-                                try {
-                                    apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                                } catch (ApiActionException errorScriptException) {
-                                    addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
-                                }
-                            } else if (defaultScript) {
-                                try {
-                                    apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                                } catch (ApiActionException defaultScriptException) {
-                                    addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
-                                }
-                            }
-                        }
-                        assetFacade.setReadonly(true)
-                    } else {
-                        assetFacade.setReadonly(false)
-                        // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
-                        if (errorScript) {
-                            try {
-                                apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                            } catch (ApiActionException errorScriptException) {
-                                addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
-                            }
-                        } else if (defaultScript) {
-                            try {
-                                apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                            } catch (ApiActionException defaultScriptException) {
-                                addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
-                            }
-                        }
-                        assetFacade.setReadonly(true)
-                    }
-                } catch (ApiActionException statusScriptException) {
-                    addTaskScriptInvocationError(taskFacade, ReactionScriptCode.STATUS, statusScriptException)
-                    // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
-                    if (errorScript) {
-                        assetFacade.setReadonly(false)
-                        try {
-                            apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                        } catch (ApiActionException errorScriptException) {
-                            addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
-                        }
-                        assetFacade.setReadonly(true)
-                    } else if (defaultScript) {
-                        assetFacade.setReadonly(false)
-                        try {
-                            apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                        } catch (ApiActionException defaultScriptException) {
-                            addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
-                        }
-                        assetFacade.setReadonly(true)
-                    }
-                }
+                reactionForApiActionResponseSuccessful(invocationParams, assetFacade)
             } else {
                 // execute FAILED or DEFAULT scripts if present when call to endpoint was not successful
                 // Network error, Timeout, Bad credentials, etc...
-                if (failScript) {
-                    try {
-                        apiActionService.invokeReactionScript(ReactionScriptCode.FAILED, failScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                    } catch (ApiActionException failedScriptException) {
-                        addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FAILED, failedScriptException)
-                    }
-                } else if (defaultScript) {
-                    assetFacade.setReadonly(false)
-                    try {
-                        apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                    } catch (ApiActionException defaultScriptException) {
-                        addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
-                    }
-                    assetFacade.setReadonly(true)
-                }
+                reactionForApiActionResponseNotSuccessful(invocationParams, assetFacade)
             }
 
             // finalize STATUS branch when it succeeded
-            if (finalizeScript) {
-                try {
-                    apiActionService.invokeReactionScript(ReactionScriptCode.FINAL, finalizeScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-                } catch (ApiActionException finalizeScriptException) {
-                    addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
-                }
-            }
-        } // end if (taskFacade && reactionScripts)
+            apiActionService.invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
+        }
 
         ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
         return apiActionResponse.asImmutable()
+    }
+
+    /**
+     *
+     * @param invocationParams
+     * @param assetFacade
+     */
+    private void reactionForApiActionResponseSuccessful(ReactionScriptInvocationParams invocationParams, AssetFacade assetFacade) {
+
+        Map<String, ?> resultsForSTATUS = apiActionService.invokeReactionScript(ReactionScriptCode.STATUS, invocationParams)
+        log.debug('{} script execution result: {}', ReactionScriptCode.STATUS, resultsForSTATUS)
+
+        if (resultsForSTATUS.errorMessage || resultsForSTATUS.result != ReactionScriptCode.SUCCESS) {
+
+            // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
+            if (apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, invocationParams).isEmpty()){
+                apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
+            }
+            return
+        }
+
+        Map<String, ?> resultsForSUCCESS = apiActionService.invokeReactionScript(ReactionScriptCode.SUCCESS, invocationParams)
+
+        if (resultsForSUCCESS.errorMessage || resultsForSUCCESS.result == ReactionScriptCode.ERROR) {
+
+            // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
+            if (apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, invocationParams).isEmpty()){
+                apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
+            }
+            return
+        }
+    }
+
+    /**
+     * HTTP invocation failed:
+     * 1) check if is necessary to evaluate FAILED
+     * 2) If not, check if is necessary to evaluate DEFAULT
+     * 3) At then evaluate FINAL script
+     *
+     * @param invocationParams
+     * @param assetFacade
+     */
+    private void reactionForApiActionResponseNotSuccessful(ReactionScriptInvocationParams invocationParams, AssetFacade assetFacade) {
+        if (apiActionService.invokeReactionScript(ReactionScriptCode.FAILED, invocationParams).isEmpty()) {
+            apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
+        }
+        apiActionService.invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
     }
 
     /**
@@ -481,10 +419,10 @@ class HttpProducerService {
      * Add task error message through the task facade
      * @param taskFacade - the task facade wrapper
      * @param reactionScriptCode - the reaction script code generating the message
-     * @param apiActionException - the API Exception
+     * @param String - the error message
      */
-    private void addTaskScriptInvocationError(TaskFacade taskFacade, ReactionScriptCode reactionScriptCode, ApiActionException apiActionException) {
-        taskFacade.error(String.format('%s script failure: %s', reactionScriptCode, apiActionException.message))
+    private void addTaskScriptInvocationError(TaskFacade taskFacade, ReactionScriptCode reactionScriptCode, String errorMessage) {
+        taskFacade.error(String.format('%s script failure: %s', reactionScriptCode, errorMessage))
     }
 
     /**
