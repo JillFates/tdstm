@@ -14,6 +14,7 @@ import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
 import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
+import org.grails.web.json.JSONObject
 
 import java.text.SimpleDateFormat
 
@@ -214,18 +215,22 @@ class ETLStreamingWriter {
      */
     private void writeObjectField(String fieldName, Object pojo) {
 
-        switch (pojo?.class) {
-            case Date:
-                generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
-                break
-            case Map:
-            case JsonObject:
-            case List:
-            case Set:
-                generator.writeStringField(fieldName, pojo.toString())
-                break
-            default:
-                generator.writeObjectField(fieldName, pojo)
+        if (pojo == null) {
+            generator.writeNullField(fieldName)
+        } else if (CharSequence.isAssignableFrom(pojo.class)) {
+            generator.writeStringField(fieldName, pojo.toString())
+        } else if (Number.isAssignableFrom(pojo.class)) {
+            generator.writeObjectField(fieldName, pojo)
+        } else if (Date.isAssignableFrom(pojo.class)) {
+            generator.writeStringField(fieldName, TimeUtil.formatToISO8601DateTime((Date) pojo))
+        } else if (Map.isAssignableFrom(pojo.class)
+                || Collection.isAssignableFrom(pojo.class)
+                || JsonObject.isAssignableFrom(pojo.class)
+                || JSONObject.isAssignableFrom(pojo.class)
+                || Number.isAssignableFrom(pojo.class)) {
+            generator.writeStringField(fieldName, pojo.toString())
+        } else {
+            generator.writeObjectField(fieldName, pojo)
         }
     }
 
