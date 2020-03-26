@@ -31,9 +31,7 @@ import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-
 import {ApiActionViewEditReactionsComponent} from './api-action-view-edit-reactions.component';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 // Service
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {APIActionService} from '../../service/api-action.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
@@ -571,16 +569,6 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 				});
 		} else {
 			super.onCancelClose();
-		}
-	}
-
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
 		}
 	}
 

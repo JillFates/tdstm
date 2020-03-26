@@ -1573,17 +1573,25 @@ div.dates-info-container {
         height: 12px;
         margin-top: 2px; }
       .tds-table table tbody tr td .status.status-Ready {
-        background: #01ab08; }
+        background: #fff; }
       .tds-table table tbody tr td .status.status-Started {
         color: #0092d1; }
       .tds-table table tbody tr td .status.status-Hold {
-        background: #F27113; }
+        background: #333; }
       .tds-table table tbody tr td .status.status-Completed {
         background: #3c8dbc; }
       .tds-table table tbody tr td .status.status-Pending {
         color: #808080; }
       .tds-table table tbody tr td .status.status-Warning {
         background: #f6c440; }
+      .tds-table table tbody tr td .status.status-Unknown {
+        color: #fff;
+        background-color: #808080; }
+      .tds-table table tbody tr td .status.status-Questioned {
+        color: #fff;
+        background: #ff020c; }
+      .tds-table table tbody tr td .status.status-Future {
+        background: #333; }
 
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {
@@ -1936,7 +1944,8 @@ body > .wrapper {
       right: 0;
       top: 0; }
       .main-header .menu-top-container .user-navarea a.licensing-error-warning {
-        line-height: 40px; }
+        line-height: 40px;
+        border: 0px; }
       .main-header .menu-top-container .user-navarea i.licensing-error-warning {
         color: #ffcc00;
         font-size: 18px; }
