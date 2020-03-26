@@ -37,7 +37,6 @@ export class AssetGlobalFiltersService {
 				}
 			});
 		}
-		console.log(params);
 	}
 
 	/**

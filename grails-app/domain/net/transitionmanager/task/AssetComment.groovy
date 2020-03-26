@@ -633,9 +633,9 @@ class AssetComment {
 	Map toMap() {
 		Map dataMap = [
 			id           : id,
-			assetEntityId: assetEntity.id,
-			assetName    : assetEntity.assetName,
-			assetType    : assetEntity.assetType,
+			assetEntityId: assetEntity?.id,
+			assetName    : assetEntity?.assetName,
+			assetType    : assetEntity?.assetType,
 			createdBy    : [id: createdBy.id, name: createdBy.toString()],
 			comment      : comment,
 			commentType  : commentType,
@@ -648,7 +648,7 @@ class AssetComment {
 			assignedTo   : assignedTo?.toString() ?: '',
 			isResolved   : dateResolved ? 'Yes' : 'No',
 			isPublished  : isPublished,
-			assetClass	 : assetEntity?.assetClass,
+			assetClass: assetEntity?.assetClass
 		]
 		return dataMap
 	}

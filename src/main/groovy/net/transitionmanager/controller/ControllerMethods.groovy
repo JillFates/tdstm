@@ -575,16 +575,12 @@ trait ControllerMethods {
 				project = Project.get(projectId)
 			}
 		} else {
-
-			// Load the user's currently selected project
-			project = securityService.userCurrentProject
-			if (! project) {
-				throw new ProjectRequiredException('No current project selected for session')
-			}
+			// Load the user's currently selected project{
+			project = securityService.getUserCurrentProjectOrException()
 		}
 
 		if (! project) {
-			throw new EmptyResultException('Project not found')
+			throw new ProjectRequiredException('No project selected')
 		}
 
 		return project

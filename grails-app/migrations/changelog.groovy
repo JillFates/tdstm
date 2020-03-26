@@ -83,6 +83,7 @@ databaseChangeLog = {
 	include file: 'version/v5_0_0/20190920-add_fk_to_party_relationship.groovy'
 	include file: 'version/v5_0_0/20191112-add_fk_to_asset_comment_asset.groovy'
 	include file: 'version/v4_7_2/20191028-batch-management-auto-process-import.groovy'
+	include file: 'version/v4_7_2/20191105-add-dataview-permissions-and-property-for-save-as.groovy'
 	include file: 'version/v4_7_2/20191119-add-use_with_asset_actions.groovy'
 	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 	include file: 'version/v5_0_0/20190925-updating-password-hashing.groovy'
@@ -92,5 +93,6 @@ databaseChangeLog = {
 	include file: 'version/v5_0_0/20200114-drop-depdencyBundle-column.groovy'
 	include file: 'version/v4_7_2/20200127-fix-empty-shared-field-specs.groovy'
 	include file: 'version/v4_7_2/20200206-add-license-lastcompliance-column.groovy'
-	include file: 'version/v4_7_2/20200129-remove-null-fields.groovy'
+    include file: 'version/v4_7_2/20200129-remove-null-fields.groovy'
+	include file: 'version/v4_7_2/20200218-drop-dataview-unique-index.groovy'
 }
