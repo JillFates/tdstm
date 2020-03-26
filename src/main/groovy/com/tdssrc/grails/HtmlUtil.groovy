@@ -296,15 +296,4 @@ class HtmlUtil {
 			return ''
 		}
 	}
-
-	/**
-	 * Construct (and escape) a person's fullname.
-	 * @param firstName
-	 * @param middleName
-	 * @param lastName
-	 * @return
-	 */
-	static String escapePersonFullName(String firstName, String middleName, String lastName) {
-		return escape(StringUtil.join([firstName, middleName, lastName]))
-	}
 }
