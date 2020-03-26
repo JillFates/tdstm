@@ -250,11 +250,6 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 		this.gridComponent.reloadData().finally();
 	}
 
-	public onBundleListChange(event: any): void {
-		this.bundleId = event.target.value;
-		this.gridComponent.reloadData().finally();
-	}
-
 	public onChangeViewFilter(event: any): void {
 		this.viewFilter = event.target.value;
 		this.gridComponent.reloadData().finally();

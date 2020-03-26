@@ -29,7 +29,7 @@ export class EventNewsColumnModel {
 			}, {
 				label: 'Resolution',
 				property: 'resolution',
-				filterType: FilterType.boolean,
+				filterType: FilterType.text,
 				width: 'auto',
 			}, {
 				label: 'Resolved At',
