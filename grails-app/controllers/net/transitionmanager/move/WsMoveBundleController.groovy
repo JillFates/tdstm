@@ -32,7 +32,7 @@ class WsMoveBundleController implements ControllerMethods {
 	 * @param moveBundleId - the id of the bundle to be edited.
 	 * @return a map with the fields of the bundle, the id of the project and the rooms.
 	 */
-	@HasPermission(Permission.BundleEdit)
+	@HasPermission(Permission.BundleView)
 	def modelForEdit(Long moveBundleId) {
 		Project project = getProjectForWs()
 		renderSuccessJson([

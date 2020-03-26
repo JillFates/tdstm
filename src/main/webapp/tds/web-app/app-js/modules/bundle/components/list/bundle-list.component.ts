@@ -150,7 +150,7 @@ export class BundleListComponent implements OnInit, AfterContentInit, OnDestroy 
 	}
 
 	public async cellClick(event: CellClickEvent): Promise<void> {
-		if (event.columnIndex > 0 && this.isEditAvailable()) {
+		if (event.columnIndex > 0) {
 			await this.openBundle(event.dataItem, ActionType.VIEW, false);
 		}
 	}
