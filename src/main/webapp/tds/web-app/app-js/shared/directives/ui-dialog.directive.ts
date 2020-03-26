@@ -1,6 +1,3 @@
-import { Subscription } from 'rxjs';
-import { DialogService } from 'tds-component-library';
-import { KEYSTROKE } from './../model/constants';
 /**
  * UI Dialog Directive works as a placeholder for any dialog being initiaded
  */
@@ -56,8 +53,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		private notifierService: NotifierService,
 		private activeDialog: UIActiveDialogService,
 		private compCreator: ComponentCreatorService,
-		private dialogService: UIDialogService,
-		public mainDialogService: DialogService) {
+		private dialogService: UIDialogService) {
 		this.registerListeners();
 	}
 
@@ -206,41 +202,17 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			}
 		});
 
-		this.closeNotifier = this.notifierService.on('dialog.close', event => {			
-			let subscr: Subscription;
-			let acti = false;
-			subscr = this.mainDialogService
-				.activatedDropdown
-				.subscribe(res => {
-					console.log('The RES:', res);
-					if (res === true) {
-						console.log(event);
-						event.name = 'dialog.open';
-						subscr.unsubscribe();
-						acti = true;
-						return;
-					} else {
-						event.name = 'dialog.open';
-						subscr.unsubscribe();
-						acti = false;
-					}
-				});
-
-			setTimeout(() => {
-				if (acti === false) {
-					if (this.cmpRef) {
-						this.el.nativeElement.style.top = 'initial';
-						this.el.nativeElement.style.left = 'initial';
-						this.resolve(event.result);
-						this.tdsUiDialog.modal('hide');
-						this.cmpRef.destroy();
-					}
-				}				
-			}, 1000);
-
+		this.closeNotifier = this.notifierService.on('dialog.close', event => {
+			if (this.cmpRef) {
+				this.el.nativeElement.style.top = 'initial';
+				this.el.nativeElement.style.left = 'initial';
+				this.resolve(event.result);
+				this.tdsUiDialog.modal('hide');
+				this.cmpRef.destroy();
+			}
 		});
 
-		this.dismissNotifier = this.notifierService.on('dialog.dismiss', event => {			
+		this.dismissNotifier = this.notifierService.on('dialog.dismiss', event => {
 			if (this.cmpRef) {
 				this.el.nativeElement.style.top = 'initial';
 				this.el.nativeElement.style.left = 'initial';
