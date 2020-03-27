@@ -64,6 +64,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	public showLegend = false;
 	public assetIconsPath = ASSET_ICONS;
 	public toggleFullScreen = true;
+	public selectedAsset = null;
 
 	public assetItem;
 	private TAG_APPLICATION = 'appLbl';
@@ -183,6 +184,9 @@ export class ArchitectureGraphComponent implements OnInit {
 				this.appLbl = res.graphPrefs.appLbl;
 				this.labelOffset = res.graphPrefs.labelOffset;
 				this.assetClasses = res.graphPrefs.assetClasses;
+				// this.assetId = res.graphPrefs.assetClass;
+				this.asset = res.graphPrefs.selectedAsset;
+				this.assetClass = res.graphPrefs.assetClass;
 
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_DATABASE);
@@ -228,6 +232,8 @@ export class ArchitectureGraphComponent implements OnInit {
 	onAssetSelected(event) {
 		if (event) {
 			this.assetId = event.id;
+			this.selectedAsset = event;
+			this.form.controls['assetClass'].markAsDirty();
 			this.loadData();
 		}
 	}
@@ -384,7 +390,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	removeNodeNamesForNotSelectedCategories(data: any): any {
 		let clonedNodes = JSON.parse(JSON.stringify(data));
 
-		const categories = this.getSelectedCategories(); // this.categories || [];
+		const categories = this.getSelectedCategories() // this.categories || [];
+					.map( label => label.value.toUpperCase());
+
 		clonedNodes.nodes.forEach(node => {
 			// Clear the node name if the assetClass is not included on the categories selected
 			if (!categories.includes(node.assetClass)) {
@@ -400,8 +408,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	getSelectedCategories(): any[] {
 		return this.graphLabels
-			.filter( label => label.checked)
-			.map( label => label.value.toUpperCase());
+			.filter( label => label.checked);
 	}
 
 	/**
@@ -438,20 +445,40 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Save the preferences changed on the control panel
 	*/
 	savePreferences() {
-		if (this.categories) {
-			const valueData = {
-				assetClass: 'ALL',
-				levelsUp: this.levelsUp,
-				levelsDown: this.levelsDown,
-				showCycles: this.showCycles,
-				appLbl: this.categories.length > 0
-			};
-			this.preferenceService
-				.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
+		const valueData = {
+			assetClass: this.assetClass,
+			assetName: 'text1',
+			levelsUp: this.levelsUp,
+			levelsDown: this.levelsDown,
+			showCycles: this.showCycles,
+			selectedAsset: this.selectedAsset,
+			// appLbl: this.categories.length > 0
+			// assetClass: this.assetId || 'ALL',
+		};
+
+		const selectedLabels = this.getSelectedCategories()
+			.map((item: any) => {
+				valueData[item.tagLabel] = 'true';
+			});
+
+		this.preferenceService
+			.setPreference('ARCH_GRAPH', JSON.stringify({...valueData, ...selectedLabels}))
+			.subscribe( res => {
+				this.resetForm();
 				if (res.status === 'success') {
 					console.log('Preferences saved correctly');
 				}
 			})
+	}
+
+	/**
+	 * Reset the form controls int the pristine state
+	 */
+	private resetForm() {
+		for (let name in this.form.controls) {
+			if (name) {
+				this.form.controls[name].markAsPristine();
+			}
 		}
 	}
 
