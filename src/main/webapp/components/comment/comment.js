@@ -2827,8 +2827,6 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
             scope.showComment = function (commentId, commentType) {
                 if (scope.hasCreateTaskPermission === 'true' || scope.hasCreateTaskPermission === true) {
                     scope.$emit("viewComment", commentUtils.commentTO(commentId, commentType), 'show');
-                } else {
-                    alert('You do not have permission to access this part of the system');
                 }
             }
             refreshView();
