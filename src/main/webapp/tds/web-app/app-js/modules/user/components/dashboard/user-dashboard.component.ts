@@ -1,5 +1,7 @@
 // Angular
 import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {tap} from 'rxjs/operators';
 // Services
 import { TaskService } from '../../../taskManager/service/task.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -25,6 +27,7 @@ import { GridComponent } from '@progress/kendo-angular-grid';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { Store } from '@ngxs/store';
 import {SetProject} from '../../../project/actions/project.actions';
+import {SetEvent} from '../../../event/action/event.actions';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -64,6 +67,7 @@ export class UserDashboardComponent implements OnInit {
 	];
 	public userContext: UserContextModel;
 	@ViewChild('taskGrid', { static: false }) taskGrid: GridComponent;
+	public selectedEvent = null;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -72,6 +76,7 @@ export class UserDashboardComponent implements OnInit {
 		private dialogService: DialogService,
 		private notifierService: NotifierService,
 		private translate: TranslatePipe,
+		private route: ActivatedRoute,
 		private store: Store) {
 		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
@@ -84,12 +89,33 @@ export class UserDashboardComponent implements OnInit {
 			title: 'User Dashboard for ' + this.userContext.person.fullName
 		});
 
-		this.populateData();
+		this.applicationColumnModel = new ApplicationColumnModel();
+		this.activePersonColumnModel = new ActivePersonColumnModel();
+		this.eventColumnModel = new EventColumnModel();
+		this.eventNewsColumnModel = new EventNewsColumnModel();
+		this.taskColumnModel = new TaskColumnModel();
+
+		this.populateData()
+			.subscribe((result) => {
+				this.selectProjectByID(this.projectInstance && this.projectInstance.id || null);
+			})
 	}
 
 	public onChangeProject($event ?: any): void {
-		this.selectProjectByID($event.id);
-		this.populateData();
+		const projectId = $event.id;
+
+		this.selectProjectByID(projectId);
+		this.populateData()
+			.subscribe((result) => {
+				console.log(result);
+				const payload = {
+					id: this.projectInstance.id,
+					name: this.projectInstance.name,
+					logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''
+				};
+				this.store.dispatch(new SetProject(payload));
+				setTimeout(() => this.updateEvent(), 500);
+			});
 	}
 
 	public selectProjectByID(id): any {
@@ -102,29 +128,43 @@ export class UserDashboardComponent implements OnInit {
 		return null;
 	}
 
-	private populateData(): void {
-		this.userService
+	private populateData(): any {
+		return this.userService
 			.fetchModelForUserDashboard(this.selectedProject ? this.selectedProject.id : '')
-			.subscribe(result => {
-				this.fetchApplicationsForGrid();
-				this.fetchEventNewsForGrid();
-				this.fetchEventsForGrid();
-				this.fetchPeopleForGrid();
-				this.fetchTasksForGrid();
-				this.projectList = result.projects;
-				this.currentPerson = result.person;
-				this.movedayCategories = result.movedayCategories;
-				this.projectInstance = result.projectInstance;
-				this.projectLogoId = result.projectLogoId;
-				this.selectedProject = this.projectInstance;
-				this.selectedProjectID = this.projectInstance.id;
-				this.store.dispatch(new SetProject({id: this.projectInstance.id, name: this.projectInstance.name, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
-			});
-		this.applicationColumnModel = new ApplicationColumnModel();
-		this.activePersonColumnModel = new ActivePersonColumnModel();
-		this.eventColumnModel = new EventColumnModel();
-		this.eventNewsColumnModel = new EventNewsColumnModel();
-		this.taskColumnModel = new TaskColumnModel();
+			.pipe(
+				tap((result) => {
+					this.fetchApplicationsForGrid();
+					this.fetchEventNewsForGrid();
+					this.fetchEventsForGrid();
+					this.fetchPeopleForGrid();
+					this.fetchTasksForGrid();
+					this.projectList = result.projects;
+					this.currentPerson = result.person;
+					this.movedayCategories = result.movedayCategories;
+					this.projectInstance = result.projectInstance;
+					this.projectLogoId = result.projectLogoId;
+					this.selectedProject = this.projectInstance;
+					this.selectedProjectID = this.projectInstance.id;
+				})
+			);
+	}
+
+	/**
+	 * Passing and event id search for it in the event list, on not found it returns
+	 * the first list element whenever the list has elements, otherwise it returns null
+ 	 * @param {number} id  Event id
+	 * @returns {any} Event found otherwhise null
+	*/
+	private getDefaultEvent(id: string): any {
+		// event ids are integer so we need to cast accordly
+		const selectedId = id ? parseInt(id, 10) : null;
+
+		if (selectedId) {
+			return this.eventList.find((event) => event.eventId === selectedId) || null;
+		} else if (this.eventList.length)  {
+			return this.eventList[0];
+		}
+		return null;
 	}
 
 	public openLinkInNewTab(url): void {
@@ -245,6 +285,23 @@ export class UserDashboardComponent implements OnInit {
 			.subscribe(result => {
 				this.eventList = result.events;
 			});
+	}
+
+	updateEvent() {
+		let selectedEventId = null;
+
+		if (this.userContext && this.userContext.event) {
+			selectedEventId = this.userContext.event.id;
+		}
+		this.selectedEvent = this.getDefaultEvent(this.route.snapshot.queryParams['moveEvent'] || selectedEventId);
+		if (this.selectedEvent) {
+			// const payload = {
+			// 	id: this.selectedEvent.eventId,
+			// 	name: this.selectedEvent.name
+			// };
+			this.store.dispatch(new SetEvent({id: this.selectedEvent.eventId, name: this.selectedEvent.name}));
+			// this.store.dispatch(new SetEvent(payload));
+		}
 	}
 
 	public fetchEventNewsForGrid(): void {

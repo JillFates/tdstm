@@ -39,7 +39,6 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
-
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
@@ -64,7 +63,6 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.tools.ant.util.DateUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -1176,7 +1174,7 @@ class ReportsService implements ServiceMethods {
             return content
         }
 
-        Closure<Task> findInTasks = { TaskVertex taskVertex, List<TimelineTask> taskList ->
+        Closure<TimelineTask> findInTasks = { TaskVertex taskVertex, List<TimelineTask> taskList ->
             return taskList.find { it.id == taskVertex.taskId }
         }
 
@@ -1195,8 +1193,7 @@ class ReportsService implements ServiceMethods {
                 summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
-                        def taskObj = findInTasks(cyclicalTask, tasks)
-                        Task task = taskObj
+                        TimelineTask task = findInTasks(cyclicalTask, tasks)
                         cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
                     cyclicalsRef.append('</ul>')
@@ -1218,8 +1215,7 @@ class ReportsService implements ServiceMethods {
                 startsRef.append('<ul>')
 
                 graph.starts.each { TaskVertex taskVertex ->
-                    def taskObj = findInTasks(taskVertex, tasks)
-                    Task task = Task.get(taskObj.id)
+                    TimelineTask task = findInTasks(taskVertex, tasks)
                     startsRef.append(htmlConverter(taskVertex, task))
                 }
                 startsRef.append('</ul>')
@@ -1238,8 +1234,7 @@ class ReportsService implements ServiceMethods {
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
                 graph.sinks.each { TaskVertex taskVertex ->
-                    def taskObj = findInTasks(taskVertex, tasks)
-                    Task task = Task.get(taskObj.id)
+                    TimelineTask task = findInTasks(taskVertex, tasks)
                     sinksRef.append(htmlConverter(taskVertex, task))
                 }
                 sinksRef.append('</ul>')

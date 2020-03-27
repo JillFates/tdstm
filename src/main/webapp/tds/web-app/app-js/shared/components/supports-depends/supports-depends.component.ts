@@ -1,3 +1,4 @@
+import { DialogService, DialogConfirmAction } from 'tds-component-library';
 /**
  * Structure does not allows to introduce other base Modules
  * So this is not in the Asset Explorer Module and belongs here instead.
@@ -24,7 +25,7 @@ declare var jQuery: any;
                 class="tds-table"
                 [data]="dataGridSupportsOnHelper.gridData"
                 [sort]="dataGridSupportsOnHelper.state.sort"
-                [sortable]="{mode:'single'}"
+								[sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
 
@@ -68,7 +69,7 @@ declare var jQuery: any;
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
+								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -192,7 +193,7 @@ declare var jQuery: any;
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-								<a clrDropdownItem (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
+								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -282,7 +283,7 @@ export class SupportsDependsComponent implements OnInit {
 	public dataGridDependsOnHelper: DataGridOperationsHelper;
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
 
-	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService) {
+	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService, private tdsDialogService: DialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
 	}
 
@@ -447,6 +448,23 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		}
 		return 'nothing';
+	}
+
+	/**
+	 * Confirm before delete
+	 * 
+	 * **/
+	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper): void {
+		this.tdsDialogService.confirm(
+			'Confirm Delete',
+			'Please confirm delete of this record. This action cannot be undone.'
+		).subscribe(
+			(data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.onDeleteDependencySupport(dataItem, dataGrid);
+				}
+			}
+		);
 	}
 
 	/**

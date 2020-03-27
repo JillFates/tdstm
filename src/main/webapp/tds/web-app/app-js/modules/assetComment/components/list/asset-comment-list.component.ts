@@ -22,6 +22,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
 import {CellClickEvent} from '@progress/kendo-angular-grid';
 import {TaskService} from '../../../taskManager/service/task.service';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 
 declare var jQuery: any;
 
@@ -101,12 +102,17 @@ export class AssetCommentListComponent implements OnInit {
 	}
 
 	/**
-	 * Check the field clicked and if appropriate open the comment view
+	 * Check the field clicked and if appropriate open the comment view or the asset details
 	 * @param {SelectionEvent} event
 	 */
-	public async cellClick(event: CellClickEvent): Promise<void> {
+	// TODO: sam, please test this funcionality.
+	protected async cellClick(event: CellClickEvent) {
 		if (event.columnIndex === 1 && this.isShowCommentAvailable()) {
 			await this.openComment(event.dataItem, ModalType.VIEW);
+		} else {
+			if (event.columnIndex === 2) {
+				this.openAssetDetails(event.dataItem.assetEntityId, event.dataItem.assetClass.name);
+			}
 		}
 	}
 
@@ -184,6 +190,28 @@ export class AssetCommentListComponent implements OnInit {
 				console.error(error);
 			}
 		}
+	}
+
+	/**
+	 * Open the asset show details
+	 * @param assetEntityId
+	 * @param assetType
+	 */
+	private async openAssetDetails(assetEntityId: string, assetClassName: string): Promise<void> {
+		await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: assetEntityId,
+				assetClass: assetClassName
+			},
+			modalConfiguration: {
+				title: '&nbsp;',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).toPromise();
 	}
 
 	/**
