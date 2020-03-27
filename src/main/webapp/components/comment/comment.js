@@ -2771,6 +2771,7 @@ tds.comments.directive.ActionBarCell = function (commentService, alerts, utils, 
  * Directive comment inner list
  */
 tds.comments.directive.CommentInnerList = function (commentService, alerts, utils, commentUtils) {
+
 	return {
 		restrict: 'E',
 		scope: {
@@ -2778,8 +2779,6 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
 			prefValue: '@',
 			viewUnpublishedValue: '@',
 			hasPublishPermission: '@',
-			hasCreateTaskPermission: '@',
-			hasEditTaskPermission: '@',
 			canEditComments: '@',
             canEditTasks: '@'
 		},
@@ -2825,9 +2824,7 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
 				scope.$emit("editComment", commentUtils.commentTO(commentId, commentType));
 			}
 			scope.showComment = function (commentId, commentType) {
-				if (scope.hasCreateTaskPermission === 'true' || scope.hasCreateTaskPermission === true) {
-					scope.$emit("viewComment", commentUtils.commentTO(commentId, commentType), 'show');
-				}
+				scope.$emit("viewComment", commentUtils.commentTO(commentId, commentType), 'show');
 			}
 			refreshView();
 		}

@@ -107,7 +107,7 @@
 		<g:render template="/assetEntity/dependentShow" model="[assetEntity:databaseInstance]" ></g:render>
 	</tr>
 	<tr id="commentListId">
-		<g:render template="/assetEntity/commentList" model="['asset':databaseInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, 'hasEditTaskPermission':hasEditTaskPermission, 'hasCreateTaskPermission':hasCreateTaskPermission]" ></g:render>
+		<g:render template="/assetEntity/commentList" model="['asset':databaseInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
 	</tr>
 	<tr>
 		<td colspan="2">

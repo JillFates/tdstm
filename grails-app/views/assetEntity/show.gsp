@@ -248,7 +248,7 @@
 			<g:render template="dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
 		</tr>
 		<tr id="commentListId">
-			<g:render template="commentList" model="['asset':assetEntity, 'hasEditTaskPermission':hasEditTaskPermission, 'hasCreateTaskPermission':hasCreateTaskPermission, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, 'hasPublishPermission':hasPublishPermission, 'canEdit': canEdit]" ></g:render>
+			<g:render template="commentList" model="['asset':assetEntity, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, 'hasPublishPermission':hasPublishPermission, 'canEdit': canEdit]" ></g:render>
 		</tr>
 		<tr>
 			<td colspan="2">
