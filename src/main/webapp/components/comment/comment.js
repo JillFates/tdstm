@@ -2779,7 +2779,7 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
             viewUnpublishedValue: '@',
             hasPublishPermission: '@',
             hasCreateTaskPermission: '@',
-            hasTaskManagerViewPermission: '@',
+            hasEditTaskPermission: '@',
             canEditComments: '@',
             canEditTasks: '@'
         },
@@ -2825,7 +2825,7 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
                 scope.$emit("editComment", commentUtils.commentTO(commentId, commentType));
             }
             scope.showComment = function (commentId, commentType) {
-                if (scope.hasTaskManagerViewPermission === 'true' || scope.hasTaskManagerViewPermission === true) {
+                if (scope.hasCreateTaskPermission === 'true' || scope.hasCreateTaskPermission === true) {
                     scope.$emit("viewComment", commentUtils.commentTO(commentId, commentType), 'show');
                 } else {
                     alert('You do not have permission to access this part of the system');

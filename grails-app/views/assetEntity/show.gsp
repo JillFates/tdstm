@@ -288,7 +288,7 @@
         <tr id="commentListId">
             <g:render template="commentList"
                       model="['asset'                  : assetEntity,
-                              'hasTaskManagerViewPermission'  : hasTaskManagerViewPermission,
+                              'hasEditTaskPermission'  : hasEditTaskPermission,
                               'hasCreateTaskPermission': hasCreateTaskPermission,
                               'prefValue'              : prefValue,
                               'viewUnpublishedValue'   : viewUnpublishedValue,

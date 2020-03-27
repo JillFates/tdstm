@@ -6,7 +6,7 @@
 			view-unpublished-value="${viewUnpublishedValue}"
 			has-publish-permission="${hasPublishPermission}"
 			has-create-task-permission="${hasCreateTaskPermission}"
-			has-task-manager-view-permission="${hasTaskManagerViewPermission}"
+			has-edit-task-permission="${hasEditTaskPermission}"
 			can-edit-comments="${canEdit}"
 			can-edit-tasks="${canEditTasks}">
 	</comment-inner-list>

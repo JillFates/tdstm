@@ -1478,7 +1478,7 @@ class AssetEntityService implements ServiceMethods {
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
 			hasCreateTaskPermission: securityService.hasPermission(Permission.TaskCreate),
-			hasTaskManagerViewPermission: securityService.hasPermission(Permission.TaskManagerView),
+			hasEditTaskPermission: securityService.hasPermission(Permission.TaskEdit),
 			customs: customFields,
 			dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.dateCreated, formatter),
 			lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),

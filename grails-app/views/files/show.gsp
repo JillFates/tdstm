@@ -110,7 +110,7 @@
                   model="['asset'                  : filesInstance,
                           'prefValue'              : prefValue,
                           'viewUnpublishedValue'   : viewUnpublishedValue,
-                          'hasTaskManagerViewPermission'  : hasTaskManagerViewPermission,
+                          'hasEditTaskPermission'  : hasEditTaskPermission,
                           'hasCreateTaskPermission': hasCreateTaskPermission]">
         </g:render>
     </tr>
