@@ -247,7 +247,7 @@
                             </li>
                             <g:if test="${currProject && moveEvent}">
                                 <li class="menu-child-item menu-parent-planning-event-detail-list">
-                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">${moveEvent.name} Event Details</a>
+                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">Event Details - ${moveEvent.name}</a>
                                 </li>
                             </g:if>
                             <tds:hasPermission permission="${Permission.NewsEdit}">
@@ -267,6 +267,11 @@
                             <li class="menu-child-item menu-parent-planning-list-bundles">
                                 <g:link class="mmlink" controller="module" action="bundle" id="list">List Bundles</g:link>
                             </li>
+                            <g:if test="${currProject && moveBundle}">
+                                <li class="menu-child-item menu-parent-planning-selected-bundle">
+                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">Bundle Details - ${moveBundle.name}</a>
+                                </li>
+                            </g:if>
                         </ul>
                     </li>
                 </tds:hasPermission>
