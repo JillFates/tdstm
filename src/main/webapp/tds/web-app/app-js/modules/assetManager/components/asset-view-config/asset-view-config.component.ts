@@ -76,7 +76,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	currentOverrideState: OverrideState;
 	private navigationSubscription: any;
 	private lastSnapshot: any;
-	private lastViewId;
+	private currentId;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -94,6 +94,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 				name: 'notificationHeaderTitleChange',
 				title: this.model.name
 			});
+			this.currentId = this.model.id;
 			this.onPreview();
 		}
 		this.reloadStrategy();
@@ -115,6 +116,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		this.draggableColumns = [];
 		this.handleQueryParams();
 		if (this.model && this.model.id) {
+			this.currentId = this.model.id;
 			this.updateFilterbyModel();
 			this.currentTab = 1;
 			this.draggableColumns = this.model.schema.columns.slice();
@@ -139,7 +141,9 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 			}
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
-				this.initResolveData(true);
+				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
+					this.initResolveData(true);
+				}
 			}
 		});
 	}
@@ -160,15 +164,14 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	}
 
 	toggleAssetView() {
-		let navigateToViewId = this.model.id;
+		let dataViewId;
 		const _override = !this.queryParams._override;
-		if (!_override && this.model.overridesView) {
-			navigateToViewId = this.model.overridesView.id
-		} else if (this.lastViewId) {
-			navigateToViewId = this.lastViewId;
+		if (this.model.overridesView) {
+			dataViewId = this.model.overridesView.id
+		} else {
+			dataViewId = this.model.id;
 		}
-		this.lastViewId = this.model.id;
-		return this.router.navigate(['/asset', 'views', navigateToViewId, 'edit'], {
+		return this.router.navigate(['/asset', 'views', dataViewId, 'edit'], {
 			queryParams: { _override }
 		});
 	}
