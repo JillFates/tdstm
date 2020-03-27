@@ -59,11 +59,11 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
         scope.controller.editComment(commentTO);
     });
 
-    scope.$on('lookUpAction', function(evt, commentId, apiActionId) {
+    scope.$on('lookUpAction', function (evt, commentId, apiActionId) {
         scope.controller.lookUpAction(commentId, apiActionId);
     });
 
-    scope.$on('showAssetDetails', function(evt, redirectTo, type, value) {
+    scope.$on('showAssetDetails', function (evt, redirectTo, type, value) {
         scope.$broadcast('forceDialogClose', ['crud', 'list']);
         EntityCrud.showAssetDetailView(type, value);
     });
@@ -73,7 +73,8 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
     });
 
     scope.$on('commentDeleted', function (evt, commentId, assetId) {
-        dispathCommentChangedEvent(commentId, assetId, 'deleted'); $('#taskListIdGrid').trigger("reloadGrid");
+        dispathCommentChangedEvent(commentId, assetId, 'deleted');
+        $('#taskListIdGrid').trigger("reloadGrid");
     });
 
     scope.$on('commentUpdated', function (evt, commentId, assetId) {
@@ -140,7 +141,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
                     return null;
                 },
                 task: function () {
-                    return parentTask || { ac: undefined, type: undefined };
+                    return parentTask || {ac: undefined, type: undefined};
                 }
             }
         });
@@ -177,13 +178,13 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
             templateUrl: utils.url.applyRootPath('/components/asset/asset-dependency-template.html'),
             controller: tds.comments.controller.viewAssetDependencyDialogController,
             scope: scope,
-            windowClass: 'modal-comment' ,
+            windowClass: 'modal-comment',
             backdrop: 'static',
             resolve: {
                 assetDependency: function () {
                     return assetDependency;
                 },
-                action: function() {
+                action: function () {
                     return action;
                 }
             }
@@ -228,7 +229,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
         });
     }
 
-    this.lookUpAction = function(commentId, apiActionId) {
+    this.lookUpAction = function (commentId, apiActionId) {
         console.log("lookUpAction(commentTO) ", commentId);
         console.log("lookUpAction(apiAction) ", apiActionId);
 
@@ -239,9 +240,9 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
             controller: tds.comments.controller.ActionLookUpDialogController,
             scope: scope,
             keyboard: false,
-            backdrop : 'static',
+            backdrop: 'static',
             resolve: {
-                apiAction: function() {
+                apiAction: function () {
                     return apiActionId;
                 }
             }
@@ -267,9 +268,9 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
         return result;
     };
 
-    var getTagsIds = function(tags) {
+    var getTagsIds = function (tags) {
         var tagIds = [];
-        tags.each( function(a){
+        tags.each(function (a) {
             tagIds.push(parseInt(a.id));
         })
         return tagIds;
@@ -279,16 +280,16 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
      * The following code is being injected in the current main controller scope, later is being used in the tag selector
      * by passing the reference from a re-compiled DOM, this make possible to communicate angular1 with a native JS call...
      */
-    scope.internal =  {
+    scope.internal = {
         assetSelector: {}
     };
 
-    scope.dependencyGroup =  {
-        assetSelector:{}
+    scope.dependencyGroup = {
+        assetSelector: {}
     };
 
     scope.assignments = {
-        assetSelector:{}
+        assetSelector: {}
     };
 
     scope.$on('sessionAssignmentTagSelector', function (evt, tagIds) {
@@ -307,12 +308,12 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
             };
 
             // Cases where is not: All, Remnants, Grouped
-            if(!isNaN(currentdependencyBundle)) {
+            if (!isNaN(currentdependencyBundle)) {
                 postData.depGroup = currentdependencyBundle;
             }
 
             // Partially Remove Prototype
-            if(window.Prototype) {
+            if (window.Prototype) {
                 delete Object.prototype.toJSON;
                 delete Array.prototype.toJSON;
                 delete Hash.prototype.toJSON;
@@ -445,21 +446,21 @@ tds.comments.controller.EventEditController = function ($scope, $q, commentServi
     // Get the Current Event
     $scope.moveEventInstanceId = $('.moveEventInstanceId').val();
 
-    $scope.internal =  {
+    $scope.internal = {
         // Server Selected Tag
-        assetSelector:{
+        assetSelector: {
             operator: "ANY",
             tag: []
         },
         // Current Selected Tags
-        selectedAssetSelector:{}
+        selectedAssetSelector: {}
     };
 
     // Get the List of Current Tags for this Event
     commentService.getAssetTagsForEvent($scope.moveEventInstanceId).then(
         function (response) {
             if (response && response.data && response.data.length >= 1) {
-                response.data.forEach(function(eventTag) {
+                response.data.forEach(function (eventTag) {
                     var eventId = eventTag.id;
                     var tagId = eventTag.tagId;
                     eventTag.id = tagId;
@@ -479,13 +480,17 @@ tds.comments.controller.EventEditController = function ($scope, $q, commentServi
     $scope.onSubmitEventEditForm = function (event) {
         if (!$scope.validEditEventSubmit) {
             event.preventDefault();
-            var diffNewSelection = $scope.internal.selectedAssetSelector.tag.filter((r) => !$scope.internal.assetSelector.tag.find((l) => r.id === l.id));
-            let diffDeletedSelection = $scope.internal.assetSelector.tag.filter((r) => !$scope.internal.selectedAssetSelector.tag.find((l) => r.id === l.id));
+            var diffNewSelection = $scope.internal.selectedAssetSelector.tag.filter((r) = > !$scope.internal.assetSelector.tag.find((l) = > r.id === l.id
+        ))
+            ;
+            let diffDeletedSelection = $scope.internal.assetSelector.tag.filter((r) = > !$scope.internal.selectedAssetSelector.tag.find((l) = > r.id === l.id
+        ))
+            ;
 
             var qPromises = [];
 
             // Partially Remove Prototype
-            if(window.Prototype) {
+            if (window.Prototype) {
                 delete Object.prototype.toJSON;
                 delete Array.prototype.toJSON;
                 delete Hash.prototype.toJSON;
@@ -494,22 +499,25 @@ tds.comments.controller.EventEditController = function ($scope, $q, commentServi
 
             // To Delete
             var deletedTagEventIds = [];
-            diffDeletedSelection.each( function(a){
+            diffDeletedSelection.each(function (a) {
                 deletedTagEventIds.push(parseInt(a.eventId));
             });
             if (deletedTagEventIds.length > 0) {
-                console.log({ ids: deletedTagEventIds });
-                qPromises.push(commentService.deleteAssetTagsForEvent({ ids: deletedTagEventIds }));
+                console.log({ids: deletedTagEventIds});
+                qPromises.push(commentService.deleteAssetTagsForEvent({ids: deletedTagEventIds}));
             }
 
             // To Add
             var newTagEventIds = [];
-            diffNewSelection.each( function(a){
+            diffNewSelection.each(function (a) {
                 newTagEventIds.push(parseInt(a.id));
             });
             if (newTagEventIds.length > 0) {
                 console.log({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId})
-                qPromises.push(commentService.createAssetTagsForEvent({tagIds: newTagEventIds, eventId: $scope.moveEventInstanceId}));
+                qPromises.push(commentService.createAssetTagsForEvent({
+                    tagIds: newTagEventIds,
+                    eventId: $scope.moveEventInstanceId
+                }));
             }
 
             var userDateInput = $('#kendoEstStartTime').data("kendoDateTimePicker").value();
@@ -528,7 +536,7 @@ tds.comments.controller.EventEditController = function ($scope, $q, commentServi
 
             $scope.validEditEventSubmit = true;
             if (qPromises.length > 0) {
-                $q.all(qPromises).then(function(){
+                $q.all(qPromises).then(function () {
                     $('#submitEditEventForm').click();
                 });
             } else {
@@ -597,11 +605,11 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
         $scope.$emit("editComment", commentTO);
     };
 
-    $scope.lookUpAction = function() {
+    $scope.lookUpAction = function () {
         $scope.$emit("lookUpAction", $scope.acData.assetComment.id, $scope.acData.apiAction.id);
     };
 
-    $scope.invokeAction = function() {
+    $scope.invokeAction = function () {
         commentService.invokeAction($scope.acData.assetComment.id).then(
             function (data) {
                 //showAssetCommentDialog(data)
@@ -702,7 +710,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
     /**
      * Compare the Data Signature to validate if the data has changed
      */
-    $scope.changeData = function() {
+    $scope.changeData = function () {
         let dataSignature = JSON.stringify($scope.assetDependency);
         $scope.isDirty = dataSignature !== $scope.dataSignature;
     };
@@ -711,8 +719,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
      * Execute the Delete of the Dependencies
      * @param asset
      */
-    $scope.deleteDependency = function(asset, toClose) {
-        if($scope.assetDependency[asset].dependency) {
+    $scope.deleteDependency = function (asset, toClose) {
+        if ($scope.assetDependency[asset].dependency) {
             var assetDependency = {
                 assetId: $scope.assetDependency[asset].dependency.asset.id,
                 dependencyId: $scope.assetDependency[asset].dependency.id
@@ -721,14 +729,14 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
             // To not recall the server, we just delete the dependency
             delete $scope.assetDependency[asset].dependency;
 
-            if(asset === 'assetA') {
+            if (asset === 'assetA') {
                 $scope.assetDependency['assetA'].dependency = $scope.assetDependency['assetB'].dependency;
                 delete $scope.assetDependency['assetB'].dependency;
             }
 
-            commentService.deleteDependency(assetDependency).then(function(){
+            commentService.deleteDependency(assetDependency).then(function () {
                 warningChangeGraph($scope.assetDependency[asset]);
-                if(toClose) {
+                if (toClose) {
                     $scope.close();
                 }
             });
@@ -738,7 +746,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
     /**
      * Open the Dependency Show view
      */
-    $scope.openDependencyView = function(asset){
+    $scope.openDependencyView = function (asset) {
         EntityCrud.showAssetDetailView(asset.dependencyClass.name, asset.dependency.dependent.id);
         $scope.close();
     };
@@ -746,29 +754,29 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
     /**
      * Listener to catch the Update from the Dialog
      */
-    $scope.onClickUpdate = function() {
+    $scope.onClickUpdate = function () {
         $scope.updateDependencies();
     };
 
     /**
      * Execute the Update of the Dependency
      */
-    $scope.updateDependencies = function() {
+    $scope.updateDependencies = function () {
         var qPromises = [];
 
-        if($scope.assetDependency.assetA.dependency) {
+        if ($scope.assetDependency.assetA.dependency) {
             qPromises.push(commentService.updateDependencies({
                 dependency: $scope.assetDependency.assetA.dependency
             }));
         }
 
-        if($scope.assetDependency.assetB.dependency) {
+        if ($scope.assetDependency.assetB.dependency) {
             qPromises.push(commentService.updateDependencies({
                 dependency: $scope.assetDependency.assetB.dependency
             }));
         }
 
-        $q.all(qPromises).then(function(){
+        $q.all(qPromises).then(function () {
             warningChangeGraph($scope.assetDependency.assetA);
             $scope.close();
         });
@@ -778,9 +786,9 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
      * On delete invoke the Confirmation Modal
      * @param asset
      */
-    $scope.toDeleteDependency = function(asset, toClose) {
+    $scope.toDeleteDependency = function (asset, toClose) {
         var confirmMessage = 'Are you sure you would like to delete the dependency?';
-        $scope.warningConfirmationDialog(confirmMessage, function(){
+        $scope.warningConfirmationDialog(confirmMessage, function () {
             $scope.deleteDependency(asset, toClose);
         });
     };
@@ -791,17 +799,17 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
      * @param confirmMessage
      * @param callback
      */
-    $scope.warningConfirmationDialog = function(confirmMessage, callback) {
+    $scope.warningConfirmationDialog = function (confirmMessage, callback) {
         var modalInstance = $modal.open({
             templateUrl: utils.url.applyRootPath('/components/modal/modal-confirmation-template.html'),
-            controller:  function($scope){
+            controller: function ($scope) {
                 $scope.confirmMessage = confirmMessage;
 
-                $scope.onConfirmAction = function() {
-                    $scope.$close({ confirm: true});
+                $scope.onConfirmAction = function () {
+                    $scope.$close({confirm: true});
                 };
 
-                $scope.closeConfirmation = function() {
+                $scope.closeConfirmation = function () {
                     $scope.$close();
                 };
             },
@@ -811,17 +819,18 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
         });
 
         return modalInstance.result.then(function (result) {
-            return result && result.confirm? callback() : function(){};
+            return result && result.confirm ? callback() : function () {
+            };
         });
     };
 
     /**
      * Change from View Mode into Edit Mode
      */
-    $scope.onEditDependency = function(edit) {
+    $scope.onEditDependency = function (edit) {
         $scope.actionTypeEdit = edit;
 
-        if(!edit) {
+        if (!edit) {
             $scope.assetDependency = jQuery.extend(true, {}, assetDependency);
             $scope.dataSignature = JSON.stringify($scope.assetDependency);
             $scope.isDirty = false;
@@ -832,7 +841,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
      * Let the user know that something has change
      */
     function warningChangeGraph(asset) {
-        $(document).trigger('entityAssetUpdated', { asset: { assetName: asset.name }});
+        $(document).trigger('entityAssetUpdated', {asset: {assetName: asset.name}});
     }
 
 };
@@ -858,10 +867,10 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
         $scope.ac.commentId = commentTO.commentId;
     }
 
-    if(!$scope.isEdit) {
+    if (!$scope.isEdit) {
         commentService.getLastCreatedTaskSessionParams().then(
             function (result) {
-                if(result.status) {
+                if (result.status) {
                     var preferencesEvent = result.data.preferences.TASK_CREATE_EVENT;
                     // Assign the event from the preferences only if there's any.
                     if (preferencesEvent && preferencesEvent != 'null') {
@@ -938,11 +947,11 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
         }, 50);
     });
 
-    $scope.close = function(updateSuccess) {
+    $scope.close = function (updateSuccess) {
         commentUtils.closePopup($scope, 'editComment');
 
         var updateTarget = false;
-        if(updateSuccess !== 'undefined' && updateSuccess) {
+        if (updateSuccess !== 'undefined' && updateSuccess) {
             updateTarget = updateSuccess;
         }
 
@@ -965,7 +974,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 
     $scope.deleteComment = function () {
         commentUtils.validateDelete($scope.ac.commentId, $scope.ac.assetEntity, commentService.deleteComment).then(
-            function(data) {
+            function (data) {
                 $scope.close(true);
                 $scope.$emit("commentDeleted", $scope.ac.commentId, $scope.ac.assetEntity);
             }
@@ -973,7 +982,10 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
     }
 
     $scope.checkHardAssigned = function () {
-        if ($scope.ac.assignedTo == '') { $scope.ac.hardAssigned = '0' };
+        if ($scope.ac.assignedTo == '') {
+            $scope.ac.hardAssigned = '0'
+        }
+        ;
     }
 
     $scope.updateEstFinish = function () {
@@ -1006,11 +1018,11 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
     $scope.commentInfo = []
 
     // if it's not a number skip and initialize variables
-    if(isNaN(assetTO ? assetTO.assetId : $scope.$root.selected)){
+    if (isNaN(assetTO ? assetTO.assetId : $scope.$root.selected)) {
         $scope.commentInfo.currentAsset = ''
     }
     // if it is, do the conversion with unary plus conversion (+)
-    else{
+    else {
         $scope.commentInfo.currentAsset = +(assetTO ? assetTO.assetId : $scope.$root.selected);
     }
 
@@ -1046,8 +1058,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
                         $("#currentAsset").val($scope.commentInfo.currentAsset);
                         EntityCrud.assetNameSelect2($("#currentAsset"));
                     });
-            }
-            else {
+            } else {
                 EntityCrud.assetNameSelect2($("#currentAsset"));
             }
         });
@@ -1135,7 +1146,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
                 $scope.ac.dueDate = moment($scope.ac.dueDate).format(utils.date.defaultDateFormat());
             }
             $scope.ac.id = $scope.ac.commentId;
-            $scope.ac.apiActionId = (($scope.acData.apiAction && $scope.acData.apiAction.id)? parseInt($scope.acData.apiAction.id): 0);
+            $scope.ac.apiActionId = (($scope.acData.apiAction && $scope.acData.apiAction.id) ? parseInt($scope.acData.apiAction.id) : 0);
             $scope.ac.assetEntity = $scope.commentInfo.currentAsset;
             $scope.ac.percentageComplete = $scope.acData.percentageComplete;
 
@@ -1190,12 +1201,12 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
  * Controller use to show the action lookup information
  */
 
-tds.comments.controller.ActionLookUpDialogController = function($scope, $modalInstance, $log, $timeout, commentService, alerts, apiAction, appCommonData, utils, commentUtils) {
+tds.comments.controller.ActionLookUpDialogController = function ($scope, $modalInstance, $log, $timeout, commentService, alerts, apiAction, appCommonData, utils, commentUtils) {
 
     $scope.apiAction = apiAction;
 
     $modalInstance.opened.then(function () {
-        setTimeout(function(){
+        setTimeout(function () {
             var element = angular.element('#actionLookUpDialog');
             if (!element || !element[0]) {
                 commentUtils.closePopup($scope, 'actionLookUp');
@@ -1203,7 +1214,7 @@ tds.comments.controller.ActionLookUpDialogController = function($scope, $modalIn
         }, 700);
     });
 
-    $scope.close = function() {
+    $scope.close = function () {
         commentUtils.closePopup($scope, 'actionLookUp');
     };
 };
@@ -1226,12 +1237,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
     var getClassForAsset = function (assetId) {
         var deferred = q.defer()
         if (assetId) {
-            http.get(utils.url.applyRootPath('/assetEntity/classForAsset?id=' + assetId)).
-
-            success(function (data, status, headers, config) {
+            http.get(utils.url.applyRootPath('/assetEntity/classForAsset?id=' + assetId)).success(function (data, status, headers, config) {
                 deferred.resolve(data.data.assetClass);
-            }).
-            error(function (data, status, headers, config) {
+            }).error(function (data, status, headers, config) {
                     deferred.reject(data);
                 }
             );
@@ -1245,11 +1253,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getAssetsByClass = function (assetClass) {
         var deferred = q.defer()
-        http.get(utils.url.applyRootPath('/assetEntity/assetsByClass?assetClass=' + assetClass)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/assetsByClass?assetClass=' + assetClass)).success(function (data, status, headers, config) {
             deferred.resolve(data.data)
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
                 deferred.reject(data)
             }
         );
@@ -1258,11 +1264,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getAssetClasses = function () {
         var deferred = q.defer()
-        http.get(utils.url.applyRootPath('/assetEntity/assetClasses')).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/assetClasses')).success(function (data, status, headers, config) {
             deferred.resolve(data.data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
                 deferred.reject(data);
             }
         );
@@ -1272,11 +1276,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getAssignedToList = function (forView, id) {
         var deferred = q.defer();
-        http.post(utils.url.applyRootPath('/assetEntity/updateAssignedToSelect?format=json&forView=' + forView + '&id=' + id)).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/assetEntity/updateAssignedToSelect?format=json&forView=' + forView + '&id=' + id)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1286,23 +1288,19 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
         var deferred = q.defer();
 
-        http.get(utils.url.applyRootPath('/assetEntity/isAllowToChangeStatus?id=' + commentId)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/isAllowToChangeStatus?id=' + commentId)).success(function (data, status, headers, config) {
             var disabledStr = "";
             if (!data.isAllowToChangeStatus) {
                 disabledStr = "disabled"
             }
             $("#status").prop("disabled", disabledStr);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
 
-        http.post(utils.url.applyRootPath('/assetEntity/updateStatusSelect?format=json&id=' + commentId)).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/assetEntity/updateStatusSelect?format=json&id=' + commentId)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1351,11 +1349,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getIndexValueMapper = function (category, commentId, taskId) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + category + '&commentId=' + commentId + '&taskId=' + taskId)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + category + '&commentId=' + commentId + '&taskId=' + taskId)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1382,13 +1378,15 @@ tds.comments.service.CommentService = function (utils, http, q) {
         angular.forEach(dependencies.deletedPredecessors, function (key, value) {
             if (result.length != 0) {
                 result += ','
-            };
+            }
+            ;
             result += key;
         });
         angular.forEach(dependencies.deletedSuccessors, function (key, value) {
             if (result.length != 0) {
                 result += ','
-            };
+            }
+            ;
             result += key;
         });
         return result;
@@ -1400,10 +1398,10 @@ tds.comments.service.CommentService = function (utils, http, q) {
         params.deletedPreds = createDeletedDependencies(dependencies);
         params.manageDependency = 1;
 
-        params.duration = (params.duration)? params.duration.toString() : "0";
+        params.duration = (params.duration) ? params.duration.toString() : "0";
 
         // Partially Remove Prototype
-        if(window.Prototype) {
+        if (window.Prototype) {
             delete Object.prototype.toJSON;
             delete Array.prototype.toJSON;
             delete Hash.prototype.toJSON;
@@ -1414,11 +1412,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
     var saveComment = function (params, dependencies) {
         var deferred = q.defer();
         createDependenciesParams(params, dependencies);
-        http.post(utils.url.applyRootPath('/assetEntity/saveComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'} }).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/assetEntity/saveComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'}}).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1427,11 +1423,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
     var updateComment = function (params, dependencies) {
         var deferred = q.defer();
         createDependenciesParams(params, dependencies);
-        http.post(utils.url.applyRootPath('/assetEntity/updateComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'} }).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/assetEntity/updateComment'), JSON.stringify(params), {headers: {'Content-Type': 'application/json'}}).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1439,11 +1433,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var searchComments = function (assetId, commentType) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/listComments/' + assetId + '?commentType=' + commentType)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/listComments/' + assetId + '?commentType=' + commentType)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1451,11 +1443,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getComment = function (commentId) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/showComment?id=' + commentId)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/showComment?id=' + commentId)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1463,11 +1453,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var invokeAction = function (commentId) {
         var deferred = q.defer();
-        http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/invokeLocalAction')).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/ws/task/' + commentId + '/invokeLocalAction')).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1493,11 +1481,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
             'includeDetails': includeDetails
         });
         var deferred = q.defer();
-        http.post(utils.url.applyRootPath('/task/genActionBarForShowViewJson'), params).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/task/genActionBarForShowViewJson'), params).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1505,11 +1491,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var predecessorTableHtml = function (commentId) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/predecessorTableHtml?commentId=' + commentId)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/predecessorTableHtml?commentId=' + commentId)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1517,11 +1501,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var successorTableHtml = function (commentId) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/successorTableHtml?commentId=' + commentId)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/successorTableHtml?commentId=' + commentId)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1529,11 +1511,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getLastCreatedTaskSessionParams = function () {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/ws/task/taskCreateDefaults')).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/ws/task/taskCreateDefaults')).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1541,11 +1521,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getDependencies = function (category, commentId, forWhom, moveEvent) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/predecessorSelectHtml?format=json&category=' + category + '&commentId=' + commentId + '&forWhom=' + forWhom + '&moveEvent=' + moveEvent)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/predecessorSelectHtml?format=json&category=' + category + '&commentId=' + commentId + '&forWhom=' + forWhom + '&moveEvent=' + moveEvent)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1557,11 +1535,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
             'assetEntity': assetId
         });
         var deferred = q.defer();
-        http.post(utils.url.applyRootPath('/assetEntity/deleteComment'), params).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/assetEntity/deleteComment'), params).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1574,11 +1550,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
             'currentStatus': currentStatus
         });
         var deferred = q.defer();
-        http.post(utils.url.applyRootPath('/task/update'), params).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/task/update'), params).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1590,11 +1564,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
             'status': status
         });
         var deferred = q.defer();
-        http.post(utils.url.applyRootPath('/task/assignToMe'), params).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/task/assignToMe'), params).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1606,11 +1578,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
             'day': day
         });
         var deferred = q.defer();
-        http.post(utils.url.applyRootPath('/task/changeEstTime'), params).
-        success(function (data, status, headers, config) {
+        http.post(utils.url.applyRootPath('/task/changeEstTime'), params).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1618,11 +1588,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getStaffRoles = function () {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/task/retrieveStaffRoles')).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/task/retrieveStaffRoles')).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1630,11 +1598,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getAssetsByType = function (assetType) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/retrieveAssetsByType?assetType=' + assetType)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/retrieveAssetsByType?assetType=' + assetType)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1642,11 +1608,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var setShowAllPreference = function (selected) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/setShowAllPreference?selected=' + selected)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/setShowAllPreference?selected=' + selected)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1654,11 +1618,9 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var setViewUnpublishedPreference = function (viewUnpublished) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/assetEntity/setViewUnpublishedPreference?viewUnpublished=' + viewUnpublished)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/assetEntity/setViewUnpublishedPreference?viewUnpublished=' + viewUnpublished)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1666,112 +1628,98 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
     var getAssetById = function (id) {
         var deferred = q.defer();
-        http.get(utils.url.applyRootPath('/ws/asset/' + id)).
-        success(function (data, status, headers, config) {
+        http.get(utils.url.applyRootPath('/ws/asset/' + id)).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
     };
 
-    var deleteDependency = function(assetDependency){
+    var deleteDependency = function (assetDependency) {
         var deferred = q.defer();
         http({
             method: 'DELETE',
             url: utils.url.applyRootPath('/ws/asset/dependencies'),
             data: JSON.stringify(assetDependency),
-            headers: { "Content-Type": "application/json"}
-        }).
-        success(function (data, status, headers, config) {
+            headers: {"Content-Type": "application/json"}
+        }).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
     };
 
-    var updateDependencies = function(dependencies) {
+    var updateDependencies = function (dependencies) {
         var deferred = q.defer();
         http({
             method: 'PUT',
             url: utils.url.applyRootPath('/ws/asset/dependencies'),
             data: JSON.stringify(dependencies),
-            headers: { "Content-Type": "application/json"}
-        }).
-        success(function (data, status, headers, config) {
+            headers: {"Content-Type": "application/json"}
+        }).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
     };
 
-    var filteredAssetList = function(filterValues) {
+    var filteredAssetList = function (filterValues) {
         var deferred = q.defer();
         http({
             method: 'POST',
             url: utils.url.applyRootPath('/ws/depAnalyzer/filteredAssetList'),
             data: JSON.stringify(filterValues),
-            headers: { "Content-Type": "application/json"}
-        }).
-        success(function (data, status, headers, config) {
+            headers: {"Content-Type": "application/json"}
+        }).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
     };
 
-    var getAssetTagsForEvent = function(tagId) {
+    var getAssetTagsForEvent = function (tagId) {
         var deferred = q.defer();
         http({
             method: 'GET',
             url: utils.url.applyRootPath('/ws/tag/event/' + tagId),
-            headers: { "Content-Type": "application/json"}
-        }).
-        success(function (data, status, headers, config) {
+            headers: {"Content-Type": "application/json"}
+        }).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
     };
 
-    var deleteAssetTagsForEvent = function(tagEventIds) {
+    var deleteAssetTagsForEvent = function (tagEventIds) {
         var deferred = q.defer();
         http({
             method: 'DELETE',
             url: utils.url.applyRootPath('/ws/tag/event/'),
             data: JSON.stringify(tagEventIds),
-            headers: { "Content-Type": "application/json"}
-        }).
-        success(function (data, status, headers, config) {
+            headers: {"Content-Type": "application/json"}
+        }).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
     };
 
-    var createAssetTagsForEvent = function(tagIds) {
+    var createAssetTagsForEvent = function (tagIds) {
         var deferred = q.defer();
         http({
             method: 'POST',
             url: utils.url.applyRootPath('/ws/tag/event/'),
             data: JSON.stringify(tagIds),
-            headers: { "Content-Type": "application/json"}
-        }).
-        success(function (data, status, headers, config) {
+            headers: {"Content-Type": "application/json"}
+        }).success(function (data, status, headers, config) {
             deferred.resolve(data);
-        }).
-        error(function (data, status, headers, config) {
+        }).error(function (data, status, headers, config) {
             deferred.reject(data);
         });
         return deferred.promise;
@@ -1823,8 +1771,8 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
         if (!scope.closed) {
             try {
                 scope.$close('close');
+            } catch (err) {
             }
-            catch (err) { }
 
             scope.$emit('popupClosed', type);
             scope.closed = true;
@@ -2048,8 +1996,8 @@ tds.comments.directive.AssignedToSelect = function (commentService, alerts, util
             };
             commentService.getAssignedToList('', scope.commentId).then(
                 function (data) {
-                    var unassigned = { "id": "0", "nameRole": "Unassigned" };
-                    var auto = { "id": "AUTO", "nameRole": "Automatic" };
+                    var unassigned = {"id": "0", "nameRole": "Unassigned"};
+                    var auto = {"id": "AUTO", "nameRole": "Automatic"};
                     var roles = data.data;
 
                     roles.push(auto);
@@ -2137,8 +2085,8 @@ tds.comments.directive.StaffRoles = function (commentService, alerts, utils) {
             };
             commentService.getStaffRoles().then(
                 function (data) {
-                    var unassigned = { "id": "", "description": "Unassigned" };
-                    var auto = { "id": "AUTO", "description": "Automatic" };
+                    var unassigned = {"id": "", "description": "Unassigned"};
+                    var auto = {"id": "AUTO", "description": "Automatic"};
                     var roles = data.data;
 
                     roles.push(auto);
@@ -2297,7 +2245,8 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
                             commentService.getIndexValueMapper(dependency.category, scope.commentId, options.value).then(
                                 function (data) {
                                     options.success(data.data);
-                                }, function (data) { }
+                                }, function (data) {
+                                }
                             );
                         }
                     },
@@ -2305,7 +2254,7 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
                     autoWidth: true,
                     dataSource: {
                         transport: {
-                            read: utils.url.applyRootPath('/assetEntity/tasksSearch?commentId=' + scope.commentId  + '&moveEvent=' + scope.moveEvent),
+                            read: utils.url.applyRootPath('/assetEntity/tasksSearch?commentId=' + scope.commentId + '&moveEvent=' + scope.moveEvent),
                             type: "get",
                             dataType: "json",
                             cache: true
@@ -2348,7 +2297,8 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
                                     commentService.getIndexValueMapper(dependency.category, scope.commentId, options.value).then(
                                         function (data) {
                                             options.success(data.data);
-                                        }, function (data) { }
+                                        }, function (data) {
+                                        }
                                     );
                                 } else if (!ds.loadedDataSource) {
                                     ds.loadedDataSource = true;
@@ -2555,7 +2505,7 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
                 window.open(utils.url.applyRootPath('/task/taskGraph?neighborhoodTaskId=' + scope.comment.commentId), '_blank');
             };
 
-            scope.invokeAction = function(button) {
+            scope.invokeAction = function (button) {
                 updateStatus(true);
                 commentService.invokeAction(scope.comment.commentId).then(
                     function (data) {
@@ -2568,7 +2518,7 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
                 );
             };
 
-            scope.resetAction = function(button) {
+            scope.resetAction = function (button) {
                 updateStatus(true);
                 commentService.resetAction(scope.comment.commentId).then(
                     function (data) {
@@ -2718,7 +2668,7 @@ tds.comments.directive.ActionBarCell = function (commentService, alerts, utils, 
                         if (content) {
                             showContent(content[1]);
                         } else {
-                            http.get(templateUrl, { cache: templateCache }).then(
+                            http.get(templateUrl, {cache: templateCache}).then(
                                 function (data) {
                                     var content = templateCache.get(templateUrl);
                                     showContent(content[1]);
@@ -2737,8 +2687,8 @@ tds.comments.directive.ActionBarCell = function (commentService, alerts, utils, 
                     timerBar.Pause();
                 windowTimedUpdate.pause();
                 var row = angular.element('#' + scope.rowPrefix + scope.commentId);
-                compile(content)(scope, function(newRow) {
-                    if(row.next().find('.statusButtonBar').length == 0) {
+                compile(content)(scope, function (newRow) {
+                    if (row.next().find('.statusButtonBar').length == 0) {
                         row.after(newRow);
                         scope.configTable[scope.commentId] = {
                             "id": scope.commentId,
@@ -2746,7 +2696,7 @@ tds.comments.directive.ActionBarCell = function (commentService, alerts, utils, 
                         }
                         scope.loading = false;
                     }
-                    setTimeout(function(){
+                    setTimeout(function () {
                         $('[data-toggle="popover"]').popover();
                     }, 2800);
                 });
@@ -2791,7 +2741,7 @@ tds.comments.directive.CommentInnerList = function (commentService, alerts, util
             var refreshView = function () {
                 commentService.searchComments(scope.assetId, '').then(
                     function (data) {
-                        scope.comments = (data.status !== 'error')? data: [];
+                        scope.comments = (data.status !== 'error') ? data : [];
                     },
                     function (data) {
                         alerts.showGenericMsg();
@@ -2885,7 +2835,6 @@ tds.comments.module.directive('staffRoles', ['commentService', 'alerts', 'utils'
 tds.comments.module.directive('assetsByType', ['appCommonData', 'commentService', 'alerts', 'utils', tds.comments.directive.AssetsByType]);
 tds.comments.module.directive('commentInnerList', ['commentService', 'alerts', 'utils', 'commentUtils', tds.comments.directive.CommentInnerList]);
 tds.comments.module.directive('gridButtons', ['utils', 'commentUtils', tds.comments.directive.GridButtons]);
-
 
 
 /***************************
