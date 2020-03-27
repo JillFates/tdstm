@@ -420,14 +420,13 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 
 	protected reset(): void {
 		this.isEditing = false;
-		this.sortable = {mode: 'single'};
+		localStorage.setItem('formDirty', 'false');
+		this.sortable = { mode: 'single' };
 		this.isFilterDisabled = false;
-		this.state.sort = [
-			{
-				dir: 'asc',
-				field: 'order',
-			},
-		];
+		this.state.sort = [{
+			dir: 'asc',
+			field: 'order'
+		}];
 		this.resetValidationFlags();
 		this.applyFilter();
 	}
@@ -786,6 +785,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	protected setIsDirty(value: boolean):
 		void {
 		this.isDirty = value;
+		const val = this.formHasError === null && value;
+		localStorage.setItem('formDirty', val.toString());
 	}
 
 	/**

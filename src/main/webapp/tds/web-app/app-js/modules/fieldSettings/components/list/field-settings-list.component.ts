@@ -81,7 +81,6 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 			}
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
-				console.log(event);
 				this.domains = this.lastSnapshot.data['fields'];
 				if (this.domains.length > 0) {
 					this.selectedTab = this.domains[0].domain;
@@ -191,6 +190,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 				if (confirmation) {
 					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 						this.refresh();
+						localStorage.setItem('formDirty', 'false');
 					} else {
 						callback.failure();
 					}

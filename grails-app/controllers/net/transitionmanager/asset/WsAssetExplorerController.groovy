@@ -1,4 +1,7 @@
 package net.transitionmanager.asset
+
+import com.tdsops.common.security.spring.HasPermission
+
 /**
  * Created by David Ontiveros
  */
@@ -9,6 +12,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewCrudCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.imports.Dataview
@@ -16,6 +20,9 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.SecurityService
+import org.apache.commons.lang3.BooleanUtils
 import org.grails.web.json.JSONObject
 
 /**
@@ -32,31 +39,75 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	DataviewService dataviewService
 	UserPreferenceService userPreferenceService
 
-	// TODO: JPM 11/2017 - Need to add Permissions on ALL methods
-	// TODO: JPM 11/2017 - Methods do NOT need try/catches
-
 	/**
 	 * Returns the list of available dataviews as a map(json) result.
 	 * All Dataviews returned belong to current user project in session.
      *
 	 * @return
 	 */
+	@HasPermission(Permission.UserGeneralAccess)
     def listDataviews() {
 		Person currentPerson = securityService.loadCurrentPerson()
 		Project currentProject = securityService.userCurrentProject
 		List<Dataview> dataviews = dataviewService.list(currentPerson, currentProject)
-		List<Map> listMap = dataviews*.toMap(currentPerson.id).sort{a, b -> a.name?.compareToIgnoreCase b.name}
+		List<Map> listMap = dataviews*.toMap(currentProject, currentPerson).sort{a, b -> a.name?.compareToIgnoreCase b.name}
 		renderSuccessJson(listMap)
 	}
 
 	/**
 	 * Returns an specific Dataview as a map(json) result.
-	 * @param id to search by.
-	 * @return
+	 * @param id - the id of the dataview to return
+	 * @param _override - when present for the request for a system view that has an overridden version, this flag is
+	 * used to indicate to return the underlying system view instead of the overridden version.
+	 * @return the dataView specification and the saveOptions based on the user's permissions and the view being accessedhom
 	 */
+	@HasPermission(Permission.UserGeneralAccess)
 	def getDataview(Integer id) {
-		Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
-		renderSuccessJson([dataView: dataviewMap])
+		Person whom = currentPerson()
+		Project project = projectForWs
+
+		Dataview dataview = dataviewService.fetch(project, whom, id, shouldShowOverridenView())
+		Map saveOptions = dataviewService.generateSaveOptions(project, whom, dataview)
+		Map dataviewMap = dataview.toMap( project, whom )
+
+		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
+	}
+
+	/**
+	 * Used to retrieve the save and saveAs options for a given dataview or when creating a new dataview (no ID passed)
+	 * @param id - the dataview ID get the save options for or null to get the save options for a new dataview
+	 * @return JSON structure for saveOptions
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def saveOptions(Integer id) {
+		Dataview dataview
+		Person whom = currentPerson()
+		Project project = projectForWs
+
+		if (id) {
+			dataview = dataviewService.fetch(project, whom, id, shouldShowOverridenView())
+		}
+
+		renderAsJson( saveOptions: dataviewService.generateSaveOptions(project, whom, dataview) )
+	}
+
+	/**
+	 * Used to determine if the getDataview request stipulated to NOT override the view, hence return the default system view
+	 * The _override=0 parameter indicates that when referencing a system view that has been overridden, that the
+	 * actual system view should be returned instead.
+	 * @return true if the _override parameter is not present
+	 */
+	private Boolean shouldShowOverridenView() {
+		final String overrideParamName = '_override'
+		// The _override parameter indicates that when referencing an overridden system view, that the overridden view
+		// should be the one to return
+		boolean override = true
+
+		if ( params.containsKey(overrideParamName) ) {
+			override = BooleanUtils.toBoolean( params[overrideParamName] )
+		}
+
+		return override
 	}
 
 	/**
@@ -65,12 +116,13 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * appropriately.
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.AssetExplorerEdit)
 	def updateDataview(Integer id) {
-		Person currentPerson = securityService.loadCurrentPerson()
-		Project currentProject = securityService.userCurrentProject
-
-		Map dataviewMap = dataviewService.update(currentPerson, currentProject, id, request.JSON).toMap(securityService.currentPersonId)
+		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
+		validateCommandObject(command)
+		Project project = projectForWs
+		Person whom = currentPerson()
+		Map dataviewMap = dataviewService.update(project, whom, id, command).toMap(project, whom)
 		renderSuccessJson([dataView: dataviewMap])
 	}
 
@@ -78,16 +130,18 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * Create an Asset Dataview for Asset Explorer ('Save As' action on Asset Explorer)
 	 * The service method will check for permissions AssetExplorerSystemCreate or AssetExplorerCreate
 	 * appropriately.
-	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
+	 * @return status:200 json{ "status": "success"/"fail", "data": { "dataview:Object", "saveOptions":Object } }
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.AssetExplorerCreate)
 	def createDataview() {
-		JSONObject dataviewJson = request.JSON
-		Person person = securityService.loadCurrentPerson()
-		Project project = dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
-
-		Map dataviewMap = dataviewService.create(person, project, dataviewJson).toMap(securityService.currentPersonId)
-		renderSuccessJson([dataView: dataviewMap])
+		DataviewCrudCommand command = populateCommandObject(DataviewCrudCommand)
+		validateCommandObject(command)
+		Project project = projectForWs
+		Person whom = currentPerson()
+		Dataview dataview = dataviewService.create(project, whom, command)
+		Map dataviewMap = dataview.toMap(project, whom)
+		Map saveOptions = dataviewService.generateSaveOptions(project, whom, dataview)
+		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
 	}
 
 	/**
@@ -96,9 +150,9 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * appropriately.
 	 * @return status:200 json{ "status": "success"/"fail", "data": "dataview:Object"}
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.AssetExplorerDelete)
 	def deleteDataview(Integer id) {
-		dataviewService.delete(id)
+		dataviewService.delete(projectForWs, currentPerson(), id)
 		renderSuccessJson([status: DELETE_OK_STATUS] )
 	}
 
@@ -155,15 +209,17 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
      *	]
      *
      */
-    @Secured('isAuthenticated()')
+	@HasPermission(Permission.UserGeneralAccess)
     def query(Long id, DataviewUserParamsCommand userParams) {
-        Project project = securityService.userCurrentProject
 
 		if (userParams.hasErrors()) {
 			renderErrorJson('User filtering was invalid')
 			return
 		}
 
+		Project project = projectForWs
+
+		// TODO : JPM 02/20202 : The query logic should validate the user is accessing a vaild dataview (what about overrides too?)
 		Dataview dataview = Dataview.get(id)
 		if (!dataview) {
 			renderErrorJson('Dataview invalid')
@@ -209,7 +265,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
      * Response:
      * 	  @see query
      */
-    @Secured('isAuthenticated()')
+	@HasPermission(Permission.UserGeneralAccess)
     def previewQuery(DataviewUserParamsCommand userParams) {
 
         if (userParams.validate()){
@@ -225,50 +281,29 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	/**
 	 * Retrieve the list of favorite views for the current user.
 	 */
-	@Secured("isAuthenticated()")
+	@HasPermission(Permission.UserGeneralAccess)
 	def favoriteDataviews() {
-		//try{
-            Person person = securityService.getUserLoginPerson()
-			def favorites = dataviewService.getFavorites(person)
-			renderSuccessJson(favorites)
-		//} catch (Exception e) {
-		//	renderErrorJson(e.getMessage())
-		//}
-
+		Person person = securityService.getUserLoginPerson()
+		def favorites = dataviewService.getFavorites(person)
+		renderSuccessJson(favorites)
 	}
 
 	/**
 	 * Favorite the given view.
 	 */
-	@Secured("isAuthenticated()")
+	@HasPermission(Permission.UserGeneralAccess)
 	def addFavoriteDataview(Long id) {
-		try{
-            Person person = securityService.getUserLoginPerson()
-            Project currentProject = securityService.getUserCurrentProject()
-
-			dataviewService.addFavoriteDataview(person, currentProject, id)
-			renderSuccessJson("Dataview ${id} favorited")
-		} catch (Exception e) {
-			renderErrorJson(e.getMessage())
-		}
-
+		dataviewService.addFavoriteDataview(projectForWs, currentPerson(), id)
+		renderSuccessJson("Dataview ${id} favorited")
 	}
 
 	/**
 	 * Delete the view from the person's favorite.
 	 */
-	@Secured("isAuthenticated()")
+	@HasPermission(Permission.UserGeneralAccess)
 	def deleteFavoriteDataview(Long id) {
-		try{
-            Person person = securityService.getUserLoginPerson()
-            Project currentProject = securityService.getUserCurrentProject()
-
-			dataviewService.deleteFavoriteDataview(person, currentProject, id)
-			renderSuccessJson("Dataview ${id} removed from the person's favorites.")
-		} catch (Exception e) {
-			renderErrorJson(e.getMessage())
-		}
-
+		dataviewService.deleteFavoriteDataview(projectForWs, currentPerson(), id)
+		renderSuccessJson("Dataview ${id} removed from the person's favorites.")
 	}
 
 	/**
@@ -281,7 +316,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * endpoint is invoked. If the name hasn't changed, it would report the name as not unique.
 	 * The parameters are encapsulated inside the DataviewNameValidationCommand.
 	 */
-	@Secured('isAuthenticated()')
+	@HasPermission(Permission.UserGeneralAccess)
 	def validateUniqueName () {
 		DataviewNameValidationCommand cmd = populateCommandObject(DataviewNameValidationCommand, false)
 		boolean isUnique = dataviewService.validateUniqueName(cmd)

@@ -384,6 +384,7 @@
 			type:'POST',
 			success: function(data) {
 				if (typeof data.error !== 'undefined') {
+					alert(data.error);
 				} else {
 					$('#myTaskList').html(data);
 					$('#showStatusId_'+objId).show();
