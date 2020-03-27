@@ -233,9 +233,11 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (event) {
 			this.assetId = event.id;
 			this.selectedAsset = event;
-			this.form.controls['assetClass'].markAsDirty();
 			this.loadData();
+		} else {
+			this.selectedAsset = {id: '', text: ''};
 		}
+		this.form.controls['assetClass'].markAsDirty();
 	}
 
 	/**
