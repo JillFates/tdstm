@@ -45,7 +45,7 @@
 								type="button" id="btnSave"
 						[disabled]="!isSaveAvailable() || !isValid()"
 				 		class="btn"
-						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+						[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success': (isValid() && isDirty() && isSaveAvailable())}"
 						(click)="onSave()">
 							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
 				</button>

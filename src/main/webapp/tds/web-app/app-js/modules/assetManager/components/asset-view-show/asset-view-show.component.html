@@ -5,7 +5,7 @@
                 <tds-button-save
                         [title]="config.canSaveAs && !config.canSave? translateService.transform('GLOBAL.SAVE_AS') : translateService.transform('GLOBAL.SAVE')"
                         (click)="save(config.saveButtonId)"
-                        [ngClass]="{'btn-default':!config.isDirty,'btn-success':config.isDirty}"
+                        [ngClass]="{'btn-default':!config.isDirty,'btn-success': (config.isDirty && !config.disableSaveButton)}"
                         [disabled] = "config.disableSaveButton"
                         [attr.id]="config.saveButtonId">
                 </tds-button-save>
