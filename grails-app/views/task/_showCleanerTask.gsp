@@ -106,7 +106,7 @@
 			</tr>
 			<tr>
 			<g:if test="${assetComment.assetEntity}">
-		   		  <td>Asset:</td><td style="">&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</td>
+		   		  <td>Asset:</td><td style="width: 1%">&nbsp;${HtmlUtil.escape(assetComment?.assetEntity.assetName)}</td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">
