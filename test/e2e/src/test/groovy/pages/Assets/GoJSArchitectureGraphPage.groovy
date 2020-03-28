@@ -9,7 +9,7 @@ class GoJSArchitectureGraphPage extends Page {
     static at = {
         architecturePageTitle.text().trim()  == "Architecture Graph"
         architecturePageBreadcrumbs[0].text()   == "Assets"
-        architecturePageBreadcrumbs[1].text()   == "Go JS Architecture Graph"
+        architecturePageBreadcrumbs[1].text()   == "GoJS Architecture Graph"
 
     }
 

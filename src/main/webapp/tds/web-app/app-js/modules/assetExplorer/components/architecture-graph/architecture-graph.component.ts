@@ -461,13 +461,10 @@ export class ArchitectureGraphComponent implements OnInit {
 	savePreferences() {
 		const valueData = {
 			assetClass: this.assetClass,
-			assetName: 'text1',
 			levelsUp: this.levelsUp,
 			levelsDown: this.levelsDown,
 			showCycles: this.showCycles,
 			selectedAsset: this.selectedAsset,
-			// appLbl: this.categories.length > 0
-			// assetClass: this.assetId || 'ALL',
 		};
 
 		const selectedLabels = this.getSelectedCategories()

@@ -276,7 +276,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'ARCHITECTURE': {
 		'ARCHITECTURE_GRAPH': 'Architecture Graph',
-		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'GoJS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
