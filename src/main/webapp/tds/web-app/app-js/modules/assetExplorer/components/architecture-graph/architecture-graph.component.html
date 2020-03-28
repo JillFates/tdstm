@@ -29,7 +29,7 @@
 						<p class="asset-title">{{'ARCHITECTURE.SELECT_AN_ASSET' | translate}}</p>
 						<tds-combobox
 								name="asset"
-								[(model)]="asset"
+								[(model)]="selectedAsset"
 								[(metaParam)]="assetClass.id"
 								[required]="false"
 								(valueChange)="onAssetSelected($event)"

@@ -185,9 +185,10 @@ export class ArchitectureGraphComponent implements OnInit {
 				this.labelOffset = res.graphPrefs.labelOffset;
 				this.assetClasses = res.graphPrefs.assetClasses;
 				// this.assetId = res.graphPrefs.assetClass;
-				this.asset = res.graphPrefs.selectedAsset;
+				// this.asset = res.graphPrefs.selectedAsset;
+				this.selectedAsset = res.graphPrefs.selectedAsset;
 				this.assetClass = res.graphPrefs.assetClass;
-				this.assetId = this.asset && this.asset.id || '';
+				this.assetId = this.selectedAsset && this.selectedAsset.id || '';
 				this.loadData();
 
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
@@ -236,13 +237,13 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (event) {
 			this.assetId = event.id;
 			this.selectedAsset = event;
-			this.asset = event;
+			// this.asset = event;
 			this.loadData();
 		} else {
 			// reset assets selected
 			this.assetId = null;
 			this.selectedAsset = {id: '', text: ''};
-			this.asset = this.selectedAsset;
+			// this.asset = this.selectedAsset;
 		}
 		this.form.controls['assetClass'].markAsDirty();
 	}
@@ -262,10 +263,14 @@ export class ArchitectureGraphComponent implements OnInit {
 					if (setInitialAsset && res && res.nodes) {
 						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
 						if (selectedAsset) {
-							this.asset = {
+							this.selectedAsset = {
 								id: selectedAsset.id,
 								text: selectedAsset.name,
 							};
+							// this.asset = {
+							// 	id: selectedAsset.id,
+							// 	text: selectedAsset.name,
+							// };
 						}
 					}
 				});
