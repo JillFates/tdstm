@@ -187,6 +187,8 @@ export class ArchitectureGraphComponent implements OnInit {
 				// this.assetId = res.graphPrefs.assetClass;
 				this.asset = res.graphPrefs.selectedAsset;
 				this.assetClass = res.graphPrefs.assetClass;
+				this.assetId = this.asset && this.asset.id || '';
+				this.loadData();
 
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_DATABASE);
