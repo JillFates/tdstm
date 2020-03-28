@@ -9,7 +9,11 @@
 		</div>
 		<div class="graph-main-container">
 			<div class="left-container">
-				<form class="graph-control-panel-gojs graphPanel"  role="form" name="archGraphForm"  #archGraphForm='ngForm' *ngIf="showControlPanel">
+				<form class="graph-control-panel-gojs graphPanel"
+					  role="form"
+					  name="archGraphForm"
+					  #archGraphForm='ngForm'
+					  [ngClass]="{'is-hidden': !showControlPanel}">
 					<div>
 						<p class="filter-title">{{'ARCHITECTURE.FILTER_LABELS' | translate}}</p>
 						<kendo-dropdownlist
@@ -108,7 +112,7 @@
 				</div>
 			</div>
 			<div class="right-container">
-				<div class="container architecture-graph-container">
+				<div class="container architecture-graph-container" [ngClass]="{'is-hidden': !assetId}">
 					<tds-lib-diagram-layout
 							[data]="data$ | async"
 							[layout]="diagramLayout$ | async"

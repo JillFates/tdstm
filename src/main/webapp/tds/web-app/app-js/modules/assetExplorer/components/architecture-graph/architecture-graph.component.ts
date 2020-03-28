@@ -230,14 +230,19 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	/**
 	 *  Sets the selected asset ID for retrieving it's graph data
+	 *  When asset is cleared out reset the current assets selected
 	 */
 	onAssetSelected(event) {
 		if (event) {
 			this.assetId = event.id;
 			this.selectedAsset = event;
+			this.asset = event;
 			this.loadData();
 		} else {
+			// reset assets selected
+			this.assetId = null;
 			this.selectedAsset = {id: '', text: ''};
+			this.asset = this.selectedAsset;
 		}
 		this.form.controls['assetClass'].markAsDirty();
 	}
