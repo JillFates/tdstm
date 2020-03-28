@@ -34,7 +34,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 	public datasource: any[] = [{id: '', text: ''}];
-	public showControlPanel = false;
+	public showControlPanel = true;
 	public data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	public ctxOpts:  ITdsContextMenuOption;
 	public diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
