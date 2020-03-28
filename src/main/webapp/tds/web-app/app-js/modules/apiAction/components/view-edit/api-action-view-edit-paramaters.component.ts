@@ -43,7 +43,7 @@ import { NgForm } from '@angular/forms';
                             <div class="action-button btn-link">
                                 <clr-dropdown *ngIf="dataItem?.required === 0  || dataItem?.required === false">
 									<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-									<clr-dropdown-menu [clrPosition]="rowIndex+1 === parameterList.length-1 ? 'right-top':'bottom-left'" *clrIfOpen>
+									<clr-dropdown-menu [clrPosition]="determinePositionClrDropdown(rowIndex, parameterList)" *clrIfOpen>
                                         <a clrDropdownItem (click)="onDeleteParameter($event, dataItem)">Delete</a>
                                     </clr-dropdown-menu>
                                 </clr-dropdown>
@@ -190,6 +190,14 @@ export class ApiActionViewEditParamatersComponent {
 		}
 	];
 	isFormValid = true;
+
+	/**
+	 * determines the position of the clr dropdown
+	 * **/
+	determinePositionClrDropdown(rowIndex, parameterList): string {
+		return rowIndex+1 === parameterList.length-1 ? 'right-top':'bottom-left'
+	}
+
 
 	/**
 	 * Add a new argument to the list of parameters and refresh the list.
