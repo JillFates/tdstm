@@ -132,15 +132,22 @@ class HttpProducerService {
      * @param actionRequest - the action request
      * @return the ApiActionResponse
      */
-    ApiActionResponse executeCall(ActionRequest actionRequest) {
+    ApiActionResponse executeCall(ReactionScriptInvocationParams invocationParams) {
+
+        HttpResponse httpResponse
+
         try {
-            return reaction(invokeActionRequest(actionRequest))
+            httpResponse = invokeActionRequest(invocationParams.actionRequest)
         } catch (Throwable throwable) {
+
             log.error('Error when executing HTTP request. {}', ExceptionUtil.stackTraceToString(throwable))
             String errorMessage = translateHttpException(throwable)
 
+            reactionForApiActionResponseNotSuccessful(invocationParams)
             return new ApiActionResponse(error: errorMessage,stderr: errorMessage, successful: false).asImmutable()
         }
+
+        return handleReactionScripts(httpResponse, invocationParams)
     }
 
     /**
@@ -148,29 +155,43 @@ class HttpProducerService {
      * explore and process accordingly
      *
      * @param httpResponse - the HttpResponse produced by the HTTPClient
+     * @param invocationParams - an instance of {@link ReactionScriptInvocationParams}
      * @return the ApiActionResponse as immutable
      */
-    ApiActionResponse reaction(HttpResponse httpResponse) {
+    @Transactional(noRollbackFor = [Throwable])
+    ApiActionResponse handleReactionScripts(HttpResponse httpResponse, ReactionScriptInvocationParams invocationParams) {
 
         if (!httpResponse) {
             throw new RuntimeException('Server response is null, please contact system administrator for support.')
         }
 
-        // retrieve from ThreadLocal and prepare objects needed to attend the reaction
-        ActionRequest actionRequest = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST)
-        TaskFacade taskFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.TASK_FACADE)
-        JSONObject reactionScripts = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
-        AssetFacade assetFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ASSET_FACADE)
-        ApiActionJob apiActionJob = new ApiActionJob()
+        // constructs ApiActionResponse object
+        invocationParams.apiActionResponse = creatActionResponseFromHttpResponse(httpResponse, invocationParams)
+
+        // if there is a task facade and reaction scripts, process and execute them accordingly
+        if (invocationParams.taskFacade && invocationParams.reactionScriptsMap.size() > 0) {
+            reactionForApiActionResponseSuccessful(invocationParams)
+        }
+
+        return invocationParams.apiActionResponse
+    }
+
+    /**
+     * After invoke HTTP request using {@link HttpProducerService#invokeActionRequest(net.transitionmanager.integration.ActionRequest)}
+     * an instance of {@link HttpResponse} is used for create an an instance of {@link ApiActionResponse}.
+     *
+     * @param httpResponse - an instance of {@link HttpResponse}
+     * @param invocationParams - an instance of {@link ReactionScriptInvocationParams}
+     * @return an an instance of {@link ApiActionResponse}
+     */
+    private ApiActionResponse creatActionResponseFromHttpResponse(HttpResponse httpResponse, ReactionScriptInvocationParams invocationParams) {
+
+        ApiActionResponse apiActionResponse = new ApiActionResponse()
 
         // obtain content type from httpResponse headers
         String contentType = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE)?.value as String
-
         // obtain response temporary filename from httpResponse headers
         String tmpResponseFilename = httpResponse.getFirstHeader(DEFAULT_TDSTM_TMP_RESPONSE_FILENAME_HEADER)?.value as String
-
-        // constructs ApiActionResponse object
-        ApiActionResponse apiActionResponse = new ApiActionResponse()
 
         // pull headers from HttpResponse and populate ApiActionResponse headers
         HeaderIterator headerIterator = httpResponse.headerIterator()
@@ -200,7 +221,7 @@ class HttpProducerService {
             apiActionResponse.data = null
         } else {
             InputStream is = httpResponse?.entity?.content
-            if (actionRequest.options.producesData == 1) {
+            if (invocationParams.actionRequest.options.producesData == 1) {
                 // if the api action call produces data, it means that a file is being downloaded
                 // and therefore it requires to be saved into the file system
                 String originalFilename = getFilenameFromHeaders(apiActionResponse.headers, contentType)
@@ -215,33 +236,15 @@ class HttpProducerService {
             }
         }
 
-        // if there is a task facade and reaction scripts, process and execute them accordingly
-        if (taskFacade && reactionScripts) {
-
-            ReactionScriptInvocationParams invocationParams = new ReactionScriptInvocationParams(reactionScripts, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
-
-            if (apiActionResponse.successful) {
-                reactionForApiActionResponseSuccessful(invocationParams, assetFacade)
-            } else {
-                // execute FAILED or DEFAULT scripts if present when call to endpoint was not successful
-                // Network error, Timeout, Bad credentials, etc...
-                reactionForApiActionResponseNotSuccessful(invocationParams, assetFacade)
-            }
-
-            // finalize STATUS branch when it succeeded
-            apiActionService.invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
-        }
-
-        ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
         return apiActionResponse.asImmutable()
     }
 
     /**
+     * Invoke STATUS reaction script when HTTP request did not fail.
      *
-     * @param invocationParams
-     * @param assetFacade
+     * @param invocationParams an instance of {@link ReactionScriptInvocationParams}
      */
-    private void reactionForApiActionResponseSuccessful(ReactionScriptInvocationParams invocationParams, AssetFacade assetFacade) {
+    private void reactionForApiActionResponseSuccessful(ReactionScriptInvocationParams invocationParams) {
 
         Map<String, ?> resultsForSTATUS = apiActionService.invokeReactionScript(ReactionScriptCode.STATUS, invocationParams)
         log.debug('{} script execution result: {}', ReactionScriptCode.STATUS, resultsForSTATUS)
@@ -252,18 +255,18 @@ class HttpProducerService {
             if (apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, invocationParams).isEmpty()){
                 apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
             }
-            return
-        }
 
-        Map<String, ?> resultsForSUCCESS = apiActionService.invokeReactionScript(ReactionScriptCode.SUCCESS, invocationParams)
+        } else {
 
-        if (resultsForSUCCESS.errorMessage || resultsForSUCCESS.result == ReactionScriptCode.ERROR) {
+            Map<String, ?> resultsForSUCCESS = apiActionService.invokeReactionScript(ReactionScriptCode.SUCCESS, invocationParams)
 
-            // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
-            if (apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, invocationParams).isEmpty()){
-                apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
+            if (resultsForSUCCESS.errorMessage || resultsForSUCCESS.result == ReactionScriptCode.ERROR) {
+
+                // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
+                if (apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, invocationParams).isEmpty()){
+                    apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
+                }
             }
-            return
         }
     }
 
@@ -271,16 +274,13 @@ class HttpProducerService {
      * HTTP invocation failed:
      * 1) check if is necessary to evaluate FAILED
      * 2) If not, check if is necessary to evaluate DEFAULT
-     * 3) At then evaluate FINAL script
      *
-     * @param invocationParams
-     * @param assetFacade
+     * @param invocationParams an instance of {@link ReactionScriptInvocationParams}
      */
-    private void reactionForApiActionResponseNotSuccessful(ReactionScriptInvocationParams invocationParams, AssetFacade assetFacade) {
+    private void reactionForApiActionResponseNotSuccessful(ReactionScriptInvocationParams invocationParams) {
         if (apiActionService.invokeReactionScript(ReactionScriptCode.FAILED, invocationParams).isEmpty()) {
             apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
         }
-        apiActionService.invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
     }
 
     /**
@@ -431,7 +431,7 @@ class HttpProducerService {
      * @param actionRequest
      * @return
      */
-    @Transactional(noRollbackFor = [RuntimeException])
+    @Transactional(noRollbackFor = [Throwable])
     private HttpResponse invokeActionRequest(ActionRequest actionRequest) {
         // set http method from the ApiAction
         String method = actionRequest.options.apiAction.httpMethod

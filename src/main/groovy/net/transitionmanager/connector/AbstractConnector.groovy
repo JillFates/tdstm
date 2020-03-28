@@ -1,6 +1,7 @@
 package net.transitionmanager.connector
 
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ReactionScriptInvocationParams
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.exception.InvalidParamException
@@ -75,10 +76,10 @@ class AbstractConnector {
 	 * @throws InvalidRequestException
 	 */
 	@CompileStatic(TypeCheckingMode.SKIP)	// Due to the dynamic method invocation
-	ApiActionResponse invoke(ApiAction apiAction, ActionRequest actionRequest) {
+	ApiActionResponse invoke(ApiAction apiAction, ReactionScriptInvocationParams invocationParams) {
 			if (apiAction.connectorMethod) {
 				log.debug 'invoke({}) about to invoke method {}', apiAction.connectorMethod
-				return "${apiAction.connectorMethod}"(actionRequest)
+				return "${apiAction.connectorMethod}"(invocationParams)
 			} else {
 				String msg = "The Action Connector $name is missing method name to invoke"
 				log.error msg

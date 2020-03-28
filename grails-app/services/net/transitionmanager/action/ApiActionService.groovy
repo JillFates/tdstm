@@ -120,6 +120,10 @@ class ApiActionService implements ServiceMethods {
 			throw new InvalidRequestException('invoke() required context was null')
 		}
 
+		if (!(context instanceof AssetComment)){
+			throw new InvalidRequestException('invoke() not implemented for class ' + context.getClass().getName() )
+		}
+
 		if (context instanceof AssetComment) {
 
 			// We only need to implement Task for the moment
@@ -155,7 +159,6 @@ class ApiActionService implements ServiceMethods {
 				// get api action connector instance
 				def connector = connectorInstanceForAction(action)
 
-				ActionRequest actionRequest
 				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context, whom)
 
 				// setup asset facade if task has an asset associated
@@ -167,15 +170,17 @@ class ApiActionService implements ServiceMethods {
 				} else {
 					assetFacade = new AssetFacade(null, null, true)
 				}
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ASSET_FACADE, assetFacade)
 
 				// check pre script : set required request configurations
+				ActionRequest actionRequest = createActionRequest(action, context)
+
 				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
-
-				actionRequest = createActionRequest(action, context)
-
-				ReactionScriptInvocationParams invocationParams = new ReactionScriptInvocationParams(reactionScripts, actionRequest, taskFacade, assetFacade)
+				ReactionScriptInvocationParams invocationParams = new ReactionScriptInvocationParams(
+						reactionScripts,
+						actionRequest,
+						taskFacade,
+						assetFacade
+				)
 
 				Map<String, ?> invocationResults = invokeReactionScript(ReactionScriptCode.PRE, invocationParams)
 				if (invocationResults.errorMessage) {
@@ -184,13 +189,8 @@ class ApiActionService implements ServiceMethods {
 						invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
 					}
 					invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
-
-					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 					return
 				}
-
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.TASK_FACADE, taskFacade)
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest
@@ -200,20 +200,14 @@ class ApiActionService implements ServiceMethods {
 					taskFacade.byPassed()
 
 				} else {
-					ApiActionResponse apiActionResponse = connector.invoke(action, actionRequest)
-					if (!apiActionResponse.successful){
-						taskFacade.error("Action invocation failed: ${apiActionResponse.error}")
-					}
+					connector.invoke(action, invocationParams)
 				}
 
-				// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
-				ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+				invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
 
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
-		} else {
-			throw new InvalidRequestException('invoke() not implemented for class ' + context.getClass().getName() )
 		}
 	}
 

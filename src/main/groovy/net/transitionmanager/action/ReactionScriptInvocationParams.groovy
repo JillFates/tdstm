@@ -18,17 +18,13 @@ class ReactionScriptInvocationParams {
     AssetFacade assetFacade
     ApiActionJob apiActionJob
 
-    ReactionScriptInvocationParams(JSONObject reactionScripts, ActionRequest actionRequest, ApiActionResponse apiActionResponse, TaskFacade taskFacade, AssetFacade assetFacade, ApiActionJob apiActionJob) {
+    ReactionScriptInvocationParams(JSONObject reactionScripts, ActionRequest actionRequest, TaskFacade taskFacade, AssetFacade assetFacade) {
         this.reactionScriptsMap = reactionScripts.collectEntries { [(ReactionScriptCode.lookup(it.key)): it.value] }
         this.actionRequest = actionRequest
-        this.apiActionResponse = apiActionResponse
+        this.apiActionResponse = new ApiActionResponse()
         this.taskFacade = taskFacade
         this.assetFacade = assetFacade
-        this.apiActionJob = apiActionJob
-    }
-
-    ReactionScriptInvocationParams(JSONObject reactionScripts, ActionRequest actionRequest, TaskFacade taskFacade, AssetFacade assetFacade) {
-        this(reactionScripts, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
+        this.apiActionJob = new ApiActionJob()
     }
 
     String getScript(ReactionScriptCode reactionScriptCode) {
