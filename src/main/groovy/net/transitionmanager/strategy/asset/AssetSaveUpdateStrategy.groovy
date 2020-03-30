@@ -269,12 +269,10 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void deleteDependencies(AssetEntity assetEntity) {
-		List<Long> dependenciesToDelete = NumberUtil.toPositiveLongList(command.dependencyMap.deleteDependencies)
-		if (dependenciesToDelete) {
-			// Delete all the requested dependencies.
-			deleteDependencies(dependenciesToDelete, assetEntity)
-		}
+		deleteDependencies(command.dependencyMap.supportsToDelete, assetEntity, true)
+		deleteDependencies(command.dependencyMap.dependentsToDelete, assetEntity, false)
 	}
+
 
 	/**
 	 * Validate that all assets associated in the dependencies section (dependent or supporting)
@@ -320,13 +318,17 @@ abstract class AssetSaveUpdateStrategy {
 	 *
 	 * @param ids - dependency ids.
 	 * @param assetEntity
+	 * @param isDependent a boolean flag that signals whether the asset if the dependent or supporting side of the dependency.
 	 */
-	private void deleteDependencies(List<Long> ids, AssetEntity assetEntity) {
+	private void deleteDependencies(List ids, AssetEntity assetEntity, boolean isDependent) {
+		List<Long> depsToDelete = ids? NumberUtil.toPositiveLongList(ids) : null
+
 		/* Delete dependencies. As an extra precaution, the query doesn't simply delete dependencies
-		* given their id, but also takes the asset being edited into account.*/
-		if (ids) {
-			String hql = "DELETE FROM AssetDependency ad WHERE (asset = :asset OR dependent = :dependent) AND id IN (:ids)"
-			Map params = [asset: assetEntity, dependent: assetEntity, ids: ids]
+		 given their id, but also takes the asset being edited into account.*/
+		String side = isDependent ? 'dependent' : 'asset'
+		if (depsToDelete) {
+			String hql = "DELETE FROM AssetDependency ad WHERE $side=:asset AND id IN (:ids)"
+			Map params = [asset: assetEntity, ids: depsToDelete]
 			AssetDependency.executeUpdate(hql, params)
 		}
 	}
