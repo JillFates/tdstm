@@ -59,7 +59,7 @@ abstract class AssetSaveUpdateStrategy {
 		if (isNew()) {
 			assetEntity = createAndInitializeAssetEntityInstance()
 		} else {
-			assetEntity = fetchAsset()
+			assetEntity = GormUtil.findInProject(project, AssetEntity, NumberUtil.toLong(command.asset.id), true)
 		}
 
 		// Populate the asset.
@@ -108,24 +108,6 @@ abstract class AssetSaveUpdateStrategy {
 		command.asset.scale = SizeScale.asEnum(command.asset.scale)
 	}
 
-	/**
-	 * Based on the command object given when instancing this object,
-	 * retrieve the corresponding asset (if any).
-	 * @return
-	 */
-	private AssetEntity fetchAsset() {
-		Long assetId = NumberUtil.toLong(command.asset.id)
-		AssetEntity assetEntity
-		if (assetId) {
-			assetEntity = GormUtil.findInProject(project, AssetEntity, assetId, true)
-		} else {
-			throw new InvalidParamException('The requested Asset ID is invalid')
-		}
-		if (!assetEntity) {
-			throw new InvalidParamException('No asset found with the given ID.')
-		}
-		return assetEntity
-	}
 
 	/**
 	 * Format all the possible date fields.
