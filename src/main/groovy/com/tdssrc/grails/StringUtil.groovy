@@ -501,7 +501,14 @@ class StringUtil {
 	 * @return a string with the values appropriately joined.
 	 */
 	static String join (Collection<String> args, String joinStr=' ') {
-		return args?.findAll({it?.trim()}).join(joinStr)
+		List<String> strings = []
+		for (String arg in args) {
+			String trimmed = arg?.trim()
+			if (trimmed) {
+				strings.add(trimmed)
+			}
+		}
+		return strings.join(joinStr)
 	}
 
 }
