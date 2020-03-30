@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ModelModel} from '../model/model.model';
+import {Aka} from "../../../shared/components/aka/model/aka.model";
 
 @Injectable()
 export class ModelService {
@@ -45,7 +46,7 @@ export class ModelService {
 		const postRequest = {
 			modelName: model.modelName,
 			manufacturer: { id: model.manufacturer },
-			assetType: { id: model.assetType },
+			assetType: model.assetType,
 			usize: model.usize,
 			weight: model.weight,
 			productLine: model.productLine,
@@ -69,8 +70,13 @@ export class ModelService {
 			sourceURL: model.sourceURL,
 			modelStatus: model.modelStatus,
 			modelConnectors: model.modelConnectors,
+			removedConnectors: model.removedConnectors,
 			connectorCount: model.connectorCount,
-			akaChanges: model.akaChanges
+			akaChanges: {
+				deleted: model.akaChanges.deleted.join(','),
+				edited: model.akaChanges.edited,
+				added: model.akaChanges.added
+			}
 		};
 		if (!model.id) {
 			return this.http.post(`${this.modelUrl}/save`, JSON.stringify(postRequest))

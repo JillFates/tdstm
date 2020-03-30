@@ -98,15 +98,16 @@ export class ModelModel {
 	sourceURL?: string;
 	productLine?: string;
 	endOfLifeDate?: Date;
-	powerUse?: number;
-	powerNameplate?: number;
-	powerDesign?: number;
+	powerUse = 0;
+	powerNameplate = 0;
+	powerDesign = 0;
 	roomObject?: boolean;
 	validatedBy?: string;
 	usize?: number;
 	updatedBy?: string;
 	createdBy?: string;
 	modelConnectors: Connector[] = [];
+	removedConnectors: Connector[] = [];
 	connectorCount?: number;
 	akaChanges?: AkaChanges;
 }

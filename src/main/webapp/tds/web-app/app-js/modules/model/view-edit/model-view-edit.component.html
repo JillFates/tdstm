@@ -16,7 +16,7 @@
                         </label>
                         <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
                             <clr-select-container>
-                                <select clrSelect id="modelManufacturer" name="modelManufacturer" (change)="onChangeManufacturer($event)" required>
+                                <select clrSelect id="modelManufacturer" name="modelManufacturer" (change)="onChangeManufacturer($event)" required [(ngModel)]="manufacturerId">
                                     <option *ngFor="let item of manufacturerList" value="{{item.id}}">{{item.name}}</option>
                                 </select>
                             </clr-select-container>
@@ -93,10 +93,11 @@
                         </label>
                         <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
                             <input clrDate type="date" id="modelEndOfLifeDate" name="modelEndOfLifeDate" class="form-control"
-                                   [(ngModel)]="modelModel.endOfLifeDate"/>
+                                   [ngModel]="modelModel.endOfLifeDate | date: dateFormat"
+                                   (ngModelChange)="modelModel.endOfLifeDate = $event"/>
                         </div>
                         <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
-                            <label class="control-label label-detail">{{modelModel.endOfLifeDate}}</label>
+                            <label class="control-label label-detail">{{modelModel.endOfLifeDate | date: dateFormat}}</label>
                         </div>
                     </div>
                     <div class="form-group">
@@ -143,7 +144,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <clr-select-container style="display: inline-block">
-                                        <select clrSelect id="powerTypeEdit" name="powerTypeEdit">
+                                        <select clrSelect id="powerTypeEdit" name="powerTypeEdit" [(ngModel)]="powerType">
                                             <option *ngFor="let item of powerTypes" value="{{item}}">{{item}}</option>
                                         </select>
                                     </clr-select-container>
@@ -154,11 +155,12 @@
                             <label class="control-label label-detail power-label">{{modelModel.powerNameplate}}</label>
                             <label class="control-label label-detail power-label">{{modelModel.powerDesign}}</label>
                             <label class="control-label label-detail power-label">{{modelModel.powerUse}}</label>
-                            <clr-select-container style="display: inline-block">
-                                <select clrSelect id="powerType" name="powerType" disabled>
-                                    <option *ngFor="let item of powerTypes" value="{{item}}">{{item}}</option>
-                                </select>
-                            </clr-select-container>
+                            <label class="control-label label-detail power-label">{{powerType}}</label>
+<!--                            <clr-select-container style="display: inline-block">-->
+<!--                                <select clrSelect id="powerType" name="powerType" disabled>-->
+<!--                                    <option *ngFor="let item of powerTypes" value="{{item}}">{{item}}</option>-->
+<!--                                </select>-->
+<!--                            </clr-select-container>-->
                         </div>
                     </div>
                     <div class="form-group">
@@ -171,7 +173,7 @@
                         </div>
                     </div>
                     <div class="form-group" *ngIf="modalType === actionTypes.VIEW">
-                        <label for="modelCreatedBy" class="col-sm-4 control-label">
+                        <label class="col-sm-4 control-label">
                             Created By:
                         </label>
                         <div class="col-sm-8">
@@ -179,7 +181,7 @@
                         </div>
                     </div>
                     <div class="form-group" *ngIf="modalType === actionTypes.VIEW" >
-                        <label for="modelValidatedBy" class="col-sm-4 control-label">
+                        <label class="col-sm-4 control-label">
                             Validated By:
                         </label>
                         <!--<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
@@ -191,7 +193,7 @@
                         </div>
                     </div>
                     <div class="form-group" *ngIf="modalType === actionTypes.VIEW">
-                        <label for="modelUpdatedBy" class="col-sm-4 control-label">
+                        <label class="col-sm-4 control-label">
                             Updated By:
                         </label>
                         <!--<div class="col-sm-8">
@@ -201,29 +203,6 @@
                         <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
                             <label class="control-label label-detail">{{modelUpdatedBy}}</label>
                         </div>
-                    </div>
-                    <div>
-                        <button *ngIf="modalType !== actionTypes.VIEW" class="btn btn-primary btn-sm" (click)="addConnector()">Add Connector</button>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Label</th>
-                                    <th>Label Position</th>
-                                    <th>Conn Pos X</th>
-                                    <th>Conn Pos Y</th>
-                                </tr>
-                            </thead>
-                            <tbody #modelConnectorTableBody>
-                                <tr *ngFor="let connector of modelConnectors">
-                                    <td>{{connector.type}}</td>
-                                    <td>{{connector.label}}</td>
-                                    <td>{{connector.labelPosition}}</td>
-                                    <td>{{connector.connectorPosX}}</td>
-                                    <td>{{connector.connectorPosY}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -301,9 +280,9 @@
                             </div>
                         </div>
                         <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-                            <label class="control-label label-detail power-label">H: {{modelModel.height}}</label>
-                            <label class="control-label label-detail power-label">W: {{modelModel.width}}</label>
-                            <label class="control-label label-detail power-label">D: {{modelModel.depth}}</label>
+                            <label class="control-label label-detail power-label">H:{{modelModel.height}}</label>
+                            <label class="control-label label-detail power-label">W:{{modelModel.width}}</label>
+                            <label class="control-label label-detail power-label">D:{{modelModel.depth}}</label>
                         </div>
                     </div>
                     <div class="form-group">
@@ -414,6 +393,36 @@
                             <label class="control-label label-detail">{{modelModel.modelStatus}}</label>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <button *ngIf="modalType !== actionTypes.VIEW" class="btn btn-primary btn-sm" (click)="addConnector()">Add Connector</button>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th *ngIf="modalType !== actionTypes.VIEW"></th>
+                            <th>Type</th>
+                            <th>Label</th>
+                            <th>Label Position</th>
+                            <th>Conn Pos X</th>
+                            <th>Conn Pos Y</th>
+                        </tr>
+                        </thead>
+                        <tbody #modelConnectorTableBody>
+                        <tr *ngFor="let connector of modelConnectorsControls">
+                            <td *ngIf="modalType === actionTypes.EDIT">
+                                <clr-icon shape="times" style="cursor:pointer; color: red;"
+                                          (click)="removeConnector(connector)"></clr-icon>
+                            </td>
+                            <td>{{connector.type}}</td>
+                            <td>{{connector.label}}</td>
+                            <td>{{connector.labelPosition}}</td>
+                            <td>{{connector.connectorPosX}}</td>
+                            <td>{{connector.connectorPosY}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

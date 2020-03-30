@@ -323,7 +323,7 @@ class ModelService implements ServiceMethods {
 		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true, failOnError: true)) {
 			int connectorCount = params.connectorCount
 			if (connectorCount > 0) {
-				for (int i = 0; i <= connectorCount; i++) {
+				for (int i = 0; i < connectorCount; i++) {
 					def modelConnector = new ModelConnector(model: model,
 							connector: model.modelConnectors[i].connector,
 							label: model.modelConnectors[i].label,
@@ -332,10 +332,6 @@ class ModelService implements ServiceMethods {
 							connectorPosX: model.modelConnectors[i].connectorPosX,
 							connectorPosY: model.modelConnectors[i].connectorPosY,
 							status: model.modelConnectors[i].status)
-
-					if (!modelConnector.hasErrors()) {
-						modelConnector.save(flush: true)
-					}
 				}
 			} else {
 				def powerConnector = new ModelConnector(model: model,
@@ -368,52 +364,57 @@ class ModelService implements ServiceMethods {
 	@Transactional
 	boolean update(Model model, Map params) {
 		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true)) {
-			/*String deletedAka = params.deletedAka
+			String deletedAka = params.akaChanges.deleted
 			if (deletedAka) {
 				List<Long> maIds = deletedAka.split(",").collect() { it as Long }
 				ModelAlias.executeUpdate("delete ModelAlias where id in :maIds", [maIds: maIds])
 			}
 
-			def modelAliasList = ModelAlias.findAllByModel(model)
-			modelAliasList.each { modelAlias ->
-				modelAlias.name = params["aka_${modelAlias.id}"]
-				modelAlias.save()
-			}
+            if (params.akaChanges.edited.size() > 0) {
+                def modelAliasList = ModelAlias.findAllByModel(model)
+                modelAliasList.each { modelAlias ->
+                    modelAlias.name = params.akaChanges.edited[modelAlias.id]
+                    modelAlias.save()
+                }
+            }
 
-			List<String> akaToSave = params.list('aka')
+			List<String> akaToSave = params.akaChanges.added.collect() { it.name  }
 			akaToSave.each { String aka ->
 				findOrCreateAliasByName(model, aka, true)
 			}
 
-			def connectorCount = params.int("connectorCount", 0)
-			if (connectorCount > 0) {
-				for(int i=1; i<=connectorCount; i++) {
-					def connector = params["connector${i}"]
+            if (params.removedConnectors.size() > 0) {
+                List<Long> maIds = params.removedConnectors.collect() { it.id as Long }
+                ModelConnector.executeUpdate("delete ModelConnector where id in :maIds", [maIds: maIds])
+            }
+
+            int connectorCount = params.connectorCount
+            if (connectorCount > 0) {
+				for(int i=0; i<connectorCount; i++) {
+					def connector = model.modelConnectors[i]
 					ModelConnector modelConnector = ModelConnector.findByModelAndConnector(model, connector ?: i)
 					if (!connector && modelConnector) {
+                        model.modelConnectors.remove(modelConnector)
 						modelConnector.delete(flush:true)
 					} else {
 						if (modelConnector) {
-							modelConnector.connector = connector
-							modelConnector.label = params["label${i}"]
-							modelConnector.type = params["type${i}"]
-							modelConnector.labelPosition = params["labelPosition${i}"]
-							modelConnector.connectorPosX = params.int("connectorPosX${i}", 0)
-							modelConnector.connectorPosY = params.int("connectorPosY${i}", 0)
-							modelConnector.status = params["status${i}"]
+							modelConnector.connector = model.modelConnectors[i].connector
+							modelConnector.label = model.modelConnectors[i].label
+							modelConnector.type = model.modelConnectors[i].type
+							modelConnector.labelPosition = model.modelConnectors[i].labelPosition
+							modelConnector.connectorPosX = model.modelConnectors[i].connectorPosX
+							modelConnector.connectorPosY =  model.modelConnectors[i].connectorPosY
+							modelConnector.status =  model.modelConnectors[i].status
 						} else if (connector) {
 							modelConnector = new ModelConnector(
 									model: model,
-									connector: connector,
-									label: params["label${i}"],
-									type: params["type${i}"],
-									labelPosition: params["labelPosition${i}"],
-									connectorPosX: params.int("connectorPosX${i}", 0),
-									connectorPosY: params.int("connectorPosY${i}", 0),
-									status: params["status${i}"])
-						}
-						if (modelConnector && !modelConnector.hasErrors()) {
-							modelConnector.save(flush: true)
+									connector:  model.modelConnectors[i].connector,
+									label: model.modelConnectors[i].label,
+									type: model.modelConnectors[i].type,
+									labelPosition: model.modelConnectors[i].labelPosition,
+									connectorPosX: model.modelConnectors[i].connectorPosX,
+									connectorPosY: model.modelConnectors[i].connectorPosY,
+									status: model.modelConnectors[i].status)
 						}
 					}
 				}
@@ -459,7 +460,7 @@ class ModelService implements ServiceMethods {
 			}
 
 			// <SL> should we use AssetEntityService?
-			AssetEntity.executeUpdate("update AssetEntity ae set ae.assetType = :at where ae.model.id = :mId", [at: model.assetType, mId: model.id])*/
+			AssetEntity.executeUpdate("update AssetEntity ae set ae.assetType = :at where ae.model.id = :mId", [at: model.assetType, mId: model.id])
 
 			if (model.sourceTDSVersion) {
 				model.sourceTDSVersion ++

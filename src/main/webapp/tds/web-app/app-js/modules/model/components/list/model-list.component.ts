@@ -111,7 +111,7 @@ export class ModelListComponent implements OnInit {
 
 	private getAssetTypeList(): void {
 
-    }
+	}
 
 	private loadData = async (): Promise<ModelModel[]> => {
 		try {
@@ -129,7 +129,12 @@ export class ModelListComponent implements OnInit {
 				usize: 1,
 				manufacturer: '0',
 				modelStatus: 'new',
-				modelConnectors: []
+				modelConnectors: [],
+				removedConnectors: [],
+				assetType: 'Server',
+				powerDesign: 0,
+				powerNameplate: 0,
+				powerUse: 0
 			};
 			await this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
