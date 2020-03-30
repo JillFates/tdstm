@@ -392,7 +392,12 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	Map createTaskActionBarMap(Task task) {
 		Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
-        List<String> instructionsLinkList = AssetUtils.parseInstructionsLink(task.instructionsLink)
+
+		Map instructionLinkMap = AssetUtils.parseInstructionsLink(task.instructionsLink)
+
+		String instructionsLinkURL = instructionLinkMap? instructionLinkMap.url: null
+		String instructionsLinkLabel = instructionLinkMap? instructionLinkMap.label: null
+
 		return [
 				taskId: task.id,
 				apiActionId: task.apiAction?.id,
@@ -405,8 +410,8 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 				predecessorsCount: task.taskDependencies.size(),
 				status: task.status,
 				successorsCount: TaskDependency.countByPredecessor(task),
-                instructionsLinkURL: instructionsLinkList[1],
-                instructionsLinkLabel: instructionsLinkList[0]
+                instructionsLinkURL: instructionsLinkURL,
+                instructionsLinkLabel: instructionsLinkLabel
 		]
 	}
 
@@ -416,7 +421,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 * @return the API Action ID (if any), the ID of the person assigned to the task (if any), the number of
 	 *  successors and predecessors.
 	 */
-    @HasPermission(Permission.TaskManagerView)
+    @HasPermission(Permission.TaskView)
     def getInfoForActionBar(Long taskId) {
         Project project = getProjectForWs()
         AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)

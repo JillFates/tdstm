@@ -53,7 +53,7 @@ class Dataview {
 			isFavorite   : isFavorite(whom.id),
 			isOverride   : isOverrideView(),
 			schema       : schemaAsJSONObject(),
-			overridesView: ignoreOverrideView ? null : toMap(project, whom, true),
+			overridesView: overridesView ? overridesView.toMap(project, whom, true) : null,
 			createdBy    : getOwnerName(),
 			createdOn    : TimeUtil.formatDate(dateCreated),
 			updatedOn    : TimeUtil.formatDate(lastModified)
