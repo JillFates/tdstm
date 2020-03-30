@@ -53,6 +53,24 @@ class Room {
 		location + ' / ' + roomName
 	}
 
+	Map toMap() {
+		[
+			id         : id,
+			roomName   : roomName,
+			location   : location,
+			roomWidth  : roomWidth,
+			roomDepth  : roomDepth,
+			project    : project.toMap(),
+			address    : address,
+			city       : city,
+			stateProv  : stateProv,
+			postalCode : postalCode,
+			country    : country,
+			dateCreated: dateCreated,
+			lastUpdated: lastUpdated
+		]
+	}
+
 	int getRackCount() {
 		Rack.countByRoom(this)
 	}

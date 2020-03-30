@@ -159,10 +159,10 @@ class Project extends PartyGroup {
 			name                 : name,
 			projectCode          : projectCode,
 			defaultBundle        : [
-				id  : defaultBundle.id,
-				name: defaultBundle.name
+				id  : defaultBundle?.id,
+				name: defaultBundle?.name
 			],
-			timezone             : timezone.label,
+			timezone             : timezone?.label,
 			projectLogoForProject: projectLogoMap
 		]
 	}
