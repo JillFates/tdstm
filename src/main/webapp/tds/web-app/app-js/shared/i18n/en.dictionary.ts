@@ -282,8 +282,8 @@ export const en_DICTIONARY: Object = {
 		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
 	'ARCHITECTURE': {
-		'ARCHITECTURE_GRAPH': 'Architecture Graph',
-		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
+		'ARCHITECTURE_GRAPH': 'GoJS Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'GoJS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
@@ -301,7 +301,7 @@ export const en_DICTIONARY: Object = {
 		'ASSET_CLASSES': 'Asset Classes: '
 	},
 	'DEPENDENCY_ANALYZER': {
-		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_ANALYZER': 'Angular Dependency Analyzer',
 		'DEPENDENCY_GROUPS': 'Dependency Groups',
 		'REGENERATE': 'Regenerate',
 		'BUNDLE': 'Bundle',
