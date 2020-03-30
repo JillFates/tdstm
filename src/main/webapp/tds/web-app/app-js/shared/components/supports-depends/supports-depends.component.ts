@@ -268,6 +268,7 @@ export class SupportsDependsComponent implements OnInit {
 	private typeList = [];
 	private statusList = [];
 	private moveBundleList = [];
+	private deleteDependencies = [];
 	public dependencyType = DEPENDENCY_TYPE;
 	public dataGridDependsOnHelper: DataGridOperationsHelper;
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
@@ -443,6 +444,10 @@ export class SupportsDependsComponent implements OnInit {
 	 * Delete the selected element
 	 */
 	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper): void {
+		if (dataItem.id) {
+			this.deleteDependencies.push(dataItem.id);
+		}
+
 		dataGrid.removeDataItem(dataItem);
 		this.onChangeInternalModel();
 	}
@@ -514,6 +519,7 @@ export class SupportsDependsComponent implements OnInit {
 		if (validForm) {
 			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
 			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.deleteDependencies = this.deleteDependencies;
 		}
 
 		this.isValidForm.emit(validForm);
