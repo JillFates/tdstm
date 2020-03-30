@@ -143,6 +143,7 @@ class HttpProducerService {
             log.error('Error when executing HTTP request. {}', ExceptionUtil.stackTraceToString(throwable))
             String errorMessage = translateHttpException(throwable)
 
+            invocationParams.taskFacade.error(String.format('HTTP action request failure: %s', errorMessage))
             reactionForApiActionResponseNotSuccessful(invocationParams)
             return new ApiActionResponse(error: errorMessage,stderr: errorMessage, successful: false).asImmutable()
         }
@@ -473,7 +474,7 @@ class HttpProducerService {
      * @param actionRequest
      * @return
      */
-    @Transactional(noRollbackFor = [RuntimeException])
+    @Transactional(noRollbackFor = [Throwable])
     private HttpResponse executeHttpCall(ActionRequest actionRequest) {
         RequestConfig.Builder requestBuilder = RequestConfig.custom()
                 .setConnectTimeout(DEFAULT_HTTP_CONNECTION_TIMEOUT * MILLISECOND)
