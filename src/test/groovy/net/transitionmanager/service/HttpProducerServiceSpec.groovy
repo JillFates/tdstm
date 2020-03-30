@@ -7,20 +7,29 @@ import com.tdssrc.grails.ThreadLocalUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
+import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.HttpProducerService
+import net.transitionmanager.action.ReactionScriptInvocationParams
+import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.common.SettingService
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.integration.ActionThreadLocalVariable
 import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskFacade
+import net.transitionmanager.task.TaskService
+import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
@@ -55,6 +64,10 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 		mockDomains Project, Provider, ApiCatalog, ApiAction
 
 		defineBeans {
+			apiActionService(ApiActionService)
+			messageSourceService(MessageSourceService) { bean ->
+				messageSource = ref('messageSource')
+			}
 			coreService(CoreService) {
 				grailsApplication = ref('grailsApplication')
 			}
@@ -64,6 +77,7 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 			}
 			settingService(SettingService)
 		}
+		service.apiActionService = applicationContext.getBean(ApiActionService)
 
 		// http://stehno.com/ersatz/
 		// http://guides.grails.org/grails-mock-http-server/guide/index.html
@@ -197,7 +211,20 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 	void 'Test http service execute call return DNS name not found'() {
 		when:
 			ActionRequest actionRequest = getActionRequest(action)
-		ApiActionResponse actionResponse = service.executeCall(actionRequest)
+			AssetComment task = new AssetComment()
+			Person whom = new Person()
+			TaskFacade taskFacade = new TaskFacade(task, whom)
+			taskFacade.messageSourceService = applicationContext.getBean(MessageSourceService)
+			TaskService taskService = Mock()
+			taskFacade.taskService = taskService
+
+			ApiActionResponse actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					actionRequest,
+					taskFacade,
+					new AssetFacade(null, [:], true)
+				)
+			)
 		then:
 			'Unable to resolve host name (zzz.about.yyy)' == actionResponse.error
 	}
@@ -207,47 +234,92 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test0'
 			ActionRequest actionRequest = getActionRequest(action)
-			ApiActionResponse actionResponse = service.executeCall(actionRequest)
+			AssetComment task = new AssetComment()
+			Person whom = new Person()
+			TaskFacade taskFacade = new TaskFacade(task, whom)
+			taskFacade.messageSourceService = applicationContext.getBean(MessageSourceService)
+			TaskService taskService = Mock()
+			taskFacade.taskService = taskService
+
+			ApiActionResponse actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					actionRequest,
+					taskFacade,
+					new AssetFacade(null, [:], true)
+			))
 		then:
 			service.getHttpResponseError(0) == actionResponse.error
 	}
 
 	@See('TM-10046')
 	void 'Test http service execute call return error'() {
+		setup:
+			AssetComment task = new AssetComment()
+			Person whom = new Person()
+			TaskFacade taskFacade = new TaskFacade(task, whom)
+			taskFacade.messageSourceService = applicationContext.getBean(MessageSourceService)
+			TaskService taskService = Mock()
+			taskFacade.taskService = taskService
+
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test400'
-			ActionRequest actionRequest = getActionRequest(action)
-			ApiActionResponse actionResponse = service.executeCall(actionRequest)
+			ApiActionResponse actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					getActionRequest(action),
+					taskFacade,
+					new AssetFacade(null, [:], true)
+			))
 		then:
 			service.getHttpResponseError(400) == actionResponse.error
+
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test401'
-			actionRequest = getActionRequest(action)
-			actionResponse = service.executeCall(actionRequest)
+			actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					getActionRequest(action),
+					taskFacade,
+					new AssetFacade(null, [:], true)
+			))
 		then:
 			service.getHttpResponseError(401) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test403'
-			actionRequest = getActionRequest(action)
-			actionResponse = service.executeCall(actionRequest)
+			actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					getActionRequest(action),
+					taskFacade,
+					new AssetFacade(null, [:], true)
+			))
 		then:
 			service.getHttpResponseError(403) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test404'
-			actionRequest = getActionRequest(action)
-			actionResponse = service.executeCall(actionRequest)
+			actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					getActionRequest(action),
+					taskFacade,
+					new AssetFacade(null, [:], true)
+			))
 		then:
 			service.getHttpResponseError(404) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test405'
-			actionRequest = getActionRequest(action)
-			actionResponse = service.executeCall(actionRequest)
+			actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					getActionRequest(action),
+					taskFacade,
+					new AssetFacade(null, [:], true)
+			))
 		then:
 			service.getHttpResponseError(405) == actionResponse.error
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test406-499'
-			actionRequest = getActionRequest(action)
-			actionResponse = service.executeCall(actionRequest)
+			actionResponse = service.executeCall(new ReactionScriptInvocationParams(
+					new JSONObject(),
+					getActionRequest(action),
+					taskFacade,
+					new AssetFacade(null, [:], true)
+			))
 		then:
 			service.getHttpResponseError(406) == actionResponse.error
 		// when:
@@ -280,7 +352,5 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 		// 	actionResponse = service.executeCall(actionRequest)
 		// then:
 		// 	service.getHttpResponseError(504) == actionResponse.error
-
 	}
-
 }

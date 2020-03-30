@@ -292,10 +292,10 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 					job
 			)
 
-		then: 'A translated error message is added in notes'
+		then: 'An error message is added in notes'
 			with (taskService){
 				1 * setTaskStatus(task, 'Hold', whom)
-				1 * addNote(task, whom, 'Le script doit renvoyer SUCCESS ou ERROR')
+				1 * addNote(task, whom, 'STATUS script failure: Le script doit renvoyer SUCCESS ou ERROR')
 			}
 
 		cleanup:
