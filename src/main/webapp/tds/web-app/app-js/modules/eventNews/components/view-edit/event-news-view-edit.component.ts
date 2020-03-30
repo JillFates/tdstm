@@ -1,5 +1,11 @@
 // Angular
-import {Component, ComponentFactoryResolver, Input, OnInit, ViewChild} from '@angular/core';
+import {
+	Component,
+	ComponentFactoryResolver,
+	Input,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {EventsService} from '../../../event/service/events.service';
@@ -65,15 +71,6 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 			type: DialogButtonType.ACTION,
 			action: this.onSaveEventNews.bind(this)
 		});
-
-		/*this.buttons.push({
-			name: 'delete',
-			icon: 'trash',
-			show: () => this.modalType !== this.actionTypes.CREATE,
-			disabled: () => !this.permissionService.hasPermission(Permission.ProviderDelete),
-			type: DialogButtonType.ACTION,
-			action: null
-		});*/
 
 		this.buttons.push({
 			name: 'close',
@@ -184,22 +181,6 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	}
 
 	/**
-	 * On delete news shows the confirmation dialog
-	 * if the user decides continue call the endpoint to delete the record
-	 */
-	/*public onDelete(): void {
-		this.promptService.open('Confirmation Required', 'You are about to delete the selected item. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.eventsService.deleteNews(this.getPayloadFromModel())
-						.subscribe(
-							res => this.activeDialog.close(),
-							error => console.error(error));
-				}
-			});
-	}*/
-
-	/**
 	 * Determines if all the field forms comply with the validation rules
 	 */
 	public formValid(): boolean {
@@ -228,7 +209,11 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	 * Verify the Object has not changed
 	 * @returns {boolean}
 	 */
-	public isDirty(): boolean {
-		return false;
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	protected isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify(this.eventNewsModel);
 	}
 }

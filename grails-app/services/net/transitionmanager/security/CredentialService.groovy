@@ -37,6 +37,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
+import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 
 import javax.net.ssl.SSLContext
@@ -153,23 +154,30 @@ class CredentialService implements ServiceMethods {
         // we shouldn't be doing re-authentication
 
         Map<String, ?> authenticationResponse
-        switch (credential.authenticationMethod) {
-			case AuthenticationMethod.BASIC_AUTH:
-				authenticationResponse = doBasicAuthentication(credential)
-				break;
-            case AuthenticationMethod.JWT:
-                authenticationResponse = doJWTTokenAuthentication(credential)
-                break
-            case AuthenticationMethod.COOKIE:
-                authenticationResponse = doCookieAuthentication(credential)
-                break
-            case AuthenticationMethod.HEADER:
-                authenticationResponse = doHeaderAuthentication(credential)
-                break
-            default:
-                authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet" ]
-                break
+
+        try {
+            switch (credential.authenticationMethod) {
+                case AuthenticationMethod.BASIC_AUTH:
+                    authenticationResponse = doBasicAuthentication(credential)
+                    break;
+                case AuthenticationMethod.JWT:
+                    authenticationResponse = doJWTTokenAuthentication(credential)
+                    break
+                case AuthenticationMethod.COOKIE:
+                    authenticationResponse = doCookieAuthentication(credential)
+                    break
+                case AuthenticationMethod.HEADER:
+                    authenticationResponse = doHeaderAuthentication(credential)
+                    break
+                default:
+                    authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet" ]
+                    break
+            }
+        }  catch (ResourceAccessException e) {
+            log.info "authenticate() exception: $e.message"
+            authenticationResponse = [error: e.cause?.message]
         }
+
 
         log.debug 'authenticate() results {}', authenticationResponse
         return authenticationResponse

@@ -21,13 +21,13 @@ export class ManufacturerColumnModel {
 				label: 'Description',
 				property: 'description',
 				filterType: FilterType.text,
-				width: 300
+				width: 280
 			},
 			{
 				label: 'Corporate Name',
 				property: 'corporateName',
 				filterType: FilterType.text,
-				width: 200
+				width: 190
 			},
 			{
 				label: 'Corporate Location',
@@ -39,19 +39,19 @@ export class ManufacturerColumnModel {
 				label: 'Website',
 				property: 'website',
 				filterType: FilterType.text,
-				width: 150
+				width: 130
 			},
 			{
 				label: 'Models',
 				property: 'modelsCount',
 				filterType: FilterType.number,
-				width: 100,
+				width: 110,
 			},
 			{
 				label: 'Asset Count',
 				property: 'assetCount',
 				filterType: FilterType.number,
-				width: 100,
+				width: 140,
 			}
 		];
 	}

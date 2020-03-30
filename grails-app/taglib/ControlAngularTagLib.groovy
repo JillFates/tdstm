@@ -1,3 +1,4 @@
+import com.tdssrc.grails.HtmlUtil
 import net.transitionmanager.asset.AssetEntity
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringEscapeUtils
@@ -67,7 +68,7 @@ class ControlAngularTagLib {
 		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
-		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
+		sb.append(HtmlUtil.escape(fieldSpec.label))
 		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
@@ -345,9 +346,10 @@ class ControlAngularTagLib {
 	private String renderRequiredLabel(Map fieldSpec) {
 		if (fieldSpec?.constraints?.required) {
 			def field = 'field' + fieldSpec.field
+			def fieldLabel = HtmlUtil.escape(fieldSpec.label)
 
 			return "<div class=\"error\" *ngIf=\"form && (form.submitted && ${field} && !${field}.valid) || " +
-					" (${field}.dirty && !${field}.valid)\">* ${fieldSpec.label} is required</div>"
+					" (${field}.dirty && !${field}.valid)\">* ${fieldLabel} is required</div>"
 		}
 		return ''
 	}
@@ -774,16 +776,16 @@ class ControlAngularTagLib {
 	 */
 	private String renderCustomValidationErrors(Map fieldSpec) {
 		def field = 'field' + fieldSpec?.field
-		def controlLabel = fieldSpec?.label
+		def controlLabel = HtmlUtil.escape(fieldSpec.label)
 
 		StringBuilder control = new StringBuilder("")
 		control.append("<tds-custom-validation-errors ")
-		control.append("   [label]='\"${controlLabel}\"' ")
 		control.append("   [errors]='${field}.errors' ")
 		control.append("   [submitted]='form && form.submitted' ")
 		control.append("   [valid]='${field}.valid' ")
 		control.append("   [touched]='${field}.touched' ")
 		control.append("   [dirty]='${field}.dirty' >")
+		control.append("${controlLabel}")
 		control.append("</tds-custom-validation-errors>")
 
 		return control.toString()

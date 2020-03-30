@@ -28,7 +28,7 @@ export const ManufacturerRoutes: Routes = [
 			page: {
 				title: 'MANUFACTURER.LIST',
 				instruction: '',
-				menu: ['GLOBAL.PROJECT', 'MANUFACTURER.LIST'],
+				menu: ['GLOBAL.ADMIN', 'MANUFACTURER.LIST'],
 				topMenu: {parent: TOP_MENU_PARENT_PROJECT, child: 'menu-parent-admin-manufacturers', subMenu: true}
 			},
 			requiresAuth: true,

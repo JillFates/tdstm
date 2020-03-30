@@ -187,7 +187,13 @@
 		// exits the neighborhood and generates the graph for the selected event
 		function submitForm () {
 			neighborhoodTaskId = -1;
-			generateGraph($('#moveEventId').val());
+			var eventEl = $('#moveEventId')[0];
+			for (var i = 0; i < eventEl.options.length; i++) {
+			    if (eventEl.value === eventEl.options[i].value) {
+                    stateManagement.setEvent(eventEl.value, eventEl.options[i].text);
+				}
+			}
+			generateGraph();
 		}
 
 		// gets the given event's graph data from the server and then renders it

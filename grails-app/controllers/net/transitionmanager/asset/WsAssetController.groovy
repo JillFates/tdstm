@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gsp.PageRenderer
@@ -658,6 +659,23 @@ class WsAssetController implements ControllerMethods {
 		progressService.update(key, 1, 'In progress')
 
 		renderSuccessJson(key: key)
+	}
+
+	/**
+	 * Get basic asset fields based on its id and dependency group id.
+	 * @return
+	 */
+	def getAssetForDependencyGroup(Long assetId) {
+		Project project = getProjectForWs()
+		AssetEntity asset = fetchDomain(AssetEntity, [id: assetId], project)
+
+		renderSuccessJson([
+		        id: asset.id,
+				name: asset.assetName,
+				description: asset.description,
+				moveBundle: asset.moveBundle?.name,
+				depGroup: AssetDependencyBundle.findByAsset(asset)?.dependencyBundle
+		])
 	}
 
 }

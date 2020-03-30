@@ -49,7 +49,7 @@
 						src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 				</div>
 
-				<g:form action="resetPassword" name="forgotPasswordForm" method="post">
+				<g:form action="applyNewPassword" name="forgotPasswordForm" method="post">
 					<input type="hidden" name="username" id="username" value="${username}" />
 					<input type="hidden" name="token" id="token" value="${token}" />
 					<p>The final step is to enter your email address associated with your account and a new password.

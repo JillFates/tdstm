@@ -28,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 @Secured('permitAll')
 class AuthController implements ControllerMethods {
+	static allowedMethods = [applyNewPassword: 'POST']
 
 	private static final int thirtyDaysInMS = 60 * 24 * 30 * 1000
 

@@ -5,22 +5,22 @@
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
 <g:set var="assetClass" value="Files"/>
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
-     class="tds-modal-content has-side-nav tds-angular-component-content">
-    <div class="modal-header">
-        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span
-                aria-hidden="true">×</span></button>
-        <h4 class="modal-title">Storage Create</h4>
-        <tds-tab-scroller>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Details</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Supports/Depends</button>
-			</tds-scroller-item>
-		</tds-tab-scroller>
+<div>
+    <div>
+        <div class="clr-row">
+            <div class="clr-col-11">
+                <tds-tab-scroller>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Details</button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Supports/Depends</button>
+                    </tds-scroller-item>
+                </tds-tab-scroller>
+            </div>
+        </div>
     </div>
-    <div class="modal-body asset-crud no-description" tdsScrollContainer style="position: relative">
+    <div class="asset-crud" tdsScrollContainer style="position: relative">
         <form 
             name="form" 
             (ngSubmit)="form.form.valid && onCreate()"
@@ -110,22 +110,4 @@
             <tds-supports-depends tdsScrollSection [(model)]="model" (initDone)="onInitDependenciesDone($event)" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>  
         </form>
     </div>
-    
-    <div class="modal-sidenav form-group-center">
-		<nav class="modal-sidenav btn-link">
-			<tds-button-edit 
-				(click)="submitForm($event)" 
-				tooltip="Create" 
-				icon="floppy"
-				tabindex="501"
-				[disabled]="!isDependenciesValidForm">
-			</tds-button-edit>
-			<tds-button-custom 
-				(click)="onCancelEdit()" 
-				tooltip="Cancel" 
-				tabindex="502"
-				icon="ban">
-			</tds-button-custom>
-		</nav>
-	</div>
 </div>

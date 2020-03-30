@@ -15,6 +15,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Router } from '@angular/router';
+import { ReportResolveService } from '../../resolve/report-resolve.service';
 
 @Component({
 	selector: 'tds-asset-view-selector',
@@ -101,9 +102,10 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	constructor(
 		private router: Router,
 		private service: AssetExplorerService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private reportResolveService: ReportResolveService) {
 		service.getReports().subscribe((result) => {
-			this.data = result;
+			this.data = this.reportResolveService.populateReport(result)
 			this.reports = result.slice();
 		});
 	}
@@ -127,13 +129,6 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 				}
 			}, 300);
 		});
-	}
-
-	public loadData() {
-		this.service.getReports()
-			.subscribe(result => {
-				this.data = result as ViewGroupModel[];
-			});
 	}
 
 	protected onSearch(): void {
@@ -187,6 +182,13 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 		return item.type === ViewType.SYSTEM_VIEWS ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
 			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+	}
+
+	public loadData() {
+		this.service.getReports()
+			.subscribe(result => {
+				this.data = this.reportResolveService.populateReport(result) as ViewGroupModel[];
+			});
 	}
 
 	protected onFocusOut($event): void {

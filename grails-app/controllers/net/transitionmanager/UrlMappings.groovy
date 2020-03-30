@@ -103,6 +103,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/assetForDependencyGroup" {
+			controller = "wsAsset"
+			action = [
+			        GET: "getAssetForDependencyGroup"
+			]
+		}
+
 		"/ws/apiAction/$id" {
 			controller = "wsApiAction"
 			action = [
@@ -822,6 +829,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/project/default" {
+			controller = "wsProject"
+			action = [
+					GET: "defaultProject"
+			]
+		}
+
 		"/ws/manufacturer/merge" {
 			controller = "wsManufacturer"
 			action = [POST:"merge"]
@@ -835,6 +849,11 @@ class UrlMappings {
 		"/auth/resetPassword/$token" {
 			controller = "auth"
 			action = [GET:"resetPassword"]
+		}
+
+		"/auth/applyNewPassword" {
+			controller = "auth"
+			action = [POST:"applyNewPassword"]
 		}
 
 		"/ws/admin/unlockAccount" {
@@ -1177,6 +1196,13 @@ class UrlMappings {
 					POST: "createDataview",
 					PUT: "updateDataview",
 					DELETE: "deleteDataview"
+			]
+		}
+
+		"/ws/assetExplorer/saveOptions/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "saveOptions"
 			]
 		}
 
