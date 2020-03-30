@@ -28,7 +28,7 @@ class GenericHttpConnector extends AbstractConnector {
 	 * Call the service supporting this connector execute method. This method name <code>invokeHttpRequest</code> is referenced
 	 * by HttpConnector and VMwarevCenterConnector dictionary in the "method" property of every dictionary item.
 	 *
-	 * @param actionRequest - the api action request
+	 * @param invocationParams - an instance of {@link ReactionScriptInvocationParams} with the api action request
 	 * @return an api action response
 	 */
 	ApiActionResponse callEndpoint(ReactionScriptInvocationParams invocationParams) {

@@ -124,7 +124,7 @@ class HttpProducerService {
      * Executes a HTTP request for the given action request
      * @see HttpAgent#executeCall()
      *
-     * @param actionRequest - the action request
+     * @param invocationParams - an instance of {@link ReactionScriptInvocationParams} with the api action request
      * @return the ApiActionResponse
      */
     ApiActionResponse executeCall(ReactionScriptInvocationParams invocationParams) {
