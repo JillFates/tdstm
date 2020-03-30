@@ -341,7 +341,8 @@ export class AssetExplorerService {
 			dependencyMap: {
 				supportAssets: this.prepareDependencies(model.dependencyMap.supportAssets),
 				dependentAssets: this.prepareDependencies(model.dependencyMap.dependentAssets),
-				deleteDependencies: model.dependencyMap.deleteDependencies || [],
+				dependentsToDelete: model.dependencyMap.dependentsToDelete || [],
+				supportsToDelete: model.dependencyMap.supportsToDelete || [],
 			}
 		};
 

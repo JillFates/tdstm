@@ -68,7 +68,7 @@ declare var jQuery: any;
 						<tds-button-delete
 							[id]="'delete-button-' + rowIndex"
 							class="command-delete"
-							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)">
+							(click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper, SUPPORTS)">
 						</tds-button-delete>
                     </div>
                 </ng-template>
@@ -185,7 +185,7 @@ declare var jQuery: any;
 						<tds-button-delete
 							[id]="'dependent-delete-button-' + rowIndex"
 							class="command-delete"
-							(click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)">
+							(click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper, DEPENDENT)">
 						</tds-button-delete>
                     </div>
                 </ng-template>
@@ -268,10 +268,13 @@ export class SupportsDependsComponent implements OnInit {
 	private typeList = [];
 	private statusList = [];
 	private moveBundleList = [];
-	private deleteDependencies = [];
+	private supportsToDelete = [];
+	private dependentsToDelete = [];
 	public dependencyType = DEPENDENCY_TYPE;
 	public dataGridDependsOnHelper: DataGridOperationsHelper;
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
+	public readonly SUPPORTS = 'Supports';
+	public readonly DEPENDENT = 'Dependent';
 
 	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
@@ -443,9 +446,13 @@ export class SupportsDependsComponent implements OnInit {
 	/**
 	 * Delete the selected element
 	 */
-	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper): void {
+	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper, type: string): void {
 		if (dataItem.id) {
-			this.deleteDependencies.push(dataItem.id);
+			if (type === this.SUPPORTS)  {
+				this.supportsToDelete.push(dataItem.id);
+			} else {
+				this.dependentsToDelete.push(dataItem.id);
+			}
 		}
 
 		dataGrid.removeDataItem(dataItem);
@@ -519,7 +526,8 @@ export class SupportsDependsComponent implements OnInit {
 		if (validForm) {
 			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
 			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
-			this.model.dependencyMap.deleteDependencies = this.deleteDependencies;
+			this.model.dependencyMap.dependentsToDelete = this.dependentsToDelete;
+			this.model.dependencyMap.supportsToDelete = this.supportsToDelete;
 		}
 
 		this.isValidForm.emit(validForm);
