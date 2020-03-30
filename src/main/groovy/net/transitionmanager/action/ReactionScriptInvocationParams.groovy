@@ -9,6 +9,18 @@ import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
 import org.grails.web.json.JSONObject
 
+/**
+ * Every API ActionReaction invocation needs a List of parameters tomo complete the execution.
+ * This class is intent to contain all these parameters.
+ * It also manages reaction script using Map with each script associated.
+ * <pre>
+ *     JSONObject reactionScriptsJSONObject = JsonUtil.parseJson(action.reactionScripts)
+ *      ReactionScriptInvocationParams invocationParams =   new ReactionScriptInvocationParams( reactionScriptsJSONObject,...)
+ *      ...
+ *      invocationParams.getScript(ReactionScriptCode.PRE) == '// PRE script content'
+ * </pre>
+ * @see
+ */
 class ReactionScriptInvocationParams {
 
     Map<ReactionScriptCode, String> reactionScriptsMap = [:]
@@ -26,7 +38,11 @@ class ReactionScriptInvocationParams {
         this.assetFacade = assetFacade
         this.apiActionJob = new ApiActionJob()
     }
-
+    /**
+     *
+     * @param reactionScriptCode a value from {@link ReactionScriptCode} enumeration.
+     * @return a String script content from {@link ReactionScriptInvocationParams#reactionScriptsMap}
+     */
     String getScript(ReactionScriptCode reactionScriptCode) {
         return this.reactionScriptsMap.get(reactionScriptCode)
     }

@@ -71,7 +71,8 @@ class AbstractConnector {
 	 * Used to trigger the invocation of the particular method on the connector
 	 *
 	 * @param dictionaryItem - api catalog dictionary item
-	 * @param actionRequest - the container class that contains all we need to know about the call
+	 * @param invocationParams - an instance of {@link ReactionScriptInvocationParams}
+	 * 			the container class that contains all we need to know about the call
 	 * @return the result of the action invocation
 	 * @throws InvalidRequestException
 	 */
