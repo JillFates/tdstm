@@ -109,7 +109,7 @@ class DeviceService implements ServiceMethods {
 		}
 
 		Map commonModel = this.getCommonModel(false, project, assetEntity, params)
-		List fields =  dataviewService.fetch(DataViewMap.DEVICES.id).toMap(securityService.currentPersonId).schema.columns.collect{it.label}
+		List fields =  dataviewService.fetch(DataViewMap.DEVICES.id).toMap(project, securityService.userLoginPerson).schema.columns.collect{it.label}
 
 		Map model = [
 			assetEntity         : assetEntity,
