@@ -1,5 +1,6 @@
 package net.transitionmanager.person
 
+import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.asset.Application
@@ -278,7 +279,7 @@ class Person extends Party {
 	}
 
 	String toString() {
-		HtmlUtil.escape(firstName+ (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : ''))
+		return getFullName()
 	}
 
 	def beforeValidate() {
@@ -329,5 +330,20 @@ class Person extends Party {
 				personImageURL: personImageURL
 		]
 		return data.asImmutable()
+	}
+
+	/**
+	 * Construct and escape this person's full name.
+	 */
+	String getFullName() {
+		return HtmlUtil.escape(buildFullName())
+	}
+
+	/**
+	 * Put together this person's full name (no escaping).
+	 * @return
+	 */
+	private String buildFullName() {
+		return StringUtil.join([firstName, middleName, lastName])
 	}
 }
