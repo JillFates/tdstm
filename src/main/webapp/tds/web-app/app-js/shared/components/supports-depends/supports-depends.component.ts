@@ -452,8 +452,7 @@ export class SupportsDependsComponent implements OnInit {
 
 	/**
 	 * Confirm before delete
-	 * 
-	 * **/
+	 * */
 	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper): void {
 		this.tdsDialogService.confirm(
 			'Confirm Delete',

@@ -53,7 +53,8 @@
 			</div>
 
 			<div class="float-right header-buttons">
-				<tds-button [type]="'button'"
+				<tds-button *ngIf="currentOverrideState.isOverwritten"
+										[type]="'button'"
 										(click)="toggleAssetView()"
 										class="view-override-button"
 										[title]="currentOverrideState.tooltip">
