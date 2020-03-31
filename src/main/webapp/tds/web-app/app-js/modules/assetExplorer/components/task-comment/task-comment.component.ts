@@ -99,12 +99,16 @@ export class TaskCommentComponent implements OnInit {
 				this.dataGridTaskHelper = new DataGridOperationsHelper(
 					this.getTaskWithFilter(),
 					null,
-					null
+					null,
+					null,
+					2000,
 				);
 				this.dataGridCommentHelper = new DataGridOperationsHelper(
 					this.getCommentsWithFilter(),
 					null,
-					null
+					null,
+					null,
+					2000,
 				);
 				this.outputCommentCount();
 				this.outputTaskCount();
