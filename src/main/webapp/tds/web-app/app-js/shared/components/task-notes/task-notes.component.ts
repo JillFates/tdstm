@@ -1,6 +1,8 @@
 import {Component, Input, Output, EventEmitter,  OnInit } from '@angular/core';
 import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
 import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
+import {Permission} from "../../model/permission.model";
+import {PermissionService} from "../../services/permission.service";
 
 @Component({
 	selector: `tds-task-notes`,
@@ -23,6 +25,7 @@ import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
 										iconClass="is-solid"
                                         [tooltip]="'Create a note'"
                                         [id]="'btnAddNote'"
+									[disabled]="!hasEditTaskPermission"
                                         (click)="onCreateNote()">
                         </tds-button-add>
 					</div>
@@ -51,13 +54,18 @@ export class TaskNotesComponent implements OnInit {
 	@Input() dataGridTaskNotesHelper: DataGridOperationsHelper;
 	@Output() create: EventEmitter<void> = new EventEmitter<void>();
 	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
+	public hasEditTaskPermission = false;
 
-	constructor() {
+
+	constructor(
+		private permissionService: PermissionService
+	) {
 		// constructor
 	}
 
 	ngOnInit() {
 		/* on init */
+		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 	}
 
 	protected onCreateNote(): void {

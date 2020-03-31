@@ -38,6 +38,12 @@ databaseChangeLog = {
 	include file: 'version/v4_6_0/20181030-update-validation.groovy'
 	include file: 'version/v4_6_0/20181106-bundle-should-only-have-replace.groovy'
 	include file: 'version/v4_6_0/20181115-delete-bogus-user-preferences.groovy'
+
+	//We use the Dataview Domain in several migrations since it's been updated with a new column those
+	//migrations will fail unless we add the new column before them
+	include file: 'version/v4_7_2/20191105-add-dataview-permissions-and-property-for-save-as.groovy'
+
+
 	include file: 'version/v4_6_0/20181115-reorder-system-views-columns.groovy'
 	include file: 'version/v4_6_0/20181123-update-system-views-list-titles.groovy'
 	include file: 'version/v4_6_0/20181123-add-tags-column-to-all-assets-view.groovy'
@@ -83,7 +89,7 @@ databaseChangeLog = {
 	include file: 'version/v5_0_0/20190920-add_fk_to_party_relationship.groovy'
 	include file: 'version/v5_0_0/20191112-add_fk_to_asset_comment_asset.groovy'
 	include file: 'version/v4_7_2/20191028-batch-management-auto-process-import.groovy'
-	include file: 'version/v4_7_2/20191105-add-dataview-permissions-and-property-for-save-as.groovy'
+
 	include file: 'version/v4_7_2/20191119-add-use_with_asset_actions.groovy'
 	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 	include file: 'version/v5_0_0/20190925-updating-password-hashing.groovy'

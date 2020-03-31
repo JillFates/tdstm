@@ -16,5 +16,7 @@ export interface TaskActionInfoModel {
 		disabled: boolean,
 		tooltipText: string,
 		label: string
-	}
+	},
+	instructionsLinkURL: string,
+	instructionsLinkLabel: string
 }
