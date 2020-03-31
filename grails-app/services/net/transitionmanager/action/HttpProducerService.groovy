@@ -406,6 +406,8 @@ class HttpProducerService {
             return IOUtils.toString(is)
         } else if (contentType =~ XML) {
             return new XmlSlurper().parseText(IOUtils.toString(is))
+        } else if (contentType =~ ~/.*text\/html.*/) {
+            return IOUtils.toString(is)
         } else {
             return is
         }
