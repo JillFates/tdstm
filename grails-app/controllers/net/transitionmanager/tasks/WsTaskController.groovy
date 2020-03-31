@@ -12,6 +12,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.command.task.TaskCommand
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.security.UserLogin
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.task.Task
 import org.grails.web.json.JSONArray
 import net.transitionmanager.action.ApiActionService
@@ -393,6 +394,12 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	Map createTaskActionBarMap(Task task) {
 		Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
+
+		Map instructionLinkMap = AssetUtils.parseInstructionsLink(task.instructionsLink)
+
+		String instructionsLinkURL = instructionLinkMap? instructionLinkMap.url: null
+		String instructionsLinkLabel = instructionLinkMap? instructionLinkMap.label: null
+
 		return [
 				taskId: task.id,
 				apiActionId: task.apiAction?.id,
@@ -404,7 +411,9 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 				invokeActionDetails: invokeActionDetails,
 				predecessorsCount: task.taskDependencies.size(),
 				status: task.status,
-				successorsCount: TaskDependency.countByPredecessor(task)
+				successorsCount: TaskDependency.countByPredecessor(task),
+                instructionsLinkURL: instructionsLinkURL,
+                instructionsLinkLabel: instructionsLinkLabel
 		]
 	}
 
@@ -414,7 +423,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 * @return the API Action ID (if any), the ID of the person assigned to the task (if any), the number of
 	 *  successors and predecessors.
 	 */
-    @HasPermission(Permission.TaskManagerView)
+    @HasPermission(Permission.TaskView)
     def getInfoForActionBar(Long taskId) {
         Project project = getProjectForWs()
         AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
