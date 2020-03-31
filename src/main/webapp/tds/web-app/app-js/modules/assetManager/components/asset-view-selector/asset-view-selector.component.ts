@@ -8,85 +8,79 @@ import {
 	EventEmitter,
 	ElementRef
 } from '@angular/core';
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-
-import {ViewGroupModel} from '../../../assetExplorer/model/view.model';
-import {ViewType} from '../../../assetExplorer/model/view.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {Permission} from '../../../../shared/model/permission.model';
-
-import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {Router} from '@angular/router';
+import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
+import { ViewGroupModel } from '../../../assetExplorer/model/view.model';
+import { ViewType } from '../../../assetExplorer/model/view.model';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { Router } from '@angular/router';
 import { ReportResolveService } from '../../resolve/report-resolve.service';
 
 @Component({
 	selector: 'tds-asset-view-selector',
 	exportAs: 'tdsAssetViewSelector',
 	template: `
-        <kendo-dropdownlist #kendoDropDown="kendoDropDownList"
-                            [defaultItem]="defaultItem"
-                            [data]="data"
-                            [disabled]="isDisabled"
-                            (close)="onAction($event)"
-                            (open)="onAction($event)"
-                            [valueField]="'name'"
-                            (click)="onToggle()"
-                            [textField]="'name'"
-                            class="asset-explorer-view-selector-component">
-            <ng-template kendoDropDownListValueTemplate let-dataItem>
-		<span class="asset-explorer-view-selector-views">
-			<div *ngIf="selectedItem !== ''; else noneSelectedItem">
-				{{selectedItem}}
-			</div>
-			<ng-template #noneSelectedItem>
-				{{dataItem.name}}
+		<kendo-dropdownlist #kendoDropDown="kendoDropDownList"
+												[defaultItem]="defaultItem"
+												[data]="data"
+												[disabled]="isDisabled"
+												(close)="onAction($event)"
+												(open)="onAction($event)"
+												[valueField]="'name'"
+												(click)="onToggle()"
+												[textField]="'name'"
+												[popupSettings]="{popupClass: 'tds-asset-view-popup'}"
+												class="asset-explorer-view-selector-component">
+			<ng-template kendoDropDownListValueTemplate let-dataItem>
+				<span class="asset-explorer-view-selector-views">
+					<div *ngIf="selectedItem !== ''; else noneSelectedItem">
+						{{selectedItem}}
+					</div>
+					<ng-template #noneSelectedItem>
+						{{dataItem.name}}
+					</ng-template>
+				</span>
 			</ng-template>
-		</span>
-            </ng-template>
-            <ng-template kendoDropDownListHeaderTemplate>
-                <div class="has-feedback" style="margin-top:-20px;">
-                    <input #viewSelectorFilter
-                           (focusout)="onFocusOut()"
-                           type="text"
-                           class="form-control"
-                           (keyup)="onSearch()"
-                           name="searchFilterSelector"
-                           [(ngModel)]='searchFilterSelector'
-                           placeholder="Search"
-                           aria-describedby="search">
-                    <i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
-                </div>
-            </ng-template>
-            <ng-template kendoDropDownListItemTemplate let-dataItem>
-                <div class="container" *ngIf="!dataItem.default; else default">
-                    <div class="row" (click)="onFolderClick(dataItem)">
-                        <i class="fa" [ngClass]="getFolderStyle(dataItem)"></i> {{dataItem.name}}
-                        <span class="label label-primary pull-right">{{dataItem.items.length}}</span>
-                    </div>
-                    <div class="row" style="margin-top:5px;" *ngIf="dataItem.open">
-                        <li *ngIf="isCreateVisible(dataItem)">
-                            <a (click)="onCreateNew(dataItem)" class="btn"><i class="fa fa-plus-square"></i> Create New</a>
-                        </li>
-                        <li>
-                            <ul style="padding-left:10px;margin-top:5px;word-wrap:break-word" *ngFor="let value of dataItem.items">
-                                <a [routerLink]="['/asset','views',(value.overrideId? value.overrideId :value.id),'show']" [queryParams] ="value.queryParams" (click)="onFocusOut()">
-                                    <i class="fa fa-file-text-o"></i> {{value.name}}</a>
-                            </ul>
-                        </li>
-                    </div>
-                </div>
-                <ng-template #default>
-                </ng-template>
-            </ng-template>
-        </kendo-dropdownlist>
+			<ng-template kendoDropDownListHeaderTemplate>
+				<div class="asset-view-selector has-feedback">
+					<input #viewSelectorFilter
+								 (focusout)="onFocusOut($event)"
+								 type="text"
+								 class="form-control searchFilterInput"
+								 (keyup)="onSearch()"
+								 name="searchFilterSelector"
+								 [(ngModel)]='searchFilterSelector'
+								 placeholder="Search"
+								 aria-describedby="search">
+					<i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
+				</div>
+			</ng-template>
+			<ng-template kendoDropDownListItemTemplate let-dataItem>
+				<div class="section-container" *ngIf="!dataItem.default; else default">
+					<div class="folder-row" (click)="onFolderClick(dataItem)">
+						<i class="fa" [ngClass]="getFolderStyle(dataItem)"></i> {{dataItem.name}}
+						<span class="badge label-primary pull-right">{{dataItem.views.length}}</span>
+					</div>
+					<div class="option-row" *ngIf="dataItem.open">
+						<li *ngIf="isCreateVisible(dataItem)">
+							<a (click)="onCreateNew(dataItem)" class="btn btn-sm">
+								<i class="fa fa-plus-square"></i> Create New</a>
+						</li>
+						<li>
+							<ul *ngFor="let value of dataItem.views">
+								<a [routerLink]="['/asset','views',value.id,'show']" (click)="onFocusOut($event)">
+									<i class="fa fa-file-text-o"></i> {{value.name}}</a>
+							</ul>
+						</li>
+					</div>
+				</div>
+				<ng-template #default>
+				</ng-template>
+			</ng-template>
+		</kendo-dropdownlist>
 	`,
-	encapsulation: ViewEncapsulation.None,
-	styles: [
-			`ul.k-list .k-item.k-state-selected, ul.k-list .k-item.k-state-selected:hover {
-            color: #656565;
-            background-color: #ededed;
-        }`
-	]
+	encapsulation: ViewEncapsulation.None
 })
 export class AssetViewSelectorComponent implements AfterViewInit {
 	@Input() open ? = false;
@@ -94,16 +88,16 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	@Input() showCreate ? = true;
 	@Input() isDisabled ? = false;
 	@Output() onSelectView = new EventEmitter<any>();
-	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
-	@ViewChild('viewSelectorFilter') viewSelectorFilter: ElementRef;
-	private reports: ViewGroupModel[];
+	@ViewChild('kendoDropDown', { static: false }) dropdown: DropDownListComponent;
+	@ViewChild('viewSelectorFilter', { static: false }) viewSelectorFilter: ElementRef;
 	public data: ViewGroupModel[];
-	private searchFilterSelector = '';
 	public defaultItem = {
 		name: 'Saved Views',
 		default: true
 	};
 	public selectedItem = '';
+	private reports: ViewGroupModel[];
+	private searchFilterSelector = '';
 
 	constructor(
 		private router: Router,
@@ -129,7 +123,7 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	public onToggle() {
 		setTimeout(() => {
 			this.dropdown.toggle(!this.dropdown.isOpen)
-			setTimeout( () => {
+			setTimeout(() => {
 				if (this.dropdown.isOpen && this.viewSelectorFilter) {
 					this.viewSelectorFilter.nativeElement.focus();
 				}
@@ -140,8 +134,8 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	protected onSearch(): void {
 		let regex = new RegExp(this.searchFilterSelector, 'i');
 		this.data = this.reports.map((reportGrp) => {
-			let item = {...reportGrp};
-			item.items = item.items.filter(report => regex.test(report.name));
+			let item = { ...reportGrp };
+			item.views = item.views.filter(report => regex.test(report.name));
 			return item;
 		});
 	}
@@ -188,7 +182,6 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 		return item.type === ViewType.SYSTEM_VIEWS ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
 			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
-
 	}
 
 	public loadData() {

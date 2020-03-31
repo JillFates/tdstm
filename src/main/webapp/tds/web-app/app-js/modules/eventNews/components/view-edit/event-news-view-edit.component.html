@@ -1,0 +1,160 @@
+<div class="event-news-view-edit-component">
+    <form
+            name="eventNewsForm"
+            role="form"
+            data-toggle="validator"
+            #eventNewsForm="ngForm"
+            class="form-horizontal left-alignment"
+    >
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group" *ngIf="modalType !== actionTypes.CREATE">
+                        <label class="col-sm-3 control-label">
+                            Created At:
+                        </label>
+                        <div class="col-sm-9">
+                            <label class="control-label label-detail">{{eventNewsModel.createdAt | date: dateFormat}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="modalType !== actionTypes.CREATE">
+                        <label class="col-sm-3 control-label">
+                            Created By:
+                        </label>
+                        <div class="col-sm-9">
+                            <label class="control-label label-detail">{{eventNewsModel.createdBy}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="commentType"
+                                class="col-sm-3 control-label">
+                            Comment Type:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <select clrSelect
+                                    id="commentType"
+                                    name="commentType"
+                                    [(ngModel)]="eventNewsModel.commentType"
+                                    class="form-control"
+                            disabled>
+                                <option value="news">News</option>
+                            </select>
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                eventNewsModel.commentType
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="comment"
+                                class="col-sm-3 control-label"
+                                [ngClass]="{'required-field': modalType !== actionTypes.VIEW}">
+                            Comment:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <textarea
+                                    clrTextarea
+                                    id="comment"
+                                    name="comment"
+                                    class="form-control"
+                                    [(ngModel)]="eventNewsModel.comment"
+                            ></textarea>
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                eventNewsModel.comment
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="resolved"
+                                class="col-sm-3 control-label">
+                            Resolved / Archived:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <input
+                                    clrCheckbox
+                                    type="checkbox"
+                                    id="resolved"
+                                    name="resolved"
+                                    class="form-control"
+                                    [checked]="eventNewsModel.isArchived"
+                                    [(ngModel)]="eventNewsModel.isArchived"
+                            />
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                (eventNewsModel.isArchived) ? 'Yes' : 'No'
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label
+                                for="resolution"
+                                class="col-sm-3 control-label">
+                            Resolution:
+                        </label>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <textarea
+                                    clrTextarea
+                                    id="resolution"
+                                    name="resolution"
+                                    class="form-control"
+                                    [(ngModel)]="eventNewsModel.resolution"
+                            ></textarea>
+                        </div>
+                        <div
+                                class="col-sm-9"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                eventNewsModel.resolution
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="modalType !== actionTypes.CREATE">
+                        <label class="col-sm-3 control-label">
+                            Resolved At:
+                        </label>
+                        <div class="col-sm-9">
+                            <label class="control-label label-detail">{{eventNewsModel.resolvedAt | date: dateFormat}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="modalType !== actionTypes.CREATE">
+                        <label class="col-sm-3 control-label">
+                            Resolved By:
+                        </label>
+                        <div class="col-sm-9">
+                            <label class="control-label label-detail">{{eventNewsModel.resolvedBy}}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,19 @@
+.user-dashboard-component {
+	kendo-grid.k-grid {
+		.grid-label {
+			font-size: 14px;
+			line-height: 24px;
+			> span {
+				font-weight: normal;
+				font-size: 10px;
+				line-height: 16px;
+				margin-left: 5px;
+			}
+		}
+	}
+}
+
+// override of the grid page-height, calculation totally valid and free to replicate on any particular grid neeeded
+.task-list kendo-grid.page-height {
+  --subtraction-height: 325px;
+}

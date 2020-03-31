@@ -14,10 +14,12 @@ export const PROMPT_CONFIRM = 'GLOBAL.CONFIRM';
 export const PROMPT_CANCEL = 'GLOBAL.CANCEL';
 export const LOADER_IDLE_PERIOD = 150;
 export const PROGRESSBAR_INTERVAL_TIME = 1 * 1000; // Seconds
+export const ESCAPE_KEYCODE = 27;
 // Pagination
 export const GRID_DEFAULT_PAGINATION_OPTIONS = [25, 50, 100];
 export const GRID_DEFAULT_PAGE_SIZE = 25;
 export const LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY = 'licenseManager.list.pageSize';
+export const MINIMUM_ROWS_TO_MAKE_MENU_COLUMN_POSITIONED_DYNAMIC = 5;
 
 // KENDO UPLOAD FILE
 export const REMOVE_FILENAME_PARAM = 'filename';

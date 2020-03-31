@@ -17,14 +17,18 @@ import {PermissionService} from "../../services/permission.service";
                         (sortChange)="dataGridTaskNotesHelper.sortChange($event)">
                 <!-- Toolbar Template -->
                 <ng-template kendoGridToolbarTemplate [position]="'top'">
-                    <label class="pad-top-2 pad-left-10 mar-bottom-0">Task Notes ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
-                    <tds-button-add class="button-header-grid float-right"
-                                    [title]="'Create'"
-                                    [tooltip]="'Create a note'"
-                                    [id]="'btnAddNote'"
+					<div class="table-container">
+                        <label class="table-title">Task Notes ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
+                        <tds-button-add [title]="'Create'"
+										[displayLabel]="false"
+										[small]="true"
+										iconClass="is-solid"
+                                        [tooltip]="'Create a note'"
+                                        [id]="'btnAddNote'"
 									[disabled]="!hasEditTaskPermission"
-                                    (click)="onCreateNote()">
-                    </tds-button-add>
+                                        (click)="onCreateNote()">
+                        </tds-button-add>
+					</div>
                 </ng-template>
                 <!-- Columns -->
                 <kendo-grid-column *ngFor="let column of taskNotesColumnsModel.columns"

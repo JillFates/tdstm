@@ -1,0 +1,77 @@
+// Basic Display Message
+.message-wrapper {
+	top: 8%;
+	margin: auto;
+	position: fixed;
+	left: 0;
+	right: 0;
+	z-index: 1100;
+	width: fit-content;
+	max-width: 50%;
+
+	.message-wrapper-container {
+		.alert {
+			display: grid;
+			grid-template-columns: min-content 1fr min-content;
+			column-gap: 10px;
+			min-height: 1.5rem;
+			&.fadeIn {
+				-webkit-transition: all linear 0.25s;
+				transition: all linear 0.25s;
+				&.fadeIn.ng-hide {
+					opacity: 0;
+				}
+				&.fadeIn.ng-show {
+					opacity: 1;
+				}
+			}
+
+			&.alert-dismissable {
+				.close {
+					padding: 0 5px;
+					width: unset;
+					position: unset;
+					height: unset;
+				}
+			}
+
+			.icon {
+				padding: 0 5px;
+				margin: auto;
+			}
+
+			h5 {
+				display: block;
+				margin: auto;
+				word-break: break-all;
+			}
+		}
+      .alert-dismissable {
+        .close:focus {
+          box-shadow: none;
+        }
+      }
+	}
+}
+
+// Kendo Notification
+div {
+	&.k-animation-container {
+		div {
+			&.k-notification {
+				top: 8% !important;
+				margin: auto !important;
+				position: fixed !important;
+				left: 0 !important;
+				right: 0 !important;
+				width: 80% !important;
+				z-index: 1100 !important;
+				background-color: inherit !important;
+				border: inherit !important;
+				div.alert {
+					border: inherit !important;
+				}
+			}
+		}
+	}
+}

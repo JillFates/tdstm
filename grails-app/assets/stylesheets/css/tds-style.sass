@@ -1,4 +1,10 @@
+@import "/tdstm/tds/web-app/assets/modules/clarity/css/clr-icons.min.css"
+@import "/tdstm/tds/web-app/assets/modules/clarity/css/clr-ui.min.css"
+
 @import "base/color"
+
+@import "bootstrap-overrides"
+@import "clarity-overrides"
 
 /* General Elements */
 @import "elements/general/alerts"
@@ -20,9 +26,13 @@
 @import "elements/general/input"
 @import "elements/general/legacy-flexbox"
 @import "shared-legacy-angular/dates-info"
+@import "elements/general/tds-modal"
+@import "elements/general/table"
 
 @import "elements/component/tds-asset-tag-selector"
-
+@import "elements/component/header-component"
+@import "elements/component/asset-dependency-component"
+@import "elements/component/dep-analyzer"
 
 @import "layout/html"
 @import "layout/top-nav"
@@ -41,7 +51,6 @@
 
 @import "page/module/errors/errorPage"
 @import "page/module/errors/licensingErrors"
-
 
 /* Migration CSS, after migrate one entire module, delete their css */
 @import "page/module/assets/assetSummary"
@@ -74,3 +83,9 @@
 @import "page/module/dashboards/userDashboard"
 @import "page/module/dashboards/planningDashboard"
 @import "page/module/tasks/cookbook"
+
+@import "legacy-css-overrides"
+
+/* Clarity */
+@import "elements/general/ng-grid"
+@import "elements/general/clr-select"

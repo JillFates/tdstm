@@ -56,35 +56,15 @@ class ControlAngularTagLib {
 			throw new InvalidParamException('<tdsAngular:inputLabel> tag requires field=fieldSpec Map')
 		}
 		StringBuilder sb = new StringBuilder("\n")
-
-		// Build the TD element
-		// <td class="label assetName C" nowrap="nowrap">
-		sb.append('<td class="label ')
-		// TODO : Determine if the fieldName is used in the LABEL class attribute
-		sb.append(fieldSpec.field)
-		if (fieldSpec.imp) {
-			String imp = fieldSpec.imp
-			sb.append(" ${imp}")
-			// Determines if the imp is I)mportant or C)ritical
-			if (imp == "Y" || imp == "G") {
-				// Checks if the value for the input was given
-				if (attrs.containsKey("value")) {
-					// If the value for the input is empty, the label will be red.
-					if (attrs.value == null || StringUtil.isBlank(attrs.value.toString()) ) {
-						sb.append(EMPTY_IMP_CRIT_FIELD_CSS_CLASS)
-					}
-				}
-			}
-		}
-		sb.append('" nowrap="nowrap">')
-		sb.append("\n")
-
+		def imp = fieldSpec.imp;
 		// Build the LABEL element
 		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('"')
-		sb.append(' >')
+		sb.append(' class="')
+		sb.append(imp)
+		sb.append('">')
 		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
@@ -95,8 +75,6 @@ class ControlAngularTagLib {
 		}
 		sb.append('</label>')
 
-		// Close out the TD
-		sb.append("\n</td>")
 		out << sb.toString()
 	}
 
@@ -258,18 +236,16 @@ class ControlAngularTagLib {
 	def showLabelAndField = { Map attrs ->
 		out << inputLabel(attrs)
 		out << labelForShowField(attrs)
-
 	}
 
 	/**
 	 * Used to render the label and the corresponding input in create/edit views.
 	 */
 	def inputLabelAndField = { Map attrs ->
-		def tdAttr = " data-for='" + attrs.field.field + "' class='" + attrs.field.imp + "' "
+		out << '<div class="clr-form-control">'
 		out << inputLabel(attrs)
-		out << "<td" + tdAttr + ">"
 		out << inputControl(attrs)
-		out << '</td>'
+		out << "</div>"
 	}
 
 	/**
@@ -356,7 +332,7 @@ class ControlAngularTagLib {
 	 * @return the INPUT Component HTML
 	 */
 	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
-		'<input #' + 'field' + fieldSpec.field + '="ngModel" [(ngModel)]="'+ ngmodel +'" ' +
+		'<input clrInput #' + 'field' + fieldSpec.field + '="ngModel" [(ngModel)]="'+ ngmodel +'" ' +
 			attribute('type', 'text') + attribute('placeholder', placeholder) +
 			commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>' +
 			renderRequiredLabel(fieldSpec)
@@ -466,9 +442,6 @@ class ControlAngularTagLib {
 	 */
 	private String classAttrib(Map fieldSpec) {
 		String c = CONTROL_CSS_CLASS
-		if (fieldSpec.imp) {
-			c += " ${fieldSpec.imp}"
-		}
 		return attribute('class', c)
 	}
 

@@ -17,6 +17,7 @@ import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.ServiceMethods
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.springframework.jdbc.core.JdbcTemplate
 
 import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
@@ -1166,7 +1167,13 @@ class PartyRelationshipService implements ServiceMethods {
 		List<Party> clients =  getCompanyClients(employer)*.partyIdTo
 		List<Party> companies = (partners + clients)
 		companies << employer
-		companies = companies.unique{ p1, p2 -> p1.id <=> p2.id}.sort { it.name }
+
+		companies = companies.unique { Party p1, Party p2 ->
+			GrailsHibernateUtil.unwrapIfProxy(p1).id <=> GrailsHibernateUtil.unwrapIfProxy(p2).id
+		}.sort {
+			GrailsHibernateUtil.unwrapIfProxy(it).name
+		}
+
 		return companies
 	}
 }

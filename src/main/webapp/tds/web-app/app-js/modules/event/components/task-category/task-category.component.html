@@ -1,16 +1,16 @@
 <div class="container task-category-component" *ngIf="taskCategories.hasInfo">
-    <div class="row">
-        <div class="col-lg-2">
-            <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;" >
+    <div style="display: grid; grid-template-columns: 240px 5fr;">
+        <div>
+            <div *ngFor="let row of taskCategories.tasks; let rowIndex = index;" >
                 <div class="category-description category-name{{rowIndex === 0 ? '-first' : ''}}">{{categories[rowIndex]}}</div>
             </div>
         </div>
-        <div class="col-lg-7 category-container" (scroll)="handleScroll($event)" #categoryContainer>
-            <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;" >
-                    <div class="col-md-10">
-                        <div class="row">
+        <div (scroll)="handleScroll($event)" #categoryContainer>
+            <div *ngFor="let row of taskCategories.tasks; let rowIndex = index;" >
+                    <div>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr);">
                             <div *ngFor="let column of row;"
-                                    class="col-md-{{colSize}} category-column {{column.classes}}"
+                                    class=" category-column {{column.classes}}"
                                     [ngClass]="{'heading': rowIndex === RowType.Header}"
                                     [style.background-color]="rowIndex === RowType.Percents && column.compose ? column.compose.color : ''">
                                     <a *ngIf="rowIndex === RowType.Header; else categoryValue"

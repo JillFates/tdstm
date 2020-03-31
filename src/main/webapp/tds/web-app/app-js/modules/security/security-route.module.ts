@@ -6,6 +6,7 @@ import {ErrorPageComponent} from './components/error-page/error-page.component';
 import {UnauthorizedPageComponent} from './components/unauthorized-page/unauthorized-page.component';
 import {NotFoundPageComponent} from './components/not-found-page/not-found-page.component';
 import {ErrorLicensePageComponent} from './components/error-license-page/error-license-page.component';
+import {TokenInvalidPageComponent} from './components/token-invalid/token-invalid-page.component';
 
 /**
  * Security Route States
@@ -25,6 +26,9 @@ export class SecurityRouteStates {
 	};
 	public static readonly LICENSE_NOT_FOUND = {
 		url: 'licenseNotFound'
+	};
+	public static readonly TOKEN_INVALID = {
+		url: 'tokenInvalid'
 	};
 }
 
@@ -57,7 +61,8 @@ export const SecurityRoute: Routes = [
 			}
 		},
 		component: UnauthorizedPageComponent
-	}, {
+	},
+	{
 		path: SecurityRouteStates.LICENSE_NOT_FOUND.url,
 		data: {
 			page: {
@@ -65,6 +70,15 @@ export const SecurityRoute: Routes = [
 			}
 		},
 		component: ErrorLicensePageComponent
+	},
+	{
+		path: SecurityRouteStates.TOKEN_INVALID.url,
+		data: {
+			page: {
+				title: '', instruction: '', menu: []
+			}
+		},
+		component: TokenInvalidPageComponent
 	}
 ];
 

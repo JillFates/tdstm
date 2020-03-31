@@ -1,39 +1,32 @@
-import {Component, ViewChild} from '@angular/core';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
+// Angular
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+// Model
 import {FieldImportance} from '../../../fieldSettings/model/field-settings.model';
 import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {Dialog, DialogButtonType} from 'tds-component-library';
+// Service
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import * as R from 'ramda';
 
 @Component({
 	selector: 'asset-explorer-view-export',
 	template: `
-        <div class="modal-content">
-            <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-                <h4 class="modal-title">Export to Excel</h4>
-            </div>
-            <div class="modal-body">
-                <form name="exportForm" role="form" data-toggle="validator" #exportForm='ngForm'>
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="fileName" class="control-label">File Name </label>
-                            <input type="text" class="form-control" id="fileName" [(ngModel)]="fileName" name="fileName" required [ngClass]="{'has-error': !exportForm.form.valid}"/>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer form-group-center">
-                <tds-button-export class="btn-primary pull-left" (click)="getExportData()" [disabled]="!exportForm.form.valid">
-                </tds-button-export>
-                <kendo-excelexport [data]="dataToExport" fileName="{{exportFileName + '.xlsx'}}" #excelexport>
-                    <kendo-excelexport-column *ngFor="let column of columns" [field]="column.name" [title]="column.title" [locked]="column.locked" [cellOptions]="column.cell">
-										</kendo-excelexport-column>
-                </kendo-excelexport>
-                <tds-button-cancel class="pull-right"  (click)="cancelCloseDialog()"></tds-button-cancel>
-            </div>
-        </div>
+		<form name="exportForm" role="form" data-toggle="validator" #exportForm='ngForm'>
+			<div class="box-body">
+				<div class="form-group">
+					<label for="fileName" class="control-label">File Name </label>
+					<input type="text" class="form-control" id="fileName" [(ngModel)]="fileName" name="fileName" required [ngClass]="{'has-error': !exportForm.form.valid}"/>
+				</div>
+			</div>
+		</form>
+        <kendo-excelexport [data]="dataToExport" fileName="{{exportFileName + '.xlsx'}}" #excelexport>
+            <kendo-excelexport-column *ngFor="let column of columns" [field]="column.name" [title]="column.title"
+                                      [locked]="column.locked" [cellOptions]="column.cell">
+            </kendo-excelexport-column>
+        </kendo-excelexport>
 	`,
 	styles: [`
         .has-error, .has-error:focus {
@@ -41,16 +34,44 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
         }
 	`]
 })
-export class AssetViewExportComponent {
+export class AssetViewExportComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	public columns: any[];
 	public fileName = 'asset_explorer';
 	public exportFileName = '';
 	public dataToExport: any[] = [];
 	private allProperties = false;
 	private fieldImportance = new FieldImportance();
-	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
+	@ViewChild('excelexport', {static: false}) public excelexport: ExcelExportComponent;
 
-	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
+	public assetExportModel: AssetExportModel;
+
+	constructor(
+		private assetExpService: AssetExplorerService
+	) {
+		super();
+	}
+
+	ngOnInit(): void {
+		this.assetExportModel = R.clone(this.data.assetExportModel);
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'export',
+			text: 'Export',
+			show: () => true,
+			type: DialogButtonType.CONTEXT,
+			action: this.getExportData.bind(this)
+		});
 
 		let configuredColumns = {...this.assetExportModel.assetQueryParams.filters.columns};
 
@@ -121,12 +142,12 @@ export class AssetViewExportComponent {
 		this.prepareAssetTagsData();
 		setTimeout(() => {
 			this.excelexport.save();
-			this.activeDialog.close();
+			super.onCancelClose();
 		}, 500);
 	}
 
 	cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		super.onCancelClose();
 	}
 
 	/**
@@ -147,5 +168,12 @@ export class AssetViewExportComponent {
 				item['common_tagAssets'] = tagsValue;
 			});
 		}
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

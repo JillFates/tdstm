@@ -1,44 +1,47 @@
-import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
-import {State} from '@progress/kendo-data-query';
-
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
+// Angular
+import { Component, ViewChild, OnInit, ComponentFactoryResolver, OnDestroy } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+// Model
 import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldSettingsModel} from '../../../fieldSettings/model/field-settings.model';
-import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
+import {ViewModel} from '../../../assetExplorer/model/view.model';
 import {ViewColumn, QueryColumn} from '../../../assetExplorer/model/view-spec.model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {AssetViewSelectorComponent} from '../../../assetManager/components/asset-view-selector/asset-view-selector.component';
-import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
-import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
-import {Permission} from '../../../../shared/model/permission.model';
 import {VIEW_COLUMN_MIN_WIDTH} from '../../../assetExplorer/model/view-spec.model';
 import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params';
 import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
-import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
+// Component
+import {AssetViewShowComponent} from '../asset-view-show/asset-view-show.component';
+import {AssetViewSelectorComponent} from '../../../assetManager/components/asset-view-selector/asset-view-selector.component';
+import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
+import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+// Service
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+// Other
+import {State} from '@progress/kendo-data-query';
 import {clone} from 'ramda';
-import { AssetViewShowComponent } from '../asset-view-show/asset-view-show.component';
-import {SaveOptions} from '../../../../shared/model/save-options.model';
 import {
 	ASSET_NOT_OVERRIDE_STATE,
 	ASSET_OVERRIDE_CHILD_STATE,
 	ASSET_OVERRIDE_PARENT_STATE, OverrideState
-} from '../models/asset-view-override-state.model';
+} from '../../models/asset-view-override-state.model';
+
 declare var jQuery: any;
+
 @Component({
 	selector: 'tds-asset-view-config',
 	templateUrl: 'asset-view-config.component.html'
 })
 export class AssetViewConfigComponent implements OnInit, OnDestroy {
-	@ViewChild('select') select: AssetViewSelectorComponent;
+	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 
 	public data: any = null;
 	private dataSignature: string;
 	protected justPlanning: boolean;
-	public saveOptions: any;
 	public gridState: State = {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE,
@@ -72,29 +75,31 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	position: any[] = [];
 	currentTab = 0;
 	public metadata: any = {};
+	saveOptions: any;
 	private queryParams: any = {};
 	currentOverrideState: OverrideState;
 	private navigationSubscription: any;
 	private lastSnapshot: any;
-	private currentId;
+	private lastViewId;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private route: ActivatedRoute,
 		private router: Router,
 		private assetExplorerService: AssetExplorerService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService) {
 		this.initResolveData();
 	}
 
 	ngOnInit(): void {
+		this.justPlanning = false;
 		if (this.model && this.model.id) {
 			this.notifier.broadcast({
 				name: 'notificationHeaderTitleChange',
 				title: this.model.name
 			});
-			this.currentId = this.model.id;
 			this.onPreview();
 		}
 		this.reloadStrategy();
@@ -109,14 +114,14 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		this.allFields = this.route.snapshot.data['fields'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
-		const {dataView, saveOptions} = this.route.snapshot.data['report'];
+		this.model = { ...this.route.snapshot.data['report'] };
+		const { dataView, saveOptions } = this.route.snapshot.data['report'];
 		this.model = dataView || this.route.snapshot.data['report'];
 		this.saveOptions = saveOptions;
 		this.dataSignature = JSON.stringify(this.model);
 		this.draggableColumns = [];
 		this.handleQueryParams();
 		if (this.model && this.model.id) {
-			this.currentId = this.model.id;
 			this.updateFilterbyModel();
 			this.currentTab = 1;
 			this.draggableColumns = this.model.schema.columns.slice();
@@ -141,9 +146,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 			}
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
-				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
-					this.initResolveData(true);
-				}
+				this.initResolveData(true);
 			}
 		});
 	}
@@ -163,15 +166,19 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/**
+	 * Switches the current view to non-override system view or override system view.
+	 */
 	toggleAssetView() {
-		let dataViewId;
+		let navigateToViewId = this.model.id;
 		const _override = !this.queryParams._override;
-		if (this.model.overridesView) {
-			dataViewId = this.model.overridesView.id
-		} else {
-			dataViewId = this.model.id;
+		if (!_override && this.model.overridesView) {
+			navigateToViewId = this.model.overridesView.id
+		} else if (this.lastViewId) {
+			navigateToViewId = this.lastViewId;
 		}
-		return this.router.navigate(['/asset', 'views', dataViewId, 'edit'], {
+		this.lastViewId = this.model.id;
+		return this.router.navigate(['/asset', 'views', navigateToViewId, 'edit'], {
 			queryParams: { _override }
 		});
 	}
@@ -296,18 +303,27 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 
 	protected openSaveDialog(): void {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
-		this.dialogService.open(AssetViewSaveComponent, [
-			{ provide: ViewModel, useValue: this.model },
-			{ provide: ViewGroupModel, useValue: selectedData },
-			{ provide: SaveOptions, useValue: this.saveOptions }
-		]).then(result => {
-			this.model = result;
-			this.dataSignature = JSON.stringify(this.model);
-			setTimeout(() => {
-				this.router.navigate(['asset', 'views', this.model.id, 'edit']);
-			});
-		}).catch(result => {
-			console.log('error');
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetViewSaveComponent,
+			data: {
+				viewModel: this.model,
+				viewGroupModel: selectedData,
+				saveOptions: this.saveOptions
+			},
+			modalConfiguration: {
+				title: 'Save List View',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe( (data: any) => {
+			if (data.status === DialogExit.ACCEPT) {
+				this.model = data;
+				this.dataSignature = JSON.stringify(this.model);
+				setTimeout(() => {
+					this.router.navigate(['asset', 'views', this.model.id, 'edit']);
+				});
+			}
 		});
 	}
 
@@ -322,47 +338,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	}
 
 	public isValid(): boolean {
-		return (
-			this.isAssetSelected() &&
-			this.isColumnSelected() &&
-			this.hasAtLeastOneNonLockedColumnOrEmpty()
-		)
-
-	}
-
-	protected isDirty(): boolean {
-		let result = this.dataSignature !== JSON.stringify(this.model);
-		// TODO: hasPendingChanges
-		// if (this.state && this.state.$current && this.state.$current.data) {
-		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
-		// }
-		return result;
-	}
-
-	public isSaveAvailable(): boolean {
-		return this.assetExplorerService.isSaveAvailable(this.model);
-	}
-
-	protected isSaveAsAvailable(): boolean {
-		return this.model.id ?
-			(	this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) && this.canCreateViews() :
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) && this.canCreateViews()
-			)
-			: this.isSaveAvailable();
-	}
-
-	/**
-	 * Check if user has AssetExplorerCreate permission.
-	 */
-	canCreateViews(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
-	}
-
-	public isSystemSaveAvailable(edit): boolean {
-		return edit ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
+		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
 	protected isCurrentTab(num: number): boolean {
@@ -387,13 +363,6 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	}
 
 	/** Dialog and view Actions methods */
-
-	protected onSaveAs(): void {
-		if (this.isSaveAsAvailable()) {
-			this.openSaveDialog();
-		}
-	}
-
 	public onCancel() {
 		if (this.model && this.model.id) {
 			const _override = this.queryParams._override;
@@ -404,17 +373,19 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	protected onSaveAs(): void {
+		this.openSaveDialog();
+	}
+
 	protected onSave() {
-		if (this.isSaveAvailable()) {
-			if (this.model.id) {
-				this.assetExplorerService.saveReport(this.model)
-					.subscribe(result => {
-						this.dataSignature = JSON.stringify(this.model);
-						this.select.loadData();
-					});
-			} else {
-				this.openSaveDialog();
-			}
+		if (this.model.id) {
+			this.assetExplorerService.saveReport(this.model)
+				.subscribe(result => {
+					this.dataSignature = JSON.stringify(this.model);
+					this.select.loadData();
+				});
+		} else {
+			this.openSaveDialog();
 		}
 	}
 
@@ -430,13 +401,18 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 			viewName: this.model.name
 		};
 
-		this.dialogService.open(AssetViewExportComponent, [
-			{ provide: AssetExportModel, useValue: assetExportModel }
-		]).then(result => {
-			console.log(result);
-		}).catch(result => {
-			console.log('error');
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetViewExportComponent,
+			data: {
+				assetExportModel: assetExportModel
+			},
+			modalConfiguration: {
+				title: 'Export to Excel',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe( );
 	}
 
 	protected onFieldSelection(field: FieldSettingsModel) {
@@ -448,7 +424,8 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 				locked: false,
 				edit: false,
 				label: field.label,
-				filter: ''
+				filter: '',
+				tip: field.tip || ''
 			});
 			if (this.model.schema.columns.length === 1) {
 				this.model.schema.sort = {
@@ -511,7 +488,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 			}
 
 		} else {
-			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'
@@ -537,6 +514,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 			this.assetExplorerService.previewQuery(params)
 				.subscribe(result => {
 					this.data = result;
+					this.addToolTipsToColumns();
 					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
@@ -649,6 +627,22 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * Add to every current schema column selected its corresponding tooltip
+	 */
+	addToolTipsToColumns(): void {
+		this.model.schema.columns.forEach((column: ViewColumn) => {
+			const currentDomain = (column.domain || '');
+			const domain = this.allFields.find((field: FieldSettingsModel) => field.domain === currentDomain.toUpperCase());
+			if (domain) {
+				const currentField = domain['fields'].find((field: FieldSettingsModel) => field.field === column.property);
+				if (currentField) {
+					column.tip = currentField.tip;
+				}
+			}
+		});
+	}
+
+	/**
 	 * Store query params from url.
 	 */
 	private handleQueryParams() {
@@ -656,13 +650,6 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 			const _override = !params._override || params._override === 'true' || params._override === true;
 			this.queryParams = { _override };
 		});
-	}
-
-	/**
-	 * Checks if current model is a system view
-	 */
-	isSystemView(): boolean {
-		return this.model.isSystem
 	}
 
 	/**

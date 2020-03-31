@@ -1,0 +1,11 @@
+.standard-notices {
+ &.tds-modal-content  {
+   .modal-body {
+     max-height: none !important;
+   }
+
+   .notices-container {
+     height: 500px;
+   }
+ }
+}

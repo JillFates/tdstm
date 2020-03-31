@@ -11,24 +11,24 @@ class UserCreationPage extends Page {
     }
 
     static content = {
-        ucPageTitle             { $("section", class:"content-header").find("h1")}
+        ucPageTitle { $("section", class:"content-header").find("h2")}
         pageMessage (required: false, wait:true) { $("div", class:"message")}
-        ucPageForm              { $("form", id:"createUserForm")}
-        ucUsername              { ucPageForm.find("input#username")}
-        ucEmail                 { ucPageForm.find("input#emailInputId")}
-        ucPassword              { ucPageForm.find("input#passwordId")}
-        ucConfirmPassword       { ucPageForm.find("input#confirmPasswordId")}
+        ucPageForm  { $("form", id:"createUserForm")}
+        ucUsername  { ucPageForm.find("input#username")}
+        ucEmail     { ucPageForm.find("input#emailInputId")}
+        ucPassword  { ucPageForm.find("input#passwordId")}
+        ucConfirmPassword { ucPageForm.find("input#confirmPasswordId")}
 
-        ucAdminRoleCB           { ucPageForm.find("input#role_ROLE_ADMIN")}
-        ucClientAdmiRoleCB      { ucPageForm.find("input#role_ROLE_CLIENT_ADMIN")}
-        ucClientMgrRoleCB       { ucPageForm.find("input#role_ROLE_CLIENT_MGR")}
-        ucEditorRoleCB          { ucPageForm.find("input#role_ROLE_EDITOR")}
-        ucSupervisorRoleCB      { ucPageForm.find("input#role_ROLE_SUPERVISOR")}
-        ucUserRoleCB            { ucPageForm.find("input#role_ROLE_USER")}
+        ucAdminRoleCB { ucPageForm.find("input#role_ROLE_ADMIN")}
+        ucClientAdmiRoleCB { ucPageForm.find("input#role_ROLE_CLIENT_ADMIN")}
+        ucClientMgrRoleCB { ucPageForm.find("input#role_ROLE_CLIENT_MGR")}
+        ucEditorRoleCB { ucPageForm.find("input#role_ROLE_EDITOR")}
+        ucSupervisorRoleCB { ucPageForm.find("input#role_ROLE_SUPERVISOR")}
+        ucUserRoleCB { ucPageForm.find("input#role_ROLE_USER")}
 
-        ucActiveSelector        { ucPageForm.find("select#active")}
-        ucProjectSelector       { ucPageForm.find("select#projectId")}
-        ucSaveBtn               { $("input", class:"save")}
+        ucActiveSelector { ucPageForm.find("select#active")}
+        ucProjectSelector { ucPageForm.find("select#projectId")}
+        ucSaveBtn { $("input", class:"save")}
     }
     /**
      * This method selects up to six random roles for the user

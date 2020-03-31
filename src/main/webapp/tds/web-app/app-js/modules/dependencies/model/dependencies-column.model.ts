@@ -12,9 +12,7 @@ export class DependenciesColumnModel {
 				label: 'Asset',
 				property: 'assetName',
 				type: 'text',
-				width: 160,
-				locked: true
-
+				width: 160
 			},
 			{
 				label: 'Asset Type',
@@ -32,7 +30,7 @@ export class DependenciesColumnModel {
 				label: 'Asset Tags',
 				property: 'tagsAsset',
 				type: 'tags',
-				width: 220
+				width: 260
 			},
 			{
 				label: 'Type',

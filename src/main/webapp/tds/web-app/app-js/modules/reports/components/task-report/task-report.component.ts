@@ -1,8 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {ReportsService} from '../../service/reports.service';
-import {Observable} from 'rxjs';
+// Angular
+import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
+// Component
 import {ReportComponent} from '../report.component';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Service
+import {ReportsService} from '../../service/reports.service';
+import {DialogService} from 'tds-component-library';
+// Other
+import {Observable} from 'rxjs';
 
 @Component({
 	selector: 'tds-task-report',
@@ -60,14 +64,13 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 									</div>
 									<div class="form-group row ">
 										<div class="col-sm-4 col-sm-offset-2 buttons">
-											<tds-button-custom class="btn-primary"
-																				 (click)="onGenerateReport()"
-																				 title="Generate"
-																				 tooltip="Generate"
-																				 icon="table">
+											<tds-button-custom
+													(click)="onGenerateReport()"
+													title="Generate"
+													tooltip="Generate"
+													icon="table">
 											</tds-button-custom>
 											<tds-button-export
-												class="btn-primary"
 												(click)="onGenerateXLSReport()"
 												title="Export to Excel"
 												tooltip="Export to Excel">
@@ -94,8 +97,12 @@ export class TaskReportComponent extends ReportComponent {
 	includeUnpublished = true;
 	private readonly allEventsOption = {id: -1, name: 'All Events'};
 
-	constructor(reportsService: ReportsService, dialogService: UIDialogService) {
-		super(reportsService, dialogService);
+	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
+		reportsService: ReportsService,
+		dialogService: DialogService
+	) {
+		super(componentFactoryResolver, reportsService, dialogService);
 		this.selectedEvents = [this.allEventsOption];
 		this.onLoad();
 	}

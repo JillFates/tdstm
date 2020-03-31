@@ -33,7 +33,7 @@ class WsApiActionController implements ControllerMethods {
      * List all available ApiActions for the user's project.
      * @return
      */
-    // @HasPermission(Permission.ActionViewScript)
+    @HasPermission(Permission.ActionView)
     def list(){
         Project project = securityService.getUserCurrentProjectOrException()
         List<Map> apiActions = apiActionService.list(project, true, params)
@@ -44,7 +44,7 @@ class WsApiActionController implements ControllerMethods {
      * Fetch the ApiAction with this id, if it belongs to the user's project.
      * @return
      */
-    // @HasPermission(Permission.ActionViewScript)
+    @HasPermission(Permission.ActionEdit)
     def fetch(Long id) {
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.find(id, project, true)
@@ -67,7 +67,7 @@ class WsApiActionController implements ControllerMethods {
      */
     @HasPermission(Permission.ActionCreate)
     def create() {
-        ApiActionCommand command = populateCommandObject(ApiActionCommand)
+        ApiActionCommand command = populateCommandObject(ApiActionCommand, false)
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(command)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
@@ -78,7 +78,7 @@ class WsApiActionController implements ControllerMethods {
      */
     @HasPermission(Permission.ActionEdit)
     def update(Long id) {
-        ApiActionCommand command = populateCommandObject(ApiActionCommand)
+        ApiActionCommand command = populateCommandObject(ApiActionCommand, false)
         // TODO : JPM 3/2018 : where is domainVersion coming from?
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(command, id, domainVersion)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
@@ -90,7 +90,6 @@ class WsApiActionController implements ControllerMethods {
 	@HasPermission(Permission.ActionInvoke)
 	def validateSyntax() {
 		ApiActionValidateScriptCommand commandObject = populateCommandObject(ApiActionValidateScriptCommand)
-		validateCommandObject(commandObject)
 		renderSuccessJson(apiActionService.validateSyntax(commandObject.scripts))
 	}
 

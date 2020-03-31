@@ -15,8 +15,8 @@ class ImportTasksPage extends Page {
     }
 
     static content = {
-        importTasksPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        importTasksPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        importTasksPageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        importTasksPageBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
         tasksModule { module TasksMenuModule}
         commonsModule { module CommonsModule }
     }

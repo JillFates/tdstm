@@ -8,10 +8,17 @@
   }
 }
 
-.notice-view-html-content {
-  .modal-body {
-    min-height: 282px;
-    max-height: 282px;
-    overflow-y: auto;
+.custom-notice-view-html-dialog {
+  width: 25.5rem !important;
+  .modal-content {
+    min-height: 412px;
   }
+}
+
+.notice-view-html-content {
+
+}
+
+.modal {
+  padding: 0 !important;
 }

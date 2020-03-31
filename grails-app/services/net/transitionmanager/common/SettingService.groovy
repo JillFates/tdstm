@@ -4,10 +4,11 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Transactional
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import net.transitionmanager.common.Setting
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.project.Project
-import net.transitionmanager.common.Setting
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.lang3.StringUtils
 import org.grails.web.json.JSONObject
@@ -97,6 +98,7 @@ class SettingService implements ServiceMethods {
      * @param setting
      * @return
      */
+    @CompileDynamic
     protected Map getSettingAsMap(Setting setting) {
         if (setting) {
             try {

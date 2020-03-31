@@ -1,18 +1,22 @@
-import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {TranslatePipe} from '../../../../pipes/translate.pipe';
-import {BulkChangeActionsComponent} from '../bulk-change-actions/bulk-change-actions.component';
-import {UIDialogService} from '../../../../services/ui-dialog.service';
+// Angular
+import {Component, Input, Output, EventEmitter, ComponentFactoryResolver} from '@angular/core';
+// Model
 import {BulkChangeModel, BulkActionResult, BulkChangeType} from '../../model/bulk-change.model';
+// Service
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {DialogService, ModalSize} from 'tds-component-library';
+// Component
+import {BulkChangeActionsComponent} from '../bulk-change-actions/bulk-change-actions.component';
 
 @Component({
 	selector: 'tds-bulk-change-button',
 	template: `
 		<tds-button-custom
-			icon="ellipsis-v"
-			title="Bulk Change"
+			[flat]="flat"
+			[icon]="'pencil'"
+			[tooltip]="'Bulk Edit'"
 			[id]="'btnBulkChange'"
-            (click)="onClick()"
-            class="btnBulkChange pull-left"
+			(click)="onClick()"
 			[disabled]="!enabled">
 		</tds-button-custom>
 	`,
@@ -22,6 +26,7 @@ export class BulkChangeButtonComponent {
 	@Input() enabled: boolean ;
 	@Input() showEdit: boolean;
 	@Input() showDelete: boolean;
+	@Input() flat: boolean;
 	@Input() bulkChangeType: BulkChangeType;
 	@Input() viewId: number;
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
@@ -30,7 +35,10 @@ export class BulkChangeButtonComponent {
 	private selectedItems: number[];
 	private selectedAssets: Array<any>;
 
-	constructor(private dialogService: UIDialogService) {
+	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService
+	) {
 		this.enabled = false;
 		this.selectedItems = [];
 		this.selectedAssets = [];
@@ -63,15 +71,19 @@ export class BulkChangeButtonComponent {
 			viewId: this.viewId
 		};
 
-		this.dialogService.extra(BulkChangeActionsComponent, [
-			{provide: BulkChangeModel, useValue: bulkChangeModel}
-		], true, false)
-			.then(bulkOperationResult => {
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: BulkChangeActionsComponent,
+			data: {
+				bulkChangeModel: bulkChangeModel
+			},
+			modalConfiguration: {
+				title: 'Bulk Change',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe( (bulkOperationResult: any) => {
 			this.operationResult.emit(bulkOperationResult);
-		}).catch(err => {
-			console.log('Error:');
-			console.log(err);
-			this.operationResult.emit(err);
 		});
 	}
 }

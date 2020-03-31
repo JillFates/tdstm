@@ -51,8 +51,8 @@ export class ReportResolveService implements Resolve<any> {
 	public populateReport(reports) {
 		if (Array.isArray(reports)) {
 			reports.map(rep => {
-				if (Array.isArray(rep.items)) {
-					rep.items.map((item) => {
+				if (Array.isArray(rep.views)) {
+					rep.views.map((item) => {
 						const _override: string = item.hasOverride ? 'false' : null;
 						item.queryParams = { _override };
 					})

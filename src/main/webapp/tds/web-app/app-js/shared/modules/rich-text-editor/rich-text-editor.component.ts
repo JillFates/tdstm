@@ -48,6 +48,7 @@ export class RichTextEditorComponent implements AfterViewInit, OnDestroy, OnChan
 				editor.on('keyup', (keyEvent) => {
 					// fix the issue that prevents closing the window pressing esc key if this control has the focus
 					if (keyEvent.key === 'Escape') {
+						keyEvent.preventDefault();
 						return this.escHandler.emit();
 					}
 

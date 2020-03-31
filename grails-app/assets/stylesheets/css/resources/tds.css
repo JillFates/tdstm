@@ -945,19 +945,9 @@ td .label_sm {
 	padding-bottom: 6px;
 }
 
-.tabInner {
-	clear: both;
-	border: 1px solid #aaa;
-	overflow: hidden;
-}
-
-.tabInner div {
-	padding: 5px;
-}
 .tabInner div.popover * {
 	padding: initial;
 }
-
 
 div#dependencyDivId tr.odd td, #dependencyGroupContainerId .depGroupPending {
 	background-color: #e0e0e0;

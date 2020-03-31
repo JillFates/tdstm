@@ -1,179 +1,169 @@
-<div class="bulk-change-edit-component modal fade in" id="bulk-change-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-md" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button (click)="cancelCloseDialog($event)"  type="button" class="close" aria-label="Close">
-					<span aria-hidden="true">×</span>
-				</button>
-				<h4 class="modal-title">Bulk Change > Edit {{entityName}}</h4>
-			</div>
-			<div class="modal-body">
-				<div class="modal-body-container full-height">
-					<form name="form" role="form" data-toggle="validator" #form='ngForm' novalidate class="form-horizontal left-alignment full-height">
-						<label>{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[bulkChangeModel.affected, entityName] }}</label>
-						<kendo-grid
-								*ngIf="gridSettings"
-								[data]="gridSettings.gridData"
-								[pageable]="false"
-								[resizable]="true"
-								(add)="addHandler($event)"
-								(remove)="removeHandler($event)">
+<div class="bulk-change-edit-component">
+	<div class="modal-body-container full-height">
+		<form name="form" role="form" data-toggle="validator" #form='ngForm' novalidate class="form-horizontal left-alignment full-height">
+			<kendo-grid
+				*ngIf="gridSettings"
+				[data]="gridSettings.gridData"
+				[pageable]="false"
+				[resizable]="true"
+				(add)="addHandler($event)"
+				(remove)="removeHandler($event)">
 
-							 <!-- Toolbar Template-->
-							<ng-template kendoGridToolbarTemplate [position]="'top'">
-                                <tds-button-add (click)="addHandler($event)" class="add-button pull-right" 
-                                    [title]="'ASSET_EXPLORER.BULK_CHANGE.EDIT.ADD_FIELD' | translate" [id]="'btnAddButton'">
-                                </tds-button-add>
-							</ng-template>
+				<!-- Toolbar Template-->
+				<ng-template kendoGridToolbarTemplate [position]="'top'">
+					<label class="bulk-instructions">{{ 'ASSET_EXPLORER.BULK_CHANGE.EDIT.EFFECTED_ASSETS' | translate:[bulkChangeModel?.affected, entityName] }}</label>
+					<tds-button class="add-button pull-right"
+											[id]="'btnAddButton'"
+											(click)="addHandler($event)"
+											[type]="'button'"
+											[title]="'ASSET_EXPLORER.BULK_CHANGE.EDIT.ADD_FIELD' | translate"
+											[iconClass]="'is-solid'"
+											[icon]="'plus-circle'">
+					</tds-button>
+				</ng-template>
 
-							<!-- Action Buttons Column -->
-							<kendo-grid-command-column [width]="50">
-								<ng-template kendoGridHeaderTemplate>
-									<div class="text-center">
-										<label class="action-header"></label>
-									</div>
-								</ng-template>
-								<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-									<div class="tds-action-button-set">
-										<tds-button-delete kendoGridRemoveCommand></tds-button-delete>
-									</div>
-								</ng-template>
-							</kendo-grid-command-column>
+				<!-- Action Buttons Column -->
+				<kendo-grid-command-column [width]="20" [resizable]="false">
+					<ng-template kendoGridHeaderTemplate>
+						<div class="text-center">
+							<label class="action-header"></label>
+						</div>
+					</ng-template>
+					<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+						<tds-button-custom
+							class="remove-field-button"
+							(click)="removeHandler({dataItem: dataItem, rowIndex: rowIndex})"
+							[flat]="true"
+							[icon]="'trash'"
+							[tooltip]="'Remove Field'">
+						</tds-button-custom>
+					</ng-template>
+				</kendo-grid-command-column>
 
-                            <!-- Field Name -->
-                            <kendo-grid-column title="Field Name" [width]="100">
-                                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                    <kendo-dropdownlist
-                                            name="field"
-											class="form-control field"
-                                            [data]="availableFields"
-                                            [value]="editRows.selectedValues[rowIndex].field"
-                                            (valueChange)="onFieldValueChange($event, rowIndex)"
-                                            [valueField]="'id'"
-                                            [textField]="'text'">
-                                    </kendo-dropdownlist>
-                                </ng-template>
-                            </kendo-grid-column>
+				<!-- Field Name -->
+				<kendo-grid-column title="Field Name" [width]="100">
+					<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+						<kendo-dropdownlist
+							name="field"
+							class="form-control field"
+							[data]="availableFields"
+							[value]="editRows.selectedValues[rowIndex].field"
+							(valueChange)="onFieldValueChange($event, rowIndex)"
+							[valueField]="'id'"
+							[textField]="'text'">
+						</kendo-dropdownlist>
+					</ng-template>
+				</kendo-grid-column>
 
-                            <!-- Action -->
-                            <kendo-grid-column title="Action" [width]="100">
-                                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                    <kendo-dropdownlist
-											*ngIf="this.editRows.selectedValues[rowIndex].field"
-                                            name="action" class="form-control action"
-                                            [data]="fieldActionsMap[this.editRows.selectedValues[rowIndex].field.id]"
-                                            [value]="editRows.selectedValues[rowIndex].action"
-                                            (valueChange)="onActionValueChange($event, rowIndex)"
-                                            [valueField]="'id'"
-                                            [textField]="'text'">
-                                    </kendo-dropdownlist>
-                                </ng-template>
-                            </kendo-grid-column>
+				<!-- Action -->
+				<kendo-grid-column title="Action" [width]="100">
+					<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+						<kendo-dropdownlist
+							*ngIf="this.editRows.selectedValues[rowIndex].field"
+							name="action" class="form-control action"
+							[data]="fieldActionsMap[this.editRows.selectedValues[rowIndex].field.id]"
+							[value]="editRows.selectedValues[rowIndex].action"
+							(valueChange)="onActionValueChange($event, rowIndex)"
+							[valueField]="'id'"
+							[textField]="'text'">
+						</kendo-dropdownlist>
+					</ng-template>
+				</kendo-grid-column>
 
-                            <!-- Value -->
-                            <kendo-grid-column title="Value" [width]="100">
-                                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                                    <!-- Text Fields -->
-                                    <input [(ngModel)]="editRows.selectedValues[rowIndex].value"
-                                           type="text" name="actionValue{{rowIndex}}" class="form-control"
-                                           *ngIf="canShowControl('String', rowIndex)"/>
+				<!-- Value -->
+				<kendo-grid-column title="Value" [width]="100">
+					<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+						<!-- Text Fields -->
+						<input [(ngModel)]="editRows.selectedValues[rowIndex].value"
+									 type="text" name="actionValue{{rowIndex}}"
+									 *ngIf="canShowControl('String', rowIndex)"/>
 
-                                    <!-- Number Fields -->
-                                    <tds-number-control *ngIf="canShowControl('Number', rowIndex)"
-                                                        [name]="'controlNumber' + rowIndex"
-                                                        [(ngModel)]="editRows.selectedValues[rowIndex].value"
-                                                        [format]="editRows.selectedValues[rowIndex].field.constraints?.format"
-                                                        [allowNegative]="editRows.selectedValues[rowIndex].field.constraints?.allowNegative"
-                                                        [precision]="editRows.selectedValues[rowIndex].field.constraints?.precision"
-                                                        [separator]="editRows.selectedValues[rowIndex].field.constraints?.separator"
-                                                        [min]="editRows.selectedValues[rowIndex].field.constraints?.minRange"
-                                                        [max]="editRows.selectedValues[rowIndex].field.constraints?.maxRange">
-                                    </tds-number-control>
-	                                <tds-custom-validation-errors
-			                                *ngIf="getFormField(form,'controlNumber' + rowIndex); let numberField"
-			                                [errors]="numberField.errors"
-			                                [valid]="numberField.valid"
-			                                [touched]="numberField.touched"
-			                                [dirty]="numberField.dirty">
-	                                </tds-custom-validation-errors>
+						<!-- Number Fields -->
+						<tds-number-control *ngIf="canShowControl('Number', rowIndex)"
+																[name]="'controlNumber' + rowIndex"
+																[(ngModel)]="editRows.selectedValues[rowIndex].value"
+																[format]="editRows.selectedValues[rowIndex].field.constraints?.format"
+																[allowNegative]="editRows.selectedValues[rowIndex].field.constraints?.allowNegative"
+																[precision]="editRows.selectedValues[rowIndex].field.constraints?.precision"
+																[separator]="editRows.selectedValues[rowIndex].field.constraints?.separator"
+																[min]="editRows.selectedValues[rowIndex].field.constraints?.minRange"
+																[max]="editRows.selectedValues[rowIndex].field.constraints?.maxRange">
+						</tds-number-control>
+						<tds-custom-validation-errors
+							*ngIf="getFormField(form,'controlNumber' + rowIndex); let numberField"
+							[errors]="numberField.errors"
+							[valid]="numberField.valid"
+							[touched]="numberField.touched"
+							[dirty]="numberField.dirty">
+						</tds-custom-validation-errors>
 
-                                    <!-- Date Fields -->
-                                    <tds-date-control *ngIf="canShowControl('Date', rowIndex)"
-										[name]="'controlDate' + rowIndex"
-										[(ngModel)]="editRows.selectedValues[rowIndex].value">
-									</tds-date-control>
-	                                <tds-custom-validation-errors
-			                                *ngIf="getFormField(form,'controlDate' + rowIndex); let dateField"
-			                                [errors]="dateField.errors"
-			                                [valid]="dateField.valid"
-			                                [touched]="dateField.touched"
-			                                [dirty]="dateField.dirty">
-	                                </tds-custom-validation-errors>
+						<!-- Date Fields -->
+						<tds-date-control *ngIf="canShowControl('Date', rowIndex)"
+															[name]="'controlDate' + rowIndex"
+															[(ngModel)]="editRows.selectedValues[rowIndex].value">
+						</tds-date-control>
+						<tds-custom-validation-errors
+							*ngIf="getFormField(form,'controlDate' + rowIndex); let dateField"
+							[errors]="dateField.errors"
+							[valid]="dateField.valid"
+							[touched]="dateField.touched"
+							[dirty]="dateField.dirty">
+						</tds-custom-validation-errors>
 
-                                    <!-- Datetime Fields -->
-                                    <tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
-                                         [name]="'controlDateTime' + rowIndex"
-                                         [(ngModel)]="editRows.selectedValues[rowIndex].value">
-                                    </tds-datetime-control>
-	                                <tds-custom-validation-errors
-			                                *ngIf="getFormField(form,'controlDateTime' + rowIndex); let dateTimeField"
-			                                [errors]="dateTimeField.errors"
-			                                [valid]="dateTimeField.valid"
-			                                [touched]="dateTimeField.touched"
-			                                [dirty]="dateTimeField.dirty">
-	                                </tds-custom-validation-errors>
+						<!-- Datetime Fields -->
+						<tds-datetime-control *ngIf="canShowControl('DateTime', rowIndex)"
+																	[name]="'controlDateTime' + rowIndex"
+																	[(ngModel)]="editRows.selectedValues[rowIndex].value">
+						</tds-datetime-control>
+						<tds-custom-validation-errors
+							*ngIf="getFormField(form,'controlDateTime' + rowIndex); let dateTimeField"
+							[errors]="dateTimeField.errors"
+							[valid]="dateTimeField.valid"
+							[touched]="dateTimeField.touched"
+							[dirty]="dateTimeField.dirty">
+						</tds-custom-validation-errors>
 
-                                    <!-- Yes/No List Fields -->
-                                    <kendo-dropdownlist
-                                            *ngIf="canShowControl('YesNo', rowIndex)"
-                                            name="yeNoList"
-                                            [(value)]="editRows.selectedValues[rowIndex].value"
-                                            [valueField]="'id'"
-                                            [textField]="'text'"
-                                            [data]="yesNoList">
-                                    </kendo-dropdownlist>
+						<!-- Yes/No List Fields -->
+						<kendo-dropdownlist
+							*ngIf="canShowControl('YesNo', rowIndex)"
+							name="yeNoList"
+							[(value)]="editRows.selectedValues[rowIndex].value"
+							[valueField]="'id'"
+							[textField]="'text'"
+							[data]="yesNoList">
+						</kendo-dropdownlist>
 
-                                    <!-- Option List Fields -->
-                                    <kendo-dropdownlist
-                                            *ngIf="canShowControl('Options', rowIndex)"
-                                            name="optionList"
-                                            [(value)]="editRows.selectedValues[rowIndex].value"
-                                            [valueField]="'id'"
-                                            [textField]="'text'"
-                                            [data]="listOptions[this.editRows.selectedValues[rowIndex].field.id]">
-                                    </kendo-dropdownlist>
+						<!-- Option List Fields -->
+						<kendo-dropdownlist
+							*ngIf="canShowControl('Options', rowIndex)"
+							name="optionList"
+							[(value)]="editRows.selectedValues[rowIndex].value"
+							[valueField]="'id'"
+							[textField]="'text'"
+							[data]="listOptions[this.editRows.selectedValues[rowIndex].field.id]">
+						</kendo-dropdownlist>
 
-                                    <!-- Custom Fields - List -->
-                                    <kendo-dropdownlist
-                                            *ngIf="canShowControl('List', rowIndex)"
-                                            name="optionList"
-                                            [(value)]="editRows.selectedValues[rowIndex].value"
-                                            [valueField]=""
-                                            [textField]=""
-                                            [data]="listOptions[this.editRows.selectedValues[rowIndex].field.id]">
-                                    </kendo-dropdownlist>
+						<!-- Custom Fields - List -->
+						<kendo-dropdownlist
+							*ngIf="canShowControl('List', rowIndex)"
+							name="optionList"
+							[(value)]="editRows.selectedValues[rowIndex].value"
+							[valueField]=""
+							[textField]=""
+							[data]="listOptions[this.editRows.selectedValues[rowIndex].field.id]">
+						</kendo-dropdownlist>
 
-                                    <!-- Asset Tag Fields -->
-                                    <tds-asset-tag-selector *ngIf="canShowControl('asset-tag-selector', rowIndex)"
-                                                            [tagList]="tagList"
-                                                            [showSwitch]="false"
-                                                            (valueChange)="onTagFilterChange(column,rowIndex, $event)">
-                                    </tds-asset-tag-selector>
+						<!-- Asset Tag Fields -->
+						<tds-asset-tag-selector *ngIf="canShowControl('asset-tag-selector', rowIndex)"
+																		[tagList]="tagList"
+																		[showSwitch]="false"
+																		(valueChange)="onTagFilterChange(column,rowIndex, $event)">
+						</tds-asset-tag-selector>
 
-                                </ng-template>
-                            </kendo-grid-column>
+					</ng-template>
+				</kendo-grid-column>
 
-						</kendo-grid>
-					</form>
-				</div>
-			</div>
-			<div class="modal-footer form-group-center">
-                <tds-button-custom title="Next" class="btn-primary pull-left" (click)="onNext()" 
-                   icon="step-forward" [disabled]="!form.valid || !isAllInputEntered()">
-				</tds-button-custom>
-				<tds-button-cancel (click)="cancelCloseDialog($event)" class="pull-right"></tds-button-cancel>
-			</div>
-		</div>
+			</kendo-grid>
+		</form>
 	</div>
 </div>
-

@@ -1,36 +1,48 @@
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+// Angular
 import {NgForm} from '@angular/forms';
-import {ViewChild} from '@angular/core';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {Input, ViewChild} from '@angular/core';
+// Model
 import {FieldSettingsModel} from '../../model/field-settings.model';
+import {Dialog, DialogConfirmAction, DialogService} from 'tds-component-library';
+// Service
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {Observable} from 'rxjs';
 
-export abstract class ConfigurationCommonComponent {
-	@ViewChild('templateForm') protected templateForm: NgForm;
+export abstract class ConfigurationCommonComponent extends Dialog {
+	@Input() data: any;
 
-	constructor(
-		public field: FieldSettingsModel,
-		public activeDialog: UIActiveDialogService,
-		public prompt: UIPromptService,
+	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
+
+	public field: FieldSettingsModel;
+
+	protected constructor(
+		public dialogService: DialogService,
 		public translate: TranslatePipe) {
-		/* constructor */
+		super();
+	}
+
+	/**
+	 * Set the Field Settings Model from the Extended Class
+	 * @param field
+	 */
+	protected setField(field: FieldSettingsModel): void {
+		this.field = field;
 	}
 
 	/**
 	 * Display warning message about loosing values if user moves forward
 	 * just display the warning when the field is not new
-	 * @returns {Promise<boolean>}
+	 * @returns {Observable<any>}
 	 */
-	protected displayWarningMessage(): Promise<boolean> {
+	protected displayWarningMessage(validationMessage: string): Observable<any> {
 		if (this.field.isNew) {
-			return Promise.resolve(true);
+			return Observable.of({confirm: DialogConfirmAction.CONFIRM});
 		}
 
-		return this.prompt.open(
+		return this.dialogService.confirm(
 			this.translate.transform('GLOBAL.CONFIRM'),
-			this.translate.transform('FIELD_SETTINGS.WARNING_VALIDATION_CHANGE'),
-			this.translate.transform('GLOBAL.CONFIRM'),
-			this.translate.transform('GLOBAL.CANCEL'));
+			validationMessage,
+		);
 	}
 
 	/**
@@ -43,18 +55,23 @@ export abstract class ConfigurationCommonComponent {
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
-			this.prompt.open(
+			this.dialogService.confirm(
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translate.transform('GLOBAL.CONFIRM'),
-				this.translate.transform('GLOBAL.CANCEL'),
-			).then((confirm: boolean) => {
-				if (confirm) {
-					this.activeDialog.dismiss();
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.onCancelClose();
 				}
 			});
 		} else {
-			this.activeDialog.dismiss();
+			this.onCancelClose();
 		}
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

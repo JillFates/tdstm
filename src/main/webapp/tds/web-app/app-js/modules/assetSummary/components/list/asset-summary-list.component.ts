@@ -6,6 +6,10 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+
+// Components
+import { HeaderActionButtonData } from 'tds-component-library';
+
 // Model
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {AssetSummaryColumnModel} from '../../model/asset-summary-column.model';
@@ -17,7 +21,7 @@ import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 	templateUrl: 'asset-summary-list.component.html',
 })
 export class AssetSummaryListComponent implements OnInit {
-
+	public headerActionButtons: HeaderActionButtonData[] = [];
 	public assetSummaryColumnModel = new AssetSummaryColumnModel();
 	public justPlanning = false;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;

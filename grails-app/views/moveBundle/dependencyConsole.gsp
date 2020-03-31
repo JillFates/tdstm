@@ -24,6 +24,7 @@
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="keyevent_constants.js" />
 		<g:javascript src="graph.js" />
+		<g:javascript src="tds-util.js" />
 		<g:javascript src="generator/runtime.js" />
 		<g:javascript src="generator/generator.js" />
 	</head>
@@ -32,47 +33,81 @@
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<div id="DependencyGroupsTableId">
-			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
-				<div id="checkBoxDivId">
-					<g:form name="checkBoxForm">
-						<div class="row">
-							<div class="col-sm-6">
-								<h3>Connection Type</h3>
-								<div class="checkboxdiv_control">
-									<g:each in="${dependencyType}" var="dependency">
-										<input type="checkbox" id="${dependency}"
-												 name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
-										<span id="dependecy_${dependency}"> ${dependency}</span>
-										<br />
-									</g:each>
+			<div id="checkBoxDiv" title="Dependency Grouping Control" style="display: none;" class="static-dialog">
+				<div id="checkBoxDivId" class="tds-modal-content" style="overflow-x: hidden; padding:unset;">
+					<div class="modal-header">
+						<button class="btn btn-icon close-button" onclick="hideDependencyControlDiv()">
+							<i class="fas fa-times"></i>
+						</button>
+
+						<div class="modal-title-container">
+							<div class="modal-title" style="padding: unset;">Dependency Grouping Control</div>
+						</div>
+					</div>
+
+					<div class="modal-body">
+						<g:form name="checkBoxForm">
+							<div class="modal-grid-2">
+								<div>
+									<div class="modal-section-header">Connection Type</div>
+									<div class="checkboxdiv_control">
+										<g:each in="${dependencyType}" var="dependency">
+											<div class="clr-control-container"  style="display:block;">
+												<div class="clr-checkbox-wrapper">
+													<input type="checkbox" id="${dependency}"
+														name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>
+													<label class="clr-control-label" id="dependecy_${dependency}" for="${dependency}">${dependency}</label>
+												</div>
+											</div>
+										</g:each>
+									</div>
+								</div>
+								<div>
+									<div class="modal-section-header">Connection Status</div>
+									<div class="checkboxdiv_control">
+										<g:each in="${dependencyStatus}" var="dependencyStatusInst">
+											<div class="clr-control-container"  style="display:block;">
+												<div class="clr-checkbox-wrapper">
+													<input type="checkbox" id="${dependencyStatusInst}"
+													name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>
+													<label class="clr-control-label" id="dependecy_${dependencyStatusInst}" for="${dependencyStatusInst}">${dependencyStatusInst}</label>
+												</div>
+											</div>
+										</g:each>
+									</div>
 								</div>
 							</div>
-							<div class="col-sm-6">
-								<h3>Connection Status</h3>
+							<div class="checkboxdiv_default">
 								<div class="checkboxdiv_control">
-									<g:each in="${dependencyStatus}" var="dependencyStatusInst">
-										<input type="checkbox" id="${dependencyStatusInst}"
-												 name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
-										<span id="dependecy_${dependencyStatusInst}"> ${dependencyStatusInst} </span>
-										<br />
-									</g:each>
+									<div class="clr-control-container ">
+										<div class="clr-checkbox-wrapper">
+											<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+											<label class="clr-control-label" for="saveDefault" style="font-weight:600;">Save As Defaults</label>
+										</div>
+									</div>
 								</div>
 							</div>
-						</div>
-						<div class="row checkboxdiv_default">
-							<div class="col-sm-12"><input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>&nbsp;&nbsp; <span>Save as defaults</span></div>
-						</div>
-						<div class="buttonR">
-							<button type="button" class="btn btn-default submit" value="Generate" id="generateId" onclick="submitCheckBox()"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Generate</button>
-						</div>
-					</g:form>
+						</g:form>
+					</div>
+
+					<div class="modal-footer">
+						<button
+							type="button"
+							id="generateId"
+							class="btn btn-icon btn-outline"
+							value="Generate"
+							onclick="submitCheckBox()"
+							>
+							<i class="fas fa-chart-bar"></i> Regenerate
+						</button>
+					</div>	
 				</div>
 			</div>
 
 
 			<div style="clear: both;"></div>
 
-			<div id = "dependencyBundleDetailsId" >
+			<div id="dependencyBundleDetailsId" >
 				<div style="margin-top: 10px;">
 					<div class="compactClass">
 						<div class="dependency-filters-container">
@@ -80,26 +115,31 @@
 							<div class="message" id="messageId" style="display:none">${flash.message}</div>
 							<div class="row dependencyConsoleForm">
 								<div class="f-grid" id="angular-compiler">
-									<div class="f-column-1">
+									<div class="f-column-1" style="display: flex; max-width:300px; align-items: center;">
 										<label>Dependency Groups</label>
 										<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
-											<input type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
+											<input type="button" class="btn btn-sm" value="Regenerate" onclick="showDependencyControlDiv()"/>
 										</tds:hasPermission>
 									</div>
 									<div class="f-column-2">
 										<label>Bundle:</label>
-										<g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="onDependencyFiltersChange()"/>
+										<div class="clr-select-wrapper">
+											<g:select class="clr-select" style="width:160px; margin-left:10px;" id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="onDependencyFiltersChange()"/>
+										</div>
 									</div>
 									<div class="f-column-3">
 										<label>Tags:</label>
 										<tm-asset-tag-selector ng-init="assetsSelector.tag = ${tagIds}" id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyFiltersChange()"></tm-asset-tag-selector>
 									</div>
 									<div class="f-column-4">
-										<input type="checkbox" id="assignedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()" />
-										<label for="assignedGroupCB" class="pointer">Show ONLY Work In Progress</label>
-										<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
-											<asset:image src="icons/arrow_refresh.png" title="Refresh Data" />
-										</g:link>
+										<div class="clr-checkbox-wrapper">
+											<input class="clr-checkbox" type="checkbox" id="assignedGroupCB" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()">
+											<label for="assignedGroupCB">Show ONLY Work In Progress</label>
+											<g:link controller="moveBundle" action="dependencyConsole"  style="display:inline-block; margin-left: 10px;">
+												<span style="font-size:16px; color:#0077b8;" title="Refresh Data"><i class="fas fa-sync"></i></span>
+											</g:link>
+										</div>
+
 									</div>
 								</div>
 							</div>
@@ -114,111 +154,107 @@
 
 			<div style="clear: both;"></div>
 
-			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
-				<g:form name="changeBundle" action="assetsAssignment" >
-					<input type="hidden" name="assetType" id="assetsTypeId"  />
-					<input type="hidden" name="bundleSession" id="bundleSession" />
-					<table style="border: 0px;">
-						<tr>
-							<td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
-						</tr>
-                        <tr>
-                            <td>
-                                <span style="color:#EFEFEF; top: 9px; position: relative; "><b>Tags</b></span> &nbsp;&nbsp;
-                                <tm-asset-tag-selector hide-operator="true" form-data='true' id="tmAssignmentTagSelector" pre-asset-selector="assignments.preAssetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
-                            </td>
-                        </tr>
-						<tr>
-							<td>
-								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;
-								<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}" style="max-width: 144px;"></g:select><br></br>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<span style="color:#EFEFEF "><b>Plan Status</b></span> &nbsp;&nbsp;<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value"></g:select><br></br>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div>
-									<label for="planningBundle" ><input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>Planning Bundles</b></span></label>
-									<label for="allBundles" ><input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>All Bundles</b></span></label><br />
+			<div id="moveBundleSelectId" title="Assignment" style="display: none;" class="static-dialog tds-modal-content">
+				<div class="modal-header">
+					<button class="btn btn-icon close-button" onclick="$('#moveBundleSelectId').dialog('close')">
+						<i class="fas fa-times"></i>
+					</button>
+
+					<div class="modal-title-container">
+						<div class="modal-title" style="padding: unset;">Asset Assignment</div>
+					</div>
+				</div>
+				
+				<g:form name="changeBundle" action="assetsAssignment" class="clr-form clr-form-horizontal clr-form-compact" >
+					<div class="modal-body">
+						<input type="hidden" name="assetType" id="assetsTypeId"  />
+						<input type="hidden" name="bundleSession" id="bundleSession" />
+						<div>Assign selected assets to:</div>
+						
+						<div class="clr-form-control">
+							<label for="tmAssignmentTagSelector" class="clr-control-label" style="width: 4rem; min-width: unset;">Tags</label>
+							<div class="clr-control-container">
+								<tm-asset-tag-selector hide-operator="true" form-data='true' id="tmAssignmentTagSelector" pre-asset-selector="assignments.preAssetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<label for="plannedStatus" class="clr-control-label" style="width: 4rem; min-width: unset;">Plan Status</label>
+							<div class="clr-control-container">
+								<div class="clr-select-wrapper">
+									<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value" class="clr-select"></g:select>
 								</div>
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: left"><input type="button" id ="saveBundleId" name="saveBundle"  value= "Assign" onclick="submitMoveForm()"> </td>
-						</tr>
-					</table>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<label for="plannedMoveBundleList" class="clr-control-label" style="width: 4rem; min-width: unset;">Bundle</label>
+							<div class="clr-control-container">
+								<div class="clr-select-wrapper">
+									<g:select name="moveBundle" id="plannedMoveBundleList" class="clr-select" from="${moveBundle}" optionKey="id" optionValue="name" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}"></g:select>
+								</div>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<div class="clr-control-container">
+								<div class="clr-radio-wrapper">
+									<input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" class="clr-radio"/>
+									<label for="planningBundle" class="clr-control-label">Planning Bundles</label>
+								</div>
+								<div class="clr-radio-wrapper">
+									<input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" class="clr-radio"/>
+									<label for="allBundles" class="clr-control-label">All Bundles</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<input type="button" class="btn btn-outiline" id ="saveBundleId" name="saveBundle"  value= "Assign" onclick="submitMoveForm()">
+					</div>
 				</g:form>
 			</div>
 		</div>
-			<div id="statusColors"  title="Dependency Group Status" style="display: none" class="static-dialog">
-				<div id="statusColorsId">
-					<div class="row">
-						<div class="col-sm-12" style="padding-top: 6px;">
-							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
-								<div class="box-header with-border" style="background-color: yellow;">
-									<h3 class="box-title">Conflicts</h3>
-									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
-									</div><!-- /.box-tools -->
-								</div><!-- /.box-header -->
-								<div class="box-body">
-									Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or more assets are assigned to different events or one or more assets' dependency status is set to Questioned or Unknown.
-								</div><!-- /.box-body -->
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
-								<div class="box-header with-border" style="background-color: #e0e0e0;">
-									<h3 class="box-title">Pending</h3>
-									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
-									</div><!-- /.box-tools -->
-								</div><!-- /.box-header -->
-								<div class="box-body">
-									Grey indicates that there are no outstanding conflicts but the Asset Validation needs to be set to Plan Ready indicating the group is ready to be assigned.
-								</div><!-- /.box-body -->
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
-								<div class="box-header with-border" style="background-color: lightgreen;">
-									<h3 class="box-title">Ready to Assign</h3>
-									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
-									</div><!-- /.box-tools -->
-								</div><!-- /.box-header -->
-								<div class="box-body">
-									Green indicates that the assets in the group are Ready to be assigned.
-								</div><!-- /.box-body -->
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-							<div class="box box-default" style="border: 0px; box-shadow: none; margin-bottom: 13px;">
-								<div class="box-header with-border" style="background-color: #5f9fcf;">
-									<h3 class="box-title">Assigned</h3>
-									<div class="box-tools pull-right">
-										<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus" style="color: black;"></i></button>
-									</div><!-- /.box-tools -->
-								</div><!-- /.box-header -->
-								<div class="box-body">
-									Blue indicates that there are no conflicts and all of the assets in the group have been assigned correctly.
-								</div><!-- /.box-body -->
-							</div>
-						</div>
-					</div>
+		<div id="statusColors"  title="Dependency Group Status" style="display: none" class="static-dialog tds-modal-content">
+			<div class="modal-header">
+				<button class="btn btn-icon close-button" onclick="$('#statusColors').dialog('close')">
+					<i class="fas fa-times"></i>
+				</button>
+
+				<div class="modal-title-container">
+					<div class="modal-title" style="padding: unset;">Dependency Group Status</div>
 				</div>
 			</div>
-		<div style="float:left;">
+
+			<div class="modal-body">
+				<div class="box-header" style="background-color: yellow;">
+					<h3 class="box-title">Conflicts</h3>
+				</div>
+				<div class="box-body">
+					Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or more assets are assigned to different events or one or more assets' dependency status is set to Questioned or Unknown.
+				</div>
+				<div class="box-header" style="background-color: #e0e0e0;">
+					<h3 class="box-title">Pending</h3>
+				</div>
+				<div class="box-body">
+					Grey indicates that there are no outstanding conflicts but the Asset Validation needs to be set to Plan Ready indicating the group is ready to be assigned.
+				</div>
+				<div class="box-header" style="background-color: lightgreen;">
+					<h3 class="box-title">Ready to Assign</h3>
+				</div>
+				<div class="box-body">
+					Green indicates that the assets in the group are Ready to be assigned.
+				</div>
+				<div class="box-header" style="background-color: #5f9fcf;">
+					<h3 class="box-title">Assigned</h3>
+				</div>
+				<div class="box-body">
+					Blue indicates that there are no conflicts and all of the assets in the group have been assigned correctly.
+				</div>
+			</div>
+		</div>
+		<div style="float:left; width:100%">
 			<div id="items1" style="display: none"></div>
 			<div id="spinnerDivId" class="containsSpinner" style="display: none"></div>
 			<g:render template="/assetEntity/modelDialog" />
@@ -227,8 +263,8 @@
 				<g:render template="/person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">
-				<g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
-				<g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
+				<g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id" optionValue="name"  noSelection="${['':'Please Select']}"></g:select><br></br>
+				<g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" optionValue="name" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
 			<g:render template="/assetEntity/dependentAdd" />
 			<g:render template="/assetEntity/initAssetEntityData"/>
@@ -360,7 +396,9 @@
 				$("#statusColors").dialog('option', 'modal', 'true');
 				$("#statusColors").dialog('option', 'position', ['center', 60]);
 				$("#statusColors").dialog('open');
-				$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+				// $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+				$('div.ui-dialog-titlebar').hide();
+				
 				$("#statusColors").show();
 
 				$("#btnCloseStatusColors").click(function () {
@@ -443,12 +481,22 @@
 						switch ('${tabName}') {
 								case "apps":
 										break; // do nothing, we are already there
-								case "map":
+							case "map":
 										getList("graph", '${groupId}');
-										window.setTimeout(function() {
-                        $('#searchBoxId').val(assetName);
-                        GraphUtil.performSearch();
-										}, 1900)
+										// fix for low networks, retry n times until the values are established
+										// completely by the gsp file
+										TDSUtilFunctions.retryFunction(
+												6,
+												1500,
+												function () {
+													return $('#searchBoxId').length;
+												},
+												function () {
+													$('#searchBoxId').val(assetName);
+													GraphUtil.performSearch();
+												}
+										);
+
 										break;
 								case "all":
 										getList("all", '${groupId}');

@@ -1,11 +1,16 @@
 <div class="field-type-selector-component">
-   <select class="form-control"
-           name="control"
-           [disabled]="disabled"
-           [ngClass]="{'to-be-deleted': disabled}"
-           id="control{{name}}"
-           (ngModelChange)="onChange($event)"
-           [(ngModel)]="value">
-      <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
-   </select>
+	<select
+		clrSelect
+		name="control"
+		[disabled]="disabled"
+		[ngClass]="{ 'to-be-deleted': disabled }"
+		id="control{{ name }}"
+		(ngModelChange)="onChange($event)"
+      [(ngModel)]="value"
+      style="width: 90px;"
+	>
+		<option *ngFor="let c of availableControls" [ngValue]="c.value">{{
+			c.text
+		}}</option>
+	</select>
 </div>

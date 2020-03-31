@@ -12,9 +12,7 @@ class AssetViewsPage extends Page{
 
     static at = {
         waitFor {viewMgrPageWindow.displayed}
-        avPageTitle.text().trim().startsWith("View")
-        waitFor {allViewsModule.viewModuleContainer.displayed}
-
+        avPageTitle.text() == "Manage Views"
     }
 
     static content = {
@@ -36,7 +34,7 @@ class AssetViewsPage extends Page{
         common { module CommonsModule}
         assetsModule { module AssetsMenuModule }
 
-        avPageTitle { $("h1")}
+        avPageTitle (wait:true) { $("section", 	class:"content-header").find("h2")}
         //>>>>>>>>>>BUTTONS
         toggleListBtn { staffViewHeaderBar.find("a", class:"ui-jqgrid-titlebar-close HeaderButton")}
 

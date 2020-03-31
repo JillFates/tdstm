@@ -1,152 +1,49 @@
-task-list
-  .button-toolbar
-    padding-top: 5px
-    padding-left: 8px
-
-  .form-control
-    padding-right: 20px !important
-
-  .component-action-clear-filter
-    width: 20px
-    height: 20px
-
-  .top-filters
-    .tds-action-button
-      margin-right:  10px
-    .event-dropdown
-      .k-input
-        height: inherit
-    .refresh-control
-      display: inline-block
-
-      .pie-countdown-container
-        .k-dropdown
-          width: 80px
-          background-color: white
-        .pie-countdown-timer
-          background-color: white
-
-  .task-grid
-    margin-top:  10px
-    height:  80vh
-
+.task-list
+  .header-controls
+    display: flex
+    height: 100%
+    justify-content: center
+    align-items: flex-end
+    padding-top: 2px
+    &.counter-down
+      align-items: baseline
+    clr-select-container
+      margin-top: unset
+  .row-controls
+    .header-controls
+      align-items: center
+      > clr-checkbox-wrapper:not(:last-child)
+          margin-right: 15px
+  form
+    height: 12%
+    input[type=checkbox][disabled] + label
+      cursor: not-allowed
+  .badge
+    padding: 0
+  .task-action-buttons
+    display: inline
+  .grid-container
+    height: 88%
     .k-grid-header
       .k-header
-        > .k-link
-          padding-right: 5px
-          > div
-            text-align: left
-            label
-              margin-bottom: 0
-            .sortable-column label
-              padding-right: 0px
-            .k-icon
-              position: relative
-              left: -5px
-              top: 1px
-      .k-filter-row
-        .component-action-clear-filter
-          line-height: 28px
-
-    .k-grid-content
-      .k-hierarchy-cell
-        > .k-icon
-          height: unset
-          padding: 0
-          &.k-plus:before
-            content: '\e014'
-          &.k-minus:before
-            content: '\e015'
-
-      tr td
-        padding-top: 0px
-        padding-bottom: 0px
-        text-overflow: ellipsis
-        white-space: nowrap
-        line-height: 0px
-
-      tr.k-grid-norecords td
-        line-height: 22px
-        text-align: center
-
+        top: 3px
+        overflow: unset
+    .box-with-empty-header
+      height: 100%
     .k-grid-toolbar
-      button
-        margin-right:  5px
-
-    .task-updated
-      padding-left: 0px
-      padding-top: 0px !important
-      padding-right: 0px
-      padding-bottom: 0px !important
-
-    .task-updated-cell
-      display: block
-      padding-left: 3px
-      margin: 0 auto
-      padding-top: 12px
-      padding-bottom: 10px
-      padding-left: 3px
-
-    .task-status
-      padding-left: 0px
-      padding-right: 100%
-      text-overflow: unset !important
-      span
-        padding: 50px 100vw 50px 3px
-        font-weight: bold
-    .task_hold
-      background-color: #FFFF33 !important
-      color: black
-    .task_hold_overtime
-      background-color: #FF0000
-      color: black
-    .task_planned
-      background-color:  #FFFFFF
-      color:  gray
-    .task_pending
-      background-color:  #FFFFFF
-      color:  black
-    .task_ready
-      background-color:  green !important
-      color:  white
-    .task_started
-      background-color:  darkturquoise!important
-      color:  white
-    .task_completed2
-      background-color:  #5478BA
-    .task_completed5
-      background-color:  #4468AA
-    .task_completed
-      background-color:  #24488A
-      color:  white
-    .task_done2
-      background-color:  #5478BA
-    .task_done5
-      background-color:  #4468AA
-    .task_done
-      background-color:  #24488A
-      color:  white
-    .task_na
-      background-color:  lightgray
-    .task_term
-      background-color:  black
-    .task_tardy
-      background-color:  #FFC266
-    .task_late
-      background-color:  #FF9900
-    .task_overdue
-      color:  red
-
-    .task-action-buttons-wrapper
-      margin: 2px 1px
-      .btn:first-child
-        margin-left: 15px
-      .btn
-        font-size: 11px
-        padding: 1px 10px
-        margin-right: 15px
-        i
-          font-size: inherit
-          padding-right: 5px
-      .task-action-buttons
-        display: inline
+      padding-top: 0
+  .label-event-list
+    font-style: normal
+    font-weight: 500
+    font-size: 14px
+    line-height: 24px
+    margin: unset
+  .task-updated-cell
+    padding: 2px 6px
+  .select-event-list
+    width: 150px
+    max-width: 150px
+    font-style: normal
+    font-weight: 500
+    font-size: 13px
+    line-height: 18px

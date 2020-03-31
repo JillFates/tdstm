@@ -1,56 +1,31 @@
-<style>
-    /* TODO: Apply this style as a general style for all forms. */
-
-</style>
-<div tds-autofocus class="modal-content">
-    <div class="modal-header">
-        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-        <h4 class="modal-title">{{ 'ASSET_TAGS.TAG_LIST.TAG_MERGE' | translate}}</h4>
-    </div>
-    <div class="modal-body" style="height: 100%; overflow: auto;">
-        <div class="modal-body-container">
-            <!-- -->
-            <form name="providerForm" class="form-horizontal left-alignment">
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">{{ 'GLOBAL.NAME' | translate}}: </label>
-                                <div class="col-sm-9">
-                                    <label class="control-label label-detail">{{tagModel.name}}</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="mergeTag" class="col-sm-2 control-label" style="padding-left: 10px;">
-                                    {{ 'ASSET_TAGS.TAG_LIST.MERGE_INTO' | translate}}: <span class="error">*</span>
-                                </label>
-                                <div class="col-sm-9">
-                                    <kendo-dropdownlist required name="mergeTag" id="mergeTag"
-                                                        class="form-control"
-                                                        [data]="tagList"
-                                                        [textField]="'name'"
-                                                        [valueField]="'id'"
-                                                        [(ngModel)]="mergeToTag"
-                                                        [ngClass]="{'error': !mergeToTag || !mergeToTag.id}">
-                                    </kendo-dropdownlist>
-                                </div>
-                            </div>
-                        </div>
+<!-- -->
+<form name="providerForm" class="form-horizontal left-alignment">
+    <div class="box-body">
+        <div class="row">
+            <div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{{ 'GLOBAL.NAME' | translate}}: </label>
+                    <div class="col-sm-9">
+                        <label class="control-label label-detail">{{tagModel.name}}</label>
                     </div>
                 </div>
-            </form>
+                <div class="form-group">
+                    <label for="mergeTag" class="col-sm-3 control-label">
+                        {{ 'ASSET_TAGS.TAG_LIST.MERGE_INTO' | translate}}:
+                        <span class="error">*</span>
+                    </label>
+                    <div class="col-sm-9">
+                        <kendo-dropdownlist required name="mergeTag" id="mergeTag"
+                                            class="form-control"
+                                            [data]="tagList"
+                                            [textField]="'name'"
+                                            [valueField]="'id'"
+                                            [(ngModel)]="mergeToTag"
+                                            [ngClass]="{'error': !mergeToTag || !mergeToTag.id}">
+                        </kendo-dropdownlist>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button [disabled]="!mergeToTag || !mergeToTag.id" (click)="onMerge()"
-                type="button" class="btn btn-primary pull-left text-center">
-            <span class="fa fa-exchange"></span> {{ 'GLOBAL.MERGE' | translate}}
-        </button>
-        <button (click)="cancelCloseDialog()"
-                type="button" class="btn btn-default text-center">
-            <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
-        </button>
-    </div>
-</div>
+</form>

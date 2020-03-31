@@ -18,6 +18,11 @@ class UrlMappings {
 			}
 		}
 
+		"/recipes/index" {
+			controller = "recipe"
+			action = [GET:"index"]
+		}
+
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */
@@ -95,6 +100,13 @@ class UrlMappings {
 					POST:"getAssetDependencies",
 					PUT:"updateCommonAssetDependencyFields",
 					DELETE:"deleteAssetDependency",
+			]
+		}
+
+		"/ws/asset/assetForDependencyGroup" {
+			controller = "wsAsset"
+			action = [
+			        GET: "getAssetForDependencyGroup"
 			]
 		}
 
@@ -195,6 +207,14 @@ class UrlMappings {
 			controller = "wsTask"
 			action = [
 			    GET : 'assetCommentCategories'
+			]
+		}
+
+		"/ws/task/saveTask" {
+			controller = "wsTask"
+			action = [
+			        PUT: 'saveTask',
+					POST: 'saveTask'
 			]
 		}
 
@@ -326,6 +346,10 @@ class UrlMappings {
 		"/ws/dashboard/getPlanningStats" {
 			controller = "wsDashboard"
 			action = [GET:"getDataForPlanningDashboard"]
+		}
+
+		"/ws/dashboard/insight/$action" {
+			controller = "WsInsight"
 		}
 
 		"/ws/cookbook/recipe/list" {
@@ -825,6 +849,11 @@ class UrlMappings {
 		"/auth/resetPassword/$token" {
 			controller = "auth"
 			action = [GET:"resetPassword"]
+		}
+
+		"/auth/applyNewPassword" {
+			controller = "auth"
+			action = [POST:"applyNewPassword"]
 		}
 
 		"/ws/admin/unlockAccount" {
@@ -1604,6 +1633,28 @@ class UrlMappings {
                     POST: "generateProjectMetrics"
             ]
         }
+
+		"/ws/architectureGraph/" {
+			controller = "wsArchitectureGraph"
+			action = [
+				GET: "architectureGraph"
+			]
+		}
+
+		"/ws/architectureGraph/$action" {
+			controller = "wsArchitectureGraph"
+		}
+
+		"/ws/dependencyConsole/" {
+			controller = "wsDependencyConsole"
+			action = [
+				GET: "dependencyConsole"
+			]
+		}
+
+		"/ws/dependencyConsole/$action" {
+			controller = "wsDependencyConsole"
+		}
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

@@ -187,7 +187,13 @@
 		// exits the neighborhood and generates the graph for the selected event
 		function submitForm () {
 			neighborhoodTaskId = -1;
-			generateGraph($('#moveEventId').val());
+			var eventEl = $('#moveEventId')[0];
+			for (var i = 0; i < eventEl.options.length; i++) {
+			    if (eventEl.value === eventEl.options[i].value) {
+                    stateManagement.setEvent(eventEl.value, eventEl.options[i].text);
+				}
+			}
+			generateGraph();
 		}
 
 		// gets the given event's graph data from the server and then renders it
@@ -358,13 +364,17 @@
 						<!-- Event select -->
 						<span class="controlWrapper">
 							<label for="moveEventId">Event:</label>
-							<g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
+							<div class="clr-select-wrapper">
+								<g:select from="${moveEvents}" class="clr-select" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
+							</div>
 						</span>
 
 						<!-- Team highlighting select -->
 						<span class="controlWrapper">
 							<label for="teamSelectId">Highlight:</label>
-							<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
+							<div class="clr-select-wrapper">
+								<select name="teamSelect" id="teamSelectId" class="clr-select" style="width:120px;"></select>
+							</div>
 						</span>
 
 						<!-- Exit Neighborhood button -->
@@ -372,20 +382,26 @@
 
 						<!-- Highlight filter controls -->
 						<div id="highlightFormId" class="newHighlightForm">
-							<input type="text" id="searchBoxId" name="Search Box" class="fullButton" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event, performSearch)"/>
+							<input type="text" id="searchBoxId" name="Search Box" class="clr-input" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event, performSearch)"/>
 							<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
-							<span id="filterSubmitButtonId" class="graphButton" onclick="performSearch()" title="Applies the selected filtering options to the graph"></span>
+							<span id="filterSubmitButtonId" class="graphButton" onclick="performSearch()" title="Applies the selected filtering options to the graph"><i class="fas fa-binoculars"></i></span>
 						</div>
 
 						<!-- Zoom buttons -->
-						<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin" onclick="GraphUtil.zoomIn()"></div>
-						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer" onclick="GraphUtil.zoomOut()"></div>
+						<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin" onclick="GraphUtil.zoomIn()"><i class="fas fa-search-plus"></i></div>
+						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer" onclick="GraphUtil.zoomOut()"><i class="fas fa-search-minus"></i></div>
 
 						<!-- View unpublished checkbox (if the user has permission) -->
 						<tds:hasPermission permission="${Permission.TaskPublish}">
 							<span class="checkboxContainer">
-								<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } />
-								<label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
+								<div class="clr-form-control" style="margin-top: unset;">
+									<div class="clr-control-container">
+										<div class="clr-checkbox-wrapper">
+											<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } />
+											<label for="viewUnpublishedId" class="clr-control-label">&nbsp;View Unpublished</label>
+										</div>
+									</div>
+								</div>
 							</span>
 						</tds:hasPermission>
 

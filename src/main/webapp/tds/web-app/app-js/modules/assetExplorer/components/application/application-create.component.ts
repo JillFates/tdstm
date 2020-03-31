@@ -1,28 +1,25 @@
-/**
- *  The component is being used dynamically, some vars will show as not being used or referenced but they could be part
- *  of the GSP
- *
- *  Use angular/views/TheAssetType as reference
- */
-import {Component, Inject, OnInit, AfterViewInit, ViewChild} from '@angular/core';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import * as R from 'ramda';
+// Angular
+import {Component, Inject, OnInit, AfterViewInit, ViewChild, ComponentFactoryResolver} from '@angular/core';
+// Model
+import {DialogService, ModalSize} from 'tds-component-library';
+import {PersonModel} from '../../../../shared/components/add-person/model/person.model';
+import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
+// Component
+import {AssetCommonEdit} from '../asset/asset-common-edit';
+import {AddPersonComponent} from '../../../../shared/components/add-person/add-person.component';
+// Service
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {AssetCommonEdit} from '../asset/asset-common-edit';
-import { AddPersonComponent } from '../../../../shared/components/add-person/add-person.component';
-import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
-import {PersonService} from '../../../../shared/services/person.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
+import * as R from 'ramda';
 
 const pleaseSelectMessage = 'Please Select';
 
-export function ApplicationCreateComponent(template: string, model: any, metadata: any): any {
+export function ApplicationCreateComponent(template: string, model: any, metadata: any, parentDialog: any): any {
 	@Component({
 		selector: 'tds-application-create',
 		template: template,
@@ -42,23 +39,22 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			appOwner: null
 		};
 
-		@ViewChild('controlSME1') public controlSME1: any;
-		@ViewChild('controlSME2') public controlSME2: any;
-		@ViewChild('controlAppOwner') public controlAppOwner: any;
+		@ViewChild('controlSME1', {static: false}) public controlSME1: any;
+		@ViewChild('controlSME2', {static: false}) public controlSME2: any;
+		@ViewChild('controlAppOwner', {static: false}) public controlAppOwner: any;
 
 		constructor(
 			@Inject('model') model: any,
-			activeDialog: UIActiveDialogService,
+			componentFactoryResolver: ComponentFactoryResolver,
 			userContextService: UserContextService,
 			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
-			dialogService: UIDialogService,
+			dialogService: DialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 			) {
-				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
+				super(componentFactoryResolver, model, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, translatePipe, parentDialog);
 		}
 
 		ngOnInit() {
@@ -259,26 +255,27 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
-			this.dialogService.extra(AddPersonComponent,
-				[UIDialogService,
-					{
-						provide: PersonModel,
-						useValue: personModel
-					},
-					PersonService
-				], false, true)
-				.then((result) => {
-					if (this.model.sourcePersonList && this.model[modelListParameter]) {
-						this.model.sourcePersonList.push({personId: result.id, fullName: result.name});
-						this.model[modelListParameter].push({personId: result.id, fullName: result.name});
-					}
-					this.model.asset[fieldName].id = result.id;
-					this.updatePersonReferences();
-				})
-				.catch((error) => {
-					// get back to previous value
-					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
-				});
+
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AddPersonComponent,
+				data: {
+					personModel: personModel
+				},
+				modalConfiguration: {
+					title: 'Person Create',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-add-person-dialog'
+				}
+			}).subscribe((data: any) => {
+				if (this.model.sourcePersonList && this.model[modelListParameter]) {
+					this.model.sourcePersonList.push({personId: data.id, fullName: data.name});
+					this.model[modelListParameter].push({personId: data.id, fullName: data.name});
+				}
+				this.model.asset[fieldName].id = data.id;
+				this.updatePersonReferences();
+			});
 		}
 
 		/**

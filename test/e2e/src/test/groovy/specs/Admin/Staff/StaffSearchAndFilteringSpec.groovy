@@ -8,7 +8,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 /**
  * @author ingrid
@@ -23,7 +23,7 @@ class StaffSearchAndFilteringSpec extends GebReportingSpec {
     //Define the names for the Staff that you will Create and Edit
     static baseName = "QAE2E"
     static userProject = "TM-Demo"
-    static userCompany = "TM Demo"
+    static userCompany = "TM Demo Company"
     static teamName = "Account Manager"
     static firstName = baseName + randStr + "First"
     static middleName = baseName + randStr + "Middle"
@@ -33,7 +33,7 @@ class StaffSearchAndFilteringSpec extends GebReportingSpec {
     static userEmail = baseName + randStr + "testuser@transitionaldata.com"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

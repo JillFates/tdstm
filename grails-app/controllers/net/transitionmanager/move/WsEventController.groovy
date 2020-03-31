@@ -71,7 +71,7 @@ class WsEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventView)
 	def getModelForViewEdit(Long moveEventId) {
-		ListCommand filter = populateCommandObject(ListCommand)
+		ListCommand filter = populateCommandObject(ListCommand, false)
 		Project project = getProjectForWs()
 		MoveEvent moveEvent
 
@@ -119,7 +119,7 @@ class WsEventController implements ControllerMethods {
 		Project project = securityService.userCurrentProject
 		List<Map> bundles = moveBundleService.lookupList(project)
 		List runbookStatuses = GormUtil.getConstrainedProperties(MoveEvent).runbookStatus.inList
-		ListCommand filter = populateCommandObject(ListCommand)
+		ListCommand filter = populateCommandObject(ListCommand, false)
 		List<Map> tags = tagService.list(
 				projectForWs,
 				filter.name,
@@ -135,7 +135,7 @@ class WsEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventCreate)
 	def save(Long moveEventId) {
-		CreateEventCommand command = populateCommandObject(CreateEventCommand)
+		CreateEventCommand command = populateCommandObject(CreateEventCommand, false)
 		Project project = getProjectForWs()
 		MoveEvent moveEvent = moveEventService.createOrUpdate(project, command, moveEventId)
 		renderSuccessJson(GormUtil.domainObjectToMap(moveEvent))

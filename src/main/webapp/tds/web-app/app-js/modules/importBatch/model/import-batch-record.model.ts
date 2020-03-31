@@ -40,21 +40,21 @@ export class ImportBatchRecordDetailColumnsModel {
 				label: 'Error Count',
 				property: 'errorCount',
 				type: 'number',
-				width: 100,
+				width: 130,
 				locked: true
 			},
 			{
 				label: 'Import Operation',
 				property: 'operation',
 				type: 'text',
-				width: 130,
+				width: 170,
 				locked: true
 			},
 			{
 				label: 'Source Row',
 				property: 'sourceRowId',
 				type: 'number',
-				width: 100,
+				width: 130,
 				locked: true
 			}
 		];

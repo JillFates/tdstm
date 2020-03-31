@@ -1,8 +1,11 @@
-import {ReportsService} from '../../service/reports.service';
-import {Component, ElementRef} from '@angular/core';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+// Angular
+import {Component, ComponentFactoryResolver, ElementRef} from '@angular/core';
+// Component
 import {ReportComponent} from '../report.component';
+// Service
+import {ReportsService} from '../../service/reports.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {DialogService} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-application-event-results-report',
@@ -92,12 +95,12 @@ import {ReportComponent} from '../report.component';
 									</div>
 									<div class="form-group row ">
 										<div class="col-sm-2 col-sm-offset-2 buttons">
-											<tds-button-custom class="btn-primary"
-																				 [disabled]="loadingSmeList || loadingLists"
-																				 (click)="onGenerateReport()"
-																				 title="Generate"
-																				 tooltip="Generate"
-																				 icon="table">
+											<tds-button-custom
+													[disabled]="loadingSmeList || loadingLists"
+													(click)="onGenerateReport()"
+													title="Generate"
+													tooltip="Generate"
+													icon="table">
 											</tds-button-custom>
 										</div>
 									</div>
@@ -127,11 +130,12 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 	private readonly allSmeOption = {id: -1, text: 'All'};
 
 	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
 		reportsService: ReportsService,
-		dialogService: UIDialogService,
+		dialogService: DialogService,
 		private elRef: ElementRef,
 		private userPreferenceService: PreferenceService) {
-		super(reportsService, dialogService);
+		super(componentFactoryResolver, reportsService, dialogService);
 		this.onLoad();
 	}
 

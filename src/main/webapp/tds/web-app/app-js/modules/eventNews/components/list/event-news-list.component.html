@@ -1,0 +1,29 @@
+<div class="event-news-list-dropdown-container" #headerDropdowns>
+    <div class="clr-row">
+        <form clrForm clrLayout="horizontal">
+            <div class="clr-row">
+                <div class="clr-col-4">
+                    <clr-select-container>
+                        <label>Event:</label>
+                        <select clrSelect name="eventList" (change)="onEventListChange($event)" [(ngModel)]="eventId">
+                            <option *ngFor="let event of headerEventData | async" value="{{event.id}}">{{event.name}}</option>
+                        </select>
+                    </clr-select-container>
+                </div>
+                <div class="clr-col-4">
+                    <clr-select-container>
+                        <label>View:</label>
+                        <select clrSelect name="viewOptions" [ngModel]="viewFilter" (change)="onChangeViewFilter($event)">
+                            <option [ngValue]="undefined" selected>All</option>
+                            <option value="active">Active</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </clr-select-container>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<tds-grid [gridModel]="gridModel"
+          (cellClick)="cellClick($event)">
+</tds-grid>

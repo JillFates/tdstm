@@ -1,122 +1,126 @@
-import {AfterViewInit, Component} from '@angular/core';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {ViewModel, ViewGroupModel} from '../../../assetExplorer/model/view.model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {NotifierService} from '../../../../shared/services/notifier.service';
-import {AlertType} from '../../../../shared/model/alert.model';
-import {SaveOptions} from '../../../../shared/model/save-options.model';
+// Angular
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+// Model
+import { ViewModel, ViewGroupModel } from '../../../assetExplorer/model/view.model';
+import { AlertType } from '../../../../shared/model/alert.model';
+import { Permission } from '../../../../shared/model/permission.model';
+import { Dialog, DialogButtonType, KEYSTROKE } from 'tds-component-library';
+// Service
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import * as R from 'ramda';
 import { ActivatedRoute } from '@angular/router';
+import { AssetViewSaveOptions } from '../../models/asset-view-save-options.model';
 
 @Component({
 	selector: 'asset-explorer-view-save',
 	template: `
-        <div class="modal-content asset-explorer-view-save-component">
-            <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title">Save List View</h4>
-            </div>
-            <div class="modal-body">
-                <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
-                      #noticeForm='ngForm'>
-                    <div class="box-body">
-                        <div class="form-group save-views-container">
-                            <div>
-                                <div class="radio">
-                                    <div>
-                                        <label>
-                                            <input type="radio"
-                                                   name="radio-mode"
-                                                   [value]="saveAsOptions.MY_VIEW.value"
-                                                   [attr.disabled]="saveAsOptions.MY_VIEW.disabled || null"
-                                                   [(ngModel)]="model.saveAsOption"
-                                                   checked>
-                                            <span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-9 my-views-child" [attr.class]="">
-                                        <label for="name" style="padding: 0;font-weight: bold">
-                                            {{ 'GLOBAL.VIEW_NAME' | translate }}:*
-                                        </label>
-                                        <input type="text"
-                                               name="name"
-                                               id="name"
-                                               class="form-control"
-                                               placeholder="Enter a name for the view"
-                                               [disabled]="!isSaveInMyViewMode()"
-                                               (keyup)="onNameChanged()"
-                                               [(ngModel)]="model.name"
-                                               required>
-                                        <span *ngIf="!isUnique && isSaveInMyViewMode()"
-                                              class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
-
-                                        <div class="checkbox" *ngIf="saveOptions.canShare">
-                                            <label>
-                                                <input type="checkbox" name="shared" [disabled]="!isSaveInMyViewMode()"
-                                                       [(ngModel)]="model.isShared">
-                                                <span>{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}</span>
-                                            </label>
-                                        </div>
-                                        <div class="checkbox" (click)="onFavorite()" disabled>
-                                            <i class="fa fa-star-o text-yellow"
-                                               style="margin-left: -43px;padding:0 10px 10px 10px;font-size: 20px;top:2px;left:30px;position: relative"
-                                               [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite,'disabled':!isSaveInMyViewMode()} "></i>
-                                            <label style="margin-left:5px">
-                                                <input type="checkbox" name="favorite"
-                                                       [disabled]="!isSaveInMyViewMode()"
-                                                       style="visibility:hidden"> {{ 'GLOBAL.ADD_FAVORITES' | translate }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div *ngIf="saveOptions.canOverride">
-                                <div class="radio" style="position:inherit">
-                                    <label for="overrideMe">
-                                        <input id="overrideMe" type="radio" name="radio-mode"
-                                               [value]="saveAsOptions.OVERRIDE_FOR_ME.value"
-                                               [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ME.disabled || null"
-                                               [(ngModel)]="model.saveAsOption">
-                                        <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div *ngIf="saveOptions.canOverride">
-                                <div class="radio">
-                                    <label for="overrideAll">
-                                        <input id="overrideAll" type="radio" name="radio-mode"
-                                               [value]="saveAsOptions.OVERRIDE_FOR_ALL.value"
-                                               [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ALL.disabled || null"
-                                               [(ngModel)]="model.saveAsOption">
-                                        <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer form-group-center">
-                <tds-button-save
-                        class="btn-primary pull-left"
-                        (click)="confirmCloseDialog()"
-                        [disabled]="!isValid()">
-                </tds-button-save>
-                <tds-button-cancel
-                        (click)="cancelCloseDialog()"
-                        class="pull-right">
-                </tds-button-cancel>
-            </div>
-        </div>
+		<div class="asset-explorer-view-save-component">
+			<form name="saveForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
+						#saveForm='ngForm'>
+				<div class="box-body">
+					<div class="form-group save-views-container">
+						<div class="col-sm-12">
+							<div class="checkbox">
+								<clr-radio-wrapper class="inline">
+										<input clrRadio type="radio"
+												 [value]="saveAsOptions.MY_VIEW.value"
+												 [name]="'radio-mode'"
+												 (change)="onIsSystemChange()"
+												 [disabled]="saveAsOptions.MY_VIEW.disabled || null"
+												 [(ngModel)]="model.saveAsOption">
+									<label class="clr-control-label inline">
+										{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}
+									</label>
+								</clr-radio-wrapper>
+							</div>
+						</div>
+						<label for="name" class="col-sm-4 control-label">View Name:
+							<span class="required_field">*</span>
+						</label>
+						<div class="col-sm-8">
+							<input #inputText type="text" (keyup)="onNameChanged()" name="name" id="name" class="form-control"
+										 [disabled]="!isSaveInMyViewMode()"
+										 placeholder="View Name" [(ngModel)]="model.name" required>
+							<span *ngIf="!isUnique" class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }}
+								name must be unique</span>
+						</div>
+						<div class="col-sm-8 col-sm-offset-4">
+							<div class="checkbox">
+								<clr-checkbox-wrapper class="inline">
+									<input clrCheckbox type="checkbox"
+												 [name]="'shared'"
+												 [disabled]="!isSaveInMyViewMode()"
+												 [(ngModel)]="model.isShared">
+									<label class="clr-control-label inline" [ngClass]="{'disabled-input' : model.isSystem}">
+										{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}
+									</label>
+								</clr-checkbox-wrapper>
+							</div>
+						</div>
+						<div class="col-sm-8 col-sm-offset-4">
+							<div class="checkbox favorite inline"
+									 (click)="onFavorite()">
+								<i class="fa fa-star-o text-yellow"
+									 [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
+								<label (click)="onFavorite()">
+									<input type="checkbox"
+												 [disabled]="!isSaveInMyViewMode()"
+												 name="favorite"
+												 style="visibility:hidden"
+												 (click)="onFavorite()">
+									{{ 'GLOBAL.ADD_FAVORITES' | translate }}
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="form-group save-views-container no-margin-bottom" *ngIf="saveOptions.canOverride">
+						<div class="col-sm-12">
+							<div class="checkbox">
+								<clr-radio-wrapper class="inline"
+																	 [ngClass]="{'disabled': saveAsOptions.OVERRIDE_FOR_ME.disabled || null}">
+									<input clrRadio type="radio"
+												 [value]="saveAsOptions.OVERRIDE_FOR_ME.value"
+												 [name]="'radio-mode'"
+												 [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ME.disabled || null"
+												 [(ngModel)]="model.saveAsOption">
+									<label class="clr-control-label inline">
+										{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}
+									</label>
+								</clr-radio-wrapper>
+							</div>
+						</div>
+					</div>
+					<div class="form-group save-views-container" *ngIf="saveOptions.canOverride">
+						<div class="col-sm-12">
+							<div class="checkbox">
+								<clr-radio-wrapper class="inline"
+																	 [ngClass]="{'disabled': saveAsOptions.OVERRIDE_FOR_ALL.disabled || null}">
+									<input clrRadio type="radio"
+												 [value]="saveAsOptions.OVERRIDE_FOR_ALL.value"
+												 [name]="'radio-mode'"
+												 [(ngModel)]="model.saveAsOption">
+									<label class="clr-control-label inline">
+										{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}
+									</label>
+								</clr-radio-wrapper>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
 	`
 })
-export class AssetViewSaveComponent implements AfterViewInit {
-	public model: ViewModel;
-	public saveOptions: SaveOptions;
-	private preModel: ViewModel;
+export class AssetViewSaveComponent extends Dialog implements OnInit, AfterViewInit {
+	@ViewChild('inputText', {static: false}) inputText: ElementRef;
+	model: ViewModel;
+	saveOptions: AssetViewSaveOptions;
+	preModel: ViewModel;
 	public isUnique = true;
+	public favorites: ViewGroupModel;
 	public saveAsOptions = {
 		MY_VIEW: {value: E_SAVE_AS_OPTIONS.MY_VIEW, disabled: false, isOverride: false},
 		OVERRIDE_FOR_ME: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ME, disabled: false, isOverride: true },
@@ -130,18 +134,46 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	constructor(
-		model: ViewModel,
-		private favorites: ViewGroupModel,
-		saveOptions: SaveOptions,
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
-		private activatedRoute: ActivatedRoute,
-		private notifier: NotifierService) {
-		this.preModel = model;
-		if (!saveOptions) {
+		private permissionService: PermissionService,
+		private notifier: NotifierService,
+		private activatedRoute: ActivatedRoute) {
+		super();
+	}
+
+	ngOnInit(): void {
+		this.model = R.clone(this.data.viewModel);
+		this.favorites = R.clone(this.data.viewGroupModel);
+		if (this.model.id) {
+			this.model.name = `Copy of ${ this.model.name }`;
+			this.model.id = null;
+			this.model.isSystem = false;
+			this.model.isFavorite = false;
+		}
+		if (this.model.isSystem) {
+			this.model.isShared = false;
+		}
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => true,
+			disabled: () => !this.isValid(),
+			type: DialogButtonType.ACTION,
+			action: this.confirmCloseDialog.bind(this)
+		});
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+		this.preModel = this.data.viewModel;
+		if (!this.data.saveOptions) {
 			this.saveOptions = this.defaultSaveOptions;
 		} else {
-			this.saveOptions = saveOptions;
+			this.saveOptions = this.data.saveOptions;
 		}
 		this.activatedRoute.queryParams.subscribe( (params) => {
 			this.preModel.querystring = params;
@@ -151,42 +183,38 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	ngAfterViewInit(): void {
-
 		if (this.model.name) {
 			this.validateUniquenessDataViewByName(this.model.name);
+		}
+		// focus form to enable the exit on ESC key event.
+		setTimeout(() => this.inputText.nativeElement.focus(), 500);
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
 		}
 	}
 
 	public cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
-	}
-
-	public myMiewClass() {
-		return this.isThereOnlySaveMyView() ? '' : 'indent';
+		super.onCancelClose();
 	}
 
 	public confirmCloseDialog() {
 		const tmpModel = this.extractModel(this.model);
 		this.assetExpService.saveReport(tmpModel)
-			.subscribe(result => result && this.activeDialog.close(result),
-				error => this.activeDialog.dismiss(error));
+			.subscribe(result => result && super.onAcceptSuccess(result),
+				error => super.onCancelClose(error));
 	}
 
-	public isSaveInMyViewMode(): boolean {
+	isSaveInMyViewMode(): boolean {
 		return this.model.saveAsOption === this.saveAsOptions.MY_VIEW.value;
 	}
 
-	public isOverrideForMeMode(): boolean {
-		return this.model.saveAsOption === this.saveAsOptions.OVERRIDE_FOR_ME.value;
-	}
-
-	public isOverrideAllUsersMode(): boolean {
-		return this.model.saveAsOption === this.saveAsOptions.OVERRIDE_FOR_ALL.value;
-	}
-
-	/**
-	 * If save as my own view (my view mode) is selected then check for name uniqueness, otherwise form is always valid.
-	 */
 	public isValid(): boolean {
 		if (this.isSaveInMyViewMode()) {
 			return this.model.name && this.model.name.trim() !== '' && this.isUnique;
@@ -204,17 +232,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		}
 	}
 
-	public isThereOnlySaveMyView(): boolean {
-		return (
-			!this.saveOptions ||
-			(
-				this.saveOptions &&
-				this.saveOptions.saveAsOptions.length === 1 &&
-				this.saveOptions.saveAsOptions[0] === E_SAVE_AS_OPTIONS.MY_VIEW
-			)
-		);
-	}
-
 	private setDisabling(): void {
 		if (this.saveOptions) {
 			const options = Object.entries(this.saveAsOptions);
@@ -224,6 +241,14 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		}
 	}
 
+	/**
+	 * Disable the System View checkbox if the user does not have the proper permission
+	 * @returns {boolean}
+	 */
+	public isSystemCreatePermitted(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate);
+	}
+
 	public onFavorite() {
 		if (!this.isSaveInMyViewMode()) {
 			return;
@@ -231,13 +256,13 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.model.isFavorite) {
 			this.model.isFavorite = false;
 			if (this.model.id) {
-				const reportIndex = this.favorites.items.findIndex(x => x.id === this.model.id);
+				const reportIndex = this.favorites.views.findIndex(x => x.id === this.model.id);
 				if (reportIndex !== -1) {
-					this.favorites.items.splice(reportIndex, 1);
+					this.favorites.views.splice(reportIndex, 1);
 				}
 			}
 		} else {
-			if (this.assetExpService.hasMaximumFavorites(this.favorites.items.length + 1)) {
+			if (this.assetExpService.hasMaximumFavorites(this.favorites.views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'
@@ -246,15 +271,31 @@ export class AssetViewSaveComponent implements AfterViewInit {
 				this.model.isFavorite = true;
 			}
 		}
-
 	}
 
 	public onNameChanged() {
 		this.validateUniquenessDataViewByName(this.model.name);
 	}
 
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Should turn isShared to false when isSystem is selected as true.
+	 */
+	private onIsSystemChange(): void {
+		if (this.model.isSystem && this.model.isShared) {
+			this.model.isShared = false;
+		}
+	}
+
 	private validateUniquenessDataViewByName(dataViewName = '') {
 		if (!dataViewName.trim()) {
+			// handle empty string
 			this.isUnique = false;
 		} else {
 			this.assetExpService.validateUniquenessDataViewByName(dataViewName)

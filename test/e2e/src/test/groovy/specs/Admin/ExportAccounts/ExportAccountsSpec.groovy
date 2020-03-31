@@ -8,7 +8,7 @@ import spock.lang.Stepwise
 import java.text.SimpleDateFormat
 import pages.Downloads.HomeUserDownloadsPage
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class ExportAccountsSpec extends GebReportingSpec {
@@ -22,7 +22,7 @@ class ExportAccountsSpec extends GebReportingSpec {
     static fullFileName = fileName + "." + fileExtension
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

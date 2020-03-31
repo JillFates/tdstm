@@ -206,7 +206,7 @@ class CookbookService implements ServiceMethods {
 		assertProject(recipe, project)
 
 		// Update all TaskBatch to null the reference to the recipe
-		TaskBatch.executeUpdate('update TaskBatch set recipe=null where recipe=?', [recipe])
+		TaskBatch.executeUpdate('update TaskBatch set recipe=null where recipe=?0', [recipe])
 
 		def rvList = RecipeVersion.findAllByRecipe(recipe)
 		log.debug 'Found {} recipe versions to be deleted', rvList.size()
@@ -230,21 +230,23 @@ class CookbookService implements ServiceMethods {
 	/**
 	 * Deletes a Recipe version using the information passed
 	 *
-	 * @param recipeId the id of the recipe
-	 * @param recipeVersion the version of the recipeVersion
+	 * @param project - user's current project.
+	 * @param recipeId - the id of the recipe
+	 * @param recipeVersion - the version of the recipeVersion
 	 */
-	def deleteRecipeVersion(recipeId, recipeVersion) {
+	def deleteRecipeVersion(Project project, Long recipeId, Integer recipeVersion) {
 		securityService.requirePermission Permission.RecipeDelete
 
-		if (recipeVersion == null || !recipeVersion.isNumber()) {
-			throw new EmptyResultException()
+		Recipe recipe = get(Recipe, recipeId, project, true)
+
+		RecipeVersion rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
+		Integer recipeVersionCount = RecipeVersion.countByRecipe(recipe)
+
+		if(recipeVersionCount < 2){
+			log.warn('You can not delete the last recipe version.')
+			throw new InvalidParamException('You can not delete the last recipe version.')
 		}
 
-		Project project = securityService.getUserCurrentProjectOrException()
-		Recipe recipe = Recipe.get(recipeId)
-		assertProject(recipe, project)
-
-		def rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
 		if (rv == null) {
 			throw new EmptyResultException()
 		}
@@ -254,7 +256,7 @@ class CookbookService implements ServiceMethods {
 			throw new InvalidParamException('Recipe and version does not have a common recipe')
 		}
 
-		if (recipe.releasedVersion == rv) {
+		if (recipe.releasedVersion?.id == rv.id) {
 			log.warn('Can not delete the currently published version')
 			throw new InvalidParamException('Can not delete the currently published version')
 		}

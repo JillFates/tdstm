@@ -53,4 +53,37 @@ export class AssetTagUIWrapperService {
 		}
 		return retVal;
 	}
+
+	/**
+	 * This functions helps add a span with 3 dots (...) to a set of tags, it calculates the size of how many tags
+	 * can fit inside a given container width.
+	 * @param {string} selector the parent container of the tags, from which we will get the width
+	 * @param {string} toCleanSelector selector that contains the 3 dots span wich will be removed every time the calculation is made
+	 * @param {string} parentSelector in this case, used for
+	 **/
+	updateTagsWidthForAssetShowView(selector, toCleanSelector, parentSelector): void {
+		let allTagsDivs = document.querySelectorAll(selector);
+		document.querySelectorAll(toCleanSelector).forEach( node => {
+			node.parentNode.removeChild(node);
+		});
+		const maxSizeWidth = (<HTMLElement>document.querySelector(parentSelector)).offsetWidth;
+		allTagsDivs.forEach( el => {
+			let castedEl = (<HTMLElement>el);
+			let tags = castedEl.querySelectorAll('div .label.tag');
+			let allTagsWidth = 0;
+			let bestFit = 0;
+			if (tags.length > 1) {
+				tags.forEach((tag: HTMLElement) => {
+					allTagsWidth += tag.offsetWidth;
+				});
+				if (allTagsWidth > maxSizeWidth) {
+					bestFit = this.testBestFit(maxSizeWidth, tags);
+					let span = document.createElement('span');
+					span.innerHTML = '...';
+					span.className = 'dots-for-tags';
+					castedEl.insertBefore(span, castedEl.children[bestFit]);
+				}
+			}
+		});
+	};
 }

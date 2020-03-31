@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d45fc64e-acb6-4c7b-9fcc-8ceedccafe72",
+		"_postman_id": "81cdd452-bfde-4707-b2d8-626629c82e51",
 		"name": "ActionStartedUpdate",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -16,7 +16,14 @@
 							"",
 							"pm.test(\"JSESSIONID present\", function () {",
 							"    pm.expect(pm.cookies.has('JSESSIONID')).to.be.true;",
-							"});"
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
 						],
 						"type": "text/javascript"
 					}
@@ -216,6 +223,11 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -310,8 +322,10 @@
 						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
 					},
 					{
-						"key": "content-type",
-						"value": "application/json"
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
 					},
 					{
 						"key": "accept",
@@ -332,11 +346,21 @@
 					{
 						"key": "sec-fetch-site",
 						"value": "same-origin"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"348\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}"
+					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"{{event1}}\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/saveComment",
@@ -383,7 +407,9 @@
 							"pm.environment.unset(\"apiActionId\");",
 							"pm.environment.unset(\"taskName\");",
 							"pm.environment.unset(\"taskID\");",
-							""
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -402,11 +428,16 @@
 						"key": "Accept",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"publicKey\":\"{{publicKey}}\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/task/{{taskID}}/recordRemoteActionStarted",
@@ -424,5 +455,6 @@
 			},
 			"response": []
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

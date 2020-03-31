@@ -1,0 +1,222 @@
+@mixin k-input {
+  .k-input {
+    padding: 0 0.25rem;
+    height: 1rem;
+    max-height: 1rem;
+    font-size: 0.541667rem;
+  }
+}
+
+kendo-numerictextbox {
+  &.k-widget {
+    ::selection {
+      background-color: unset;
+      color: unset;
+      color: black;
+    }
+
+    &.form-control {
+      @include k-input();
+    }
+  }
+
+  &.form-control {
+    height: unset;
+  }
+
+  &:hover {
+    .k-select {
+      border-color: unset;
+      background-color: unset;
+      background-image: unset;
+      color: #0092d1;
+    }
+  }
+
+  &.k-numerictextbox {
+    .k-numeric-wrap {
+      border: unset;
+      color: black;
+      border-bottom: 1px solid #999;
+    }
+
+    .k-state-focused {
+      -webkit-box-shadow: unset;
+      box-shadow: unset;
+      border: unset;
+      border-bottom: 1px solid #0092d1;
+    }
+
+    .k-select {
+      border: unset;
+      background-color: unset;
+      background-image: unset;
+      color: #0092d1;
+
+      &:hover {
+        background-color: unset;
+        background-image: unset;
+        color: #0092d1;
+      }
+    }
+  }
+}
+
+kendo-popup {
+  .k-popup {
+    .k-list-optionlabel,
+    .k-list-optionlabel:hover {
+      background-color: #0092d1 !important;
+    }
+  }
+}
+
+kendo-list {
+  &.ng-star-inserted {
+    .k-list {
+      .k-item {
+        line-height: unset;
+        font-weight: normal;
+        white-space: pre;
+        padding: 0px 2px 1px;
+        min-height: 1.2em;
+        overflow-x: hidden;
+
+        &.k-state-selected {
+          color: white;
+          background-color: #0092d1;
+        }
+
+        &.k-state-focused {
+          box-shadow: unset;
+          -webkit-box-shadow: unset;
+        }
+      }
+    }
+  }
+}
+
+kendo-combobox,
+kendo-dropdownlist {
+  &.k-header {
+    border: unset;
+  }
+
+  &.k-combobox {
+    .k-select {
+      background: unset;
+    }
+  }
+
+  &.k-combobox,
+  &.k-dropdown {
+    display: block;
+
+    .k-dropdown-wrap {
+      border: unset;
+      color: black;
+      border-bottom: 1px solid #999;
+
+      &.k-state-focused {
+        -webkit-box-shadow: unset;
+        box-shadow: unset;
+        border: unset;
+        border-bottom: 1px solid #0092d1;
+      }
+
+      &:hover {
+        border: unset;
+        border-bottom: 1px solid #999;
+      }
+
+      @include k-input();
+    }
+  }
+
+  .k-select {
+    .k-icon {
+      color: #0092d1;
+    }
+  }
+
+  &.has-error {
+    border: none !important;
+    .k-dropdown-wrap {
+      border-bottom: 1px #f00 solid !important;
+    }
+  }
+}
+
+.k-timepicker {
+  .k-select {
+    color: #0092d1 !important;
+  }
+}
+
+.k-timepicker:hover .k-select {
+  background-color: inherit;
+  background-image: none;
+}
+
+kendo-datepicker {
+  &.k-datepicker {
+    display: block;
+
+    &:hover {
+      .k-select {
+        border: unset;
+        background-color: unset;
+        background-image: unset;
+        color: #0092d1;
+      }
+    }
+
+    .k-widget {
+      ::selection {
+        background-color: unset;
+        color: unset;
+        color: black;
+      }
+    }
+
+    .k-dateinput {
+      @include k-input();
+    }
+
+    .k-dateinput-wrap {
+      border: unset;
+    }
+
+    .k-picker-wrap {
+      border: unset;
+      border-bottom: 1px solid #999;
+    }
+
+    .k-state-focused {
+      -webkit-box-shadow: unset;
+      box-shadow: unset;
+      border: unset;
+      border-bottom: 1px solid #0092d1;
+    }
+
+    .k-select {
+      border: unset;
+      background-color: unset;
+      background-image: unset;
+      color: #0092d1;
+      position: absolute;
+      right: 0px;
+      bottom: 2px;
+
+      &:hover {
+        background-color: unset;
+        background-image: unset;
+        color: #0092d1;
+      }
+    }
+  }
+}
+
+kendo-popup .k-popup {
+  border-color: #ccc !important
+}

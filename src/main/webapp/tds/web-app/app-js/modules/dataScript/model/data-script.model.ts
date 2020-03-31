@@ -1,3 +1,5 @@
+import {FilterType} from 'tds-component-library';
+
 export const COLUMN_MIN_WIDTH = 360;
 
 export class DataScriptColumnModel {
@@ -6,42 +8,41 @@ export class DataScriptColumnModel {
 	constructor(dateFormat: string) {
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 70,
-				locked: true
-			}, {
 				label: 'Name',
 				property: 'name',
-				type: 'text',
-				locked: true
-			}, {
+				filterType: FilterType.text,
+				width: 160
+			},
+			{
 				label: 'Provider',
 				property: 'provider.name',
-				type: 'text',
-				width: 220
-			}, {
+				filterType: FilterType.text,
+				width: 150
+			},
+			{
 				label: 'Description',
 				property: 'description',
-				type: 'text'
-			}, {
+				filterType: FilterType.text
+			},
+			{
 				label: 'Mode',
 				property: 'modeFormat',
-				type: 'text',
-				width: 200
-			}, {
+				filterType: FilterType.text,
+				width: 80
+			},
+			{
 				label: 'Date Create',
 				property: 'dateCreated',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
-				width: 170
-			}, {
+				width: 120
+			},
+			{
 				label: 'Last Modified',
 				property: 'lastUpdated',
-				type: 'date',
+				filterType: FilterType.date,
 				format: dateFormat,
-				width: 170
+				width: 120
 			}
 		];
 	}
