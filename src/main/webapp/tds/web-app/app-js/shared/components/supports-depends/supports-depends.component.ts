@@ -69,7 +69,7 @@ declare var jQuery: any;
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper, , dependencyType.SUPPORT)">Dependency Delete</a>
+								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper, dependencyType.SUPPORT)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -309,13 +309,14 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		}
 
-		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
-			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
-			if (this.dataGridDependsOnHelper) {
-				this.initDone.emit(this.model);
-			}
-		});
+		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT)
+			.subscribe((dataGridDependsOnHelper) => {
+				this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
+				this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+				if (this.dataGridDependsOnHelper) {
+					this.initDone.emit(this.model);
+				}
+			});
 
 		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
@@ -355,7 +356,7 @@ export class SupportsDependsComponent implements OnInit {
 					dependencies.push(dependencySupportModel);
 				});
 			}
-			observer.next(new DataGridOperationsHelper(dependencies, null, null));
+			observer.next(new DataGridOperationsHelper(dependencies, null, null, null, 2000));
 		});
 	}
 
