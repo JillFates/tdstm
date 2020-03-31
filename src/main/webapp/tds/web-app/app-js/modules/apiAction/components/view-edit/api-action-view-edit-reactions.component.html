@@ -139,7 +139,7 @@
 													 [(model)]="eventReactions[1].value"></code-mirror>
 							<div *ngIf="eventReactions[1].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxSuccess"
 													[ngModel]="eventReactions[1].error" readonly></textarea>
 							</div>
 						</div>
@@ -167,7 +167,7 @@
 													 [(model)]="eventReactions[2].value"></code-mirror>
 							<div *ngIf="eventReactions[2].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea  class="form-control script-error" name="apiActionSyntaxDefault"
 													 [ngModel]="eventReactions[2].error" readonly></textarea>
 							</div>
 						</div>
@@ -196,7 +196,7 @@
 													 [(model)]="eventReactions[3].value"></code-mirror>
 							<div *ngIf="eventReactions[3].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea  class="form-control script-error" name="apiActionSyntaxError"
 													 [ngModel]="eventReactions[3].error" readonly></textarea>
 							</div>
 						</div>
@@ -225,7 +225,7 @@
 							</code-mirror>
 							<div *ngIf="eventReactions[4].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea  class="form-control script-error" name="apiActionSyntaxFailed"
 													 [ngModel]="eventReactions[4].error" readonly></textarea>
 							</div>
 						</div>
@@ -253,7 +253,7 @@
 													 [(model)]="eventReactions[5].value"></code-mirror>
 							<div *ngIf="eventReactions[5].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxLapsed"
 													[ngModel]="eventReactions[5].error" readonly></textarea>
 							</div>
 						</div>
@@ -285,7 +285,7 @@
 													 [(model)]="eventReactions[6].value"></code-mirror>
 							<div *ngIf="eventReactions[6].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxStalled"
 													[ngModel]="eventReactions[6].error" readonly></textarea>
 							</div>
 						</div>
@@ -318,7 +318,7 @@
 													 [(model)]="eventReactions[7].value"></code-mirror>
 							<div *ngIf="eventReactions[7].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxBeforeCall"
 													[ngModel]="eventReactions[7].error" readonly></textarea>
 							</div>
 						</div>
@@ -348,7 +348,7 @@
 													 [(model)]="eventReactions[8].value"></code-mirror>
 							<div *ngIf="eventReactions[8].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxAfterCall"
 													[ngModel]="eventReactions[8].error" readonly></textarea>
 							</div>
 						</div>
