@@ -985,7 +985,7 @@ digraph runbook {
 	 * @param : commentId.
 	 * @return : retMap.
 	 */
-	@HasPermission(Permission.TaskManagerView)
+	@HasPermission(Permission.TaskEdit)
 	def changeEstTime(Long commentId, Integer day) {
 		Map<String, String> retMap = [etext: '', estStart: '', estFinish: '']
 		try {

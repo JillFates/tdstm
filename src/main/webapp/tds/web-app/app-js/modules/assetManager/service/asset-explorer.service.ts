@@ -83,8 +83,15 @@ export class AssetExplorerService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Used to save or create new dataviews
+	 * @param model
+	 */
 	saveReport(model: ViewModel): Observable<ViewModel> {
-		if (!model.id) {
+		// When the model has the property saveAsOption then this is creating a new view. If there is no saveAsOption
+		// then the logic needs to see if the view has an id already. If so then it is a save otherwise a create.
+		const isCreate = ('saveAsOption' in model) || ! model.id ;
+		if (isCreate) {
 			return this.http.post(`${this.assetExplorerUrl}/view`, JSON.stringify(model))
 				.map((response: any) => {
 					return response && response.status === 'success' && response.data && response.data.dataView;

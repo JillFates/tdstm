@@ -569,6 +569,7 @@
 													iconClass="is-solid"
 													[tooltip]="modelHelper.CREATE_PREDECESSOR"
 													[id]="'btnAddPredecessor'"
+													[disabled]="!hasCreateTaskPermission"
 													(click)="onAddTaskDependency(model.predecessorList,dataGridTaskPredecessorsHelper)">
 												</tds-button-add>
 											</div>
@@ -729,6 +730,7 @@
 													[id]="
 														'btnAddSuccessor'
 													"
+													[disabled]="!hasCreateTaskPermission"
 													(click)="
 														onAddTaskDependency(
 															model.successorList,

@@ -306,4 +306,21 @@ class NumberUtilTests extends Specification {
 			null        | 5.0f     || 5.0f
 			123.23f     | 5.0f     || 123.23f
 	}
+
+	def 'Test percentage'() {
+		expect:
+			result == NumberUtil.percentage(total, value)
+		where:
+			total	|	value	||	result
+			1000	|	500		||	50
+			1000	|	0		||	0
+			0		|	500		||	0
+			1000	|	1		||	1
+			1000	|	999		||	99
+			1000	|	479		||	48
+			1000	|	463		||	46
+			1000	|	1000	||	100
+			500000	| 499999	||	99
+			500000	| 1			||	1
+	}
 }

@@ -25,7 +25,7 @@ class DatabaseService implements ServiceMethods {
 	@NotTransactional
 	Map getModelForShow(Project project, Database db, Map params) {
 		Map commonModel = assetEntityService.getCommonModel(false, project, db, 'Database', params)
-		List fields =  dataviewService.fetch(DataViewMap.DATABASES.id).toMap(securityService.currentPersonId).schema.columns.collect{it.label}
+		List fields =  dataviewService.fetch(DataViewMap.DATABASES.id).toMap(project, securityService.userLoginPerson).schema.columns.collect{it.label}
 
 		return [
 				   databaseInstance: db,
