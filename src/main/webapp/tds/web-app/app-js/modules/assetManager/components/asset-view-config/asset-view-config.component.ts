@@ -345,18 +345,10 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 
 	protected isSaveAsAvailable(): boolean {
 		return this.model.id ?
-			(	this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) && this.canCreateViews() :
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) && this.canCreateViews()
-			)
-			: this.isSaveAvailable();
-	}
-
-	/**
-	 * Check if user has AssetExplorerCreate permission.
-	 */
-	canCreateViews(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+			this.model.isSystem ?
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
+				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) :
+			this.isSaveAvailable();
 	}
 
 	public isSystemSaveAvailable(edit): boolean {
