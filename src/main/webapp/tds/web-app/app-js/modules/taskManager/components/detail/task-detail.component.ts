@@ -125,7 +125,7 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-			this.hasCreateTaskPermission = this.permissionService.hasPermission(Permission.TaskCreate);
+		this.hasCreateTaskPermission = this.permissionService.hasPermission(Permission.TaskCreate);
 		setTimeout(() => {
 			this.setTitle(this.taskDetailModel.modal.title);
 		});
