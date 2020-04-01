@@ -73,7 +73,7 @@ class RecipeHistorySpec extends GebReportingSpec {
         at MenuPage
         waitFor{tasksModule.goToTasksCookbook()}
         at CookbookPage
-        commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
+        waitFor{commonsModule.blockCookbookLoadingIndicator()} // disable loading for this spec
         // Create clean recipe verify stuff
         clickOnCreateButton()
         at CreateRecipePage
@@ -149,7 +149,7 @@ class RecipeHistorySpec extends GebReportingSpec {
             at CookbookPage
 
         then: 'The Page title should reflect the Generation History Legend'
-            pageTitle.text().trim() == "Generation History"
+            pageTitle.text().trim() == "Recipes"
     }
 
     def "5. Going to the empty 'Actions' tab"() {
@@ -284,7 +284,7 @@ class RecipeHistorySpec extends GebReportingSpec {
             at TabHistoryTabTasksPage
 
         then: 'Active Elements should be shown'
-            waitFor {hisTabTasksTabTasksList.size() > 1 }
+            waitFor {hisTabTasksTabTasksList.size() > 0 }
             hisTabTasksTabTasksGridHeadCols.getAt(0).text() == "Task #"
             hisTabTasksTabTasksGridHeadCols.getAt(1).text() == "Description"
             hisTabTasksTabTasksGridHeadCols.getAt(2).text() == "Asset"
