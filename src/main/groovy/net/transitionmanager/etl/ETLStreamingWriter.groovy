@@ -228,7 +228,7 @@ class ETLStreamingWriter {
                 || JsonObject.isAssignableFrom(pojo.class)
                 || JSONObject.isAssignableFrom(pojo.class)
                 || Number.isAssignableFrom(pojo.class)
-            || pojo.class.isArray()
+                || pojo.class.isArray()
         ) {
             generator.writeStringField(fieldName, pojo.toString())
         } else {
