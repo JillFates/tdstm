@@ -152,7 +152,6 @@ import { NgForm } from '@angular/forms';
       .has-error, .has-error:focus {
           border: 1px #f00 solid;
 	  }
-	  
 	`]
 })
 export class ApiActionViewEditParamatersComponent {
@@ -195,9 +194,8 @@ export class ApiActionViewEditParamatersComponent {
 	 * determines the position of the clr dropdown
 	 * **/
 	determinePositionClrDropdown(rowIndex, parameterList): string {
-		return rowIndex+1 === parameterList.length-1 ? 'right-top':'bottom-left'
+		return rowIndex + 1 === parameterList.length - 1 ? 'right-top' : 'bottom-left'
 	}
-
 
 	/**
 	 * Add a new argument to the list of parameters and refresh the list.
@@ -288,7 +286,7 @@ export class ApiActionViewEditParamatersComponent {
 			});
 			if (assetClass && assetClass.value) {
 				return assetClass.value;
-			}				
+			}
 		}
 		return context;
 	};
@@ -300,7 +298,7 @@ export class ApiActionViewEditParamatersComponent {
 	getFieldLabel(dataItem?: APIActionParameterModel): string {
 		if (dataItem) {
 			const field = dataItem.currentFieldList.find(item => item.field === dataItem.fieldName);
-			return field ? field.label : dataItem.fieldName;				
+			return field ? field.label : dataItem.fieldName;
 		}
 	}
 
@@ -312,9 +310,9 @@ export class ApiActionViewEditParamatersComponent {
 		const invalidParams = this.parameterList.filter(item => {
 			if (item) {
 				return item.context !== 'USER_DEF' && !item.fieldName;
+			} else {
+				return true;
 			}
-			else { return true; }
-			
 		});
 		this.isFormValid = this.isFormValid && invalidParams.length === 0;
 		this.onValuesChangeEmitter.emit({parameterList: this.parameterList, isFormValid: this.isFormValid});
