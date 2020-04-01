@@ -1439,6 +1439,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 * @return String HTML representing the page
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
+	@Deprecated
 	def retrieveLists() {
 
 		def start = new Date()
