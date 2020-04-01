@@ -125,8 +125,8 @@ import { en_DICTIONARY } from './i18n/en.dictionary';
 import { PreferencesResolveService } from './resolves/preferences-resolve.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CircleCountdownComponent } from './components/circle-countdown/circle-countdown.component';
-import {MenusModule} from '@progress/kendo-angular-menu';
-import {TooltipModule} from '@progress/kendo-angular-tooltip';
+import { MenusModule } from '@progress/kendo-angular-menu';
+import { TooltipModule } from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [

@@ -31,14 +31,14 @@ export class DataScriptColumnModel {
 				width: 80
 			},
 			{
-				label: 'Date Create',
+				label: 'Date Created',
 				property: 'dateCreated',
 				filterType: FilterType.date,
 				format: dateFormat,
 				width: 120
 			},
 			{
-				label: 'Last Modified',
+				label: 'Last Updated',
 				property: 'lastUpdated',
 				filterType: FilterType.date,
 				format: dateFormat,

@@ -346,14 +346,14 @@
 				</tr>
 				<tr class="no-grow-container" *ngIf="!collapsedTaskDetail">
 					<td class="dates-info-container" colspan="2">
-						<table class="dates-info">
+						<table *ngIf="taskDetailModel.modal.type === modalType.EDIT" class="dates-info">
 							<tbody>
 							<tr>
-								<td class="date-created">Created by {{model.personCreateObj}} at {{model.dtCreated}}
+								<td class="date-created">Created By: {{model.personCreateObj}} at {{model.dtCreated}}
 									{{(model.taskSpecId) ? ' with spec id ' + model.taskSpecId : ''}}
 									<span *ngIf="model.recipe && hasCookbookPermission"> in recipe <a
 										href="./../cookbook/index#/recipes/{{model.recipe?.id}}/gentasks/start"> {{model.recipe?.name}}</a></span>
-								<td class="last-updated">Last updated: {{model.lastUpdated}}</td>
+								<td class="last-updated">Last Updated: {{model.lastUpdated}}</td>
 							</tr>
 							</tbody>
 						</table>

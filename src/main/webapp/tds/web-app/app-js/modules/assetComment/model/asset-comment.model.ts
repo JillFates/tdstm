@@ -60,7 +60,7 @@ export class AssetCommentColumnModel {
 				width: 170
 			},
 			{
-				label: 'Created',
+				label: 'Date Created',
 				property: 'dateCreated',
 				filterType: FilterType.date,
 				format: dateFormat,
@@ -73,7 +73,7 @@ export class AssetCommentColumnModel {
 				width: 170
 			},
 			{
-				label: 'Updated',
+				label: 'Last Updated',
 				property: 'lastUpdated',
 				filterType: FilterType.date,
 				format: dateFormat,

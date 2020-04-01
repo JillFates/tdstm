@@ -105,7 +105,8 @@ export class AssetCommentListComponent implements OnInit {
 	 * Check the field clicked and if appropriate open the comment view or the asset details
 	 * @param {SelectionEvent} event
 	 */
-	public async cellClick(event: CellClickEvent): Promise<void> {
+	// TODO: sam, please test this funcionality.
+	protected async cellClick(event: CellClickEvent) {
 		if (event.columnIndex === 1 && this.isShowCommentAvailable()) {
 			await this.openComment(event.dataItem, ModalType.VIEW);
 		} else {

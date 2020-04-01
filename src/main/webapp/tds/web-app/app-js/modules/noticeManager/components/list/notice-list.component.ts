@@ -196,7 +196,8 @@ export class NoticeListComponent implements OnInit {
 				modalConfiguration: {
 					title: 'Notice Create',
 					draggable: true,
-					modalSize: ModalSize.MD
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-notice-edit-view-create'
 				}
 			}).toPromise();
 			await this.gridComponent.reloadData();
@@ -219,7 +220,8 @@ export class NoticeListComponent implements OnInit {
 				modalConfiguration: {
 					title: 'Notice',
 					draggable: true,
-					modalSize: ModalSize.MD
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-notice-edit-view-create'
 				}
 			}).toPromise();
 			await this.gridComponent.reloadData();

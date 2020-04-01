@@ -90,6 +90,7 @@ class MoveEvent {
 
 	Map toMap() {
 		return [
+			id                   : id,
 			project              : [
 				id  : project.id,
 				name: project.name

@@ -217,7 +217,7 @@
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-gojs-task-graph">
                         <a [routerLink]="['taskManager', 'task-graph']">GoJS Task Graph</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-timeline">
+                    <li *ngIf="hasPermission(permission.TaskTimelineView)" class="menu-child-item menu-parent-tasks-task-timeline">
                         <a href="/tdstm/task/taskTimeline">Task Timeline</a>
                     </li>
                     <li *ngIf="hasPermission(permission.RecipeView)" class="menu-child-item menu-parent-tasks-cookbook">

@@ -19,6 +19,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { DataGridOperationsHelper, fixContentWrapper } from '../../../../shared/utils/data-grid-operations.helper';
 import { SortDescriptor } from '@progress/kendo-data-query';
 import {ProjectColumnModel} from '../../../project/model/project.model';
+import { ReportResolveService } from '../../resolve/report-resolve.service';
 
 @Component({
 	selector: 'tds-asset-view-manager',
@@ -38,7 +39,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	userDateFormat: string;
 	sortBy: string;
 	private viewType = ViewType;
-	private report;
+	private reports;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -49,8 +50,10 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		private dictionary: DictionaryService,
 		private translateService: TranslatePipe,
-		private preferenceService: PreferenceService) {
-		this.report = this.route.snapshot.data['reports'] as Observable<ViewGroupModel[]>;
+		private preferenceService: PreferenceService,
+		private reportResolveService: ReportResolveService) {
+		const reports = this.route.snapshot.data['reports'] as Observable<ViewGroupModel[]>;
+		this.reports = this.reportResolveService.populateReport(reports);
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
@@ -66,7 +69,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 			.getUserDatePreferenceAsKendoFormat()
 			.subscribe(dateFormat => {
 				this.dateFormat = dateFormat;
-				this.gridColumns = AssetViewManagerColumnsHelper.createColumns(`{0:${dateFormat}}`);
+				this.gridColumns = AssetViewManagerColumnsHelper.createColumns(dateFormat	);
 			});
 		const preferencesCodes = `${ PREFERENCES_LIST.CURRENT_DATE_FORMAT },${ PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT }`;
 		this.preferenceService.getPreferences(preferencesCodes)
@@ -87,7 +90,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	private setupDefaultSettings(preferences: any[]) {
 		this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 		this.gridColumns = AssetViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
-		this.reportGroupModels = this.report;
+		this.reportGroupModels = this.reports;
 		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 		this.sortBy = preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT];
 		if (!this.sortBy) {
@@ -197,7 +200,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		this.assetExpService.getReports()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(result => {
-				this.reportGroupModels = result as ViewGroupModel[];
+				this.reportGroupModels = this.reportResolveService.populateReport(result) as ViewGroupModel[];
 				this.reportGroupModels.forEach((folder: ViewGroupModel) => {
 					folder.open = false;
 					if (folder.name === selectedFolder.name) {

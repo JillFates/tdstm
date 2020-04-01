@@ -346,8 +346,7 @@
 						if (typeof data.error !== 'undefined') {
 							alert(data.error);
 						} else {
-							$("#myIssueList").replaceWith(data);
-							$("#search").focus();
+							$('.refresh-button').click();
 						}
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -384,20 +383,9 @@
 			type:'POST',
 			success: function(data) {
 				if (typeof data.error !== 'undefined') {
+					alert(data.error);
 				} else {
-					$('#myTaskList').html(data);
-					$('#showStatusId_'+objId).show();
-					$('#issueTrId_'+objId).each(function(){
-						$(this).removeAttr('onclick');
-						$(this).unbind("click").bind("click", function(){
-							hideStatus(objId,status);
-						});
-					});
-
-					if (status=='Started') {
-						$('#started_'+objId).hide();
-					}
-					progressTimer.Restart();
+					$('.refresh-button').click();
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {

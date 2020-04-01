@@ -57,6 +57,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
 		'FETCH': 'Fetch',
+		'VIEW_NAME': 'View Name',
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
@@ -135,12 +136,18 @@ export const en_DICTIONARY: Object = {
 			'FAVORITE': 'Favorite',
 			'NAME': 'Name',
 			'CREATED_BY': 'Created By',
-			'CREATED_ON': 'Created On',
-			'UPDATED_ON': 'Updated On',
+			'CREATED_ON': 'Date Created',
+			'UPDATED_ON': 'Last Updated',
+			'GLOBAL': 'Global',
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
+			'OVERRIDE': 'Override',
 		},
 		'SYSTEM_VIEW': 'System View',
+		'SAVE_LIST_VIEW': 'Save List View',
+		'SAVE_IN_MY_VIEWS': 'Save as My Own View',
+		'OVERRIDE_EXISTING_VIEW_ME': 'Override System View (for Me)',
+		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override System View (for All Users)',
 		'BULK_CHANGE' : {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
@@ -275,8 +282,8 @@ export const en_DICTIONARY: Object = {
 		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
 	'ARCHITECTURE': {
-		'ARCHITECTURE_GRAPH': 'Architecture Graph',
-		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
+		'ARCHITECTURE_GRAPH': 'GoJS Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'GoJS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
@@ -294,7 +301,7 @@ export const en_DICTIONARY: Object = {
 		'ASSET_CLASSES': 'Asset Classes: '
 	},
 	'DEPENDENCY_ANALYZER': {
-		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_ANALYZER': 'Angular Dependency Analyzer',
 		'DEPENDENCY_GROUPS': 'Dependency Groups',
 		'REGENERATE': 'Regenerate',
 		'BUNDLE': 'Bundle',
