@@ -194,7 +194,7 @@ export class ApiActionViewEditParamatersComponent {
 	 * determines the position of the clr dropdown
 	 * **/
 	determinePositionClrDropdown(rowIndex, parameterList): string {
-		return rowIndex + 1 === parameterList.length - 1 ? 'right-top' : 'bottom-left'
+		return rowIndex + 1 === parameterList.length - 1 ? 'right-top' : 'bottom-left';
 	}
 
 	/**
@@ -310,9 +310,7 @@ export class ApiActionViewEditParamatersComponent {
 		const invalidParams = this.parameterList.filter(item => {
 			if (item) {
 				return item.context !== 'USER_DEF' && !item.fieldName;
-			} else {
-				return true;
-			}
+			} else { return true; }
 		});
 		this.isFormValid = this.isFormValid && invalidParams.length === 0;
 		this.onValuesChangeEmitter.emit({parameterList: this.parameterList, isFormValid: this.isFormValid});
