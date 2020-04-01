@@ -540,9 +540,6 @@ export class TaskCommentComponent implements OnInit {
 	// because the Show and Edit functions on Tasks are not loosely coupled in the FE.
 	// I'm adding this method here, that should be removed once this is taken care of in a sepparate ticket.
 	protected canOpenTaskDetail(): boolean {
-		return (
-			this.permissionService.hasPermission(Permission.CommentCreate) &&
-			this.permissionService.hasPermission(Permission.TaskCreate)
-		);
+		return this.permissionService.hasPermission(Permission.TaskView);
 	}
 }

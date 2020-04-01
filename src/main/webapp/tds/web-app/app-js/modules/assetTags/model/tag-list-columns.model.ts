@@ -64,7 +64,7 @@ export class TagListColumnsModel {
 				locked: false
 			},
 			{
-				label: 'Last Modified',
+				label: 'Last Updated',
 				filterable: true,
 				property: 'lastModified',
 				type: 'date',

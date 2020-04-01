@@ -261,5 +261,5 @@ class Model {
 		productLine: 'Product Line', modelFamily: 'Model Family', endOfLifeDate: 'End Of Life Date',
 		endOfLifeStatus: 'endOfLifeStatus', modelConnectors: 'No Of Connectors', roomObject: 'roomObject',
 		createdBy: 'Created By', updatedBy: 'Updated By', validatedBy: 'Validated By', dateCreated: 'Date Created',
-		lastModified: 'Last Modified', sourceURL: 'Source URL'].asImmutable()
+		lastModified: 'Last Updated', sourceURL: 'Source URL'].asImmutable()
 }

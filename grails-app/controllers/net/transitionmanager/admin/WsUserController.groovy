@@ -95,7 +95,7 @@ class WsUserController implements ControllerMethods {
 		Person person = Person.get(Long.valueOf(id))
 		List<RoleType> teams = partyRelationshipService.getTeamRoleTypes()
 
-		renderSuccessJson(person: person.toMap(project), availableTeams: teams)
+		renderSuccessJson(person: person.toMap(), availableTeams: teams)
 	}
 
 	/**
