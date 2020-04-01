@@ -446,7 +446,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.apiActionService.getParameters(this.apiActionModel).subscribe(
 			(result: any) => {
 				this.parameterList = result;
-				this.parameterList.push(null);	// buffer necessary
+				this.parameterList.push(null);
 				this.parameterList.forEach((parameter) => {
 					this.onContextValueChange(parameter);
 				});

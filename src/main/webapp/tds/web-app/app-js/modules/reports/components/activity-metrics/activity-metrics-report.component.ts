@@ -13,7 +13,7 @@ import {DialogService} from 'tds-component-library';
 			<tds-report-toggle-filters
 				[hideFilters]="hideFilters"
 				(reload)="onReload()"
-				(toggle)="toggleFilters($event)"
+				(toggle)="toggleFilters()"
 				[disabled]="!generatedReport">
 			</tds-report-toggle-filters>
 			<section class="box-body">
