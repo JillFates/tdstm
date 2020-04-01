@@ -83,5 +83,14 @@ class ETLStreamingWriterSpec extends ETLBaseSpec {
             ['key', 'value']                                      || '[key, value]'
             ['key', 'value'] as Set                               || '[key, value]'
             "${'test a GString'}"                                 || 'test a GString'
+            ['Test', 'Array'] as String[]                         || '[Test, Array]'
+            [1l, 2l] as Long[]                                    || '[1, 2]'
+            [1, 2] as Integer[]                                   || '[1, 2]'
+            [12.34d, 12.35d] as Double[]                          || '[12.34, 12.35]'
+            [12.34f, 12.35f] as Float[]                           || '[12.34, 12.35]'
+            [1l, 2l] as long[]                                    || '[1, 2]'
+            [1, 2] as int[]                                       || '[1, 2]'
+            [12.34d, 12.35d] as double[]                          || '[12.34, 12.35]'
+            [12.34f, 12.35f] as float[]                           || '[12.34, 12.35]'
     }
 }
