@@ -48,7 +48,7 @@ import java.text.SimpleDateFormat
  *  new ETLStreamingWriter(os).writeETLResultsHeader(processorResult)
  * </pre>
  *
- * @see net.transitionmanager.imports.ScriptProcessorService#saveDomainDataUsingStreaming
+ * @see net.transitionmanager.imports.ScriptProcessorService#saveResultsUsingStreaming(com.tdsops.etl.ETLProcessorResult)
  */
 @CompileStatic
 class ETLStreamingWriter {
@@ -227,7 +227,9 @@ class ETLStreamingWriter {
                 || Collection.isAssignableFrom(pojo.class)
                 || JsonObject.isAssignableFrom(pojo.class)
                 || JSONObject.isAssignableFrom(pojo.class)
-                || Number.isAssignableFrom(pojo.class)) {
+                || Number.isAssignableFrom(pojo.class)
+            || pojo.class.isArray()
+        ) {
             generator.writeStringField(fieldName, pojo.toString())
         } else {
             generator.writeObjectField(fieldName, pojo)
