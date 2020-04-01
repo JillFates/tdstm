@@ -269,7 +269,7 @@
                             </li>
                             <g:if test="${currProject && moveBundle}">
                                 <li class="menu-child-item menu-parent-planning-selected-bundle">
-                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">Bundle Details - ${moveBundle.name}</a>
+                                    <a href="/tdstm/module/bundle/list?show=${moveBundle.id}">Bundle Details - ${moveBundle.name}</a>
                                 </li>
                             </g:if>
                         </ul>
