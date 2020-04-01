@@ -18,7 +18,7 @@ export class ProviderColumnModel {
 				width: 300,
 			},
 			{
-				label: 'Date Create',
+				label: 'Date Created',
 				property: 'dateCreated',
 				format: dateFormat,
 				filterType: FilterType.date,

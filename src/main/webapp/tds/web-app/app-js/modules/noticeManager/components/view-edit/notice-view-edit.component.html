@@ -267,7 +267,7 @@
 					[ngClass]="{ 'readonly-control': noticeIsLocked }"
 				>
 					<kendo-editor
-							[value]="model.htmlText"
+							[value]="htmlText"
 							(valueChange)="onValueChange($event)"
 							[readonly]="(noticeIsLocked || action === EnumActionType.View)"
 					>

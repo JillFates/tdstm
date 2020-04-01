@@ -59,7 +59,7 @@ export class APIActionColumnModel {
 				filterType: FilterType.text,
 				width: 180
 			}, {
-				label: 'Created',
+				label: 'Date Created',
 				property: 'dateCreated',
 				format: dateFormat,
 				filterType: FilterType.date,
