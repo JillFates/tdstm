@@ -36,10 +36,10 @@ class WsMoveBundleController implements ControllerMethods {
 	@HasPermission(Permission.BundleEdit)
 	def modelForEdit(Long moveBundleId) {
 		Project project = getProjectForWs()
-		MoveBundle moveBundle = fetchDomain(MoveBundle, [id: moveBundleId], project).toMap()
+		MoveBundle moveBundle = fetchDomain(MoveBundle, [id: moveBundleId], project)
 		userPreferenceService.setPreference(UserPreferenceEnum.CURR_BUNDLE, moveBundleId)
 		renderSuccessJson([
-			moveBundleInstance: moveBundle,
+			moveBundleInstance: moveBundle.toMap(),
 			projectId: project.id,
 			rooms: Room.findAllByProject(project)*.toMap()
 		])
