@@ -35,10 +35,14 @@ class RequireCsrfProtectionMatcher implements RequestMatcher {
 		/^\/tdstm\/rackLayouts\/.*$/,
 		/^\/tdstm\/ws\/user\/.*$/,
 		/^\/tdstm\/ws\/asset\/dependencies.*$/, // Remove when Architecture Graph is Angularized
+		/^\/tdstm\/ws\/task\/generateTasks.*$/,
 		/^\/tdstm\/ws\/cookbook\/.*$/,
+		/^\/tdstm\/wsTimeline\/.*$/,
 		/^\/tdstm\/task\/.*$/,	 // Remove when My Task get Angularized
 		/^\/tdstm\/ws\/depAnalyzer\/.*$/, // Remove when DA get Angularized
-		/^\/tdstm\/application\/.*$/ // Remove when DA get Angularized
+		/^\/tdstm\/application\/.*$/, // Remove when DA get Angularized
+		/^\/tdstm\/api\/.*$/,
+		/^\/tdstm\/auth\/applyNewPassword/
 	]
 
 	/**

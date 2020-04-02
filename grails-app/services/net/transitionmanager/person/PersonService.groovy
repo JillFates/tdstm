@@ -1829,4 +1829,32 @@ class PersonService implements ServiceMethods {
 		Person.executeQuery('select u.person from UserLogin u where u.username=:username',
 				[username: username])[0]
 	}
+
+	/**
+	 * Feth a person from the database and validate that they have access to the user's current project.
+	 * @param project
+	 * @param personId
+	 * @param reportViolation
+	 * @return
+	 */
+	Person getPerson(Project project, Long personId, boolean reportViolation = true) {
+		Person person = null
+		if (!project) {
+			project = securityService.getUserCurrentProject()
+		}
+		if (personId) {
+			person = get(Person, personId, project)
+			if (!isAssignedToProject(project, person)) {
+				if (reportViolation) {
+					String errorMsg = "Attempted to assign person $personId to a project they don't have access to."
+					securityService.reportViolation(errorMsg, securityService.userLogin.username)
+					List msgArgs = [person.id, project.id]
+					throwException(InvalidParamException, 'person.project.noPermission', errorMsg, msgArgs)
+				} else {
+					person = null
+				}
+			}
+		}
+		return person
+	}
 }

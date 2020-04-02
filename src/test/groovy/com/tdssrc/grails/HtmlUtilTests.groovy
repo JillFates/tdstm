@@ -50,4 +50,26 @@ class HtmlUtilTests extends Specification {
 			true			| 'true'
 			'&lt;'			| '&amp;lt;'
 	}
+
+	void 'test the underlying method used for parsing instruction links with valid input'() {
+		expect:
+			List<String> instructionsLinkList = HtmlUtil.parseMarkupURL(instructionsLink, defaultLabel)
+			label == instructionsLinkList[0]
+			url == instructionsLinkList[1]
+		where:
+			label		|	url						|	instructionsLink						|	defaultLabel
+			'label'		|	'http://foo.com'		|	'label|http://foo.com'				|	''
+			'dummy'		|	'http://foo.com'		|	'http://foo.com'					|	'dummy'
+			'label'		|	'http://foo.com'		|	' label | http://foo.com '			|	''
+	}
+
+	void 'test the underlying method used for parsing instruction links with invalid input'() {
+		expect:
+			HtmlUtil.parseMarkupURL(instructionsLink, defaultLabel) == null
+		where:
+			instructionsLink	|	defaultLabel
+			null			|	'label'
+			''				|	'label'
+			'label'			|	''
+	}
 }

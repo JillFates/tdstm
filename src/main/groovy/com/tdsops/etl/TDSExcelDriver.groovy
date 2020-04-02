@@ -14,6 +14,7 @@ import getl.utils.ListUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
@@ -129,7 +130,7 @@ class TDSExcelDriver extends ExcelDriver {
 		int additionalRows = limit + offsetRows + (header ? (1 as int) : (0 as int))
 
 		rows.each { Row row ->
-			if (row.rowNum >= additionalRows) return
+			if (!(workbook instanceof StreamingWorkbook) && row.rowNum >= additionalRows) return
 			Iterator cells = row.cellIterator()
 			LinkedHashMap<String, Object> updater = [:]
 
@@ -169,6 +170,7 @@ class TDSExcelDriver extends ExcelDriver {
 
 			Row row = rows.next()
 			rowsProcessed += 1
+			dataset.params.currentRowIndex = rowsProcessed
 			Iterator cells = row.cellIterator()
 			List<Field> fields = []
 			cells.each { Cell cell ->
@@ -195,7 +197,12 @@ class TDSExcelDriver extends ExcelDriver {
 		if (cell instanceof StreamingCell) {
 			return cell.stringCellValue
 		} else {
-			return cell.toString()
+			String cellValue = cell.toString()
+			// See (TM-16942) When file is 'xls', with NUMERIC formats, It adds .0 at the end.
+			if(cell.getCellTypeEnum() == CellType.NUMERIC && cellValue.endsWith('.0')){
+				cellValue = cellValue[0..-3]
+			}
+			return cellValue
 		}
 	}
 

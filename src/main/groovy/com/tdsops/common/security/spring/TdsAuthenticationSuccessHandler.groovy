@@ -57,7 +57,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			'/assetEntity/assetImport',
 			'/assetEntity/assetOptions',
 			'/assetEntity/importTask',
-			'/cookbook/index',
+			'/recipes/index',
 			'/dataTransferBatch/list',
 			'/manufacturer/list',
 			'/model/importExport',

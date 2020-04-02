@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gsp.PageRenderer
@@ -19,10 +20,12 @@ import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
 import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
@@ -41,19 +44,22 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 
-	ApplicationService    applicationService
-	AssetEntityService    assetEntityService
-	AssetService          assetService
-	CommentService        commentService
-	TaskService           taskService
-	ControllerService     controllerService
-	DatabaseService       databaseService
-	DeviceService         deviceService
-	MoveBundleService     moveBundleService
-	PageRenderer          groovyPageRenderer
-	ProgressService       progressService
-	Scheduler             quartzScheduler
-	StorageService        storageService
+
+	ApplicationService applicationService
+	AssetEntityService assetEntityService
+	AssetService       assetService
+	CommentService     commentService
+	TaskService        taskService
+	ControllerService  controllerService
+	DatabaseService    databaseService
+	DeviceService      deviceService
+	MoveBundleService  moveBundleService
+	PageRenderer       groovyPageRenderer
+	ProgressService    progressService
+	Scheduler          quartzScheduler
+	StorageService     storageService
+    PartyRelationshipService partyRelationshipService
+    CustomDomainService customDomainService
 	UserPreferenceService userPreferenceService
 
 	/**
@@ -360,7 +366,8 @@ class WsAssetController implements ControllerMethods {
 			model.modelName = model.asset.model.modelName;
 		}
 
-
+		Project project = projectForWs
+		model.personList = partyRelationshipService.getProjectApplicationStaff(project)
 
 		String domainName = AssetClass.getDomainForAssetType(model.asset.assetClass.toString())
 		if (mode == 'show') {
@@ -379,7 +386,16 @@ class WsAssetController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def getDefaultCreateModel(String assetClass) {
-		renderAsJson( assetService.getCreateModel(getProjectForWs(), assetClass) )
+		Project project = projectForWs
+		Map model = assetService.getCreateModel(getProjectForWs(), assetClass)
+
+		// Add the custom field specs to the model
+		model.put('customs', assetEntityService.getCustomFieldsSettings(project, assetClass, true) )
+
+		// Add the standardFieldASpecs to the model
+		assetService.addFieldSpecsToCrudModel(project, assetClass, model)
+
+		renderAsJson( model )
 	}
 
 	/**
@@ -643,6 +659,23 @@ class WsAssetController implements ControllerMethods {
 		progressService.update(key, 1, 'In progress')
 
 		renderSuccessJson(key: key)
+	}
+
+	/**
+	 * Get basic asset fields based on its id and dependency group id.
+	 * @return
+	 */
+	def getAssetForDependencyGroup(Long assetId) {
+		Project project = getProjectForWs()
+		AssetEntity asset = fetchDomain(AssetEntity, [id: assetId], project)
+
+		renderSuccessJson([
+		        id: asset.id,
+				name: asset.assetName,
+				description: asset.description,
+				moveBundle: asset.moveBundle?.name,
+				depGroup: AssetDependencyBundle.findByAsset(asset)?.dependencyBundle
+		])
 	}
 
 }

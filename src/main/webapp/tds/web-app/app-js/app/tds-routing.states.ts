@@ -14,6 +14,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'assetsummary', loadChildren: '../modules/assetSummary/asset-summary.module#AssetSummaryModule'},
 	{path: 'asset', loadChildren: '../modules/assetManager/asset-manager.module#AssetManagerModule'},
 	{path: 'event', loadChildren: '../modules/event/event.module#EventModule'},
+	{path: 'event-news', loadChildren: '../modules/eventNews/event-news.module#EventNewsModule'},
 	{path: 'insight', loadChildren: '../modules/insight/insight.module#InsightModule'},
 	{path: 'bundle', loadChildren: '../modules/bundle/bundle.module#BundleModule'},
 	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
@@ -32,6 +33,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'reports', loadChildren: '../modules/reports/reports.module#ReportsModule'},
 	{path: 'taskManager', loadChildren: '../modules/taskManager/task-manager.module#TaskManagerModule'},
 	{path: 'export', loadChildren: '../modules/export/export.module#ExportModule'},
+	{path: 'manufacturer', loadChildren: '../modules/manufacturer/manufacturer.module#ManufacturerModule'},
 	{path: '**', redirectTo: 'auth' },
 ];
 

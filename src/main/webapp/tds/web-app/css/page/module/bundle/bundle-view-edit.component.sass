@@ -1,38 +1,49 @@
 .bundle-view-edit-component
-  font-size: 14px
-  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif
-  .bundle-time-picker
-    padding-left: 0px
-    padding-top: 12px
-    label
-      min-width: 90px;
-  td
-    line-height: 14px
-    padding: 4px 5px
-    text-align: left
-  .steps_table
-    height: auto
-    .prop
-      .name
-        text-align: left
-        white-space: nowrap
-        vertical-align: top
-        width: 50%
-        font-weight: bold
-      .value
-        width: 50%
+  font-size: 12px
+  .clr-form-control
+    margin-top: unset
+  .assetTag
+    display: inline-block
+    margin-top: 2px
+    padding: 5px
+    margin-right: 4px
+  tds-asset-tag-selector
+    .asset-tag-selector-component
+      kendo-multiselect
+        display: block !important
+        width: 172px !important
+  select
+    width: 180px
+  .required
+    float: right
+    font-size: 9px
+    color: red
+  table
+    width: 100%
+    .name
+      white-space: nowrap
+      width: 15%
+      font-weight: bold
+    .value
+      width: 85%
       .k-dateinput-wrap input
-        font-size: 14px !important
-    .span
-      position: absolute
-      text-align: center
-      width: auto
-      margin: -17px 0 0 10px
-      padding: 0px 8px
-      background: #ffffff
-    .required
-      float: right
-      font-size: 9px
-      color: red
-    input [type='checkbox']
-      margin: 0 !important
+        font-size: 12px !important
+      input[type=text]
+        width: 180px
+      ul
+        padding-left: 0px
+      .k-switch.asset-tag
+        display: none
+    td
+      line-height: 12px
+      padding: 4px 5px
+      text-align: left
+      vertical-align: top
+      label, ul
+        margin-top: 10px
+      label.api-action-for-planning
+        margin-top: 15px
+  .btn
+    margin-right: 4px
+  input[type=checkbox]
+    margin-top: 0px !important

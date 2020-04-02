@@ -11,7 +11,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class RecipeEditionSpec extends GebReportingSpec {
@@ -27,13 +27,13 @@ class RecipeEditionSpec extends GebReportingSpec {
     ]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
         login()
         at MenuPage
-        tasksModule.goToTasksCookbook()
+        waitFor{tasksModule.goToTasksCookbook()}
         at CookbookPage
         commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         clickOnCreateButton()
@@ -101,7 +101,6 @@ class RecipeEditionSpec extends GebReportingSpec {
                 '    id: 1100,',
                 '    description: \'Startup ALL applications\',',
                 '    title: \'Startup app ${it.assetName}\',',
-                '    workflow: \'AppStartup\',',
                 '    team: \'APP_COORD\',',
                 '    category: \'startup\',',
                 '    duration: 10,',
@@ -187,20 +186,19 @@ class RecipeEditionSpec extends GebReportingSpec {
                 '  [',
                 '    id: 1100,',
                 '    description: \'Startup ALL applications\',',
-                "    title: 'Startup app ${it.assetName}',",
-                '    workflow: \'AppStartup\',',
+                '    title: \'Startup app ${it.assetName}\',',
                 '    team: \'APP_COORD\',',
                 '    category: \'startup\',',
                 '    duration: 10,',
                 '      filter : [',
-                '        class: \'application\'',
+                '        class: \'application\',',
                 '      ],',
                 '  ],',
                 ']'
         ]
         String recipeText = recipe.join('\\n')
         when: 'The User adds all related information'
-            browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeText+'"');
+            browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeText+'"')
 
         then: 'The TextArea should be displayed'
             //   TODO should compare the recipe text vs textarea

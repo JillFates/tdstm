@@ -3,7 +3,6 @@
 		<kendo-grid
 			*ngIf="dataGridTaskHelper"
 			class="tds-table"
-			[ngClass]="{'row-actions-2-children': dataGridTaskHelper.canSupportColumnMenuDynamic()}"
 			[data]="dataGridTaskHelper.gridData"
 			[sort]="dataGridTaskHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -12,7 +11,7 @@
 		>
 			<!-- Toolbar Template -->
 			<ng-template kendoGridToolbarTemplate [position]="'top'">
-				<div class="clr-row">
+				<div class="clr-row tool-bar-wrapper">
 					<div class="grid-label clr-col-4">
 						<strong>Tasks</strong>
 					</div>
@@ -72,14 +71,14 @@
 					*ngIf="column.type === 'action'"
 					let-dataItem
 				>
-					<div class="action-button btn-group btn-link">
-						<clr-dropdown>
-							<tds-button
-								icon="ellipsis-vertical"
-								title="Actions"
-								clrDropdownTrigger
-							></tds-button>
-							<clr-dropdown-menu *clrIfOpen>
+					<div class="action-button btn-link">
+						<clr-dropdown #dropdown>
+							<tds-button icon="ellipsis-vertical"
+													title="Actions"
+													clrDropdownTrigger
+													tdsGridContextMenuFixedPosition [clrDropdown]="dropdown">
+							</tds-button>
+							<clr-dropdown-menu *clrIfOpen clr-dropdown-menu>
 								<a
 									clrDropdownItem
 									(click)="openTaskEdit(dataItem)"
@@ -130,7 +129,6 @@
 		<kendo-grid
 			*ngIf="dataGridCommentHelper"
 			class="tds-table"
-			[ngClass]="{'row-actions-2-children': dataGridCommentHelper.canSupportColumnMenuDynamic()}"
 			[data]="dataGridCommentHelper.gridData"
 			[sort]="dataGridCommentHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -139,7 +137,7 @@
 		>
 			<!-- Toolbar Template -->
 			<ng-template kendoGridToolbarTemplate [position]="'top'">
-				<div class="clr-row">
+				<div class="clr-row tool-bar-wrapper">
 					<div class="grid-label clr-col-4">
 						<strong>Comments</strong>
 					</div>
@@ -189,13 +187,11 @@
 					*ngIf="column.type === 'action'"
 					let-dataItem
 				>
-					<div class="action-button btn-group btn-link">
-						<clr-dropdown>
-							<tds-button
-								icon="ellipsis-vertical"
-								title="Actions"
-								clrDropdownTrigger
-							></tds-button>
+					<div class="action-button btn-link">
+						<clr-dropdown #dropdown>
+							<tds-button icon="ellipsis-vertical"
+													clrDropdownTrigger
+													tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"></tds-button>
 							<clr-dropdown-menu *clrIfOpen>
 								<a
 									clrDropdownItem
@@ -242,7 +238,7 @@
 				</ng-template>
 			</kendo-grid-column>
 			<kendo-grid-messages noRecords="There are no records to display.">
-			</kendo-grid-messages>
+		</kendo-grid-messages>
 		</kendo-grid>
 	</div>
 </div>

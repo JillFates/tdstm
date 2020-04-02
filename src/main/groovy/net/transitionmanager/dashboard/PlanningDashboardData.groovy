@@ -134,7 +134,7 @@ class PlanningDashboardData {
 		return [
 			movedAppPerc: percentageMetrics.movedAppPerc,
 			movedServerPerc: percentageMetrics.serversCompletedPercentage,
-			moveEventList: moveEventList,
+			moveEventList: moveEventList*.toMap(),
 			openTasks: moveEventMetrics.metrics['openTasks'],
 			unassignedAppCount: basicMetrics.unassignedApplicationCount,
 			unassignedAppPerc: percentageMetrics.unassignedAppPerc,
@@ -208,6 +208,7 @@ class PlanningDashboardData {
 		static final String selectCount = 'SELECT count(ae)'
 		static final String baseWhere = 'WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)'
 		static final String deviceWhere = "$baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
+		static final String otherDeviceWhere = "$baseWhere AND ae.assetClass=:assetClass AND (ae.assetType NOT IN (:type) OR ae.assetType IS NULL)"
 		protected PlanningDashboardData planningDashboardData
 
 		/**
@@ -230,10 +231,11 @@ class PlanningDashboardData {
 		 * @param asset - 'Application', 'Database', etc.
 		 * @param countArgs - parameters to inject to the query.
 		 * @param additionalClauses - additional clauses that need to be used for querying.
+		 * @param isOther - a flag for signaling that the query is for other devices. This is because "Other Devices" query is a little different.
 		 * @return
 		 */
-		Long getAssetCount(String asset, Map countArgs, List<String> additionalClauses = []) {
-			String where = (asset == 'AssetEntity' && !additionalClauses) ? deviceWhere : baseWhere
+		Long getAssetCount(String asset, Map countArgs, List<String> additionalClauses = [], boolean isOther = false) {
+			String where = (asset == 'AssetEntity' && !additionalClauses) ? (isOther ? otherDeviceWhere : deviceWhere) : baseWhere
 			String countQuery = "$selectCount FROM $asset ae $where ${additionalClauses.join(" ")}"
 			return AssetEntity.executeQuery(countQuery, countArgs)[0]
 		}
@@ -576,7 +578,7 @@ class PlanningDashboardData {
 				application: [domain: 'Application', args: eventWiseArgs],
 				database: [domain: 'Database', args: eventWiseArgs],
 				file: [domain: 'Files', args: eventWiseArgs],
-				other: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes]],
+				other: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes], other: true],
 				physicalAsset: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass: AssetClass.DEVICE, type: AssetType.physicalServerTypes]],
 				physicalStorage: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass:AssetClass.DEVICE, type:AssetType.storageTypes]],
 				server: [domain: 'AssetEntity', args: eventWiseArgs + [assetClass: AssetClass.DEVICE, type: AssetType.allServerTypes]],
@@ -587,7 +589,8 @@ class PlanningDashboardData {
 
 			if (moveBundles) {
 				queryInfo.each { String key, Map params ->
-					assetCounts[key] = getAssetCount(params['domain'], params['args'])
+					boolean isOther = 'other' in params ? params['other'] : false
+					assetCounts[key] = getAssetCount(params['domain'], params['args'], [], isOther)
 				}
 			}
 

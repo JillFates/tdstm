@@ -15,34 +15,36 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-combobox',
 	template: `
-        <kendo-combobox #innerComboBox
-                        [data]="datasource"
-                        [(ngModel)]="model"
+		<kendo-combobox #innerComboBox
+						[data]="datasource"
+						class="tds-combobox"
+						[(ngModel)]="model"
 						[tabindex]="tabindex"
-                        [textField]="'text'"
-                        [valueField]="'id'"
-                        [placeholder]="placeholder"
-                        [filterable]="true"
-                        [title]="model?.text || ''"
-                        (valueChange)="onValueChange($event)"
-                        (selectionChange)="onSelectionChange($event)"
-                        (filterChange)="onFilterChange($event)"
-                        (open)="onOpen()"
-                        (close)="onClose()"
-                        (focus)="onFocus()"
-                        (blur)="onBlur()"
-                        [suggest]="true"
-                        [disabled]="disabled"
-                        [required]="required"
-                        name="testName"
-                        style="width: 100%;">
-            <ng-template kendoComboBoxItemTemplate let-dataItem>
-                <span [innerHTML]="comboBoxInnerSearch(dataItem)"></span>
-            </ng-template>
-            <ng-template kendoComboBoxFooterTemplate>
-                <span #dropdownFooter></span>
-            </ng-template>
-        </kendo-combobox>
+						[textField]="'text'"
+						[valueField]="'id'"
+						[placeholder]="placeholder"
+						[filterable]="true"
+						[title]="model?.text || ''"
+						(valueChange)="onValueChange($event)"
+						(selectionChange)="onSelectionChange($event)"
+						(filterChange)="onFilterChange($event)"
+						(open)="onOpen()"
+						(close)="onClose()"
+						(focus)="onFocus()"
+						(blur)="onBlur()"
+						[suggest]="true"
+						[disabled]="disabled"
+						[ngClass]="{'missing-fields': required && !innerComboBox.value?.id}"
+						[required]="required"
+						name="testName"
+						style="width: 100%;">
+			<ng-template kendoComboBoxItemTemplate let-dataItem>
+				<span [innerHTML]="comboBoxInnerSearch(dataItem)"></span>
+			</ng-template>
+			<ng-template kendoComboBoxFooterTemplate>
+				<span #dropdownFooter></span>
+			</ng-template>
+		</kendo-combobox>
 	`,
 	styles: []
 })
@@ -61,6 +63,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Output('blur') blur: EventEmitter<any> = new EventEmitter();
 	// Model
 	@Output() modelChange = new EventEmitter<string>();
+	@Input('allowEmptyValue') allowEmptyValue = false;
 	@Input('model') model: any;
 	@Input('metaParam') metaParam: any;
 	@Input('tabindex') tabindex: any;
@@ -108,7 +111,14 @@ export class TDSComboBoxComponent implements OnChanges {
 	 * @param model Item to add
 	 */
 	addToDataSource(model: any): void {
-		if (model && model.id && !this.datasource.find((item) => item.id === model.id)) {
+		// if is a valid model
+		if (model && model.id) {
+			// and doesn't exists in the collection
+			if (!this.datasource.find((item) => item.id === model.id)) {
+				this.datasource.push(model);
+			}
+		} else if (this.allowEmptyValue) {
+			// if is a new empty value and the control allows empty values
 			this.datasource.push(model);
 		}
 	}

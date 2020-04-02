@@ -1,32 +1,33 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-
-import { TaskCommentService } from '../../service/task-comment.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { ModalType } from '../../../../shared/model/constants';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+// Angular
+import {Component, Input, OnInit, Output, EventEmitter, ComponentFactoryResolver} from '@angular/core';
+// Model
 import {
 	TaskColumnsModel,
 	CommentColumnsModel,
 } from './model/task-comment-columns.model';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { TaskService } from '../../../taskManager/service/task.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { TaskDetailComponent } from '../../../taskManager/components/detail/task-detail.component';
-import { TaskEditCreateComponent } from '../../../taskManager/components/edit-create/task-edit-create.component';
-import { TaskDetailModel } from '../../../taskManager/model/task-detail.model';
+import {ModalType} from '../../../../shared/model/constants';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
+import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
+import {DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+// Component
+import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
+import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
+// Service
+import {TaskCommentService} from '../../service/task-comment.service';
+import {TaskService} from '../../../taskManager/service/task.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
 import {
 	PREFERENCES_LIST,
 	PreferenceService,
 } from '../../../../shared/services/preference.service';
-import { TaskEditCreateModelHelper } from '../../../taskManager/components/common/task-edit-create-model.helper';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { clone } from 'ramda';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { Permission } from '../../../../shared/model/permission.model';
-import {AssetCommentModel} from '../../../assetComment/model/asset-comment.model';
-import {AssetCommentViewEditComponent} from '../../../assetComment/components/view-edit/asset-comment-view-edit.component';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {UserContextService} from '../../../auth/service/user-context.service';
 
 @Component({
 	selector: `task-comment`,
@@ -63,9 +64,9 @@ export class TaskCommentComponent implements OnInit {
 	private userDateFormat;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private taskService: TaskCommentService,
-		private dialogService: UIDialogService,
-		public promptService: UIPromptService,
 		public taskManagerService: TaskService,
 		private userContextService: UserContextService,
 		private preferenceService: PreferenceService,
@@ -179,13 +180,12 @@ export class TaskCommentComponent implements OnInit {
 	}
 
 	/**
-	 * Create a task
+	 * Create a Comment
 	 * @param comment
 	 */
-	public createComment(comment: any): void {
+	public createComment(): void {
 		let assetCommentModel: AssetCommentModel = {
 			modal: {
-				title: 'Comment Create',
 				type: ModalType.CREATE,
 			},
 			archive: false,
@@ -200,19 +200,20 @@ export class TaskCommentComponent implements OnInit {
 			},
 		};
 
-		this.dialogService
-			.extra(
-				AssetCommentViewEditComponent,
-				[{ provide: AssetCommentModel, useValue: assetCommentModel }],
-				false,
-				false
-			)
-			.then(result => {
-				this.createDataGrids();
-			})
-			.catch(result => {
-				console.log('Dismissed Dialog');
-			});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetCommentViewEditComponent,
+			data: {
+				assetCommentModel: assetCommentModel
+			},
+			modalConfiguration: {
+				title: 'Comment',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((data: any) => {
+			this.createDataGrids();
+		});
 	}
 
 	/**
@@ -260,19 +261,20 @@ export class TaskCommentComponent implements OnInit {
 			dateCreated: comment.commentInstance.dateCreated,
 		};
 
-		this.dialogService
-			.extra(
-				AssetCommentViewEditComponent,
-				[{ provide: AssetCommentModel, useValue: assetCommentModel }],
-				false,
-				false
-			)
-			.then(result => {
-				this.createDataGrids();
-			})
-			.catch(result => {
-				console.log('Dismissed Dialog');
-			});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetCommentViewEditComponent,
+			data: {
+				assetCommentModel: assetCommentModel
+			},
+			modalConfiguration: {
+				title: 'Comment',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((data: any) => {
+			this.createDataGrids();
+		});
 	}
 
 	/**
@@ -294,21 +296,21 @@ export class TaskCommentComponent implements OnInit {
 			},
 		};
 
-		this.dialogService
-			.extra(
-				TaskEditCreateComponent,
-				[{ provide: TaskDetailModel, useValue: taskCreateModel }],
-				false,
-				false
-			)
-			.then(result => {
-				if (result) {
-					this.createDataGrids();
-				}
-			})
-			.catch(result => {
-				console.log('Cancel:', result);
-			});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskEditCreateComponent,
+			data: {
+				taskDetailModel: taskCreateModel
+			},
+			modalConfiguration: {
+				title: 'Task',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
+			}
+		}).subscribe((data: any) => {
+			this.createDataGrids();
+		});
 	}
 
 	/**
@@ -326,33 +328,32 @@ export class TaskCommentComponent implements OnInit {
 			},
 		};
 
-		this.dialogService
-			.extra(
-				TaskDetailComponent,
-				[{ provide: TaskDetailModel, useValue: taskDetailModel }],
-				false,
-				false
-			)
-			.then(result => {
-				if (result) {
-					if (result.isDeleted) {
-						this.deleteTaskComment(dataItem).then(() =>
-							this.createDataGrids()
-						);
-					} else if (result.commentInstance) {
-						this.openTaskDetail(result);
-					} else if (result.shouldEdit) {
-						this.openTaskEdit({
-							commentInstance: { id: result.id.id },
-						});
-					}
-				}
-			})
-			.catch(result => {
-				if (result) {
-					this.createDataGrids();
-				}
-			});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskDetailComponent,
+			data: {
+				taskDetailModel: taskDetailModel
+			},
+			modalConfiguration: {
+				title: 'Task',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
+			}
+		}).subscribe((data: any) => {
+			if (data.isDeleted) {
+				this.deleteTaskComment(dataItem).then(() =>
+					this.createDataGrids()
+				);
+			} else if (data.commentInstance) {
+				this.openTaskDetail(data);
+			} else if (data.shouldEdit) {
+				this.openTaskEdit({
+					commentInstance: { id: data.id.id },
+				});
+			}
+		});
+
 	}
 
 	/**
@@ -370,7 +371,8 @@ export class TaskCommentComponent implements OnInit {
 					this.userDateFormat,
 					this.taskManagerService,
 					this.dialogService,
-					this.translate
+					this.translate,
+					this.componentFactoryResolver
 				);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
@@ -388,31 +390,29 @@ export class TaskCommentComponent implements OnInit {
 				);
 				model.modal = taskDetailModel.modal;
 
-				this.dialogService
-					.extra(
-						TaskEditCreateComponent,
-						[{ provide: TaskDetailModel, useValue: clone(model) }],
-						false,
-						false
-					)
-					.then(result => {
-						if (result) {
-							if (result.isDeleted) {
-								this.deleteTaskComment(dataItem).then(() =>
-									this.createDataGrids()
-								);
-							} else if (result.commentInstance) {
-								this.openTaskDetail(result);
-							} else {
-								this.reloadTasksGrid();
-							}
-						}
-					})
-					.catch(result => {
-						if (result) {
-							this.createDataGrids();
-						}
-					});
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: TaskEditCreateComponent,
+					data: {
+						taskDetailModel: model
+					},
+					modalConfiguration: {
+						title: 'Task',
+						draggable: true,
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
+					}
+				}).subscribe((data: any) => {
+					if (data.isDeleted) {
+						this.deleteTaskComment(dataItem).then(() =>
+							this.createDataGrids()
+						);
+					} else if (data.commentInstance) {
+						this.openTaskDetail(data);
+					} else {
+						this.createDataGrids();
+					}
+				});
 			});
 	}
 
@@ -458,15 +458,12 @@ export class TaskCommentComponent implements OnInit {
 	 * Prompt for delete the Asset Comment
 	 */
 	protected onDelete(dataItem: any): void {
-		this.promptService
-			.open(
-				'Confirmation Required',
-				'Confirm deletion of this record. There is no undo for this action.',
-				'Confirm',
-				'Cancel'
-			)
-			.then(confirm => {
-				if (confirm) {
+		this.dialogService.confirm(
+			'Confirmation Required',
+			'Confirm deletion of this record. There is no undo for this action.'
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.deleteTaskComment(dataItem).then(deleted => {
 						if (deleted) {
 							this.outputCommentCount();
@@ -474,8 +471,7 @@ export class TaskCommentComponent implements OnInit {
 						}
 					});
 				}
-			})
-			.catch(error => console.log(error));
+			});
 	}
 
 	/**
@@ -540,9 +536,6 @@ export class TaskCommentComponent implements OnInit {
 	// because the Show and Edit functions on Tasks are not loosely coupled in the FE.
 	// I'm adding this method here, that should be removed once this is taken care of in a sepparate ticket.
 	protected canOpenTaskDetail(): boolean {
-		return (
-			this.permissionService.hasPermission(Permission.CommentCreate) &&
-			this.permissionService.hasPermission(Permission.TaskCreate)
-		);
+		return this.permissionService.hasPermission(Permission.TaskView);
 	}
 }

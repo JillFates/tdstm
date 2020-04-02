@@ -648,6 +648,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 */
 	@NotTransactional()
 	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
+		Long projectId = project.id
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
 		Map context
 
@@ -697,7 +698,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				List records = ImportBatchRecord.where {
 					id in recordSetIds
 				}.list(sortBy: 'id')
-
 				ImportBatchRecord.withNewTransaction { DefaultTransactionStatus status ->
 					for (record in records) {
 						context.record = record
@@ -713,7 +713,9 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 					log.debug 'processBatch({}) clearing Hibernate Session', batchId
 					GormUtil.flushAndClearSession()
-					project.refresh()
+
+					//TM-17058 to fix the slow project.refresh() from TM-16534 The refresh was taking 10 to 20 seconds.
+					project = Project.get(projectId)
 				}
 				batch.refresh()
 				aborted = ! updateBatchProgress( batchId, rowsProcessed, totalRowCount)
@@ -795,7 +797,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 * set the status to PENDING.
 	 * @param batch - the batch that the ImportBatchRecord
 	 */
-	@NotTransactional()
+	@Transactional()
 	private void updateBatchStatus(Long batchId) {
 		Integer count = ImportBatchRecord.where {
 			importBatch.id == batchId
@@ -1366,7 +1368,15 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
 				Class refDomain = GormUtil.getDomainPropertyType(domainClass, fieldName)
+
+
 				valueToSet = SearchQueryHelper.findEntityByMetaData(fieldName, fieldsInfo, context, domain)
+
+				//TM-16914 fixes an issue where the value already exists in this session, and the valueToSet becomes detached.
+				if(!valueToSet.isAttached() && valueToSet.id == existingValue.id){
+					valueToSet = existingValue
+				}
+
 				recordAnySearchQueryHelperErrors(fieldName, fieldsInfo, context)
 				log.debug 'bindFieldsInfoValuesToEntity() {} {} {} {}',
 					fieldName, refDomain.getName(), (valueToSet ? valueToSet.getClass().getName() : null), valueToSet

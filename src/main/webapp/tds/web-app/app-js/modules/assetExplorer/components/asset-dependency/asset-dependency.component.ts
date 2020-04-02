@@ -1,14 +1,18 @@
-import {Component, Inject} from '@angular/core';
-import {forkJoin} from 'rxjs/observable/forkJoin';
-
-import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {DependecyService} from '../../service/dependecy.service';
+// Angular
+import {Component, Inject, Input, OnInit} from '@angular/core';
+// Model
 import {DependencyChange, DependencyType} from './model/asset-dependency.model';
-import {BulkActions} from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {Permission} from '../../../../shared/model/permission.model';
+// Service
+import {DependecyService} from '../../service/dependecy.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
+import {forkJoin} from 'rxjs/observable/forkJoin';
+import {Observable} from 'rxjs';
+import * as R from 'ramda';
+import {ActionType} from '../../../../shared/model/data-list-grid.model';
 
 @Component({
 	selector: 'asset-dependency',
@@ -60,7 +64,9 @@ import {PermissionService} from '../../../../shared/services/permission.service'
             width: 150px;
         }`]
 })
-export class AssetDependencyComponent extends UIExtraDialog {
+export class AssetDependencyComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	protected frequencyList: string[];
 	protected typeList: string[];
 	protected statusList: string[];
@@ -71,28 +77,80 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	public dependencyB: any;
 	public isEditing: boolean;
 
+	public assetDependency: any;
+
 	constructor(
-		@Inject('ASSET_DEP_MODEL') public assetDependency: any,
+		private dialogService: DialogService,
 		private assetService: DependecyService,
-		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private permissionService: PermissionService) {
-		super('#assetDependency');
+		super();
+	}
+
+	ngOnInit(): void {
+		// Sub Objects are not being created, just copy
+		this.assetDependency = R.clone(this.data.assetDependency);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.isEditAvailable(),
+			active: () => this.isEditing,
+			type: DialogButtonType.ACTION,
+			action: this.changeToEditMode.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.isEditing,
+			disabled: () => !this.editedDependencies.dependencies,
+			type: DialogButtonType.ACTION,
+			action: this.saveChanges.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.isDeleteAvailable() && this.dependencyA && !this.dependencyB,
+			type: DialogButtonType.ACTION,
+			action: this.onDeleteDependencyA.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => !this.isEditing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.isEditing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEdit.bind(this)
+		});
 
 		this.isEditing = false;
 
-		this.dependencyA = assetDependency.assetA && assetDependency.assetA.dependency || null;
-		this.dependencyB = assetDependency.assetB && assetDependency.assetB.dependency || null;
+		this.dependencyA = this.assetDependency.assetA && this.assetDependency.assetA.dependency || null;
+		this.dependencyB = this.assetDependency.assetB && this.assetDependency.assetB.dependency || null;
 
 		// while dateCreated and lastUpdated are not coming from server inside of assetDependency.assetX.dependency
 		// we need to get them from assetDependency.assetX
-		this.dependencyA = this.getDependencyWithDates(this.dependencyA, assetDependency.assetA);
-		this.dependencyB = this.getDependencyWithDates(this.dependencyB, assetDependency.assetB);
+		this.dependencyA = this.getDependencyWithDates(this.dependencyA, this.assetDependency.assetA);
+		this.dependencyB = this.getDependencyWithDates(this.dependencyB, this.assetDependency.assetB);
 
 		this.frequencyList = this.assetDependency.dataFlowFreq;
 		this.typeList = this.assetDependency.dependencyType;
 		this.statusList = this.assetDependency.dependencyStatus;
 		this.directionList = this.assetDependency.directionList;
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
 	}
 
 	/**
@@ -115,7 +173,33 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	 * @return {void)
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.hasChanges()) {
+			this.promptForSave().subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					super.onCancelClose();
+				}
+			});
+		} else {
+			super.onCancelClose();
+		}
+	}
+
+	/**
+	 * Launch the prompt modal asking for saving changes
+	 *
+	 */
+	private promptForSave(): Observable<any> {
+		return this.dialogService.confirm(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+		);
+	}
+
+	/**
+	 * Change to Edit Mode
+	 */
+	private changeToEditMode(): void {
+		this.setEditMode(true);
 	}
 
 	/**
@@ -125,6 +209,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	 */
 	protected setEditMode(enabled: boolean): void {
 		this.isEditing = enabled;
+		this.setTitle(this.getModalTitle());
 	}
 
 	/**
@@ -156,10 +241,25 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Cancel the edit changes
+	 * Cancel the edit changes, if there is changes prompt for saving
 	 * @return {void)
 	 */
 	protected cancelEdit(): void {
+		if (this.hasChanges()) {
+			this.promptForSave().subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.changeToViewMode();
+				}
+			});
+		} else {
+			this.changeToViewMode();
+		}
+	}
+
+	/**
+	 * Se the current view mode to read mode
+	 */
+	private changeToViewMode(): void {
 		this.setEditMode(false);
 		this.editedDependencies = this.getInitialEditDependencies();
 	}
@@ -204,48 +304,57 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
+	 * When there is only one Dependency, we delete the first one
+	 */
+	private onDeleteDependencyA(): void {
+		this.onDeleteDependency(DependencyType.dependencyA);
+	}
+	/**
 	 * Delete a dependency previous confirmation
 	 * @param {DependencyType} dependencyType Type of dependency to be deleted
 	 * @return {void)
 	 */
 	protected onDeleteDependency(dependencyType: DependencyType): void {
-		this.confirmDelete()
-			.then((result) => {
-				if (result) {
-					console.log(result);
-					const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
+		this.confirmDelete().subscribe((data: any) => {
+			if (data.confirm === DialogConfirmAction.CONFIRM) {
+				const dependency = dependencyType === DependencyType.dependencyA ? this.dependencyA : this.dependencyB;
 
-					const dependencyChange = {
-						assetId: dependency.asset.id,
-						dependencyId: dependency.id
-					};
+				const dependencyChange = {
+					assetId: dependency.asset.id,
+					dependencyId: dependency.id
+				};
 
-					this.assetService.deleteDependency(dependencyChange)
-						.subscribe((result) => {
-							if (result) {
-								if (dependencyType === DependencyType.dependencyA) {
-									this.cancelCloseDialog();
-								} else {
-									this.dependencyB = null;
-								}
+				this.assetService.deleteDependency(dependencyChange)
+					.subscribe((result) => {
+						if (result) {
+							if (dependencyType === DependencyType.dependencyA) {
+								super.onCancelClose({delete: true});
+							} else {
+								this.dependencyB = null;
 							}
-						}, (error) => console.log('Error:', error));
-				}
-			});
+						}
+					}, (error) => console.log('Error:', error));
+			}
+		});
+	}
+
+	/**
+	 * Determines if there is changes in place
+	 */
+	private hasChanges(): boolean {
+		return this.editedDependencies.dependencies;
 	}
 
 	/**
 	 * confirmation popup. Launched when user wants to delete a dependency
 	 * @returns {Promise<boolean>}
 	 */
-	private confirmDelete(): Promise<boolean> {
-		const message = this.translatePipe
-			.transform('DEPENDENCIES.CONFIRM_DELETE_DEPENDENCY');
+	private confirmDelete(): Observable<any> {
+		const message = this.translatePipe.transform('DEPENDENCIES.CONFIRM_DELETE_DEPENDENCY');
 
-		return this.promptService.open(this.translatePipe.transform(
-			'GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
-			message, this.translatePipe.transform('GLOBAL.CONFIRM'),
-			this.translatePipe.transform('GLOBAL.CANCEL'));
+		return this.dialogService.confirm(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
+			message);
 	}
 
 	public isEditAvailable(): boolean {
@@ -256,4 +365,21 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		return this.permissionService.hasPermission(Permission.AssetDependencyDelete);
 	}
 
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Based on action returns the corresponding title
+	 * @returns {string}
+	 */
+	private getModalTitle(): string {
+		return (!this.isEditing
+				? this.translatePipe.transform('ASSET_EXPLORER.DEPENDENCY_DETAIL')
+				: this.translatePipe.transform('ASSET_EXPLORER.DEPENDENCY_EDIT')
+		);
+	}
 }

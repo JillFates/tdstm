@@ -7,9 +7,9 @@ class EditRecipePage extends Page {
     static at = {
         editorModalWindow.isDisplayed()
         editorModalCloseBtn //TODO check if enabled
-        editorModalCloseBtn.text() == "Close"
+        editorModalCloseBtn.text() == "CLOSE"
         editorModalCancelBtn //TODO check if enabled
-        editorModalCancelBtn.text() == "Cancel"
+        editorModalCancelBtn.text() == "CANCEL"
     }
 
     static content = {

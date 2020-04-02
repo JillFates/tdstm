@@ -14,8 +14,8 @@ class DatabaseConflictsPage extends Page {
     }
 
     static content = {
-        databaseConflictsPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        databaseConflictsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
+        databaseConflictsPageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        databaseConflictsPageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         reportsModule { module ReportsMenuModule}
         commonsModule { module CommonsModule }
     }

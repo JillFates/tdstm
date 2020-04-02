@@ -18,6 +18,10 @@ import { NotifierService } from '../services/notifier.service';
 
 declare var jQuery: any;
 
+/**
+ * TODO: (dontiveros) migrate usage of Grid Helper to Helper class from component-library.
+ * @deprecated Please user Grid Helper class from component-library.
+ */
 export class DataGridOperationsHelper {
 	public gridData: GridDataResult = {
 		data: [],
@@ -390,8 +394,10 @@ export class DataGridOperationsHelper {
 	public onFilterWithValue(value: any, column: GridColumnModel, operator?: string): void {
 		column.filter = value;
 		let root = this.getFilter(column, operator);
-		root = this.removeEmptyFilters(root, column) ;
-		this.filterChange(root);
+		if (root) {
+			root = this.removeEmptyFilters(root, column);
+			this.filterChange(root);
+		}
 	}
 
 	/**
@@ -406,7 +412,6 @@ export class DataGridOperationsHelper {
 		if (column.filter === '' && column.type === 'boolean') {
 			root.filters = root.filters.filter((filter: any) => filter.field !== column.property);
 		}
-
 		return root;
 	}
 
@@ -431,5 +436,17 @@ export class DataGridOperationsHelper {
 	public getFilterCounter(state: State = null): number {
 		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
 		return uniq(filters.map((filter: any) => filter.field)).length;
+	}
+}
+
+/**
+ * Remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+ * TODO: (dontiveros) we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
+ */
+export const fixContentWrapper = () => {
+	const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
+	if (contentWrapper) {
+		// 45px is the header height, 31px is the footer height
+		setTimeout(() => (contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))');
 	}
 }

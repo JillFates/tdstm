@@ -1,140 +1,128 @@
+// Angular
 import {
 	AfterContentInit,
-	Component,
-	ElementRef, OnDestroy,
+	Component, ComponentFactoryResolver, OnDestroy,
 	OnInit,
-	Renderer2,
+	ViewChild,
 } from '@angular/core';
-import {
-	CompositeFilterDescriptor,
-	process,
-	State,
-} from '@progress/kendo-data-query';
-import {
-	GRID_DEFAULT_PAGE_SIZE,
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-} from '../../../../shared/model/constants';
-import {
-	ActionType,
-	COLUMN_MIN_WIDTH,
-} from '../../../dataScript/model/data-script.model';
-import { GridDataResult } from '@progress/kendo-angular-grid';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { PreferenceService } from '../../../../shared/services/preference.service';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
-import { HeaderActionButtonData } from 'tds-component-library';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {
 	ActivatedRoute,
 	Params,
 	Router,
 	NavigationEnd,
 } from '@angular/router';
-import { ProjectService } from '../../service/project.service';
-import { ProjectColumnModel, ProjectModel } from '../../model/project.model';
+// Model
+import {ActionType} from '../../../dataScript/model/data-script.model';
 import {
-	BooleanFilterData,
-	DefaultBooleanFilterData,
-} from '../../../../shared/model/data-list-grid.model';
-import { ProjectCreateComponent } from '../create/project-create.component';
-import { ProjectViewEditComponent } from '../view-edit/project-view-edit.component';
-import { NotifierService } from '../../../../shared/services/notifier.service';
+	ColumnHeaderData, DialogConfirmAction, DialogService,
+	GridComponent,
+	GridModel,
+	GridRowAction,
+	GridSettings,
+	HeaderActionButtonData, ModalSize
+} from 'tds-component-library';
+import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
 import {Permission} from '../../../../shared/model/permission.model';
-
-declare var jQuery: any;
+// Component
+import {ProjectCreateComponent} from '../create/project-create.component';
+import {ProjectViewEditComponent} from '../view-edit/project-view-edit.component';
+// Service
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ProjectService} from '../../service/project.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: `project-list`,
 	templateUrl: 'project-list.component.html',
 })
-export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentInit {
-	public disableClearFilters: Function;
-	public headerActionButtons: HeaderActionButtonData[];
-	protected state: State = {
-		sort: [
-			{
-				dir: 'asc',
-				field: 'name',
-			},
-		],
-		filter: {
-			filters: [],
-			logic: 'and',
-		},
+export class ProjectListComponent implements OnInit, AfterContentInit, OnDestroy {
+
+	private gridRowActions: GridRowAction[];
+
+	private headerActions: HeaderActionButtonData[];
+
+	private gridSettings: GridSettings = {
+		defaultSort: [{field: 'name', dir: 'asc'}],
+		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
 	};
-	public skip = 0;
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+
+	private columnModel: ColumnHeaderData[];
+	public gridModel: GridModel;
+	private dateFormat = '';
+
+	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
 	public projectColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public gridData: GridDataResult;
-	public resultSet: ProjectModel[];
-	protected navigationSubscription;
-	public canEditProject;
-	public dateFormat = '';
-	public booleanFilterData = BooleanFilterData;
-	public defaultBooleanFilterData = DefaultBooleanFilterData;
+
 	public showActive: boolean;
 	private projectToOpen: string;
 	private projectOpen = false;
-	protected showFilters = false;
-	private dataGridOperationsHelper: DataGridOperationsHelper;
+
+	private navigationSubscription;
 
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private projectService: ProjectService,
-		private prompt: UIPromptService,
 		private preferenceService: PreferenceService,
 		private notifierService: NotifierService,
 		private router: Router,
 		private route: ActivatedRoute,
-		private elementRef: ElementRef,
-		private renderer: Renderer2,
 		private translateService: TranslatePipe,
 	) {
-		this.state.take = this.pageSize;
-		this.state.skip = this.skip;
-		this.showActive =
-			this.route.snapshot.queryParams['active'] !== 'completed';
-		this.resultSet = this.showActive
-			? this.route.snapshot.data['projects'].activeProjects
-			: this.route.snapshot.data['projects'].completedProjects;
-		this.gridData = process(this.resultSet, this.state);
-
-		// use partially datagrid operations helper, for the moment just to know the number of filters selected
-		// in the future this view should be refactored to use the data grid operations helper
-		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+		this.showActive = this.route.snapshot.queryParams['active'] !== 'completed';
 	}
 
-	ngOnInit() {
-		this.disableClearFilters = this.onDisableClearFilter.bind(this);
-		this.headerActionButtons = [
+	async ngOnInit() {
+
+		this.gridRowActions = [
 			{
-				icon: 'plus-circle',
-				iconClass: 'is-solid',
-				title: this.translateService.transform('PROJECT.CREATE_PROJECT'),
-				disabled: !this.isCreateAvailable(),
+				name: 'Edit',
 				show: true,
-				onClick: this.openCreateProject.bind(this),
+				disabled: !this.isEditAvailable(),
+				onClick: this.onEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onDelete,
 			},
 		];
 
-		this.preferenceService
-			.getUserDatePreferenceAsKendoFormat()
-			.subscribe(dateFormat => {
-				this.dateFormat = dateFormat;
-				this.projectColumnModel = new ProjectColumnModel(
-					`{0:${dateFormat}}`
-				);
-			});
+		this.headerActions = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateProject,
+			},
+		];
+
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
+
+		this.dateFormat = await this.preferenceService.getUserDatePreferenceAsKendoFormat().toPromise();
+
+		this.columnModel = new ProjectColumnModel(this.dateFormat).columns;
+
+		this.gridModel.columnModel = this.columnModel;
+
 		this.updateBreadcrumbAndTitle();
-		this.canEditProject = this.permissionService.hasPermission(
-			'ProjectEdit'
-		);
 	}
 
 	ngAfterContentInit() {
@@ -144,16 +132,22 @@ export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentIni
 			if (event && event.state && event.state && event.state.url.indexOf('/project/list') !== -1) {
 				this.projectToOpen = event.state.root.queryParams.show;
 			}
-			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length && !this.projectOpen) {
-				this.showProject(this.projectToOpen);
+			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length) {
+				setTimeout(() => {
+					if (!this.projectOpen) {
+						this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+					}
+				}, 500);
 			}
 		});
 
 		this.route.queryParams.subscribe(params => {
 			if (this.projectToOpen && !this.projectOpen) {
 				setTimeout(() => {
-					this.showProject(this.projectToOpen);
-				});
+					if (!this.projectOpen) {
+						this.openProject(parseInt(this.projectToOpen, 10), ActionType.VIEW);
+					}
+				}, 500);
 			}
 		});
 	}
@@ -170,28 +164,8 @@ export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentIni
 				queryParams: queryParams,
 			});
 			this.updateBreadcrumbAndTitle();
-			this.reloadData();
+			await this.gridComponent.reloadData();
 		}
-	}
-
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected onFilter(column: any): void {
-		const root = this.projectService.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
-
-	protected clearValue(column: any): void {
-		this.projectService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
 	}
 
 	protected updateBreadcrumbAndTitle(): void {
@@ -201,124 +175,90 @@ export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentIni
 		});
 		this.notifierService.broadcast({
 			name: 'notificationHeaderTitleChange',
-			title:
-				'Projects' + ' - ' + (this.showActive ? 'Active' : 'Completed'),
+			title: 'Projects' + ' - ' + (this.showActive ? 'Active' : 'Completed'),
 		});
 	}
 
-	protected showProject(id): void {
-		if (!this.projectOpen) {
+	/**
+	 * Select the current element and open the Edit Dialog
+	 * @param dataItem
+	 */
+	private onEdit = async (dataItem: ProjectModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				await this.openProject(dataItem.id, ActionType.EDIT, true);
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	/**
+	 * Open The Dialog to Create, View or Edit the Project
+	 * @param {ProjectModel} projectModel
+	 * @param {number} actionType
+	 */
+	private async openProject(projectModelId: number, actionType: ActionType, openFromList = false): Promise<void> {
+		try {
 			this.projectOpen = true;
-			this.dialogService
-				.open(ProjectViewEditComponent, [
-					{ provide: 'id', useValue: id },
-				])
-				.then(result => {
-					this.projectOpen = false;
-					this.reloadData();
-				})
-				.catch(result => {
-					this.projectOpen = false;
-					this.reloadData();
-				});
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: ProjectViewEditComponent,
+				data: {
+					projectModelId: projectModelId,
+					actionType: actionType,
+					openFromList: openFromList
+				},
+				modalConfiguration: {
+					title: 'Project',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			this.projectOpen = false;
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
-	protected openCreateProject(): void {
-		this.dialogService
-			.open(ProjectCreateComponent, [])
-			.then(result => {
-				this.reloadData();
-			})
-			.catch(result => {
-				this.reloadData();
+	/**
+	 * On Create Project
+	 */
+	private onCreateProject = async (): Promise<void> => {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: ProjectCreateComponent,
+				data: {},
+				modalConfiguration: {
+					title: 'Project Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	protected loadData = async (): Promise<ProjectModel[]> => {
+		try {
+			const result = await this.projectService.getProjects().toPromise();
+			return new Promise((resolve) => {
+				let resultSet = this.showActive ? result.activeProjects : result.completedProjects;
+				resolve(resultSet);
 			});
-	}
-
-	protected reloadData(): void {
-		this.projectService.getProjects().subscribe(
-			result => {
-				this.resultSet = this.showActive
-					? result.activeProjects
-					: result.completedProjects;
-				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid(), 100);
-			},
-			err => console.log(err)
-		);
-	}
-
-	/**
-	 * This work as a temporary fix.
-	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
-	 */
-	private forceDisplayLastRowAddedToGrid(): void {
-		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(
-			`tr[data-kendo-grid-item-index="${lastIndex}"]`
-		);
-		this.renderer.setStyle(target, 'height', '23px');
-	}
-
-	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
-	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
-	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
-	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
-		// Adjusting the locked column(s) height to prevent cut-off issues.
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-	}
-
-	/**
-	 * Returns the number of distinct currently selected filters
-	 */
-	protected filterCount(): number {
-		return this.dataGridOperationsHelper.getFilterCounter(this.state);
-	}
-
-	/**
-	 * Determines if there is almost 1 filter selected
-	 */
-	protected hasFilterApplied(): boolean {
-		return this.state.filter.filters.length > 0;
-	}
-
-	/**
-	 * Set on/off the filter icon indicator
-	 */
-	protected toggleFilter(): void {
-		this.showFilters = !this.showFilters;
-	}
-
-	/**
-	 * Clear all filters
-	 */
-	protected clearAllFilters(): void {
-		this.showFilters = false;
-		this.dataGridOperationsHelper.clearAllFilters(this.projectColumnModel.columns, this.state);
-		this.reloadData();
-	}
-
-	/**
-	 * Disable clear filters
-	 */
-	private onDisableClearFilter(): boolean {
-		return this.filterCount() === 0;
+	public async cellClick(event: CellClickEvent): Promise<void> {
+		if (event.columnIndex > 0 && this.isEditAvailable()) {
+			await this.openProject(event.dataItem.id, ActionType.VIEW);
+		}
 	}
 
 	/**
@@ -326,6 +266,30 @@ export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentIni
 	 */
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProjectCreate);
+	}
+
+	private isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProjectEdit);
+	}
+
+	/**
+	 * On Delete Project
+	 */
+	public onDelete = async (dataItem: ProjectModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				const confirmation = await this.dialogService.confirm(
+					'Confirmation Required',
+					'WARNING: Are you sure you want to delete this project? This cannot be undone.'
+				).toPromise();
+				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+					await this.projectService.deleteProject(dataItem.id).toPromise();
+					await this.gridComponent.reloadData();
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**

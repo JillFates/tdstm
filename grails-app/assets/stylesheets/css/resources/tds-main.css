@@ -3,12 +3,6 @@
 body {
 	background: #fff;
 }
-
-a:link, a:visited, a:hover {
-	color: #666;
-	font-weight: bold;
-	text-decoration: none;
-}
 .links {
 	color: #000 !important;
 	font-weight: bold;

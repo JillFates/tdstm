@@ -22,6 +22,7 @@ import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.Task
 import org.apache.commons.lang3.RandomStringUtils
+import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -320,6 +321,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			result.size() == 0
 	}
 
+	@Ignore // TM-17144 revisit MoveBundleServiceIntegrationSpec.'04. Test deleteBundleAndAssets method'
 	@See('TM-6847')
 	void '04. Test deleteBundleAndAssets method'() {
 		when: 'a new Bundle is created'
@@ -385,7 +387,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, null, null, null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 0, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
@@ -394,7 +396,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [11, 8],
+				server : [10, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
@@ -408,7 +410,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ANY', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 0, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
@@ -417,7 +419,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [11, 8],
+				server : [10, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
@@ -429,7 +431,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id], 'ALL', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList ==  [
-				[dependencyBundle:0, appCount:0, serverCount:3, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict'],
+				[dependencyBundle:0, appCount:0, serverCount:2, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict'],
 				[dependencyBundle:1, appCount:0, serverCount:4, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict'],
 				[dependencyBundle:2, appCount:0, serverCount:2, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict'],
 				[dependencyBundle:3, appCount:0, serverCount:2, vmCount:0, dbCount:0, storageCount:0, statusClass:'depGroupConflict']
@@ -438,7 +440,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [11, 8],
+				server : [10, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
@@ -450,7 +452,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ANY', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 0, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
@@ -459,7 +461,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [11, 8],
+				server : [10, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]
@@ -471,7 +473,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			Map dependencyConsole = moveBundleService.dependencyConsoleMap(project, pBundle.id, [tag1.id, tag2.id], 'ALL', null, null)
 		then: ''
 			dependencyConsole.dependencyConsoleList == [
-				[dependencyBundle: 0, appCount: 0, serverCount: 3, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
+				[dependencyBundle: 0, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 1, appCount: 0, serverCount: 4, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 2, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict'],
 				[dependencyBundle: 3, appCount: 0, serverCount: 2, vmCount: 0, dbCount: 0, storageCount: 0, statusClass: 'depGroupConflict']
@@ -480,7 +482,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.gridStats == [
 				app    : [0, 0],
 				db     : [0, 0],
-				server : [11, 8],
+				server : [10, 8],
 				vm     : [0, 0],
 				storage: [0, 0]
 			]

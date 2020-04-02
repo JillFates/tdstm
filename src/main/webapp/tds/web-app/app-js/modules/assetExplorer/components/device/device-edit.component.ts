@@ -1,24 +1,21 @@
-/**
- *  The component is being used dynamically, some vars will show as not being used or referenced but they could be part
- *  of the GSP
- *
- *  Use angular/views/TheAssetType as reference
- */
-
-import * as R from 'ramda';
-import {Component, Inject, OnInit} from '@angular/core';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
+// Model
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+// Service
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {DialogService} from 'tds-component-library';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {DeviceCommonComponent} from './model-device/device-common.component';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Component
+import {DeviceCommonComponent} from './model-device/device-common.component';
+// Other
+import * as R from 'ramda';
 
-export function DeviceEditComponent(template, editModel, metadata: any) {
+export function DeviceEditComponent(template, editModel, metadata: any, parentDialog: any) {
 
 	@Component({
 		selector: `tds-device-edit`,
@@ -29,18 +26,17 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 	}) class DeviceEditComponent extends DeviceCommonComponent implements OnInit {
 		constructor(
 			@Inject('model') model: any,
-			activeDialog: UIActiveDialogService,
+			componentFactoryResolver: ComponentFactoryResolver,
 			userContextService: UserContextService,
 			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
-			dialogService: UIDialogService,
+			dialogService: DialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 		) {
 
-			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
+			super(componentFactoryResolver, model, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, translatePipe, parentDialog);
 		}
 
 		ngOnInit() {
@@ -117,14 +113,6 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
-
-			// Custom Fields
-			this.model.customs.forEach((custom: any) => {
-				let customValue = modelRequest.asset[custom.field.toString()];
-				if (customValue && customValue.value) {
-					modelRequest.asset[custom.field.toString()] = customValue.value;
-				}
-			});
 
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((result) => {
 				this.notifierService.broadcast({

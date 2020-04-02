@@ -1,28 +1,9 @@
-<div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()"
-     class="modal fade in tds-ui-modal-decorator notice-view-html-content" id="noticeViewHtml" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog($event)" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-md" role="document">
-		<div class="tds-modal-content"
-			 tds-ui-modal-decorator=""
-			 [options]="modalOptions">
-			<div class="modal-header">
-				<button type="button" (click)="cancelCloseDialog()" class="close" data-dismiss="modal" aria-label="Close"><clr-icon aria-hidden="true" shape="close"></clr-icon></button>
-				<h4 class="modal-title">View HTML</h4>
-			</div>
-			<div class="modal-body">
-				<form name="applyLicenseForm" role="form" data-toggle="validator" #applyLicenseForm='ngForm' class="form-horizontal left-alignment">
-					<div class="form-group">
-						<div class="col-sm-12">
-							<div [innerHTML]="noticeModel.htmlText | safeHtml"></div>
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					<span>{{'GLOBAL.CLOSE' | translate }}</span>
-				</button>
+<div class="notice-view-html-content">
+	<form name="applyLicenseForm" role="form" data-toggle="validator" #applyLicenseForm='ngForm' class="form-horizontal left-alignment">
+		<div class="form-group">
+			<div class="col-sm-12">
+				<div [innerHTML]="noticeModel.htmlText | safeHtml"></div>
 			</div>
 		</div>
-	</div>
+	</form>
 </div>

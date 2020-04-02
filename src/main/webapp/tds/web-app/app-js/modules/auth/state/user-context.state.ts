@@ -7,14 +7,12 @@ import {GetLicense, LoginInfo, Login, Logout, GetPermissions, SessionExpired} fr
 import {PostNoticeRemove, PostNotices} from '../action/notice.actions';
 import {SetEvent} from '../../event/action/event.actions';
 import {SetBundle} from '../../bundle/action/bundle.actions';
-import {SetProject} from '../../project/actions/project.actions';
+import {SetProject, SetDefaultProject} from '../../project/actions/project.actions';
 import {SetPageChange} from '../action/page.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
-import {LoginService} from '../service/login.service';
-import {PostNoticesManagerService} from '../service/post-notices-manager.service';
 // Others
 import {tap, catchError} from 'rxjs/operators';
 import {of} from 'rxjs';
@@ -46,6 +44,16 @@ export class UserContextState {
 		return state;
 	}
 
+	@Selector()
+	static getUserEvent(state: UserContextModel) {
+		return state.event;
+	}
+
+	@Selector()
+	static getUserBundle(state: UserContextModel) {
+		return state.bundle;
+	}
+
 	/**
 	 * Get the current Token for the CSRFT
 	 * @param state
@@ -59,7 +67,6 @@ export class UserContextState {
 		private authService: AuthService,
 		private permissionService: PermissionService,
 		private postNoticesService: PostNoticesService,
-		private loginService: LoginService,
 		private userService: UserService) {
 	}
 
@@ -181,6 +188,15 @@ export class UserContextState {
 		ctx.setState({
 			...state,
 			bundle: payload,
+		});
+	}
+
+	@Action(SetDefaultProject)
+	setDefaultProject(ctx: StateContext<UserContextModel>, { payload }: SetDefaultProject) {
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			defaultProject: payload,
 		});
 	}
 

@@ -9,21 +9,21 @@ class AssetFieldSettingsPage extends Page {
 
     static at = {
         pagetitle.text() == "Asset Field Settings"
-        editButton.displayed
-        filterInput.displayed
-        filterButton.displayed
-        kendoGridContainer.displayed
+        pageBreadcrumbs[0].text() == "Project"
+        pageBreadcrumbs[1].text() == "Asset Field Settings"
     }
 
     static content = {
-        pagetitle { $("section", class:"content-header").find("h1")}
+        pagetitle { $("section", class:"content-header").find("h2")}
+        pageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         projectsModule { module ProjectsMenuModule}
         commonsModule { module CommonsModule }
+        //TODO: We have to refactor the whole page.
         contentContainer { $("div.field-setting-component")}
         navTabs { contentContainer.find("ul.nav-tabs li a")}
         activeTab { navTabs.parent(".active")}
         activeTabPane { $(".tab-pane.active")}
-        editButton { activeTabPane.find("#btnEdit")}
+        editButton {contentContainer.find(class:"box-with-empty-header").find("tds-button-edit") }
         cancelButton { activeTabPane.find("#btnCancel")}
         saveAllButton { activeTabPane.find("#btnSaveAll")}
         filterInput { activeTabPane.find("input.searchFilterInput")}

@@ -1,305 +1,253 @@
+// Angular
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+// Model
+import {ModalType} from '../../../../shared/model/constants';
+import {AssetCommentColumnModel, AssetCommentModel} from '../../model/asset-comment.model';
+import {Permission} from '../../../../shared/model/permission.model';
 import {
-	Component,
-	ElementRef,
-	HostListener,
-	OnDestroy,
-	OnInit,
-	Renderer2,
-} from '@angular/core';
-import {
-	CompositeFilterDescriptor,
-	process,
-	State,
-} from '@progress/kendo-data-query';
-import {
-	GRID_DEFAULT_PAGE_SIZE,
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-	ModalType,
-} from '../../../../shared/model/constants';
-import {
-	ActionType,
-	COLUMN_MIN_WIDTH,
-} from '../../../dataScript/model/data-script.model';
-import { CellClickEvent, GridDataResult } from '@progress/kendo-angular-grid';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { AssetCommentService } from '../../service/asset-comment.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { PreferenceService } from '../../../../shared/services/preference.service';
-import { ActivatedRoute } from '@angular/router';
-import {
-	AssetCommentColumnModel,
-	AssetCommentModel,
-} from '../../model/asset-comment.model';
-import { Permission } from '../../../../shared/model/permission.model';
-import { AssetCommentViewEditComponent } from '../view-edit/asset-comment-view-edit.component';
-import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
-import {
-	COMMON_SHRUNK_COLUMNS,
-	COMMON_SHRUNK_COLUMNS_WIDTH,
-} from '../../../../shared/constants/common-shrunk-columns';
-import { HeaderActionButtonData } from 'tds-component-library';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+	ColumnHeaderData, DialogConfirmAction, DialogService,
+	GridComponent,
+	GridModel,
+	GridRowAction,
+	GridSettings,
+	HeaderActionButtonData, ModalSize
+} from 'tds-component-library';
+// Component
+import {AssetCommentViewEditComponent} from '../view-edit/asset-comment-view-edit.component';
+// Service
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetCommentService} from '../../service/asset-comment.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Other
+import {CellClickEvent} from '@progress/kendo-angular-grid';
+import {TaskService} from '../../../taskManager/service/task.service';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+
 declare var jQuery: any;
 
 @Component({
 	selector: `asset-comment-list`,
 	templateUrl: 'asset-comment-list.component.html',
 })
-export class AssetCommentListComponent implements OnInit, OnDestroy {
-	public disableClearFilters: Function;
-	public headerActionButtons: HeaderActionButtonData[];
-	protected gridColumns: any[];
-	private dataGridOperationsHelper: DataGridOperationsHelper;
-	protected state: State = {
-		sort: [
-			{
-				dir: 'asc',
-				field: 'name',
-			},
-		],
-		filter: {
-			filters: [],
-			logic: 'and',
-		},
+export class AssetCommentListComponent implements OnInit {
+	public gridRowActions: GridRowAction[];
+
+	public headerActions: HeaderActionButtonData[];
+
+	public gridSettings: GridSettings = {
+		defaultSort: [{ field: 'title', dir: 'asc' }],
+		sortSettings: { mode: 'single' },
+		selectableSettings: {enabled: true, mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
 	};
-	public skip = 0;
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
-	public assetCommentColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public gridData: GridDataResult;
-	public resultSet: AssetCommentModel[];
-	public dateFormat = '';
-	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
-	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
-	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
-	protected showFilters = false;
 
+	protected columnModel: ColumnHeaderData[];
+
+	protected gridModel: GridModel;
+	protected dateFormat = '';
+
+	@ViewChild(GridComponent, { static: false }) gridComponent: GridComponent;
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
+		public taskManagerService: TaskService,
 		private permissionService: PermissionService,
-		private assetCommentService: AssetCommentService,
-		private prompt: UIPromptService,
 		private preferenceService: PreferenceService,
-		private route: ActivatedRoute,
-		private elementRef: ElementRef,
-		private renderer: Renderer2,
-		private translateService: TranslatePipe,
+		private assetCommentService: AssetCommentService,
+		private translatePipe: TranslatePipe
 	) {
-		// use partially datagrid operations helper, for the moment just to know the number of filters selected
-		// in the future this view should be refactored to use the data grid operations helper
-		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
-
-		this.state.take = this.pageSize;
-		this.state.skip = this.skip;
-		this.resultSet = this.route.snapshot.data['assetComments'];
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	ngOnInit() {
-		this.disableClearFilters = this.onDisableClearFilter.bind(this);
-		this.headerActionButtons = [];
-
-		this.preferenceService
-			.getUserDatePreferenceAsKendoFormat()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(dateFormat => {
-				this.dateFormat = dateFormat;
-				this.assetCommentColumnModel = new AssetCommentColumnModel(
-					`{0:${dateFormat}}`
-				);
-				this.gridColumns = this.assetCommentColumnModel.columns.filter(
-					(column: { type: string }) => column.type !== 'action'
-				);
-			});
-	}
-
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected onFilter(column: any): void {
-		const root = this.assetCommentService.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
-
-	public onClearFilters(): void {
-		this.state.filter.filters = [];
-		this.assetCommentColumnModel.columns.forEach((column) => {
-			delete column.filter;
-		});
-		this.showFilters = false;
-		this.onFilter({filter: ''});
-	}
-
-	protected clearValue(column: any): void {
-		this.assetCommentService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
 	}
 
 	/**
-	 * Select the current element and open the Edit Dialog
-	 * @param dataItem
+	 * Initialize the grid settings.
 	 */
-	protected onEdit(dataItem: any): void {
-		this.openAssetCommentDialogViewEdit(dataItem, ModalType.EDIT);
+	async ngOnInit() {
+		this.gridRowActions = [
+			{
+				name: 'Edit',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.openEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isCommentDeleteAvailable(),
+				onClick: this.onDelete,
+			}
+		];
+
+		this.headerActions = [];
+
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
+
+		this.dateFormat = await this.preferenceService
+			.getUserDatePreferenceAsKendoFormat()
+			.toPromise();
+
+		this.columnModel = new AssetCommentColumnModel(
+			this.dateFormat
+		).columns;
+
+		this.gridModel.columnModel = this.columnModel;
 	}
 
 	/**
-	 * Check the field clicked and if appropriate open the comment view
+	 * Check the field clicked and if appropriate open the comment view or the asset details
 	 * @param {SelectionEvent} event
 	 */
-	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex === 1) {
-			this.openAssetCommentDialogViewEdit(
-				event['dataItem'],
-				ModalType.VIEW
-			);
+	// TODO: sam, please test this funcionality.
+	protected async cellClick(event: CellClickEvent) {
+		if (event.columnIndex === 1 && this.isShowCommentAvailable()) {
+			await this.openComment(event.dataItem, ModalType.VIEW);
+		} else {
+			if (event.columnIndex === 2) {
+				this.openAssetDetails(event.dataItem.assetEntityId, event.dataItem.assetClass.name);
+			}
 		}
 	}
 
-	protected reloadData(): void {
-		this.assetCommentService
-			.getAssetComments()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(
-				result => {
-					this.resultSet = result;
-					this.gridData = process(this.resultSet, this.state);
-					setTimeout(
-						() => this.forceDisplayLastRowAddedToGrid(),
-						100
-					);
+	public loadData = async (): Promise<AssetCommentModel[]> => {
+		try {
+			let data = await this.assetCommentService.getAssetComments().toPromise();
+			return data;
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	};
+
+	public openEdit = async (dataItem: AssetCommentModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				await this.openComment(dataItem, ModalType.EDIT);
+				await this.gridComponent.reloadData();
+			}
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	};
+
+	public openView = async (dataItem: AssetCommentModel): Promise<void> => {
+		try {
+			await this.openComment(dataItem, ModalType.VIEW);
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	};
+
+	public async openComment(comment: any, action: ModalType): Promise<void> {
+		try {
+			let commentModel: AssetCommentModel = {
+				id: comment.id,
+				modal: {
+					type: action,
 				},
-				err => console.log(err)
-			);
-	}
+				archive: comment.dateResolved !== null,
+				comment: comment.comment,
+				category: comment.category,
+				assetClass: {
+					text: comment.assetType,
+				},
+				asset: {
+					id: comment.assetEntityId,
+					text: comment.assetName,
+				},
+				lastUpdated: comment.lastUpdated,
+				dateCreated: comment.dateCreated,
+			};
 
-	/**
-	 * This work as a temporary fix.
-	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
-	 */
-	private forceDisplayLastRowAddedToGrid(): void {
-		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(
-			`tr[data-kendo-grid-item-index="${lastIndex}"]`
-		);
-		this.renderer.setStyle(target, 'height', '36px');
-	}
-
-	/**
-	 * Open The Dialog to Create, View or Edit the Provider
-	 * @param {ProviderModel} providerModel
-	 * @param {number} actionType
-	 */
-	private openAssetCommentDialogViewEdit(
-		comment: any,
-		type: ModalType
-	): void {
-		let commentModel: AssetCommentModel = {
-			id: comment.id,
-			modal: {
-				type: type,
-			},
-			archive: comment.dateResolved !== null,
-			comment: comment.comment,
-			category: comment.category,
-			assetClass: {
-				text: comment.assetType,
-			},
-			asset: {
-				id: comment.assetEntityId,
-				text: comment.assetName,
-			},
-			lastUpdated: comment.lastUpdated,
-			dateCreated: comment.dateCreated,
-		};
-		this.dialogService
-			.extra(AssetCommentViewEditComponent, [
-				{ provide: AssetCommentModel, useValue: commentModel },
-			])
-			.then(result => {
-				this.reloadData();
-			})
-			.catch(result => {
-				console.log('Dismissed Dialog');
-			});
-	}
-
-	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
-	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetCommentViewEditComponent,
+				data: {
+					assetCommentModel: commentModel
+				},
+				modalConfiguration: {
+					title: 'Comment',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
 		}
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
+	 * Open the asset show details
+	 * @param assetEntityId
+	 * @param assetType
 	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
-		// Adjusting the locked column(s) height to prevent cut-off issues.
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	private async openAssetDetails(assetEntityId: string, assetClassName: string): Promise<void> {
+		await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: assetEntityId,
+				assetClass: assetClassName
+			},
+			modalConfiguration: {
+				title: '&nbsp;',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).toPromise();
 	}
 
 	/**
-	 * Returns the number of distinct currently selected filters
+	 * Delete the Asset Comment
 	 */
-	public filterCount(): number {
-		return this.dataGridOperationsHelper.getFilterCounter(this.state);
+	public onDelete = async (dataItem: AssetCommentModel): Promise<void> => {
+		if (this.isCommentDeleteAvailable()) {
+			const confirmation = await this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				'Confirm deletion of this record. There is no undo for this action.'
+			)
+				.toPromise();
+			if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+				await this.taskManagerService.deleteTaskComment(dataItem.id).toPromise();
+				await this.gridComponent.reloadData();
+			}
+		}
 	}
 
 	/**
-	 * Returns whether or not any filters are applied to the grid.
+	 * Determine if the user has the permission to edit comments
 	 */
-	public hasFilterApplied(): boolean {
-		return this.state.filter.filters.length > 0;
-	}
-
-	public toggleFilter(): void {
-		this.showFilters = !this.showFilters;
-	}
-
-	/**
-	 * unsubscribe from all subscriptions on destroy hook.
-	 * @HostListener decorator ensures the OnDestroy hook is called on events like
-	 * Page refresh, Tab close, Browser close, navigation to another view.
-	 */
-	@HostListener('window:beforeunload')
-	ngOnDestroy(): void {
-		this.unsubscribeOnDestroy$.next();
-		this.unsubscribeOnDestroy$.complete();
-	}
-
-	/**
-	 * Determines if user has permission to edit comments
-	 */
-	protected isCommentEditAvailable(): boolean {
+	protected isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.CommentEdit);
 	}
 
 	/**
-	 * Disable clear filters
+	 * Determine if the user has the permission to see comment details
 	 */
-	private onDisableClearFilter(): boolean {
-		return !this.hasFilterApplied();
+	protected isShowCommentAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentView);
+	}
+
+	protected isCommentDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentDelete);
 	}
 }

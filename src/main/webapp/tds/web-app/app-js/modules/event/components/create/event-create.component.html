@@ -1,204 +1,169 @@
-<div
-	tds-autofocus
-	class="event-create-component tds-modal-content has-side-nav"
-	id="event-create-component"
->
-	<div class="modal-header">
-		<tds-button-custom
-			class="close"
-			[icon]="'close'"
-			(click)="cancelCloseDialog()"
-			[displayLabel]="false"
-			[flat]="true"
-		></tds-button-custom>
-		<div class="modal-title-container">
-			<div class="modal-title">
-				Event Create
-			</div>
-		</div>
-	</div>
+<div class="event-create-component">
+	<table>
+		<tbody>
+			<tr>
+				<td colspan="2">
+					<div class="required" style="color: red">
+						Fields marked ( * ) are mandatory
+					</div>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="name">Name:
+						<span class="requiredProp" style="color: red">*</span>
+					</label>
+				</td>
+				<td class="value">
+					<input
+						type="text"
+						clrInput
+						id="name"
+						[(ngModel)]="eventModel.name"
+					/>
+				</td>
+			</tr>
 
-	<div class="modal-body">
-		<div class="modal-body-container">
-			<table>
-				<tbody>
-					<tr>
-						<td colspan="2">
-							<div class="required" style="color: red">
-								Fields marked ( * ) are mandatory
-							</div>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="name"
-								>Name:
-								<span class="requiredProp" style="color: red"
-									>*</span
-								>
-							</label>
-						</td>
-						<td class="value">
-							<input
-								type="text"
-								clrInput
-								id="name"
-								[(ngModel)]="eventModel.name"
-							/>
-						</td>
-					</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="description">Description: </label>
+				</td>
+				<td class="value">
+					<input
+						type="text"
+						clrInput
+						id="description"
+						[(ngModel)]="eventModel.description"
+					/>
+				</td>
+			</tr>
 
-					<tr class="prop">
-						<td class="name">
-							<label for="description">Description: </label>
-						</td>
-						<td class="value">
-							<input
-								type="text"
-								clrInput
-								id="description"
-								[(ngModel)]="eventModel.description"
-							/>
-						</td>
-					</tr>
+			<tr class="prop">
+				<td class="name">
+					<label class="tag-title">Tag:</label>
+				</td>
+				<td class="value">
+					<tds-asset-tag-selector
+						class="field"
+						[tagList]="assetTags"
+						[showSwitch]="showSwitch"
+						(valueChange)="onAssetTagChange($event)"
+					></tds-asset-tag-selector>
+				</td>
+			</tr>
 
-					<tr class="prop">
-						<td class="name">
-							<label class="tag-title">Tag:</label>
-						</td>
-						<td class="value">
-							<tds-asset-tag-selector
-								class="field"	
-								[tagList]="assetTags"
-								[showSwitch]="showSwitch"
-								(valueChange)="onAssetTagChange($event)"
-							></tds-asset-tag-selector>
-						</td>
-					</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="moveBundle">Bundle:</label>
+				</td>
+				<td class="value">
+					<kendo-multiselect
+						id="moveBundle"
+						textField="name"
+						valueField="id"
+						class="field"
+						[data]="bundles"
+						[clearButton]= "showClearButton"
+						(valueChange) = "clearButtonBundleChange($event)"
 
-					<tr class="prop">
-						<td class="name">
-							<label for="moveBundle">Bundle:</label>
-						</td>
-						<td class="value">
-							<kendo-multiselect
-								id="moveBundle"
-								textField="name"
-								valueField="id"
-								class="field"
-								[data]="bundles"
-								[clearButton]= "showClearButton"
-								(valueChange) = "clearButtonBundleChange($event)"
-								
-							></kendo-multiselect>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="runbookStatus">Runbook Status:</label>
-						</td>
-						<td class="value">
-                            <select
-                                clrSelect
-								id="runbookStatus"
-								[(ngModel)]="eventModel.runbookStatus"
-							>
-								<option value="">Please Select</option>
-								<option
-									*ngFor="let status of runbookStatuses"
-									[value]="status"
-									>{{ status }}</option
-								>
-							</select>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="description">Runbook Bridge1 :</label>
-						</td>
-						<td class="value">
-							<input
-								type="text"
-								clrInput
-								id="runbookBridge1"
-								[(ngModel)]="eventModel.runbookBridge1"
-							/>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="description">Runbook Bridge2 :</label>
-						</td>
-						<td class="value">
-							<input
-								type="text"
-								clrInput
-								id="runbookBridge2"
-								[(ngModel)]="eventModel.runbookBridge2"
-							/>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="description">Video Link:</label>
-						</td>
-						<td class="value">
-							<input
-								type="text"
-								clrInput
-								id="videolink"
-								[(ngModel)]="eventModel.videolink"
-							/>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="estStartTime">Estimated Start:</label>
-						</td>
-						<td valign="top" class="value">
-							<tds-datetime-control
-								id="estStartTime"
-								[(ngModel)]="eventModel.estStartTime"
-							></tds-datetime-control>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="estCompletionTime"
-								>Estimated Completion:</label
-							>
-						</td>
-						<td valign="top" class="value">
-							<tds-datetime-control
-								id="estCompletionTime"
-								[(ngModel)]="eventModel.estCompletionTime"
-							></tds-datetime-control>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">
-							<label for="apiActionBypass"
-								>By-Pass Actions:</label
-							>
-						</td>
-						<td class="value">
-							<input
-                                id="apiActionBypass"
-                                clrCheckbox
-								type="checkbox"
-								[(ngModel)]="eventModel.apiActionBypass"
-							/>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<div class="modal-sidenav btn-link">
-		<tds-button-save
-			[disabled]="!validateRequiredFields(eventModel)"
-			(click)="saveForm()"
-		></tds-button-save>
-		<tds-button-cancel (click)="cancelCloseDialog()"></tds-button-cancel>
-	</div>
+					></kendo-multiselect>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="runbookStatus">Runbook Status:</label>
+				</td>
+				<td class="value">
+					<select
+						clrSelect
+						id="runbookStatus"
+						[(ngModel)]="eventModel.runbookStatus"
+					>
+						<option value="">Please Select</option>
+						<option
+							*ngFor="let status of runbookStatuses"
+							[value]="status"
+							>{{ status }}</option
+						>
+					</select>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="description">Runbook Bridge1 :</label>
+				</td>
+				<td class="value">
+					<input
+						type="text"
+						clrInput
+						id="runbookBridge1"
+						[(ngModel)]="eventModel.runbookBridge1"
+					/>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="description">Runbook Bridge2 :</label>
+				</td>
+				<td class="value">
+					<input
+						type="text"
+						clrInput
+						id="runbookBridge2"
+						[(ngModel)]="eventModel.runbookBridge2"
+					/>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="description">Video Link:</label>
+				</td>
+				<td class="value">
+					<input
+						type="text"
+						clrInput
+						id="videolink"
+						[(ngModel)]="eventModel.videolink"
+					/>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="estStartTime">Estimated Start:</label>
+				</td>
+				<td valign="top" class="value">
+					<tds-datetime-control
+						id="estStartTime"
+						[(ngModel)]="eventModel.estStartTime"
+					></tds-datetime-control>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="estCompletionTime"
+						>Estimated Completion:</label
+					>
+				</td>
+				<td valign="top" class="value">
+					<tds-datetime-control
+						id="estCompletionTime"
+						[(ngModel)]="eventModel.estCompletionTime"
+					></tds-datetime-control>
+				</td>
+			</tr>
+			<tr class="prop">
+				<td class="name">
+					<label for="apiActionBypass" class="api-action-bypass">By-Pass Actions:</label>
+				</td>
+				<td class="value">
+					<input
+						id="apiActionBypass"
+						clrCheckbox
+						type="checkbox"
+						[(ngModel)]="eventModel.apiActionBypass"
+					/>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>

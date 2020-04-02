@@ -1,76 +1,52 @@
+import { ColumnHeaderData, FilterType } from 'tds-component-library';
+
 export class LicenseColumnModel {
-	columns: any[];
+	columns: Array<ColumnHeaderData>;
 
 	constructor(dateFormat: string) {
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 52,
-				locked: true
-			}, {
 				label: 'Client',
-				filterable: true,
 				property: 'client.name',
-				type: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Project',
-				filterable: true,
 				property: 'project.name',
-				type: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Contact Email',
-				filterable: true,
 				property: 'email',
-				type: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Status',
-				filterable: true,
-				property: 'status',
-				type: 'text',
-				width: 160,
+				property: 'licenseStatus',
+				filterType: FilterType.text
 			}, {
 				label: 'Type',
-				filterable: true,
-				property: 'type',
-				type: 'text',
-				width: 160,
+				property: 'licenseType',
+				filterType: FilterType.text
 			}, {
 				label: 'Method',
-				filterable: true,
 				property: 'method.name',
-				type: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Server/Tokens',
-				filterable: true,
 				property: 'method.max',
-				type: 'text',
-				width: 160,
+				filterType: FilterType.text
 			}, {
 				label: 'Inception',
-				filterable: true,
 				property: 'activationDate',
-				type: 'date',
 				format: dateFormat,
-				width: 170
+				filterType: FilterType.date
 			}, {
 				label: 'Expiration',
-				filterable: true,
 				property: 'expirationDate',
-				type: 'date',
 				format: dateFormat,
-				width: 170
+				filterType: FilterType.date
 			}, {
 				label: 'Environment',
-				filterable: true,
-				property: 'environment',
-				type: 'text',
-				width: 160,
+				property: 'licenseEnvironment',
+				filterType: FilterType.text
 			}
 		];
 	}
@@ -87,7 +63,7 @@ export class RequestLicenseModel {
 export class LicenseModel {
 	id?: number;
 	key?: string;
-	name: string;
+	name?: string;
 	status?: string;
 	description?: string;
 	expirationDate?: string;
@@ -111,7 +87,8 @@ export enum LicenseType {
 export enum LicenseStatus {
 	PENDING = 'PENDING',
 	ACTIVE = 'ACTIVE',
-	CORRUPT = 'CORRUPT'
+	CORRUPT = 'CORRUPT',
+	EXPIRED = 'EXPIRED'
 }
 
 export enum LicenseEnvironment {

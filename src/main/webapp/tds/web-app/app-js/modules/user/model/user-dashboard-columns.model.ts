@@ -12,7 +12,7 @@ export class ApplicationColumnModel {
 				label: 'Plan Status',
 				property: 'planStatus',
 				type: 'text',
-				width: 100
+				width: 50
 			}, {
 				label: 'Bundle',
 				property: 'moveBundle',
@@ -132,13 +132,13 @@ export class TaskColumnModel {
 			}, {
 				label: 'Due/Est Finish',
 				property: 'dueEstFinish',
-				width: 100,
+				width: '*',
 				type: 'text',
 			}, {
 				label: 'Status',
 				property: 'status',
 				type: 'text',
-				width: 80
+				width: 100
 			}
 		];
 	}

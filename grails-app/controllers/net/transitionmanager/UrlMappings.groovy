@@ -18,6 +18,11 @@ class UrlMappings {
 			}
 		}
 
+		"/recipes/index" {
+			controller = "recipe"
+			action = [GET:"index"]
+		}
+
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */
@@ -95,6 +100,13 @@ class UrlMappings {
 					POST:"getAssetDependencies",
 					PUT:"updateCommonAssetDependencyFields",
 					DELETE:"deleteAssetDependency",
+			]
+		}
+
+		"/ws/asset/assetForDependencyGroup" {
+			controller = "wsAsset"
+			action = [
+			        GET: "getAssetForDependencyGroup"
 			]
 		}
 
@@ -617,6 +629,16 @@ class UrlMappings {
 			controller = "wsTimeLine"
 			action = [GET:"timeline"]
 		}
+
+		"/ws/taskGraph/taskHighlightOptions" {
+			controller = "wsTaskGraph"
+			action = [GET: "taskHighlightOptions"]
+		}
+
+		"/ws/taskGraph/taskSearch" {
+			controller = "wsTaskGraph"
+			action = [GET: "taskSearch"]
+		}
 		
 		/*"/ws/timeline/$id/updateStatus" {
 			controller = "wsTask"
@@ -817,6 +839,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/project/default" {
+			controller = "wsProject"
+			action = [
+					GET: "defaultProject"
+			]
+		}
+
 		"/ws/manufacturer/merge" {
 			controller = "wsManufacturer"
 			action = [POST:"merge"]
@@ -830,6 +859,11 @@ class UrlMappings {
 		"/auth/resetPassword/$token" {
 			controller = "auth"
 			action = [GET:"resetPassword"]
+		}
+
+		"/auth/applyNewPassword" {
+			controller = "auth"
+			action = [POST:"applyNewPassword"]
 		}
 
 		"/ws/admin/unlockAccount" {
@@ -1172,6 +1206,13 @@ class UrlMappings {
 					POST: "createDataview",
 					PUT: "updateDataview",
 					DELETE: "deleteDataview"
+			]
+		}
+
+		"/ws/assetExplorer/saveOptions/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "saveOptions"
 			]
 		}
 

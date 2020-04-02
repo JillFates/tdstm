@@ -1,5 +1,5 @@
 <div class="container task-category-component" *ngIf="taskCategories.hasInfo">
-    <div style="display: grid; grid-template-columns: 240px 5fr;">
+    <div style="display: grid; grid-template-columns: 260px 5fr;">
         <div>
             <div *ngFor="let row of taskCategories.tasks; let rowIndex = index;" >
                 <div class="category-description category-name{{rowIndex === 0 ? '-first' : ''}}">{{categories[rowIndex]}}</div>

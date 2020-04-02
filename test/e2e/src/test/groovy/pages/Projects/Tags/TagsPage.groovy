@@ -10,21 +10,25 @@ class TagsPage extends Page{
     static at = {
         title == "Manage Tags"
         pageHeaderName.text().trim() == "Manage Tags"
-        createBtn.text() == "Create Tag"
-        tagsGrid.displayed
+        pageBreadcrumbs[0].text() == "Project"
+        pageBreadcrumbs[1].text() == "Manage Tags"
     }
 
     static content = {
-        pageHeaderName { $("section", class:"content-header").find("h1")}
+        pageHeaderName { $("section", class:"content-header").find("h2")}
+        pageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
         createBtn { $('button.k-grid-add-command')}
-        tagsGrid {$('div[role=grid]')}
-        tagsGridDataRows {tagsGrid.find(".k-grid-container .k-grid-content tr[kendogridlogicalrow]")}
+        tagsGrid (wait: true){$("tbody", role: "presentation")}
+        tagsGridDataRows (wait: true){tagsGrid.find(".k-grid-container .k-grid-content tr[kendogridlogicalrow]")}
         tagsGridActionsRows {tagsGrid.find(".k-grid-container .k-grid-content-locked tr[kendogridlogicalrow]")}
         tagsNoDataRecords {tagsGrid.find(".k-grid-container .k-grid-content tr.k-grid-norecords").find("td")}
-        nameFilter { tagsGrid.find("td[kendogridfiltercell]", "aria-colindex": "2").find("input")}
-        nameFilterRemove { nameFilter.next("span")}
-        descFilter { tagsGrid.find("td[kendogridfiltercell]", "aria-colindex": "3").find("input")}
-        descFilterRemove { descFilter.next("span")}
+        filterButton (wait: true){$("button", class:"tds-button")[4]}
+        clearButton (required: false) {$("button", title: "Clear filters")}
+        refreshButton {$("button", title: "Refresh")}
+        nameFilter (required: false) {$("input.text-filter")[0]}
+        nameFilterRemove (required: false) { nameFilter.next("span")}
+        descFilter (required: false) { $("input.text-filter")[1]}
+        descFilterRemove (required: false) { descFilter.next("span")}
         //First Element of the Tags Table
         firstTagActions { tagsGridActionsRows.find("td", "aria-colindex": "1")[0]}
         firstTagSaveButton { firstTagActions.find(".k-grid-save-command").find("button", title:"Save")}
@@ -46,7 +50,16 @@ class TagsPage extends Page{
         projectsModule { module ProjectsMenuModule}
     }
 
+    def refresh(){
+        refreshButton.click()
+    }
+
+    def clearFilters(){
+        clearButton.click()
+    }
+
     def filterByName(name){
+        nameFilter = ""
         waitFor{nameFilter.displayed}
         nameFilter = name
     }
@@ -120,6 +133,11 @@ class TagsPage extends Page{
     def clickOnEditButton(){
         waitFor{firstTagEditButton.displayed}
         waitFor{firstTagEditButton.click()}
+    }
+
+    def clickOnFilterButton() {
+        waitFor{filterButton.displayed}
+        waitFor{filterButton.click()}
     }
 
     def isFirstTagRowNameNotEditable(){

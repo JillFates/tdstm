@@ -1,66 +1,59 @@
+// Angular
 import {
 	ElementRef,
 	Component,
 	OnInit,
 	ViewChild,
-	HostListener,
-	Inject,
+	Input, Output, EventEmitter, ComponentFactoryResolver,
 } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
-import {
-	UIActiveDialogService,
-	UIDialogService,
-} from '../../../../shared/services/ui-dialog.service';
-import { ActionType } from '../../../dataScript/model/data-script.model';
-import { ProviderModel } from '../../model/provider.model';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { KEYSTROKE } from '../../../../shared/model/constants';
-import { ProviderService } from '../../service/provider.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { ProviderAssociatedComponent } from '../provider-associated/provider-associated.component';
-import { ProviderAssociatedModel } from '../../model/provider-associated.model';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { Permission } from '../../../../shared/model/permission.model';
+import {NgForm} from '@angular/forms';
+// Model
+import {ActionType} from '../../../dataScript/model/data-script.model';
+import {ProviderModel} from '../../model/provider.model';
+import {Permission} from '../../../../shared/model/permission.model';
+// Component
+import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
+// Service
+import {ProviderService} from '../../service/provider.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+// Other
+import {Subject} from 'rxjs/Subject';
 
 @Component({
 	selector: 'provider-view-edit',
 	templateUrl: 'provider-view-edit.component.html',
 	styles: [
-		`
-			.has-error,
-			.has-error:focus {
-				border: 1px #f00 solid;
-			}
+			`
+            .has-error,
+            .has-error:focus {
+                border: 1px #f00 solid;
+            }
 		`,
 	],
 })
-export class ProviderViewEditComponent implements OnInit {
-	@ViewChild('providerNameElement', { read: ElementRef, static: true })
-	providerNameElement: ElementRef;
-	@ViewChild('providerContainer', { static: false })
-	providerContainer: ElementRef;
+export class ProviderViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
+	@ViewChild('providerForm', {read: NgForm, static: true}) providerForm: NgForm;
+
 	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
+	public modalType = ActionType.VIEW;
 	private dataSignature: string;
 	protected isUnique = true;
 	private providerName = new Subject<String>();
 
 	constructor(
-		public originalModel: ProviderModel,
-		public modalType: ActionType,
-		public promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService,
-		private dialogService: UIDialogService,
-		private prompt: UIPromptService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private translatePipe: TranslatePipe,
 		private providerService: ProviderService,
 		private permissionService: PermissionService
 	) {
-		this.providerModel = Object.assign({}, this.originalModel);
-		this.modalTitle = this.getModalTitle(this.modalType);
-		this.dataSignature = JSON.stringify(this.providerModel);
-		this.providerName.next(this.providerModel.name);
+		super();
 	}
 
 	/**
@@ -69,13 +62,63 @@ export class ProviderViewEditComponent implements OnInit {
 	protected onSaveProvider(): void {
 		this.providerService.saveProvider(this.providerModel).subscribe(
 			(result: any) => {
-				this.activeDialog.close(result);
+				this.onAcceptSuccess(result);
 			},
 			err => console.log(err)
 		);
 	}
 
 	ngOnInit(): void {
+		this.providerModel = Object.assign({}, this.data.providerModel);
+		this.modalType = this.data.actionType;
+		this.modalTitle = this.getModalTitle(this.modalType);
+		this.dataSignature = JSON.stringify(this.providerModel);
+		this.providerName.next(this.providerModel.name);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
+			disabled: () => !this.permissionService.hasPermission(Permission.ProviderUpdate),
+			active: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.changeToEditProvider.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
+			disabled: () => !this.providerForm.form.valid || !this.isUnique || this.isEmptyValue() || !this.providerForm.form.dirty,
+			type: DialogButtonType.ACTION,
+			action: this.onSaveProvider.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.modalType !== this.actionTypes.CREATE,
+			disabled: () => !this.permissionService.hasPermission(Permission.ProviderDelete),
+			type: DialogButtonType.ACTION,
+			action: this.onDeleteProvider.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.modalType === this.actionTypes.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEditDialog.bind(this)
+		});
+
 		this.providerName
 			.debounceTime(800) // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged() // ignore if next search term is same as previous
@@ -95,12 +138,10 @@ export class ProviderViewEditComponent implements OnInit {
 						);
 				}
 			});
+
 		setTimeout(() => {
-			// Delay issues on Auto Focus
-			if (this.providerNameElement) {
-				this.providerNameElement.nativeElement.focus();
-			}
-		}, 500);
+			this.setTitle(this.getModalTitle(this.modalType));
+		});
 	}
 
 	protected onValidateUniqueness(): void {
@@ -120,55 +161,42 @@ export class ProviderViewEditComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
-				)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.dismiss();
-					} else {
-						this.focusForm();
-					}
-				})
-				.catch(error => console.log(error));
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM) {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			this.activeDialog.dismiss();
+			this.onCancelClose();
 		}
 	}
 
 	public cancelEditDialog(): void {
 		if (this.isDirty()) {
-			this.promptService
-				.open(
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
-					),
-					this.translatePipe.transform(
-						'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
-					),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL')
-				)
-				.then(confirm => {
-					if (confirm) {
-						this.modalType = this.actionTypes.VIEW;
-						this.modalTitle = this.getModalTitle(this.modalType);
-					} else {
-						this.focusForm();
-					}
-				})
-				.catch(error => console.log(error));
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM && !this.data.openFromList) {
+					// Put back original model
+					this.providerModel = JSON.parse(this.dataSignature);
+					this.dataSignature = JSON.stringify(this.providerModel);
+					this.modalType = this.actionTypes.VIEW;
+					this.setTitle(this.getModalTitle(this.modalType));
+				} else if (result.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			this.modalType = this.actionTypes.VIEW;
-			this.modalTitle = this.getModalTitle(this.modalType);
+			if (!this.data.openFromList) {
+				this.modalType = this.actionTypes.VIEW;
+				this.setTitle(this.getModalTitle(this.modalType));
+			} else {
+				this.onCancelClose();
+			}
 		}
 	}
 
@@ -177,8 +205,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 */
 	protected changeToEditProvider(): void {
 		this.modalType = this.actionTypes.EDIT;
-		this.modalTitle = this.getModalTitle(this.modalType);
-		this.focusForm();
+		this.setTitle(this.getModalTitle(this.modalType));
 	}
 
 	/**
@@ -189,44 +216,30 @@ export class ProviderViewEditComponent implements OnInit {
 		this.providerService
 			.deleteContext(this.providerModel.id)
 			.subscribe((result: any) => {
-				this.dialogService
-					.extra(
-						ProviderAssociatedComponent,
-						[
-							{
-								provide: ProviderAssociatedModel,
-								useValue: result,
-							},
-						],
-						false,
-						false
-					)
-					.then((toDelete: any) => {
-						if (toDelete) {
-							this.providerService
-								.deleteProvider(this.providerModel.id)
-								.subscribe(
-									result => {
-										this.activeDialog.close(result);
-									},
-									err => console.log(err)
-								);
-						}
-					})
-					.catch(error => console.log('Closed'));
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: ProviderAssociatedComponent,
+					data: {
+						providerAssociatedModel: result,
+					},
+					modalConfiguration: {
+						title: 'Confirmation Required',
+						draggable: true,
+						modalSize: ModalSize.MD
+					}
+				}).subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						this.providerService
+							.deleteProvider(this.providerModel.id)
+							.subscribe(
+								result => {
+									this.onCancelClose(result);
+								},
+								err => console.log(err)
+							);
+					}
+				});
 			});
-	}
-
-	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(
-		event: KeyboardEvent
-	) {
-		if (event && event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
 	}
 
 	/**
@@ -239,10 +252,6 @@ export class ProviderViewEditComponent implements OnInit {
 			term = this.providerModel.name.trim();
 		}
 		return term === '';
-	}
-
-	private focusForm() {
-		this.providerContainer.nativeElement.focus();
 	}
 
 	/**
@@ -259,11 +268,10 @@ export class ProviderViewEditComponent implements OnInit {
 			: 'Provider Detail';
 	}
 
-	protected isDeleteAvailable(): boolean {
-		return this.permissionService.hasPermission(Permission.ProviderDelete);
-	}
-
-	protected isUpdateAvailable(): boolean {
-		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

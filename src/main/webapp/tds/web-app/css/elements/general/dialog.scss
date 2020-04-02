@@ -1,7 +1,6 @@
 div.modal-dialog {
 	padding: 0px;
 	margin: unset !important;
-	display: none;
 	visibility: visible;
 
 	&.modal-xlg {
@@ -41,7 +40,6 @@ div.modal-dialog {
 
 		div.modal-header {
 			color: $color--white !important;
-			background: $color-material--blue1 50% 50% repeat-x !important;
 			border-color: $color-material--blue1 !important;
 			-webkit-border-radius: 0px;
 			-moz-border-radius: 0px;
@@ -64,7 +62,6 @@ div.modal-dialog {
 				font-size: 16px !important;
 				font-weight: bold !important;
 				line-height: inherit !important;
-				font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif !important;
 			}
 
 			.tool-box {

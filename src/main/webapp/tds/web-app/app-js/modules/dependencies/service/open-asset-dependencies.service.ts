@@ -1,14 +1,16 @@
-import {Injectable} from '@angular/core';
+// Angular
+import {ComponentFactoryResolver, Injectable} from '@angular/core';
+// Model
+import {DependecyService} from '../../assetExplorer/service/dependecy.service';
+import {DialogService, ModalSize} from 'tds-component-library';
+// Component
+import {AssetShowComponent} from '../../assetExplorer/components/asset/asset-show.component';
+import {AssetDependencyComponent} from '../../assetExplorer/components/asset-dependency/asset-dependency.component';
+// Other
 import {Observable} from 'rxjs';
-
 import {
 	switchMap
 } from 'rxjs/operators';
-import {AssetShowComponent} from '../../assetExplorer/components/asset/asset-show.component';
-import {DIALOG_SIZE} from '../../../shared/model/constants';
-import {AssetDependencyComponent} from '../../assetExplorer/components/asset-dependency/asset-dependency.component';
-import {UIDialogService} from '../../../shared/services/ui-dialog.service';
-import {DependecyService} from '../../assetExplorer/service/dependecy.service';
 
 export interface AssetDependency {
 	id: number;
@@ -20,9 +22,9 @@ export interface AssetDependency {
 @Injectable()
 export class OpenAssetDependenciesService {
 	constructor(
-		private dialog: UIDialogService,
+		private dialogService: DialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private dependencyService: DependecyService) {
-
 	}
 
 	/**
@@ -33,7 +35,16 @@ export class OpenAssetDependenciesService {
 		return (targetAsset: string, assetDependency: AssetDependency) => {
 			const asset = this.getAssetForOpen(allowedAssets, targetAsset, assetDependency);
 			return asset.getParams
-				.pipe((switchMap((results) => Observable.from(asset.open(asset.component, results, ...asset.extraParams)))))
+				.pipe((switchMap((results: any) =>
+					Observable.from(
+						this.dialogService.open({
+							componentFactoryResolver: this.componentFactoryResolver,
+							component: asset.component,
+							data: results.data,
+							modalConfiguration: asset.modalConfiguration
+						})
+					)
+				)))
 		}
 	}
 
@@ -46,37 +57,55 @@ export class OpenAssetDependenciesService {
 	 */
 	private getAssetForOpen(allowedAssets: string[], targetAsset: string, assetDependency: AssetDependency): any {
 		const [assetName, dependentName, type] = allowedAssets;
-		const open = this.dialog.open.bind(this.dialog);
-		const extra = this.dialog.extra.bind(this.dialog);
 
 		const assetParameters = {
 			[assetName]: {
 				component: AssetShowComponent,
-				getParams: Observable.of([
-					{ provide: 'ID', useValue: assetDependency.id },
-					{ provide: 'ASSET', useValue: assetDependency.class }
-				]),
-				extraParams: [DIALOG_SIZE.XXL],
-				open
+				getParams: Observable.of({
+					data: {
+						assetId: assetDependency.id,
+						assetClass: assetDependency.class
+					}
+				}),
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
 			},
 			[dependentName]: {
 				component: AssetShowComponent,
-				getParams: Observable.of([
-					{ provide: 'ID', useValue: assetDependency.dependentId },
-					{ provide: 'ASSET', useValue: assetDependency.dependentClass }
-				]),
-				extraParams: [DIALOG_SIZE.XXL],
-				open
+				getParams: Observable.of({
+					data: {
+						assetId: assetDependency.dependentId,
+						assetClass: assetDependency.dependentClass
+					}
+				}),
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
 			},
 			[type]: {
 				component: AssetDependencyComponent,
-				getParams: this.dependencyService
-					.getDependencies(assetDependency.id, assetDependency.dependentId)
+				getParams: this.dependencyService.getDependencies(assetDependency.id, assetDependency.dependentId)
 					.pipe(
-						switchMap((result: any) => Observable.of([{provide: 'ASSET_DEP_MODEL', useValue: result}]))
+						switchMap((result: any) =>
+							Observable.of({
+								data: {
+									assetDependency: result
+								}
+							})
+						)
 					),
-				extraParams: [true],
-				open: extra
+				modalConfiguration: {
+					title: 'Dependency Detail',
+					draggable: true,
+					modalSize: ModalSize.MD,
+				}
 			}
 		};
 

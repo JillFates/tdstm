@@ -1,6 +1,7 @@
 package modules
 
 import geb.Module
+
 import pages.Tasks.*
 import pages.Tasks.TaskManager.*
 import pages.Cookbook.*
@@ -12,7 +13,8 @@ class TasksMenuModule extends Module {
 
     static content = {
         menuContainer { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
-        menuBar { menuContainer.find("div#navbar-collapse")}
+
+        menuBar { menuContainer.find("div#mobile-nav") }
 
         tasksItem { menuBar.find("li.menu-parent-tasks")}
         tasksMenu { tasksItem.find("ul",class:"dropdown-menu menu-item-expand")}
@@ -21,6 +23,7 @@ class TasksMenuModule extends Module {
         taskCount { tasksMenu.find("span#todoCountProjectId")}
         tasksManagerItem { tasksMenu.find("li.menu-parent-tasks-task-manager")}
         tasksGraphItem { tasksMenu.find("li.menu-parent-tasks-task-graph")}
+        tasksGoJSGraphItem { tasksMenu.find("li.menu-parent-tasks-gojs-graph")}
         tasksTimelineItem { tasksMenu.find("li.menu-parent-tasks-task-timeline")}
         tasksCookbookItem { tasksMenu.find("li.menu-parent-tasks-cookbook")}
         tasksGenHistoryItem { tasksMenu.find("li.menu-parent-tasks-generation-history")}
@@ -53,12 +56,8 @@ class TasksMenuModule extends Module {
     }
 
     def goToTasksMenu(){
+        waitFor(30){tasksItem}
         tasksItem.click()
-    }
-
-    def goToMyTasks(){
-        selectMenu(tasksItem)
-        selectItem(tasksMyTasksItem)
     }
 
     def goToTasksManager(){
@@ -69,8 +68,15 @@ class TasksMenuModule extends Module {
     }
 
     def goToTaskGraph(){
+        waitFor(30){tasksItem}
         selectMenu(tasksItem)
         selectItem(tasksGraphItem)
+    }
+
+    def goToGoJSTaskGraph(){
+        waitFor(30){tasksItem}
+        selectMenu(tasksItem)
+        selectItem(tasksGoJSGraphItem)
     }
 
     def goToTaskTimeline(){

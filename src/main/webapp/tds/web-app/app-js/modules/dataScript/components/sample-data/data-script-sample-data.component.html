@@ -1,373 +1,300 @@
-<div
-	class="modal fade in"
-	id="loadSampleData"
-	data-backdrop="static"
-	tabindex="-1"
-	role="dialog"
-	tds-handle-escape
-	(escPressed)="cancelCloseDialog()"
+<div class="data-script-sample-data">
+	<form
+	name="dataScriptForm"
+	role="form"
+	#dataScriptForm="ngForm"
+	class="form-horizontal left-alignment"
 >
-	<div class="modal-dialog modal-md" role="document">
-		<div class="tds-modal-content" style="width: 650px;">
-			<div class="modal-header">
-				<tds-button-custom
-					class="close"
-					[icon]="'close'"
-					(click)="cancelCloseDialog($event)"
-					[displayLabel]="false"
-					[flat]="true"
-				></tds-button-custom>
-				<div class="modal-title-container">
-					<div class="modal-title">
-						{{
-							'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_TITLE'
-								| translate
-						}}
-					</div>
-				</div>
-			</div>
-			<div class="modal-body">
-				<form
-					name="dataScriptForm"
-					role="form"
-					#dataScriptForm="ngForm"
-					class="form-horizontal left-alignment"
-				>
-					<!-- top radio buttons options -->
-					<div class="row">
-						<div class="col-md-12">
-							<div class="radio">
-								<label
-									[ngStyle]="{
-										'font-weight':
-											OPTIONS.selected === OPTIONS.FILE
-												? 500
-												: 400
-									}"
-								>
-									<input
-										type="radio"
-										value="{{ OPTIONS.FILE }}"
-										[(ngModel)]="OPTIONS.selected"
-										name="loadSourceOption"
-									/>
-									{{
-										'DATA_INGESTION.DATASCRIPT.DESIGNER.UPLOAD_FILE'
-											| translate
-									}}
-								</label>
-								<label
-									style="margin-left: 10px;"
-									[ngStyle]="{
-										'font-weight':
-											OPTIONS.selected === OPTIONS.SERVICE
-												? 500
-												: 400
-									}"
-								>
-									<input
-										type="radio"
-										value="{{ OPTIONS.SERVICE }}"
-										[(ngModel)]="OPTIONS.selected"
-										name="loadSourceOption"
-									/>
-									{{
-										'DATA_INGESTION.DATASCRIPT.DESIGNER.FETCH_DATA_FROM_WEBSERVICE'
-											| translate
-									}}
-								</label>
-								<label
-									style="margin-left: 10px;"
-									[ngStyle]="{
-										'font-weight':
-											OPTIONS.selected === OPTIONS.CSV
-												? 500
-												: 400
-									}"
-								>
-									<input
-										type="radio"
-										selected
-										value="{{ OPTIONS.CSV }}"
-										[(ngModel)]="OPTIONS.selected"
-										name="loadSourceOption"
-									/>
-									{{
-										'DATA_INGESTION.DATASCRIPT.DESIGNER.PASTE_CONTENT'
-											| translate
-									}}
-								</label>
-							</div>
-						</div>
-					</div>
-
-					<div class="row" style="margin-top: 10px;">
-						<!-- file -->
-						<div
-							*ngIf="
-								OPTIONS.selected === OPTIONS.FILE &&
-								etlScriptModel.originalSampleFilename
-							"
-							class="col-md-12"
-							style="margin-bottom: 5px;"
-						>
-							<label class="control-label">Current File:</label>
-							<span style="margin-left: 5px;">{{
-								etlScriptModel.originalSampleFilename
-							}}</span>
-						</div>
-						<div
-							*ngIf="OPTIONS.selected === OPTIONS.FILE"
-							class="col-md-12"
-						>
-							<kendo-upload
-								#kendoUploadInstance="kendoUpload"
-								[restrictions]="file.uploadRestrictions"
-								[autoUpload]="file.autoUpload"
-								[saveUrl]="file.uploadSaveUrl"
-								[removeUrl]="file.uploadDeleteUrl"
-								[saveField]="file.saveField"
-								[removeField]="file.removeField"
-								[multiple]="file.multiple"
-								(select)="clearFilename($event)"
-								(upload)="onUploadFile($event)"
-								(remove)="onRemoveFile($event)"
-								(success)="completeEventHandler($event)"
-							>
-							</kendo-upload>
-						</div>
-
-						<!-- web service -->
-						<div
-							*ngIf="OPTIONS.selected === OPTIONS.SERVICE"
-							class="col-md-12"
-						>
-							<div
-								*ngIf="webService.options.length === 0"
-								style="margin: 30px 0px 30px 0px; text-align: center;"
-							>
-								<span *ngIf="webService.options.length === 0">
-									<i>{{
-										'DATA_INGESTION.DATASCRIPT.DESIGNER.PRESENTLY_THERE_ARE_NO_DATASOURCES'
-											| translate
-									}}</i>
-								</span>
-							</div>
-
-							<div
-								*ngIf="webService.options.length > 0"
-								class="form-group"
-								style="margin-bottom: 0px;"
-							>
-								<div class="col-sm-12">
-									<kendo-dropdownlist
-										id="apiaction"
-										name="apiaction"
-										class="form-control"
-										[(ngModel)]="webService.selected"
-										[data]="webService.options"
-										textField="name"
-										valueField="id"
-										[defaultItem]="{
-											name: 'Select a source',
-											id: -1
-										}"
-									>
-									</kendo-dropdownlist>
-								</div>
-								<div class="col-sm-12">
-									<button
-										[disabled]="
-											!webService.selected ||
-											webService.selected.id === -1
-										"
-										(click)="onFetch()"
-										type="button"
-										class="btn btn-default pull-right"
-										style="margin-top: 5px;"
-									>
-										{{ 'GLOBAL.FETCH' | translate }}
-										<i
-											*ngIf="csv.state === 'success'"
-											class="green icon fa fa-check"
-										></i>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						<!-- csv -->
-						<div
-							*ngIf="OPTIONS.selected === OPTIONS.CSV"
-							class="col-md-12"
-						>
-							<div class="form-group" style="margin-bottom: 0px;">
-								<label
-									for="fileExtension"
-									class="control-label"
-									style="padding: 7px 15px 0px 15px;"
-								>
-									{{
-										'DATA_INGESTION.DATASCRIPT.DESIGNER.FILE_TYPE'
-											| translate
-									}}
-								</label>
-								<div
-									style="width: 200px; display: inline-block;"
-								>
-									<kendo-dropdownlist
-										id="fileExtension"
-										name="fileExtension"
-										class="form-control"
-										[(ngModel)]="csv.selected"
-										(ngModelChange)="csv.state = 'dirty'"
-										[data]="csv.options.slice(1)"
-										textField="text"
-										valueField="value"
-									>
-									</kendo-dropdownlist>
-								</div>
-							</div>
-							<div class="form-group" style="margin-bottom: 0px;">
-								<label
-									for="fileExtension"
-									class="col-sm-12"
-								>
-									{{
-										'DATA_INGESTION.DATASCRIPT.DESIGNER.CONTENT'
-											| translate
-									}}
-								</label>
-								<div class="col-sm-12">
-									<textarea
-										class="col-sm-12"
-										name="fileContent"
-										cols="30"
-										rows="8"
-										style="resize: vertical; padding-left: 0px; padding-right: 0px;"
-										[(ngModel)]="csv.fileContent"
-										(ngModelChange)="csv.state = 'dirty'"
-									></textarea>
-								</div>
-								<div class="col-sm-12">
-									<button
-										[disabled]="
-											csv.fileContent.length < 1 ||
-											csv.state === 'success' ||
-											csv.selected.value === -1
-										"
-										(click)="onUploadFileText()"
-										type="button"
-										class="btn btn-default pull-right"
-										style="margin-top: 5px;"
-									>
-										{{ 'GLOBAL.UPLOAD' | translate }}
-										<i
-											*ngIf="csv.state === 'success'"
-											class="green icon fa fa-check"
-										></i>
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Options not displayed for Phase 1, will be supported on Phase 2 -->
-					<div style="display: none;">
-						<hr />
-						<div class="row">
-							<div class="col-md-12">
-								<div class="form-group">
-									<label
-										class="col-sm-4 control-label"
-										for="includeHeaders"
-									>
-										Data include header labels
-										<input
-											id="includeHeaders"
-											type="checkbox"
-											value=""
-											style="margin-left: 5px;"
-										/>
-									</label>
-									<label
-										class="col-sm-3 control-label"
-										style="width: 115px;"
-										for=""
-										>Limit # of Rows</label
-									>
-									<kendo-numerictextbox
-										id="limitRows"
-										name="limitRows"
-										[format]="'n'"
-										[min]="0"
-										[autoCorrect]="'true'"
-									>
-									</kendo-numerictextbox>
-								</div>
-								<div
-									class="form-group"
-									style="margin-bottom: 0px;"
-								>
-									<label
-										class="col-sm-4 control-label"
-										for="autoETL"
-									>
-										Auto Generate ETL script
-										<input
-											[(ngModel)]="autoETL"
-											id="autoETL"
-											name="autoETL"
-											type="checkbox"
-											value=""
-											style="margin-left: 15px;"
-										/>
-									</label>
-									<label
-										class="col-sm-3 control-label"
-										style="width: 115px; text-align: right;"
-										for=""
-										>Asset Classes
-										<span
-											style="color: red;"
-											*ngIf="autoETL"
-											>*</span
-										></label
-									>
-									<kendo-dropdownlist
-										id="assetClasses"
-										name="assetClasses"
-										[(ngModel)]="assetClassSelected"
-										[data]="assetClassOptions"
-										textField="text"
-										valueField="value"
-									>
-									</kendo-dropdownlist>
-								</div>
-							</div>
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer form-group-center">
-				<button
-					[disabled]="!validForm()"
-					(click)="onContinue()"
-					type="button"
-					class="btn btn-primary pull-left"
-				>
-					<span class="fa fa-fw fa-upload"></span>
-					{{ 'GLOBAL.CONTINUE' | translate }}
-				</button>
-				<button
-					(click)="cancelCloseDialog()"
-					type="button"
-					class="btn btn-default pull-right"
-				>
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					{{ 'GLOBAL.CANCEL' | translate }}
-				</button>
+	<!-- top radio buttons options -->
+	<div class="row">
+		<div class="col-md-12 select-tab-options">
+			<div class="radio">
+				<clr-radio-wrapper>
+					<input
+							type="radio"
+							clrRadio
+							value="{{ OPTIONS.FILE }}"
+							[(ngModel)]="OPTIONS.selected"
+							name="loadSourceOption"
+					/>
+					<label [ngStyle]="{'font-weight':OPTIONS.selected === OPTIONS.FILE? 500: 400 }">
+						{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.UPLOAD_FILE' | translate }}
+					</label>
+				</clr-radio-wrapper>
+				<clr-radio-wrapper>
+					<input
+							type="radio"
+							clrRadio
+							value="{{ OPTIONS.SERVICE }}"
+							[(ngModel)]="OPTIONS.selected"
+							name="loadSourceOption"
+					/>
+					<label style="margin-left: 10px;" [ngStyle]="{ 'font-weight': OPTIONS.selected === OPTIONS.SERVICE ? 500: 400}">
+						{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.FETCH_DATA_FROM_WEBSERVICE' | translate }}
+					</label>
+				</clr-radio-wrapper>
+				<clr-radio-wrapper>
+					<input
+							type="radio"
+							clrRadio
+							selected
+							value="{{ OPTIONS.CSV }}"
+							[(ngModel)]="OPTIONS.selected"
+							name="loadSourceOption"
+					/>
+					<label style="margin-left: 10px;" [ngStyle]="{ 'font-weight': OPTIONS.selected === OPTIONS.CSV ? 500 : 400 }" >
+						{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.PASTE_CONTENT' | translate }}
+					</label>
+				</clr-radio-wrapper>
 			</div>
 		</div>
 	</div>
+
+	<div class="row" style="margin-top: 10px;">
+		<!-- file -->
+		<div
+			*ngIf="
+				OPTIONS.selected === OPTIONS.FILE &&
+				etlScriptModel.originalSampleFilename
+			"
+			class="col-md-12"
+			style="margin-bottom: 5px;"
+		>
+			<label class="control-label">Current File:</label>
+			<span style="margin-left: 5px;">{{
+				etlScriptModel.originalSampleFilename
+			}}</span>
+		</div>
+		<div
+			*ngIf="OPTIONS.selected === OPTIONS.FILE"
+			class="col-md-12"
+		>
+			<kendo-upload
+				#kendoUploadInstance="kendoUpload"
+				[restrictions]="file.uploadRestrictions"
+				[autoUpload]="file.autoUpload"
+				[saveUrl]="file.uploadSaveUrl"
+				[removeUrl]="file.uploadDeleteUrl"
+				[saveField]="file.saveField"
+				[removeField]="file.removeField"
+				[multiple]="file.multiple"
+				(select)="clearFilename($event)"
+				(upload)="onUploadFile($event)"
+				(remove)="onRemoveFile($event)"
+				(success)="completeEventHandler($event)"
+			>
+			</kendo-upload>
+		</div>
+
+		<!-- web service -->
+		<div
+			*ngIf="OPTIONS.selected === OPTIONS.SERVICE"
+			class="col-md-12"
+		>
+			<div
+				*ngIf="webService.options.length === 0"
+				style="margin: 30px 0px 30px 0px; text-align: center;"
+			>
+				<span *ngIf="webService.options.length === 0">
+					<i>{{
+						'DATA_INGESTION.DATASCRIPT.DESIGNER.PRESENTLY_THERE_ARE_NO_DATASOURCES'
+							| translate
+					}}</i>
+				</span>
+			</div>
+
+			<div
+				*ngIf="webService.options.length > 0"
+				class="form-group"
+				style="margin-bottom: 0px;"
+			>
+				<div class="col-sm-12">
+					<kendo-dropdownlist
+						id="apiaction"
+						name="apiaction"
+						class="form-control"
+						[(ngModel)]="webService.selected"
+						[data]="webService.options"
+						textField="name"
+						valueField="id"
+						[defaultItem]="{
+							name: 'Select a source',
+							id: -1
+						}"
+					>
+					</kendo-dropdownlist>
+				</div>
+				<div class="col-sm-12">
+					<button
+						[disabled]="
+							!webService.selected ||
+							webService.selected.id === -1
+						"
+						(click)="onFetch()"
+						type="button"
+						class="btn btn-default pull-right"
+						style="margin-top: 5px;"
+					>
+						{{ 'GLOBAL.FETCH' | translate }}
+						<i
+							*ngIf="csv.state === 'success'"
+							class="green icon fa fa-check"
+						></i>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- csv -->
+		<div
+			*ngIf="OPTIONS.selected === OPTIONS.CSV"
+			class="col-md-12"
+		>
+			<div class="form-group" style="margin-bottom: 0px;">
+				<label
+					for="fileExtension"
+					class="control-label"
+					style="padding: 7px 15px 0px 15px;"
+				>
+					{{
+						'DATA_INGESTION.DATASCRIPT.DESIGNER.FILE_TYPE'
+							| translate
+					}}
+				</label>
+				<div
+					style="width: 200px; display: inline-block;"
+				>
+					<kendo-dropdownlist
+						id="fileExtension"
+						name="fileExtension"
+						class="form-control"
+						[(ngModel)]="csv.selected"
+						(ngModelChange)="csv.state = 'dirty'"
+						[data]="csv.options.slice(1)"
+						textField="text"
+						valueField="value"
+					>
+					</kendo-dropdownlist>
+				</div>
+			</div>
+			<div class="form-group" style="margin-bottom: 0px;">
+				<label
+					for="fileExtension"
+					class="col-sm-12"
+				>
+					{{
+						'DATA_INGESTION.DATASCRIPT.DESIGNER.CONTENT'
+							| translate
+					}}
+				</label>
+				<div class="col-sm-12">
+					<textarea
+						class="col-sm-12"
+						name="fileContent"
+						cols="30"
+						rows="8"
+						style="resize: vertical; padding-left: 0px; padding-right: 0px;"
+						[(ngModel)]="csv.fileContent"
+						(ngModelChange)="csv.state = 'dirty'"
+					></textarea>
+				</div>
+				<div class="col-sm-12">
+					<button
+						[disabled]="
+							csv.fileContent.length < 1 ||
+							csv.state === 'success' ||
+							csv.selected.value === -1
+						"
+						(click)="onUploadFileText()"
+						type="button"
+						class="btn btn-default pull-right"
+						style="margin-top: 5px;"
+					>
+						{{ 'GLOBAL.UPLOAD' | translate }}
+						<i
+							*ngIf="csv.state === 'success'"
+							class="green icon fa fa-check"
+						></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Options not displayed for Phase 1, will be supported on Phase 2 -->
+	<div style="display: none;">
+		<hr />
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label
+						class="col-sm-4 control-label"
+						for="includeHeaders"
+					>
+						Data include header labels
+						<input
+							id="includeHeaders"
+							type="checkbox"
+							value=""
+							style="margin-left: 5px;"
+						/>
+					</label>
+					<label
+						class="col-sm-3 control-label"
+						style="width: 115px;"
+						for=""
+						>Limit # of Rows</label
+					>
+					<kendo-numerictextbox
+						id="limitRows"
+						name="limitRows"
+						[format]="'n'"
+						[min]="0"
+						[autoCorrect]="'true'"
+					>
+					</kendo-numerictextbox>
+				</div>
+				<div
+					class="form-group"
+					style="margin-bottom: 0px;"
+				>
+					<label
+						class="col-sm-4 control-label"
+						for="autoETL"
+					>
+						Auto Generate ETL script
+						<input
+							[(ngModel)]="autoETL"
+							id="autoETL"
+							name="autoETL"
+							type="checkbox"
+							value=""
+							style="margin-left: 15px;"
+						/>
+					</label>
+					<label
+						class="col-sm-3 control-label"
+						style="width: 115px; text-align: right;"
+						for=""
+						>Asset Classes
+						<span
+							style="color: red;"
+							*ngIf="autoETL"
+							>*</span
+						></label
+					>
+					<kendo-dropdownlist
+						id="assetClasses"
+						name="assetClasses"
+						[(ngModel)]="assetClassSelected"
+						[data]="assetClassOptions"
+						textField="text"
+						valueField="value"
+					>
+					</kendo-dropdownlist>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
 </div>

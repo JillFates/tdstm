@@ -15,8 +15,8 @@ class TaskGraphPage extends Page {
     }
 
     static content = {
-        taskGraphPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        taskGraphPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        taskGraphPageTitle (wait:true) { $("section", class:"content-header").find("h2")}
+        taskGraphPageBreadcrumbs { $("ol", class:"legacy-breadcrumb").find("li a")}
         tasksModule { module TasksMenuModule}
         commonsModule { module CommonsModule }
     }

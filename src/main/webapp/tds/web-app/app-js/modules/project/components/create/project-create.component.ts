@@ -1,20 +1,31 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {ProjectService} from '../../service/project.service';
+// Angular
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+// Modal
 import {ProjectModel} from '../../model/project.model';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
 import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
-import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
-import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
+// Component
+import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
+// Service
+import {ProjectService} from '../../service/project.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+// Other
+import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 
 @Component({
 	selector: `project-create`,
 	templateUrl: 'project-create.component.html',
 })
-export class ProjectCreateComponent implements OnInit {
+export class ProjectCreateComponent extends Dialog implements OnInit {
 	public managers;
 	public planMethodologies;
 	public clients;
@@ -31,19 +42,39 @@ export class ProjectCreateComponent implements OnInit {
 
 	@ViewChild('startDatePicker', {static: false}) startDatePicker;
 	@ViewChild('completionDatePicker', {static: false}) completionDatePicker;
+
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private projectService: ProjectService,
-		private promptService: UIPromptService,
-		private activeDialog: UIActiveDialogService,
-		private dialogService: UIDialogService) {
+		private dialogService: DialogService) {
+		super();
 	}
 
 	ngOnInit() {
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => true,
+			disabled: () => !this.validateRequiredFields(this.projectModel),
+			type: DialogButtonType.ACTION,
+			action: this.saveForm.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
 		this.getModel();
+
 		let today = new Date();
 		this.projectModel = new ProjectModel();
 		this.defaultModel = {
-			clientId: 0,
+			clientId: null,
 			projectName: '',
 			description: '',
 			startDate: new Date(),
@@ -80,26 +111,33 @@ export class ProjectCreateComponent implements OnInit {
 	}
 
 	openTimezoneModal(): void {
-		this.dialogService.extra(UserDateTimezoneComponent, [{
-			provide: Boolean,
-			useValue: true
-		}, {
-			provide: String,
-			useValue: this.projectModel.timeZone
-		}]).then(result => {
-			this.projectModel.timeZone = result.timezone;
-		}).catch(result => {
-			console.log('Dismissed Dialog');
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: UserDateTimezoneComponent,
+			data: {
+				shouldReturnData: true,
+				defaultTimeZone: this.projectModel.timeZone
+			},
+			modalConfiguration: {
+				title: 'Time Zone Select',
+				draggable: true,
+				modalCustomClass: 'custom-time-zone-dialog',
+				modalSize: ModalSize.CUSTOM
+			}
+		}).subscribe((data) => {
+			if (data.status === DialogExit.ACCEPT) {
+				this.projectModel.timeZone = data.timezone;
+			}
 		});
 	}
 
 	// This is a work-around for firefox users
-	onOpenStartDatePicker (event) {
+	onOpenStartDatePicker(event) {
 		event.preventDefault();
 		this.startDatePicker.toggle();
 	}
 
-	onOpenCompletionDatePicker (event) {
+	onOpenCompletionDatePicker(event) {
 		event.preventDefault();
 		this.completionDatePicker.toggle();
 	}
@@ -113,7 +151,7 @@ export class ProjectCreateComponent implements OnInit {
 			return;
 		}
 		// delete temporary server uploaded file
-		const tempServerFilesToDelete = [ this.fetchResult.filename ];
+		const tempServerFilesToDelete = [this.fetchResult.filename];
 
 		// delete temporary transformed file
 		if (this.transformResult) {
@@ -121,7 +159,7 @@ export class ProjectCreateComponent implements OnInit {
 		}
 
 		// get the coma separated file names to delete
-		e.data = { filename: tempServerFilesToDelete.join(',') };
+		e.data = {filename: tempServerFilesToDelete.join(',')};
 
 		this.fetchResult = null;
 		this.transformResult = null;
@@ -141,13 +179,13 @@ export class ProjectCreateComponent implements OnInit {
 			this.file.fileUID = null;
 		} else if (e.files[0]) { // file uploaded successfully
 			let filename = response.filename;
-			this.fetchResult = { status: 'success', filename: filename };
+			this.fetchResult = {status: 'success', filename: filename};
 			this.projectModel.projectLogo = response.filename;
 
 			this.logoOriginalFilename = response.originalFilename;
 		} else {
 			this.clearFilename();
-			this.fetchResult = { status: 'error' };
+			this.fetchResult = {status: 'error'};
 		}
 	}
 
@@ -166,7 +204,13 @@ export class ProjectCreateComponent implements OnInit {
 	}
 
 	public saveForm(): void {
-		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel) && this.validatePartners(this.projectModel.partners)) {
+		const validateDate = DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel) && this.validatePartners(this.projectModel.partners);
+		if (!validateDate) {
+			this.dialogService.notify(
+				'Validation Required',
+				'The completion time must be later than the start time.'
+			).subscribe();
+		} else {
 			if (this.projectModel.startDate) {
 				this.projectModel.startDate.setHours(0, 0, 0, 0);
 				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
@@ -177,7 +221,16 @@ export class ProjectCreateComponent implements OnInit {
 			}
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
-					this.activeDialog.close();
+					this.onAcceptSuccess();
+					// get the project image logo
+					const projectLogo = result.data && result.data.projectLogoForProject && result.data.projectLogoForProject.id || '';
+
+					// notify about project updates
+					this.projectService.updateProjectInfo(
+						result.data.id,
+						this.projectModel.projectName,
+						this.projectService.getProjectImagePath(projectLogo)
+					);
 				}
 			});
 		}
@@ -227,18 +280,25 @@ export class ProjectCreateComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.projectModel) !== JSON.stringify(this.defaultModel)) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.close();
+				'You have changes that have not been saved. Do you want to continue and lose those changes?'
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.activeDialog.close();
+			super.onCancelClose();
 		}
 	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
@@ -7,30 +7,41 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 		<div *ngIf="config.canShowSaveButton" class="btn-group">
 			<tds-button [ngClass]="{'btn-secondary':!config.isDirty,'btn-success':config.isDirty}"
 									[id]="config.saveButtonId"
+									[disabled]="config.disableSaveButton"
 									[title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')"
 									(click)="saveClick(config.saveButtonId)">
 				{{config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')}}
 			</tds-button>
-			<clr-dropdown>
-				<tds-button [title]="''"
-										icon="angle down"
+			<clr-dropdown [clrCloseMenuOnItemClick]="true">
+				<tds-button [icon]="'angle down'"
 										[ngClass]="{'btn-secondary':!config.isDirty,'btn-success':config.isDirty}"
 										clrDropdownTrigger>
 				</tds-button>
 				<clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
-					<li *ngIf="config.canSave">
-						<a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
-					</li>
-					<li *ngIf="config.canSaveAs">
-						<a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
-					</li>
+					<button *ngIf="config.canSave" clrDropdownItem class="btn"
+									[disabled]="config.canSave && !config.isDirty"
+									(click)="onSave()">
+						{{ 'GLOBAL.SAVE' | translate }}
+					</button>
+					<button *ngIf="config.canSaveAs" clrDropdownItem class="btn"
+									(click)="onSaveAs()">
+						{{ 'GLOBAL.SAVE_AS' | translate }}
+					</button>
 				</clr-dropdown-menu>
 			</clr-dropdown>
 		</div>
 	`,
 })
 export class AssetViewShowSaveButtonComponent {
-	@Input() config: any;
+	@Input() config: {
+		isDirty: boolean,
+		saveButtonId: string,
+		canSave: boolean,
+		canSaveAs: boolean,
+		isEditAvailable: boolean,
+		canShowSaveButton: boolean,
+		disableSaveButton: boolean
+	};
 	@Output() save = new EventEmitter<any>();
 	@Output() saveAs = new EventEmitter<any>();
 	protected readonly SAVE_BUTTON_ID = 'btnSave';

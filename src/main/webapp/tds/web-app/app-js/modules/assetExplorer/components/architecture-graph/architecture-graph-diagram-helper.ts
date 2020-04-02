@@ -10,7 +10,8 @@ import {
 	Size,
 	Spot,
 	TextBlock,
-	TreeLayout
+	TreeLayout,
+	LayeredDigraphLayout
 } from 'gojs';
 import {
 	ITdsContextMenuOption
@@ -40,11 +41,15 @@ export class ArchitectureGraphDiagramHelper {
 				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
 				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
 			linkTemplate: this.linkTemplate(),
-			lowScaleTemplate: this.lowScaleNodeTemplate(),
-			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
+			lowScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.lowScaleNodeTemplate(),
+			mediumScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
 			rootNode: params.rootAsset,
-			// extras: params.extras && params.extras
+			extras: params.extras
 		};
 	}
 
@@ -59,7 +64,7 @@ export class ArchitectureGraphDiagramHelper {
 
 		dataCopy.nodes.map((t: IAssetNode) => {
 			t.key = t.id;
-			t.iconPath = t.assetClass && ASSET_ICONS[t.assetClass.toLowerCase()].icon;
+			t.iconPath = ASSET_ICONS[t.assetClass.toLowerCase()] && ASSET_ICONS[t.assetClass.toLowerCase()].icon;
 			nodeDataArr.push(t);
 		});
 		dataCopy.links
@@ -97,12 +102,6 @@ export class ArchitectureGraphDiagramHelper {
 		panel.background = '#fff';
 		panel.padding = new Margin(0, 0, 0, 0);
 
-		const nodeShape = new Shape();
-		nodeShape.figure = 'RoundedRectangle';
-		nodeShape.strokeWidth = 2;
-		nodeShape.stroke = '#3c8dbc';
-		nodeShape.fill = '#3c8dbc';
-
 		const panelBody = new Panel(Panel.Vertical);
 		panel.padding = new Margin(0, 0, 0, 0);
 		panel.margin = new Margin(0, 0, 0, 0);
@@ -116,15 +115,13 @@ export class ArchitectureGraphDiagramHelper {
 
 		// TextBlock
 		const textBlock = new TextBlock();
-		textBlock.stroke = '#fff';
+		textBlock.stroke = '#000';
 		textBlock.bind(new Binding('text', 'name'));
 
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
-		panel.add(nodeShape);
 		panel.add(panelBody);
-
 		node.add(panel);
 
 		if (opts.isExpandable) {
@@ -171,8 +168,7 @@ export class ArchitectureGraphDiagramHelper {
 
 	linkTemplate(): Link {
 		const linkTemplate = new Link();
-		linkTemplate.routing = Link.AvoidsNodes;
-		linkTemplate.corner = 5;
+		linkTemplate.layerName = 'Background';
 
 		const linkShape = new Shape();
 		linkShape.strokeWidth = 2;
@@ -189,10 +185,10 @@ export class ArchitectureGraphDiagramHelper {
 	}
 
 	layout(): Layout {
-		const treeLayout = new TreeLayout();
-		treeLayout.angle = 90;
-		treeLayout.layerSpacing = 35;
-		return treeLayout;
+		const diagraph = new LayeredDigraphLayout();
+		diagraph.direction = 90;
+		diagraph.layerSpacing = 100;
+		return diagraph;
 	}
 
 	lowScaleNodeTemplate(): Node {

@@ -11,7 +11,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 /**
  * This class sweeps over the Projects Menu.
@@ -25,7 +25,7 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
     static testCount
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
@@ -64,8 +64,9 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
         when: 'The user goes to the Project Details page'
             projectsModule.goToProjectsDetails()
 
-        then: 'The PProject Details Page is loaded successfully'
+        then: 'The Project Details modal is loaded successfully'
             at ProjectDetailsPage
+            closeProjectModal()
     }
 
     def "4. Verify the Projects Staff Landing Page"() {

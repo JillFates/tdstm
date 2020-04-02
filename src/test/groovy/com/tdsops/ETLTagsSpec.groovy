@@ -771,6 +771,62 @@ class ETLTagsSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-16944')
+	void 'test can add a single tag without using extract command'() {
+
+		given:
+			String tagName = 'Code Blue'
+
+		and:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				application id,tag
+				12345678,$tagName
+			""".stripIndent())
+
+			tagValidator.addTag(tagName, 100l)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Application
+					extract 'tag' set tag
+					tagAdd tag 
+				}
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 0
+						assertWith(tags, TagResults) {
+							add == [tagName] as Set
+							remove == [] as Set
+							replace == [:]
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
+			}
+	}
+
 	/**
 	 * Creates a {@code ETLTagValidator} instance used in test cases.
 	 *

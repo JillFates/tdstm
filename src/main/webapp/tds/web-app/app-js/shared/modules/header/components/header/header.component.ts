@@ -1,5 +1,5 @@
 // Angular
-import {Component} from '@angular/core';
+import {Component, ComponentFactoryResolver} from '@angular/core';
 import {FormGroup, FormControl} from '@angular/forms';
 // NGXS
 import {Store} from '@ngxs/store';
@@ -12,6 +12,7 @@ import {UserDateTimezoneComponent} from '../date-timezone/user-date-timezone.com
 import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
 import {UIDialogService} from '../../../../services/ui-dialog.service';
 import {NotifierService} from '../../../../services/notifier.service';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
 // Model
 import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 import {PersonModel} from '../../../../components/add-person/model/person.model';
@@ -21,8 +22,6 @@ import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
 import {ReplaySubject} from 'rxjs';
 import {SetUserContextPerson} from '../../../../../modules/auth/action/user-context-person.actions';
-
-declare var jQuery: any;
 
 @Component({
 	selector: 'tds-header',
@@ -38,8 +37,10 @@ export class HeaderComponent {
 	public iconText: ReplaySubject<string> = new ReplaySubject<string>(1);
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private userContextService: UserContextService,
-		private dialogService: UIDialogService,
+		private oldDialogService: UIDialogService,
+		private dialogService: DialogService,
 		private notifierService: NotifierService,
 		private store: Store
 	) {
@@ -91,13 +92,13 @@ export class HeaderComponent {
 	 * Opens the user preferences modal.
 	 */
 	public openPrefModal(): void {
-		this.dialogService.extra(UserPreferencesComponent, [], true, true).catch(result => {
+		this.oldDialogService.extra(UserPreferencesComponent, [], true, true).catch(result => {
 			//
 		});
 	}
 
 	public openEditPersonModal(): void {
-		this.dialogService.open(UserEditPersonComponent, [
+		this.oldDialogService.open(UserEditPersonComponent, [
 			{provide: PersonModel, useValue: {}},
 			{provide: PasswordChangeModel, useValue: {}}
 		]).catch(result => {
@@ -106,16 +107,20 @@ export class HeaderComponent {
 	}
 
 	public openDateTimezoneModal(): void {
-
-		this.dialogService.extra(UserDateTimezoneComponent, [{
-			provide: Boolean,
-			useValue: false
-		}, {
-			provide: String,
-			useValue: ''
-		}]).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: UserDateTimezoneComponent,
+			data: {
+				shouldReturnData: false,
+				defaultTimeZone: ''
+			},
+			modalConfiguration: {
+				title: 'Date and Time Zone Select',
+				draggable: true,
+				modalCustomClass: 'custom-time-zone-dialog',
+				modalSize: ModalSize.CUSTOM
+			}
+		}).subscribe();
 	}
 
 	/**

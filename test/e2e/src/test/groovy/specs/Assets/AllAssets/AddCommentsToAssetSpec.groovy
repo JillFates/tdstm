@@ -16,7 +16,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 import utils.CommonActions
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class AddCommentsToAssetSpec extends GebReportingSpec {
@@ -32,7 +32,7 @@ class AddCommentsToAssetSpec extends GebReportingSpec {
     def beforeCommentsCount
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

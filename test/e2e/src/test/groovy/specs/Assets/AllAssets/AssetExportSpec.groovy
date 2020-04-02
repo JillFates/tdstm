@@ -7,7 +7,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import pages.Downloads.HomeUserDownloadsPage
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class AssetExportSpec extends GebReportingSpec {
@@ -17,7 +17,7 @@ class AssetExportSpec extends GebReportingSpec {
     static fileName = "TM_Demo-${projName}-"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

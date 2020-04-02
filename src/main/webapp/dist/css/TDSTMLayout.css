@@ -1,4 +1,3 @@
-@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
 /*!
  *   AdminLTE v2.3.0
  *   Author: Almsaeed Studio
@@ -3134,7 +3133,8 @@ table.text-center th {
 }
 .login-page,
 .register-page {
-  background: #d2d6de;
+  background: #fff url(/tdstm/assets/images/login-background.jpg) no-repeat;
+  background-size: cover;
 }
 .login-box,
 .register-box {
@@ -3158,6 +3158,9 @@ table.text-center th {
 .login-box-body .form-control-feedback,
 .register-box-body .form-control-feedback {
   color: #777;
+}
+.login-box-body .clr-input {
+    width: 100%;
 }
 .login-box-msg,
 .register-box-msg {

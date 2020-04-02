@@ -1,46 +1,58 @@
+// Angular
 import {
-	Component,
-	HostListener,
-	OnInit,
 	AfterViewInit,
+	ComponentFactoryResolver,
+	Input,
 	OnDestroy,
+	OnInit,
+	QueryList,
 	ViewChild,
-	ViewChildren,
-	QueryList
+	ViewChildren
 } from '@angular/core';
-import {Observable, Subject} from 'rxjs';
 import {NgForm} from '@angular/forms';
-import {clone} from 'ramda';
+// Model
 import {ModalType} from '../../../../shared/model/constants';
-import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskDetailModel} from '../../model/task-detail.model';
-import {TaskService} from '../../service/task.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-import {DateUtils, DatePartUnit} from '../../../../shared/utils/date.utils';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
-import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
 import {DateRangeSelectorModel} from '../../../../shared/components/date-range-selector/model/date-range-selector.model';
-import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/model/task-notes-columns.model';
-import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {YesNoList, TaskStatus} from '../../model/task-edit-create.model';
+import {TaskStatus, YesNoList} from '../../model/task-edit-create.model';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
+// Component
+import {DateRangeSelectorComponent} from '../../../../shared/components/date-range-selector/date-range-selector.component';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {takeUntil} from 'rxjs/operators';
+// Service
+import {TaskService} from '../../service/task.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {DatePartUnit, DateUtils} from '../../../../shared/utils/date.utils';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {PermissionService} from '../../../../shared/services/permission.service';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {StringUtils} from '../../../../shared/utils/string.utils';
+import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+// Other
+import {Observable, Subject} from 'rxjs';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {takeUntil} from 'rxjs/operators';
+import * as R from 'ramda';
 
 declare var jQuery: any;
 
-export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnInit, AfterViewInit, OnDestroy {
+export class TaskEditCreateCommonComponent extends Dialog implements OnInit, AfterViewInit, OnDestroy {
+	@Input() data: any;
+
 	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 	@ViewChild('dueDate', {static: false}) dueDate;
@@ -53,7 +65,6 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 	protected taskSuccessorPredecessorColumnsModel = new TaskSuccessorPredecessorColumnsModel();
 	public collapsedTaskDetail = false;
 	protected hasCookbookPermission = false;
-	public modalOptions: DecoratorOptions;
 	public model: any = null;
 	protected getAssetList: Function;
 	protected yesNoList = [...YesNoList];
@@ -70,24 +81,61 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 	protected metaParam: any;
 	private destroySubject: Subject<any> = new Subject<any>();
 	public taskViewType: string;
+	private taskDetailModel: TaskDetailModel;
 
 	constructor(
-		private taskDetailModel: TaskDetailModel,
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService,
-		private promptService: UIPromptService,
+		private dialogService: DialogService,
 		private userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe) {
-
-		super('#task-component');
-		this.taskViewType = this.taskDetailModel.modal.type === ModalType.CREATE ? 'task-create-view' : 'task-edit-view';
-		this.modalOptions = {isResizable: false, isCentered: true, isDraggable: false};
-		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
+		super();
 	}
 
 	ngOnInit() {
-		console.log('----on init----');
+		this.taskDetailModel = R.clone(this.data.taskDetailModel);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.taskDetailModel.modal.type === ModalType.EDIT,
+			active: () => this.taskDetailModel.modal.type === ModalType.EDIT,
+			type: DialogButtonType.ACTION,
+			action: Function()
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => (this.taskDetailModel.modal.type === ModalType.EDIT || this.taskDetailModel.modal.type === ModalType.CREATE) && this.hasEditTaskPermission,
+			disabled: () => this.isFormInvalid(),
+			type: DialogButtonType.ACTION,
+			action: this.onSave.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.taskDetailModel.modal.type === ModalType.EDIT && this.hasEditTaskPermission,
+			type: DialogButtonType.ACTION,
+			action: this.deleteTask.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.taskViewType = this.taskDetailModel.modal.type === ModalType.CREATE ? 'task-create-view' : 'task-edit-view';
+		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
 	}
 
 	// set the handlers on open / on close to set the flags that indicate the state of the
@@ -104,7 +152,8 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 				this.userPreferenceService.getUserDateFormat(),
 				this.taskManagerService,
 				this.dialogService,
-				this.translatePipe);
+				this.translatePipe,
+				this.componentFactoryResolver);
 
 			this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
 				this.modelHelper.getModelForCreate(this.taskDetailModel)
@@ -362,21 +411,26 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 			duration: this.model.durationParts
 		};
 
-		this.dialogService.extra(DateRangeSelectorComponent,
-			[
-				{provide: UIPromptService, useValue: this.promptService},
-				{provide: DateRangeSelectorModel, useValue: clone(dateModel)}
-			], false, false).then((result: DateRangeSelectorModel) => {
-			if (result) {
-				const {start, end, duration, locked} = result;
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: DateRangeSelectorComponent,
+			data: {
+				dateRangeSelectorModel: dateModel
+			},
+			modalConfiguration: {
+				title: 'Select a start date',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe((data: any) => {
+			if (data.status === DialogExit.ACCEPT) {
+				const {start, end, duration, locked} = data;
 				this.model.estimatedStart = start;
 				this.model.estimatedFinish = end;
 				this.model.durationParts = duration;
 				this.model.locked = locked;
 				this.hasModelChanges = true;
 			}
-		}).catch(result => {
-			// console.log('Dismissed Dialog');
 		});
 	}
 
@@ -392,7 +446,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 			observable = this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
 		}
 
-		observable.subscribe((result) => this.close(result));
+		observable.subscribe((result) => super.onCancelClose(result));
 	}
 
 	/**
@@ -407,18 +461,21 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isFormDirty()) {
-			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'))
-				.then(result => {
-					if (result) {
-						this.dismiss();
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
+				)
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
 					}
 				});
 		} else {
-			this.dismiss();
+			super.onCancelClose();
 		}
 	}
 
@@ -427,14 +484,15 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 	 * delegate operation to host component
 	 */
 	public deleteTask(): void {
-		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRM'),
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRM'
+			),
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK'),
-			this.translatePipe.transform('GLOBAL.CONFIRM'),
-			this.translatePipe.transform('GLOBAL.CANCEL'))
-			.then(result => {
-				if (result) {
-					this.close({id: this.taskDetailModel, isDeleted: true})
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					super.onAcceptSuccess({id: this.taskDetailModel, isDeleted: true});
 				}
 			});
 	}
@@ -576,4 +634,29 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 		this.dueDate.toggle();
 	}
 
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @returns {string}
+	 */
+	private getModalTitle(): string {
+
+		if (this.taskDetailModel.modal.type === ModalType.EDIT) {
+			return this.translatePipe.transform(
+				'TASK_MANAGER.EDIT_TASK'
+			);
+		}
+
+		if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+			return this.translatePipe.transform(
+				'TASK_MANAGER.CREATE_TASK'
+			);
+		}
+	}
 }

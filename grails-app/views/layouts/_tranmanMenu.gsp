@@ -57,9 +57,8 @@
                                 </tds:hasPermission>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Manage Model Library</li>
                             <li class="menu-child-item menu-list-manufacturers">
-                                <g:link controller="manufacturer">List Manufacturers</g:link>
+                                <a href="/tdstm/module/manufacturer/list">List Manufacturers</a>
                             </li>
                             <li class="menu-child-item menu-list-models">
                                 <g:link controller="model" >List Models</g:link>
@@ -188,6 +187,11 @@
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
+                            <tds:hasPermission permission="${Permission.DepAnalyzerView}">
+                                <li class="menu-child-item menu-parent-assets-dependency-analyzer-clr">
+                                    <g:link controller="module" action="taskManager" id="dependency-analyzer">Angular Dependency Analyzer</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">
                                 <li class="menu-child-item menu-parent-assets-architecture-graph">
                                     <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
@@ -196,7 +200,7 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">
-                                <li class="menu-child-item menu-parent-assets-architecture-graph">
+                                <li class="menu-child-item menu-parent-assets-architecture-graph-gojs">
                                     <g:link controller="module" action="taskManager" id="architecture-graph">GoJS Architecture Graph</g:link>
                                 </li>
                             </tds:hasPermission>
@@ -243,12 +247,12 @@
                             </li>
                             <g:if test="${currProject && moveEvent}">
                                 <li class="menu-child-item menu-parent-planning-event-detail-list">
-                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">${moveEvent.name} Event Details</a>
+                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">Event Details - ${moveEvent.name}</a>
                                 </li>
                             </g:if>
                             <tds:hasPermission permission="${Permission.NewsEdit}">
                                 <li class="menu-child-item menu-parent-planning-event-news">
-                                    <g:link controller="newsEditor">List Event News</g:link>
+                                    <a href="/tdstm/module/event-news/list">List Event News</a>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventPrep}">
@@ -263,6 +267,11 @@
                             <li class="menu-child-item menu-parent-planning-list-bundles">
                                 <g:link class="mmlink" controller="module" action="bundle" id="list">List Bundles</g:link>
                             </li>
+                            <g:if test="${currProject && moveBundle}">
+                                <li class="menu-child-item menu-parent-planning-selected-bundle">
+                                    <a href="/tdstm/module/bundle/list?show=${moveBundle.id}">Bundle Details - ${moveBundle.name}</a>
+                                </li>
+                            </g:if>
                         </ul>
                     </li>
                 </tds:hasPermission>
@@ -292,12 +301,12 @@
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.RecipeView}">
                                     <li class="menu-child-item menu-parent-tasks-cookbook">
-                                        <g:link controller="cookbook" action="index">Cookbook</g:link>
+                                        <g:link controller="recipes" action="index">Recipes</g:link>
                                     </li>
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.RecipeGenerateTasks}">
                                     <li class="menu-child-item menu-parent-tasks-generation-history">
-                                        <a href="/tdstm/cookbook/index#/generationHistory">Generation History</a>
+                                        <a href="/tdstm/recipes/index#/generationHistory">Generation History</a>
                                     </li>
                                 </tds:hasPermission>
 

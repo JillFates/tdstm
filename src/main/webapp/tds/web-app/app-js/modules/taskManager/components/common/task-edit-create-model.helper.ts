@@ -9,6 +9,9 @@ import {SingleNoteModel} from '../../../assetExplorer/components/single-note/mod
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskService} from '../../service/task.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {ComponentFactoryResolver} from '@angular/core';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -24,8 +27,9 @@ export class TaskEditCreateModelHelper {
 		userTimeZone: string,
 		userCurrentDateFormat: string,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService,
-		private translate: TranslatePipe) {
+		private dialogService: DialogService,
+		private translate: TranslatePipe,
+		private componentFactoryResolver: ComponentFactoryResolver) {
 		this.model = {};
 
 		this.userTimeZone = userTimeZone;
@@ -323,7 +327,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: hardAssigned === No ? '0' : '1',
 			sendNotification: sendNotification ===  No ? '0' : '1',
 			isResolved: '0', /* ? */
-			instructionsLink: this.addProtocolToLabelURL(instructionLink),
+			instructionsLink: instructionLink,
 			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
 			mustVerify: '0',
 			override: '0',
@@ -408,7 +412,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: hardAssigned === No ? '0' : '1',
 			sendNotification: sendNotification ===  No ? '0' : '1',
 			isResolved: '0', /* ? */
-			instructionsLink: this.addProtocolToLabelURL(instructionLink),
+			instructionsLink: instructionLink,
 			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
 			mustVerify: '0',
 			override: '0',
@@ -502,28 +506,6 @@ export class TaskEditCreateModelHelper {
 		});
 
 		return ids;
-	}
-
-	/**
-	 * Add protocol in case is not present
-	 * @param {string} labelURL
-	 * @returns {string}
-	 */
-	private addProtocolToLabelURL(labelURL = ''): string {
-		const separator = '|';
-		let isJustURL = false;
-		let [label, url] = labelURL.split(separator);
-
-		if (!url) {
-			isJustURL = true;
-			url = label;
-		}
-		url = url.toLowerCase();
-		if (url && !url.startsWith('http://') && !url.startsWith('https://') ) {
-			url = 'http://' + url;
-		}
-
-		return isJustURL ? url : [label, url].join(separator);
 	}
 
 	/**
@@ -738,18 +720,25 @@ export class TaskEditCreateModelHelper {
 				note: ''
 			};
 
-			this.dialogService.extra(SingleNoteComponent, [
-				{provide: SingleNoteModel, useValue: singleNoteModel}
-			], false, false)
-				.then(addedNote => {
-					this.createNote(this.model.id, addedNote)
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: SingleNoteComponent,
+				data: {
+					singleNoteModel: singleNoteModel
+				},
+				modalConfiguration: {
+					title: 'Note Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).subscribe((data: any) => {
+				if (data.status === DialogExit.ACCEPT) {
+					this.createNote(this.model.id, data.note)
 						.subscribe((result) => {
 							console.log('The result is:', result);
 							observer.next(result);
 						});
-				}).catch(result => {
-				console.log(result);
-				observer.next(null);
+				}
 			});
 		});
 	}

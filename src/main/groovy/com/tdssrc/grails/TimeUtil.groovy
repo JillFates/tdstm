@@ -24,7 +24,7 @@ import java.time.ZonedDateTime
  */
 @Slf4j(value='logger')
 class TimeUtil {
-
+	static final long HALF_DAY_MILLISECONDS = 12 * 60 * 60000l
 	static final String MIDDLE_ENDIAN = 'MM/DD/YYYY'	// Primarily in the US
 	static final String LITTLE_ENDIAN = 'DD/MM/YYYY'	// Used outside US and China
 	static final String BIG_ENDIAN    = 'YYYY/MM/DD'	// Used principally in China but not used in TM today
@@ -841,7 +841,7 @@ class TimeUtil {
 	 * @return the adjusted date
 	 */
 	@CompileStatic
-	private static Date adjustDateFromGMTToTZ(Date date, String toTZ) {
+	static Date adjustDateFromGMTToTZ(Date date, String toTZ) {
 		if (toTZ == defaultTimeZone) {
 			date
 		} else {
@@ -1209,6 +1209,18 @@ class TimeUtil {
 			time = pointInTime + minutes.minutes
 		}
 		return time
+	}
+
+	/**
+	 * Returns a Date rounded to Midnight, this is
+	 * any date above 12:00 PM gets rounded to the next Day at 00:00
+	 * any date below 11:59 AM gets rounded to the same Date at 00:00
+	 * @param milliseconds representing a Date
+	 * @return
+	 */
+	@CompileStatic
+	static Date roundedDate(long millis) {
+		return new Date( millis + HALF_DAY_MILLISECONDS).clearTime()
 	}
 
 }

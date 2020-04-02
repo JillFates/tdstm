@@ -1,68 +1,3 @@
-kendo-grid {
-	&.k-grid {
-		background-color: transparent;
-		th,
-		td {
-			border: 0;
-			word-break: break-all;
-		}
-		td {
-			line-height: 20px;
-			padding: 4px 8px;
-			background: $color-text-inverse;
-			border: 1px solid $color-head;
-			border-width: 0 0 1px 0;
-			overflow: hidden;
-		}
-		.k-grid-aria-root {
-			overflow: auto;
-		}
-		.grid-label {
-			font-size: 18px;
-			line-height: 48px;
-		}
-	}
-	.k-grid-content {
-		min-height: 2rem;
-	}
-	.grid-actions {
-		> .clr-checkbox-wrapper {
-			display: inline-block;
-			padding: 8px;
-		}
-		> div {
-			float: right;
-			.btn {
-				padding: 0 5px;
-				clr-icon {
-					margin: 0 5px;
-				}
-			}
-		}
-	}
-	.k-grid-aria-root,
-	kendo-grid-list {
-		overflow: visible;
-	}
-    .k-grid-header {
-      .k-icon.k-i-sort-asc-sm, .k-icon.k-i-sort-desc-sm {
-        float: right;
-      }
-    }
-
-  	// Fix issue displaying check icon within a grid
-	.clr-checkbox-wrapper {
-		box-sizing: border-box;
-	}
-}
-
-task-comment kendo-grid.k-grid .k-grid-content {
-	td:nth-child(1) {
-		overflow: visible;
-	}
-	padding-bottom: 4rem;
-}
-
 .user-dashboard-component {
 	kendo-grid.k-grid {
 		.grid-label {
@@ -76,4 +11,9 @@ task-comment kendo-grid.k-grid .k-grid-content {
 			}
 		}
 	}
+}
+
+// override of the grid page-height, calculation totally valid and free to replicate on any particular grid neeeded
+.task-list kendo-grid.page-height {
+  --subtraction-height: 325px;
 }

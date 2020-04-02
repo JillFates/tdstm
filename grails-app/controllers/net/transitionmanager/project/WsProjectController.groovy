@@ -147,10 +147,10 @@ class WsProjectController implements ControllerMethods {
 
 		renderSuccessJson([
 				  clients              : projectDetails.clients,
-				  projectInstance      : project,
+				  projectInstance      : project.toMap(),
 				  timezone             : project.timezone?.label ?: '',
 				  client               : project.client,
-				  defaultBundle        : project.defaultBundle,
+				  defaultBundle        : project.defaultBundle.toMap(),
 				  availableBundles     : availableBundles,
 				  possiblePartners     : projectDetails.partners,
 				  possibleManagers     : projectDetails.managers,
@@ -186,5 +186,10 @@ class WsProjectController implements ControllerMethods {
 		projectService.deleteProject(project.id, true)
 
 		renderSuccessJson("Project $project.name deleted")
+	}
+
+	@HasPermission(Permission.ProjectView)
+	def defaultProject() {
+		renderSuccessJson(id: Project.defaultProject.id)
 	}
 }

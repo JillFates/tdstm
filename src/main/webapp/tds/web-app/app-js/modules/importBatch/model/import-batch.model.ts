@@ -123,7 +123,7 @@ export class ImportBatchColumnsModel {
 				property: 'dateCreated',
 				type: 'datetime',
 				format: 'yyyy-MM-dd HH:mm:ss',
-				width: 170,
+				width: 200,
 				locked: false,
 				filterable: true
 			},
@@ -132,7 +132,7 @@ export class ImportBatchColumnsModel {
 				property: 'lastUpdated',
 				type: 'datetime',
 				format: 'yyyy-MM-dd HH:mm:ss',
-				width: 170,
+				width: 200,
 				locked: false,
 				filterable: true
 			},

@@ -51,7 +51,7 @@ import {
 	AssetDependency,
 } from '../../service/open-asset-dependencies.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import {ViewColumn} from '../../../assetExplorer/model/view-spec.model';
+import { AssetTagSelectorComponent } from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 
 declare var jQuery: any;
 
@@ -69,8 +69,8 @@ interface ComponentState {
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
-	@ViewChild('tdsBulkChangeButton', { static: false })
-	tdsBulkChangeButton: BulkChangeButtonComponent;
+	@ViewChild('tdsBulkChangeButton', { static: false }) tdsBulkChangeButton: BulkChangeButtonComponent;
+	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
 	@ViewChild('grid', { static: false }) grid: GridComponent;
 	public dependenciesColumnModel: DependenciesColumnModel;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
@@ -124,6 +124,8 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		// Setup state observables
 		this.setupComponentStateObservable();
 		this.setupTagsFilterStateObservable();
+
+		this.eventListeners();
 	}
 
 	/**
@@ -289,14 +291,15 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * @param {string} field Name of the tags filter column
 	 * @param {any}  filter Object containing the tags context information
 	 */
-	protected onTagFilterChange(field: string, filter: any): void {
+	protected onTagFilterChange(column: GridColumnModel, filter: any): void {
+		column.filter = '';
+		const field = column.property;
 		let operator = filter.operator && filter.operator === 'ALL' ? '&' : '|';
-
 		const tags = (filter.tags || [])
 			.filter(tag => !isNaN(tag.id))
 			.map(tag => tag.id)
 			.join(operator);
-
+		column.filter = tags;
 		this.tagsStateSubject.next({ field, tags });
 	}
 
@@ -395,24 +398,29 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * Update each Filter on a manual way
 	 * @param column
 	 */
-	public onFilter(column: any): void {
-		const filters = pathOr(
-			[],
-			['gridState', 'filter', 'filters'],
-			this.state
-		).filter((item: any) => item.field !== column.property);
+	public onFilter(column: any, event: any = null): void {
+		column.filter = event;
+		if (!event) {
+			this.onClearValue(column);
+		} else {
+			const filters = pathOr(
+				[],
+				['gridState', 'filter', 'filters'],
+				this.state
+			).filter((item: any) => item.field !== column.property);
 
-		if (column.filter) {
-			filters.push({
-				field: column.property,
-				operator: 'contains',
-				value: column.filter,
-			});
+			if (column.filter) {
+				filters.push({
+					field: column.property,
+					operator: 'contains',
+					value: column.filter,
+				});
+			}
+
+			const clonedState = clone(this.state);
+			clonedState.gridState.filter.filters = filters;
+			this.componentState.next(clonedState);
 		}
-
-		const clonedState = clone(this.state);
-		clonedState.gridState.filter.filters = filters;
-		this.componentState.next(clonedState);
 	}
 
 	/**
@@ -423,8 +431,10 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.dependenciesColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
-		this.showFilters = false;
 		this.onFilter({filter: ''});
+		if (this.tagSelector) {
+			this.tagSelector.reset();
+		}
 	}
 
 	/**
@@ -508,12 +518,21 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.openAssetsHandler(fieldName, assetDependency)
 			.pipe(takeUntil(this.destroySubject))
 			.subscribe(
-				_ => this.changeState(),
+				_ => this.reloadData(),
 				error => {
 					console.log(error);
 					this.changeState();
 				}
 			);
+	}
+
+	/**
+	 * Reload the current Kendo List when an event that requires the changes occurs completely out of the context.
+	 */
+	private eventListeners() {
+		this.notifier.on('reloadCurrentAssetList', (event) => {
+			this.reloadData();
+		});
 	}
 
 	protected isBulkSelectAvailable(): boolean {

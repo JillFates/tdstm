@@ -102,14 +102,14 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			boolean dataToStringCalled = false
 			boolean clearCustomFieldsCalled = false
 
-			service.metaClass.dataDateToDateTime = { Project project, String assetClassName, String fieldName -> dataDateToDateTimeCalled = true }
-			service.metaClass.dataDateTimeToDate = { Project project, String assetClassName, String fieldName -> dataDateTimeToDateCalled = true }
-			service.metaClass.dataToYesNo = { Project project, String assetClassName, String fieldName -> dataToYesNoCalled = true }
-			service.metaClass.dataToString = { Project project, String assetClassName, String fieldName, Integer maxLength -> dataToStringCalled = true }
-			service.metaClass.clearCustomFields = { Project project, String assetClassName, List<String> fieldNames -> clearCustomFieldsCalled = true }
+			service.metaClass.dataDateToDateTime = { String fieldName -> dataDateToDateTimeCalled = true; return ""; }
+			service.metaClass.dataDateTimeToDate = { String fieldName -> dataDateTimeToDateCalled = true; return ""; }
+			service.metaClass.dataToYesNo = { String fieldName -> dataToYesNoCalled = true; return ""; }
+			service.metaClass.dataToString = { String fieldName, Integer maxLength -> dataToStringCalled = true; return ""; }
+			service.metaClass.anyTypeToNull = { String fieldName -> clearCustomFieldsCalled = true; return ""; }
 
 		expect: 'when updateFieldData is called the flags are set appropriately'
-			service.updateFieldData(oldFieldSpec, newFieldSpec, AssetType.APPLICATION.name, defaultProject)
+			String updateString = service.updateFieldData(oldFieldSpec, newFieldSpec)
 			dataDateToDateTimeCalled == dataDateToDateTimeSet
 			dataDateTimeToDateCalled == dataDateTimeToDateSet
 			dataToYesNoCalled == dataToYesNoSet

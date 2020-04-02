@@ -13,22 +13,33 @@ import { Store } from '@ngxs/store';
 import { saveAs } from 'file-saver';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 
+enum EXPORT_STATUS {
+	FAILED = 'Failed',
+	COMPLETED = 'Completed',
+	PENDING = 'Pending',
+	IN_PROGRESS = 'In progress',
+	PAUSED = 'Paused',
+	CANCELLED = 'Cancelled'
+}
+
 @Component({
 	selector: 'tds-asset-export',
 	templateUrl: 'export-asset.component.html',
-	styles: [],
+	styles: []
 })
 export class ExportAssetComponent implements OnInit {
-	protected gridColumns: any[];
 	public selectedAll = false;
-	protected userPreferences = [];
-	protected selectedBundles = ['useForPlanning'];
-	protected errorMessage = '';
-	protected opened = false;
-	protected title = '';
-	protected progress_value = 0;
-	private userContext: UserContextModel;
 	public exportAssetsData: ExportAssetModel = new ExportAssetModel();
+	exportStatus: EXPORT_STATUS;
+	exportMessage = '';
+	protected gridColumns: any[];
+	private userPreferences = [];
+	private selectedBundles = ['useForPlanning'];
+	private errorMessage = '';
+	private opened = false;
+	private title = '';
+	private progress_value = 0;
+	private userContext: UserContextModel;
 
 	constructor(
 		private exportService: ExportAssetService,
@@ -47,12 +58,9 @@ export class ExportAssetComponent implements OnInit {
 			this.exportAssetsData = res;
 			this.updateUserPreferencesModel();
 		});
-
-		this.store
-			.select(state => state.TDSApp.userContext)
-			.subscribe((userContext: UserContextModel) => {
-				this.userContext = userContext;
-			});
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
+		});
 	}
 
 	/**
@@ -62,60 +70,19 @@ export class ExportAssetComponent implements OnInit {
 		this.userPreferences = [
 			{
 				preference: 'ImportApplication',
-				selected:
-					this.exportAssetsData.userPreferences[
-						'ImportApplication'
-					] === 'true',
+				selected: this.exportAssetsData.userPreferences['ImportApplication'] === 'true'
 			},
-			{
-				preference: 'ImportServer',
-				selected:
-					this.exportAssetsData.userPreferences['ImportServer'] ===
-					'true',
-			},
-			{
-				preference: 'ImportDatabase',
-				selected:
-					this.exportAssetsData.userPreferences['ImportDatabase'] ===
-					'true',
-			},
-			{
-				preference: 'ImportStorage',
-				selected:
-					this.exportAssetsData.userPreferences['ImportStorage'] ===
-					'true',
-			},
-			{
-				preference: 'ImportRoom',
-				selected:
-					this.exportAssetsData.userPreferences['ImportRoom'] ===
-					'true',
-			},
-			{
-				preference: 'ImportRack',
-				selected:
-					this.exportAssetsData.userPreferences['ImportRack'] ===
-					'true',
-			},
+			{ preference: 'ImportServer', selected: this.exportAssetsData.userPreferences['ImportServer'] === 'true' },
+			{ preference: 'ImportDatabase', selected: this.exportAssetsData.userPreferences['ImportDatabase'] === 'true' },
+			{ preference: 'ImportStorage', selected: this.exportAssetsData.userPreferences['ImportStorage'] === 'true' },
+			{ preference: 'ImportRoom', selected: this.exportAssetsData.userPreferences['ImportRoom'] === 'true' },
+			{ preference: 'ImportRack', selected: this.exportAssetsData.userPreferences['ImportRack'] === 'true' },
 			{
 				preference: 'ImportDependency',
-				selected:
-					this.exportAssetsData.userPreferences[
-						'ImportDependency'
-					] === 'true',
+				selected: this.exportAssetsData.userPreferences['ImportDependency'] === 'true'
 			},
-			{
-				preference: 'ImportCabling',
-				selected:
-					this.exportAssetsData.userPreferences['ImportCabling'] ===
-					'true',
-			},
-			{
-				preference: 'ImportComment',
-				selected:
-					this.exportAssetsData.userPreferences['ImportComment'] ===
-					'true',
-			},
+			{ preference: 'ImportCabling', selected: this.exportAssetsData.userPreferences['ImportCabling'] === 'true' },
+			{ preference: 'ImportComment', selected: this.exportAssetsData.userPreferences['ImportComment'] === 'true' }
 		];
 	}
 
@@ -151,33 +118,27 @@ export class ExportAssetComponent implements OnInit {
 	exportData(): void {
 		this.progress_value = 0;
 		if (this.selectedBundles.length === 0) {
-			this.errorMessage = this.translatePipe.transform(
-				'ASSET_EXPORT.BUNDLE_ERROR'
-			);
+			this.errorMessage = this.translatePipe.transform('ASSET_EXPORT.BUNDLE_ERROR');
 		} else {
+			this.exportStatus = EXPORT_STATUS.IN_PROGRESS;
 			let data = {
 				projectIdExport: this.userContext.project.id,
 				dataTransferSet: 1,
 				application: 'application',
 				asset: 'asset',
-				exportFormat: 'xlsx',
+				exportFormat: 'xlsx'
 			};
 			this.userPreferences.reduce((map, obj) => {
 				data[obj.preference] = obj.selected;
 				return map;
 			}, {});
-
-			if (
-				this.selectedBundles.find(el => {
-					return el === 'All';
-				})
-			) {
+			if (this.selectedBundles.find(el => {
+				return el === 'All'
+			})) {
 				data['bundle'] = 'All';
-			} else if (
-				this.selectedBundles.find(el => {
-					return el === 'useForPlanning';
-				})
-			) {
+			} else if (this.selectedBundles.find(el => {
+				return el === 'useForPlanning'
+			})) {
 				data['bundle'] = 'useForPlanning';
 			} else {
 				data['bundle'] = this.selectedBundles;
@@ -198,27 +159,26 @@ export class ExportAssetComponent implements OnInit {
 	 * to 100 % ready
 	 */
 	async pollUntilTaskFinished(taskId) {
-		this.exportService.getProgress(taskId).subscribe(
-			progress => {
-				console.log(progress);
-				this.progress_value = progress['percentComp'];
-				this.title = progress['status'];
-				if (this.progress_value < 100) {
-					setTimeout(() => this.pollUntilTaskFinished(taskId), 1000);
-				} else {
-					saveAs(
-						this.exportService.getBundleFile(taskId),
-						progress['data'].header.split('=')[1]
-					);
-					this.opened = false;
-					this.disableGlobalAnimation(false);
-				}
-			},
-			error => {
-				console.log(error);
-				this.disableGlobalAnimation(false);
+		this.exportService.getProgress(taskId).subscribe((progress) => {
+			this.progress_value = progress['percentComp'];
+			// const progressStatus = progress['status'];
+			this.exportStatus = progress['status'];
+			this.title = progress['status'];
+			if (this.exportStatus === EXPORT_STATUS.IN_PROGRESS || this.exportStatus === EXPORT_STATUS.PENDING) {
+				setTimeout(() => this.pollUntilTaskFinished(taskId), 1000);
+			} else if (this.exportStatus === EXPORT_STATUS.COMPLETED) {
+				saveAs(this.exportService.getBundleFile(taskId), progress['data'].header.split('=')[1]);
+				this.progress_value = 100;
+				setTimeout(() => this.onExportClose(), 1000);
+			} else if (this.exportStatus === EXPORT_STATUS.FAILED || this.exportStatus === EXPORT_STATUS.CANCELLED) {
+				this.exportMessage = progress['detail'] || 'Export Failed';
+				console.error(this.exportMessage);
 			}
-		);
+		}, error => {
+			this.exportMessage = error || 'Export Failed';
+			this.exportStatus = EXPORT_STATUS.FAILED;
+			console.error(this.exportMessage);
+		});
 	}
 
 	/**
@@ -229,13 +189,34 @@ export class ExportAssetComponent implements OnInit {
 	}
 
 	/**
+	 * Determines if export dialog can be closed.
+	 */
+	enableClose(): boolean {
+		return this.exportStatus === EXPORT_STATUS.FAILED
+			|| this.exportStatus === EXPORT_STATUS.CANCELLED
+			|| this.exportStatus === EXPORT_STATUS.COMPLETED;
+	}
+
+	/**
+	 * On Export dialog close, clean message, status, progress, etc.
+	 */
+	onExportClose(): void {
+		this.opened = false;
+		this.title = '';
+		this.progress_value = 0;
+		this.exportStatus = null;
+		this.exportMessage = null;
+		this.disableGlobalAnimation(false);
+	}
+
+	/**
 	 * To disable Global animation that is being manually represent by the Progress bar
 	 * @param disabled
 	 */
 	private disableGlobalAnimation(disabled: boolean): void {
 		this.notifierService.broadcast({
 			name: 'notificationDisableProgress',
-			disabled: disabled,
+			disabled: disabled
 		});
 	}
 }

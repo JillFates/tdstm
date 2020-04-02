@@ -1,4 +1,15 @@
 .page-asset-explorer-config
+  .fa-start-o.disabled,
+  .far-start.disabled
+    cursor: not-allowed
+    opacity: 0.5
+    filter: alpha(opacity = 50)
+  #btnCancel
+    margin-left: 15px
+  .view-override-button
+    font-size: 19px
+    margin: 0
+    padding: 2px 0 0 0
   tds-button.btn-success
     background: none
     &:hover
@@ -51,12 +62,16 @@
           .filters-bar
             margin-bottom: 20px
             tds-filter-input
+              display: inline-block
               margin-right: 10px
+              width: 300px
+              position: relative
+              top: 1px
               clr-input-container
                 margin-top: 0
                 display: inline
                 .clr-control-container
-                  width: 25%
+                  width: 100%
                   .clr-input
                     width: 100%
               tds-button[icon="times-circle"]
@@ -101,6 +116,12 @@
     border-top-color: #777 !important
   .disabled a
     color: #777 !important
+  .fa-start-o.disabled,
+  .far-start.disabled
+    cursor: not-allowed
+    opacity: 0.5
+    filter: alpha(opacity = 50)
+
   li.active a
     font-weight: bold
   .drag-icon
@@ -133,3 +154,12 @@
     color: #222
   i.not-freeze-column
     color: #b0b1b5
+
+  #btnCancel
+    margin-left: 15px
+
+  .view-override-button
+    .btn
+      font-size: 15px !important
+      margin-bottom: 0
+      margin-top: 3px

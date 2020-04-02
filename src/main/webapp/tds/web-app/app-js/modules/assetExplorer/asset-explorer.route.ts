@@ -7,6 +7,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
+import {DependencyAnalyzerComponent} from './components/dependency-analyzer/dependency-analyzer.component';
 
 /**
  * Asset Manager Route States
@@ -17,6 +18,9 @@ export class AssetExplorerStates {
 	public static readonly ARCHITECTURE_GRAPH = {
 		url: 'architecture-graph'
 	};
+	public static readonly DEPENDENCY_ANALYZER = {
+		url: 'dependency-analyzer'
+	};
 }
 
 /**
@@ -25,23 +29,37 @@ export class AssetExplorerStates {
  */
 const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
 
-export const AssetExplorerrRoute: Routes = [
+export const AssetExplorerRoute: Routes = [
 	{
 		path: AssetExplorerStates.ARCHITECTURE_GRAPH.url,
 		data: {
 			page: {
-				title: 'Architecture Graph', instruction: '', menu: ['ASSETS.ASSETS', 'Architecture Graph']
+				title: 'ARCHITECTURE.ARCHITECTURE_GRAPH', instruction: '',
+				menu: ['ASSETS.ASSETS', 'ARCHITECTURE.GOJSARCHITECTUREGRAPH'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-architecture-graph-gojs', subMenu: false }
 			}
 		},
 		component: ArchitectureGraphComponent,
+		canActivate: [AuthGuardService, ModuleResolveService]
+	},
+	{
+		path: AssetExplorerStates.DEPENDENCY_ANALYZER.url,
+		data: {
+			page: {
+				title: 'DEPENDENCY_ANALYZER.DEPENDENCY_ANALYZER', instruction: '',
+				menu: ['ASSETS.ASSETS', 'DEPENDENCY_ANALYZER.DEPENDENCY_ANALYZER'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-dependency-analyzer-clr', subMenu: false }
+			}
+		},
+		component: DependencyAnalyzerComponent,
 		canActivate: [AuthGuardService, ModuleResolveService]
 	}
 ];
 
 @NgModule({
 	exports: [RouterModule],
-	imports: [RouterModule.forChild(AssetExplorerrRoute)]
+	imports: [RouterModule.forChild(AssetExplorerRoute)]
 })
 
-export class AssetExplorerrRouteModule {
+export class AssetExplorerRouteModule {
 }

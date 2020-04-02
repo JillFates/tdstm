@@ -1,8 +1,6 @@
 // Clarity Overrides App Wide
 body,
 html {
-	font-family: 'Roboto', 'Metropolis', 'Avenir Next', 'Helvetica Neue', Arial,
-		serif;
 	background: #fff;
 }
 
@@ -20,9 +18,11 @@ a {
 		color: $primary-text-color;
 	}
 }
-
-.modal {
-	display: none;
+tds-ui-dialog,
+tds-ui-prompt {
+  .modal {
+    display: none;
+  }
 }
 .modal-dialog .modal-content {
 	padding: 0;
@@ -206,5 +206,16 @@ table.clarity-table-grid {
       width: 100%;
       overflow: auto;
     }
+  }
+}
+
+// TODO: Remove when dialog migration is done
+// This is caused by overrides in the current app
+tds-dynamic-host {
+  .modal {
+    background: none !important;
+  }
+  div.modal-backdrop {
+    background: black;
   }
 }

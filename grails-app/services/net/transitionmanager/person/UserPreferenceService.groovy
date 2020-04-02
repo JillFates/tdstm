@@ -181,9 +181,8 @@ class UserPreferenceService {
 
 			// If a user is loggedIn try to get the value from the Preferences Storage of the user
 			if (userLogin) {
-				UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
+				userPrefValue = getUserPreference(userLogin, preferenceCode)
 
-				userPrefValue = userPreference?.value
 				if (userPrefValue == null) {
 					userPrefValue = defaultIfNotSet
 				}
@@ -679,12 +678,18 @@ class UserPreferenceService {
 
 	/**
 	 * Used to read the UserPreference setting from the database
+	 *
 	 * @param userLogin - the user to whom to get the preference for
 	 * @param preferenceCode - the code to look for
+	 *
 	 * @return the UserPreference if found otherwise null
 	 */
-	private UserPreference getUserPreference(UserLogin userLogin, String preferenceCode) {
-		UserPreference.get(new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode))
+	@Transactional(readOnly=true)
+	private String getUserPreference(UserLogin userLogin, String preferenceCode) {
+		UserPreference.where {
+		   userLogin == userLogin
+		   preferenceCode == preferenceCode
+		}.projections{ property 'value' }.get()
 	}
 
 	/**

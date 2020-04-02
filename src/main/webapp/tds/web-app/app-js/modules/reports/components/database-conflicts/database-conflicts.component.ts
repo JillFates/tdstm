@@ -1,18 +1,19 @@
-import {
-	Component
-} from '@angular/core';
-
-import {
-	Observable,
-} from 'rxjs';
-
+// Angular
+import {Component, ComponentFactoryResolver} from '@angular/core';
+// Model
+import {EntityConflict} from '../../model/conflicts.model';
+import {DatabaseFiltersModel} from '../../model/database-filters.model';
+// Component
+import {ReportComponent} from '../report.component';
+// Service
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../auth/service/user.service';
-import { EntityConflict } from '../../model/conflicts.model';
-import {ReportComponent} from '../report.component';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DatabaseFiltersModel} from '../../model/database-filters.model';
+// Other
+import {
+	Observable,
+} from 'rxjs';
+import {DialogService} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-database-conflicts',
@@ -51,11 +52,12 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	databaseConflicts: Array<EntityConflict> = [];
 
 	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
 		private preferenceService: PreferenceService,
 		private userService: UserService,
-		protected dialogService: UIDialogService,
+		protected dialogService: DialogService,
 		protected reportsService: ReportsService) {
-			super(reportsService, dialogService);
+			super(componentFactoryResolver, reportsService, dialogService);
 			this.planningBundles =  {id: 'useForPlanning', name: 'Planning Bundles'};
 			this.load();
 	}

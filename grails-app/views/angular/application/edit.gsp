@@ -5,38 +5,10 @@
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
-	 class="tds-modal-content has-side-nav tds-angular-component-content">
-	<div class="modal-header">
-		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCloseEdit()"></tds-button-close>
-
-		<div class="clr-row">
-			<div class="clr-col-12">
-				<%-- TODO: Implement badge with correct color and rounded corners. --%>
-				<div class="modal-title-container">
-					<div class="badge modal-badge" style="">A</div>
-					<h4 class="modal-title">${asset.assetName}</h4>
-					<%-- TODO: Update Subtitle content with field --%>
-					<div class="modal-subtitle">${asset?.moveBundle}</div>
-					<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
-				</div>
-
-				<div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
-					<div *ngIf="readMore">
-						<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
-					</div>
-					<div *ngIf="!readMore" class="readMore">
-						<g:if test="${asset.description?.length() > 80}">
-							<div class="truncated-description">${asset.description.substring(0,80)}...</div>
-							<a (click)="readMore = !readMore">Read More</a>
-						</g:if>
-						<g:else>
-							<div class="truncated-description">${asset.description}</div>
-						</g:else>
-					</div>
-				</div>
-			</div>
-			<div class="clr-col-12">
+<div>
+	<div>
+		<div class="clr-row tab-scroll-container" [ngClass]="{'has-description': ${!!asset.description?.trim()}}">
+			<div class="clr-col-11">
 				<tds-tab-scroller>
 					<tds-scroller-item>
 						<button tdsScrollerLink>Details</button>
@@ -48,7 +20,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal-body asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+	<div class="asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
 		<form
 			name="form"
 			(ngSubmit)="form.form.valid && onUpdate()"
@@ -68,16 +40,21 @@
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
-					<kendo-dropdownlist #controlSme
-							[tabIndex]="8"
-							name="modelAssetSme"
-							[(ngModel)]="persons.sme"
-							(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
-							[defaultItem]="defaultItem"
-							[textField]="'fullName'"
-							[valueField]="'personId'"
-							[data]="getPersonList(${personList as JSON})">
-					</kendo-dropdownlist>
+                <kendo-dropdownlist #controlSME1
+                                    [filterable]="true"
+                                    (filterChange)="filterSME1Change($event)"
+                                    (focus)="focusSME1()"
+                                    (close)="onClose($event, controlSME1)"
+                                    [tabIndex]="11"
+                                    class="tm-input-control person-list"
+                                    name="modelAssetSme"
+                                    [(ngModel)]="persons.sme"
+                                    (valueChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'sme1PersonList', controlSME1)"
+                                    [defaultItem]="defaultItem"
+                                    [textField]="'fullName'"
+                                    [valueField]="'personId'"
+                                    [data]="model.sme1PersonList">
+                </kendo-dropdownlist>
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
@@ -89,16 +66,21 @@
 						<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 						<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap With SME2"></div>
 					</div>
-					<kendo-dropdownlist  #controlSme2
-						[tabIndex]="12"
-						name="modelAssetSme2"
-						[(ngModel)]="persons.sme2"
-						(selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
-						[defaultItem]="defaultItem"
-						[textField]="'fullName'"
-						[valueField]="'personId'"
-						[data]="getPersonList(${personList as JSON})">
-					</kendo-dropdownlist>
+                <kendo-dropdownlist  #controlSME2
+                                     [filterable]="true"
+                                     (filterChange)="filterSME2Change($event)"
+                                     (focus)="focusSME2()"
+                                     (close)="onClose($event, controlSME2)"
+                                     [tabIndex]="12"
+                                     class="tm-input-control person-list"
+                                     name="modelAssetSme2"
+                                     [(ngModel)]="persons.sme2"
+                                     (valueChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'sme2PersonList', controlSME2)"
+                                     [defaultItem]="defaultItem"
+                                     [textField]="'fullName'"
+                                     [valueField]="'personId'"
+                                     [data]="model.sme2PersonList">
+                </kendo-dropdownlist>
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${asset.criticality}" tabindex="13"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
@@ -110,16 +92,21 @@
 						<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 						<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap With App Owner"></div>
 					</div>
-					<kendo-dropdownlist
-							[tabIndex]="16"
-							name="modelAssetappOwner"
-							[(ngModel)]="persons.appOwner"
-							(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
-							[defaultItem]="defaultItem"
-							[textField]="'fullName'"
-							[valueField]="'personId'"
-							[data]="getPersonList(${personList as JSON})">
-					</kendo-dropdownlist>
+                <kendo-dropdownlist #controlAppOwner
+                                    [filterable]="true"
+                                    (filterChange)="filterAppOwnerChange($event)"
+                                    (focus)="focusAppOwner()"
+                                    (close)="onClose($event, controlAppOwner)"
+                                    [tabIndex]="13"
+                                    class="tm-input-control"
+                                    name="modelAssetappOwner"
+                                    [(ngModel)]="persons.appOwner"
+                                    (valueChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON}, 'appOwnerPersonList', controlAppOwner)"
+                                    [defaultItem]="defaultItem"
+                                    [textField]="'fullName'"
+                                    [valueField]="'personId'"
+                                    [data]="model.appOwnerPersonList">
+                </kendo-dropdownlist>
 				</div>
 
 				<div class="clr-form-control">
@@ -200,12 +187,10 @@
 					</tds-combobox-group>
 				</div>
 
-				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
-					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
-							[(ngModel)]="model.asset.shutdownDuration"/>
-					<span>m</span>
-				</div>
+				<tdsAngular:inputLabelAndField
+						field="${standardFieldSpecs.shutdownDuration}"
+						value="${asset.shutdownDuration}"
+						ngmodel="model.asset.shutdownDuration" tabindex="32"/>
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
@@ -235,11 +220,10 @@
 					</tds-combobox-group>
 				</div>
 
-				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"/>
-					<span>m</span>
-				</div>
+				<tdsAngular:inputLabelAndField
+						field="${standardFieldSpecs.testingDuration}"
+						value="${asset.testingDuration}"
+						ngmodel="model.asset.testingDuration" tabindex="36"/>
 
 				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
 			</div>
@@ -247,36 +231,5 @@
 
 			<tds-supports-depends tdsScrollSection (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
 		</form>
-	</div>
-	<div class="modal-sidenav form-group-center">
-		<nav class="modal-sidenav btn-link">
-			<tds-button-edit
-				theme="primary"
-				icon="pencil"
-				class="selected-button">
-			</tds-button-edit>
-			<tds-button-save
-				(click)="submitForm($event)"
-				[disabled]="!(this.isDirty() && this.form.valid)"
-				[permissions]="['${Permission.AssetEdit}']"
-				tooltip="Save"
-				icon="floppy"
-				tabindex="501">
-			</tds-button-save>
-			<tds:hasPermission permission="${Permission.AssetDelete}">
-				<tds-button-delete
-					tooltip="Delete Asset"
-					class="btn-danger"
-					[permissions]="['${Permission.AssetDelete}']"
-					(click)="onDeleteAsset()"
-					tabindex="502">
-				</tds-button-delete>
-			</tds:hasPermission>
-			<tds-button-cancel
-					tooltip="Cancel Edit"
-					tabindex="503"
-					(click)="onCancelEdit()">
-			</tds-button-cancel>
-		</nav>
 	</div>
 </div>

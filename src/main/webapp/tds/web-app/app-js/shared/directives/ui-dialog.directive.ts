@@ -64,10 +64,6 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				this.reject();
 			}
 		});
-		jQuery(this.el.nativeElement).draggable({
-			handle: '.modal-header',
-			containment: 'window'
-		});
 	}
 
 	/**
@@ -130,7 +126,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				'display': 'block',
 				'visibility': 'hidden'
 			}).css({
-				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 0) + 'px',
+				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 30) + 'px',
 				'left': (jQuery(window).width() - modalDialog.width()) / 2
 			}).css({
 				'visibility': 'visible'
@@ -151,10 +147,19 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		jQuery(window).resize(function () {
 			let modalDialogs = jQuery(document).find('.modal-dialog');
 			if (modalDialogs) {
-				for (let m = 0; m <= modalDialogs.length; m++) {
-					jQuery(modalDialogs[m]).css({
-						'left': (jQuery(window).width() - jQuery(modalDialogs[m]).width()) / 2
-					});
+				let valid = true;
+				try {
+					let dynamicContent = jQuery(jQuery(document).find('.modal-dialog').parent()[0])
+					valid = !dynamicContent.hasClass('dynamic-host-component');
+				} catch (e) {
+					//
+				}
+				if (valid) {
+					for (let m = 0; m <= modalDialogs.length; m++) {
+						jQuery(modalDialogs[m]).css({
+							'left': (jQuery(window).width() - jQuery(modalDialogs[m]).width()) / 2
+						});
+					}
 				}
 			}
 		});

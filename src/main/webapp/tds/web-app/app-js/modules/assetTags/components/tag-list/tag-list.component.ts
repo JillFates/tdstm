@@ -1,33 +1,27 @@
 // Angular
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import {Component, ComponentFactoryResolver, HostListener, OnDestroy, OnInit} from '@angular/core';
 // Services
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UserContextService } from '../../../auth/service/user-context.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {TagService} from '../../service/tag.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 // Components
-import { TagMergeDialogComponent } from '../tag-merge/tag-merge-dialog.component';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { HeaderActionButtonData } from 'tds-component-library';
-
+import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
+import {DialogConfirmAction, DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
 // Models
-import { TagModel } from '../../model/tag.model';
-import { TagListColumnsModel } from '../../model/tag-list-columns.model';
-import { ApiResponseModel } from '../../../../shared/model/ApiResponseModel';
-import { Permission } from '../../../../shared/model/permission.model';
-import { UserContextModel } from '../../../auth/model/user-context.model';
+import {TagModel} from '../../model/tag.model';
+import {TagListColumnsModel} from '../../model/tag-list-columns.model';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {Permission} from '../../../../shared/model/permission.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {
-	DIALOG_SIZE,
-	PROMPT_CANCEL,
-	PROMPT_CONFIRM,
 	PROMPT_DEFAULT_TITLE_KEY,
 } from '../../../../shared/model/constants';
 // Others
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
-import { TagService } from '../../service/tag.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { takeUntil } from 'rxjs/operators';
-import { ReplaySubject } from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {ReplaySubject} from 'rxjs';
 
 @Component({
 	selector: 'tag-list',
@@ -51,21 +45,22 @@ export class TagListComponent implements OnInit, OnDestroy {
 	protected showFilters = false;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private tagService: TagService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
-		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private userContext: UserContextService
-	) {}
+	) {
+	}
 
 	ngOnInit(): void {
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
-				icon: 'plus-circle',
+				icon: 'plus',
 				iconClass: 'is-solid',
-				title: this.translatePipe.transform('ASSET_TAGS.CREATE_TAG'),
+				title: this.translatePipe.transform('GLOBAL.CREATE'),
 				disabled: !this.canCreate(),
 				show: true,
 				onClick: this.onAddButton.bind(this),
@@ -98,9 +93,9 @@ export class TagListComponent implements OnInit, OnDestroy {
 					if (result.status === ApiResponseModel.API_SUCCESS) {
 						this.gridSettings = new DataGridOperationsHelper(
 							result.data,
-							[{ dir: 'asc', field: 'name' }], // initial sort config.
-							{ mode: 'single', checkboxOnly: false }, // selectable config.
-							{ useColumn: 'id' }
+							[{dir: 'asc', field: 'name'}], // initial sort config.
+							{mode: 'single', checkboxOnly: false}, // selectable config.
+							{useColumn: 'id'}
 						); // checkbox config.
 					} else {
 						this.handleError(
@@ -117,69 +112,67 @@ export class TagListComponent implements OnInit, OnDestroy {
 	/**
 	 * On Merge button click.
 	 */
-	protected onMerge(dataItem: TagModel): void {
-		this.dialogService
-			.open(
-				TagMergeDialogComponent,
-				[{ provide: TagModel, useValue: dataItem }],
-				DIALOG_SIZE.MD
-			)
-			.then(result => {
-				if (result) {
-					this.reloadTagList();
+	protected onMerge = async (dataItem: TagModel): Promise<void> => {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: TagMergeDialogComponent,
+				data: {
+					tagModel: dataItem,
+				},
+				modalConfiguration: {
+					title: 'Tag Merge',
+					draggable: true,
+					modalSize: ModalSize.MD
 				}
-			})
-			.catch(result => {
-				console.log('Dismissed Dialog');
-			});
+			}).toPromise();
+			await this.reloadTagList();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Handles the Remove action on Remove/Delete button click.
 	 * @param {any} sender
 	 */
-	protected removeHandler({ dataItem }): void {
-		this.promptService
-			.open(
-				this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
-				this.translatePipe.transform(this.REMOVE_CONFIRMATION),
-				this.translatePipe.transform(PROMPT_CONFIRM),
-				this.translatePipe.transform(PROMPT_CANCEL)
-			)
-			.then(
-				result => {
-					if (result) {
-						this.tagService
-							.deleteTag(dataItem.id)
-							.pipe(takeUntil(this.unsubscribeOnDestroy$))
-							.subscribe(
-								(result: ApiResponseModel) => {
-									if (
-										result.status ===
-										ApiResponseModel.API_SUCCESS
-									) {
-										this.reloadTagList();
-									} else {
-										this.handleError(
-											result.errors
-												? result.errors[0]
-												: 'an error ocurred while deleting the tag.'
-										);
-									}
-								},
-								error => this.handleError(error)
-							);
-					}
-				},
-				(reason: any) => console.log('confirm rejected', reason)
-			);
+	protected removeHandler = async (item: any): Promise<void> => {
+		try {
+			const confirmation = await this.dialogService.confirm(this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY), this.translatePipe.transform(this.REMOVE_CONFIRMATION)).toPromise();
+			if (confirmation) {
+				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+					this.tagService
+						.deleteTag(item.dataItem.id)
+						.pipe(takeUntil(this.unsubscribeOnDestroy$))
+						.subscribe(
+							(result: ApiResponseModel) => {
+								if (
+									result.status ===
+									ApiResponseModel.API_SUCCESS
+								) {
+									this.reloadTagList();
+								} else {
+									this.handleError(
+										result.errors
+											? result.errors[0]
+											: 'an error occurred while deleting the tag.'
+									);
+								}
+							},
+							error => this.handleError(error)
+						);
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Handles the Add process.
 	 * @param {any} sender
 	 */
-	protected addHandler({ sender }): void {
+	protected addHandler({sender}): void {
 		this.closeEditor(sender);
 		sender.addRow(new TagModel());
 	}
@@ -190,7 +183,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * @param {any} rowIndex
 	 * @param {any} dataItem
 	 */
-	protected editHandler({ sender, rowIndex, dataItem }): void {
+	protected editHandler({sender, rowIndex, dataItem}): void {
 		// close the previously edited item
 		this.closeEditor(sender);
 
@@ -213,7 +206,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * @param {any} dataItem
 	 * @param {any} isNew
 	 */
-	protected saveHandler({ sender, rowIndex, dataItem, isNew }): void {
+	protected saveHandler({sender, rowIndex, dataItem, isNew}): void {
 		const tagModel: TagModel = dataItem as TagModel;
 		if (isNew) {
 			this.createTag(tagModel, sender, rowIndex);
@@ -227,7 +220,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * @param {any} sender
 	 * @param {any} rowIndex
 	 */
-	protected cancelHandler({ sender, rowIndex }): void {
+	protected cancelHandler({sender, rowIndex}): void {
 		// call the helper method
 		this.closeEditor(sender, rowIndex);
 	}
@@ -371,7 +364,6 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * Clear all filters
 	 */
 	protected clearAllFilters(): void {
-		this.showFilters = false;
 		this.gridSettings.clearAllFilters(this.gridColumns.columns);
 		this.reloadTagList();
 	}
@@ -397,6 +389,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 	protected onAddButton() {
 		document.getElementById('addButton').click();
 	}
+
 	/**
 	 * Returns the number of current filters applied.
 	 */

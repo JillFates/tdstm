@@ -11,6 +11,7 @@ import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
 import {IGraphNode, IGraphTask, IMoveEventTask} from '../model/graph-task.model';
 import {IMoveEvent} from '../model/move-event.model';
+import {DateUtils} from '../../../shared/utils/date.utils';
 import {ITaskHighlightQuery, ITaskHighlightOption} from '../model/task-highlight-filter.model';
 
 export interface IGrapTaskResponseBody {
@@ -185,7 +186,7 @@ export class TaskService {
 		&value=${ searchParams.value || '' }
 		&max=${ searchParams.maxPage }
 		&page=${ searchParams.currentPage }
-		&assetClassOption=${ searchParams.metaParam }`)
+		&assetClassOption=${ searchParams.metaParam && searchParams.metaParam.toUpperCase() }`)
 			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.results,
@@ -430,6 +431,10 @@ export class TaskService {
 				if (!response.rows || response.rows === null) {
 					return {rows: [], totalCount: 0};
 				}
+				response.rows.forEach((row) => {
+					row.dueDate = row.dueDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(row.dueDate), DateUtils.SERVER_FORMAT_DATE) : '';
+				})
 				return response;
 			}),
 			catchError(error => {
@@ -519,7 +524,9 @@ export class TaskService {
 			apiActionCompletedAt: actionBarInfo.apiActionCompletedAt,
 			apiActionInvokedAt: actionBarInfo.apiActionInvokedAt,
 			category: actionBarInfo.category,
-			status: actionBarInfo.status
+			status: actionBarInfo.status,
+			instructionsLinkURL: actionBarInfo.instructionsLinkURL,
+			instructionsLinkLabel: actionBarInfo.instructionsLinkLabel
 		};
 		if (actionBarInfo.invokeActionDetails) {
 			result.invokeButton = { ...actionBarInfo.invokeActionDetails };

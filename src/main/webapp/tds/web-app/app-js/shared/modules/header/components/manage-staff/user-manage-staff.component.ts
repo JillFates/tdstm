@@ -1,18 +1,22 @@
-import {Component, Inject} from '@angular/core';
-
+// Angular
+import {Component, Inject, Input, OnInit} from '@angular/core';
+// Service
 import {HeaderService} from '../../services/header.service';
-import {PersonModel} from '../../../../components/add-person/model/person.model';
-import {UIPromptService} from '../../../../directives/ui-prompt.directive';
-import {UIActiveDialogService, UIExtraDialog} from '../../../../services/ui-dialog.service';
-import {DecoratorOptions} from '../../../../model/ui-modal-decorator.model';
 import {PermissionService} from '../../../../services/permission.service';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
+// Model
+import {PersonModel} from '../../../../components/add-person/model/person.model';
+import {DecoratorOptions} from '../../../../model/ui-modal-decorator.model';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import {Permission} from '../../../../model/permission.model';
 
 @Component({
 	selector: 'user-manage-staff',
 	templateUrl: 'user-manage-staff.component.html'
 })
-export class UserManageStaffComponent extends UIExtraDialog {
+export class UserManageStaffComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
 	public modalOptions: DecoratorOptions;
 	public editing;
 	public currentTab;
@@ -24,17 +28,56 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	public currentImageURL;
 	private teamKeys;
 	private savedPersonModel;
-
+	public personId;
+	public personModel: PersonModel;
 	constructor(
-		public personModel: PersonModel,
 		private headerService: HeaderService,
 		private permissionService: PermissionService,
-		private promptService: UIPromptService,
-		public activeDialog: UIActiveDialogService,
-		private translatePipe: TranslatePipe,
-		@Inject('id') private id) {
-		super('#user-manage-staff-component');
-		this.modalOptions = { isResizable: true, isDraggable: false, isCentered: true };
+		private dialogService: DialogService,
+		private translatePipe: TranslatePipe) {
+		super();
+	}
+
+	ngOnInit(): void {
+		this.personId = this.data.personId;
+		this.personModel = Object.assign({}, this.data.personModel);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => true,
+			disabled: () => !this.canEditPerson,
+			active: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.changeToEdit.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.editing && this.canEditPerson,
+			disabled: () => false,
+			type: DialogButtonType.ACTION,
+			action: this.submitInfo.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => !this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.editing,
+			type: DialogButtonType.ACTION,
+			action: this.cancelEditDialog.bind(this)
+		});
+
+		this.modalOptions = {isResizable: true, isDraggable: false, isCentered: true};
 		this.salaryOptions = ['Contractor', 'Hourly', 'Salary'];
 		this.activeOptions = ['Y', 'N'];
 		this.loadComponentModel();
@@ -43,55 +86,55 @@ export class UserManageStaffComponent extends UIExtraDialog {
 		this.teamKeys = {};
 	}
 
-	// Decide whether or not to launch the confirmation dialogue before closing
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	protected isDirty(): boolean {
+		return JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel);
+	}
+
+	/**
+	 * Close the Dialog but first it verify is not Dirty
+	 */
 	public cancelCloseDialog(): void {
-		if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
-			this.promptService.open(
+		if (this.isDirty()) {
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM')	,
-				this.translatePipe.transform('GLOBAL.CANCEL')	,
-			)
-				.then(confirm => {
-					if (confirm) {
-						this.dismiss();
-					}
-				})
-				.catch((error) => console.log(error));
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM) {
+					this.onCancelClose();
+				}
+			});
 		} else {
-			this.dismiss();
+			this.onCancelClose();
 		}
 	}
 
-	// Decide what to do when the cancel button is clicked
-	public handleCancelButton() {
-		if (this.editing) {
-			if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
-				this.promptService.open(
-					this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-					this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-					this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL'),
-				)
-					.then(confirm => {
-						if (confirm) {
-							this.personModel = Object.assign({}, this.savedPersonModel);
-							this.editing = false;
-						}
-					})
-					.catch((error) => console.log(error));
-			} else {
-				this.personModel = Object.assign({}, this.savedPersonModel);
-				this.editing = false;
-			}
+	/**
+	 * Cancel on Edit
+	 */
+	public cancelEditDialog() {
+		if (this.isDirty()) {
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM ) {
+						this.personModel = Object.assign({}, this.savedPersonModel);
+						this.editing = false;
+					}
+				});
 		} else {
-			this.cancelCloseDialog();
+			this.personModel = Object.assign({}, this.savedPersonModel);
+			this.editing = false;
 		}
 	}
 
 	// Populate the data for the model
 	private loadComponentModel() {
-		this.headerService.fetchModelForStaffViewEdit(this.id).subscribe(
+		this.headerService.fetchModelForStaffViewEdit(this.personId).subscribe(
 			(result: any) => {
 				const defaultPerson = {
 					firstName: '',
@@ -158,36 +201,46 @@ export class UserManageStaffComponent extends UIExtraDialog {
 
 	// Save changes
 	public submitInfo() {
-		if (this.editing) {
-			let data = Object.assign({}, this.personModel);
+		let data = Object.assign({}, this.personModel);
 
-			// Convert travelOK into integer format from boolean
-			data['travelOK'] = data['travelOK'] ? 1 : 0;
-			// Add Id to the model
-			data['id'] = this.id;
-			// Remove info that shouldn't be saved
-			delete data['company'];
+		// Convert travelOK into integer format from boolean
+		data['travelOK'] = data['travelOK'] ? 1 : 0;
+		// Add Id to the model
+		data['id'] = this.personId;
+		// Remove info that shouldn't be saved
+		delete data['company'];
 
-			// Filter out teams with duplicate ids
-			let person = this.personModel;
-			person.teams = person.teams.filter(function(team, index) {
-				return person.teams.map(a => a.id).indexOf(team.id) === index;
+		// Filter out teams with duplicate ids
+		let person = this.personModel;
+		person.teams = person.teams.filter(function(team, index) {
+			return person.teams.map(a => a.id).indexOf(team.id) === index;
+		});
+
+		// Isolate just team codes
+		data['teams'] = this.personModel.teams.map(a => a.id);
+
+		this.headerService.updateAccountAdmin(data).subscribe(
+			(result) => {
+				if (result) {
+					this.savedPersonModel = Object.assign({}, this.personModel);
+					this.editing = false;
+				}
 			});
+	}
 
-			// Isolate just team codes
-			data['teams'] = this.personModel.teams.map(a => a.id);
-
-			this.headerService.updateAccountAdmin(data).subscribe(
-				(result) => {
-					if (result) {
-						this.savedPersonModel = Object.assign({}, this.personModel);
-						this.editing = false;
-					}
-				});
-		} else {
-			if (this.canEditPerson) {
-				this.editing = true;
-			}
+	/**
+	 * Change to Edit mode if the use has the permission
+	 */
+	public changeToEdit(): void {
+		if (this.canEditPerson && !this.editing) {
+			this.editing = true;
 		}
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

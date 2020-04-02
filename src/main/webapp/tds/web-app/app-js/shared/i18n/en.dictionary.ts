@@ -51,11 +51,13 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
 		'CORRUPT': 'Corrupt',
+		'EXPIRED': 'Expired',
 		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
 		'FETCH': 'Fetch',
+		'VIEW_NAME': 'View Name',
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
@@ -64,7 +66,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
 			'CONFIRMATION_TITLE': 'Confirmation Required',
-			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click Confirm to delete otherwise press Cancel'
 		},
 		'SELECT_PLACEHOLDER': 'Select...',
 		'ARTIFACTS': {
@@ -81,7 +83,9 @@ export const en_DICTIONARY: Object = {
 		'TOTAL': 'Total',
 		'TIMEZONE': 'Time Zone Select',
 		'DATE_TIMEZONE': 'Date and Timezone',
-		'DATE_FORMAT': 'Date Format'
+		'DATE_FORMAT': 'Date Format',
+		'LOADING_RECORDS': 'Loading records...',
+		'NO_RECORDS': 'No records found'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -132,12 +136,18 @@ export const en_DICTIONARY: Object = {
 			'FAVORITE': 'Favorite',
 			'NAME': 'Name',
 			'CREATED_BY': 'Created By',
-			'CREATED_ON': 'Created On',
-			'UPDATED_ON': 'Updated On',
+			'CREATED_ON': 'Date Created',
+			'UPDATED_ON': 'Last Updated',
+			'GLOBAL': 'Global',
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
+			'OVERRIDE': 'Override',
 		},
 		'SYSTEM_VIEW': 'System View',
+		'SAVE_LIST_VIEW': 'Save List View',
+		'SAVE_IN_MY_VIEWS': 'Save as My Own View',
+		'OVERRIDE_EXISTING_VIEW_ME': 'Override System View (for Me)',
+		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override System View (for All Users)',
 		'BULK_CHANGE' : {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
@@ -258,7 +268,8 @@ export const en_DICTIONARY: Object = {
 		'LIST': 'Event List',
 		'TITLE_DASHBOARD': 'Event Dashboard',
 		'DASHBOARD': 'Dashboard',
-		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks',
+		'NEWS': 'Event News List'
 	},
 	'INSIGHT': {
 		'INSIGHT': 'Insight',
@@ -269,6 +280,33 @@ export const en_DICTIONARY: Object = {
 		'DEVICES_BY_EVENT': 'Devices By Event',
 		'ASSETS_BY_PROVIDERS_AND_ASSET_TYPE': 'Assets by Providers and Asset Type',
 		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
+	},
+	'ARCHITECTURE': {
+		'ARCHITECTURE_GRAPH': 'GoJS Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'GoJS Architecture Graph',
+		'CONTROL_PANEL': 'Control Panel',
+		'LEGEND': 'Legend',
+		'FULLSCREEN': 'Fullscreen',
+		'NORMAL_SCREEN': 'Normal Screen',
+		'SELECT_AN_ASSET': 'Select an Asset',
+		'FILTER_LABELS': 'Class filter',
+		'TIERS_ABOVE': 'Tiers above',
+		'TIERS_BELOW': 'Tiers below',
+		'SHOW_CYCLICAL_REFERENCE': 'Show Cyclical Reference',
+		'SHOW_LABELS': 'Show Labels: ',
+		'SPACING': 'Spacing',
+		'REGENERATE_GRAPH': 'Regenerate Graph',
+		'SAVE_PREFERENCES': 'Save Preferences',
+		'RESET_DEFAULTS': 'Reset Default',
+		'ASSET_CLASSES': 'Asset Classes: '
+	},
+	'DEPENDENCY_ANALYZER': {
+		'DEPENDENCY_ANALYZER': 'Angular Dependency Analyzer',
+		'DEPENDENCY_GROUPS': 'Dependency Groups',
+		'REGENERATE': 'Regenerate',
+		'BUNDLE': 'Bundle',
+		'TAGS': 'Tags',
+		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
@@ -299,7 +337,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
-		'WARNING_VALIDATION_CHANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
+		'WARNING_VALIDATION_CHANGE': `Changing the validation will have adverse effects if existing data falls outside current values. Press confirm to proceed and change the validation`,
+		'WARNING_VALIDATION_CHANGE_RANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
@@ -506,5 +545,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Applications Grouped by Dependencies',
 		'DEPENDENCIES_BY_VENDOR': 'Dependencies by Vendor',
 		'TOP_TAGS': 'Top Tags'
-	}
+	},
+	'MANUFACTURER': {
+		'LIST': 'Manufacturer List'
+	},
 };

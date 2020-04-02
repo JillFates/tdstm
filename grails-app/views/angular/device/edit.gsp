@@ -7,38 +7,10 @@
 <g:set var="actionLabel" value="${action == 'save' ? 'Save' : 'Update'}" />
 <g:set var="jsAction" value="${action=='save' ? 'saveToShow' : 'performAssetUpdate'}" />
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
-     class="tds-modal-content has-side-nav tds-angular-component-content">
-    <div class="modal-header">
-        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span  aria-hidden="true">×</span></button>
-
-        <div class="clr-row">
-            <div class="clr-col-12">
-                <%-- TODO: Implement badge with correct color and rounded corners. --%>
-                <div class="modal-title-container">
-                    <div class="badge modal-badge" style="">D</div>
-                    <h4 class="modal-title">${asset.assetName}</h4>
-                    <%-- TODO: Update Subtitle content with field --%>
-                    <div class="modal-subtitle">${asset?.moveBundle}</div>
-                    <div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
-                </div>
-
-                <div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
-                    <div *ngIf="readMore">
-                        <p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
-                    </div>
-                    <div *ngIf="!readMore" class="readMore">
-                        <g:if test="${asset.description?.length() > 80}">
-                            <div class="truncated-description">${asset.description.substring(0,80)}...</div>
-                            <a (click)="readMore = !readMore">Read More</a>
-                        </g:if>
-                        <g:else>
-                            <div class="truncated-description">${asset.description}</div>
-                        </g:else>
-                    </div>
-                </div>
-            </div>
-            <div class="clr-col-12">
+<div>
+    <div>
+        <div class="clr-row tab-scroll-container" [ngClass]="{'has-description': ${!!asset.description?.trim()}}">
+            <div class="clr-col-11">
                 <tds-tab-scroller>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Details</button>
@@ -50,7 +22,7 @@
             </div>
         </div>
     </div>
-    <div class="modal-body asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+    <div class="asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
         <form 
             name="form"
             (ngSubmit)="form.form.valid && onUpdate()"
@@ -361,35 +333,4 @@
             <tds-supports-depends tdsScrollSection (initDone)="onInitDependenciesDone($event)" [(model)]="model"  (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
         </form>
     </div>
-    <div class="modal-sidenav form-group-center">
-		<nav class="modal-sidenav btn-link">
-            <tds-button-edit
-				theme="primary" 
-				icon="pencil"
-				class="selected-button">
-			</tds-button-edit>
-			<tds-button-save 
-				(click)="submitForm($event)" 
-				[disabled]="!(this.isDirty() && this.form.valid)"
-				[permissions]="['${Permission.AssetEdit}']" 
-				tooltip="Save Asset" 
-				icon="floppy"
-				tabindex="501">
-			</tds-button-save> 
-			<tds:hasPermission permission="${Permission.AssetDelete}">
-                <tds-button-delete
-                    tooltip="Delete Asset"
-                    class="btn-danger"
-                    [permissions]="['${Permission.AssetDelete}']"
-                    (click)="onDeleteAsset()"
-                    tabindex="502">
-                </tds-button-delete>
-			</tds:hasPermission>
-			<tds-button-cancel
-					tooltip="Cancel Edit"
-					tabindex="503"
-					(click)="onCancelEdit()">
-			</tds-button-cancel>
-		</nav>
-	</div>
 </div>

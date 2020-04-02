@@ -7,7 +7,9 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 180,
 		locked: false,
-		filterable: true
+		filterable: true,
+		cellClass: 'is-grid-link',
+		resizable: true
 	},
 	{
 		label: 'Description',
@@ -15,7 +17,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 240,
 		locked: false,
-		filterable: true
+		filterable: true,
+		resizable: true
 	},
 	{
 		label: 'userSelectedCol0',
@@ -24,7 +27,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true
+		filterable: true,
+		resizable: true
 	},
 	{
 		label: 'userSelectedCol1',
@@ -33,7 +37,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true
+		filterable: true,
+		resizable: true
 	},
 	{
 		label: 'Updated',
@@ -41,15 +46,17 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 120,
 		filterable: false,
-		locked: false
+		locked: false,
+		resizable: true
 	},
 	{
 		label: 'Due Date',
 		property: 'dueDate',
-		type: 'text',
+		type: 'date',
 		width: 180,
 		locked: false,
-		filterable: true
+		filterable: true,
+		resizable: true
 	},
 	{
 		label: 'Status',
@@ -58,7 +65,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		cellClass: 'task-status',
-		filterable: true
+		filterable: true,
+		resizable: true
 	},
 	{
 		label: 'userSelectedCol2',
@@ -76,7 +84,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true
+		filterable: true,
+		resizable: true
 	},
 	{
 		label: 'userSelectedCol4',
@@ -85,20 +94,23 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true
+		filterable: true,
+		resizable: true
 	},
 	{
 		label: 'Suc.',
-		property: 'assetName',
+		property: 'successors',
 		type: 'number',
 		width: 180,
-		locked: false
+		locked: false,
+		resizable: true
 	},
 	{
 		label: 'Score',
 		property: 'score',
 		type: 'number',
 		width: 180,
-		locked: false
+		locked: false,
+		resizable: true
 	},
 ];

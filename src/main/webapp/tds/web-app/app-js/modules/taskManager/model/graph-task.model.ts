@@ -128,5 +128,17 @@ export const enum TASK_TOOLTIP_FIELDS {
 	STATUS = 'Status',
 	ASSIGNED_TO = 'Assigned To',
 	TEAM = 'Team',
-	ASSET = 'Asset'
+	ASSET_CLASS = 'Asset Class',
+	ASSET_NAME = 'Asset Name'
+}
+
+export interface ILinkPath {
+	from: number | string;
+	to: number | string;
+}
+
+export const enum ContainerComp {
+	NEIGHBORHOOD = 'NeighborhoodComponent',
+	ARCHITECTURE_GRAPH = 'ArchitectureGraph',
+	TASK_TIMELINE = 'TaskTimeline'
 }

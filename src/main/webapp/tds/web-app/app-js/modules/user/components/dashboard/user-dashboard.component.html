@@ -1,19 +1,15 @@
 <div class="user-dashboard-component">
 	<form clrForm clrLayout="horizontal" class="project-selection-form">
-		<clr-select-container class="project">
-			<label class="table-title">Project: </label>
-			<select
-				clrSelect
-				class="project-selection"
-				name="selectedProjectID"
-				[(ngModel)]="selectedProjectID"
-				(ngModelChange)="onChangeProject()">
-				<option
-					*ngFor="let project of projectList"
-					[value]="project.id"
-					[attr.selected]="selectedProjectID === project.id">{{ project.name }}</option>
-			</select>
-		</clr-select-container>
+		<label class="table-title">Project: </label>
+		<kendo-dropdownlist
+			class="project-selection"
+			name="selectedProjectID"
+			[data]="projectList"
+			[(ngModel)]="selectedProject"
+			textField="name"
+			valueField="id"
+			(ngModelChange)="onChangeProject($event)">
+		</kendo-dropdownlist>
 	</form>
 
 	<div class="clr-row">
@@ -121,7 +117,7 @@
 						<span *ngIf="column.field == 'event'"
 							><a
 								[href]="
-									'/tdstm/dashboard/index?moveEvent=' +
+									'/tdstm/module/event/dashboard?moveEvent=' +
 									dataItem['eventId']
 								"
 								>{{ dataItem[column.field] }}</a

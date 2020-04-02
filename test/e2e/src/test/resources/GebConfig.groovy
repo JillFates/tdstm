@@ -50,6 +50,7 @@ environments {
 				        options.addArguments("--disable-dev-shm-usage");
 				        options.addArguments("--disable-browser-side-navigation");
 				        options.addArguments("--disable-gpu");
+                        options.addArguments("--window-size=2048,1080");
 
 								options.addArguments("--verbose");
 								options.addArguments("--enable-logging");
@@ -107,7 +108,7 @@ environments {
 // To run the tests with chrome and firefox browsers just run “./gradlew test”
 
 // Set or get the baseUrl of the system to be tested
-baseUrl = System.properties['geb.build.baseUrl'] ?: 'https://tmqa12.transitionmanager.net'
+baseUrl = System.properties['geb.build.baseUrl'] ?: 'https://tmqa11.transitionmanager.net'
 println "geb.build.baseUrl: Testing qa environment ${baseUrl}"
 
 //reportsDir = "target/geb-reports"

@@ -8,7 +8,7 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import spock.lang.Shared
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 /**
  * This spec is to search by QAE2E Field Settings and clean up cases in which more than 2 are being displayed.
@@ -25,7 +25,7 @@ class ApplicationFieldCleanUpSpec extends GebReportingSpec{
     static minNumberOfFieldsPresent = 2
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

@@ -20,6 +20,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.AssetOptionsCommand
@@ -439,7 +440,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		assetCommentsInstance.each {
 			if (viewUnpublished || it.isPublished)
-				assetCommentsList <<[commentInstance: it, assetEntityId: it.assetEntity.id,
+				assetCommentsList <<[commentInstance: it.toMap(), assetEntityId: it.assetEntity.id,
 									 cssClass: it.dueDate < today ? 'Lightpink' : 'White',
 									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
 									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
@@ -450,7 +451,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderAsJson assetCommentsList
 	}
 
-	@HasPermission(Permission.TaskView)
+	/**
+	 * Used to access the content of a comment/task
+	 * @return
+	 */
+	@HasPermission([Permission.CommentView, Permission.TaskView])
 	def showComment() {
 		def commentList = []
 		def personResolvedObj
@@ -496,23 +501,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
 
-			def instructionsLinkURL
-			def instructionsLinkLabel
+			Map instructionsLinkMap = AssetUtils.parseInstructionsLink(assetComment.instructionsLink)
 
-			if (assetComment.instructionsLink) {
-				List<String> instructionsLinkInfo = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)
-				if (instructionsLinkInfo) {
-					if (instructionsLinkInfo.size() > 1) {
-						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
-						instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
-					}
-					else {
-						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
-					}
-				}
-			}
+            String instructionsLinkURL = instructionsLinkMap? instructionsLinkMap.url: null
+			String instructionsLinkLabel = instructionsLinkMap? instructionsLinkMap.label: null
 
-			StringBuilder predecessorTable
+            StringBuilder predecessorTable
 			def predecessorList = []
 			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {
@@ -1445,6 +1439,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 * @return String HTML representing the page
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
+	@Deprecated
 	def retrieveLists() {
 
 		def start = new Date()
@@ -1500,7 +1495,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				WHERE project_id=? AND dependency_bundle in (${nodesQuery.join(',')})
 				ORDER BY dependency_bundle
 			) AS deps
-			LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = deps.asset_id
+			JOIN asset_entity ae ON ae.asset_entity_id = deps.asset_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
 			LEFT OUTER JOIN move_event me ON me.move_event_id = mb.move_event_id
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
@@ -1526,8 +1521,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def asset
 
 		if (params.entity != 'graph') {
-			depMap = moveBundleService.dependencyConsoleMap(project, null, null, null, null,
-				params.dependencyBundle != "null" ? params.dependencyBundle : "all")
+			def dependencyBundle = params.dependencyBundle
+			if( dependencyBundle == null || dependencyBundle == 'null' ) {
+				dependencyBundle = "all"
+			}
+			def moveBundleId = NumberUtils.toLong(params.bundle)
+			List<Long>tagIds = params['tags[]'].collect { it.toLong() }
+			depMap = moveBundleService.dependencyConsoleMap(project, moveBundleId, tagIds,
+					'ANY', '0', dependencyBundle)
 			depMap = depMap.gridStats
 		}
 		else {
@@ -1566,47 +1567,46 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				break
 
 			case "apps" :
-				def applicationList = assetDependentlist.findAll { it.type ==  AssetType.APPLICATION.toString() }
-				def appList = []
-
-				applicationList.each {
-					asset = Application.read(it.assetId)
-
-					appList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle?.toInteger()]
+				String assetClass = AssetClass.APPLICATION.toString()
+				List<Map<String, ?>> appList = assetDependentlist.findResults {
+					if( it.assetClass == assetClass ) {
+						asset = Application.read(it.assetId)
+						[asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle?.toInteger()]
+					}
 				}
 				appList = sortAssetByColumn(appList,sortOn,orderBy)
 				model.appList = appList
-				model.applicationListSize = applicationList.size()
+				model.applicationListSize = appList.size()
 
 				render(template:"appList", model:model)
 				break
 
 			case "server":
-				def assetList = []
-				def assetEntityList = assetDependentlist.findAll { AssetType.allServerTypes.contains(it.type) }
-
-				assetEntityList.each {
-					asset = AssetEntity.read(it.assetId)
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, locRoom:asset.roomSource, depGroup: it.bundle?.toInteger()]
+				String assetClass = AssetClass.DEVICE.toString()
+				List<Map<String, ?>> assetList = assetDependentlist.findResults {
+					if( it.assetClass == assetClass &&
+							AssetType.allServerTypes.contains(it.type) ) {
+						asset = AssetEntity.read(it.assetId)
+						[asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, locRoom: asset.roomSource, depGroup: it.bundle?.toInteger()]
+					}
 				}
 				assetList = sortAssetByColumn(assetList,sortOn,orderBy)
 				model.assetList = assetList
-				model.assetEntityListSize = assetEntityList.size()
+				model.assetEntityListSize = assetList.size()
 				render(template:"assetList", model:model)
 				break
 
 			case "database" :
-				def databaseList = assetDependentlist.findAll{it.type == AssetType.DATABASE.toString() }
-				def dbList = []
-
-				databaseList.each {
-					asset = Database.read(it.assetId)
-
-					dbList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle?.toInteger()]
+				String assetClass = AssetClass.DATABASE.toString()
+				List<Map<String, ?>> dbList = assetDependentlist.findResults {
+					if( it.assetClass == assetClass ) {
+						asset = Database.read(it.assetId)
+						[asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, depGroup: it.bundle?.toInteger()]
+					}
 				}
 				dbList = sortAssetByColumn(dbList,sortOn,orderBy)
 				model.databaseList = dbList
-				model.dbDependentListSize = databaseList.size()
+				model.dbDependentListSize = dbList.size()
 				render(template:'dbList', model:model)
 				break
 
@@ -2861,7 +2861,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		// Check if the parameters are null
 		if ((context.assetId == null || context.assetId == -1) || (context.levelsUp == null || context.levelsDown == null)) {
-			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModel(rootAsset, context.levelsUp, context.levelsDown, context.mode))
+			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModelLegacy(rootAsset, context.levelsUp, context.levelsDown))
 			return
 		}
 

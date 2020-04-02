@@ -36,6 +36,14 @@
 			</div>
 
 			<div class="inline float-right">
+				<tds-button *ngIf="currentOverrideState.icon && collapsed"
+										[type]="'button'"
+										(click)="toggleAssetView()"
+										class="view-override-button"
+										[title]="currentOverrideState.tooltip">
+					<fa-icon [icon]="currentOverrideState.icon">
+					</fa-icon>
+				</tds-button>
 				<!-- Export button -->
 				<tds-button-custom [id]="'btnExport'"
 													 [icon]="'download-cloud'"
@@ -57,7 +65,7 @@
 									class="preview"
 									[disabled]="!isValid()"
 									[ngClass]="{'btn-secondary':!isValid(),'btn-success':isValid()}"
-									(click)="previewButtonClicked = true; onPreview()">
+									(click)="onPreview()">
 				Preview
 			</tds-button>
 			<tds-button-custom [icon]="'angle down'"
@@ -109,11 +117,11 @@
 					<ng-template kendoTabContent>
 						<div class="fields-section">
 							<div class="filters-bar">
-								<tds-filter-input
+								<tds-grid-filter-input
 									[value]="filterModel.search || ''"
 									(filter)="filterModel.search = $event; applyFilters()"
 									placeholder="Filter on field name">
-								</tds-filter-input>
+								</tds-grid-filter-input>
 								<clr-select-container class="inline">
 									<select clrSelect
 													name="selected"
@@ -152,7 +160,7 @@
 														 [(ngModel)]="field.selected">
 											<label style="width:100%;padding-left:25px;"
 														 [ngClass]="field.imp + ' text-delimited'"
-														 [title]="field.label">
+														 [title]="field.tip || field.label">
 												{{ field.label }}
 											</label>
 										</clr-checkbox-wrapper>

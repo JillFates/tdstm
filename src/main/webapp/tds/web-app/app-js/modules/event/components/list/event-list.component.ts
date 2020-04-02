@@ -1,305 +1,288 @@
 // Angular
 import {
 	AfterContentInit,
-	Component,
-	ElementRef,
+	Component, ComponentFactoryResolver, OnDestroy,
 	OnInit,
-	Renderer2,
+	ViewChild
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 // Store
-import { Store } from '@ngxs/store';
+import {Store} from '@ngxs/store';
+import {UserContextState} from '../../../auth/state/user-context.state';
+// Model
+import {EventColumnModel, EventModel} from '../../model/event.model';
+import {
+	ColumnHeaderData, DialogConfirmAction, DialogService,
+	GridComponent,
+	GridModel,
+	GridRowAction,
+	GridSettings,
+	HeaderActionButtonData, ModalSize
+} from 'tds-component-library';
+import {ActionType} from '../../../dataScript/model/data-script.model';
 // Actions
-import { SetEvent } from '../../action/event.actions';
+import {SetEvent} from '../../action/event.actions';
 // Services
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { EventsService } from '../../service/events.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {EventsService} from '../../service/events.service';
 import {
-	PreferenceService,
-	PREFERENCES_LIST,
+	PreferenceService
 } from '../../../../shared/services/preference.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
-import { HeaderActionButtonData } from 'tds-component-library';
-// Models
+import {EventCreateComponent} from '../create/event-create.component';
+import {EventViewEditComponent} from '../view-edit/event-view-edit.component';
+// Other
 import {
-	COLUMN_MIN_WIDTH,
-	ActionType,
-} from '../../../dataScript/model/data-script.model';
-import {
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-	GRID_DEFAULT_PAGE_SIZE,
-} from '../../../../shared/model/constants';
-// Kendo
-import {
-	CompositeFilterDescriptor,
-	State,
-	process,
-} from '@progress/kendo-data-query';
-import {
-	CellClickEvent,
-	GridDataResult,
-	PageChangeEvent,
+	CellClickEvent
 } from '@progress/kendo-angular-grid';
-import { EventColumnModel, EventModel } from '../../model/event.model';
-import { EventCreateComponent } from '../create/event-create.component';
-import { EventViewEditComponent } from '../view-edit/event-view-edit.component';
-
-declare var jQuery: any;
 
 @Component({
 	selector: 'event-list',
 	templateUrl: 'event-list.component.html',
 })
-export class EventListComponent implements OnInit, AfterContentInit {
-	public disableClearFilters: Function;
-	public headerActionButtons: HeaderActionButtonData[];
-	protected gridColumns: any[];
+export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
+	public gridRowActions: GridRowAction[];
 
-	protected state: State = {
-		sort: [
-			{
-				dir: 'asc',
-				field: 'name',
-			},
-		],
-		filter: {
-			filters: [],
-			logic: 'and',
-		},
+	public headerActions: HeaderActionButtonData[];
+
+	public gridSettings: GridSettings = {
+		defaultSort: [{field: 'title', dir: 'asc'}],
+		sortSettings: {mode: 'single'},
+		selectableSettings: {enabled: true, mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
 	};
-	public skip = 0;
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
-	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
-	public eventColumnModel = null;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	public actionType = ActionType;
-	public gridData: GridDataResult;
-	public resultSet: EventModel[];
-	public selectedRows = [];
-	public dateFormat = '';
-	public canEditEvent = false;
-	protected showFilters = false;
-	private dataGridOperationsHelper: DataGridOperationsHelper;
+
+	protected columnModel: ColumnHeaderData[];
+
+	protected gridModel: GridModel;
+	protected dateFormat = '';
+
+	private navigationSubscription;
+	private eventToOpen: string;
+	private eventOpen = false;
+
+	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
 
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
-		private eventsService: EventsService,
-		private prompt: UIPromptService,
-		private route: ActivatedRoute,
-		private elementRef: ElementRef,
-		private renderer: Renderer2,
-		private store: Store,
 		private preferenceService: PreferenceService,
+		private eventsService: EventsService,
+		private eventService: EventsService,
 		private translateService: TranslatePipe,
+		private store: Store,
+		private router: Router,
+		private route: ActivatedRoute
 	) {
-		// use partially datagrid operations helper, for the moment just to know the number of filters selected
-		// in the future this view should be refactored to use the data grid operations helper
-		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
-
-		this.state.take = this.pageSize;
-		this.state.skip = this.skip;
-		this.resultSet = this.route.snapshot.data['events'];
-		this.gridData = process(this.resultSet, this.state);
 	}
 
-	ngOnInit() {
-		this.disableClearFilters = this.onDisableClearFilter.bind(this);
-		this.headerActionButtons = [
+	/**
+	 * Initialize the grid settings.
+	 */
+	async ngOnInit() {
+
+		this.gridRowActions = [
 			{
-				icon: 'plus-circle',
-				iconClass: 'is-solid',
-				title: this.translateService.transform('EVENT.CREATE_EVENT'),
-				disabled: !this.isCreateAvailable(),
+				name: 'Edit',
 				show: true,
-				onClick: this.openEventDialogCreate.bind(this),
+				disabled: !this.isEditAvailable(),
+				onClick: this.onEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onDelete,
 			},
 		];
 
-		this.preferenceService
-			.getPreference(PREFERENCES_LIST.CURR_TZ)
-			.subscribe();
-		this.preferenceService
+		this.headerActions = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateEvent,
+			}];
+
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
+
+		this.dateFormat = await this.preferenceService
 			.getUserDatePreferenceAsKendoFormat()
-			.subscribe(dateFormat => {
-				this.dateFormat = dateFormat;
-				this.eventColumnModel = new EventColumnModel(
-					`{0:${dateFormat}}`
-				);
-				this.gridColumns = this.eventColumnModel.columns.filter(
-					column => column.type !== 'action'
-				);
-			});
-		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
+			.toPromise();
+
+		this.columnModel = new EventColumnModel(
+			this.dateFormat
+		).columns;
+
+		this.gridModel.columnModel = this.columnModel;
 	}
 
 	ngAfterContentInit() {
-		if (this.route.snapshot.queryParams['show']) {
-			let { id, name } = this.resultSet.find((bundle: any) => {
-				return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0)
-			});
-			setTimeout(() => {
-				this.showEvent(id, name);
-			});
+		this.eventToOpen = this.route.snapshot.queryParams['show'];
+		// The following code Listen to any change made on the route to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event && event.state && event.state && event.state.url.indexOf('/event/list') !== -1) {
+				this.eventToOpen = event.state.root.queryParams.show;
+			}
+			if (event instanceof NavigationEnd && this.eventToOpen && this.eventToOpen.length) {
+				setTimeout(() => {
+					if (!this.eventOpen) {
+						this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+					}
+				}, 500);
+			}
+		});
+
+		this.route.queryParams.subscribe(params => {
+			if (this.eventToOpen) {
+				setTimeout(() => {
+					if (!this.eventOpen) {
+						this.openEvent({id: parseInt(this.eventToOpen, 10)}, ActionType.VIEW);
+					}
+				}, 500);
+			}
+		});
+	}
+
+	public async cellClick(event: CellClickEvent): Promise<void> {
+		if (event.columnIndex > 0 && this.isEditAvailable()) {
+			await this.openEvent(event.dataItem, ActionType.VIEW, false);
 		}
 	}
 
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected sortChange(sort): void {
-		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected onFilter(column: any): void {
-		const root = this.eventsService.filterColumn(column, this.state);
-		this.filterChange(root);
-	}
-
-	protected clearValue(column: any): void {
-		this.eventsService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
-	}
+	public loadData = async (): Promise<EventModel[]> => {
+		try {
+			return await this.eventService.getEventsForList().toPromise();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	};
 
 	/**
-	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * On Delete Event
 	 */
-	protected cellClick(event: CellClickEvent): void {
-		this.selectRow(event.dataItem.id);
-	}
-
-	protected reloadData(): void {
-		this.eventsService.getEventsForList().subscribe(
-			result => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid(), 100);
-			},
-			err => console.log(err)
-		);
-	}
-
-	/**
-	 * This work as a temporary fix.
-	 * TODO: talk when Jorge Morayta get's back to do a proper/better fix.
-	 */
-	private forceDisplayLastRowAddedToGrid(): void {
-		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(
-			`tr[data-kendo-grid-item-index="${lastIndex}"]`
-		);
-		if (target) {
-			this.renderer.setStyle(target, 'height', '36px');
+	public onDelete = async (dataItem: EventModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				const confirmation = await this.dialogService.confirm(
+					'Confirmation Required',
+					'WARNING: Are you sure you want to delete this event?'
+				).toPromise();
+				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+					this.eventsService.deleteEvent(dataItem.id).toPromise();
+					await this.gridComponent.reloadData();
+					setTimeout(() => {
+						// If the Delete Item is the one selected, remove it from the Storage
+						const event = this.store.selectSnapshot(UserContextState.getUserEvent);
+						if (event.id === dataItem.id) {
+							this.store.dispatch(new SetEvent(null));
+						}
+					});
+				}
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
-	protected openEventDialogCreate(): void {
-		this.dialogService
-			.open(EventCreateComponent, [])
-			.then(result => {
-				// update the list to reflect changes, it keeps the filter
-				this.reloadData();
-			})
-			.catch(result => {
-				console.log('Dismissed Dialog');
-			});
-	}
-
-	protected selectRow(dataItemId: number): void {
-		this.selectedRows = [];
-		this.selectedRows.push(dataItemId);
-	}
+	public onCreateEvent = async (): Promise<void> => {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: EventCreateComponent,
+				data: {},
+				modalConfiguration: {
+					title: 'Event Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
+		}
+	};
 
 	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
+	 * Select the current element and open the Edit Dialog
+	 * @param dataItem
 	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
+	private onEdit = async (dataItem: EventModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				await this.openEvent(dataItem, ActionType.EDIT, true);
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	public async openEvent(event: any, actionType: ActionType, openFromList = false): Promise<void> {
+		try {
+			if (event.name) {
+				this.store.dispatch(new SetEvent({id: event.id, name: event.name}));
+			}
+			this.eventOpen = true;
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: EventViewEditComponent,
+				data: {
+					eventId: event.id,
+					actionType: actionType,
+					openFromList: openFromList
+				},
+				modalConfiguration: {
+					title: 'Event',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+			this.eventOpen = false;
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			if (error) {
+				console.error(error);
+			}
 		}
 	}
 
 	/**
-	 * Open and show the selected Event
-	 * Also it set into the local the new value
-	 * @param id
+	 * Determine if the user has the permission to edit events
 	 */
-	protected showEvent(id, name): void {
-		this.store.dispatch(new SetEvent({ id: id, name: name }));
-		this.dialogService
-			.open(EventViewEditComponent, [{ provide: 'id', useValue: id }])
-			.then(result => {
-				this.reloadData();
-			})
-			.catch(result => {
-				this.reloadData();
-			});
+	protected isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.EventEdit);
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
-	 */
-	public pageChange(event: any): void {
-		this.skip = event.skip;
-		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
-		this.gridData = process(this.resultSet, this.state);
-		// Adjusting the locked column(s) height to prevent cut-off issues.
-		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-	}
-
-	/**
-	 * Set on/off the filter icon indicator
-	 */
-	protected toggleFilter(): void {
-		this.showFilters = !this.showFilters;
-	}
-
-	/**
-	 * Returns the number of distinct currently selected filters
-	 */
-	protected filterCount(): number {
-		return this.dataGridOperationsHelper.getFilterCounter(this.state);
-	}
-
-	/**
-	 * Determines if there is almost 1 filter selected
-	 */
-	protected hasFilterApplied(): boolean {
-		return this.state.filter.filters.length > 0;
-	}
-	/**
-	 * Clear all filters
-	 */
-	protected clearAllFilters(): void {
-		this.showFilters = false;
-		this.dataGridOperationsHelper.clearAllFilters(this.eventColumnModel.columns, this.state);
-		this.reloadData();
-	}
-
-	/**
-	 * Disable clear filters
-	 */
-	private onDisableClearFilter(): boolean {
-		return this.filterCount() === 0;
-	}
-
-	/**
-	 * Determines if user has the permission to create projects
+	 * Determine if the user has the permission to create events
 	 */
 	protected isCreateAvailable(): boolean {
-		return this.permissionService.hasPermission(Permission.ProjectCreate);
+		return this.permissionService.hasPermission(Permission.EventCreate);
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 }

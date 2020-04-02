@@ -92,20 +92,13 @@
           (nodeClicked)="onNeighborhood($event)"
           (backToFullGraph)="viewFullGraphFromCache()"
           (diagramAnimationFinished)="onDiagramAnimationFinished()"
+          (nodeMoveDiagramAnimationFinished)="onNodeMoveDiagramAnimationFinished()"
           (ctxMenuActionDispatched)="onActionDispatched($event)"
           (nodeUpdated)="updateGraphCache($event)"
           (diagramClicked)="diagramClicked()"
+          (initialAnimationStarting)="showLoader()"
           #graph
     ></tds-lib-diagram-layout>
-<!--    <tds-diagram-layout-->
-<!--		[nodeData]="nodeData$ | async"-->
-<!--    [currentUser]="currentUser$ | async"-->
-<!--    [contextMenuOptions]="ctxMenuOpts$ | async"-->
-<!--    (nodeClicked)="onNeighborhood($event)"-->
-<!--    (backTofullGraph)="viewFullGraphFromCache()"-->
-<!--    (nodeUpdated)="updateGraphCache($event)"-->
-<!--    (diagramClicked)="diagramClicked()"-->
-<!--    #graph></tds-diagram-layout>-->
   </div>
 
 </div>

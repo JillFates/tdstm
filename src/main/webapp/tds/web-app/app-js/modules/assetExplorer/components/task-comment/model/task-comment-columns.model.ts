@@ -41,7 +41,7 @@ export class TaskColumnsModel {
 			},
 			{
 				label: 'Assigned To',
-				property: 'assignedTo',
+				property: 'commentInstance.assignedTo',
 				type: 'text',
 				width: 105
 			}

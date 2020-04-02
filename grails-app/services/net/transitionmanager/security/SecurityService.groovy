@@ -35,6 +35,7 @@ import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ProjectRequiredException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.PartyRelationship
@@ -240,7 +241,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Project project = getUserCurrentProject()
 
 		if(project == null){
-			throw new EmptyResultException('No project selected')
+			throw new ProjectRequiredException('No project selected')
 		}
 
 		return project
@@ -307,7 +308,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		Person person = userLogin ? userLogin.person : getUserLoginPerson()
 		List<Long> projectIds = []
 		Boolean showAllProjPerm = hasPermission(Permission.ProjectShowAll)
-		Boolean hasAccessToDefaultProject = securityService.hasPermission(person, Permission.ProjectManageDefaults)
+		Boolean hasAccessToDefaultProject = hasPermission(person, Permission.ProjectManageDefaults)
 
 		if (showAllProjPerm) {
 			// Find all the projects that are available for the user's company as client or as partner or owner
@@ -532,13 +533,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			} else {
 
 				// See if the user account is properly configured to a state that they're allowed to change their password
-				securityService.validateAllowedToChangePassword(userLogin)
+				validateAllowedToChangePassword(userLogin)
 
 
 				//
 				// Made it throught the guantlet of password requirements so lets update the password
 				//
-				securityService.setUserLoginPassword(userLogin, command.password, command.confirmPassword)
+				setUserLoginPassword(userLogin, command.password, command.confirmPassword)
 
 				if (!userLogin.save(failOnError: false)) {
 					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"
@@ -573,7 +574,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	@Transactional
 	void unlockAccount(UserLogin account) {
 		requirePermission Permission.UserUnlock
-
+		account.failedLoginAttempts = 0
 		account.lockedOutUntil = null
 		account.lastLogin = TimeUtil.nowGMT()
 		auditService.saveUserAudit UserAuditBuilder.userAccountWasUnlockedBy(getCurrentUsername(), account)
@@ -1474,6 +1475,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 	}
 
+
 	/**
 	 * Overload of hasPermission (userLogin, permission, reportViolation) that is used to determine if a the currently logged in user has a particular permission
 	 * @param A permission tag name
@@ -1507,6 +1509,47 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			reportViolation("attempted action requiring unallowed permission $permission", principal.username)
 		}
 		return false
+	}
+
+	/**
+	 * Used to validate if the current user does NOT have a given permission
+	 * @parameter permission - the permission to check for
+	 * @return true if the user does NOT has the specified permission
+	 */
+	Boolean notPermitted(String permission) {
+		! hasPermission(permission)
+	}
+
+	/**
+	 * Used to validate if the current user has any of a list of permissions
+	 * @parameter permissions - the list of permissions to check for
+	 * @return true if the user has any of the specified permission
+	 */
+	Boolean hasAnyPermission(List<String> permissions) {
+		Boolean permitted = false
+		for (String perm in permissions) {
+			permitted = hasPermission(perm)
+			if (permitted) {
+				break
+			}
+		}
+		return permitted
+	}
+
+	/**
+	 * Used to validate if the current user has ALL of the permissions provided in the list
+	 * @parameter permissions - the list of permissions to check for
+	 * @return true if the user has ALL of the specified permission
+	 */
+	Boolean hasAllPermission(List<String> permissions) {
+		Boolean permitted = true
+		for (String perm in permissions) {
+			if (! hasPermission(perm)) {
+				permitted = false
+				break
+			}
+		}
+		return permitted
 	}
 
 	/**

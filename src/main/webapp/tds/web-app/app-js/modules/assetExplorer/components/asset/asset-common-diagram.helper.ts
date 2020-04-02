@@ -1,5 +1,5 @@
 import {
-	Binding, GraphObject,
+	Binding, GraphObject, LayeredDigraphLayout,
 	Layout,
 	Link,
 	Margin,
@@ -39,11 +39,15 @@ export class AssetCommonDiagramHelper {
 				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
 				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
 			linkTemplate: this.linkTemplate(),
-			lowScaleTemplate: this.lowScaleNodeTemplate(),
-			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
+			lowScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.lowScaleNodeTemplate(),
+			mediumScaleTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
 			rootNode: params.rootNode,
-			// extras: params.extras && params.extras
+			extras: params.extras
 		};
 	}
 
@@ -168,8 +172,7 @@ export class AssetCommonDiagramHelper {
 
 	linkTemplate(): Link {
 		const linkTemplate = new Link();
-		linkTemplate.routing = Link.AvoidsNodes;
-		linkTemplate.corner = 5;
+		linkTemplate.layerName = 'Background';
 
 		const linkShape = new Shape();
 		linkShape.strokeWidth = 2;
@@ -186,10 +189,10 @@ export class AssetCommonDiagramHelper {
 	}
 
 	layout(): Layout {
-		const treeLayout = new TreeLayout();
-		treeLayout.angle = 90;
-		treeLayout.layerSpacing = 35;
-		return treeLayout;
+		const diagraph = new LayeredDigraphLayout();
+		diagraph.direction = 90;
+		diagraph.layerSpacing = 100;
+		return diagraph;
 	}
 
 	lowScaleNodeTemplate(): Node {
