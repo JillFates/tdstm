@@ -74,7 +74,7 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 		let today = new Date();
 		this.projectModel = new ProjectModel();
 		this.defaultModel = {
-			clientId: 0,
+			clientId: null,
 			projectName: '',
 			description: '',
 			startDate: new Date(),
