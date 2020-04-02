@@ -236,8 +236,6 @@ class ApiActionService implements ServiceMethods {
 					invocationParams.assetFacade,
 					invocationParams.apiActionJob
 			)
-
-			invocationParams.assetFacade.setReadonly(!readOnly)
 		}
 
 		return invocationResults
