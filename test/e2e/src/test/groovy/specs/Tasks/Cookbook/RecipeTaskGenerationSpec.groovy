@@ -73,7 +73,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         /* EDIT Recipe */
         openEditTab()
         at TabEditorPage
-        clickOnEditButton()
+        waitFor {clickOnEditButton()}
         at EditRecipePage
         browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeText+'"');
         waitFor {editorModalCloseBtn.click()}
@@ -94,6 +94,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         given: 'The User is in the Cookbook Section'
             at CookbookPage
         when: 'The User clicks the Recipe with Task on It'
+             scrollUp()
             waitFor{getRecipeByName(recipeName).click()}
         then: 'Information should be populated'
             waitFor{getRecipeByName(recipeName) != null}

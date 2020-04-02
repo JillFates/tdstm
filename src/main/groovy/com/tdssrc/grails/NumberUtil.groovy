@@ -411,12 +411,31 @@ class NumberUtil {
 
 	/**
 	 * Calculate the percentage 'value' is of 'total'.
+	 * If 99 < value < 100  ==> percentage = 99
+	 * If 0 < value < 1	==> percentage = 1
+	 *
 	 * @param total - the total that represents 100%
 	 * @param value - a given proportion
 	 * @param defaultIfZero - a default value to use, should the total be 0.
 	 * @return
 	 */
 	static int percentage(Long total, Long value, int defaultIfZero = 0) {
-		return total ? Math.round((value /  total) * 100) : defaultIfZero
+		int percentage
+		if (total > 0) {
+			// Calculate the percentage with the correct handling.
+			percentage = Math.round((value /  total) * 100)
+
+			// Prevent values very close to 0% to be converted to 0%. Making them 1 instead.
+			if (percentage == 0 && value > 0) {
+				percentage = 1
+			// Prevent values very close to 100% to be converted to 100%. Making them 99 instead.
+			} else if (percentage == 100 && total > value){
+				percentage = 99
+			}
+		} else {
+			percentage = defaultIfZero
+		}
+
+		return percentage
 	}
 }

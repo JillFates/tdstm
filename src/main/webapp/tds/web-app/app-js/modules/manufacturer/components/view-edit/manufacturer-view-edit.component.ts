@@ -246,6 +246,9 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 	 */
 	protected changeToEditProvider(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.alias = (this.manufacturerModel.alias !== '') ? this.manufacturerModel.alias.split(',') : [];
+		this.aliasPristineList = (this.manufacturerModel.aliases) ? this.manufacturerModel.aliases : [];
+		this.aliasControls = (this.manufacturerModel.aliases) ? this.manufacturerModel.aliases : [];
 		this.setTitle(this.getModalTitle(this.modalType));
 	}
 

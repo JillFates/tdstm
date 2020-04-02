@@ -10,7 +10,7 @@ import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 import {ProjectModel} from '../model/project.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 import {Store} from '@ngxs/store';
-import {SetProject} from '../actions/project.actions';
+import { SetDefaultProject, SetProject } from '../actions/project.actions';
 
 @Injectable()
 export class ProjectService {
@@ -22,6 +22,18 @@ export class ProjectService {
 		private preferenceService: PreferenceService,
 		private store: Store) {
 		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
+	}
+
+	getDefaultProject(): Observable<any> {
+		return this.http.get(`../ws/project/default`)
+			.map((response: any) => {
+				this.store.dispatch(new SetDefaultProject(response.data));
+				return response.data;
+			})
+			.catch((error: any) => {
+				this.store.dispatch(new SetDefaultProject(null));
+				return error
+			});
 	}
 
 	/**

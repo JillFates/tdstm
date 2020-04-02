@@ -12,6 +12,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -3223,5 +3224,4 @@ class AssetEntityService implements ServiceMethods {
 			totalFiles: totalFiles
 		]
 	}
-
 }

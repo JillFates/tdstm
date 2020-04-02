@@ -147,10 +147,10 @@ class Project extends PartyGroup {
 	Map toMap() {
 		ProjectLogo logo = ProjectLogo.findByProject(this)
 		Map projectLogoMap = null
-		if(logo) {
+		if (logo) {
 			projectLogoMap = [
-			    id: logo.id,
-				name: logo.name,
+				id          : logo.id,
+				name        : logo.name,
 				partnerImage: logo.partnerImage
 			]
 		}

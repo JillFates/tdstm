@@ -23,7 +23,7 @@ class WsMoveBundleController implements ControllerMethods {
 	@HasPermission(Permission.BundleCreate)
 	def modelForCreate() {
 		Project project = getProjectForWs()
-		renderSuccessJson([ projectInstance: project, rooms: Room.findAllByProject(project)
+		renderSuccessJson([ projectInstance: project.toMap(), rooms: Room.findAllByProject(project)*.toMap()
 		])
 	}
 
@@ -36,9 +36,9 @@ class WsMoveBundleController implements ControllerMethods {
 	def modelForEdit(Long moveBundleId) {
 		Project project = getProjectForWs()
 		renderSuccessJson([
-			moveBundleInstance: fetchDomain(MoveBundle, [id: moveBundleId], project),
+			moveBundleInstance: fetchDomain(MoveBundle, [id: moveBundleId], project).toMap(),
 			projectId: project.id,
-			rooms: Room.findAllByProject(project)
+			rooms: Room.findAllByProject(project)*.toMap()
 		])
 	}
 
