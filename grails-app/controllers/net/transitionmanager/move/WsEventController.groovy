@@ -80,13 +80,6 @@ class WsEventController implements ControllerMethods {
 			// Fail if the move event doesn't exist or it doesn't belong to the user's current project.
 			moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
 			userPreferenceService.setPreference(UserPreferenceEnum.MOVE_EVENT, moveEventId)
-			Long moveBundleId = NumberUtil.toLong(userPreferenceService.moveBundleId)
-			if (moveBundleId) {
-				MoveBundle moveBundle = fetchDomain(MoveBundle, [id: moveBundleId], project)
-				if (moveBundle?.moveEvent?.id != moveEventId) {
-					userPreferenceService.removePreference(UserPreferenceEnum.CURR_BUNDLE)
-				}
-			}
 		} else {
 			moveEventId =  NumberUtil.toLong(userPreferenceService.getPreference(UserPreferenceEnum.MOVE_EVENT))
 			moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
