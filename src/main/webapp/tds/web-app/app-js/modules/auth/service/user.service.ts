@@ -13,9 +13,7 @@ export class UserService {
 	private userUrl = '../ws/user';
 	private licenseUrl = '../ws';
 
-	constructor(private http: HttpClient, private projectService: ProjectService) {
-		this.projectService.getDefaultProject().subscribe();
-	}
+	constructor(private http: HttpClient) {	}
 
 	getUserContext(): Observable<any> {
 		return this.http.get(`${this.userUrl}/context`)
