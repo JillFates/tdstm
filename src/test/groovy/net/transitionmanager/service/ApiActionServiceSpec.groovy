@@ -1,23 +1,22 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import net.transitionmanager.action.ApiActionService
-import net.transitionmanager.common.MessageSourceService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.person.Person
+import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
 import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ReactionHttpStatus
 import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.person.Person
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import net.transitionmanager.task.TaskService
 import org.springframework.context.i18n.LocaleContextHolder
@@ -245,10 +244,10 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			)
 
 		then: 'An error message is added in notes'
-		with (taskService){
-			1 * setTaskStatus(task, 'Hold', whom)
-			1 * addNote(task, whom, 'STATUS script failure: Script must return SUCCESS or ERROR')
-		}
+			with(taskService) {
+				1 * setTaskStatus(task, 'Hold', whom)
+				1 * addNote(task, whom, 'STATUS script failure: Script must return SUCCESS or ERROR')
+			}
 	}
 
 	void 'test can throw an Exception with i18n message if a reaction STATUS script does not return a ReactionScriptCode'() {
