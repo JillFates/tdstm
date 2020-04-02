@@ -1,4 +1,5 @@
 import {GridColumnModel} from '../../../model/data-list-grid.model';
+import {RecordState} from '../../../utils/data-grid-operations.helper';
 
 /**
  * Defines the columns.
@@ -64,4 +65,5 @@ export class DependencySupportModel {
 	public assetDepend: any;
 	public dependencyType: string;
 	public comment: string;
+	public recordState: RecordState;
 }

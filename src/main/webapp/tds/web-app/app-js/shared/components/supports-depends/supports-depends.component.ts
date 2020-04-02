@@ -3,7 +3,7 @@
  * So this is not in the Asset Explorer Module and belongs here instead.
  */
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
+import {DataGridOperationsHelper, RecordState} from '../../utils/data-grid-operations.helper';
 import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
 import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
@@ -22,6 +22,10 @@ declare var jQuery: any;
         <kendo-grid
                 *ngIf="dataGridSupportsOnHelper"
                 class="dependents-grid"
+                [pageSize]="dataGridSupportsOnHelper.state.take"
+                [skip]="dataGridSupportsOnHelper.state.skip"
+                [pageable]="{pageSizes: dataGridSupportsOnHelper.defaultPageOptions, info: true}"
+                (pageChange)="dataGridSupportsOnHelper.pageChange($event)"
                 [data]="dataGridSupportsOnHelper.gridData"
                 [sort]="dataGridSupportsOnHelper.state.sort"
 								[sortable]="false"
@@ -78,6 +82,7 @@ declare var jQuery: any;
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
                             [(ngModel)]="dataItem.dataFlowFreq"
+                            (valueChange)="updateRecordState(dataItem)"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
@@ -109,6 +114,7 @@ declare var jQuery: any;
                                         [data]="moveBundleList"
                                         [textField]="'text'"
                                         [valueField]="'id'"
+                                        (valueChange)="this.updateRecordState(dataItem)"
                                         [(ngModel)]="dataItem.assetDepend.moveBundle"
                                         [ngClass]="getMoveBundleColor(dataItem)"
                                         (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
@@ -120,6 +126,7 @@ declare var jQuery: any;
                     <kendo-dropdownlist
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="typeList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.type"
                             required>
                     </kendo-dropdownlist>
@@ -129,6 +136,7 @@ declare var jQuery: any;
                     <kendo-dropdownlist
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="statusList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.status"
                             required>
                     </kendo-dropdownlist>
@@ -141,6 +149,10 @@ declare var jQuery: any;
                 *ngIf="dataGridDependsOnHelper"
                 class="dependents-grid is-dependent-on"
                 [data]="dataGridDependsOnHelper.gridData"
+                [pageSize]="dataGridDependsOnHelper.state.take"
+                [skip]="dataGridDependsOnHelper.state.skip"
+                [pageable]="{pageSizes: dataGridDependsOnHelper.defaultPageOptions, info: true}"
+                (pageChange)="dataGridDependsOnHelper.pageChange($event)"
                 [sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridDependsOnHelper.sortChange($event)">
@@ -194,6 +206,7 @@ declare var jQuery: any;
                     <kendo-dropdownlist
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.dataFlowFreq"
                             required>
                     </kendo-dropdownlist>
@@ -226,6 +239,7 @@ declare var jQuery: any;
                                         [data]="moveBundleList"
                                         [textField]="'text'"
                                         [valueField]="'id'"
+                                        (valueChange)="this.updateRecordState(dataItem)"
                                         [(ngModel)]="dataItem.assetDepend.moveBundle"
                                         [ngClass]="getMoveBundleColor(dataItem)"
                                         (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
@@ -237,6 +251,7 @@ declare var jQuery: any;
                     <kendo-dropdownlist
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="typeList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.type"
                             required>
                     </kendo-dropdownlist>
@@ -246,6 +261,7 @@ declare var jQuery: any;
                     <kendo-dropdownlist
                             name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                             [data]="statusList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.status"
                             required>
                     </kendo-dropdownlist>
@@ -331,6 +347,7 @@ export class SupportsDependsComponent implements OnInit {
 					let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
 					let dependencySupportModel: DependencySupportModel = {
 						id: dependency.id,
+						recordState: RecordState.pristine,
 						dataFlowFreq: dependency.dataFlowFreq,
 						assetClass: assetClass,
 						assetDepend: {
@@ -346,8 +363,16 @@ export class SupportsDependsComponent implements OnInit {
 					dependencies.push(dependencySupportModel);
 				});
 			}
-			observer.next(new DataGridOperationsHelper(dependencies, null, null, null, 2000));
+			observer.next(new DataGridOperationsHelper(dependencies,
+				[{ dir: 'asc', field: 'name'}],
+				{ mode: 'single', checkboxOnly: false},
+				{ useColumn: 'id' },
+				50));
 		});
+	}
+
+	public updateRecordState(dataItem: DependencySupportModel): void {
+		dataItem.recordState = RecordState.updated;
 	}
 
 	/**
@@ -360,6 +385,7 @@ export class SupportsDependsComponent implements OnInit {
 		}
 		let dependencySupportModel: DependencySupportModel = {
 			id: 0,
+			recordState: RecordState.created,
 			dataFlowFreq: this.dataFlowFreqList[0],
 			assetClass: this.dependencyClassList[0],
 			assetDepend: {
@@ -390,6 +416,7 @@ export class SupportsDependsComponent implements OnInit {
 			text: '',
 			moveBundle: dataItem.assetDepend.moveBundle
 		};
+		this.updateRecordState(dataItem);
 		this.onChangeInternalModel();
 	}
 
@@ -398,6 +425,8 @@ export class SupportsDependsComponent implements OnInit {
 	 * @param {DependencySupportModel} dataItem
 	 */
 	public onDependencyChange(dependency: any, dataItem: DependencySupportModel): void {
+		this.updateRecordState(dataItem);
+
 		if (dependency) {
 			let changeParams = {
 				assetId: dependency.id,

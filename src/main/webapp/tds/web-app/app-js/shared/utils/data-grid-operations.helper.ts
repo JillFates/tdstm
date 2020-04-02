@@ -13,6 +13,12 @@ import { NotifierService } from '../services/notifier.service';
 
 declare var jQuery: any;
 
+export enum RecordState {
+	pristine,
+	updated,
+	created
+}
+
 export class DataGridOperationsHelper {
 	public gridData: GridDataResult = {
 		data: [],
