@@ -35,7 +35,6 @@ import net.transitionmanager.task.TaskService
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
-import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -209,6 +208,7 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties
 	 */
+	@Deprecated
 	def dependencyConsoleMap(
 		Project project,
 		Long moveBundleId,
@@ -389,6 +389,7 @@ class MoveBundleService implements ServiceMethods {
 	 *
 	 * @return A string that contains the dependency console query for counts, or tags.
 	 */
+	@Deprecated
 	String dependencyConsoleQuery(Project project, List<Long> tagIds, dependencyBundle, boolean includeTags = false) {
 		String physicalTypes = AssetType.physicalServerTypesAsString
 		String virtualTypes = AssetType.virtualServerTypesAsString
