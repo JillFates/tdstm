@@ -9,6 +9,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 // Other
 import * as R from 'ramda';
+import { SortUtils } from '../../../../shared/utils/sort.utils';
 
 @Component({
 	selector: 'tag-merge-dialog',
@@ -64,7 +65,10 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 				defaultEmptyItem.name = this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER');
 				this.mergeToTag = defaultEmptyItem;
 				this.tagList.push(defaultEmptyItem);
-				this.tagList.push(...result.data.filter(item => item.id !== this.tagModel.id));
+				this.tagList.push(...result.data
+					.filter(item => item.id !== this.tagModel.id)
+					.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'))
+				);
 				this.dataSignature = JSON.stringify(this.mergeToTag);
 			} else {
 				this.handleError(result.errors ? result.errors[0] : 'an error ocurred while loading the tag list.');
