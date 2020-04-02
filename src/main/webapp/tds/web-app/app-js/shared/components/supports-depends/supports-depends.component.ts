@@ -79,7 +79,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
                             [(ngModel)]="dataItem.dataFlowFreq"
                             (valueChange)="updateRecordState(dataItem)"
@@ -89,7 +89,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="dependencyClassList"
                             [textField]="'text'"
                             [valueField]="'id'"
@@ -110,7 +110,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                                        class="form-control" style="width: 100%;"
                                         [data]="moveBundleList"
                                         [textField]="'text'"
                                         [valueField]="'id'"
@@ -124,7 +124,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="typeList"
                             (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.type"
@@ -134,7 +134,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="statusList"
                             (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.status"
@@ -204,7 +204,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
                             (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.dataFlowFreq"
@@ -214,7 +214,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							class="form-control" style="width: 100%;"
                             [data]="dependencyClassList"
                             [textField]="'text'"
                             [valueField]="'id'"
@@ -235,7 +235,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                                        class="form-control" style="width: 100%;"
                                         [data]="moveBundleList"
                                         [textField]="'text'"
                                         [valueField]="'id'"
@@ -249,7 +249,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="typeList"
                             (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.type"
@@ -259,7 +259,7 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="statusList"
                             (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.status"
@@ -367,7 +367,7 @@ export class SupportsDependsComponent implements OnInit {
 				[{ dir: 'asc', field: 'name'}],
 				{ mode: 'single', checkboxOnly: false},
 				{ useColumn: 'id' },
-				50));
+				25));
 		});
 	}
 
