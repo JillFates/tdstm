@@ -12,6 +12,7 @@ import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.DependencyConsoleService
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
@@ -26,6 +27,7 @@ class WsDependencyConsoleController implements ControllerMethods, PaginationMeth
 	UserPreferenceService    userPreferenceService
 	LicenseAdminService      licenseAdminService
 	MoveBundleService        moveBundleService
+	DependencyConsoleService dependencyConsoleService
 
 
 /**
@@ -60,20 +62,18 @@ class WsDependencyConsoleController implements ControllerMethods, PaginationMeth
 			console.assignedGroup ?: userPreferenceService.getPreference(UserPreferenceEnum.ASSIGNED_GROUP) ?: "1"
 		)
 
-		Map map = moveBundleService.dependencyConsoleMap(
+		Map map = dependencyConsoleService.dependencyConsoleMap(
 			project,
 			console.bundle,
 			console.tagIds,
 			console.tagMatch,
 			console.assignedGroup,
 			null,
-			false,
 			console.subsection,
 			console.groupId,
 			console.assetName
 		)
 
-		//log.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		render view: '/common/mapAsJson', model: [data: map]
 	}
 
@@ -97,14 +97,13 @@ class WsDependencyConsoleController implements ControllerMethods, PaginationMeth
 			console.assignedGroup ?: userPreferenceService.getPreference(UserPreferenceEnum.ASSIGNED_GROUP) ?: "1"
 		)
 
-		Map model = moveBundleService.dependencyConsoleMap(
+		Map model = dependencyConsoleService.dependencyConsoleMap(
 			project,
 			console.bundle,
 			console.tagIds,
 			console.tagMatch,
 			console.assignedGroup,
 			null,
-			false,
 			console.subsection,
 			console.groupId,
 			console.assetName
