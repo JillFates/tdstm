@@ -530,7 +530,7 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		}
 
-		dataGrid.removeDataItem(dataItem);
+		dataGrid.removeResultSetItem(dataItem);
 		this.onChangeInternalModel();
 	}
 

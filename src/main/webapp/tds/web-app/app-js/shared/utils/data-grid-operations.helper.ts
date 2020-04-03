@@ -375,12 +375,24 @@ export class DataGridOperationsHelper {
 	 */
 	public addResultSetItem(item: any): void {
 		this.addDataItem(item);
-		console.log(this.gridData);
 
 		if (this.state.skip > this.resultSet.length) {
 			this.resultSet.push(item);
 		} else {
 			this.resultSet.splice(this.state.skip, 0, item);
+		}
+	}
+
+	/**
+	 * Remove one element from to the whole result set item
+	 * @param item
+	 */
+	public removeResultSetItem(item: any): void {
+		let index = this.resultSet.indexOf(item);
+
+		if (index >= 0) {
+			this.resultSet.splice(index, 1);
+			this.reloadData(this.resultSet);
 		}
 	}
 
