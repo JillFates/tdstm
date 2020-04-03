@@ -27,3 +27,12 @@ export class DependencyAnalyzerDataModel {
 	tagsIds: [];
 	tagMatch: string;
 }
+
+export class DependencyBundleModel {
+	appCount: number;
+	serverCount: number;
+	vmCount: number;
+	dbCount: number;
+	storageCount: number;
+	statusClass: string;
+}

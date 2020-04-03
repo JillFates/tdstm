@@ -60,52 +60,53 @@
 	</div>
 	<kendo-grid
 		#dependencyAnalizerGrid="kendoGrid"
-		[data]="gridStats">
+		[data]="finalData">
 
-		<kendo-grid-column field="field" title="Group">
-			<ng-template
-				kendoGridHeaderTemplate
-				let-column
-				let-columnIndex="columnIndex"
-			>
-			<span class="column">
-				Group
-			</span>
-			</ng-template>
-		</kendo-grid-column>
-		<kendo-grid-column field="field" title="All">
-			<ng-template
-				kendoGridHeaderTemplate
-				let-column
-				let-columnIndex="columnIndex"
-			>
-			<span class="column">
-				All
-			</span>
-			</ng-template>
-		</kendo-grid-column>
-		<kendo-grid-column field="field" title="Remnants">
-			<ng-template
-				kendoGridHeaderTemplate
-				let-column
-				let-columnIndex="columnIndex"
-			>
-			<span class="column">
-				Remnants
-			</span>
-			</ng-template>
-		</kendo-grid-column>
-		<kendo-grid-column field="field" title="Grouped">
-			<ng-template
-				kendoGridHeaderTemplate
-				let-column
-				let-columnIndex="columnIndex"
-			>
-			<span class="column">
-				Grouped
-			</span>
-			</ng-template>
-		</kendo-grid-column>
+<!--		<kendo-grid-column field="field" title="Group">-->
+<!--			<ng-template-->
+<!--				kendoGridHeaderTemplate-->
+<!--				let-column-->
+<!--				let-columnIndex="columnIndex"-->
+<!--			>-->
+<!--			<span class="column">-->
+<!--				Group-->
+<!--			</span>-->
+<!--			</ng-template>-->
+<!--		</kendo-grid-column>-->
+<!--		<kendo-grid-column field="field" title="All">-->
+<!--			<ng-template-->
+<!--				kendoGridHeaderTemplate-->
+<!--				let-column-->
+<!--				let-columnIndex="columnIndex"-->
+<!--			>-->
+<!--			<span class="column">-->
+<!--				All-->
+<!--			</span>-->
+<!--			</ng-template>-->
+<!--		</kendo-grid-column>-->
+<!--		<kendo-grid-column field="field" title="Remnants">-->
+<!--			<ng-template-->
+<!--				kendoGridHeaderTemplate-->
+<!--				let-column-->
+<!--				let-columnIndex="columnIndex"-->
+<!--			>-->
+<!--			<span class="column">-->
+<!--				Remnants-->
+<!--			</span>-->
+<!--			</ng-template>-->
+<!--		</kendo-grid-column>-->
+<!--		<kendo-grid-column field="field" title="Grouped">-->
+<!--			<ng-template-->
+<!--				kendoGridHeaderTemplate-->
+<!--				let-column-->
+<!--				let-columnIndex="columnIndex"-->
+<!--			>-->
+<!--			<span class="column">-->
+<!--				Grouped-->
+<!--			</span>-->
+<!--			</ng-template>-->
+<!--		</kendo-grid-column>-->
+<!--		<kendo-grid-column *ngFor="let col of dependencyConsoleList" [title]="col.dependencyBundle" [width]="50">-->
+<!--		</kendo-grid-column>-->
 	</kendo-grid>
-
 </div>
