@@ -316,14 +316,14 @@ class NumberUtil {
 	}
 
 	/**
-	* Receive a list of  numbers and converts them to longs. Then it returns the list of long values.
+	* Receive a list of string numbers and converts them to longs. Then it returns the list of long values.
 	* If any value on the list is not positive, it will be just ignored and not returned/converted.
-	* @param values    The list of values to be converted
+	* @param stringsList    The list of strings to be converted
 	* @return   The resulting list of converted long values
 	*/
-	static List<Long> toPositiveLongList(List values) {
+	static List<Long> toPositiveLongList(List<String> stringsList) {
 		List<Long> longsList = []
-		values.each { v ->
+		stringsList.each { v ->
 			Long id = toPositiveLong(v, null)
 			if (id != null) {
 			longsList << id
