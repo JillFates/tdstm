@@ -124,7 +124,7 @@ declare var jQuery: any;
                     </tds-combobox>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundleName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist #dropdownFooter
                                         class="form-control" style="width: 100%;"
                                         [data]="moveBundleList"
@@ -264,7 +264,7 @@ declare var jQuery: any;
                     </tds-combobox>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundleName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist #dropdownFooter
                                         class="form-control" style="width: 100%;"
                                         [data]="moveBundleList"
@@ -388,6 +388,9 @@ export class SupportsDependsComponent implements OnInit {
 							text: dependency.asset.name,
 							moveBundle: R.clone(dependency.asset.moveBundle)
 						},
+						assetName: dependency.asset.name,
+						assetClassName: assetClass.text,
+						moveBundleName: dependency.asset.moveBundle.name,
 						type: dependency.type,
 						status: dependency.status,
 						dependencyType: dependencyType,

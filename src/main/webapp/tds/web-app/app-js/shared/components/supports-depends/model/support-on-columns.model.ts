@@ -24,7 +24,7 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Class',
-				property: 'assetClass',
+				property: 'assetClassName',
 				type: 'text',
 				width: 120
 			},
@@ -36,7 +36,7 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Bundle',
-				property: 'moveBundle',
+				property: 'moveBundleName',
 				type: 'text',
 				width: 195
 			},
@@ -62,6 +62,9 @@ export class DependencySupportModel {
 	public type: string;
 	public status: string;
 	public assetClass: any;
+	public assetName?: string;
+	public assetClassName?: string;
+	public moveBundleName?: string;
 	public assetDepend: any;
 	public dependencyType: string;
 	public comment: string;
