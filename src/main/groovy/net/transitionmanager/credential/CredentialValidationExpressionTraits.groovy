@@ -1,8 +1,6 @@
 package net.transitionmanager.credential
 
-import com.tdssrc.grails.HtmlUtil
 import net.transitionmanager.exception.InvalidSyntaxException
-import org.apache.commons.lang.StringEscapeUtils
 
 /**
  * Contains the follow on methods that used by each of the DSL methods
