@@ -25,6 +25,7 @@ declare var jQuery: any;
                 [pageSize]="dataGridSupportsOnHelper.state.take"
                 [skip]="dataGridSupportsOnHelper.state.skip"
                 [pageable]="{pageSizes: dataGridSupportsOnHelper.defaultPageOptions, info: true}"
+                [filterable]="true"
                 (pageChange)="dataGridSupportsOnHelper.pageChange($event)"
                 [data]="dataGridSupportsOnHelper.gridData"
                 [sort]="dataGridSupportsOnHelper.state.sort"
@@ -53,6 +54,21 @@ declare var jQuery: any;
                                [style]="column.cellStyle ? column.cellStyle : ''"
                                [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 
+                <!-- Default Generic Filter Template -->
+                <ng-template kendoGridFilterCellTemplate let-filter>
+                    <div class="has-feedback" style="margin-bottom:0px;">
+                        <div *ngIf="column.property !== 'action'">
+                            <input type="text" (keyup)="dataGridSupportsOnHelper.onFilter(column)" class="form-control"
+                                   name="{{column.property}}" [(ngModel)]="column.filter"
+                                   placeholder="Filter {{column.label}}" value="">
+                            <span *ngIf="column.filter" (click)="dataGridSupportsOnHelper.clearValue(column)"
+                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </ng-template>	            
+	            
+	            
                 <!-- Header Template -->
                 <ng-template kendoGridHeaderTemplate>
                     <label>{{column.label}}</label>
@@ -149,6 +165,7 @@ declare var jQuery: any;
                 *ngIf="dataGridDependsOnHelper"
                 class="dependents-grid is-dependent-on"
                 [data]="dataGridDependsOnHelper.gridData"
+                [filterable]="true"
                 [pageSize]="dataGridDependsOnHelper.state.take"
                 [skip]="dataGridDependsOnHelper.state.skip"
                 [pageable]="{pageSizes: dataGridDependsOnHelper.defaultPageOptions, info: true}"
@@ -170,7 +187,7 @@ declare var jQuery: any;
             </ng-template>
 
             <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
+            <kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
                                field="{{column.property}}"
                                [headerClass]="column.headerClass ? column.headerClass : ''"
                                [headerStyle]="column.headerStyle ? column.headerStyle : ''"
@@ -181,6 +198,20 @@ declare var jQuery: any;
                 <!-- Header Template -->
                 <ng-template kendoGridHeaderTemplate>
                     <label>{{column.label}}</label>
+                </ng-template>
+
+                <!-- Default Generic Filter Template -->
+                <ng-template kendoGridFilterCellTemplate let-filter>
+                    <div class="has-feedback" style="margin-bottom:0px;">
+                        <div *ngIf="column.property !== 'action'">
+                            <input type="text" (keyup)="dataGridDependsOnHelper.onFilter(column)" class="form-control"
+                                   name="{{column.property}}" [(ngModel)]="column.filter"
+                                   placeholder="Filter {{column.label}}" value="">
+                            <span *ngIf="column.filter" (click)="dataGridDependsOnHelper.clearValue(column)"
+                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
                 </ng-template>
 
                 <!-- Action -->
@@ -279,6 +310,7 @@ export class SupportsDependsComponent implements OnInit {
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 	@Output('initDone')  initDone: EventEmitter<any> = new EventEmitter();
 	private supportOnColumnModel: SupportOnColumnsModel;
+	private dependentOnColumnModel: SupportOnColumnsModel;
 	private dataFlowFreqList = [];
 	private dependencyClassList = [];
 	private typeList = [];
@@ -340,6 +372,7 @@ export class SupportsDependsComponent implements OnInit {
 	private getDependencyList(dependencyMap: string, dependencyType): Observable<DataGridOperationsHelper> {
 		return new Observable(observer => {
 			this.supportOnColumnModel = new SupportOnColumnsModel();
+			this.dependentOnColumnModel = new SupportOnColumnsModel();
 			let dependencies = [];
 			if (this.model.dependencyMap && this.model.dependencyMap[dependencyMap]) {
 				let assets = R.clone(this.model.dependencyMap[dependencyMap]);

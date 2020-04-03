@@ -369,7 +369,6 @@ export class DataGridOperationsHelper {
 		return this.state.take;
 	}
 
-
 	/**
 	 * Add one element to the list
 	 * @param item
