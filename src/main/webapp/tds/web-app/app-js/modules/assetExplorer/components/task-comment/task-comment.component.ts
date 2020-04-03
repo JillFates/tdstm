@@ -86,8 +86,8 @@ export class TaskCommentComponent implements OnInit {
 		this.taskService.searchComments(this.id, '')
 			.subscribe((res) => {
 				this.taskCommentsList = res;
-				this.dataGridTaskHelper = new DataGridOperationsHelper(this.getTaskWithFilter(), null, null, null, 2000);
-				this.dataGridCommentHelper = new DataGridOperationsHelper(this.getCommentsWithFilter(), null, null, null, 2000);
+				this.dataGridTaskHelper = new DataGridOperationsHelper(this.getTaskWithFilter(), null, null);
+				this.dataGridCommentHelper = new DataGridOperationsHelper(this.getCommentsWithFilter(), null, null);
 			}, (err) => console.log(err));
 	}
 

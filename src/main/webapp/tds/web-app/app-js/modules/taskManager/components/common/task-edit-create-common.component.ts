@@ -168,9 +168,9 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 				this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
 			});
 
-		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null, null, 2000);
-		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null, null, 2000);
-		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null, null, 2000);
+		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
+		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
+		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
