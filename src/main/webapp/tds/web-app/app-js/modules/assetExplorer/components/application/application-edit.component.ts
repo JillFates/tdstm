@@ -20,6 +20,8 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
+declare var jQuery: any;
+
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
 		selector: 'tds-application-edit',
@@ -155,7 +157,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 */
 		public focusSME1(): void {
 			setTimeout( () => {
-				this.controlSME1.toggle(true);
+				if (!this.controlSME1.isOpen) {
+					jQuery('.controlSME1 .k-dropdown-wrap').click();
+				}
 				this.controlSME2.toggle(false);
 				this.controlAppOwner.toggle(false);
 			});
@@ -177,7 +181,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		public focusSME2(): void {
 			setTimeout( () => {
 				this.controlSME1.toggle(false);
-				this.controlSME2.toggle(true);
+				if (!this.controlSME2.isOpen) {
+					jQuery('.controlSME2 .k-dropdown-wrap').click();
+				}
 				this.controlAppOwner.toggle(false);
 			});
 		}
@@ -199,7 +205,9 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			setTimeout( () => {
 				this.controlSME1.toggle(false);
 				this.controlSME2.toggle(false);
-				this.controlAppOwner.toggle(true);
+				if (!this.controlAppOwner.isOpen) {
+					jQuery('.controlAppOwner .k-dropdown-wrap').click();
+				}
 			});
 		}
 

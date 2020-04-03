@@ -66,9 +66,9 @@ declare var jQuery: any;
                                   class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
-                </ng-template>	            
-	            
-	            
+                </ng-template>
+
+
                 <!-- Header Template -->
                 <ng-template kendoGridHeaderTemplate>
                     <label>{{column.label}}</label>
