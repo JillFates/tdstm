@@ -269,7 +269,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void deleteDependencies(AssetEntity assetEntity) {
-		List<Long> dependenciesToDelete = command.dependencyMap.deleteDependencies
+		List<Long> dependenciesToDelete = NumberUtil.toPositiveLongList(command.dependencyMap.deleteDependencies)
 		if (dependenciesToDelete) {
 			// Delete all the requested dependencies.
 			deleteDependencies(dependenciesToDelete, assetEntity)
@@ -324,6 +324,7 @@ abstract class AssetSaveUpdateStrategy {
 	private void deleteDependencies(List<Long> ids, AssetEntity assetEntity) {
 		/* Delete dependencies. As an extra precaution, the query doesn't simply delete dependencies
 		* given their id, but also takes the asset being edited into account.*/
+		String side = isDependent ? 'dependent' : 'asset'
 		String hql = "DELETE FROM AssetDependency ad WHERE (asset = :asset OR dependent = :dependent)"
 		Map params = [asset: assetEntity, dependent: assetEntity]
 		// Add the NOT IN condition only if the dependents list is not empty
