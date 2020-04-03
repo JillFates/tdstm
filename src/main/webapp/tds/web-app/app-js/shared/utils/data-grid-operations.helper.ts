@@ -10,6 +10,7 @@ import {
 import { GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS } from '../model/constants';
 import { DateUtils } from './date.utils';
 import { NotifierService } from '../services/notifier.service';
+import {DependencySupportModel} from '../components/supports-depends/model/support-on-columns.model';
 
 declare var jQuery: any;
 
@@ -366,5 +367,40 @@ export class DataGridOperationsHelper {
 	 */
 	public getPageSize(): number {
 		return this.state.take;
+	}
+
+	/**
+	 * Add one element to the list
+	 * @param item
+	 */
+	public addResultSetItem(item: any): void {
+		this.addDataItem(item);
+		console.log(this.gridData);
+
+		if (this.state.skip > this.resultSet.length) {
+			this.resultSet.push(item);
+		} else {
+			this.resultSet.splice(this.state.skip, 0, item);
+		}
+	}
+
+	/**
+	 * Get just the created or updated records
+	 */
+	public getCreatedUpdatedRecords(): DependencySupportModel[] {
+		const result = this.resultSet
+			.filter((dependency: DependencySupportModel) => {
+				return dependency.recordState === RecordState.updated ||
+					dependency.recordState === RecordState.created;
+			})
+			.map((dependency: DependencySupportModel) => {
+				const item = {...dependency} ;
+				delete item['recordState'];
+				return item;
+			});
+
+		console.log(result);
+
+		return result;
 	}
 }
