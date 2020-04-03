@@ -372,13 +372,19 @@ export class SupportsDependsComponent implements OnInit {
 	}
 
 	public updateRecordState(dataItem: DependencySupportModel): void {
-		dataItem.recordState = RecordState.updated;
+		if (dataItem.recordState === RecordState.pristine) {
+			dataItem.recordState = RecordState.updated;
+		}
+		// this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
+		this.onChangeInternalModel();
 	}
 
 	/**
 	 * Add a new Dependency
 	 */
 	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
+		// this.dataGridSupportsOnHelper.getCreatedUpdatedRecords();
+
 		let unknownIndex = this.statusList.indexOf('Unknown');
 		if (unknownIndex === -1) {
 			unknownIndex = 0
@@ -402,8 +408,10 @@ export class SupportsDependsComponent implements OnInit {
 			comment: ''
 		};
 
-		dataGrid.addDataItem(dependencySupportModel);
+		// dataGrid.addDataItem(dependencySupportModel);
+		dataGrid.addResultSetItem(dependencySupportModel);
 		this.onChangeInternalModel();
+		this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
 	}
 
 	/**
@@ -417,7 +425,6 @@ export class SupportsDependsComponent implements OnInit {
 			moveBundle: dataItem.assetDepend.moveBundle
 		};
 		this.updateRecordState(dataItem);
-		this.onChangeInternalModel();
 	}
 
 	/**
@@ -553,8 +560,12 @@ export class SupportsDependsComponent implements OnInit {
 		});
 
 		if (validForm) {
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.getCreatedUpdatedRecords();
+			// this.dataGridSupportsOnHelper.gridData.data;
+
+			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
+			// this.dataGridDependsOnHelper.gridData.data;
+
 			this.model.dependencyMap.dependentsToDelete = this.dependentsToDelete;
 			this.model.dependencyMap.supportsToDelete = this.supportsToDelete;
 		}
