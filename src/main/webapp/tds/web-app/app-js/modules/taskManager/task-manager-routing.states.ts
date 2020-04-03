@@ -50,7 +50,7 @@ export const TaskManagerRoute: Routes = [
 		path: TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url,
 		data: {
 			page: {
-				title: 'GO JS Task Graph',
+				title: 'GoJS Task Graph',
 				titleColor: '#3c8dbc',
 				titleFontWeight: 'bold',
 				instruction: '',

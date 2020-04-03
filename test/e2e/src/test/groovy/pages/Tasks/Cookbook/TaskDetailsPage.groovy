@@ -9,9 +9,8 @@ class TaskDetailsPage extends Page {
     static at = {
         taskDetailsModalWindow.isDisplayed()
         taskDetailsModalEditBtn //TODO check if enabled
-        taskDetailsModalEditBtn.text() == "Edit"
         taskDetailsModalDeleteBtn //TODO check if enabled
-        taskDetailsModalDeleteBtn.text() == "Delete"
+        
     }
 
     static content = {

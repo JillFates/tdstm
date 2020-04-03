@@ -103,6 +103,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/assetForDependencyGroup" {
+			controller = "wsAsset"
+			action = [
+			        GET: "getAssetForDependencyGroup"
+			]
+		}
+
 		"/ws/apiAction/$id" {
 			controller = "wsApiAction"
 			action = [
@@ -622,6 +629,16 @@ class UrlMappings {
 			controller = "wsTimeLine"
 			action = [GET:"timeline"]
 		}
+
+		"/ws/taskGraph/taskHighlightOptions" {
+			controller = "wsTaskGraph"
+			action = [GET: "taskHighlightOptions"]
+		}
+
+		"/ws/taskGraph/taskSearch" {
+			controller = "wsTaskGraph"
+			action = [GET: "taskSearch"]
+		}
 		
 		/*"/ws/timeline/$id/updateStatus" {
 			controller = "wsTask"
@@ -819,6 +836,13 @@ class UrlMappings {
 			controller = "wsProject"
 			action = [
 					DELETE: "deleteProject"
+			]
+		}
+
+		"/ws/project/default" {
+			controller = "wsProject"
+			action = [
+					GET: "defaultProject"
 			]
 		}
 
@@ -1182,6 +1206,13 @@ class UrlMappings {
 					POST: "createDataview",
 					PUT: "updateDataview",
 					DELETE: "deleteDataview"
+			]
+		}
+
+		"/ws/assetExplorer/saveOptions/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "saveOptions"
 			]
 		}
 

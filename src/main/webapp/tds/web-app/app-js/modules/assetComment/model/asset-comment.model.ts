@@ -38,6 +38,7 @@ export class AssetCommentColumnModel {
 				label: 'Asset',
 				property: 'assetName',
 				filterType: FilterType.text,
+				class: 'column-cursor-pointer',
 				width: 170
 			},
 			{
@@ -59,7 +60,7 @@ export class AssetCommentColumnModel {
 				width: 170
 			},
 			{
-				label: 'Created',
+				label: 'Date Created',
 				property: 'dateCreated',
 				filterType: FilterType.date,
 				format: dateFormat,
@@ -72,7 +73,7 @@ export class AssetCommentColumnModel {
 				width: 170
 			},
 			{
-				label: 'Updated',
+				label: 'Last Updated',
 				property: 'lastUpdated',
 				filterType: FilterType.date,
 				format: dateFormat,

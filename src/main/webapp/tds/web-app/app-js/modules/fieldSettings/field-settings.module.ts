@@ -24,9 +24,10 @@ import { FieldTypeSelectorComponent } from './components/field-type-selector/fie
 import { ModuleResolveService } from '../../shared/resolves/module.resolve.service';
 import { FieldsResolveService } from './resolve/fields-resolve.service';
 // Services
-import { FieldSettingsService } from './service/field-settings.service';
-import { CustomDomainService } from './service/custom-domain.service';
-import { FieldConverterService } from './service/field-converter.service';
+import {PreventUrlChangeService} from './service/prevent-url-change.service';
+import {FieldSettingsService} from './service/field-settings.service';
+import {CustomDomainService} from './service/custom-domain.service';
+import {FieldConverterService} from './service/field-converter.service';
 import {ProjectService} from '../project/service/project.service';
 import { TabStripModule } from '@progress/kendo-angular-layout';
 
@@ -59,6 +60,7 @@ import { TabStripModule } from '@progress/kendo-angular-layout';
 		// Resolve
 		FieldsResolveService,
 		// Services
+		PreventUrlChangeService,
 		ModuleResolveService,
 		FieldSettingsService,
 		CustomDomainService,

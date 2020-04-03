@@ -178,7 +178,7 @@ export class TaskService {
 		&value=${ searchParams.value || '' }
 		&max=${ searchParams.maxPage }
 		&page=${ searchParams.currentPage }
-		&assetClassOption=${ searchParams.metaParam }`)
+		&assetClassOption=${ searchParams.metaParam && searchParams.metaParam.toUpperCase() }`)
 			.map((response: any) => {
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.results,
@@ -516,7 +516,9 @@ export class TaskService {
 			apiActionCompletedAt: actionBarInfo.apiActionCompletedAt,
 			apiActionInvokedAt: actionBarInfo.apiActionInvokedAt,
 			category: actionBarInfo.category,
-			status: actionBarInfo.status
+			status: actionBarInfo.status,
+			instructionsLinkURL: actionBarInfo.instructionsLinkURL,
+			instructionsLinkLabel: actionBarInfo.instructionsLinkLabel
 		};
 		if (actionBarInfo.invokeActionDetails) {
 			result.invokeButton = { ...actionBarInfo.invokeActionDetails };

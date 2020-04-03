@@ -237,14 +237,14 @@ class HtmlUtil {
 			// If input has a valid URL
 			if(isMarkupURL(input)){
 				def tokens = input.tokenize('|')
-				def urlTokenPosition = 1
+				int urlTokenPosition = 1
 				if(tokens.size() > 1){
-					label = tokens[0]
+					label = tokens[0].trim()
 				}else{
 					urlTokenPosition = 0
 					label = defaultLabel
 				}
-				result = [label, tokens[urlTokenPosition]]
+				result = [label, tokens[urlTokenPosition].trim()]
 			}
 
 		}

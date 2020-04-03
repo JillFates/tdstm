@@ -1,0 +1,26 @@
+import net.transitionmanager.command.dataview.DataviewSchemaCommand
+import net.transitionmanager.command.dataview.DataviewSchemaColumnCommand
+
+model {
+    DataviewSchemaCommand result
+}
+
+json {
+    domains result.domains
+    sort {
+        domain result.sort.domain
+        order result.sort.order
+        property result.sort.property
+    }
+    columns(result.columns) { DataviewSchemaColumnCommand column ->
+        filter column.filter
+        edit column.edit
+        domain column.domain
+        property column.property
+        label column.label
+        locked column.locked
+        width column.width
+    }
+}
+
+

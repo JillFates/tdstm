@@ -218,7 +218,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 					assetClass: assetClass
 				},
 				modalConfiguration: {
-					title: 'Asset',
+					title: '&nbsp;',
 					draggable: true,
 					modalSize: ModalSize.CUSTOM,
 					modalCustomClass: 'custom-asset-modal-dialog'
@@ -324,7 +324,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			this.translatePipe.transform(
 				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
 			),
-			'You are about to delete the selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+			'You are about to delete the selected asset for which there is no undo. Are you sure? Click Confirm to delete otherwise press Cancel'
 		)
 			.subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {

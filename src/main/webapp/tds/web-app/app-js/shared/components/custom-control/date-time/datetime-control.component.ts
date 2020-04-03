@@ -52,7 +52,8 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * output: yyyy-MM-ddThh:mm:ssZ
  */
 export class TDSDateTimeControlComponent extends TDSCustomControl implements OnInit, OnChanges {
-	private readonly KENDO_DATETIME_DISPLAY_FORMAT = 'yyyy-MM-dd HH:mm:ss';
+	private readonly KENDO_DATETIME_DISPLAY_FORMAT_MMDD = 'yyyy-MM-dd HH:mm:ss';
+	private readonly KENDO_DATETIME_DISPLAY_FORMAT_DDMM = 'yyyy-dd-MM HH:mm:ss';
 	protected outputFormat: string;
 	protected selectedDate: any;
 	protected selectedTime: string;
@@ -64,7 +65,7 @@ export class TDSDateTimeControlComponent extends TDSCustomControl implements OnI
 		protected validationRulesFactory: ValidationRulesFactoryService
 	) {
 		super(validationRulesFactory);
-		this.displayFormat = this.KENDO_DATETIME_DISPLAY_FORMAT;
+		this.displayFormat = this.userPreferenceService.getUserDateFormat() === 'DD/MM/YYYY' ? this.KENDO_DATETIME_DISPLAY_FORMAT_DDMM : this.KENDO_DATETIME_DISPLAY_FORMAT_MMDD;
 	}
 
 	/**

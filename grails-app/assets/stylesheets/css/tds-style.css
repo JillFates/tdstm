@@ -263,8 +263,7 @@ div.modal-dialog {
       div.modal-dialog div.modal-content div.modal-header h4 {
         font-size: 16px !important;
         font-weight: bold !important;
-        line-height: inherit !important;
-        font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif !important; }
+        line-height: inherit !important; }
       div.modal-dialog div.modal-content div.modal-header .tool-box {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -1037,7 +1036,6 @@ div.graphContainer.fullscreen {
   overflow: hidden;
   border: 1px solid #CCC;
   white-space: nowrap;
-  font-family: sans-serif;
   background: #FFF;
   color: #333;
   border-radius: 1px;
@@ -1573,17 +1571,25 @@ div.dates-info-container {
         height: 12px;
         margin-top: 2px; }
       .tds-table table tbody tr td .status.status-Ready {
-        background: #01ab08; }
+        background: #fff; }
       .tds-table table tbody tr td .status.status-Started {
         color: #0092d1; }
       .tds-table table tbody tr td .status.status-Hold {
-        background: #F27113; }
+        background: #333; }
       .tds-table table tbody tr td .status.status-Completed {
         background: #3c8dbc; }
       .tds-table table tbody tr td .status.status-Pending {
         color: #808080; }
       .tds-table table tbody tr td .status.status-Warning {
         background: #f6c440; }
+      .tds-table table tbody tr td .status.status-Unknown {
+        color: #fff;
+        background-color: #808080; }
+      .tds-table table tbody tr td .status.status-Questioned {
+        color: #fff;
+        background: #ff020c; }
+      .tds-table table tbody tr td .status.status-Future {
+        background: #333; }
 
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {
@@ -1870,9 +1876,6 @@ body > .wrapper {
   padding-top: 45px; }
 
 .main-header {
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-weight: 500;
   font-size: 14px !important;
   z-index: 80 !important;
@@ -1936,7 +1939,8 @@ body > .wrapper {
       right: 0;
       top: 0; }
       .main-header .menu-top-container .user-navarea a.licensing-error-warning {
-        line-height: 40px; }
+        line-height: 40px;
+        border: 0px; }
       .main-header .menu-top-container .user-navarea i.licensing-error-warning {
         color: #ffcc00;
         font-size: 18px; }
@@ -2488,6 +2492,9 @@ div.content-wrapper div.container .body table.asset-summary-table {
   border-spacing: 2px;
   border-collapse: initial; }
 
+div.content-wrapper div.container .indent {
+  padding-left: 30px; }
+
 div.content-wrapper div.container .body table#assetListIdGrid div.ui-jqgrid-bdiv {
   overflow-x: hidden !important; }
 
@@ -2811,7 +2818,6 @@ div.content-wrapper div.container .body.move-event-show .asset-tag-selector-comp
 div.content-wrapper div.container .body.move-event-edit .asset-tag-selector-component .km-switch,
 div.content-wrapper div.container .body.move-event-create .asset-tag-selector-component .km-switch,
 div.content-wrapper div.container .body.move-event-show .asset-tag-selector-component .km-switch {
-  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
   top: 5px; }
   div.content-wrapper div.container .body.move-event-edit .asset-tag-selector-component .km-switch .km-switch-container .km-switch-handle,
   div.content-wrapper div.container .body.move-event-create .asset-tag-selector-component .km-switch .km-switch-container .km-switch-handle,

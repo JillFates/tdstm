@@ -9,22 +9,27 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SizeScale
+import com.tdsops.tm.enums.domain.ViewSaveAsOptionEnum
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
+import org.grails.web.json.JSONObject
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.dataview.DataviewApiFilterParam
 import net.transitionmanager.command.dataview.DataviewApiParamsCommand
+import net.transitionmanager.command.dataview.DataviewCrudCommand
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
+import net.transitionmanager.command.dataview.DataviewSchemaColumnCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
+import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidConfigurationException
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.person.FavoriteDataview
 import net.transitionmanager.person.Person
@@ -38,6 +43,9 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.service.dataview.DataviewSpec
 import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
 import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.util.JsonViewRenderService
+import org.apache.commons.collections4.CollectionUtils
 import org.grails.web.json.JSONObject
 
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
@@ -50,16 +58,14 @@ import static com.tdsops.tm.enums.domain.AssetDependencyStatus.VALIDATED
  */
 class DataviewService implements ServiceMethods {
 
+	JsonViewRenderService jsonViewRenderService
+
 	@Lazy
 	static ProjectService projectService = { -> ApplicationContextHolder.getBean('projectService', ProjectService) }()
 	@Lazy
 	private static CustomDomainService customDomainService = { -> ApplicationContextHolder.getBean('customDomainService', CustomDomainService) }()
 
 	UserPreferenceService userPreferenceService
-
-	// Properties used in validating the JSON Create and Update functions
-	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
-	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
 
 	static final InvalidParamException MISSING_ID_EXCEPTION     = new InvalidParamException('Missing required id')
 	static final EmptyResultException  VIEW_NOT_FOUND_EXCEPTION = new EmptyResultException('View was not found')
@@ -69,96 +75,343 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 *
-	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
-	 * current person in session
+	 * Query for getting all Dataviews where: belong to current project and either shared, system or are owned by
+	 * current whom in session
 	 *
-	 * @param person
+	 * @param whom
 	 * @param project
 	 * @return
 	 */
-    List<Dataview> list(Person userPerson, Project userProject) {
-        def query
+	List<Dataview> list(Person userPerson, Project userProject) {
+		def query
 		List<Long> favoriteSystemViewIds
 
-        boolean canSeeSystemViews = securityService.hasPermission(userPerson, Permission.AssetExplorerSystemList)
-        if (canSeeSystemViews) {
-            query = Dataview.where {
-                (project == userProject && (isShared == true || person == userPerson)) \
-				|| \
-				(project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
-            }
-        } else {
+		boolean canSeeSystemViews = securityService.hasPermission(Permission.AssetExplorerSystemList)
+		if (canSeeSystemViews) {
+			query = Dataview.where {
+				(project == userProject && (isShared == true || person == userPerson)) \
+				 ||  \
+				 (project.id == Project.DEFAULT_PROJECT_ID && (isSystem == true || isShared == true || person == userPerson))
+			}
+		} else {
 			// Get list of user's list favorite View Ids
-            favoriteSystemViewIds = FavoriteDataview.where { person == userPerson }
-        		.projections { property('dataview.id') }
+			favoriteSystemViewIds = FavoriteDataview.where { person == userPerson }
+				.projections { property('dataview.id') }
 				.list()
 
-            if (favoriteSystemViewIds) {
-                query = Dataview.where {
-                    (project == userProject  && (isShared == true || person == userPerson)) \
-					|| \
-                    (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
-                }
-            } else {
-                query = Dataview.where {
-                    (project == userProject  && (isShared == true || person == userPerson))
-                }
-            }
-        }
+			if (favoriteSystemViewIds) {
+				query = Dataview.where {
+					(project == userProject && (isShared == true || person == userPerson)) \
+					 ||  \
+					(project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
+				}
+			} else {
+				query = Dataview.where {
+					(project == userProject && (isShared == true || person == userPerson))
+				}
+			}
+		}
 
-        return query.list()
+		return query.list()
     }
 
-    /**
-	 * Returns a Dataview by id after validating that the user has proper access
+	/**
+	 * Returns a Dataview, validating that the user has proper access
+	 * if it's a system view it will look for ny overriden view that needs to be shown instead of the default using
+	 * the following logic:
+	 * 		1st. from the current project and created by the current user and not shared(myViews)
+	 * 		2nd. from the same project and shared from other user
+	 * 		3rd. from the DEFAULT Project and is shared
 	 * @param id
+	 * @param override true by default, we serve those views overriding the default one. When set to false then the
+	 * specified dataview id will be returned.
 	 * @return
 	 */
-	Dataview fetch(Long id) throws InvalidParamException, EmptyResultException {
-		if (! id || id < 1) {
+	@Deprecated
+	Dataview fetch(Long id, boolean override = true) throws InvalidParamException, EmptyResultException {
+		if (!id || id < 1) {
 			throw MISSING_ID_EXCEPTION
 		}
 
-		Dataview dataview = Dataview.get(id)
-		if (!dataview) {
+		return fetch(securityService.userCurrentProject,securityService.loadCurrentPerson(), id, override)
+	}
+
+	/**
+	 * Returns a Dataview after validating that the user has proper access to it.
+	 * When it is a system view, then based on the fetchOverrideVersion parameter it will substitute the appropriate
+	 * overridden version if exists instead of the actual system view.
+	 * The override logic is as follows:
+	 * 		1st. from the current project and created by self and not shared (i.e, myViews)
+	 * 		2nd. from the same project and isShared by self or another user
+	 * 		3rd. from the DEFAULT Project and is shared
+	 * @param id
+	 * @param fetchOverrideVersion - flag when true and the view is a system view then it should return the overridden
+	 * version of the view.
+	 * @return the appropriate version of the specified view
+	 */
+	Dataview fetch(Project currentProject, Person whom, Long id, boolean fetchOverrideVersion) throws InvalidParamException, EmptyResultException {
+
+		Dataview dataview = Dataview.read(id)
+		if ( ! dataview ) {
 			throw VIEW_NOT_FOUND_EXCEPTION
-		} else {
-			validateDataviewViewAccessOrException(id, dataview);
 		}
 
+		// If user is in the DEFAULT project things are a bit different because there is no MyViews
+		if (Project.DEFAULT_PROJECT_ID == currentProject.id) {
+			// If it is a system view and the we should be overridding if one is available we will check it out
+			if (dataview.isSystem && fetchOverrideVersion) {
+				List<Dataview> overrideDataviewList = Dataview.where {
+					project.id == Project.DEFAULT_PROJECT_ID
+					overridesView.id == id
+				}.list()
+
+				if ( overrideDataviewList.size() > 1) {
+					throwException(ConfigurationException, 'dataview.validate.multipleDefintionsDefined',
+							[overrideDataviewList*.id],
+							"Multiple dataview definitions were encountered with ids (${overrideDataviewList*.id})" )
+				} else if (overrideDataviewList.size() == 1) {
+					dataview = overrideDataviewList[0]
+				}
+			}
+			return dataview
+		}
+
+		if ( fetchOverrideVersion && dataview.isSystem ) {
+			/*
+			 * Find the appropriate overriden system view if it exists. The search will be based on:
+			 * 		1) from the current project and created by the current user as a My View
+			 * 		2) from the same project and shared from other user
+			 * 		3) from the DEFAULT Project and is shared
+			 */
+			List<Dataview> overridesDataviews = Dataview.whereAny {
+				overridesView.id == id && project.id == currentProject.id && person.id == whom.id && isShared == false
+				overridesView.id == id && project.id == currentProject.id && isShared == true
+				overridesView.id == id && project.id == Project.DEFAULT_PROJECT_ID && isShared == true
+			}.list()
+
+			if ( overridesDataviews ) {
+				// Need to sort the list into the order of precedence as listed above
+				overridesDataviews.sort {
+					if ( it.project.id == currentProject.id ) {
+						if ( it.person.id == whom.id && ! it.isShared ) {
+							// This is an overridden view saved by the user for themself
+							return 1
+						} else {
+							// This is an overridden system view shared within the project
+							return 2
+						}
+					} else {
+						// This would represent an overridden view in the Default Project for the system view
+						return 3
+					}
+				}
+				dataview = overridesDataviews.first()
+			}
+		}
+		// TODO : JM 1/2020 - should we pass id here?
+		validateDataviewViewAccessOrException(currentProject, whom, dataview);
 		return dataview
+	}
+
+	/**
+	 * Generates a map that contains the save and saveAsOptions list that will be used by the frontend to present the
+	 * various saving options.
+	 *
+	 * The 'save' boolean setting is used to determine if the current view can be saved.
+	 * The 'saveAsOptions' is list containing the various options (MY_VIEW, OVERRIDE_FOR_ME, OVERRIDE_FOR_ALL)
+	 * appropriately.
+	 *
+	 * The ability to save is based on the following rules:
+	 * 		- Owner of view
+	 * 			- The view was created by them
+	 * 			- the view is in the same project as the user context
+	 * 		- Non-Owner in Non-Default Project
+	 * 			- the view is in their project
+	 * 			- it is an override of a system view
+	 * 			- it is shared
+	 * 			- the user has permission OVERRIDE_FOR_ALL
+	 * 		- Non-Owner in Default Project
+	 * 		 	- the view is in the default project
+	 * 			- the user context is set to the default project
+	 * 			- the view is shared
+	 * 			- the view is an override of a system view
+	 * @param project - the user's current Project context
+	 * @param whom - the Person that is updating the view
+	 * @param dataview - The dataview being saved
+	 * @return - A list of the save as methods that are available for the dataview.
+	 */
+	Map generateSaveOptions(Project project, Person whom, Dataview dataview) {
+		boolean isDefaultProject = project.isDefaultProject()
+		Set saveAsOptions = []
+		boolean canShare = false
+		boolean canOverride = false
+
+		if ( securityService.hasPermission(Permission.AssetExplorerCreate) ) {
+			// User can always save as My View if they have the Create perm
+			if ( securityService.hasPermission(Permission.AssetExplorerSaveAs) ) {
+				saveAsOptions << ViewSaveAsOptionEnum.MY_VIEW.name()
+			}
+
+			// Add the Override options if system view and user has perms
+			saveAsOptions.addAll( overrideOptions(project, whom, dataview ) )
+
+			// Determine if the person has the ability to share a view
+			canShare = securityService.hasPermission(
+				(isDefaultProject ? Permission.AssetExplorerSystemCreate :  Permission.AssetExplorerPublish) )
+
+			// User can always save as My View
+			canOverride = canViewBeOverridden(project, dataview)
+		}
+
+		return [
+			canOverride: canOverride,
+			canShare: canShare,
+			save: canModifyView(project, whom, dataview),
+			saveAsOptions: saveAsOptions as List
+		]
+	}
+
+	/**
+	 * Used to determine if the dataview presented can be Saved/Modified by the current user
+	 * @param project - the current project
+	 * @param whom - the person whom is trying to make a change
+	 * @param dataview - the view that is being changed
+	 * @return true if the person is allowed to modify the view otherwise false
+	 */
+	boolean canModifyView(Project project, Person whom, Dataview dataview) {
+		boolean hasEditPerm = securityService.hasPermission(Permission.AssetExplorerEdit)
+		boolean hasGlobalOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
+		boolean hasProjectOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)
+		boolean isDefaultProject = project.isDefaultProject()
+
+		boolean canModify = false
+		if (hasEditPerm && dataview) {
+			if (dataview.personId == whom.id) {
+				canModify = (dataview.projectId == project.id)
+			} else {
+				boolean hasPerm = (isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm)
+				canModify = (hasPerm &&
+						dataview.isShared &&
+						dataview.overridesView &&
+						dataview.projectId == project.id)
+			}
+		}
+		return canModify
+	}
+
+	/**
+	 * Used to get the list of System View Override Save options that a user can do for a given dataview. This will be
+	 * based on the type of view, user permissions and if there are already previously overridden version of the view.
+	 * @param project
+	 * @param whom
+	 * @param dataview
+	 * @return A list that may include the OVERRIDE_FOR_ME and/or OVERRIDE_FOR_ALL
+	 */
+	List<String> overrideOptions(Project project, Person whom, Dataview dataview) {
+		boolean hasGlobalOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
+		boolean hasProjectOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)
+		boolean isDefaultProject = project.isDefaultProject()
+
+		List options = []
+		// Check to see if user already has an overridden version of a system view for themselves and if not
+		// then they get the OVERRIDE_FOR_ME option
+		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
+		if ( isOverrideable ) {
+			Long overriddenViewId
+			if (dataview.overridesView) {
+				overriddenViewId = dataview.overridesView.id
+			} else {
+				overriddenViewId = dataview.id
+			}
+
+			if (securityService.hasPermission(Permission.AssetExplorerSaveAs)) {
+				if (Dataview.where {
+					project.id == project.id
+					// Make sure we're querying on the root system view id
+					overridesView.id == overriddenViewId
+					person.id == whom.id
+					isShared == false
+				}.count() == 0) {
+					options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+				}
+			}
+
+			// Check to see if anybody has an overridden version of a system view for ALL users and if not
+			// then they get the OVERRIDE_FOR_ALL option, as long as they also have that permission.
+			if (	(isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm) &&
+					Dataview.where {
+						project.id == project.id
+						// Make sure we're querying on the root system view id
+						overridesView.id == overriddenViewId
+						isShared == true
+					}.count() == 0) {
+				options << ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
+			}
+		}
+		return options
+	}
+
+	/**
+	 * Used to determine if the dataview can be overrriden and if the user has permissions to do so
+	 * @param project
+	 * @param dataview
+	 * @return true if the dataview can be overridden
+	 */
+	boolean canViewBeOverridden(Project project, Dataview dataview) {
+		// Determine if the Override options in the Save Modal should appear regardless of options available
+		boolean canOverride = false
+		boolean isOverrideable = (dataview?.isSystem || dataview?.overridesView)
+		if (isOverrideable) {
+			if (project.isDefaultProject()) {
+				// If in the Default
+				canOverride = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
+			} else {
+				canOverride = securityService.hasAnyPermission(
+						[Permission.AssetExplorerCreate, Permission.AssetExplorerOverrideAllUserProject])
+			}
+		}
+		return canOverride
 	}
 
 	/**
 	 * Updates a database dataview object.
 	 * At this point just schema and isShared properties are accessible to be updated.
+	 * @param project - the user's current Project context
+	 * @param whom - the Person that is updating the view
+	 * @param id - the ID of the dataview
 	 * @param dataviewJson JSONObject to take changes from.
 	 * @return the Dataview object that was updated
 	 * @throws net.transitionmanager.exception.DomainUpdateException, UnauthorizedException
 	 */
 	@Transactional
-	Dataview update(Person person, Project project, Long id, JSONObject dataviewJson) {
-		Dataview dataview = Dataview.get(id)
-		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
+	Dataview update(Project project, Person whom, Long id, DataviewCrudCommand dataviewCommand) {
+		Dataview dataview = dataviewCommand.id
 
+		validateDataviewUpdateAccessOrException(project, whom, dataviewCommand, dataview)
+		removeQueryStringFromFilters(dataviewCommand)
+		validateOverrideViewFiltersMatch(dataviewCommand)
+		validateViewNameUniqueness(project, whom, dataviewCommand)
+
+		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
+
+		// This is an issue when a person is viewing a shared override or their own override and saving the opposite
 		dataview.with {
-			reportSchema = dataviewJson.schema.toString()
-			isShared = dataviewJson.isShared
+			reportSchema = schema
+			isShared = dataviewCommand.isShared
+			// User's are not allowed to rename overridden system views
+			if (! dataviewCommand.overridesView) {
+				name = dataviewCommand.name
+			}
 		}
-
-		if (!dataview.save(failOnError:false)) {
-			throw new DomainUpdateException('Error on update', dataview)
-		}
-
-		Long currentPersonId = person.id
+		dataview.save()
 
 		// Check if the view is favorite and must be unfavorited.
-		if (dataview.isFavorite(currentPersonId) && !dataviewJson.isFavorite) {
-			deleteFavoriteDataview(person, project, dataview.id)
+		if (dataview.isFavorite(whom.id) && !dataviewCommand.isFavorite) {
+			deleteFavoriteDataview(project, whom, dataview.id)
 		} else {
 			// Check if the view must be favorited
-			if (!dataview.isFavorite(currentPersonId) && dataviewJson.isFavorite) {
-				addFavoriteDataview(person, project, dataview.id)
+			if (!dataview.isFavorite(whom.id) && dataviewCommand.isFavorite) {
+				addFavoriteDataview(project, whom, dataview.id)
 			}
 		}
 
@@ -167,35 +420,58 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 *
-	 * Create a Dataview object and add it to the person's favorite if needed.
-	 * Dataview person and project should be passed as a parameter
+	 * Create a Dataview object and add it to the whom's favorite if needed.
+	 * Dataview whom and project should be passed as a parameter
 	 *
-	 * @param currentPerson
-	 * @param currentProject
-	 * @param dataviewJson - JSONObject to take changes from.
+	 * @param currentProject - the current project for the user context
+	 * @param whom - the whom that is attempting to access the view
+	 * @param dataviewCommand - command object for Dataview CRUD operations
 	 * @return the Dataview object that was created
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
 	@Transactional
-	Dataview create(Person currentPerson, Project currentProject, JSONObject dataviewJson) {
-		validateDataviewCreateAccessOrException(dataviewJson)
+	Dataview create(Project currentProject, Person whom, DataviewCrudCommand dataviewCommand) {
+		validateDataviewCreateAccessOrException(dataviewCommand, currentProject, whom)
+		removeQueryStringFromFilters(dataviewCommand)
+		validateOverrideViewFiltersMatch(dataviewCommand)
+
+		// If the user is overriding a System View, they may be overriding their own override or
+		// a shared override so it's important to get the root system view being overridden
+		Boolean saveAsMyView = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.MY_VIEW
+		if (saveAsMyView) {
+			validateViewNameUniqueness(currentProject, whom, dataviewCommand)
+		} else {
+			if (! dataviewCommand.overridesView) {
+				throwException(InvalidParamException.class, 'dataview.validate.missingViewForOverride',
+						'The request to create override view was missing the view id to be overridden')
+			}
+			dataviewCommand.overridesView = getRootSystemView(dataviewCommand.overridesView)
+			// use the name from the view that is being overridden
+			dataviewCommand.name = dataviewCommand.overridesView.name
+		}
+
+		String schema = jsonViewRenderService.render('/dataview/reportSchema', dataviewCommand.schema)
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			person       = currentPerson
-			project      = currentProject
-			name         = dataviewJson.name
-			isSystem     = dataviewJson.isSystem
-			isShared     = dataviewJson.isShared
-			reportSchema = JsonUtil.toJson(dataviewJson.schema)
+			if (saveAsMyView) {
+				isShared = dataviewCommand.isShared
+			} else {
+				isShared = dataviewCommand.saveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL
+			}
+			name = dataviewCommand.name
+			person = whom
+            project = currentProject
+			reportSchema = schema
+			overridesView = (saveAsMyView ? null : dataviewCommand.overridesView)
+			isSystem = false
 		}
 
-		if (!dataview.save(failOnError: false)) {
-			throw new DomainUpdateException('Error on create', dataview)
-		}
+		dataview.save()
 
-		if (dataviewJson.isFavorite) {
-			addFavoriteDataview(currentPerson, currentProject, dataview.id)
+		// Only bother creating the Favorite on Create if the user is creating view for themselves TM-17291
+		if (dataviewCommand.isFavorite && !  dataviewCommand.overridesView) {
+			addFavoriteDataview(currentProject, whom, dataview.id)
 		}
 
 		return dataview
@@ -203,65 +479,168 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 * Deletes a Dataview object
-	 * Dataview person and project are taken from current session
+	 * Dataview whom and project are taken from current session
+	 * @param project - the current project for the user context
+	 * @param whom - the whom that is attempting to access the view
 	 * @param id Dataview id to delete
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
 	@Transactional
-	void delete(Long id) {
+	void delete(Project project, Person whom, Long id) {
 		Dataview dataview = fetch(id)
-		validateDataviewDeleteAccessOrException(id, dataview)
+		validateDataviewDeleteAccessOrException(project, whom, id, dataview)
 		dataview.delete()
 	}
 
 	/**
-	 * Validates if person accessing dataview is authorized to access it
+	 * Used to retrieve the root system view when working with an overridden view or the creation of one. This will
+	 * use recursion to find it. It will only try up to 4 times since there should never be more than that level
+	 * of hierarchy.
+	 * @param dataview - the dataview that we're starting from
+	 * @param depth - used to control the recursion (default 4) but should not be passed
+	 * @return the root system view
+	 */
+	Dataview getRootSystemView(Dataview dataview, int depth=4) {
+		if (dataview.isSystem && dataview.overridesView == null) {
+			return dataview
+		}
+		if (dataview.overridesView.isSystem) {
+			return dataview.overridesView
+		}
+		if (depth < 1) {
+			throwException(InvalidConfigurationException, 'dataview.validate.overrideNestingExceeded', [],
+					'There is an unexpected amount of nested overridden system views')
+		}
+		return getRootSystemView(dataview.overridesView, --depth)
+	}
+
+	/**
+	 * Dataview specifications coming from the frontend may have filters that were applied to columns that were from
+	 * querystring parameters of the URL request. These parameters should not be saved with the dataview specification.
+	 * Therefore, this method will iterate over the list of parameters passed and clear out the filter for any of the
+	 * specified columns.
+	 * @param dataviewCommand
+	 */
+	void removeQueryStringFromFilters(DataviewCrudCommand dataviewCommand) {
+		if (dataviewCommand.querystring) {
+			dataviewCommand.querystring.keySet().each { param ->
+				List<String> match = param.split('_')
+				if (match.size() == 2 && match[0] ) {
+					DataviewSchemaColumnCommand column = dataviewCommand.schema.columns.find {
+						it.domain == match[0] && it.property == match[1]
+					}
+					if (column) {
+						column.filter = ''
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Validates that the filters are unchanged when the user is attempting to override a system view
+	 * @param dataviewCommand - the command object that has the override and original system view
+	 */
+	void validateOverrideViewFiltersMatch(DataviewCrudCommand dataviewCommand) {
+		if (dataviewCommand.overridesView) {
+			// Get the list of filters fzrom the orginal system view
+			Map systemViewFilters = [:]
+			JSONObject rootSchema = dataviewCommand.overridesView.schemaAsJSONObject()
+			rootSchema?.columns.each {
+				systemViewFilters.put(it.property, [filter: it.filter, label: it.label] )
+			}
+
+			// Iterate over the list of fields in the new view to see if the filtering is different
+			List<String>columnsWithBadFilters = []
+			for (int i = 0; i < dataviewCommand.schema.columns.size(); i++ ) {
+				DataviewSchemaColumnCommand column = dataviewCommand.schema.columns[i]
+				if (systemViewFilters.containsKey(column.property)) {
+					if (column.filter != systemViewFilters[column.property].filter) {
+						columnsWithBadFilters << systemViewFilters[column.property].label
+					}
+				} else if (column.filter) {
+					columnsWithBadFilters << column.label
+				}
+			}
+			// Iterate over the systemViewsFilters that have filters (probably none) and make sure that they're the same
+			// First get a short list of systemView columns that are not in the override view
+			List<String>systemViewColumnNames = systemViewFilters.keySet() as List
+			List<String>overrideViewColumnNames = rootSchema?.columns.collect { it.property }
+			List<String>missingSystemColumns = systemViewColumnNames - overrideViewColumnNames
+			missingSystemColumns.each {
+				if (systemViewFilters[it].filter) {
+					columnsWithBadFilters << systemViewFilters[it].label
+				}
+			}
+			if (columnsWithBadFilters) {
+				throwException(InvalidParamException.class,
+						'dataview.validate.overrideFiltersMatch',
+						[columnsWithBadFilters],
+						"Filters for column(s) {$columnsWithBadFilters} must match the original system view")
+			}
+
+			// Check to make sure that the domains of the views match as well
+			List<String>rootViewDomains = rootSchema.domains
+			List<String>overrideViewDomains = dataviewCommand.schema.domains
+			if ( CollectionUtils.disjunction(rootViewDomains, overrideViewDomains ).size() > 0 ) {
+				throwException(InvalidParamException.class,
+						'dataview.validate.overrideDomainMismatch',
+						[columnsWithBadFilters],
+						'When overriding a system view the Asset Classes can not be modified')
+			}
+		}
+	}
+
+	/**
+	 * Validates if whom accessing dataview is authorized to access it
 	 * - should belong to current project in session
-	 * - should be either system or shared or current person in session owned
-	 * @param dataview
+	 * - should be either system or shared or current whom in session owned
+	 * @param project - the current project for the user context
+	 * @param whom - the whom that is attempting to access the view
+	 * @param dataview - the loaded dataview
 	 * @throws net.transitionmanager.exception.InvalidRequestException
 	 */
-	void validateDataviewViewAccessOrException(Long id, Dataview dataview) {
+	void validateDataviewViewAccessOrException(Project project, Person whom, Dataview dataview) {
 		boolean throwNotFound = false
 		if (!dataview) {
 			throwNotFound = true
 		}
 
         boolean canAccess =
-			(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.isSystem) \
-			|| (dataview.project.id == securityService.userCurrentProject.id)
+			(dataview.project.id == Project.DEFAULT_PROJECT_ID && (dataview.isSystem || dataview.isShared || dataview.personId == whom.id)) \
+			|| \
+			(dataview.project.id == project.id && (dataview.personId == whom.id || dataview.isShared))
+
 
 		// Validate Dataview belongs to the project
 		if (!throwNotFound && !canAccess) {
-			securityService.reportViolation("attempted to access Dataview $dataview.id unrelated to project")
+			securityService.reportViolation("attempted to access Dataview $dataview.id")
 			throwNotFound = true
-		}
-
-		if (!throwNotFound) {
-			// Make sure the user has proper access to the Dataview
-			boolean allowedToView = (dataview.isSystem || dataview.isShared || dataview.person.id == securityService.currentPersonId)
-			if (! allowedToView) {
-				securityService.reportViolation("attempted to access non-shared Dataview ($dataview.id)")
-				throwNotFound = true
-			}
 		}
 
 		// Throw an exception if any of the above falied
 		if (throwNotFound) {
-			throw new EmptyResultException("Dataview not found ($id})")
+			throw new EmptyResultException('Dataview not found')
 		}
 	}
 
 	/**
-	 * Validates if the person updating a dataview has permission to it.
-	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
+	 * Validates if the whom updating a dataview has permission to it.
+	 * @param project - the current project for the user context
+	 * @param whom - the whom that is attempting to access the view
+	 * @param dataviewCommand - the JSON object containing information about the Dataview to create
 	 * @param dataview - original object from database
 	 * @throws net.transitionmanager.exception.UnauthorizedException
 	 */
-	void validateDataviewUpdateAccessOrException(Long id, JSONObject dataviewJson, Dataview dataview) {
-		validateDataviewViewAccessOrException(id, dataview)
-		validateDataviewJson(dataviewJson, UPDATE_PROPERTIES)
+	void validateDataviewUpdateAccessOrException(Project project, Person whom, DataviewCrudCommand dataviewCommand, Dataview dataview) {
+		validateDataviewViewAccessOrException(project, whom, dataview)
 
+		if (dataview.isSystem) {
+			throwException(InvalidParamException.class, 'dataview.validate.modifySystemView', 'System views can not be modified. Please perform Save As and choose an Override options as an alternative.')
+		}
+
+		// Make sure that the name is unique across the all cases
+		validateViewNameUniqueness(project, whom, dataviewCommand)
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemEdit : Permission.AssetExplorerEdit
 		if (! securityService.hasPermission(requiredPerm)) {
 			securityService.reportViolation("attempted to modify Dataview ($dataview.id) without required permission $requiredPerm")
@@ -270,28 +649,107 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
-	 * Validates if the person creating a dataview has permission to create a Dataview
-	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
+	 * Validates if the whom creating a dataview has permission to create a Dataview
+	 * @param dataviewCommand - the command object used for Dataview CRUD
+	 * @param project - the current project
+	 * @param whom - the whom that is attempting to create the Dataview
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewCreateAccessOrException(JSONObject dataviewJson) {
-		validateDataviewJson(dataviewJson, CREATE_PROPERTIES)
+	void validateDataviewCreateAccessOrException(DataviewCrudCommand dataviewCommand, Project project, Person whom) {
+		/*
+		 * Users in the Default project
+		 */
+		if ( project.isDefaultProject() ) {
+			if ( securityService.notPermitted(Permission.AssetExplorerSystemCreate) ) {
+				throwException(InvalidParamException.class,
+						'dataview.validation.saveInDefaultProject',
+						'You do not have the necessary permission to save views into the Default project')
+			}
 
-		// Check if user has necessary permission(s)
-		String requiredPerm = dataviewJson.isSystem ? Permission.AssetExplorerSystemCreate : Permission.AssetExplorerCreate
-		if (! securityService.hasPermission(requiredPerm)) {
-			securityService.reportViolation("attempted to create a Dataview without required permission $requiredPerm")
-			throw new UnauthorizedException(requiredPerm)
+			if (dataviewCommand.overridesView) {
+				if (securityService.notPermitted(Permission.AssetExplorerOverrideAllUserGlobal) ) {
+					throwException(InvalidParamException.class,
+							'dataview.validate.overrideGlobalPermission',
+							'You do not have the necessary permission to save into the Default project')
+				}
+
+				// Check if the there is already an overridden view already
+				if ( Dataview.where {
+					project == project
+					overridesView == dataviewCommand.overridesView
+				}.count() > 0 ) {
+					throwException(InvalidParamException.class,
+							'dataview.validate.overrideAlreadyExists',
+							'An override for this system view already exists in the project')
+				}
+			}
+		} else {
+			// Saving into a user project
+			switch (dataviewCommand.saveAsOption) {
+				case ViewSaveAsOptionEnum.MY_VIEW:
+					if (securityService.notPermitted(Permission.AssetExplorerCreate)) {
+						throwException(UnauthorizedException,
+								'dataview.validate.createPermission',
+								'You do not have the necessary permission to create views')
+					}
+					break
+
+				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME:
+					if (securityService.notPermitted(Permission.AssetExplorerCreate)) {
+						throwException(UnauthorizedException.class,
+								'dataview.validate.createPermission',
+								'You do not have the necessary permission to create views')
+					}
+
+					// Make sure that the user hasn't already saved an override for themselves for this system view
+					if (Dataview.where {
+						project.id == project.id
+						overridesView.id == dataviewCommand.overridesView.id
+						person.id == whom.id
+						isShared == false
+					}.count() > 0) {
+						throwException(InvalidParamException.class,
+								'dataview.validate.overrideAlreadyExists',
+								'An override for this system view already exists in the project')
+					}
+					break
+
+				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL:
+					if (securityService.notPermitted(Permission.AssetExplorerOverrideAllUserProject)) {
+						throwException(UnauthorizedException.class,
+								'dataview.validate.overrideAllUsers',
+								'You do not have the necessary permission to save override views for all users')
+					}
+
+					// Make sure that nobody has already saved an override for this system view that is shared in the project
+					if (Dataview.where {
+						project.id == project.id
+						overridesView.id == dataviewCommand.overridesView.id
+						isShared == true
+					}.count() > 0) {
+						throwException(InvalidParamException,
+								'dataview.validate.overrideAlreadyExists',
+								'An override for this system view already exists in the project')
+					}
+					break
+				default:
+					throwSwitchNotHandledException(dataviewCommand.saveAsOption.toString())
+			}
 		}
 	}
 
 	/**
-	 * Validates if person deleting a Dataview has permission to do so
+	 * Validates if whom deleting a Dataview has permission to do so
+	 * @param project - the current project for the user context
+	 * @param whom - the whom that is attempting to access the view
+	 * @param id - the id of the dataview being checked (should match that of dataview.id - not sure why this is called if there is no dataview?)
+	 * @param dataview - the loaded dataview
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewDeleteAccessOrException(Long id, Dataview dataview) {
-		validateDataviewViewAccessOrException(id, dataview)
+	@Transactional
+	void validateDataviewDeleteAccessOrException(Project project, Person whom, Long id, Dataview dataview) {
+		validateDataviewViewAccessOrException(project, whom, dataview)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemDelete : Permission.AssetExplorerDelete
 		if (! securityService.hasPermission(requiredPerm)) {
@@ -301,20 +759,68 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to validate if the Dataview JSON request has all of the required properties
-	 * @param dataviewJson - the JSON object to inspect
-	 * @throws net.transitionmanager.exception.InvalidRequestException with what property is missing or if no object present
+	 * Checks to make sure that the name is unique to avoid confusion.
+	 *
+	 * The rules are:
+	 * 		1) When view is overriding, don't bother checking
+	 * 		2) When project is Default project:
+	 * 			a) View must be shared
+	 * 			b) Name must be unique across all projects
+	 * 		3) When project is not the Default project
+	 * 			- User is Sharing:
+	 * 				a) Name can't exist in any view in the Default or Client projects
+	 * 			- User is Not Sharing:
+	 * 				b) Name not in Default project
+	 * 				c) Name not shared by others in client project
+	 * 				d User doesn't have saved view with same name in client project
+	 *
+	 * @param project - the current project for the user context
+	 * @param whom - the whom that is attempting to access the view
+	 * @param dataviewCommand - the CRUD command object for the view
+	 * @throws net.transitionmanager.exception.InvalidParamException
 	 */
-	void validateDataviewJson(JSONObject dataviewJson, List<String> props) {
-		if (dataviewJson) {
-			for (String prop in props) {
-				if (! dataviewJson.containsKey(prop)) {
-					log.warn "validateDataviewJson failed validation of JSON for property $prop for $dataviewJson"
-					throw new InvalidRequestException("JSON object missing property $prop")
-				}
+	void validateViewNameUniqueness(Project project, Person whom, DataviewCrudCommand dataviewCommand) {
+		// Only have to check views that are not overridden because there are other controls in place for that
+		if (dataviewCommand.overridesView == null) {
+			boolean isNotDefaultProject = ! project.isDefaultProject()
+			Long dataviewId = dataviewCommand.id?.id
+
+			// Check for a system view or the user's own
+			List<Long> projectIds = [project.id]
+			if (isNotDefaultProject) {
+				projectIds << Project.DEFAULT_PROJECT_ID
 			}
-		} else {
-			throw new InvalidRequestException('Dataview JSON object was missing from request')
+
+			// Check to see if the name already exists in the default project and not the current view
+			// Test covers 2a, 2b, 3a (partially), 3b
+			boolean foundDuplicateName = Dataview.where {
+				project.id == Project.DEFAULT_PROJECT_ID
+				name == dataviewCommand.name
+				if (dataviewId) {
+					id != dataviewId
+				}
+			}.count() > 0
+
+			// Query for a view of the same name in the default project or current project
+			// Test covers 3a (remainder), 3c, 3d
+			if (! foundDuplicateName && isNotDefaultProject) {
+				foundDuplicateName = Dataview.where {
+					project.id == project.id
+					name == dataviewCommand.name
+					if (dataviewId) {
+						id != dataviewId
+					}
+					( 	person.id == whom.id || (person.id != whom.id && dataviewCommand.isShared) )
+				}.count() > 0
+			}
+			if (foundDuplicateName) {
+				throwException(
+						InvalidParamException.class,
+						'dataview.validate.nameAlreadyExists',
+						[],
+						'A view with the same name already exists'
+				)
+			}
 		}
 	}
 
@@ -464,11 +970,11 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
-	 * Retrieve the list of favorite data views for the current person,
+	 * Retrieve the list of favorite data views for the current whom,
 	 * @return List of dataviews (DataView instances) the user has favorited.
 	 */
 	List<Dataview> getFavorites(Person person) {
-		// Retrieve all the favorited views for the person.
+		// Retrieve all the favorited views for the whom.
 		/* Using createCriteria instead of where because there's no way of limiting the number
 		  of results using DetachedCriteria */
 		List<FavoriteDataview> favorites = FavoriteDataview.createCriteria().list {
@@ -485,17 +991,17 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
-	 * Delete the given dataview from the current person's favorites.
+	 * Delete the given dataview from the current whom's favorites.
 	 * @param dataviewId
 	 * @return
 	 */
 	@Transactional
-	void deleteFavoriteDataview(Person person, Project currentProject, Long dataviewId) throws EmptyResultException, DomainUpdateException{
-		Dataview dataview = fetch(dataviewId)
+	void deleteFavoriteDataview(Project currentProject, Person whom, Long dataviewId) throws EmptyResultException, DomainUpdateException{
+		Dataview dataview = fetch(currentProject, whom, dataviewId, false)
 
 		// Delete the corresponding favorite
 		int deletedFavs = FavoriteDataview.where{
-			person == person && dataview == dataview
+			person == whom && dataview == dataview
 		}.deleteAll()
 
 		// If no favs were deleted, throw an exception.
@@ -505,16 +1011,18 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
-	 * Add the given dataview to the current person's favorites.
+	 * Add the given dataview to the current whom's favorites.
+	 * @param currentProject
+	 * @param whom
 	 * @param dataviewId
 	 */
 	@Transactional
-	void addFavoriteDataview(Person person, Project currentProject, Long dataviewId) {
-		Dataview dataview = fetch(dataviewId)
+	void addFavoriteDataview(Project currentProject, Person whom, Long dataviewId) {
+		Dataview dataview = fetch(currentProject, whom, dataviewId, false)
 
-		// Check if the favorite already exists.
+		// Check if the favorite already exists
 		FavoriteDataview favoriteDataview = FavoriteDataview.where {
-			person == person && dataview == dataview
+			person == whom && dataview == dataview
 		}.find()
 
 		// If a favorite was found, throw an exception
@@ -522,7 +1030,7 @@ class DataviewService implements ServiceMethods {
 			throw new DomainUpdateException('View is already a favorite')
 		}
 
-		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview)
+		favoriteDataview = new FavoriteDataview(person: whom, dataview: dataview)
 		if (!favoriteDataview.save(failOnError: false)) {
 			throw new DomainUpdateException('Unable to create favorite', favoriteDataview)
 		}
@@ -1036,7 +1544,7 @@ class DataviewService implements ServiceMethods {
 
 	/**
 	 * Tansformer for the By fields that replaces IDs with the
-	 * corresponding person's fullname.
+	 * corresponding whom's fullname.
 	 */
 	private static transformByField = { Map queryResults, field,  mixedResults->
 		queryResults.assets.each { asset ->

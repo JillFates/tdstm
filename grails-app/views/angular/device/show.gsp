@@ -5,7 +5,7 @@
 
 <div>
     <div>
-        <div class="clr-row">
+        <div class="clr-row tab-scroll-container" [ngClass]="{'has-description': ${!!asset.description?.trim()}}">
             <div class="clr-col-11">
                 <tds-tab-scroller>
                     <tds-scroller-item>
@@ -62,9 +62,7 @@
         </div>
     </div>
 
-    <div class="asset-crud"
-         [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}"
-         tdsScrollContainer style="position: relative">
+    <div class="asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
         <div tdsScrollSection class="clr-row">
             <div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
                 <g:if test="${errors}">
@@ -81,10 +79,12 @@
                     <tr style="order: 3">
                         <tds:clrInputLabel field="${standardFieldSpecs.manufacturer}" value="${asset.manufacturer}"/>
                         <td>
-                            <a *ngIf="isManufacturerLinkAvailable()"
-                               (click)="showManufacturer('${assetEntity.manufacturer?.id}')">
-                                {{getManufacturer('${assetEntity.manufacturer}')}}
-                            </a>
+                            <span class="clickable-text">
+                                <a *ngIf="isManufacturerLinkAvailable()"
+                                   (click)="showManufacturer('${assetEntity.manufacturer?.id}')">
+                                    {{getManufacturer('${assetEntity.manufacturer}')}}
+                                </a>
+                            </span>
                             <span *ngIf="!isManufacturerLinkAvailable()">{{getManufacturer('${assetEntity.manufacturer}')}}</span>
                         </td>
                     </tr>
@@ -115,9 +115,11 @@
                     <tr style="order: 9">
                         <tds:clrInputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
                         <td>
-                            <a *ngIf="isModelLinkAvailable()"
-                               (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')"
-                               [innerText]="getModelName('${assetEntity.model}')"></a>
+                            <span class="clickable-text">
+                                <a *ngIf="isModelLinkAvailable()"
+                                   (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')"
+                                   [innerText]="getModelName('${assetEntity.model}')"></a>
+                            </span>
                             <span *ngIf="!isModelLinkAvailable()">${assetEntity.model}</span>
                         </td>
                     </tr>
@@ -270,7 +272,7 @@
         </div>
 
         <div tdsScrollSection class="clr-row">
-            <div class="clr-col-12">
+            <div class="clr-col-12 table-data-section">
                 <g:render
                         template="/angular/common/supportShow"
                         model="[supportAssets: supportAssets]">
@@ -279,7 +281,7 @@
         </div>
 
         <div tdsScrollSection class="clr-row">
-            <div class="clr-col-12">
+            <div class="clr-col-12 table-data-section">
                 <g:render
                         template="/angular/common/dependentShow"
                         model="[dependent: dependentAssets, support: supportAssets]">

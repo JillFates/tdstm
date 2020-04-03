@@ -140,7 +140,8 @@
 												>
 											</td>
 											<td class="valueNW">
-												<a
+												<span class="actionable-link">
+													<a
 													(click)="
 														openTaskActionSummaryDetailHandler()
 													"
@@ -152,6 +153,7 @@
 															''
 													}}</a
 												>
+												</span>
 											</td>
 										</tr>
 
@@ -201,7 +203,8 @@
 												<label>Asset</label>
 											</td>
 											<td class="valueNW">
-												<a
+												<span class="actionable-link">
+													<a
 													(click)="
 														onOpenLinkAsset()
 													"
@@ -212,6 +215,7 @@
 																.text
 													}}</a
 												>
+												</span>
 											</td>
 										</tr>
 
@@ -231,7 +235,7 @@
 												>
 											</td>
 											<td class="valueNW">
-												<span
+												<span class="actionable-link"
 													><tds-url-viewer
 														*ngIf="
 															model.instructionLink
@@ -480,7 +484,7 @@
 								<tbody>
 									<tr>
 										<td class="date-created">
-											Created by
+											Created By:
 											{{
 												model.personCreateObj
 											}}
@@ -515,7 +519,7 @@
 											</span>
 										</td>
 										<td class="last-updated">
-											Last updated:
+											Last Updated:
 											{{
 												model.lastUpdated
 											}}
@@ -565,6 +569,7 @@
 													iconClass="is-solid"
 													[tooltip]="modelHelper.CREATE_PREDECESSOR"
 													[id]="'btnAddPredecessor'"
+													[disabled]="!hasCreateTaskPermission"
 													(click)="onAddTaskDependency(model.predecessorList,dataGridTaskPredecessorsHelper)">
 												</tds-button-add>
 											</div>
@@ -725,6 +730,7 @@
 													[id]="
 														'btnAddSuccessor'
 													"
+													[disabled]="!hasCreateTaskPermission"
 													(click)="
 														onAddTaskDependency(
 															model.successorList,
