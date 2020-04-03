@@ -25,7 +25,7 @@ import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
 // Others
 import {Observable} from 'rxjs';
 import {map, withLatestFrom} from 'rxjs/operators';
-import {fixContentWrapper} from "../../../../shared/utils/data-grid-operations.helper";
+import {fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
 	selector: 'tds-login',
