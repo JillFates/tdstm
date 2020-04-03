@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "Login - ETL Kickoff",
+			"name": "Login - Public API - ETL Kickoff",
 			"event": [
 				{
 					"listen": "test",
@@ -49,6 +49,73 @@
 						"login"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login - ETL Script",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2b17bc48-14e9-43d1-bed2-e730da57442f",
+						"exec": [
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
 			},
 			"response": []
 		},
@@ -137,8 +204,10 @@
 							"",
 							"var jsonObject = JSON.parse(responseBody);",
 							"var providerId = jsonObject.data[0].id; ",
+							"var providerName = jsonObject.data[0].name;",
 							"",
 							"pm.environment.set(\"providerId\", providerId);",
+							"pm.environment.set(\"providerName\", providerName);",
 							"",
 							"var etlScriptNewName = \"API ETL Script \" + _.random(1, 1000) + _.random(1, 1000) ;",
 							"",
@@ -149,6 +218,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -194,6 +273,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -266,6 +355,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -544,12 +643,12 @@
 						},
 						{
 							"key": "dataScriptName",
-							"value": "TM-17073",
+							"value": "{{etlScriptName}}",
 							"type": "text"
 						},
 						{
 							"key": "providerName",
-							"value": "Zza Provider",
+							"value": "{{providerName}}",
 							"type": "text"
 						},
 						{
@@ -605,13 +704,24 @@
 							"pm.environment.unset(\"etlOutputName\");",
 							"pm.environment.unset(\"jwt_token\");",
 							"pm.environment.unset(\"tokenHeaderName\");",
-							"pm.environment.unset(\"token\");"
+							"pm.environment.unset(\"token\");",
+							"pm.environment.unset(\"providerName\");"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [
 					{
@@ -636,8 +746,8 @@
 					},
 					{
 						"key": "{{tokenHeaderName}}",
-						"value": "{{token}}",
-						"type": "text"
+						"type": "text",
+						"value": "{{token}}"
 					}
 				],
 				"url": {
