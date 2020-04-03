@@ -2,7 +2,7 @@
   .modal
     width: 80%
   .modal-body
-    overflow: auto
+    overflow: hidden
     padding: 6px 18px 1px 18px !important
     table.clarity-table-grid
       width: 100%
@@ -12,6 +12,8 @@
         width: 200px
         max-width: 200px
       .pref-value
+        text-overflow: ellipsis
+        overflow: hidden
         width: 500px
         max-width: 500px
       .pref-remove
