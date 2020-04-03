@@ -103,7 +103,7 @@ declare var jQuery: any;
                     </kendo-dropdownlist>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClassName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
                             class="form-control" style="width: 100%;"
                             [data]="dependencyClassList"
@@ -243,7 +243,7 @@ declare var jQuery: any;
                     </kendo-dropdownlist>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClassName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
 							class="form-control" style="width: 100%;"
                             [data]="dependencyClassList"
@@ -350,7 +350,8 @@ export class SupportsDependsComponent implements OnInit {
 
 		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+			this.model.dependencyMap.supportAssets = [];
+			// this.dataGridSupportsOnHelper.gridData.data;
 			if (this.dataGridDependsOnHelper) {
 				this.initDone.emit(this.model);
 			}
@@ -358,7 +359,8 @@ export class SupportsDependsComponent implements OnInit {
 
 		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.dependentAssets = [];
+			// this.dataGridDependsOnHelper.gridData.data;
 			if (this.dataGridSupportsOnHelper) {
 				this.initDone.emit(this.model);
 			}
@@ -408,11 +410,12 @@ export class SupportsDependsComponent implements OnInit {
 	}
 
 	public updateRecordState(dataItem: DependencySupportModel): void {
-		if (dataItem.recordState === RecordState.pristine) {
+		if (dataItem.recordState === RecordState.created) {
+			return;
+		} else {
 			dataItem.recordState = RecordState.updated;
+			this.onChangeInternalModel();
 		}
-		// this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
-		this.onChangeInternalModel();
 	}
 
 	/**
@@ -549,6 +552,7 @@ export class SupportsDependsComponent implements OnInit {
 			], true, false)
 			.then((result) => {
 				dataItem.comment = result.comment;
+				this.updateRecordState(dataItem);
 			}).catch((error) => console.log(error));
 	}
 
