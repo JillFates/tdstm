@@ -269,11 +269,42 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void deleteDependencies(AssetEntity assetEntity) {
-		List<Long> dependenciesToDelete = NumberUtil.toPositiveLongList(command.dependencyMap.deleteDependencies)
-		if (dependenciesToDelete) {
-			// Delete all the requested dependencies.
-			deleteDependencies(dependenciesToDelete, assetEntity)
+		// Delete missing supporting dependencies
+		deleteDependencies(assetEntity, false)
+		// Delete missing dependents
+		deleteDependencies(assetEntity, true)
+	}
+
+	/**
+	 * Determine which dependencies are no longer require and delete them.
+	 *
+	 * This method works with only one side (dependent or supporting), which is controlled
+	 * by the isDependent flag.
+	 *
+	 * @param assetEntity
+	 * @param isDependent - true: the given asset is the dependent side; false: it's the supporting one.
+	 */
+	private void deleteDependencies(AssetEntity assetEntity, boolean isDependent) {
+		// Determine those dependencies no longer valid.
+		List<Long> dependents = collectDependencies(isDependent)
+		// Delete the dependencies for the asset not included in the dependents list.
+		deleteDependencies(dependents, assetEntity, isDependent)
+	}
+
+	/**
+	 * Collect a list of Dependency IDs (dependent or supporting dependencies)
+	 */
+	private List<Long> collectDependencies(boolean isDependent) {
+		List<Long> dependencies = []
+		List depList = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
+		for (depMap in depList) {
+			Long id = NumberUtil.toLong(depMap.id)
+			if (id) {
+				dependencies << id
+			}
 		}
+
+		return dependencies
 	}
 
 	/**
@@ -320,16 +351,17 @@ abstract class AssetSaveUpdateStrategy {
 	 *
 	 * @param ids - dependency ids.
 	 * @param assetEntity
+	 * @param isDependent - true: the target asset is the dependent side, false if it's the supporting side.
 	 */
-	private void deleteDependencies(List<Long> ids, AssetEntity assetEntity) {
+	private void deleteDependencies(List<Long> ids, AssetEntity assetEntity, boolean isDependent) {
 		/* Delete dependencies. As an extra precaution, the query doesn't simply delete dependencies
 		* given their id, but also takes the asset being edited into account.*/
 		String side = isDependent ? 'dependent' : 'asset'
-		String hql = "DELETE FROM AssetDependency ad WHERE (asset = :asset OR dependent = :dependent)"
-		Map params = [asset: assetEntity, dependent: assetEntity]
+		String hql = "DELETE FROM AssetDependency ad WHERE $side = :asset"
+		Map params = [asset: assetEntity]
 		// Add the NOT IN condition only if the dependents list is not empty
 		if (ids) {
-			hql += " AND id IN (:ids)"
+			hql += " AND id NOT IN (:ids)"
 			params['ids'] = ids
 		}
 		AssetDependency.executeUpdate(hql, params)
