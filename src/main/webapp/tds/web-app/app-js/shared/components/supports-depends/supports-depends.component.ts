@@ -351,7 +351,6 @@ export class SupportsDependsComponent implements OnInit {
 		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
 			this.model.dependencyMap.supportAssets = [];
-			// this.dataGridSupportsOnHelper.gridData.data;
 			if (this.dataGridDependsOnHelper) {
 				this.initDone.emit(this.model);
 			}
@@ -360,7 +359,6 @@ export class SupportsDependsComponent implements OnInit {
 		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
 			this.model.dependencyMap.dependentAssets = [];
-			// this.dataGridDependsOnHelper.gridData.data;
 			if (this.dataGridSupportsOnHelper) {
 				this.initDone.emit(this.model);
 			}
@@ -429,8 +427,6 @@ export class SupportsDependsComponent implements OnInit {
 	 * Add a new Dependency
 	 */
 	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
-		// this.dataGridSupportsOnHelper.getCreatedUpdatedRecords();
-
 		let unknownIndex = this.statusList.indexOf('Unknown');
 		if (unknownIndex === -1) {
 			unknownIndex = 0
@@ -454,7 +450,6 @@ export class SupportsDependsComponent implements OnInit {
 			comment: ''
 		};
 
-		// dataGrid.addDataItem(dependencySupportModel);
 		dataGrid.addResultSetItem(dependencySupportModel);
 		this.onChangeInternalModel();
 		this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
@@ -608,11 +603,7 @@ export class SupportsDependsComponent implements OnInit {
 
 		if (validForm) {
 			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.getCreatedUpdatedRecords();
-			// this.dataGridSupportsOnHelper.gridData.data;
-
 			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
-			// this.dataGridDependsOnHelper.gridData.data;
-
 			this.model.dependencyMap.dependentsToDelete = this.dependentsToDelete;
 			this.model.dependencyMap.supportsToDelete = this.supportsToDelete;
 		}
