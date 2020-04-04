@@ -14,6 +14,7 @@ import {DependencySupportModel} from '../components/supports-depends/model/suppo
 
 declare var jQuery: any;
 
+// Define the row state
 export enum RecordState {
 	pristine,
 	updated,
@@ -370,7 +371,7 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * Add one element to the list
+	 * Add one element to the whole list
 	 * @param item
 	 */
 	public addResultSetItem(item: any): void {
@@ -410,8 +411,6 @@ export class DataGridOperationsHelper {
 				delete item['recordState'];
 				return item;
 			});
-
-		console.log(result);
 
 		return result;
 	}

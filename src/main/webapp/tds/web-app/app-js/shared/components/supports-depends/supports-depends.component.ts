@@ -409,8 +409,15 @@ export class SupportsDependsComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Set the flag indicating the record state (updated, created)
+	 * after that updates the internal model
+	 * @param dataItem
+	 */
+
 	public updateRecordState(dataItem: DependencySupportModel): void {
 		if (dataItem.recordState === RecordState.created) {
+			this.onChangeInternalModel();
 			return;
 		} else {
 			dataItem.recordState = RecordState.updated;
