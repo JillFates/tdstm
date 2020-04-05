@@ -225,11 +225,12 @@ export class UserContextState {
 	@Action(SetPageChange)
 	setPageChange(ctx: StateContext<UserContextModel>, {payload}: SetPageChange) {
 		const state = ctx.getState();
-		let notices = state.notices;
-		notices.redirectUrl = payload.path;
+		const notices = state.notices;
 		ctx.setState({
 			...state,
-			notices: notices
+			notices: {
+				redirectUrl: payload.path
+			}
 		});
 	}
 

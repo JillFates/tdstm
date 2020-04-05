@@ -4,9 +4,7 @@ import {
 	EventEmitter,
 	HostListener,
 	Input,
-	OnChanges,
 	Output,
-	SimpleChanges,
 	ViewChild
 } from '@angular/core';
 import {ReplaySubject} from 'rxjs';
@@ -33,10 +31,9 @@ import {TaskService} from '../../service/task.service';
                     <label class="popup-label">Assigned Person:</label>
                     <kendo-combobox
                             [data]="highlightOptions?.persons"
-                            [(value)]="persons"
+                            [(value)]="person"
                             [valueField]="'name'"
                             [textField]="'name'"
-                            (valueChange)="tasksByQuery()"
                             #personsCombobox>
                     </kendo-combobox>
 		              </div>
@@ -47,18 +44,16 @@ import {TaskService} from '../../service/task.service';
 					                  [(value)]="selectedTeam"
 	                          [valueField]="'name'"
 	                          [textField]="'name'"
-	                          (valueChange)="tasksByQuery()"
 					                  #teamCombobox>
 	                  </kendo-combobox>
                   </div>
 		              <div class="popup-option">
 	                  <label class="popup-label">Application Owner or SMEs:</label>
 	                  <kendo-combobox
-					                  [data]="highlightOptions?.ownerAndSmes"
+					                  [data]="highlightOptions?.ownersAndSmes"
 					                  [(value)]="appOwner"
 	                          [valueField]="'name'"
 	                          [textField]="'name'"
-	                          (valueChange)="tasksByQuery()"
 					                  #ownerCombobox>
 	                  </kendo-combobox>
 		              </div>
@@ -69,49 +64,48 @@ import {TaskService} from '../../service/task.service';
 					                  [(value)]="environment"
 	                          [valueField]="'name'"
 	                          [textField]="'name'"
-	                          (valueChange)="tasksByQuery()"
 					                  #environmentCombobox>
 	                  </kendo-combobox>
                   </div>
-                  <div class="popup-option">
-	                  <label class="popup-label">Tags assigned to Assets:</label>
-	                  <kendo-combobox
-					                  [data]="highlightOptions?.environments"
-					                  [(value)]="environment"
-	                          [valueField]="'name'"
-	                          [textField]="'name'"
-	                          (valueChange)="tasksByQuery()"
-					                  #environmentCombobox>
-	                  </kendo-combobox>
-                  </div>
+<!--                  <div class="popup-option">-->
+<!--	                  <label class="popup-label">Tags assigned to Assets:</label>-->
+<!--	                  <kendo-combobox-->
+<!--					                  [data]="highlightOptions?.environments"-->
+<!--					                  [(value)]="environment"-->
+<!--	                          [valueField]="'name'"-->
+<!--	                          [textField]="'name'"-->
+<!--	                          (valueChange)="tasksByQuery()"-->
+<!--					                  #environmentCombobox>-->
+<!--	                  </kendo-combobox>-->
+<!--                  </div>-->
 		              <br/>
 
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="highlightOptions.showCycles"
-				                      (ngModelChange)="tasksByQuery()" />
-                      <span class="checkmark"></span>
+				                      [(ngModel)]="highlightOptions.showCycles"/>
+                      <span class="highlight-checkmark"></span>
                       Cyclical Paths
                   </label>
 
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="highlightOptions.withActions"
-				                      (ngModelChange)="tasksByQuery()" />
-                      <span class="checkmark"></span>
+				                      [(ngModel)]="highlightOptions.withActions"/>
+                      <span class="highlight-checkmark"></span>
                       With Actions
                   </label>
 
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="highlightOptions.withTmdActions"
-				                      (ngModelChange)="tasksByQuery()" />
-                      <span class="checkmark"></span>
+				                      [(ngModel)]="highlightOptions.withTmdActions"/>
+                      <span class="highlight-checkmark"></span>
                       With Actions requiring TMD
                   </label>
+		              <div class="popup-option">
+                      <button class="btn"(click)="tasksByQuery()">Search</button>
+		              </div>
               </kendo-popup>
 		      </div>
           <div class="disp-table-cell">
@@ -120,7 +114,6 @@ import {TaskService} from '../../service/task.service';
                       class="form-control highlight-filter-control"
                       placeholder="Highlight filter"
                       [(ngModel)]="filterText"
-                      (ngModelChange)="highlightFilterChange()"
                       #highlightFilterText
               />
           </div>
@@ -131,10 +124,12 @@ import {TaskService} from '../../service/task.service';
                       [ngClass]="['clear-icon-button']"
                       [hidden]="!filterText || filterText.length < 1"></fa-icon>
           </div>
-      </div>`,
+      </div>`
 })
 export class TaskHighlightFilter {
 	@Input('highlightOptions') highlightOptions: ITaskHighlightOption;
+	@Input('eventId') eventId: number;
+	@Input('viewUnpublished') viewUnpublished: boolean;
 	@Output() filteredTasks: EventEmitter<IGraphTask[]> = new EventEmitter();
 	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
 	icons = FA_ICONS;
@@ -142,7 +137,7 @@ export class TaskHighlightFilter {
 	textFilter: ReplaySubject<string> = new ReplaySubject<string>(1);
 	unsubscribe$: ReplaySubject<void> = new ReplaySubject(1);
 	teamHighlights$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
-	persons: any;
+	person: any;
 	selectedTeam: any;
 	appOwner: any;
 	tag: any;
@@ -168,18 +163,24 @@ export class TaskHighlightFilter {
 
 	tasksByQuery(text?: string): void {
 		this.filterQueryObj = {
-			text: text || this.filterText,
-			persons: this.persons && this.persons.name,
-			teams: this.selectedTeam && this.selectedTeam.name,
-			ownerAndSmes: this.appOwner && this.appOwner.name,
-			environments: this.environment && this.environment.name,
-			tag: this.tag && this.tag.name
+			eventId: this.eventId,
+			viewUnpublished: this.viewUnpublished ? 1 : 0,
+			taskText: text || this.filterText || '',
+			assignedPersonId: this.person && this.person.id || '',
+			teams: this.selectedTeam && this.selectedTeam.name || '',
+			ownerSmeId: this.appOwner && this.appOwner.id || '',
+			environments: this.environment && this.environment.name || '',
+			tagIds: [],
+			tagMatch: '',
+			cyclicalPath: this.highlightOptions.showCycles ? '1' : '0',
+			withActions: this.highlightOptions.withActions ? '1' : '0',
+			withTmdActions: this.highlightOptions.withTmdActions ? '1' : '0'
 		};
 		this.taskService.findTasksByQuery(this.filterQueryObj)
 			.subscribe(res => {
-				const data = res.body && res.body.data;
+				const data = res.body && res.body.data.taskIds;
 				if (data) {
-					this.filteredTasks.emit(data.map(d => ({key: d})));
+					this.filteredTasks.emit(data);
 				}
 			});
 	}

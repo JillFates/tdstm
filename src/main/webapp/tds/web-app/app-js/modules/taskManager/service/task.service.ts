@@ -54,7 +54,7 @@ export class TaskService {
 	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
 	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/wsTimeline/timeline`;
-	private readonly TASK_BY_QUERY = `${ this.baseURL }/task/neighborhood`;
+	private readonly TASK_BY_QUERY = `${ this.baseURL }/ws/taskGraph/taskSearch`;
 	private readonly TASK_HIGHLIGHT_OPTIONS = `${ this.baseURL }/ws/taskGraph/taskHighlightOptions`;
 
 	// Resolve HTTP using the constructor
@@ -603,19 +603,27 @@ export class TaskService {
 	 * GET - Find task for neighborhood component
 	 * @param queryObj
 	 */
-	findTasksByQuery(queryObj: ITaskHighlightQuery): Observable<HttpResponse<ITaskResponseBody>> {
+	findTasksByQuery(queryObj: ITaskHighlightQuery): Observable<HttpResponse<any>> {
 		const params = new HttpParams()
-			.set('text', queryObj.text)
-			.set('persons', queryObj.persons)
+			.set('eventId', `${queryObj.eventId}`)
+			.set('viewUnpublished', `${queryObj.viewUnpublished ? '1' : '0'}`)
+			.set('taskText', queryObj.taskText)
+			.set('assignedPersonId', `${queryObj.assignedPersonId}`)
 			.set('teams', queryObj.teams)
-			.set('ownerAndSmes', queryObj.ownerAndSmes)
-			.set('tag', queryObj.tag);
-		return this.http.get<ITaskResponseBody>(`${this.TASK_BY_QUERY}`,
+			.set('ownerSmeId', queryObj.ownerSmeId);
+		return this.http.get<any>(`${this.TASK_BY_QUERY}`,
 			{ params, observe: 'response' });
 	}
 
-	highlightOptions(): Observable<HttpResponse<ITaskHighlightOptionsResponseBody>> {
-		return this.http.get<ITaskHighlightOptionsResponseBody>(this.TASK_HIGHLIGHT_OPTIONS, { observe: 'response' });
+	highlightOptions(eventId: number, viewUnpublished: boolean): Observable<HttpResponse<ITaskHighlightOptionsResponseBody>> {
+		const params = new HttpParams()
+			.set('eventId', `${eventId}`)
+			.set('viewUnpublished', `${viewUnpublished ? '1' : '0'}`);
+		return this.http.get<ITaskHighlightOptionsResponseBody>(`${this.TASK_HIGHLIGHT_OPTIONS}`,
+			{
+				params,
+				observe: 'response'
+			});
 	}
 
 	/**

@@ -148,7 +148,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	loadAll(): void {
 		this.subscribeToHighlightFilter();
 		this.loadUserContext();
-		this.loadHighlightOptions();
 		this.loadFilters();
 		this.loadEventList();
 	}
@@ -204,34 +203,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	loadHighlightOptions(): void {
-		// this.taskService.highlightOptions()
-		// 	.subscribe(res => {
-		// 		const data = res.body && res.body.data;
-		// 		if (data) {
-		// 			this.highlightOptions$.next(data);
-		// 		}
-		// 	});
-		const mock: ITaskHighlightOption = {
-			persons: [
-				{id: 123, name: 'Bill Bord'},
-				{id: 456, name: 'Robin Banks'}
-			],
-			teams: [
-				{id: 'SYS_ADMIN', name: 'System Admin'}
-			],
-			ownerAndSmes: [
-				{id: 123, name: 'Bill Bord'},
-				{id: 456, name: 'Robin Banks'}
-			],
-			environments: [
-				{id: 'PRODUCTION', name: 'PRODUCTION'},
-				{id: 'DEVELOPMENT', name: 'DEVELOPMENT'}
-			],
-		};
-		this.highlightOptions$.next(mock);
-	}
-
 	/**
 	 * Load user preferences to filter tasks and then load tasks
  	**/
@@ -262,6 +233,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		} else {
 			this.loadFromSelectedEvent();
 		}
+		this.loadHighlightOptions();
 	}
 
 	/**
@@ -378,6 +350,19 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
+	}
+
+	/**
+	 * load highlight options
+	 */
+	loadHighlightOptions(): void {
+		this.taskService.highlightOptions(this.selectedEvent.id, this.viewUnpublished)
+			.subscribe(res => {
+				const data = res.body && res.body.data;
+				if (data) {
+					this.highlightOptions$.next(data);
+				}
+			});
 	}
 
 	/**
@@ -585,9 +570,19 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if ((this.taskCycles && this.taskCycles.length > 0) && this.showCycles) {
 			const cycles = [];
 			this.taskCycles.forEach(arr => cycles.push(...arr));
-			this.graph.highlightNodes((n: Node) => cycles.includes(n.data.id), true);
+			this.graph.highlightNodes((n: Node) => cycles && cycles.includes(n.data.id), true);
 		} else {
 			this.graph.clearHighlights();
+		}
+	}
+
+	/**
+	 * Highlight nodes
+	 * @param {any} tasks
+	 */
+	highlightTasks(tasks: any): void {
+		if (tasks && tasks.length > 0) {
+			this.graph.highlightNodes((n: Node) => tasks && tasks.includes(n.data.id));
 		}
 	}
 

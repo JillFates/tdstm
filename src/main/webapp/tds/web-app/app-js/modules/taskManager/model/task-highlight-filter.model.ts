@@ -1,16 +1,22 @@
 export interface ITaskHighlightQuery {
-	persons?: string;
+	eventId?: number;
+	viewUnpublished?: number;
+	assignedPersonId?: number;
 	teams?: string;
-	ownerAndSmes?: string;
+	ownerSmeId?: string;
 	environments?: string;
-	text?: string;
-	tag?: string;
+	taskText?: string;
+	tagIds?: [];
+	tagMatch?: string;
+	cyclicalPath?: any;
+	withActions?: any;
+	withTmdActions?: any;
 }
 
 export interface ITaskHighlightOption {
 	persons?: IFilterOption[];
 	teams?: IFilterOption[];
-	ownerAndSmes?: IFilterOption[];
+	ownersAndSmes?: IFilterOption[];
 	environments?: IFilterOption[];
 	showCycles?: boolean;
 	withActions?: boolean;

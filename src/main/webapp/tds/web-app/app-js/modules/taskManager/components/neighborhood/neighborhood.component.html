@@ -51,6 +51,8 @@
     <div class="col-md-2">
       <task-highlight-filter
               [highlightOptions]="highlightOptions$ | async"
+              [eventId]="selectedEvent?.id"
+              [viewUnpublished]="viewUnpublished"
               (filteredTasks)="this.highlightTasks($event)"></task-highlight-filter>
     </div>
 

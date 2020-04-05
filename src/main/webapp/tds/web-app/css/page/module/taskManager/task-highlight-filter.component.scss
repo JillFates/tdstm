@@ -1,11 +1,12 @@
 .highlight-filter-popup {
   z-index: 70;
   border-radius: .2rem;
-  padding: 0 2px 0 2px;
+  padding: 2px 2px 2px 2px;
 }
 
 .popup-option {
   align-self: center;
+  margin-bottom: 10px;
 }
 
 .popup-label {
@@ -52,7 +53,7 @@
 }
 
 /* Create a custom checkbox */
-.checkmark {
+.highlight-checkmark {
   position: absolute;
   top: 5%;
   left: 0;
@@ -62,30 +63,30 @@
 }
 
 /* On mouse-over, add a grey background color */
-.task-chk-container:hover input ~ .checkmark {
+.task-chk-container:hover input ~ .highlight-checkmark {
   background-color: #ccc;
 }
 
 /* When the checkbox is checked, add a blue background */
-.task-chk-container input:checked ~ .checkmark {
+.task-chk-container input:checked ~ .highlight-checkmark {
   background-color: #2196F3;
 }
 /* Create the checkmark/indicator (hidden when not checked) */
-.checkmark:after {
+.highlight-checkmark:after {
   content: "";
   position: absolute;
   display: none;
 }
 
 /* Show the checkmark when checked */
-.task-chk-container input:checked ~ .checkmark:after {
+.task-chk-container input:checked ~ .highlight-checkmark:after {
   display: block;
 }
 
 /* Style the checkmark/indicator */
-.task-chk-container .checkmark:after {
-  left: 9px;
-  top: 5px;
+.task-chk-container .highlight-checkmark:after {
+  left: 6px;
+  top: 2px;
   width: 5px;
   height: 10px;
   border: solid white;
