@@ -20,12 +20,12 @@ declare var jQuery: any;
 	selector: 'tds-supports-depends',
 	template: `
         <kendo-grid
-                *ngIf="dataGridSupportsOnHelper"
+                *ngIf="dataGridSupportsOnHelper && dataGridSupportsOnHelper.gridData; let gridDataSupports"
                 class="dependents-grid"
                 [pageSize]="dataGridSupportsOnHelper.state.take"
                 [skip]="dataGridSupportsOnHelper.state.skip"
-                [pageable]="{pageSizes: dataGridSupportsOnHelper.defaultPageOptions, info: true}"
-                [filterable]="true"
+         		[filterable]="gridDataSupports.total === 0 ? false : true"
+                [pageable]="gridDataSupports.total === 0 ? false : {pageSizes: dataGridSupportsOnHelper.defaultPageOptions, info: true}"
                 (pageChange)="dataGridSupportsOnHelper.pageChange($event)"
                 [data]="dataGridSupportsOnHelper.gridData"
                 [sort]="dataGridSupportsOnHelper.state.sort"
@@ -162,13 +162,13 @@ declare var jQuery: any;
         </kendo-grid>
 
         <kendo-grid
-                *ngIf="dataGridDependsOnHelper"
+                *ngIf="dataGridDependsOnHelper && dataGridDependsOnHelper.gridData; let gridDataDependent"
                 class="dependents-grid is-dependent-on"
                 [data]="dataGridDependsOnHelper.gridData"
-                [filterable]="true"
+                [filterable]="gridDataDependent.total === 0 ? false : true"
+                [pageable]="gridDataDependent.total === 0 ? false : {pageSizes: dataGridDependsOnHelper.defaultPageOptions, info: true}"
                 [pageSize]="dataGridDependsOnHelper.state.take"
                 [skip]="dataGridDependsOnHelper.state.skip"
-                [pageable]="{pageSizes: dataGridDependsOnHelper.defaultPageOptions, info: true}"
                 (pageChange)="dataGridDependsOnHelper.pageChange($event)"
                 [sortable]="false"
                 [resizable]="true"
