@@ -382,6 +382,7 @@ export class DataGridOperationsHelper {
 		} else {
 			this.resultSet.splice(this.state.skip, 0, item);
 		}
+		this.reloadData(this.resultSet);
 	}
 
 	/**
