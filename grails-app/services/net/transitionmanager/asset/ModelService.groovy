@@ -1,19 +1,16 @@
 package net.transitionmanager.asset
 
-import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.asset.AssetCableMap
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.command.ModelCommand
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.command.ModelCommand
 import net.transitionmanager.controller.PaginationObject
-import grails.web.servlet.mvc.GrailsParameterMap
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelAlias
@@ -235,7 +232,7 @@ class ModelService implements ServiceMethods {
 	 * @param manufacturerId
 	 * @return
 	 */
-	boolean isValidName(String modelName, Long modelId, Long manufacturerId) {
+	void validateModelName(String modelName, Long modelId, Long manufacturerId) {
 		// rule #1
 		int count = Model.where {
 			modelName == modelName
@@ -245,23 +242,18 @@ class ModelService implements ServiceMethods {
 			}
 		}.count()
 
-		if (count == 0) {
-			// rule #2
-			count = ModelAlias.where {
-				name == modelName
-				manufacturer.id == manufacturerId
-			}.count()
+		if (count != 0) {
+			throwException(InvalidParamException, 'model.name.manufacturer.unique', [modelName], '"Model name `{0}` is not unique within the same manufacturer."')
+		}
 
-			if (count == 0) {
-				return true
-			} else {
-				String error = "Model name (${modelName}) duplicates an existing AKA."
-				throw new ServiceException(error)
-			}
+		// rule #2
+		count = ModelAlias.where {
+			name == modelName
+			manufacturer.id == manufacturerId
+		}.count()
 
-		} else {
-			String error = "Model name (${modelName}) is not unique within the same manufacturer."
-			throw new ServiceException(error)
+		if (count != 0) {
+			throwException(InvalidParamException, 'model.name.aka.duplicate', [modelName], 'Model name `{0}` duplicates an existing AKA.')
 		}
 	}
 
@@ -319,51 +311,8 @@ class ModelService implements ServiceMethods {
 	}
 
 	@Transactional
-	boolean save(Model model, Map params) {
-		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true, failOnError: true)) {
-			int connectorCount = params.connectorCount
-			if (connectorCount > 0) {
-				for (int i = 0; i < connectorCount; i++) {
-					def modelConnector = new ModelConnector(model: model,
-							connector: model.modelConnectors[i].connector,
-							label: model.modelConnectors[i].label,
-							type: model.modelConnectors[i].type,
-							labelPosition: model.modelConnectors[i].labelPosition,
-							connectorPosX: model.modelConnectors[i].connectorPosX,
-							connectorPosY: model.modelConnectors[i].connectorPosY,
-							status: model.modelConnectors[i].status)
-				}
-			} else {
-				def powerConnector = new ModelConnector(model: model,
-						connector: 1,
-						label: "Pwr1",
-						type: "Power",
-						labelPosition: "Right",
-						connectorPosX: 0,
-						connectorPosY: 0,
-						status: "missing"
-				)
-
-				powerConnector.save(flush: true)
-			}
-
-			model.sourceTDSVersion = 1
-			model.save(flush: true)
-			List akaNames = params.akaChanges.added
-			akaNames.each { aka ->
-				if (!StringUtil.isBlank(aka.name)) {
-					findOrCreateAliasByName(model, aka.name, true)
-				}
-			}
-			return true
-		} else {
-			return false
-		}
-	}
-
-	@Transactional
 	boolean update(Model model, Map params) {
-		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true)) {
+		if (validateModelName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true)) {
 			String deletedAka = params.akaChanges.deleted
 			if (deletedAka) {
 				List<Long> maIds = deletedAka.split(",").collect() { it as Long }
@@ -563,6 +512,9 @@ class ModelService implements ServiceMethods {
 	 */
 	Model createOrUpdateModel(Project project, ModelCommand modelCommand) {
 		Model model = (Model) GormUtil.populateDomainFromCommand(project, Model, modelCommand.id, modelCommand, null, true)
+
+		// Firts validate name with Manufacturer
+		validateModelName(model.modelName, model.id, model.manufacturer.id)
 
 		if (modelCommand.powerType && modelCommand.powerType.equalsIgnoreCase('Amps')) {
 			model.powerNameplate = NumberUtil.toInteger(model.powerNameplate, 0) * 120

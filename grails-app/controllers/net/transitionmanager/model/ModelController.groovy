@@ -1,31 +1,35 @@
 package net.transitionmanager.model
 
+import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.ExportUtil
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
+import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.asset.AssetCableMap
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityAttributeLoaderService
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.ModelService
-import net.transitionmanager.exception.ServiceException
-import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.tm.enums.domain.AssetCableStatus
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.*
-import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.security.Permission
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.MediaType
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.web.multipart.MultipartFile
+
 import java.text.DateFormat
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -110,30 +114,16 @@ class ModelController implements ControllerMethods, PaginationMethods {
 
 	@HasPermission(Permission.ModelCreate)
 	def create() {
-		List<ModelConnector> modelConnectors
-		Model modelTemplate
 
-		List<Integer> otherConnectors = []
-		int existingConnectors = modelConnectors ? modelConnectors.size() + 1 : 1
-
-		for (int i = existingConnectors; i < 51; i++) {
-			otherConnectors << i
-		}
-
-		Model modelInstance = new Model()
-		def usizeList = com.tdssrc.grails.GormUtil.getConstrainedProperties(modelInstance.class).usize.inList
-
-		def paramsMap = [
-			modelInstance  : modelInstance,
-			modelConnectors: modelConnectors,
-			otherConnectors: otherConnectors,
-			modelTemplate  : modelTemplate,
-			powerType      : userPreferenceService.getPreference(PREF.CURR_POWER_TYPE),
-			assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value,
-			usizeList      : usizeList
-		]
-
-		renderSuccessJson(paramsMap)
+		renderSuccessJson([
+				modelInstance  : new Model(),
+				modelConnectors: null,
+				otherConnectors: (1..50).collect {it},
+				modelTemplate  : null,
+				powerType      : userPreferenceService.getPreference(PREF.CURR_POWER_TYPE),
+				assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value,
+				usizeList      : GormUtil.getConstrainedProperties(Model).usize.inList
+		])
 	}
 
 	private boolean isValidImage(MultipartFile file) {
@@ -141,70 +131,6 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			return OK_CONTENTS.contains(file.getContentType())
 		}
 		return false
-	}
-
-	@HasPermission(Permission.ModelEdit)
-	def save() {
-		try {
-			Map modelRequest = request.JSON
-			def modelId = modelRequest.modelId
-			def powerNameplate = modelRequest.powerNameplate?.toFloat()
-			def powerDesign = modelRequest.powerDesign?.toFloat()
-			def powerUsed = modelRequest.powerUse?.toFloat()
-			def powerType = modelRequest.powerType
-			def memorySize = modelRequest.memorySize?.toFloat()
-			def storageSize = modelRequest.storageSize?.toFloat()
-			def endOfLifeDate = modelRequest.endOfLifeDate
-
-			if (endOfLifeDate) {
-				modelRequest.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
-			}
-
-			if (powerType == "Amps") {
-				powerNameplate *= 120
-				powerDesign *= 120
-				powerUsed *= 120
-			}
-
-			Model modelTemplate = modelId ? Model.get(modelId) : null
-			modelRequest.powerUse = powerUsed
-
-			def modelInstance = new Model(modelRequest)
-			modelInstance.powerUse = powerUsed
-			modelInstance.powerDesign = powerDesign
-			modelInstance.powerNameplate = powerNameplate
-			modelInstance.memorySize = memorySize
-			modelInstance.storageSize = storageSize
-
-			if (modelRequest.modelStatus == 'valid') {
-				modelInstance.validatedBy = securityService.loadCurrentPerson()
-			}
-
-			if (modelService.save(modelInstance, modelRequest)) {
-				renderSuccessJson([status: "${modelInstance.modelName} created"])
-			} else {
-				modelInstance.errors.allErrors.each {  log.error it }
-
-				def modelConnectors = modelTemplate ? ModelConnector.findAllByModel(modelTemplate) : null
-				def otherConnectors = []
-				def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
-				for (int i = existingConnectors ; i<51; i++) { // <SL> magic number 51?
-					otherConnectors << i
-				}
-
-				Map modelPref = assetEntityService.getExistingPref(PREF.Model_Columns)
-				Map attributes = Model.getModelFieldsAndlabels()
-				Map columnLabelpref = [:]
-				modelPref.each { key, value -> columnLabelpref[key] = attributes[value] }
-				render(view: "list", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
-											 otherConnectors:otherConnectors, modelTemplate:modelTemplate,
-											 modelPref: modelPref,
-											 attributesList: attributes.keySet().sort(),
-											 columnLabelpref: columnLabelpref ] )
-			}
-		} catch (ServiceException e) {
-			renderErrorJson([status: e.message])
-		}
 	}
 
 	@HasPermission(Permission.ModelView)
@@ -292,94 +218,6 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		} else {
 			flash.message = "Model id $params.id is not a valid Id "
 			redirect(action: "list")
-		}
-	}
-
-	@HasPermission(Permission.ModelEdit)
-	def update() {
-		try{
-			Map modelRequest = request.JSON
-			def modelInstance = Model.get(params.id)
-			def modelStatus = modelInstance?.modelStatus
-			def endOfLifeDate = modelRequest.endOfLifeDate
-
-			Person person = null
-			if (securityService.loggedIn) {
-				person = securityService.userLoginPerson
-			}
-
-			if (endOfLifeDate) {
-				modelRequest.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
-			}
-
-			if (modelInstance) {
-				def powerNameplate = modelRequest.powerNameplate?.toFloat()
-				def powerDesign = modelRequest.powerDesign?.toFloat()
-				def powerUsed = modelRequest.powerUse?.toFloat()
-				def powerType = modelRequest.powerType
-				def memorySize = modelRequest.memorySize?.toFloat()
-				def storageSize = modelRequest.storageSize?.toFloat()
-
-				if (powerType== "Amps") {
-					powerNameplate = powerNameplate * 120
-					powerDesign = powerDesign * 120
-					powerUsed = powerUsed * 120
-				}
-
-				//params.useImage = params.boolean("useImage", false) ? 1 : 0
-				modelRequest.powerNameplate = powerNameplate
-				modelRequest.powerDesign = powerDesign
-				modelRequest.powerUse = powerUsed
-				modelRequest.memorySize = memorySize
-				modelRequest.storageSize = storageSize
-
-				modelInstance.height = modelRequest.height?.toDouble()?.round()
-				modelInstance.weight = modelRequest.weight?.toDouble()?.round()
-				modelInstance.depth = modelRequest.depth?.toDouble()?.round()
-				modelInstance.width = modelRequest.width?.toDouble()?.round()
-
-				if (modelRequest.modelStatus == 'valid' && modelStatus == 'full') {
-					modelInstance.validatedBy = person
-					modelInstance.updatedBy = modelInstance.updatedBy
-				} else {
-					modelInstance.updatedBy = person
-				}
-
-				modelInstance.properties = modelRequest
-
-				try {
-					if (modelService.update(modelInstance, modelRequest)) {
-                        renderSuccessJson([status: "$modelInstance.modelName Updated"])
-						if (params.redirectTo == "assetAudit") {
-							render(template: "modelAuditView", model: [modelInstance: modelInstance])
-						} else {
-                            renderSuccessJson()
-						}
-					} else {
-						modelInstance.errors.allErrors.each { log.error it }
-                        renderWarningJson([status: "Unable to update model"])
-					}
-				} catch (ServiceException e) {
-                    renderErrorJson([status: e.message])
-				}
-			} else {
-                renderWarningJson([status: "Model not found with Id ${params.id}"])
-			}
-		} catch(RuntimeException rte) {
-            renderErrorJson([status: rte.message])
-		}
-	}
-
-	@HasPermission(Permission.ModelDelete)
-	def delete() {
-		Model model = Model.get(params.id)
-		try {
-			modelService.delete(model)
-			renderSuccessJson(DELETE_OK_MESSAGE)
-		} catch (DataIntegrityViolationException e) {
-			renderErrorJson(e.messge)
-		} catch (ServiceException e) {
-			renderErrorJson(e.message)
 		}
 	}
 
