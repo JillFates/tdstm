@@ -13,6 +13,8 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {AssetEditComponent} from './asset-edit.component';
+import {process, State} from '@progress/kendo-data-query';
+import {DataStateChangeEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
 declare var jQuery: any;
 
@@ -26,6 +28,19 @@ export class AssetCommonShow implements OnInit {
 	protected isHighField = AssetCommonHelper.isHighField;
 	public ignoreDoubleClickClasses =
 		['btn', 'clickableText', 'table-responsive', 'task-comment-component'];
+
+	public supports: State = {
+		skip: 0,
+		take: 5,
+
+		// Initial filter descriptor
+		filter: {
+			logic: 'and',
+			filters: [{ field: 'ProductName', operator: 'contains', value: 'Chef' }]
+		}
+	};
+
+	public gridSupportsData: GridDataResult = process([], this.supports);
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
@@ -48,6 +63,11 @@ export class AssetCommonShow implements OnInit {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
+	}
+
+	public dataStateChange(state: DataStateChangeEvent): void {
+		this.supports = state;
+		this.gridSupportsData = process([], this.supports);
 	}
 
 	/**
