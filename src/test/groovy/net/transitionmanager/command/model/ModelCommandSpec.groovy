@@ -59,7 +59,7 @@ class ModelCommandSpec extends Specification implements ControllerUnitTest<Model
             null      | null           | null                | null        | null             | null     | null          || false
             'Watts'   | null           | null                | null        | null             | null     | null          || false
             'Watts'   | '1.0'          | 1.0f                | '1.0'       | 1.0f             | '1.0'    | 1.0f          || true
-            'Amps'    | '1.0'          | 120.0f              | '1.0'       | 120.0f           | '1.0'    | 120.0f        || true
+            'Amps'    | '1.0'          | 1.0f                | '1.0'       | 1.0f             | '1.0'    | 1.0f          || true
             'Invalid' | '1.0'          | 1.0f                | '1.0'       | 1.0f             | '1.0'    | 1.0f          || false
     }
 
