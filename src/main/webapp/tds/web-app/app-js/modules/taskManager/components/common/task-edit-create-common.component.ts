@@ -178,7 +178,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 				commonCalls.push(this.taskManagerService.getEvents());
 				commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
 				commonCalls.push(this.taskManagerService.getAssetClasses());
-				commonCalls.push(this.taskManagerService.getClassForAsset(this.model && this.model.asset.id));
+				commonCalls.push(this.taskManagerService.getClassForAsset(assetId));
 			}
 
 			this.metaParam = this.getMetaParam();
