@@ -26,7 +26,6 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {FieldInfoType} from '../../../importBatch/components/record/import-batch-record-fields.component';
 import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
 import {FieldReferencePopupComponent} from '../../../../shared/components/field-reference-popup/field-reference-popup.component';
-import { SelectEvent } from '@progress/kendo-angular-layout/dist/es2015/tabstrip/tabstrip-events';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -177,10 +176,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 								const data = result && result.data || {};
 								this.scriptTestResult.domains = data.domains || [];
 								this.transformedDataGrids = [];
-								// Load first domain data only from the array.
-								if (this.scriptTestResult.domains.length) {
-									this.loadDataForDomain(0);
-								}
+								this.scriptTestResult.domains.forEach( (domain,  index) => {
+									this.transformedDataGrids[index] = new DataGridOperationsHelper(domain.data);
+									// console.log(`${domain.domain}-${index.toString()}`);
+								});
 								this.scriptTestResult.consoleLog = data.consoleLog;
 								this.consoleSettings.scriptTestResult = this.scriptTestResult;
 								// Finally re-load the Sample Data Preview if working with JSON files.
@@ -195,38 +194,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					}, 2000)
 				}
 			});
-	}
-
-	/**
-	 * On tab domain change, load it's data if hasn't been loaded yet.
-	 * @param $event
-	 */
-	onDomainTabSelected($event: SelectEvent) {
-		this.loadDataForDomain($event.index);
-	}
-
-	/**
-	 * Returns the correct title name for the domain tab.
-	 * @param domain
-	 */
-	getDomainTabTitle(domain: any): string {
-		let title = domain.domain;
-		return domain.dataSize || domain.dataSize === 0 ? `${title} (${domain.dataSize})` : title;
-	}
-
-	/**
-	 * If current domain doesn't have [data], then it needs to be loaded from a file.
-	 * @param tabIndex
-	 */
-	private loadDataForDomain(tabIndex: number): void {
-		const domain: any = this.scriptTestResult.domains[tabIndex];
-		if (!domain.data) {
-			this.importAssetsService.getFileContent(domain.outputFilename)
-				.subscribe((result: any) => {
-					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
-					domain.data = result.data;
-				});
-		}
 	}
 
 	/**
