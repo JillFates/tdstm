@@ -13,6 +13,7 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -1467,14 +1468,14 @@ class AssetEntityService implements ServiceMethods {
 		    assetCommentList: assetCommentList,
 		    dateFormat: userPreferenceService.getDateFormat(),
 			dependencyBundleNumber: depBundle,
-			dependentAssets: dependentAssets,
+			dependentAssets: JsonUtil.toJson(dependentAssets),
 			errors: params.errors,
 			escapedName: getEscapedName(assetEntity),
 			prefValue: prefValue,
 			project: project,
 			client: project.client,
 			redirectTo: params.redirectTo,
-			supportAssets: supportAssets,
+			supportAssets: JsonUtil.toJson(supportAssets),
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
 			hasCreateTaskPermission: securityService.hasPermission(Permission.TaskCreate),
