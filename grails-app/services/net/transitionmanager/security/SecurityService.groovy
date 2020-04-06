@@ -224,7 +224,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	@Transactional(readOnly=true)
 	Project getUserCurrentProject() {
 		Project project = null
-		String projectId = this.getUserCurrentProjectId()//
+		String projectId = this.getUserCurrentProjectId()
 		if(projectId){
 			project = Project.get( this.getUserCurrentProjectId() )
 		}
