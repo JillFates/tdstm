@@ -79,10 +79,10 @@ class TaskGraphService implements ServiceMethods {
 
         // boolean that tells whether or not unpublished tasks need to be included.
         boolean viewUnpublished = taskSearchCommand.viewUnpublishedTasks(securityService.hasPermission(Permission.TaskViewUnpublished))
-        MoveEvent moveEvent = null
+        MoveEvent moveEvent
         // If a MoveEvent id is provided, fetch the domain object from the database (fail if the id is invalid or doesn't belong to the project).
         if (taskSearchCommand.eventId) {
-            get(MoveEvent, taskSearchCommand.eventId, project)
+            moveEvent = get(MoveEvent, taskSearchCommand.eventId, project)
         }
 
         // Check if the CPA needs to be calculated, in which case it gets executed.

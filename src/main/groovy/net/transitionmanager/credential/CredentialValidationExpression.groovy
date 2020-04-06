@@ -24,6 +24,7 @@ class CredentialValidationExpression {
 	static final String INVALID_HEADER_EXPRESSION_MSG = 'Invalid header expression (e.g. header Location contains "/welcome")'
 	static final String INVALID_STATUS_EXPRESSION_MSG = 'Invalid status expression (e.g. status code contains "200")'
 	static final String EMPTY_EXPRESSION_MSG = 'An expression is required'
+	static final String UNRECOGNIZED_SYNTAX_MSG = "Unrecognized syntax"
 
 	CredentialValidationExpression(String expression) {
 		parse(expression)
