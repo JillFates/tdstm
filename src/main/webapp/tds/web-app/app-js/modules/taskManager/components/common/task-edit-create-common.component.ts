@@ -38,7 +38,6 @@ import {DatePartUnit, DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
-import {StringUtils} from '../../../../shared/utils/string.utils';
 import {TaskEditCreateModelHelper} from './task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
@@ -47,6 +46,7 @@ import {Observable, Subject} from 'rxjs';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
 import * as R from 'ramda';
+import {StringUtils} from '../../../../shared/utils/string.utils';
 
 declare var jQuery: any;
 
@@ -174,17 +174,17 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 
 			if (this.taskDetailModel.modal.type === ModalType.CREATE) {
 				let assetId = this.model.asset && this.model.asset.id || null;
-				commonCalls.push(this.taskManagerService.getAssetClasses());
 				commonCalls.push(this.taskManagerService.getAssetCommentCategories());
 				commonCalls.push(this.taskManagerService.getEvents());
 				commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
+				commonCalls.push(this.taskManagerService.getAssetClasses());
 				commonCalls.push(this.taskManagerService.getClassForAsset(assetId));
 			}
 
 			this.metaParam = this.getMetaParam();
 			Observable.forkJoin(commonCalls)
 				.subscribe((results: any[]) => {
-					const [status, persons, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
+					const [status, persons, staffRoles, dateFormat, actions, categories, events, taskDefaults, assetClasses, classForAsset] = results;
 					let personList = persons || [];
 
 					this.model.statusList = status;
@@ -211,29 +211,27 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 					if (categories) {
 						this.model.categoriesList = [''].concat(categories);
 					}
+
+					if (assetClasses) {
+						this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
+					}
+
+					if (this.taskDetailModel.modal.type === ModalType.EDIT && classForAsset) {
+						const assetClass = this.model.assetClasses.find((asset: any) => asset.id === classForAsset && classForAsset.assetClass);
+						if (assetClass) {
+							this.model.assetClass = {
+								id: assetClass.id,
+								text: StringUtils.toCapitalCase(assetClass.text)
+							};
+						}
+					}
 					if (events) {
-						this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
+						this.model.eventList = events.map((item) => ({id: item.id && item.id.toString(), text: item.name}));
 					}
 					if (taskDefaults && taskDefaults.preferences && this.taskDetailModel.modal.type === ModalType.CREATE) {
 						this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 						this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 						this.metaParam = this.getMetaParam();
-					}
-					if (assetClasses) {
-						this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
-					}
-					// on CREATE mode
-					if (this.taskDetailModel.modal.type === ModalType.CREATE) {
-						this.model.assetClass = (classForAsset && classForAsset.assetClass)
-							? {id: classForAsset.assetClass, text: ''}
-							: {id: this.model.assetClasses[0].id, text: ''};
-						// on EDIT mode and empty assetClass
-					} else if (!this.model.assetClass || !this.model.assetClass.id) {
-						this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
-					} else {
-						// for displaying the existing assetClass
-						const deCapitilized = StringUtils.toCapitalCase(this.model.assetClass.id);
-						this.model.assetClass = {id: deCapitilized, text: deCapitilized};
 					}
 					jQuery('[data-toggle="popover"]').popover();
 					const percentageComplete = this.taskEditCreateForm.form.controls['percentageComplete'];
