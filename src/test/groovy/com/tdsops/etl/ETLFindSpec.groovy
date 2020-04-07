@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
@@ -12,6 +13,8 @@ import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
@@ -37,6 +40,20 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model, AssetOptions
@@ -145,12 +162,12 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152254', '152254')
 
-						assertWith(fields['id'].find, FindResult){
+						assertWith(fields['id'].find){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -162,11 +179,11 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						}
 					}
 
-					assertWith(data[1], RowResult){
+					assertWith(data[1]){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152255', '152255')
-						assertWith(fields['id'].find, FindResult){
+						assertWith(fields['id'].find){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -244,12 +261,12 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152254', '152254')
 
-						assertWith(fields['id'].find, FindResult){
+						assertWith(fields['id'].find){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -261,11 +278,11 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						}
 					}
 
-					assertWith(data[1], RowResult){
+					assertWith(data[1]){
 						fields.size() == 2
 						assertFieldResult(fields['environment'], 'Production', 'Production')
 						assertFieldResult(fields['id'], '152255', '152255')
-						assertWith(fields['id'].find, FindResult){
+						assertWith(fields['id'].find){
 							query.size() == 1
 							assertQueryResult(
 								query[0],
@@ -831,9 +848,9 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						fields.size() == 2
-						assertWith(fields['asset'].find, FindResult){
+						assertWith(fields['asset'].find){
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -976,9 +993,9 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 					]
 					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						fields.size() == 2
-						assertWith(fields['asset'].find, FindResult){
+						assertWith(fields['asset'].find){
 							query.size() == 4
 							assertQueryResult(
 								query[0],
@@ -2423,6 +2440,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
+            enable lookup
 			read labels
 			iterate {
 				extract 'Primary App' set primaryAppVar
@@ -2539,30 +2557,6 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						}
 
 					}
-					assertWith(data[1]){
-						op == ImportOperationEnum.INSERT.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 1
-						assertWith(fields.id) {
-							originalValue == null
-							value == null
-							init == null
-							errors == []
-							warn == false
-							assertWith(find) {
-								results == []
-								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Application, [['assetName', 'eq', 'Oracle7-Cluster']])
-							}
-							assertWith(create){
-								assetName == 'Oracle7-Cluster'
-
-							}
-						}
-
-					}
 				}
 				assertWith(domains[1]) {
 					domain == ETLDomain.Device.name()
@@ -2592,35 +2586,11 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						}
 
 					}
-					assertWith(data[1]){
-						op == ImportOperationEnum.INSERT.toString()
-						warn == false
-						duplicate == false
-						errors == []
-						rowNum == 1
-						assertWith(fields.id) {
-							originalValue == null
-							value == null
-							init == null
-							//errors == []
-							warn == false
-							assertWith(find) {
-								results == []
-								matchOn == null
-								assertQueryResult(query[0], ETLDomain.Device, [['assetName', 'eq', 'zuludb01']])
-							}
-							assertWith(create){
-								assetName == 'zuludb01'
-
-							}
-						}
-
-					}
 				}
 				assertWith(domains[2]) {
 					domain == ETLDomain.Dependency.name()
 					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq'] as Set
-					data.size() == 3
+					data.size() == 1
 				}
 			}
 
@@ -3334,7 +3304,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 					fieldLabelMap == ['id': 'Id']
 					data.size() == 2
 
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 1
@@ -3342,7 +3312,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						duplicate == false
 						errors == []
 						fields.size() == 1
-						assertWith(fields['id'], FieldResult){
+						assertWith(fields['id']){
 							originalValue == '152254'
 							value == '152254'
 							init == null
@@ -3351,7 +3321,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 							create == null
 							update == null
 
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3360,7 +3330,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						}
 					}
 
-					assertWith(data[1], RowResult){
+					assertWith(data[1]){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 1
@@ -3368,7 +3338,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						duplicate == false
 						errors == []
 						fields.size() == 1
-						assertWith(fields['id'], FieldResult){
+						assertWith(fields['id']){
 							originalValue == '152255'
 							value == '152255'
 							init == null
@@ -3377,7 +3347,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 							create == null
 							update == null
 
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3543,7 +3513,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 0
@@ -3551,27 +3521,27 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						assertWith(fields['assetName'], FieldResult){
+						assertWith(fields['assetName']){
 							originalValue == 'xray'
 							value == 'xray'
 							init == null
 							create == null
 							update == null
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						assertWith(fields['id'], FieldResult){
+						assertWith(fields['id']){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3584,7 +3554,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 				assertWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 0
@@ -3592,27 +3562,27 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						assertWith(fields['assetName'], FieldResult){
+						assertWith(fields['assetName']){
 							originalValue == 'zulu'
 							value == 'zulu'
 							init == null
 							create == null
 							update == null
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						assertWith(fields['id'], FieldResult){
+						assertWith(fields['id']){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3675,7 +3645,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 				assertWith(domains[0]) {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						errorCount == 0
@@ -3683,27 +3653,27 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						assertWith(fields['assetName'], FieldResult){
+						assertWith(fields['assetName']){
 							originalValue == 'xray'
 							value == 'xray'
 							init == null
 							create == null
 							update == null
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						assertWith(fields['id'], FieldResult){
+						assertWith(fields['id']){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 1
@@ -3716,7 +3686,7 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 				assertWith(domains[1]) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					assertWith(data[0], RowResult){
+					assertWith(data[0]){
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						errorCount == 0
@@ -3724,27 +3694,27 @@ class ETLFindSpec extends ETLBaseSpec implements DataTest{
 						duplicate == false
 						errors == []
 						fields.size() == 2
-						assertWith(fields['assetName'], FieldResult){
+						assertWith(fields['assetName']){
 							originalValue == 'zulu'
 							value == 'zulu'
 							init == null
 							create == null
 							update == null
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 0
 							}
 						}
 
-						assertWith(fields['id'], FieldResult){
+						assertWith(fields['id']){
 							originalValue == null
 							value == null
 							init == null
 							create == null
 							update == null
 
-							assertWith(find, FindResult){
+							assertWith(find){
 								results == []
 								matchOn == null
 								query.size() == 1

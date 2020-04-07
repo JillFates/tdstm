@@ -16,7 +16,8 @@ class AssetEntityTestHelper {
                 moveBundle: moveBundle,
                 assetClass: assetClass,
                 assetName: 'Test AssetEntity-' + RandomStringUtils.randomAlphabetic(10),
-				retireDate: new Date()
+				retireDate: new Date(),
+				custom7   : "something",
         )
 
 		assetEntity.save(flush: true)

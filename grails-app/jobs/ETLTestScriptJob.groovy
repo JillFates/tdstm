@@ -8,7 +8,7 @@ import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 
 @Slf4j
-class ETLTestScriptJob {
+class  ETLTestScriptJob {
 	static group = 'tdstm-etl-test-script'
 	static triggers = {}
 
@@ -34,7 +34,7 @@ class ETLTestScriptJob {
 			Map result = scriptProcessorService.testScript(projectId, scriptFilename, filename, progressKey)
 			log.info('ETL transform data execution result: {}', result)
 		} catch (Throwable e) {
-			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
+			log.debug "execute() received exception ${e.getMessage()}"
 			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))
 
 		}

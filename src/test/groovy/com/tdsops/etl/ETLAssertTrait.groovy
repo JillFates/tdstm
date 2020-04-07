@@ -16,7 +16,7 @@ trait ETLAssertTrait {
 	 * @param errors
 	 * @param warn
 	 */
-	Object assertFieldResult(FieldResult fieldResult,
+	Object assertFieldResult(Map<String, ?> fieldResult,
 						  Object originalValue = null,
 						  Object value = null,
 						  Object initValue = null,
@@ -36,7 +36,7 @@ trait ETLAssertTrait {
 	 * @param domain
 	 * @param values
 	 */
-	def assertQueryResult(QueryResult queryResult, ETLDomain domain, List<List<Object>> values) {
+	def assertQueryResult(Map<String, ?>  queryResult, ETLDomain domain, List<List<Object>> values) {
 		assert queryResult.domain == domain.name()
 		queryResult.criteria.eachWithIndex { Map map, int i ->
 			assert map['propertyName'] == values[i][0]

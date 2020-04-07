@@ -15,7 +15,8 @@ class ApplicationTestHelper {
 			project: project,
 			moveBundle: moveBundle,
 			assetClass: assetClass,
-			assetName: 'Test AssetEntity-' + RandomStringUtils.randomAlphabetic(10)
+			assetName: 'Test AssetEntity-' + RandomStringUtils.randomAlphabetic(10),
+			custom7 : 'something'
 		)
 
 		application.save(flush: true)

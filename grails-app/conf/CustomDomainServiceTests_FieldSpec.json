@@ -926,7 +926,7 @@
           "replace"
         ],
         "constraints": {
-          "required": 1
+          "required": 0
         },
         "control": "String",
         "default": "CNN|http://www.cnn.com",
@@ -1572,7 +1572,7 @@
           "replace"
         ],
         "constraints": {
-          "required": 1
+          "required": 0
         },
         "control": "String",
         "default": "CNN|http://www.cnn.com",
@@ -2468,7 +2468,7 @@
           "replace"
         ],
         "constraints": {
-          "required": 1
+          "required": 0
         },
         "control": "String",
         "default": "CNN|http://www.cnn.com",
@@ -2960,7 +2960,7 @@
           "replace"
         ],
         "constraints": {
-          "required": 1
+          "required": 0
         },
         "control": "String",
         "default": "CNN|http://www.cnn.com",

@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
@@ -18,6 +19,9 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 			fileSystemService(FileSystemService) {
 				coreService = ref('coreService')
 			}
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
 		}
 	}
 
@@ -61,11 +65,11 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				read labels
 				domain Application
 				iterate {
-					set columnVar with 'name'
-					extract columnVar transform with lowercase() set nameVar
-					if (nameVar){
-						nameVar transform with uppercase() set upperNameVar
-						load 'Name' with upperNameVar
+					set column with 'name'
+					extract column transform with lowercase() set name
+					if (name){
+						element name transform with uppercase() set upperName
+						load 'Name' with upperName
 					}
 				}
 			""".stripIndent())
@@ -75,7 +79,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['assetName'], 'ACMEVMPROD01', 'ACMEVMPROD01')
 					}
@@ -107,9 +111,9 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				read labels
 				domain Application
 				iterate {
-					extract 'name' set nameVar
-					nameVar transform with middle(3, 2) uppercase() set upperNameVar 
-					load 'Name' with upperNameVar
+					extract 'name' set name
+					element name transform with middle(3, 2) uppercase() set upperName 
+					load 'Name' with upperName
 				}
 			""".stripIndent())
 
@@ -118,7 +122,7 @@ class ETLTransformLocalVariableSpec extends Specification implements FieldSpecVa
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['assetName'], 'ME', 'ME')
 					}

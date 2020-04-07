@@ -10,7 +10,7 @@ import org.quartz.JobExecutionContext
 
 @Slf4j
 class ImportBatchJob extends SecureJob implements EventPublisher {
-	static final String NEXT_BATCH_READY = 'NEXT_BATCH_READY'
+
 	static String group = 'tdstm-import-batch'
 	static triggers = {}
 
@@ -51,7 +51,7 @@ class ImportBatchJob extends SecureJob implements EventPublisher {
 			Map<String, ?> nextBatch = dataImportService.getNextBatchToProcess(projectId)
 			if (nextBatch) {
 				// if there is a next batch to process, then trigger an application event to schedule it
-				notify(NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(projectId, nextBatch.batchId, nextBatch.queuedBy))
+				notify(ImportBatchJobSchedulerEventDetails.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(projectId, nextBatch.batchId, nextBatch.queuedBy))
 			}
 		}
 	}

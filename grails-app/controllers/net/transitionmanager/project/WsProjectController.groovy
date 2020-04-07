@@ -8,7 +8,7 @@ import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.ProjectCommand
+import net.transitionmanager.command.ProjectCreateOrUpdateCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
@@ -166,7 +166,7 @@ class WsProjectController implements ControllerMethods {
 
 	@HasPermission(Permission.ProjectEdit)
 	def saveProject(String projectId) {
-		ProjectCommand projectCommand = populateCommandObject(ProjectCommand)
+		ProjectCreateOrUpdateCommand projectCommand = populateCommandObject(ProjectCreateOrUpdateCommand)
 
 		if (projectId) {
 			projectCommand.id = projectId.toLong()
