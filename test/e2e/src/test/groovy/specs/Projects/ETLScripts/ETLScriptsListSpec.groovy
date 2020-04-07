@@ -35,18 +35,16 @@ class ETLScriptsListSpec extends GebReportingSpec{
         at ETLScriptsPage
         createBtn.click()
         at CreateETLScriptsPage
+        datascriptNameField = datascriptName
+        datascriptDescField = datascriptDescription
         waitFor{providerDropdown.click()}
         //We select the latest provider that was created
         waitFor{latestProvider.displayed}
         datascriptProvider = latestProvider.text().trim()
         latestProvider.click()
         waitFor{datascriptDescField.click()}
-        datascriptDescField = datascriptDescription
-        datascriptNameField = datascriptName
         waitFor {datascriptSaveBtn.isDisplayed()}
         waitFor {datascriptSaveBtn.click()}
-        at ETLScriptsDetailsPage
-        clickOnXButton()
     }
 
     def setup() {
@@ -63,7 +61,9 @@ class ETLScriptsListSpec extends GebReportingSpec{
         given: 'The User is in ETLScripts list page'
             at ETLScriptsPage
         when: 'The user fill Filter Name'
-            filterByName datascriptName
+            clickOnFilterButton()
+            filterByName(datascriptName)
+            waitFor{firstDS.text().contains(datascriptName)}
         then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The User cleans Filter Name'
@@ -86,6 +86,7 @@ class ETLScriptsListSpec extends GebReportingSpec{
             at ETLScriptsPage
         when: 'The user fill Filter Description'
             filterByDescription datascriptDescription
+            waitFor{firstDS.text().contains(datascriptDescription)}
         then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The User cleans Filter Description'
@@ -113,7 +114,6 @@ class ETLScriptsListSpec extends GebReportingSpec{
         then: 'ETLScripts information is properly displayed'
             getDSProviderLabelText() == firstDSInformation.provider
             getDSNameLabelText() == firstDSInformation.name
-            getDSModeLabelText() == firstDSInformation.mode
             getDSDescriptionLabelText() == firstDSInformation.description
     }
 
@@ -122,6 +122,8 @@ class ETLScriptsListSpec extends GebReportingSpec{
             clickOnXButton()
         when: 'The User is in ETLScripts list page'
             at ETLScriptsPage
+        and: 'The User clicks on Name header'
+            clickOnNameHeader()
         then: 'Grid is ordered by asc name'
             isOrderedByName "asc"
         when: 'The User clicks on Name header'
@@ -133,30 +135,24 @@ class ETLScriptsListSpec extends GebReportingSpec{
     def "7. The User finds a ETLScripts filtering by different combinations"() {
         given: 'The User is in ETLScripts list page'
             at ETLScriptsPage
-        when: 'The user fill Filter Name + Date Created already selected'
+        when: 'The user fill Filter Name'
             filterByName datascriptName
+            waitFor{firstDS.text().contains(datascriptName)}
         then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The User cleans adds Filter Description'
             filterByDescription datascriptDescription
+            waitFor{firstDS.text().contains(datascriptDescription)}
         then: 'One ETLScript row should be displayed'
             getDSRowsSize() == 1
         when: 'The user removes some filters'
-            removeDescriptionFilter()
             removeNameFilter()
-            removeDateCreateFilter()
+            removeDescriptionFilter()
         and: 'The User cleans adds Filter Provider'
             filterByProvider datascriptProvider
+            waitFor{firstDS.text().contains(datascriptProvider)}
         then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
-        when: 'The User cleans adds Filter Mode'
-            filterByMode "Import"
-        then: 'At least one ETLScript row should be displayed'
-            getDSRowsSize() >= 1
-        when: 'The user fill Filter Name + Date Created already selected'
-            filterByName datascriptName
-        then: 'One ETLScript row should be displayed'
-            getDSRowsSize() == 1
     }
 
 }

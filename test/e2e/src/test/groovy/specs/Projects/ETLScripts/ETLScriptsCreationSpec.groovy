@@ -70,36 +70,29 @@ class ETLScriptsCreationSpec extends GebReportingSpec{
             waitFor{createBtn.click()}
             at CreateETLScriptsPage
         when: 'The user fills the necessary data to create a ETLScripts'
+            datascriptDescField = datascriptDescription
+            datascriptNameField = datascriptName
             waitFor{providerDropdown.click()}
             //We select the latest provider that was created
             waitFor{latestProvider.click()}
             waitFor{datascriptDescField.click()}
-            datascriptDescField = datascriptDescription
-            datascriptNameField = datascriptName
             waitFor {datascriptSaveBtn.isDisplayed()}
             waitFor {datascriptSaveBtn.click()}
 
-        then: 'The ETLScripts Detail page is displayed'
-            at ETLScriptsDetailsPage
+        then: 'The ETLScripts Create popup is closed'
+            at ETLScriptsPage
     }
 
-    def "4. Close the detail pop up and search the ETLScripts"(){
+    def "4. Search the ETLScripts"(){
         given: 'The user is on the ETLScripts Detail pop up page after a ETLScripts was created'
-            at ETLScriptsDetailsPage
-        when: 'The user closes the details pop up'
-            waitFor{dsDetailXIcon.click()}
-        and: 'The ETLScripts Page is displayed'
             at ETLScriptsPage
-        and: 'The user clicks the Name filter'
-            waitFor {nameFilter.click()}
-        and: 'Filters by the DS Name'
-            nameFilter = datascriptName
-        //This is to make sure that if 2 different DS start with the same characters,
-        //that we get exactly the one we just created.
-            waitFor {nameFilter == datascriptName}
-
+        when: 'The user clicks on Filter button'
+            clickOnFilterButton()
+        and: 'The user filters by the DS name'
+            filterByName(datascriptName)
+            waitFor{firstDS.text().contains(datascriptName)}
         then: 'The DS is displayed and we verify that it is the same we just created'
-            firstDS.text() == datascriptName
+            firstDSName.text() == datascriptName
     }
 
 }
