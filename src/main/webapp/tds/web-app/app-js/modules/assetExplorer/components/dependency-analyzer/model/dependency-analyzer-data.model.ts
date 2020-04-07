@@ -4,27 +4,39 @@ export class DependencyAnalyzerDataModel {
 	asset: string;
 	date: Date;
 	dependencyType: [];
-	dependencyConsoleList: [];
-	assetDependency: [];
-	moveBundle: [];
+	dependencyConsole: {
+		group: [],
+		application: [],
+		serversPhysical: [],
+		serversVirtual: [],
+		databases: [],
+		storage: [],
+		statusClass: []
+	};
+	dependencyStatus: [];
+	assetDependency: {
+		dataFlowDirection: string;
+		comment: string;
+		dataFlowFreq: string,
+		type: string,
+		status: string
+	};
+	planningBundles: [];
 	allMoveBundles: [];
 	planStatusOptions: [];
-	dependencyStatus: [];
-	gridStats: [];
-	isAssigned: [];
-	moveBundleList: [];
+	isAssigned: boolean;
 	depGrpCrt: {
-		modifiedDate: number,
+		modifiedDate: string,
 		modifiedBy: string,
 		connectionTypes: [],
 		statusTypes: []
 	};
 	compactPref: string;
-	showTabs: boolean;
-	tabName: string;
-	groupId: string;
-	assetName: string;
-	tagsIds: [];
+	showTabs: any;
+	tabName: any;
+	groupId: any;
+	assetName: any;
+	tagIds: [];
 	tagMatch: string;
 }
 

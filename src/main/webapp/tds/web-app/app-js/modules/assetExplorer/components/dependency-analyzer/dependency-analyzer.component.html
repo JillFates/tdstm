@@ -59,54 +59,47 @@
 <!--			</label>-->
 	</div>
 	<kendo-grid
-		#dependencyAnalizerGrid="kendoGrid"
-		[data]="finalData">
+		#grid
+		[data]="gridData">
+		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]" [width]="i < 4 ? '60' : '40'">
+			<ng-template kendoGridHeaderTemplate>
+				<div *ngIf="col === 'Groups'" class="group-column" (click)="openGroupInfoModal($event)">
+					{{col}} <fa-icon [icon]="icons.faQuestion" size="md"></fa-icon>
+				</div>
+				<div *ngIf="col !== 'Groups'" class="data-columns" (click)="columnClicked($event, i)">
+					{{col}}
+				</div>
+			</ng-template>
+			<ng-template kendoGridCellTemplate let-dataItem >
+				<div *ngIf="i === 0">
+					{{dataItem[i]}}
+				</div>
+				<div class="data-item-columns" *ngIf="i > 0">
+					{{dataItem[i]}}
+				</div>
+			</ng-template>
+		</kendo-grid-column>
 
-<!--		<kendo-grid-column field="field" title="Group">-->
-<!--			<ng-template-->
-<!--				kendoGridHeaderTemplate-->
-<!--				let-column-->
-<!--				let-columnIndex="columnIndex"-->
-<!--			>-->
-<!--			<span class="column">-->
-<!--				Group-->
-<!--			</span>-->
-<!--			</ng-template>-->
-<!--		</kendo-grid-column>-->
-<!--		<kendo-grid-column field="field" title="All">-->
-<!--			<ng-template-->
-<!--				kendoGridHeaderTemplate-->
-<!--				let-column-->
-<!--				let-columnIndex="columnIndex"-->
-<!--			>-->
-<!--			<span class="column">-->
-<!--				All-->
-<!--			</span>-->
-<!--			</ng-template>-->
-<!--		</kendo-grid-column>-->
-<!--		<kendo-grid-column field="field" title="Remnants">-->
-<!--			<ng-template-->
-<!--				kendoGridHeaderTemplate-->
-<!--				let-column-->
-<!--				let-columnIndex="columnIndex"-->
-<!--			>-->
-<!--			<span class="column">-->
-<!--				Remnants-->
-<!--			</span>-->
-<!--			</ng-template>-->
-<!--		</kendo-grid-column>-->
-<!--		<kendo-grid-column field="field" title="Grouped">-->
-<!--			<ng-template-->
-<!--				kendoGridHeaderTemplate-->
-<!--				let-column-->
-<!--				let-columnIndex="columnIndex"-->
-<!--			>-->
-<!--			<span class="column">-->
-<!--				Grouped-->
-<!--			</span>-->
-<!--			</ng-template>-->
-<!--		</kendo-grid-column>-->
-<!--		<kendo-grid-column *ngFor="let col of dependencyConsoleList" [title]="col.dependencyBundle" [width]="50">-->
-<!--		</kendo-grid-column>-->
 	</kendo-grid>
+
+	<p>{{'Column selected:' + (selectedData | json)}}</p>
+	<form *ngIf="showBottomGrid">
+		<kendo-tabstrip [keepTabContent]="true">
+			<kendo-tabstrip-tab [title]="'Tab 1'" [selected]="true">
+				<ng-template kendoTabContent>
+					<p>First Tab Form Content</p>
+				</ng-template>
+			</kendo-tabstrip-tab>
+			<kendo-tabstrip-tab [title]="'Tab 2'">
+				<ng-template kendoTabContent>
+					<p>Second Tab Form Content</p>
+				</ng-template>
+			</kendo-tabstrip-tab>
+			<kendo-tabstrip-tab [title]="'Tab 3'">
+				<ng-template kendoTabContent>
+					<p>Third Tab Form Content</p>
+				</ng-template>
+			</kendo-tabstrip-tab>
+		</kendo-tabstrip>
+	</form>
 </div>

@@ -1,10 +1,11 @@
-import { Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {GridModel} from 'tds-component-library';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DependencyAnalyzerService} from './service/dependency-analyzer.service';
 import {DependencyAnalyzerDataModel, DependencyBundleModel} from './model/dependency-analyzer-data.model';
 import {TagService} from '../../../assetTags/service/tag.service';
+import { GridComponent } from '@progress/kendo-angular-grid';
 declare var jQuery: any;
 
 @Component({
@@ -12,6 +13,7 @@ declare var jQuery: any;
 	templateUrl: 'dependency-analyzer.component.html'
 })
 export class DependencyAnalyzerComponent implements OnInit {
+
 	private userContext: any;
 	public gridModel: GridModel;
 	public showOnlyWIP;
@@ -23,10 +25,15 @@ export class DependencyAnalyzerComponent implements OnInit {
 	dependencyStatus;
 	dependencyType;
 	allTags;
-	gridStats;
+	columns = [];
+	classes = [];
 	dependencyConsoleList: DependencyBundleModel[];
 	gridData = [];
-	finalData = [];
+	showBottomGrid = false;
+	keepTabContent = true;
+	selectedColumn = '';
+	selectedData;
+	planningBundles;
 
 	constructor(
 		private userContextService: UserContextService,
@@ -38,45 +45,23 @@ export class DependencyAnalyzerComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.getInitialData();
+		this.columns.push('Groups');
+		this.classes.push('');
 	}
 
 	getInitialData() {
 		this.dependencyAnalyzerService.getDependencyAnalyzerData().subscribe(( res: DependencyAnalyzerDataModel) => {
 			this.allMoveBundles = res.allMoveBundles;
+			this.planningBundles = res.planningBundles;
 			this.dependencyType = res.dependencyType;
 			this.dependencyStatus = res.dependencyStatus;
-			this.dependencyConsoleList = res.dependencyConsoleList;
-			this.gridStats = res.gridStats;
-
-			// "dependencyBundle": 0,
-			// 			// 	"appCount": 278,
-			// 			// 	"serverCount": 36,
-			// 			// 	"vmCount": 4,
-			// 			// 	"dbCount": 14,
-			// 			// 	"storageCount": 52,
-			// 			// 	"statusClass": "depGroupConflict"
-
-			this.gridData.push(
-				[
-					'Application',
-					'Servers Physical',
-					'Servers Virtual',
-					'Databases',
-					'Storage (all)'
-				]
-			);
-			// console.log('entries', Object.keys(this.gridStats));
-			this.gridData.push([this.gridStats['app'][0], this.gridStats['server'][0], this.gridStats['vm'][0], this.gridStats['db'][0], this.gridStats['storage'][0]]);
-			this.gridData.push([this.gridStats['app'][0] - this.gridStats['app'][1], this.gridStats['server'][0] - this.gridStats['server'][1], this.gridStats['vm'][0] - this.gridStats['vm'][1],
-				this.gridStats['db'][0] - this.gridStats['db'][1], this.gridStats['storage'][0] - this.gridStats['storage'][1]]);
-			this.gridData.push([this.gridStats['app'][1], this.gridStats['server'][1], this.gridStats['vm'][1], this.gridStats['db'][1], this.gridStats['storage'][1]]);
-
-			for (let item of this.dependencyConsoleList) {
-				this.gridData.push([item.appCount, item.serverCount, item.vmCount, item.dbCount, item.storageCount]);
-			}
-			console.log(this.gridData);
-			this.finalData = this.getPivotArray(this.gridData, 0, 1, 2);
-			console.log(this.finalData);
+			this.columns = this.columns.concat(res.dependencyConsole.group);
+			this.classes = this.classes.concat(res.dependencyConsole.statusClass);
+			this.gridData.push(['Application', ...res.dependencyConsole.application]);
+			this.gridData.push(['Servers Physical', ...res.dependencyConsole.serversPhysical]);
+			this.gridData.push(['Servers Virtual', ...res.dependencyConsole.serversVirtual]);
+			this.gridData.push(['Databases', ...res.dependencyConsole.databases]);
+			this.gridData.push(['Storage', ...res.dependencyConsole.storage]);
 
 		});
 		this.tagService.getTags().subscribe((res: any) => {
@@ -84,48 +69,76 @@ export class DependencyAnalyzerComponent implements OnInit {
 		});
 	}
 
-	getPivotArray(dataArray) {
-		// Code from https://techbrij.com
-		let result = {}, ret = [];
-		let newCols = [];
+	openGroupInfoModal(event) {
+		// Open informative modal here
+	}
 
-		for (let i = 0; i < dataArray.length; i++) {
-			for (let j = 0; j < dataArray[i].length; j++) {
-				if (ret[j]) {
-					ret[j].push(dataArray[i][j]);
+	columnClicked(event, index) {
+		let headers = document.querySelectorAll('th');
+		for (let i = 0; i < headers.length; i++) {
+			headers[i].classList.remove('active-column-header');
+		}
+		let tmp = event.target as HTMLElement;
+		tmp.parentElement.classList.add('active-column-header');
+		this.showBottomGrid = true;
+		this.selectedColumn = index;
+		this.selectedData = this.getDataFromIndex(index);
+		this.addClassToSelectedColumn(index);
+	}
+	addClassToSelectedColumn(index) {
+		// remove class from others if present
+		let cells = document.querySelectorAll('td');
+		for (let i = 0; i < cells.length; i++) {
+			cells[i].classList.remove('active-column');
+			cells[i].classList.remove('last-active-cell');
+		}
+
+		cells = document.querySelectorAll('td:nth-child(' + (index + 1) + ')');
+		for (let i = 0 ; i < cells.length ; i++) {
+			if (cells[i].textContent.trim() > '') {
+				if (i === (cells.length - 1)) {
+					cells[i].classList.add('active-column');
+					cells[i].classList.add('last-active-cell');
 				} else {
-					ret[j] = [dataArray[i][j]];
+					cells[i].classList.add('active-column');
 				}
 			}
 		}
-		return ret;
+}
+
+	getDataFromIndex(index) {
+		const retVal = {};
+		retVal['group'] = this.columns[index];
+		retVal['application'] = this.gridData[0][index] || 0;
+		retVal['serversPhysical'] = this.gridData[1][index] || 0;
+		retVal['serversVirtual'] = this.gridData[2][index] || 0;
+		retVal['databases'] = this.gridData[3][index] || 0;
+		retVal['storage'] = this.columns[4][index] || 0;
+		return retVal;
 	}
 
 	onBundleSelect(event) {
-		console.log('bundle selected: ', event);
+		// console.log('bundle selected: ', event);
 	}
 
 	onAssetTagChange(event) {
-		console.log(event);
+		// console.log(event, this.selectedTags);
+		// console.log(event);
 	}
 
 	onShowOnlyWIPChange(event) {
-		console.log('show only work in progress');
+		// change data source or hide non complete columns
 	}
 
 	onRefeshData() {
 		this.getInitialData();
 	}
 
-	cellClick(event) {
-		console.log(' on cell clicked');
-	}
-
-	highlightByTeam(event) {
-		console.log('something');
-	}
-
 	refreshDiagram() {
-		console.log('refresh diagram');
+		// console.log('refresh diagram');
+	}
+
+	onTabSelect(event) {
+		// console.log(event);
 	}
 }
