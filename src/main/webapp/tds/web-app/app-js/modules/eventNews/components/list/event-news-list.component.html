@@ -12,15 +12,6 @@
                 </div>
                 <div class="clr-col-4">
                     <clr-select-container>
-                        <label>Bundle:</label>
-                        <select clrSelect name="bundleOptions" (change)="onBundleListChange($event)" [(ngModel)]="bundleId">
-                            <option [ngValue]="undefined" selected>All</option>
-                            <option *ngFor="let bundle of headerEventBundleData | async" value="{{bundle.id}}">{{bundle.name}}</option>
-                        </select>
-                    </clr-select-container>
-                </div>
-                <div class="clr-col-4">
-                    <clr-select-container>
                         <label>View:</label>
                         <select clrSelect name="viewOptions" [ngModel]="viewFilter" (change)="onChangeViewFilter($event)">
                             <option [ngValue]="undefined" selected>All</option>

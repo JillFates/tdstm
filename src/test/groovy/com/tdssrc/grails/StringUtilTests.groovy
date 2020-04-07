@@ -447,4 +447,14 @@ class StringUtilTests extends Specification {
 			guid != guid2
 	}
 
+	def 'test join'() {
+		expect:
+			expected == StringUtil.join(params, separator)
+		where:
+			params								| separator	|expected
+			['Hello', null, '', '  World  ']	| ' '		| 'Hello World'
+			['Hello', null, '', '  World  ']	| '   '		| 'Hello   World'
+			['Hello', null, '', '  World  ']	| ','		| 'Hello,World'
+	}
+
 }

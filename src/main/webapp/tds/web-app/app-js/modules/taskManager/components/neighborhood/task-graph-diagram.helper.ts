@@ -228,15 +228,17 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 	}
 
 	mediumScaleNodeTemplate(): Node {
-		const node = new go.Node(go.Panel.Horizontal);
+		const node = new go.Node(Panel.Horizontal);
 		node.fromEndSegmentLength = 20;
 		node.toEndSegmentLength = 20;
 		node.avoidableMargin = new Margin(6, 6, 6, 6);
 
-		node.add(this.iconShape());
-
-		node.add(this.assetIconShape());
-
+		const panel = new Panel(Panel.Auto);
+		panel.background = '#fff';
+		panel.desiredSize = new Size(90, 50);
+		panel.add(this.containerShape());
+		panel.add(this.mediumPanelBody());
+		node.add(panel);
 		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 
 		return node;
@@ -335,10 +337,10 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 	/**
 	 * Node outer panel container to hold individual shapes related to the node
 	 **/
-	containerPanel(): go.Panel {
-		const panel = new go.Panel(go.Panel.Auto);
+	containerPanel(): Panel {
+		const panel = new Panel(Panel.Auto);
 		panel.background = '#fff';
-		panel.padding = new go.Margin(0, 0, 0, 0);
+		panel.padding = new Margin(0, 0, 0, 0);
 		panel.mouseOver = (e, o) => o.cursor = 'pointer';
 		panel.mouseLeave = (e, o) => o.cursor = 'none';
 
@@ -377,6 +379,22 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 		panel.add(this.iconShape());
 		panel.add(this.assetIconShape());
 		panel.add(this.textBlockShape());
+
+		return panel;
+	}
+
+	/**
+	 * Node panel body holding the node content
+	 **/
+	mediumPanelBody(): go.Panel {
+		const panel = new go.Panel(go.Panel.Horizontal);
+		panel.padding = new go.Margin(0, 0, 0, 0);
+		panel.margin = new go.Margin(0, 0, 0, 0);
+		panel.mouseOver = (e, o) => o.cursor = 'pointer';
+		panel.mouseLeave = (e, o) => o.cursor = 'none';
+
+		panel.add(this.iconShape());
+		panel.add(this.assetIconShape());
 
 		return panel;
 	}

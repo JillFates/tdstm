@@ -51,6 +51,8 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 	userDateFormat = '';
 	public action: ActionType = ActionType.View;
 
+	public htmlText = '';
+
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private translatePipe: TranslatePipe,
@@ -64,6 +66,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 
 	ngOnInit() {
 		this.model = R.clone(this.data.noticeModel);
+		this.htmlText = R.clone(this.model.htmlText);
 		this.action = this.data.actionType;
 
 		this.buttons.push({
@@ -146,6 +149,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.action));
+			super.onSetUpFocus();
 		});
 	}
 

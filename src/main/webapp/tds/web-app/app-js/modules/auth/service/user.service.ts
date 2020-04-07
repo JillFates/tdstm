@@ -5,6 +5,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import { ProjectService } from '../../project/service/project.service';
 
 @Injectable()
 export class UserService {
@@ -12,8 +13,7 @@ export class UserService {
 	private userUrl = '../ws/user';
 	private licenseUrl = '../ws';
 
-	constructor(private http: HttpClient) {
-	}
+	constructor(private http: HttpClient) {	}
 
 	getUserContext(): Observable<any> {
 		return this.http.get(`${this.userUrl}/context`)

@@ -20,6 +20,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.AssetOptionsCommand
@@ -450,7 +451,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderAsJson assetCommentsList
 	}
 
-	@HasPermission(Permission.TaskView)
+	/**
+	 * Used to access the content of a comment/task
+	 * @return
+	 */
+	@HasPermission([Permission.CommentView, Permission.TaskView])
 	def showComment() {
 		def commentList = []
 		def personResolvedObj
@@ -496,23 +501,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
 
-			def instructionsLinkURL
-			def instructionsLinkLabel
+			Map instructionsLinkMap = AssetUtils.parseInstructionsLink(assetComment.instructionsLink)
 
-			if (assetComment.instructionsLink) {
-				List<String> instructionsLinkInfo = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)
-				if (instructionsLinkInfo) {
-					if (instructionsLinkInfo.size() > 1) {
-						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
-						instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
-					}
-					else {
-						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
-					}
-				}
-			}
+            String instructionsLinkURL = instructionsLinkMap? instructionsLinkMap.url: null
+			String instructionsLinkLabel = instructionsLinkMap? instructionsLinkMap.label: null
 
-			StringBuilder predecessorTable
+            StringBuilder predecessorTable
 			def predecessorList = []
 			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {
@@ -1445,6 +1439,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 * @return String HTML representing the page
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
+	@Deprecated
 	def retrieveLists() {
 
 		def start = new Date()

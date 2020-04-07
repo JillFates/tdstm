@@ -9,7 +9,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 	template: `
 		<div *ngIf="shouldDisplayDropdownButton(); else saveButton"
 				 class="btn-group">
-			<tds-button *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+			<tds-button *ngIf="model.isOwner || (isSystemView() && isSystemSaveAvailable(true))"
 									[id]="'btnSave'"
 									[disabled]="(!assetExplorerService.isSaveAvailable(this.model) || !isValid) || !isDirty()"
 									[title]="'GLOBAL.SAVE' | translate"
@@ -17,7 +17,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
 				{{'GLOBAL.SAVE' | translate}}
 			</tds-button>
-			<tds-button *ngIf="!model.isOwner && !model.isSystem"
+			<tds-button *ngIf="!model.isOwner && !isSystemView()"
 									[id]="'btnSaveAs'"
 									[disabled]="!isSaveAsAvailable() || !isValid"
 									[title]="'GLOBAL.SAVE_AS' | translate"
@@ -43,14 +43,14 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 		</div>
 		<ng-template #saveButton>
 			<tds-button [id]="'btnSave'"
-									*ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+									*ngIf="( (model.id && !isSystemView()) || (model.id && isSystemView() && model.isOwner && isSystemSaveAvailable(true)))"
 									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
 									(click)="onSave()">
 				{{ 'GLOBAL.SAVE' | translate }}
 			</tds-button>
 			<tds-button [id]="'btnSaveAs'"
-									*ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
+									*ngIf="((model.id && isSystemView() && isSaveAsAvailable()) || isSaveAsAvailable())"
 									[disabled]="!isSaveAsAvailable() || !isValid"
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
 									(click)="onSaveAs()">
@@ -79,26 +79,47 @@ export class AssetViewConfigSaveButtonComponent {
 		return result;
 	}
 
+	/**
+	 * Check is user has permissions to Save As (create) a view.
+	 */
 	isSaveAsAvailable(): boolean {
 		return this.model.id ?
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) :
-			this.assetExplorerService.isSaveAvailable(this.model);
+			(	this.model.isSystem ?
+					this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) && this.canCreateViews() :
+					this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) && this.canCreateViews()
+			)
+			: this.assetExplorerService.isSaveAvailable(this.model);
 	}
 
+	/**
+	 * Check if user has AssetExplorerCreate permission.
+	 */
+	canCreateViews(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+	}
+
+	/**
+	 * Check if user has permissions to Save a view.
+	 * @param edit
+	 */
 	isSystemSaveAvailable(edit): boolean {
 		return edit ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
 	}
 
+	/**
+	 * On Save As button clicked, emit.
+	 */
 	onSaveAs(): void {
 		if (this.isSaveAsAvailable()) {
 			this.saveAs.emit();
 		}
 	}
 
+	/**
+	 * On Save button clicked, emit.
+	 */
 	onSave() {
 		if (this.assetExplorerService.isSaveAvailable(this.model)) {
 			this.save.emit();
@@ -109,9 +130,16 @@ export class AssetViewConfigSaveButtonComponent {
 	 * Returns true if dropdown button should be displayed, otherwise false.
 	 */
 	shouldDisplayDropdownButton(): boolean {
-		return this.model.id && (this.model.isOwner || (
-				this.model.isSystem && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))
+		return this.model.id && !this.isSystemView() && (this.model.isOwner || (
+				this.isSystemView() && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))
 			)
 		);
+	}
+
+	/**
+	 * Checks if current model is a system view
+	 */
+	isSystemView(): boolean {
+		return this.model.isSystem
 	}
 }

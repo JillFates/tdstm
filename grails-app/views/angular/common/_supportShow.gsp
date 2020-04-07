@@ -1,6 +1,6 @@
 <%@page defaultCodec="html" %>
 <div class="tds-table">
-	<div class="clr-row">
+	<div class="clr-row tool-bar-wrapper">
 		<div class="grid-label clr-col-4">
 			<strong>Supports</strong>
 		</div>
@@ -103,7 +103,7 @@
 							</span>
 						</g:if>
 						<g:if test="${support.status == 'Validated_NA'}">
-							<span class="status-icon status-Validated_NA">
+							<span class="status-icon status-Validated-NA">
 								<fa-icon [icon]="['fas', 'square']"></fa-icon>
 							</span>
 						</g:if>
@@ -121,6 +121,11 @@
 					</td>
 				</tr>
 			</g:each>
+			<g:if test="${supportAssets.size == 0}">
+				<tr class="k-grid-norecords">
+					<td colspan="5" align="center">There are no records to display.</td>
+				</tr>
+			</g:if>
 		</tbody>
 	</table>
 </div>

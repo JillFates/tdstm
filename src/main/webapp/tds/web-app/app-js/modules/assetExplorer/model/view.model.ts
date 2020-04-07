@@ -6,8 +6,13 @@ export class ViewModel {
 	isOwner: boolean;
 	isSystem: boolean;
 	isShared: boolean;
+	hasOverride: boolean;
 	isFavorite?: boolean;
+	isOverride?: boolean;
+	saveAsOption?: string;
 	schema?: ViewSpec;
+	overridesView?: any;
+	querystring?: any;
 	constructor() {
 		this.schema = new ViewSpec();
 		this.isOwner = true;

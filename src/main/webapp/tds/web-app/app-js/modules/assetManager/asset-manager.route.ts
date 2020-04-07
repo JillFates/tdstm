@@ -123,7 +123,6 @@ export const AssetManagerRoute: Routes = [
 		resolve: {
 			tagList: TagsResolveService,
 			report: ReportResolveService,
-			reports: ReportsResolveService,
 			fields: FieldsResolveService
 		},
 		canActivate: [AuthGuardService, ModuleResolveService],

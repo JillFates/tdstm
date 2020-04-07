@@ -7,7 +7,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 		<div *ngIf="config.canShowSaveButton" class="btn-group">
 			<tds-button [ngClass]="{'btn-secondary':!config.isDirty,'btn-success':config.isDirty}"
 									[id]="config.saveButtonId"
-									[disabled]="config.canSave && !config.isDirty"
+									[disabled]="config.disableSaveButton"
 									[title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')"
 									(click)="saveClick(config.saveButtonId)">
 				{{config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')}}
@@ -39,7 +39,8 @@ export class AssetViewShowSaveButtonComponent {
 		canSave: boolean,
 		canSaveAs: boolean,
 		isEditAvailable: boolean,
-		canShowSaveButton: boolean
+		canShowSaveButton: boolean,
+		disableSaveButton: boolean
 	};
 	@Output() save = new EventEmitter<any>();
 	@Output() saveAs = new EventEmitter<any>();

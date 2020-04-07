@@ -387,7 +387,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 					assetClass: assetClass
 				},
 				modalConfiguration: {
-					title: 'Asset',
+					title: '&nbsp;',
 					draggable: true,
 					modalSize: ModalSize.CUSTOM,
 					modalCustomClass: 'custom-asset-modal-dialog'
@@ -411,7 +411,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				assetClass: data['common_assetClass']
 			},
 			modalConfiguration: {
-				title: data['common_assetName'] + ' ' + data['common_moveBundle'],
+				title: '&nbsp;',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
@@ -611,7 +611,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				openFromList: true
 			},
 			modalConfiguration: {
-				title: 'Asset',
+				title: '&nbsp;',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
@@ -652,7 +652,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 						assetClass: dataItem.common_assetClass
 					},
 					modalConfiguration: {
-						title: 'Asset',
+						title: '&nbsp;',
 						draggable: true,
 						modalSize: ModalSize.CUSTOM,
 						modalCustomClass: 'custom-asset-modal-dialog'

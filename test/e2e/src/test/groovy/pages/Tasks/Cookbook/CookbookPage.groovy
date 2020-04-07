@@ -10,7 +10,7 @@ class CookbookPage extends Page {
     static at = {
 
         //  TODO Refactor the whole page
-        pageTitle.text()  == "Cookbook"
+        pageTitle.text()  == "Recipes"
     }
 
     static content = {
@@ -133,5 +133,8 @@ class CookbookPage extends Page {
             }
         }
         true // done, just return true to avoid test fails
+    }
+    def scrollUp(){
+        browser.driver.executeScript('$("html,body").scrollTop(0)')
     }
 }

@@ -28,15 +28,16 @@ export const AssetViewManagerColumnsHelper = {
 			label: 'ASSET_EXPLORER.INDEX.FAVORITE',
 			resizable: false,
 			type: 'boolean',
-			width: 120,
-			cellClass: ['text-center']
+			width: 104,
+			cellClass: ['text-center'],
+			headerStyle: {'text-align' : 'center'}
 		});
 		addColumn({
 			property: 'name',
 			label: 'ASSET_EXPLORER.INDEX.NAME',
 			resizable: true,
 			type: 'text',
-			width: 250,
+			width: 400,
 			filterable: true,
 			cellClass: ['link-text']
 		});
@@ -46,7 +47,7 @@ export const AssetViewManagerColumnsHelper = {
 			resizable: true,
 			type: 'text',
 			filterable: true,
-			width: 130
+			width: 150
 		});
 		addColumn({
 			property: 'createdOn',
@@ -55,7 +56,7 @@ export const AssetViewManagerColumnsHelper = {
 			type: 'date',
 			filterable: true,
 			format: dateFormat,
-			width: 150
+			width: 135
 		});
 		addColumn({
 			property: 'updatedOn',
@@ -64,23 +65,43 @@ export const AssetViewManagerColumnsHelper = {
 			type: 'date',
 			filterable: true,
 			format: dateFormat,
-			width: 150
+			width: 137
 		});
 		addColumn({
 			property: 'isShared',
 			label: 'ASSET_EXPLORER.INDEX.SHARED',
 			resizable: false,
 			type: 'boolean',
+			width: 95,
+			cellClass: ['text-center'],
+			headerStyle: {'text-align' : 'center'}
+		});
+		addColumn({
+			property: 'isGlobal',
+			label: 'ASSET_EXPLORER.INDEX.GLOBAL',
+			sort: { isSorting: false, isAscending: false },
+			type: 'boolean',
 			width: 100,
-			cellClass: ['text-center']
+			cellClass: 'text-center',
+			headerStyle: {'text-align' : 'center'}
 		});
 		addColumn({
 			property: 'isSystem',
 			label: 'ASSET_EXPLORER.INDEX.SYSTEM',
 			resizable: false,
 			type: 'boolean',
-			width: 110,
-			cellClass: ['text-center']
+			width: 100,
+			cellClass: ['text-center'],
+			headerStyle: {'text-align' : 'center'}
+		});
+		addColumn({
+			property: 'isOverride',
+			label: 'ASSET_EXPLORER.INDEX.OVERRIDE',
+			sort: { isSorting: false, isAscending: false },
+			type: 'boolean',
+			width: 103,
+			cellClass: 'text-center',
+			headerStyle: {'text-align' : 'center'}
 		});
 		return columns;
 	},

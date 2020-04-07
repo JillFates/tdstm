@@ -7,7 +7,7 @@
 
 <div>
     <div>
-        <div class="clr-row">
+        <div class="clr-row tab-scroll-container" [ngClass]="{'has-description': ${!!asset.description?.trim()}}">
             <div class="clr-col-11">
                 <tds-tab-scroller>
                     <tds-scroller-item>
@@ -20,7 +20,7 @@
             </div>
         </div>
     </div>
-    <div class="asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+    <div class="asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
         <form 
             name="form" 
             (ngSubmit)="form.form.valid && onUpdate()"

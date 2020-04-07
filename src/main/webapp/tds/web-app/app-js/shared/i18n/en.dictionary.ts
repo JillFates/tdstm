@@ -57,6 +57,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
 		'FETCH': 'Fetch',
+		'VIEW_NAME': 'View Name',
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
@@ -65,7 +66,7 @@ export const en_DICTIONARY: Object = {
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
 			'CONFIRMATION_TITLE': 'Confirmation Required',
-			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
+			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click Confirm to delete otherwise press Cancel'
 		},
 		'SELECT_PLACEHOLDER': 'Select...',
 		'ARTIFACTS': {
@@ -135,12 +136,18 @@ export const en_DICTIONARY: Object = {
 			'FAVORITE': 'Favorite',
 			'NAME': 'Name',
 			'CREATED_BY': 'Created By',
-			'CREATED_ON': 'Created On',
-			'UPDATED_ON': 'Updated On',
+			'CREATED_ON': 'Date Created',
+			'UPDATED_ON': 'Last Updated',
+			'GLOBAL': 'Global',
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
+			'OVERRIDE': 'Override',
 		},
 		'SYSTEM_VIEW': 'System View',
+		'SAVE_LIST_VIEW': 'Save List View',
+		'SAVE_IN_MY_VIEWS': 'Save as My Own View',
+		'OVERRIDE_EXISTING_VIEW_ME': 'Override System View (for Me)',
+		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override System View (for All Users)',
 		'BULK_CHANGE' : {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
@@ -275,7 +282,7 @@ export const en_DICTIONARY: Object = {
 		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
 	'ARCHITECTURE': {
-		'ARCHITECTURE_GRAPH': 'Architecture Graph',
+		'ARCHITECTURE_GRAPH': 'GoJS Architecture Graph',
 		'GOJSARCHITECTUREGRAPH': 'GoJS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
@@ -294,7 +301,7 @@ export const en_DICTIONARY: Object = {
 		'ASSET_CLASSES': 'Asset Classes: '
 	},
 	'DEPENDENCY_ANALYZER': {
-		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_ANALYZER': 'Angular Dependency Analyzer',
 		'DEPENDENCY_GROUPS': 'Dependency Groups',
 		'REGENERATE': 'Regenerate',
 		'BUNDLE': 'Bundle',
@@ -523,6 +530,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
 		'CREATE_PREDECESSOR': 'Create new predecessor task',
 		'CREATE_SUCCESSOR': 'Create new successor task',
+		'ADD_PREDECESSOR': 'Add link to an existing predecessor task',
+		'ADD_SUCCESSOR': 'Add link to an existing successor task',
 		'EDIT': {
 			'REQUIRED_FIELD': 'Field is required',
 			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',

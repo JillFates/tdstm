@@ -5,7 +5,7 @@
 
 <div>
     <div>
-        <div class="clr-row">
+        <div class="clr-row tab-scroll-container" [ngClass]="{'has-description': ${!!asset.description?.trim()}}">
             <div class="clr-col-11">
                 <tds-tab-scroller>
                     <tds-scroller-item>
@@ -62,9 +62,7 @@
         </div>
     </div>
 
-    <div class="asset-crud"
-         [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}"
-         tdsScrollContainer style="position: relative">
+    <div class="asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
         <div tdsScrollSection class="clr-row">
             <div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
                 <g:if test="${errors}">
@@ -274,7 +272,7 @@
         </div>
 
         <div tdsScrollSection class="clr-row">
-            <div class="clr-col-12">
+            <div class="clr-col-12 table-data-section">
                 <g:render
                         template="/angular/common/supportShow"
                         model="[supportAssets: supportAssets]">
@@ -283,7 +281,7 @@
         </div>
 
         <div tdsScrollSection class="clr-row">
-            <div class="clr-col-12">
+            <div class="clr-col-12 table-data-section">
                 <g:render
                         template="/angular/common/dependentShow"
                         model="[dependent: dependentAssets, support: supportAssets]">
