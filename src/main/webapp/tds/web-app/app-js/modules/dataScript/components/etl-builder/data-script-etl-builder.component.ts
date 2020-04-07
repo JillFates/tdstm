@@ -1,18 +1,26 @@
 // Angular
-import {Component, AfterViewInit, ViewChild, ElementRef, OnInit, Input, ComponentFactoryResolver} from '@angular/core';
+import {
+	Component,
+	AfterViewInit,
+	ViewChild,
+	ElementRef,
+	OnInit,
+	Input,
+	ComponentFactoryResolver
+} from '@angular/core';
 // Component
-import {DataScriptSampleDataComponent} from '../sample-data/data-script-sample-data.component';
-import {DataScriptConsoleComponent} from '../console/data-script-console.component';
-import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
-import {FieldInfoType} from '../../../importBatch/components/record/import-batch-record-fields.component';
+import { DataScriptSampleDataComponent } from '../sample-data/data-script-sample-data.component';
+import { DataScriptConsoleComponent } from '../console/data-script-console.component';
+import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
+import { FieldInfoType } from '../../../importBatch/components/record/import-batch-record-fields.component';
 // Model
-import {DataScriptModel, SampleDataModel} from '../../model/data-script.model';
+import { DataScriptModel, SampleDataModel } from '../../model/data-script.model';
 import {
 	ScriptConsoleSettingsModel,
 	ScriptTestResultModel,
 	ScriptValidSyntaxResultModel
 } from '../../model/script-result.models';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import { ApiResponseModel } from '../../../../shared/model/ApiResponseModel';
 import {
 	CHECK_ACTION,
 	OperationStatusModel,
@@ -25,23 +33,23 @@ import {
 	DialogService,
 	ModalSize
 } from 'tds-component-library';
-import {Permission} from '../../../../shared/model/permission.model';
-import {isNullOrEmptyString} from '@progress/kendo-angular-grid/dist/es2015/utils';
+import { Permission } from '../../../../shared/model/permission.model';
+import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
 // Service
 import {
 	DataScriptService,
 	PROGRESSBAR_COMPLETED_STATUS,
 	PROGRESSBAR_FAIL_STATUS,
 } from '../../service/data-script.service';
-import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {FieldReferencePopupHelper} from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
+import { ImportAssetsService } from '../../../importBatch/service/import-assets.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { OBJECT_OR_LIST_PIPE } from '../../../../shared/pipes/utils.pipe';
+import { FieldReferencePopupHelper } from '../../../../shared/components/field-reference-popup/field-reference-popup.helper';
 // Other
 import 'rxjs/add/operator/finally';
-import {DialogAction} from '@progress/kendo-angular-dialog';
+import { SelectEvent } from '@progress/kendo-angular-layout';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -49,39 +57,38 @@ import {DialogAction} from '@progress/kendo-angular-dialog';
 })
 export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, AfterViewInit {
 	@Input() data: any;
-
-	@ViewChild('codeMirror', {static: false})
+	@ViewChild('codeMirror', { static: false })
 	codeMirrorComponent: CodeMirrorComponent;
-	@ViewChild('resizableForm', {static: false}) resizableForm: ElementRef;
+	@ViewChild('resizableForm', { static: false }) resizableForm: ElementRef;
 	public collapsed = {
 		code: true,
 		sample: false,
 		transform: false,
 	};
 	public script: string;
-	private filename: string;
 	public sampleDataModel: SampleDataModel = new SampleDataModel([], []);
-	protected sampleDataGridHelper: DataGridOperationsHelper;
 	public operationStatus = {
 		save: undefined,
 		test: new OperationStatusModel(),
 		syntax: new OperationStatusModel(),
 	};
-	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	public scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
-	protected transformedDataGrids: Array<DataGridOperationsHelper>;
-	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
 	public closeErrorsSection = false;
 	public CHECK_ACTION = CHECK_ACTION;
+	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
+	public dataScriptModel: DataScriptModel;
+	protected sampleDataGridHelper: DataGridOperationsHelper;
+	protected transformedDataGrids: Array<DataGridOperationsHelper>;
 	protected testScriptProgress = {
 		progressKey: null,
 		currentProgress: 0,
 	};
-	public MESSAGE_FIELD_WILL_BE_INITIALIZED: string;
 	protected OBJECT_OR_LIST_PIPE = OBJECT_OR_LIST_PIPE;
 	protected FieldInfoType = FieldInfoType;
 	protected fieldReferencePopupHelper: FieldReferencePopupHelper;
-	public dataScriptModel: DataScriptModel;
+	private filename: string;
+	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
+	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -96,7 +103,6 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 
 	ngOnInit(): void {
 		this.dataScriptModel = Object.assign({}, this.data.dataScriptModel);
-
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
@@ -104,18 +110,15 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			type: DialogButtonType.ACTION,
 			action: this.onSave.bind(this)
 		});
-
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});
-
 		this.script = '';
 		this.loadETLScript();
 		this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
-
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle());
 		});
@@ -128,32 +131,6 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
-	}
-
-	/**
-	 * Loads the Script from API call, If a previous sampleFilename exists or has been uploaded before then it loads the
-	 * content calling the #extractSampleDataFromFile method.
-	 */
-	private loadETLScript(): void {
-		this.dataIngestionService
-			.getETLScript(this.dataScriptModel.id)
-			.subscribe(
-				(result: ApiResponseModel) => {
-					if (result.status === ApiResponseModel.API_SUCCESS) {
-						this.dataScriptModel = result.data.dataScript;
-						this.filename = this.dataScriptModel.sampleFilename;
-						this.script = this.dataScriptModel.etlSourceCode
-							? this.dataScriptModel.etlSourceCode.slice(0)
-							: '';
-						if (this.filename && this.filename.length > 0) {
-							this.extractSampleDataFromFile(
-								this.dataScriptModel.originalSampleFilename
-							);
-						}
-					}
-				},
-				error => console.log(error)
-			);
 	}
 
 	/**
@@ -192,76 +169,6 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 				error =>
 					(this.operationStatus.test.state = CHECK_ACTION.INVALID)
 			);
-	}
-
-	/**
-	 * Initializes the Progress loop.
-	 */
-	private setProgressLoop(): void {
-		this.testScriptProgress.currentProgress = 0;
-		this.progressLoop();
-	}
-
-	/**
-	 * Progress loop, this function is called recursively until the progress finish.
-	 */
-	private progressLoop(): void {
-		this.dataIngestionService
-			.getJobProgress(this.testScriptProgress.progressKey)
-			.subscribe((response: ApiResponseModel) => {
-				let currentProgress = response.data.percentComp;
-				this.testScriptProgress.currentProgress = currentProgress;
-				// On Fail
-				if (response.data.status === PROGRESSBAR_FAIL_STATUS) {
-					this.scriptTestResult = new ScriptTestResultModel();
-					this.operationStatus.test.state = CHECK_ACTION.INVALID;
-					this.scriptTestResult.isValid = false;
-					this.scriptTestResult.error = response.data.data.message;
-					this.addSyntaxErrors([response.data.data.startLine - 1]);
-
-					// On Success
-				} else if (
-					currentProgress === 100 &&
-					response.data.status === PROGRESSBAR_COMPLETED_STATUS
-				) {
-					setTimeout(() => {
-						this.clearSyntaxErrors();
-						let scripTestFilename = response.data.detail;
-						this.operationStatus.test.state = CHECK_ACTION.VALID;
-						this.scriptTestResult = new ScriptTestResultModel();
-						this.scriptTestResult.isValid = true;
-						this.importAssetsService
-							.getFileContent(scripTestFilename)
-							.subscribe(result => {
-								const data = (result && result.data) || {};
-								this.scriptTestResult.domains =
-									data.domains || [];
-								this.transformedDataGrids = [];
-								this.scriptTestResult.domains.forEach(
-									(domain, index) => {
-										this.transformedDataGrids[
-											index
-											] = new DataGridOperationsHelper(
-											domain.data
-										);
-										// console.log(`${domain.domain}-${index.toString()}`);
-									}
-								);
-								this.scriptTestResult.consoleLog =
-									data.consoleLog;
-								this.consoleSettings.scriptTestResult = this.scriptTestResult;
-								// Finally re-load the Sample Data Preview if working with JSON files.
-								if (this.showSampleDataRefresh()) {
-									this.reloadSampleData();
-								}
-							});
-					}, 500);
-				} else {
-					setTimeout(() => {
-						this.progressLoop();
-					}, 2000);
-				}
-			});
 	}
 
 	/**
@@ -309,7 +216,6 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 				updated: this.operationStatus.save === 'success',
 				newEtlScriptCode: this.script,
 			};
-
 			this.onCancelClose(result);
 		}
 	}
@@ -342,12 +248,6 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			: this.script.length > 0;
 	}
 
-	private onScriptChange(event: { newValue: string; oldValue: string }) {
-		this.operationStatus.save = undefined;
-		this.operationStatus.syntax.value = event.newValue;
-		this.operationStatus.test.value = event.newValue;
-	}
-
 	public toggleSection(section: string) {
 		this.collapsed[section] = !this.collapsed[section];
 	}
@@ -378,12 +278,227 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 	}
 
 	/**
+	 * On View Console button open the console dialog.
+	 */
+	public onViewConsole(): void {
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: DataScriptConsoleComponent,
+			data: {
+				consoleSettingsModel: this.consoleSettings
+			},
+			modalConfiguration: {
+				title: 'View console?',
+				draggable: true,
+				modalSize: ModalSize.LG
+			}
+		}).subscribe((result: any) => {
+			//
+		});
+	}
+
+	public testHasErrors(): boolean {
+		return (
+			!this.scriptTestResult.isValid &&
+			this.scriptTestResult.error &&
+			this.scriptTestResult.error.length > 0
+		);
+	}
+
+	public sampleDataHasErrors(): boolean {
+		return (
+			this.sampleDataModel &&
+			this.sampleDataModel.errors &&
+			this.sampleDataModel.errors.length > 0
+		);
+	}
+
+	public syntaxHasErrors(): boolean {
+		return (
+			!this.scriptValidSyntaxResult.validSyntax &&
+			this.scriptValidSyntaxResult.errors &&
+			this.scriptValidSyntaxResult.errors.length > 0
+		);
+	}
+
+	public closeErrors(): void {
+		this.closeErrorsSection = true;
+	}
+
+	public isCheckSyntaxDisabled(): boolean {
+		return !this.script || !this.filename;
+	}
+
+	public isTestDisabled(): boolean {
+		return (
+			!this.script ||
+			!this.filename ||
+			this.operationStatus.test.state === CHECK_ACTION.IN_PROGRESS
+		);
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
 	 * On refresh sample data button click.
 	 */
 	protected reloadSampleData(): void {
 		this.extractSampleDataFromFile(
 			this.dataScriptModel.originalSampleFilename
 		);
+	}
+
+	/**
+	 * if value is present return value otherwise returns init
+	 */
+	protected getInitOrValue(dataItem): string {
+		if (dataItem.value !== undefined && dataItem.value !== null) {
+			return dataItem.value;
+		} else {
+			return dataItem.init || '';
+		}
+	}
+
+	protected canLoadSampleData(): boolean {
+		return this.permissionService.hasPermission(
+			Permission.ETLScriptLoadSampleData
+		);
+	}
+
+	protected isUpdateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ETLScriptUpdate);
+	}
+
+	/**
+	 * Loads the Script from API call, If a previous sampleFilename exists or has been uploaded before then it loads the
+	 * content calling the #extractSampleDataFromFile method.
+	 */
+	private loadETLScript(): void {
+		this.dataIngestionService
+			.getETLScript(this.dataScriptModel.id)
+			.subscribe(
+				(result: ApiResponseModel) => {
+					if (result.status === ApiResponseModel.API_SUCCESS) {
+						this.dataScriptModel = result.data.dataScript;
+						this.filename = this.dataScriptModel.sampleFilename;
+						this.script = this.dataScriptModel.etlSourceCode
+							? this.dataScriptModel.etlSourceCode.slice(0)
+							: '';
+						if (this.filename && this.filename.length > 0) {
+							this.extractSampleDataFromFile(
+								this.dataScriptModel.originalSampleFilename
+							);
+						}
+					}
+				},
+				error => console.log(error)
+			);
+	}
+
+	/**
+	 * Initializes the Progress loop.
+	 */
+	private setProgressLoop(): void {
+		this.testScriptProgress.currentProgress = 0;
+		this.progressLoop();
+	}
+
+	/**
+	 * Progress loop, this function is called recursively until the progress finish.
+	 */
+	private progressLoop(): void {
+		this.dataIngestionService
+			.getJobProgress(this.testScriptProgress.progressKey)
+			.subscribe((response: ApiResponseModel) => {
+				let currentProgress = response.data.percentComp;
+				this.testScriptProgress.currentProgress = currentProgress;
+				// On Fail
+				if (response.data.status === PROGRESSBAR_FAIL_STATUS) {
+					this.scriptTestResult = new ScriptTestResultModel();
+					this.operationStatus.test.state = CHECK_ACTION.INVALID;
+					this.scriptTestResult.isValid = false;
+					this.scriptTestResult.error = response.data.data.message;
+					this.addSyntaxErrors([response.data.data.startLine - 1]);
+					// On Success
+				} else if (
+					currentProgress === 100 &&
+					response.data.status === PROGRESSBAR_COMPLETED_STATUS
+				) {
+					setTimeout(() => {
+						this.clearSyntaxErrors();
+						let scripTestFilename = response.data.detail;
+						this.operationStatus.test.state = CHECK_ACTION.VALID;
+						this.scriptTestResult = new ScriptTestResultModel();
+						this.scriptTestResult.isValid = true;
+						this.importAssetsService
+							.getFileContent(scripTestFilename)
+							.subscribe(result => {
+								const data = (result && result.data) || {};
+								this.scriptTestResult.domains = data.domains || [];
+								this.transformedDataGrids = [];
+								// Load first domain data only from the array.
+								if (this.scriptTestResult.domains.length) {
+									this.loadDataForDomain(0);
+								}
+								this.scriptTestResult.consoleLog = data.consoleLog;
+								this.consoleSettings.scriptTestResult = this.scriptTestResult;
+								// Finally re-load the Sample Data Preview if working with JSON files.
+								if (this.showSampleDataRefresh()) {
+									this.reloadSampleData();
+								}
+							});
+					}, 500);
+				} else {
+					setTimeout(() => {
+						this.progressLoop();
+					}, 2000);
+				}
+			});
+	}
+
+	/**
+	 * On tab domain change, load it's data if hasn't been loaded yet.
+	 * @param $event
+	 */
+	onDomainTabSelected($event: SelectEvent) {
+		this.loadDataForDomain($event.index);
+	}
+
+	/**
+	 * Returns the correct title name for the domain tab.
+	 * @param domain
+	 */
+	getDomainTabTitle(domain: any): string {
+		let title = domain.domain;
+		return domain.dataSize || domain.dataSize === 0 ? `${title} (${domain.dataSize})` : title;
+	}
+
+	/**
+	 * If current domain doesn't have [data], then it needs to be loaded from a file.
+	 * @param tabIndex
+	 */
+	private loadDataForDomain(tabIndex: number): void {
+		const domain: any = this.scriptTestResult.domains[tabIndex];
+		if (!domain.data && domain.outputFilename) {
+			this.importAssetsService.getFileContent(domain.outputFilename)
+				.subscribe((result: any) => {
+					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
+					domain.data = result.data;
+				});
+		} else {
+			this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(domain.data ? domain.data : []);
+		}
+	}
+
+	private onScriptChange(event: { newValue: string; oldValue: string }) {
+		this.operationStatus.save = undefined;
+		this.operationStatus.syntax.value = event.newValue;
+		this.operationStatus.test.value = event.newValue;
 	}
 
 	/**
@@ -441,57 +556,9 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		return result;
 	}
 
-	/**
-	 * On View Console button open the console dialog.
-	 */
-	public onViewConsole(): void {
-		this.dialogService.open({
-			componentFactoryResolver: this.componentFactoryResolver,
-			component: DataScriptConsoleComponent,
-			data: {
-				consoleSettingsModel: this.consoleSettings
-			},
-			modalConfiguration: {
-				title: 'View console?',
-				draggable: true,
-				modalSize: ModalSize.LG
-			}
-		}).subscribe((result: any) => {
-			//
-		});
-	}
-
-	public testHasErrors(): boolean {
-		return (
-			!this.scriptTestResult.isValid &&
-			this.scriptTestResult.error &&
-			this.scriptTestResult.error.length > 0
-		);
-	}
-
-	public sampleDataHasErrors(): boolean {
-		return (
-			this.sampleDataModel &&
-			this.sampleDataModel.errors &&
-			this.sampleDataModel.errors.length > 0
-		);
-	}
-
-	public syntaxHasErrors(): boolean {
-		return (
-			!this.scriptValidSyntaxResult.validSyntax &&
-			this.scriptValidSyntaxResult.errors &&
-			this.scriptValidSyntaxResult.errors.length > 0
-		);
-	}
-
-	public closeErrors(): void {
-		this.closeErrorsSection = true;
-	}
-
 	private getSyntaxErrors(): string {
 		let errors = this.scriptValidSyntaxResult.errors.map(error => {
-			return `message: ${error.message} --> start line: ${error.startLine}, end line: ${error.endLine}, start column: ${error.startColumn}, endColumn: ${error.endColumn}, fatal: ${error.fatal}`;
+			return `message: ${ error.message } --> start line: ${ error.startLine }, end line: ${ error.endLine }, start column: ${ error.startColumn }, endColumn: ${ error.endColumn }, fatal: ${ error.fatal }`;
 		});
 		return errors.join('\n');
 	}
@@ -519,29 +586,6 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		}
 	}
 
-	public isCheckSyntaxDisabled(): boolean {
-		return !this.script || !this.filename;
-	}
-
-	public isTestDisabled(): boolean {
-		return (
-			!this.script ||
-			!this.filename ||
-			this.operationStatus.test.state === CHECK_ACTION.IN_PROGRESS
-		);
-	}
-
-	/**
-	 * if value is present return value otherwise returns init
-	 */
-	protected getInitOrValue(dataItem): string {
-		if (dataItem.value !== undefined && dataItem.value !== null) {
-			return dataItem.value;
-		} else {
-			return dataItem.init || '';
-		}
-	}
-
 	/**
 	 * Clears out ALL the Syntax Error class of the given line numbers stored in currentErrorLines.
 	 * If the codeMirrorComponent object is empty, it does nothing.
@@ -563,27 +607,10 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		}
 	}
 
-	protected canLoadSampleData(): boolean {
-		return this.permissionService.hasPermission(
-			Permission.ETLScriptLoadSampleData
-		);
-	}
-
-	protected isUpdateAvailable(): boolean {
-		return this.permissionService.hasPermission(Permission.ETLScriptUpdate);
-	}
-
 	/**
 	 * Based on modalType action returns the corresponding title
 	 */
 	private getModalTitle(): string {
-		return `ETL Script Edit - ${this.dataScriptModel.provider.name} / ${this.dataScriptModel.name} `;
-	}
-
-	/**
-	 * User Dismiss Changes
-	 */
-	public onDismiss(): void {
-		this.cancelCloseDialog();
+		return `ETL Script Edit - ${ this.dataScriptModel.provider.name } / ${ this.dataScriptModel.name } `;
 	}
 }

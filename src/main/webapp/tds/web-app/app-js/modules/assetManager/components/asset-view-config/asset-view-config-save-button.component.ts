@@ -45,7 +45,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 			<tds-button [id]="'btnSave'"
 									*ngIf="( (model.id && !isSystemView()) || (model.id && isSystemView() && model.isOwner && isSystemSaveAvailable(true)))"
 									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
-									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
+									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success': (isValid && isDirty() && this.assetExplorerService.isSaveAvailable(this.model))}"
 									(click)="onSave()">
 				{{ 'GLOBAL.SAVE' | translate }}
 			</tds-button>
