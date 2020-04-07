@@ -755,11 +755,11 @@ class DataImportServiceIntegrationSpec extends Specification {
 			transformJson.domains.size() == 1
 		and: 'the Domain is Dependency'
 			transformJson.domains[0].domain == 'Dependency'
-		and: 'the data has only one element'
-			transformJson.domains[0].data.size() == 1
+		and: 'the data has not element field'
+			!transformJson.domains[0].data
 		cleanup: 'Delete test files'
-			fileSystemService.deleteTemporaryFile(fileUploadName)
-			fileSystemService.deleteTemporaryFile(transformedFileName)
+			if (fileUploadName) fileSystemService.deleteTemporaryFile(fileUploadName)
+			if (transformedFileName) fileSystemService.deleteTemporaryFile(transformedFileName)
 
 	}
 
