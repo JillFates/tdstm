@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
@@ -16,6 +17,8 @@ import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.project.Project
 import org.apache.commons.lang3.time.DateUtils
@@ -56,6 +59,20 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
 	ETLFieldsValidator validator
+
+	Closure doWithSpring() {
+		{ ->
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+			}
+			applicationContextHolder(ApplicationContextHolder) { bean ->
+				bean.factoryMethod = 'getInstance'
+			}
+		}
+	}
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database
@@ -1460,99 +1477,99 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 7
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						rowNum == 1
 						errorCount == 0
-						assertWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						assertWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate) {
 							value == goodDate
 							init == null
 							errors == []
 						}
 					}
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						rowNum == 2
 						errorCount == 0
-						assertWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						assertWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate) {
 							value == goodDate
 							init == null
 							errors == []
 						}
 					}
-					assertWith(data[2], RowResult) {
+					assertWith(data[2]) {
 						rowNum == 3
 						errorCount == 1
-						assertWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate) {
 							value == goodDate
 							init == null
 							errors == []
 						}
-						assertWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate) {
 							value == '06/25/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
-					assertWith(data[3], RowResult) {
+					assertWith(data[3]) {
 						rowNum == 4
 						errorCount == 1
-						assertWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate) {
 							value == '99/99/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
 						}
-						assertWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate) {
 							value == '99/99/2018'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
 						}
 					}
-					assertWith(data[4], RowResult) {
+					assertWith(data[4]) {
 						rowNum == 5
 						errorCount == 1    // Should be 2
-						assertWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
-						assertWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
-					assertWith(data[5], RowResult) {
+					assertWith(data[5]) {
 						rowNum == 6
 						errorCount == 1 // Should be 2
-						assertWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
-						assertWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate) {
 							value == null
 							init == null
 							errors == ['Unable to transform blank or null value to a date']
 						}
 					}
-					assertWith(data[6], RowResult) {
+					assertWith(data[6]) {
 						rowNum == 7
 						errorCount == 1 // Should be 2
-						assertWith(fields.retireDate, FieldResult) {
+						assertWith(fields.retireDate) {
 							value == 'abc-123'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd, MM/dd/yyyy']
 						}
-						assertWith(fields.maintExpDate, FieldResult) {
+						assertWith(fields.maintExpDate) {
 							value == 'abc-123'
 							init == null
 							errors == ['Unable to transform value to a date with pattern(s) yyyy-MM-dd, yyyy/MM/dd']
@@ -1624,27 +1641,27 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
 					data.size() == 3
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						errorCount == 1
-						assertWith(fields.size, FieldResult) {
+						assertWith(fields.size) {
 							originalValue == '10.22'
 							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Integer']
 						}
 					}
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						errorCount == 0
-						assertWith(fields.size, FieldResult) {
+						assertWith(fields.size) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 						}
 					}
-					assertWith(data[2], RowResult) {
+					assertWith(data[2]) {
 						errorCount == 0
-						assertWith(fields.size, FieldResult) {
+						assertWith(fields.size) {
 							originalValue == '5'
 							value == 5
 							init == null
@@ -1694,58 +1711,58 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Storage.name()
 					data.size() == 3
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						errorCount == 1
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == 'NGM01'
 							init == null
 							errors == []
 						}
-						assertWith(fields.size, FieldResult) {
+						assertWith(fields.size) {
 							originalValue == '10.22'
 							value == '10.22'
 							init == null
 							errors == ['Unable to transform value to Long']
 						}
 					}
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						rowNum == 2
 						errorCount == 0
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == 'NGM03'
 							init == null
 							errors == []
 						}
-						assertWith(fields.size, FieldResult) {
+						assertWith(fields.size) {
 							originalValue == null
 							value == null
 							init == null
 							errors == []
 						}
 					}
-					assertWith(data[2], RowResult) {
+					assertWith(data[2]) {
 						rowNum == 3
 						errorCount == 0
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == 'NGM04'
 							init == null
 							errors == []
 						}
-						assertWith(fields.size, FieldResult) {
+						assertWith(fields.size) {
 							originalValue == '5'
 							value == 5
 							init == null
 							errors == []
 						}
 					}
-					assertWith(data[2], RowResult) {
+					assertWith(data[2]) {
 						errorCount == 0
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == 'NGM04'
 							init == null
 							errors == []
 						}
-						assertWith(fields.size, FieldResult) {
+						assertWith(fields.size) {
 							originalValue == '5'
 							value == 5
 							init == null
@@ -1797,24 +1814,24 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						errorCount == 0
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value != null
 						}
-						assertWith(fields.appVersion, FieldResult) {
+						assertWith(fields.appVersion) {
 							value == 6
 						}
-						assertWith(fields.description, FieldResult) {
+						assertWith(fields.description) {
 							value != null
 						}
-						assertWith(fields.appSource, FieldResult) {
+						assertWith(fields.appSource) {
 							value != null
 						}
-						assertWith(fields.appTech, FieldResult) {
+						assertWith(fields.appTech) {
 							value != null
 						}
-						assertWith(fields.license, FieldResult) {
+						assertWith(fields.license) {
 							value == 1
 						}
 					}
@@ -1862,21 +1879,21 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						errorCount == 0
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == 12134556l
 						}
-						assertWith(fields.externalRefId, FieldResult) {
+						assertWith(fields.externalRefId) {
 							value != null
 						}
-						assertWith(fields.appVendor, FieldResult) {
+						assertWith(fields.appVendor) {
 							value == 'Vendor: Apple Inc.'
 						}
-						assertWith(fields.appVersion, FieldResult) {
+						assertWith(fields.appVersion) {
 							value == 'V.1.0.0'
 						}
-						assertWith(fields.license, FieldResult) {
+						assertWith(fields.license) {
 							value == 'www.apple.com'
 						}
 					}
@@ -1889,5 +1906,61 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 			}
 	}
 
+	@See('TM-17215')
+	void 'test can use NumberUtil and and StringUtil in an ETl script'() {
 
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				application id,vendor name,app version,url,reference id
+				12134556,Apple Inc.,1.0.0,www.tds.com/license,
+			""")
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'application id' set applicationId 
+					if (NumberUtil.isLong(applicationId)){
+						load 'id' with NumberUtil.toLong(applicationId)
+					} 
+					extract 'url' set url
+					if (StringUtil.isNotBlank(url)){
+						 load 'license' with StringUtil.ellipsis(url, 15)
+					}
+				}
+			""".stripIndent())
+
+		then: 'Every column for every row is transformed with toDate transformation'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+
+					assertWith(data[0]) {
+						errorCount == 0
+						assertWith(fields.id) {
+							value == 12134556l
+							originalValue = null
+							init == null
+						}
+						assertWith(fields.license) {
+							value == 'www.tds.com/...'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
+			}
+	}
 }

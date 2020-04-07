@@ -29,7 +29,7 @@
 						<ng-template [ngIf]="preferenceList && preferenceList.length > 0">
 							<tr *ngFor="let preference of preferenceList">
 								<td class="pref-label">{{preference.label}}</td>
-								<td class="pref-value">{{preference.value}}</td>
+								<td class="pref-value" title="{{preference.value}}}">{{preference.value}}</td>
 								<td class="pref-remove">
 									<tds-button-custom
 										*ngIf="fixedPreferenceCodes.indexOf(preference.code) === -1"

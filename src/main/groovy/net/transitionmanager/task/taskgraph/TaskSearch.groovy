@@ -154,7 +154,10 @@ class TaskSearch {
             taskWhereClauses.add('is_critical_path = true')
         }
 
-        if (!moveEvent) {
+        if (moveEvent) {
+            taskWhereClauses.add('move_event_id = :eventId')
+            queryParams['eventId'] = moveEvent.id
+        } else {
             taskWhereClauses.add('project_id = :projectId')
             queryParams['projectId'] = project.id
         }

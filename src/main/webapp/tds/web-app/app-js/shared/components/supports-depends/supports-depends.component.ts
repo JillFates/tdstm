@@ -1,19 +1,19 @@
-import { DialogService, DialogConfirmAction } from 'tds-component-library';
+import {DialogConfirmAction, DialogService} from 'tds-component-library';
 /**
  * Structure does not allows to introduce other base Modules
  * So this is not in the Asset Explorer Module and belongs here instead.
  */
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { DataGridOperationsHelper } from '../../utils/data-grid-operations.helper';
-import { DependencySupportModel, SupportOnColumnsModel } from './model/support-on-columns.model';
-import { AssetExplorerService } from '../../../modules/assetManager/service/asset-explorer.service';
-import { ComboBoxSearchModel } from '../combo-box/model/combobox-search-param.model';
-import { DEPENDENCY_TYPE } from './model/support-depends.model';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
+import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
+import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
+import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
+import {DEPENDENCY_TYPE} from './model/support-depends.model';
 import * as R from 'ramda';
-import { Observable } from 'rxjs';
-import { UIDialogService } from '../../services/ui-dialog.service';
-import { AssetComment } from '../dependent-comment/model/asset-coment.model';
-import { DependentCommentComponent } from '../dependent-comment/dependent-comment.component';
+import {Observable} from 'rxjs';
+import {UIDialogService} from '../../services/ui-dialog.service';
+import {AssetComment} from '../dependent-comment/model/asset-coment.model';
+import {DependentCommentComponent} from '../dependent-comment/dependent-comment.component';
 
 declare var jQuery: any;
 
@@ -69,7 +69,7 @@ declare var jQuery: any;
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
+								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper, dependencyType.SUPPORT)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -193,7 +193,7 @@ declare var jQuery: any;
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
                                 <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
+								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridDependsOnHelper, dependencyType.DEPENDENT)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
@@ -282,6 +282,8 @@ export class SupportsDependsComponent implements OnInit {
 	public dependencyType = DEPENDENCY_TYPE;
 	public dataGridDependsOnHelper: DataGridOperationsHelper;
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
+	private supportsToDelete = [];
+	private dependentsToDelete = [];
 
 	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService, private tdsDialogService: DialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
@@ -307,13 +309,14 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		}
 
-		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
-			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
-			if (this.dataGridDependsOnHelper) {
-				this.initDone.emit(this.model);
-			}
-		});
+		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT)
+			.subscribe((dataGridDependsOnHelper) => {
+				this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
+				this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+				if (this.dataGridDependsOnHelper) {
+					this.initDone.emit(this.model);
+				}
+			});
 
 		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
@@ -353,7 +356,7 @@ export class SupportsDependsComponent implements OnInit {
 					dependencies.push(dependencySupportModel);
 				});
 			}
-			observer.next(new DataGridOperationsHelper(dependencies, null, null));
+			observer.next(new DataGridOperationsHelper(dependencies, null, null, null, 2000));
 		});
 	}
 
@@ -452,14 +455,20 @@ export class SupportsDependsComponent implements OnInit {
 
 	/**
 	 * Confirm before delete
-	 **/
-	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper): void {
+	 *
+	 * **/
+	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper, dependencyType: DEPENDENCY_TYPE): void {
 		this.tdsDialogService.confirm(
 			'Confirm Delete',
 			'Please confirm delete of this record. This action cannot be undone.'
 		).subscribe(
 			(data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					if (dependencyType === DEPENDENCY_TYPE.SUPPORT)  {
+						this.supportsToDelete.push(dataItem.id);
+					} else {
+						this.dependentsToDelete.push(dataItem.id);
+					}
 					this.onDeleteDependencySupport(dataItem, dataGrid);
 				}
 			}
@@ -541,6 +550,8 @@ export class SupportsDependsComponent implements OnInit {
 		if (validForm) {
 			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
 			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.dependentsToDelete = this.dependentsToDelete;
+			this.model.dependencyMap.supportsToDelete = this.supportsToDelete;
 		}
 
 		this.isValidForm.emit(validForm);
