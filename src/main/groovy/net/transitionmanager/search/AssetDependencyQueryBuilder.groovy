@@ -86,17 +86,25 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder implements TagSearc
 			status: [property: 'dep.status', type: String],
 			tagsAsset: [
 				property: """
-				CONCAT(
+				(SELECT CONCAT(
 					'[',
 					if(
-						TA_A.id,
+						TA_A2.id,
 						group_concat(
-							json_object('id', TA_A.id, 'tagId', T_A.id, 'name', T_A.name, 'description', T_A.description, 'color', T_A.color)
+							json_object('id', TA_A2.id, 'tagId', T_A2.id, 'name', T_A2.name, 'description', T_A2.description, 'color', T_A2.color)
 						),
 						''
 					),
 					']'
-				)""",
+				)  from
+				AssetDependency dep2
+				LEFT OUTER JOIN dep2.asset ae2
+				LEFT OUTER JOIN ae2.tagAssets TA_A2
+				LEFT OUTER JOIN dep2.dependent ad2
+				LEFT OUTER JOIN TA_A2.tag T_A2
+
+				WHERE ae.project = :project and ae2.id = ae.id and ad2.id = ad.id
+				GROUP BY dep2.id)""",
 				whereProperty: 'ae.id',
 				manyToManyQueries: [
 					AND : { String filter ->
@@ -124,17 +132,25 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder implements TagSearc
 			],
 			tagsDependent: [
 				property: """
-				CONCAT(
+				(SELECT CONCAT(
 					'[',
 					if(
-						TA_D.id,
+						TA_D3.id,
 						group_concat(
-							json_object('id', TA_D.id, 'tagId', T_D.id, 'name', T_D.name, 'description', T_D.description, 'color', T_D.color)
+							json_object('id', TA_D3.id, 'tagId', T_D3.id, 'name', T_D3.name, 'description', T_D3.description, 'color', T_D3.color)
 						),
 						''
 					),
 					']'
-				)""",
+				) from
+				AssetDependency dep3
+				LEFT OUTER JOIN dep3.asset ae3
+				LEFT OUTER JOIN dep3.dependent ad3
+				LEFT OUTER JOIN ad3.tagAssets TA_D3
+				LEFT OUTER JOIN TA_D3.tag T_D3
+
+				WHERE ae.project = :project and ae3.id = ae.id and ad3.id=ad.id
+				GROUP BY dep3.id)""",
 				whereProperty: 'ad.id',
 				manyToManyQueries: [
 					AND : { String filter ->
@@ -182,22 +198,6 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder implements TagSearc
 			[
 				property: 'ad.moveBundle',
 				alias: 'dmb'
-			],
-			[
-				property: 'ae.tagAssets',
-				alias: 'TA_A'
-			],
-			[
-				property: 'TA_A.tag',
-				alias: 'T_A'
-			],
-			[
-				property: 'ad.tagAssets',
-				alias: 'TA_D'
-			],
-			[
-				property: 'TA_D.tag',
-				alias: 'T_D'
 			]
 		]
 	}
