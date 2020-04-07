@@ -34,6 +34,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DialogService, ModalSize} from 'tds-component-library';
 import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
 import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
+import {fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
 	selector: 'user-dashboard',
@@ -84,6 +85,7 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		fixContentWrapper();
 		this.notifierService.broadcast({
 			name: 'notificationHeaderTitleChange',
 			title: 'User Dashboard for ' + this.userContext.person.fullName

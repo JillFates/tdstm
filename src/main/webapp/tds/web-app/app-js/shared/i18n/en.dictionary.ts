@@ -530,6 +530,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
 		'CREATE_PREDECESSOR': 'Create new predecessor task',
 		'CREATE_SUCCESSOR': 'Create new successor task',
+		'ADD_PREDECESSOR': 'Add link to an existing predecessor task',
+		'ADD_SUCCESSOR': 'Add link to an existing successor task',
 		'EDIT': {
 			'REQUIRED_FIELD': 'Field is required',
 			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',
