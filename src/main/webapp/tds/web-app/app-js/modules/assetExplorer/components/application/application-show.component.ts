@@ -30,7 +30,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService, metadata);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
 				this.assetType = DOMAIN.APPLICATION;

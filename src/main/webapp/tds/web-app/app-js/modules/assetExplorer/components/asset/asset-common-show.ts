@@ -29,18 +29,18 @@ export class AssetCommonShow implements OnInit {
 	public ignoreDoubleClickClasses =
 		['btn', 'clickableText', 'table-responsive', 'task-comment-component'];
 
-	public supports: State = {
+	public supportsSate: State = {
 		skip: 0,
-		take: 5,
-
-		// Initial filter descriptor
-		filter: {
-			logic: 'and',
-			filters: [{ field: 'ProductName', operator: 'contains', value: 'Chef' }]
-		}
+		take: 25
 	};
 
-	public gridSupportsData: GridDataResult = process([], this.supports);
+	public dependenciesState: State = {
+		skip: 0,
+		take: 25
+	};
+
+	public gridSupportsData: GridDataResult = process([], this.supportsSate);
+	public gridDependenciesData: GridDataResult = process([], this.dependenciesState);
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
@@ -50,13 +50,17 @@ export class AssetCommonShow implements OnInit {
 		protected assetExplorerService: AssetExplorerService,
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
-		protected windowService: WindowService) {
+		protected windowService: WindowService,
+		private metadata: any) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
 				.subscribe((userContext: UserContextModel) => {
 					this.userDateFormat = userContext.dateFormat;
 					this.userTimeZone = userContext.timezone;
 				});
+
+			this.gridSupportsData = process(this.metadata.supports, this.supportsSate);
+			this.gridDependenciesData = process(this.metadata.dependents, this.supportsSate);
 	}
 
 	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
@@ -65,9 +69,14 @@ export class AssetCommonShow implements OnInit {
 		}
 	}
 
-	public dataStateChange(state: DataStateChangeEvent): void {
-		this.supports = state;
-		this.gridSupportsData = process([], this.supports);
+	public dataSupportStateChange(state: DataStateChangeEvent): void {
+		this.supportsSate = state;
+		this.gridSupportsData = process(this.metadata.supports, this.supportsSate);
+	}
+
+	public dataDependenciesStateChange(state: DataStateChangeEvent): void {
+		this.dependenciesState = state;
+		this.gridDependenciesData = process(this.metadata.dependents, this.dependenciesState);
 	}
 
 	/**

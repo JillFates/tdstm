@@ -43,7 +43,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			userContextService: UserContextService,
 			private permissionService: PermissionService,
 			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService, metadata);
 				this.mainAsset = modelId;
 				this.assetType = DOMAIN.DEVICE;
 				this.assetTags = metadata.assetTags;
