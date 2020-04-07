@@ -64,7 +64,7 @@
                 [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
         >
             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports:</label>
+                <label class="pad-top-2 pad-left-10 mar-bottom-3">Is dependent on:</label>
             </ng-template>
             <!-- Columns -->
             <kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
