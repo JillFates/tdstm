@@ -397,7 +397,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
 	}
-
+	
 	void 'test can iterate FINDINGS results'() {
 
 		given:
@@ -451,7 +451,7 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 		then: 'Results should contain Application domain results associated'
 			results.domains.size() == 2
 			results.domains[0].domain == ETLDomain.Dependency.name()
-			results.domains[0].data[0].fields.size() == 2
+			results.domains[0].data[0].fields.size() == 3
 
 			results.domains[1].domain == ETLDomain.Device.name()
 			results.domains[1].data.each { row ->

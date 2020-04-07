@@ -304,6 +304,15 @@ class CustomValidators {
 	static controlDefaultValidator( String value, Map fieldSpec, Object domain) {
 		new Validator( fieldSpec ) {
 			void validate() {
+				// if the field is empty, validate the 'required' constraint
+				if (!value) {
+					def required = fieldSpec.constraints?.required ?: null
+					if (required) {
+						addError('default.blank.message', [getLabel(), GormUtil.domainShortName(domain)])
+					}
+					return // with or without error, as the value is empty, just return
+				}
+
 				def minSize = fieldSpec?.constraints?.minSize ?: 0
 				def maxSize = fieldSpec?.constraints?.maxSize ?: Integer.MAX_VALUE
 

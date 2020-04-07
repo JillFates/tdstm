@@ -1,6 +1,6 @@
 package net.transitionmanager.command
 
-class ProjectCommand implements CommandObject {
+class ProjectCreateOrUpdateCommand implements CommandObject {
 
 	Long       clientId
 	Boolean    collectMetrics
