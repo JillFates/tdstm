@@ -152,7 +152,7 @@
 			[width]="
 			commonShrunkColumns.includes(column.label)
 				? commonShrunkColumnWidth
-				: column.width
+				: EXTRA_WIDTH_COLUMNS.includes(column.label) ? EXTRA_COLUMN_WIDTH : column.width
 		"
 			[class]="column.domain"
 		>
