@@ -10,6 +10,7 @@ import {GridModule} from '@progress/kendo-angular-grid';
 import {SortableModule} from '@progress/kendo-angular-sortable';
 import {IntlModule} from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
+import {TabStripModule} from '@progress/kendo-angular-layout';
 // Services
 import {AssetExplorerService} from '../assetManager/service/asset-explorer.service';
 import {TaskCommentService} from './service/task-comment.service';
@@ -58,6 +59,7 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		SortableModule,
 		IntlModule,
 		DateInputsModule,
+		TabStripModule,
 		// Route
 		AssetExplorerRouteModule
 	],

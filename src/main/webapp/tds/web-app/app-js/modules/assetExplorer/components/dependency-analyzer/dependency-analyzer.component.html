@@ -8,30 +8,25 @@
 			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.BUNDLE' | translate}}:</label>
 			<kendo-dropdownlist
 				id="dependency-analyzer-teams-dropdown"
-				textField="label"
-				valueField="label"
+				textField="name"
+				valueField="id"
 				[ngClass]="'dependency-analyzer-custom-dropdown'"
 				[value]="selectedBundle"
-				[data]="teamHighlights$ | async"
-				(selectionChange)="highlightByTeam($event)"
+				[data]="allMoveBundles"
+				(selectionChange)="onBundleSelect($event)"
 				[(ngModel)]="selectedBundle"
                 #teamHighlightDropdown>
 			</kendo-dropdownlist>
 		</div>
 
-		<div class="col-md-2 ">
+		<div class="col-md-2 " *ngIf="allTags">
 			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.TAGS' | translate}}:</label>
-			<kendo-dropdownlist
-				id="dependency-analyzer-tags-dropdown"
-				textField="label"
-				valueField="label"
-				[ngClass]="'dependency-analyzer-custom-dropdown'"
-				[value]="selectedTags"
-				[data]="teamHighlights$ | async"
-				(selectionChange)="highlightByTeam($event)"
-				[(ngModel)]="selectedTags"
-                #teamHighlightDropdown>
-			</kendo-dropdownlist>
+			<tds-asset-tag-selector
+				[tagList]="allTags"
+				[model]="selectedTags"
+				[showSwitch]="true"
+				(valueChange)="onAssetTagChange($event)"
+			></tds-asset-tag-selector>
 		</div>
 
 		<div class="col-md-4 chk-filter-container">
@@ -63,9 +58,48 @@
 <!--				Minimize Auto Tasks-->
 <!--			</label>-->
 	</div>
-	<tds-grid
-		[gridModel]="gridModel"
-		(cellClick)="cellClick($event)">
-	</tds-grid>
+	<kendo-grid
+		#grid
+		[data]="gridData">
+		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]" [width]="i < 4 ? '60' : '40'">
+			<ng-template kendoGridHeaderTemplate>
+				<div *ngIf="col === 'Groups'" class="group-column" (click)="openGroupInfoModal($event)">
+					{{col}} <fa-icon [icon]="icons.faQuestion" size="md"></fa-icon>
+				</div>
+				<div *ngIf="col !== 'Groups'" class="data-columns" (click)="columnClicked($event, i)">
+					{{col}}
+				</div>
+			</ng-template>
+			<ng-template kendoGridCellTemplate let-dataItem >
+				<div *ngIf="i === 0">
+					{{dataItem[i]}}
+				</div>
+				<div class="data-item-columns" *ngIf="i > 0">
+					{{dataItem[i]}}
+				</div>
+			</ng-template>
+		</kendo-grid-column>
 
+	</kendo-grid>
+
+	<p>{{'Column selected:' + (selectedData | json)}}</p>
+	<form *ngIf="showBottomGrid">
+		<kendo-tabstrip [keepTabContent]="true">
+			<kendo-tabstrip-tab [title]="'Tab 1'" [selected]="true">
+				<ng-template kendoTabContent>
+					<p>First Tab Form Content</p>
+				</ng-template>
+			</kendo-tabstrip-tab>
+			<kendo-tabstrip-tab [title]="'Tab 2'">
+				<ng-template kendoTabContent>
+					<p>Second Tab Form Content</p>
+				</ng-template>
+			</kendo-tabstrip-tab>
+			<kendo-tabstrip-tab [title]="'Tab 3'">
+				<ng-template kendoTabContent>
+					<p>Third Tab Form Content</p>
+				</ng-template>
+			</kendo-tabstrip-tab>
+		</kendo-tabstrip>
+	</form>
 </div>
