@@ -29,7 +29,7 @@ declare var jQuery: any;
                 (pageChange)="dataGridSupportsOnHelper.pageChange($event)"
                 [data]="dataGridSupportsOnHelper.gridData"
                 [sort]="dataGridSupportsOnHelper.state.sort"
-								[sortable]="false"
+				[sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
 
@@ -60,7 +60,7 @@ declare var jQuery: any;
                         <div *ngIf="column.property !== 'action'">
                             <input type="text" (keyup)="dataGridSupportsOnHelper.onFilter(column)" class="form-control"
                                    name="{{column.property}}" [(ngModel)]="column.filter"
-                                   placeholder="Filter {{column.label}}" value="">
+                                   placeholder="Filter" value="">
                             <span *ngIf="column.filter" (click)="dataGridSupportsOnHelper.clearValue(column)"
                                   style="cursor:pointer;color:#656565;pointer-events:all"
                                   class="fa fa-times form-control-feedback" aria-hidden="true"></span>
@@ -206,7 +206,7 @@ declare var jQuery: any;
                         <div *ngIf="column.property !== 'action'">
                             <input type="text" (keyup)="dataGridDependsOnHelper.onFilter(column)" class="form-control"
                                    name="{{column.property}}" [(ngModel)]="column.filter"
-                                   placeholder="Filter {{column.label}}" value="">
+                                   placeholder="Filter" value="">
                             <span *ngIf="column.filter" (click)="dataGridDependsOnHelper.clearValue(column)"
                                   style="cursor:pointer;color:#656565;pointer-events:all"
                                   class="fa fa-times form-control-feedback" aria-hidden="true"></span>

@@ -13,8 +13,11 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {AssetEditComponent} from './asset-edit.component';
-import {process, State} from '@progress/kendo-data-query';
-import {DataStateChangeEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {
+	SupportDependentsOnViewColumnsModel,
+	SupportOnColumnsModel
+} from '../../../../shared/components/supports-depends/model/support-on-columns.model';
 
 declare var jQuery: any;
 
@@ -29,18 +32,11 @@ export class AssetCommonShow implements OnInit {
 	public ignoreDoubleClickClasses =
 		['btn', 'clickableText', 'table-responsive', 'task-comment-component'];
 
-	public supportsSate: State = {
-		skip: 0,
-		take: 25
-	};
+	public gridSupportsData: DataGridOperationsHelper;
+	public gridDependenciesData: DataGridOperationsHelper;
 
-	public dependenciesState: State = {
-		skip: 0,
-		take: 25
-	};
-
-	public gridSupportsData: GridDataResult = process([], this.supportsSate);
-	public gridDependenciesData: GridDataResult = process([], this.dependenciesState);
+	private supportOnColumnModel: SupportOnColumnsModel;
+	private dependentOnColumnModel: SupportOnColumnsModel;
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
@@ -59,24 +55,24 @@ export class AssetCommonShow implements OnInit {
 					this.userTimeZone = userContext.timezone;
 				});
 
-			this.gridSupportsData = process(this.metadata.supports, this.supportsSate);
-			this.gridDependenciesData = process(this.metadata.dependents, this.supportsSate);
+			this.gridSupportsData = new DataGridOperationsHelper(this.metadata.supports, [{
+				dir: 'asc',
+				field: 'name'
+			}], {mode: 'single', checkboxOnly: false}, {useColumn: 'id'}, 25);
+
+			this.gridDependenciesData = new DataGridOperationsHelper(this.metadata.dependents, [{
+				dir: 'asc',
+				field: 'name'
+			}], {mode: 'single', checkboxOnly: false}, {useColumn: 'id'}, 25);
+
+			this.supportOnColumnModel = new SupportDependentsOnViewColumnsModel();
+			this.dependentOnColumnModel = new SupportDependentsOnViewColumnsModel();
 	}
 
 	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
-	}
-
-	public dataSupportStateChange(state: DataStateChangeEvent): void {
-		this.supportsSate = state;
-		this.gridSupportsData = process(this.metadata.supports, this.supportsSate);
-	}
-
-	public dataDependenciesStateChange(state: DataStateChangeEvent): void {
-		this.dependenciesState = state;
-		this.gridDependenciesData = process(this.metadata.dependents, this.dependenciesState);
 	}
 
 	/**

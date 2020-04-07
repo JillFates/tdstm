@@ -3,44 +3,47 @@
     <div class="view-dependencies">
         <kendo-grid
                 class="dependents-grid"
-                [data]="gridSupportsData"
-                [pageSize]="supportsSate.take"
-                [skip]="supportsSate.skip"
-                [sort]="supportsSate.sort"
-                [filter]="supportsSate.filter"
-                [sortable]="true"
-                [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+                [pageSize]="gridDependenciesData.state.take"
+                [skip]="gridSupportsData.state.skip"
                 [filterable]="true"
-                (dataStateChange)="dataSupportStateChange($event)"
+                (pageChange)="gridSupportsData.pageChange($event)"
+                [data]="gridSupportsData.gridData"
+                [sort]="gridSupportsData.state.sort"
+                [sortable]="false"
+                [resizable]="true"
+                (sortChange)="gridSupportsData.sortChange($event)"
+                [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
             >
-            <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports</label>
+                <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports:</label>
             </ng-template>
-            <kendo-grid-column field="assetClass" title="Class" width="80" >
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
+            <!-- Columns -->
+            <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
+                               field="{{column.property}}"
+                               [headerClass]="column.headerClass ? column.headerClass : ''"
+                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                               [class]="column.cellClass ? column.cellClass : ''"
+                               [style]="column.cellStyle ? column.cellStyle : ''"
+                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                <!-- Header Template -->
+                <ng-template kendoGridHeaderTemplate>
+                    <label>{{column.label}}</label>
                 </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="name" title="Name">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
+
+                <!-- Default Generic Filter Template -->
+                <ng-template kendoGridFilterCellTemplate let-filter>
+                    <div class="has-feedback" style="margin-bottom:0px;">
+                        <div *ngIf="column.property !== 'action'">
+                            <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
+                                   name="{{column.property}}" [(ngModel)]="column.filter"
+                                   placeholder="Filter" value="">
+                            <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)"
+                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
                 </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="moveBundle" title="Bundle">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
-                </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="type" title="Type">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
-                </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="status" title="Status">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
-                </ng-template>
+
             </kendo-grid-column>
         </kendo-grid>
     </div>
@@ -48,45 +51,51 @@
 <td valign="top">
     <div class="view-dependencies">
         <kendo-grid
-            class="dependents-grid"
-            [data]="gridDependenciesData"
-            [pageSize]="dependenciesState.take"
-            [skip]="dependenciesState.skip"
-            [sort]="dependenciesState.sort"
-            [filter]="dependenciesState.filter"
-            [sortable]="true"
-            [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
-            [filterable]="true"
-            (dataStateChange)="dataDependenciesStateChange($event)"
+                class="dependents-grid"
+                [pageSize]="gridDependenciesData.state.take"
+                [skip]="gridDependenciesData.state.skip"
+                [filterable]="true"
+                (pageChange)="gridDependenciesData.pageChange($event)"
+                [data]="gridDependenciesData.gridData"
+                [sort]="gridDependenciesData.state.sort"
+                [sortable]="false"
+                [resizable]="true"
+                (sortChange)="gridDependenciesData.sortChange($event)"
+                [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
         >
             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                <label class="pad-top-2 pad-left-10 mar-bottom-3">Is Dependent On </label>
+                <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports:</label>
             </ng-template>
-            <kendo-grid-column field="assetClass" title="Class" width="80">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
+            <!-- Columns -->
+            <kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
+                               field="{{column.property}}"
+                               [headerClass]="column.headerClass ? column.headerClass : ''"
+                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                               [class]="column.cellClass ? column.cellClass : ''"
+                               [style]="column.cellStyle ? column.cellStyle : ''"
+                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+                <!-- Header Template -->
+                <ng-template kendoGridHeaderTemplate>
+                    <label>{{column.label}}</label>
                 </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="name" title="Name">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
+
+                <!-- Default Generic Filter Template -->
+                <ng-template kendoGridFilterCellTemplate let-filter>
+                    <div class="has-feedback" style="margin-bottom:0px;">
+                        <div *ngIf="column.property !== 'action'">
+                            <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control"
+                                   name="{{column.property}}" [(ngModel)]="column.filter"
+                                   placeholder="Filter" value="">
+                            <span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)"
+                                  style="line-height: 28px;cursor:pointer;color:#656565;pointer-events:all"
+                                  class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
                 </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="moveBundle" title="Bundle">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
-                </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="type" title="Type">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
-                </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-column field="status" title="Status">
-                <ng-template kendoGridFilterCellTemplate let-filter let-column="column">
-                    <kendo-grid-string-filter-cell [showOperators]="false" [column]="column" [filter]="filter"> </kendo-grid-string-filter-cell>
-                </ng-template>
+
             </kendo-grid-column>
         </kendo-grid>
+
+
     </div>
 </td>

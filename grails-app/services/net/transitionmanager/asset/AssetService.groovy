@@ -332,6 +332,7 @@ class AssetService implements ServiceMethods{
 		}
 
 		return [
+				asset: asset,
 		        supports: supports,
 				dependents: dependents
 		]

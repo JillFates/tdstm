@@ -13,6 +13,28 @@
     margin-left: 4px
 
 .view-dependencies
+  kendo-grid
+    kendo-grid-list
+      table
+        td
+          cursor: pointer
+          padding: 0px !important
+          .cell-template
+            height: 30px
+            padding-top: 9px
+            padding-left: 2px
+            &.dep-Validated
+              background: LightGreen
+            &.dep-Unknown
+              background: #F9FF90
+            &.dep-Questioned
+              background: LightPink
+            &.dep-Not
+              background: #EEE
+            &.dep-Archived
+              background: #EEE
+            &.dep-Future
+              background: #EEE
   kendo-grid-filter-cell-operators
     display: none
   kendo-pager

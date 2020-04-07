@@ -70,3 +70,42 @@ export class DependencySupportModel {
 	public comment: string;
 	public recordState: RecordState;
 }
+
+export class SupportDependentsOnViewColumnsModel {
+	columns: Array<GridColumnModel>;
+
+	constructor() {
+		this.columns = [
+			{
+				label: 'Class',
+				property: 'assetClass',
+				type: 'text',
+				width: 90
+			},
+			{
+				label: 'Name',
+				property: 'name',
+				type: 'text',
+				width: 90
+			},
+			{
+				label: 'Bundle',
+				property: 'moveBundle',
+				type: 'text',
+				width: 90
+			},
+			{
+				label: 'Type',
+				property: 'type',
+				type: 'text',
+				width: 90
+			},
+			{
+				label: 'Status',
+				property: 'status',
+				type: 'text',
+				width: 90
+			}
+		];
+	}
+}
