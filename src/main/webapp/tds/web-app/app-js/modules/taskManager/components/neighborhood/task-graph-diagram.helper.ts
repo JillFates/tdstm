@@ -152,7 +152,8 @@ export class TaskGraphDiagramHelper implements IDiagramLayoutHelper {
 			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
 			rootNode: params.rootNode,
-			extras: params && params.extras
+			extras: params && params.extras,
+			isRefreshTriggered: params && params.isRefreshTriggered
 		};
 	}
 

@@ -93,7 +93,7 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.QUEUE:
-				notify(ImportBatchJob.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, actionCmd.ids[0], securityService.currentUsername))
+				notify(ImportBatchJobSchedulerEventDetails.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, actionCmd.ids[0], securityService.currentUsername))
 				impacted = 1
 				break
 

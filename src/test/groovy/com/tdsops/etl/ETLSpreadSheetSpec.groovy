@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -8,11 +9,14 @@ import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
+
 /**
  * Using SpreadSheet in ETL script. It manages the following commands:
  * <ul>
@@ -27,6 +31,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model
@@ -126,20 +144,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -172,20 +190,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -215,20 +233,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -335,20 +353,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -381,20 +399,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -430,20 +448,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		and:
 			etlProcessor.currentRowIndex == 2
@@ -515,8 +533,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					sheet 'Applications'
 					read labels
 					domain Application
@@ -530,8 +547,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 					iterate {
 						extract 'name' load 'Name'
 					}
-					""".stripIndent(),
-						  ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.finalResult().domains.size() == 2
@@ -592,20 +608,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		cleanup:
 			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
@@ -638,20 +654,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
-			etlProcessor.column('application id').index == 0
-			etlProcessor.column(0).label == 'application id'
+			etlProcessor.getColumnByName('application id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'application id'
 
 		and:
-			etlProcessor.column('vendor name').index == 1
-			etlProcessor.column(1).label == 'vendor name'
+			etlProcessor.getColumnByName('vendor name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'vendor name'
 
 		and:
-			etlProcessor.column('technology').index == 2
-			etlProcessor.column(2).label == 'technology'
+			etlProcessor.getColumnByName('technology').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'technology'
 
 		and:
-			etlProcessor.column('location').index == 3
-			etlProcessor.column(3).label == 'location'
+			etlProcessor.getColumnByName('location').index == 3
+			etlProcessor.getColumnByPosition(3).label == 'location'
 
 		cleanup:
 			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
@@ -788,13 +804,11 @@ class ETLSpreadSheetSpec extends ETLBaseSpec implements DataTest {
 	static final String ApplicationDataSet = """
 		application id,vendor name,technology,location
 		152254,Microsoft,(xlsx updated),ACME Data Center
-		152255,Mozilla,NGM,ACME Data Center
-		""".stripIndent().trim()
+		152255,Mozilla,NGM,ACME Data Center""".stripIndent().trim()
 
 	static final String DeviceDataSet = """
 		name,mfg,model,type
 		xraysrv01,Dell,PE2950,Server
-		zuludb01,HP,BL380,Blade
-		""".stripIndent().trim()
+		zuludb01,HP,BL380,Blade""".stripIndent().trim()
 
 }

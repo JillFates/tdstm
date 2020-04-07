@@ -22,6 +22,8 @@ export class TaskEditCreateModelHelper {
 	public STATUS = TaskStatus;
 	CREATE_PREDECESSOR = '';
 	CREATE_SUCCESSOR = '';
+	ADD_PREDECESSOR = '';
+	ADD_SUCCESSOR = '';
 
 	constructor(
 		userTimeZone: string,
@@ -37,6 +39,8 @@ export class TaskEditCreateModelHelper {
 		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 		this.CREATE_PREDECESSOR = this.translate.transform('TASK_MANAGER.CREATE_PREDECESSOR');
 		this.CREATE_SUCCESSOR = this.translate.transform('TASK_MANAGER.CREATE_SUCCESSOR');
+		this.ADD_PREDECESSOR = this.translate.transform('TASK_MANAGER.ADD_PREDECESSOR');
+		this.ADD_SUCCESSOR = this.translate.transform('TASK_MANAGER.ADD_SUCCESSOR');
 	}
 
 	/**

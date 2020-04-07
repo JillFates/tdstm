@@ -25,6 +25,7 @@ import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
 // Others
 import {Observable} from 'rxjs';
 import {map, withLatestFrom} from 'rxjs/operators';
+import {fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
 
 @Component({
 	selector: 'tds-login',
@@ -95,6 +96,7 @@ export class LoginComponent implements OnInit {
 	 * Get the Login Information and prepare the store subscriber to redirect the user on a Success Login
 	 */
 	ngOnInit(): void {
+		fixContentWrapper();
 		let loginRequests = [
 			this.pageService.updateLastPage().catch(e => Observable.of({successful: false})),
 			this.loginService.getLoginInfo()

@@ -15,12 +15,12 @@ class EditETLScriptsPage extends Page{
     }
 
     static content = {
-        modaltitle { $("div", class:"modal-header").find("h4" , class:"modal-title")[0]}
+        modaltitle { $("div", class:"modal-header").find("h3" , class:"modal-title")[0]}
         providerDdownName { $("label", for:"dataScriptProvider")}
         datascriptName { $("label", for:"dataScriptName")}
         datascriptDesc { $("label", for:"dataScriptDescription")}
-        datascriptSaveBtn  { $("button", text: contains("Save"))}
-        datascriptXIcon { $('div.modal.fade.in button.close')}
+        datascriptSaveBtn  { $('clr-icon[shape="floppy"]').closest("button")[0]}
+        datascriptXIcon { $('clr-icon[shape="close"]').closest("button")[0]}
         providerDropdown { $('#dataScriptProvider span.k-select')}
         selectedProvider { $("#dataScriptProvider span.k-input")}
         //This gives you the latest created provider

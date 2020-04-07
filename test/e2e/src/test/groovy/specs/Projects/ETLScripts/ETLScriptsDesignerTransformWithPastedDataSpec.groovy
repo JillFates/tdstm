@@ -40,14 +40,19 @@ class ETLScriptsDesignerTransformWithPastedDataSpec extends GebReportingSpec{
         at ETLScriptsPage
         createBtn.click()
         at CreateETLScriptsPage
+        datascriptDescField = datascriptDescription
+        datascriptNameField = datascriptName
         waitFor{providerDropdown.click()}
         //We select the latest provider that was created
         waitFor{latestProvider.click()}
         waitFor{datascriptDescField.click()}
-        datascriptDescField = datascriptDescription
-        datascriptNameField = datascriptName
         waitFor {datascriptSaveBtn.isDisplayed()}
         waitFor {datascriptSaveBtn.click()}
+        at ETLScriptsPage
+        clickOnFilterButton()
+        filterByName(datascriptName)
+        waitFor{firstDS.text().contains(datascriptName)}
+        waitFor{firstDS.click()}
     }
 
     def setup() {

@@ -150,7 +150,7 @@ export class BundleListComponent implements OnInit, AfterContentInit, OnDestroy 
 	}
 
 	public async cellClick(event: CellClickEvent): Promise<void> {
-		if (event.columnIndex > 0 && this.isEditAvailable()) {
+		if (event.columnIndex > 0 && this.isViewAvailable()) {
 			await this.openBundle(event.dataItem, ActionType.VIEW, false);
 		}
 	}
@@ -253,6 +253,13 @@ export class BundleListComponent implements OnInit, AfterContentInit, OnDestroy 
 				console.error(error);
 			}
 		}
+	}
+
+	/**
+	 * Determine if the user has the permission to view bundles
+	 */
+	protected isViewAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.BundleView);
 	}
 
 	/**

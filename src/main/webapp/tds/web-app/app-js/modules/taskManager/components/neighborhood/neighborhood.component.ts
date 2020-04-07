@@ -1054,7 +1054,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if (this.refreshTriggered) {
 			this.taskGraphDiagramExtras.contentAlignment = Spot.None;
 			this.taskGraphDiagramExtras.initialAutoScale = Diagram.None;
-			this.taskGraphDiagramExtras.initialScale = (this.graph && this.graph.diagram) && this.graph.diagram.scale;
+			this.taskGraphDiagramExtras.scale = (this.graph && this.graph.diagram) && this.graph.diagram.scale;
 			this.lastDiagramPos = Object.assign({}, (this.graph && this.graph.diagram) && this.graph.diagram.position);
 		} else {
 			this.setTaskGraphDiagramExtras();
@@ -1065,7 +1065,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			currentUserId: this.userContext.user.id,
 			nodeDataArray,
 			linkDataArray,
-			extras: this.taskGraphDiagramExtras
+			extras: this.taskGraphDiagramExtras,
+			isRefreshTriggered: this.refreshTriggered
 		}));
 	}
 

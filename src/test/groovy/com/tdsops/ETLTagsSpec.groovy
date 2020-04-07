@@ -1,5 +1,6 @@
 package com.tdsops
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLBaseSpec
@@ -8,9 +9,9 @@ import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.ETLProcessorResult
-import com.tdsops.etl.RowResult
-import com.tdsops.etl.TagResults
 import com.tdsops.etl.dataset.ETLDataset
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.project.Project
 import spock.lang.See
 
@@ -21,6 +22,20 @@ class ETLTagsSpec extends ETLBaseSpec {
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 	ETLTagValidator tagValidator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
 	def setup() {
 		GMDEMO = Mock(Project)
@@ -75,10 +90,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [tagName] as Set
 							remove == [] as Set
 							replace == [:]
@@ -132,11 +147,11 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
 
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [tagNames[0], tagNames[1]] as Set
 							remove == [] as Set
 							replace == [:]
@@ -191,10 +206,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [] as Set
 							remove == [tagName] as Set
 							replace == [:]
@@ -248,11 +263,11 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
 
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [] as Set
 							remove == [tagNames[0], tagNames[1]] as Set
 							replace == [:]
@@ -309,10 +324,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [] as Set
 							remove == [] as Set
 							replace == [(currentTag): newTag]
@@ -368,10 +383,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [] as Set
 							remove == [] as Set
 							replace == [(currentTag): newTag]
@@ -430,10 +445,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [] as Set
 							remove == [] as Set
 							replace == [(currentTag): newTag]
@@ -489,11 +504,11 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
 
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [] as Set
 							remove == [] as Set
 							replace == [
@@ -757,7 +772,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['id'], '12345678', '12345678')
 						tags == null
@@ -810,9 +825,9 @@ class ETLTagsSpec extends ETLBaseSpec {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 0
-						assertWith(tags, TagResults) {
+						assertWith(tags) {
 							add == [tagName] as Set
 							remove == [] as Set
 							replace == [:]

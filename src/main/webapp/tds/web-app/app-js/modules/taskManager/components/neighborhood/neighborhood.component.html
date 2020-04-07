@@ -57,32 +57,82 @@
     </div>
 
     <div class="col-md-6 chk-filter-container">
-      <label class="task-chk-container">
-        <input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />
-        <span class="checkmark"></span>
-        Minimize Auto Tasks
+      <label class="task-chk-container">        
+        <clr-checkbox-wrapper class="inline">
+          <input
+              clrCheckbox
+              id="minimizeAutoTasks"
+              type="checkbox"
+              name="minimizeAutoTasks"              
+              [(ngModel)]="minimizeAutoTasks"
+              (ngModelChange)="onMinimizeAutoTasksFilterChange()"
+          />
+          <label
+              class="clr-control-label clr-control-label-sm inline"
+              for="minimizeAutoTasks"
+          >
+          Minimize Auto Tasks
+          </label>
+      </clr-checkbox-wrapper>
+      </label>
+
+      <label class="task-chk-container">        
+        <clr-checkbox-wrapper class="inline">
+          <input
+              clrCheckbox
+              id="myTasks"
+              type="checkbox"
+              name="myTasks"
+              [(ngModel)]="myTasks"
+              (ngModelChange)="onMyTasksFilterChange()"
+          />
+          <label
+              class="clr-control-label clr-control-label-sm inline"
+              for="myTasks"
+          >
+          My Tasks
+          </label>
+      </clr-checkbox-wrapper>
       </label>
 
       <label class="task-chk-container">
-        <input name="myTasks" type="checkbox" [(ngModel)]="myTasks" (ngModelChange)="onMyTasksFilterChange()" />
-        <span class="checkmark"></span>
-        My Tasks
-      </label>
-
-      <label class="task-chk-container">
-        <input  type="checkbox" [(ngModel)]="viewUnpublished" (ngModelChange)="onViewUnpublishedFilterChange()" />
-        <span class="checkmark"></span>
-        View Unpublished
+        <clr-checkbox-wrapper class="inline">
+          <input
+              clrCheckbox
+              id="viewUnpublished"
+              type="checkbox"
+              name="viewUnpublished"
+              [(ngModel)]="viewUnpublished"
+              (ngModelChange)="onViewUnpublishedFilterChange()"
+          />
+          <label
+              class="clr-control-label clr-control-label-sm inline"
+              for="viewUnpublished"
+          >
+          View Unpublished
+          </label>
+      </clr-checkbox-wrapper>        
       </label>
 
       <label class="task-chk-container" [ngClass]="{'disabled': !hasCycles}">
-        <input
-                type="checkbox"
-                [(ngModel)]="showCycles"
-                (ngModelChange)="highlightCycles()"
-                [disabled]="!hasCycles"/>
-        <span class="checkmark"></span>
-        Cycles
+                <clr-checkbox-wrapper class="inline">
+                  <input
+                      clrCheckbox
+                      id="cycles"
+                      type="checkbox"
+                      name="cycles"
+                      class="component-action-just-planning"
+                      [(ngModel)]="showCycles"
+                      (ngModelChange)="highlightCycles()"
+                      [disabled]="!hasCycles"
+                  />
+                  <label
+                      class="clr-control-label clr-control-label-sm inline"
+                      for="cycles"
+                  >
+                  Cycles
+                  </label>
+              </clr-checkbox-wrapper>                
       </label>
     </div>
 

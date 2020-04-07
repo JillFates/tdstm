@@ -10,14 +10,14 @@ class ETLScriptsDesignerSampleDataPage extends Page{
     }
 
     static content = {
-        sampleDataContainer {$("data-script-sample-data div.modal-content")}
-        modalTitle {sampleDataContainer.find("div", class:"modal-header").find("h4" , class:"modal-title")}
+        sampleDataContainer {$(".modal-dialog.modal-lg")}
+        modalTitle {sampleDataContainer.find("h3")}
         pasteContentOption {sampleDataContainer.find("label", text: contains("Paste content"))}
-        fileFormatDropDown {sampleDataContainer.find("kendo-dropdownlist", id: "fileExtension").find("span", class: "k-select")}
-        fileFormatDropDownOptions {$("li[kendodropdownsselectable]")}
-        fileContentSampleData {sampleDataContainer.find("textarea", name: "fileContent")}
-        uploadSampleDataButton {sampleDataContainer.find("button", text: contains("Upload"))}
-        continueSampleDataButton {sampleDataContainer.find("button", text: contains("Continue"))}
+        fileFormatDropDown (required:false){sampleDataContainer.find("kendo-dropdownlist", id: "fileExtension").find("span", class: "k-select")}
+        fileFormatDropDownOptions (required:false){$("li[kendodropdownsselectable]")}
+        fileContentSampleData (required:false){sampleDataContainer.find("textarea", name: "fileContent")}
+        uploadSampleDataButton (required:false){sampleDataContainer.find("button", text: contains("UPLOAD"))}
+        continueSampleDataButton {sampleDataContainer.find("button", text: contains("CONTINUE"))}
         commonsModule {module CommonsModule}
     }
 
