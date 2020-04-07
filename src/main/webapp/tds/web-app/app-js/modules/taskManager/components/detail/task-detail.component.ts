@@ -1,38 +1,49 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {DIALOG_SIZE, KEYSTROKE, ModalType} from '../../../../shared/model/constants';
-import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver, Input, OnInit} from '@angular/core';
+// Model
+import { ModalType} from '../../../../shared/model/constants';
 import {TaskDetailModel} from '../../model/task-detail.model';
-import {TaskService} from '../../service/task.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
 import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/model/task-notes-columns.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
+import {AlertType} from '../../../../shared/model/alert.model';
+import { UserContextModel } from '../../../auth/model/user-context.model';
+import { TaskActionInfoModel } from '../../model/task-action-info.model';
+import {
+	Dialog,
+	DialogButtonType,
+	DialogConfirmAction,
+	DialogExit,
+	DialogService,
+	ModalSize
+} from 'tds-component-library';
+// Component
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
+// Service
+import {TaskService} from '../../service/task.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
-import {TaskEditComponent} from '../edit/task-edit.component';
-import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {WindowService} from '../../../../shared/services/window.service';
-import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
-import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {TaskCreateComponent} from '../create/task-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
-import { TaskActionInfoModel } from '../../model/task-action-info.model';
+import * as R from 'ramda';
+import {TaskStatus} from '../../model/task-edit-create.model';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: `task-detail`,
 	templateUrl: 'task-detail.component.html',
 	styles: []
 })
-export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
+export class TaskDetailComponent extends Dialog implements OnInit {
+	@Input() data: any;
 
 	protected modalType = ModalType;
 	protected dateFormat: string;
@@ -50,47 +61,134 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public hasEditTaskPermission = false;
 	public hasDeleteTaskPermission = false;
 	public hasCreateTaskPermission = false;
-	public modalOptions: DecoratorOptions;
 	public model: any = {};
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
-	taskActionInfoModel: TaskActionInfoModel;
-	public ignoreDoubleClickClasses = ['btn', 'actionable-link', 'k-grid'];
+	private taskActionInfoModel: TaskActionInfoModel = null;
+	private taskDetailModel: TaskDetailModel;
 
 	constructor(
-		private taskDetailModel: TaskDetailModel,
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService,
-		private promptService: UIPromptService,
+		private dialogService: DialogService,
 		private userPreferenceService: PreferenceService,
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private windowService: WindowService,
 		private notifierService: NotifierService,
 		private userContextService: UserContextService) {
+		super();
 
-		super('#task-detail-component');
-		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
-			this.hasChanges = false;
-			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
-			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
-				this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
-			} else {
-				this.currentUserId = this.userContext.user.id;
-			}
-			this.loadTaskDetail();
-			this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
-			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
-			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-			this.hasCreateTaskPermission = this.permissionService.hasPermission(Permission.TaskCreate);
+		this.taskDetailModel = R.clone(this.data.taskDetailModel);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => this.hasEditTaskPermission,
+			type: DialogButtonType.ACTION,
+			action: this.editTaskDetail.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.hasDeleteTaskPermission,
+			type: DialogButtonType.ACTION,
+			action: this.deleteTask.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.hasChanges = false;
+		this.dateFormat = this.userPreferenceService.getUserDateFormat();
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+
+		if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
+			this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
+		} else {
+			this.currentUserId = this.userContext.user.id;
+		}
+		this.loadTaskDetail();
+		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
+		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
+		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
+		this.hasCreateTaskPermission = this.permissionService.hasPermission(Permission.TaskCreate);
+		setTimeout(() => {
+			this.setTitle(this.taskDetailModel.modal.title);
+		});
+	}
+
+	private prepareTaskActionButtons(): void {
+		this.buttons = this.buttons.filter((button: any) => {
+			return (['toPlay', 'toDone', 'toInvoke', 'toResetAction', 'toAssignTo', 'toNeighborhood'].indexOf(button.name) === -1)
+		});
+
+		this.buttons.push({
+			name: 'toPlay',
+			icon: 'play',
+			text: 'Start',
+			show: () => this.taskActionInfoModel && [TaskStatus.READY].indexOf(this.taskActionInfoModel.status) >= 0,
+			type: DialogButtonType.CONTEXT,
+			action: this.onStartTask.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toDone',
+			icon: 'check',
+			text: 'Done',
+			show: () => this.taskActionInfoModel && [TaskStatus.READY, TaskStatus.STARTED].indexOf(this.taskActionInfoModel.status) >= 0,
+			type: DialogButtonType.CONTEXT,
+			action: this.onDoneTask.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toInvoke',
+			icon: 'cog',
+			text: ((this.taskActionInfoModel.invokeButton && this.taskActionInfoModel.invokeButton.label) ? this.taskActionInfoModel.invokeButton.label : 'Invoke'),
+			show: () => this.showInvoke(),
+			disabled: () => !this.permissionService.hasPermission(Permission.ActionInvoke) || (this.taskActionInfoModel.invokeButton && this.taskActionInfoModel.invokeButton.disabled),
+			type: DialogButtonType.CONTEXT,
+			action: this.onInvoke.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toResetAction',
+			icon: 'power',
+			text: 'Reset Action',
+			show: () => this.taskActionInfoModel && this.taskActionInfoModel.apiActionId && this.taskActionInfoModel.status === TaskStatus.HOLD,
+			type: DialogButtonType.CONTEXT,
+			action: this.onReset.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toAssignTo',
+			icon: 'user',
+			text: 'Assign To Me',
+			show: () => this.showAssignToMe(),
+			type: DialogButtonType.CONTEXT,
+			action: this.onAssignToMe.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'toNeighborhood',
+			icon: 'power',
+			text: 'Neighborhood',
+			show: () => this.taskActionInfoModel && (this.taskActionInfoModel.predecessors + this.taskActionInfoModel.successors > 0),
+			type: DialogButtonType.CONTEXT,
+			action: this.onNeighborhood.bind(this)
 		});
 	}
 
@@ -101,10 +199,9 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		this.taskManagerService.getTaskDetails(this.taskDetailModel.id)
 			.subscribe((res) => {
 				if (!res) {
-					this.dismiss();
+					super.onCancelClose();
 					return;
 				}
-				this.dateFormat = this.userPreferenceService.getUserDateFormat();
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 				this.taskDetailModel.detail = res;
 
@@ -113,14 +210,15 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 					this.userPreferenceService.getUserDateFormat(),
 					this.taskManagerService,
 					this.dialogService,
-					this.translatePipe);
+					this.translatePipe,
+					this.componentFactoryResolver);
 				this.model = this.modelHelper.getModelForDetails(this.taskDetailModel);
 				this.model.instructionLink = this.modelHelper.getInstructionsLink(this.taskDetailModel.detail);
 
-				this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
-				this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
+				this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null, null, 2000);
+				this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null, null, 2000);
 				// Notes are coming into an Array of Arrays...
-				this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
+				this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null, null, 2000);
 				// Convert the Duration into a Human Readable form
 				this.model.durationText = DateUtils.formatDuration(this.model.duration, this.model.durationScale);
 
@@ -135,10 +233,14 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 						}
 					});
 			});
-		this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
-			.subscribe((result: TaskActionInfoModel) => {
-			this.taskActionInfoModel = result;
-		});
+		const taskId = parseInt(this.taskDetailModel.id, 0);
+		this.taskManagerService.getBulkTaskActionInfo([taskId])
+			.subscribe((result: TaskActionInfoModel[]) => {
+				if (result && result[taskId]) {
+					this.taskActionInfoModel = result[taskId];
+					this.prepareTaskActionButtons();
+				}
+			});
 	}
 
 	/**
@@ -146,7 +248,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * @param task
 	 */
 	public openTaskDetail(task: any, modalType: ModalType): void {
-		this.close({commentInstance: {...task, id: task.taskId}, shouldOpenTask: true});
+		super.onCancelClose({commentInstance: {...task, id: task.taskId}, shouldOpenTask: true});
 	}
 
 	public onCollapseTaskDetail(): void {
@@ -157,21 +259,24 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Close Dialog
 	 */
 	public cancelCloseDialog(): void {
-		this.dismiss(this.hasChanges);
+		super.onCancelClose({hasChanges: this.hasChanges});
 	}
 	/**
 	 * Prompt confirm delete a task
 	 * delegate operation to host component
 	 */
 	deleteTask(): void {
-		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
-			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
-			this.translatePipe.transform('GLOBAL.CONFIRM'),
-			this.translatePipe.transform('GLOBAL.CANCEL'))
-			.then(result => {
-				if (result) {
-					this.close({id: this.taskDetailModel, isDeleted: true})
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+			),
+			this.translatePipe.transform(
+				'TASK_MANAGER.DELETE_TASK'
+			)
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					super.onCancelClose({id: this.taskDetailModel, isDeleted: true})
 				}
 			});
 	}
@@ -179,7 +284,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Open view to edit task details
 	 */
 	public editTaskDetail(): void {
-		this.close({id: this.taskDetailModel, shouldEdit: true});
+		super.onCancelClose({id: this.taskDetailModel, shouldEdit: true});
 	}
 
 	/**
@@ -267,13 +372,21 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		const assetClass = this.taskManagerService.getAssetCategory(this.model.assetClass.id);
 
 		if (assetClass) {
-			this.dialogService.replace(AssetShowComponent,
-				[UIDialogService,
-					{ provide: 'ID', useValue: id },
-					{ provide: 'ASSET', useValue: assetClass }
-				], DIALOG_SIZE.LG);
-
-			this.close();
+			super.onCancelClose();
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetShowComponent,
+				data: {
+					assetId: id,
+					assetClass: assetClass
+				},
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe();
 		} else {
 			this.notifierService.broadcast({
 				name: AlertType.DANGER,
@@ -290,7 +403,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	public onAddTaskDependency(taskList: any[], gridHelper: any): void {
 		let taskCreateModel: TaskDetailModel = {
-			id: this.model.asset.id, // dataItem.common_id,
+			id: this.model.id,
 			modal: {
 				title: 'Create Task',
 				type: ModalType.CREATE
@@ -299,40 +412,47 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				assetClass: this.model.assetClass,
 				assetEntity: this.model.asset.id,
 				assetName:  this.model.assetName,
-				currentUserId: this.model.assignedTo.id
+				currentUserId: this.model.assignedTo.id,
+				event: this.model.event
 			}
 		};
 
-		this.dialogService.extra(TaskCreateComponent, [
-			{provide: TaskDetailModel, useValue: taskCreateModel}
-		], false, false)
-			.then(result => {
-				if (result) {
-					const task = {
-						category: result.assetComment.category,
-						desc: result.assetComment.comment,
-						id: result.assetComment.id,
-						model: {
-							id: result.assetComment.id,
-							text: result.assetComment.comment
-						},
-						originalId: '',
-						status: result.assetComment.status,
-						taskId: result.assetComment.id,
-						taskNumber: result.assetComment.taskNumber
-					};
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskEditCreateComponent,
+			data: {
+				taskDetailModel: taskCreateModel
+			},
+			modalConfiguration: {
+				title: 'Create Task',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
+			}
+		}).subscribe((data: any) => {
+			if (data.status === DialogExit.ACCEPT) {
+				const task = {
+					category: data.assetComment.category,
+					desc: data.assetComment.comment,
+					id: data.assetComment.id,
+					model: {
+						id: data.assetComment.id,
+						text: data.assetComment.comment
+					},
+					originalId: '',
+					status: data.assetComment.status,
+					taskId: data.assetComment.id,
+					taskNumber: data.assetComment.taskNumber
+				};
 
-					taskList.unshift(task);
-					gridHelper.addDataItem(task);
-					console.log('Reloading');
-					const payload = this.modelHelper.getPayloadForUpdate();
+				taskList.unshift(task);
+				gridHelper.addDataItem(task);
+				console.log('Reloading');
+				const payload = this.modelHelper.getPayloadForUpdate();
 
-					this.taskManagerService.updateTask(payload)
-						.subscribe((result) => this.loadTaskDetail());
-				}
-
-			}).catch(result => {
-			console.log('Cancel:', result);
+				this.taskManagerService.updateTask(payload)
+					.subscribe((result) => this.loadTaskDetail());
+			}
 		});
 	}
 
@@ -355,12 +475,69 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Opens the action summary modal.
 	 */
 	openTaskActionSummaryDetailHandler(): void {
-		this.dialogService.extra(TaskActionSummaryComponent, [
-			{ provide: TaskDetailModel, useValue: this.taskDetailModel }
-		]).then((result) => {
-			// do nothing, modal was closed;
-		}).catch(result => {
-			// do nothing, modal was closed
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskActionSummaryComponent,
+			data: {
+				taskDetailModel: this.taskDetailModel
+			},
+			modalConfiguration: {
+				title: 'Task',
+				draggable: true,
+				modalSize: ModalSize.LG
+			}
+		}).subscribe();
 	}
+
+	showInvoke(): boolean {
+		if (this.taskActionInfoModel
+			&& this.taskActionInfoModel.invokeButton
+			&& this.taskActionInfoModel.invokeButton !== null) {
+			this.taskActionInfoModel.invokeButton = this.taskActionInfoModel.invokeButton;
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Determines if Assign to me button can be shown.
+	 */
+	showAssignToMe(): boolean {
+		return (this.taskActionInfoModel
+			&&
+			(	( !this.taskActionInfoModel.assignedTo
+					||
+					this.userContext.person.id !== this.taskActionInfoModel.assignedTo )
+				&&
+				[TaskStatus.READY, TaskStatus.PENDING, TaskStatus.STARTED].indexOf(this.taskActionInfoModel.status) >= 0
+			) );
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * On double click
+	 */
+	public onDoubleClick(event: MouseEvent): void {
+		this.changeToEditViewOnDoubleClick(event);
+		super.onDoubleClick(event);
+	}
+
+	/**
+	 * Change the view to edit view if the click was made over a not banned css class
+	 * @param event MouseEvent info where the double click was made
+	 */
+	private changeToEditViewOnDoubleClick(event: MouseEvent): void {
+		const bannedClasses = ['btn', 'actionable-link', 'k-grid'];
+		if (!ValidationUtils.isBannedClass(bannedClasses, event)) {
+			// move to edit mode
+			this.editTaskDetail();
+		}
+	}
+
 }

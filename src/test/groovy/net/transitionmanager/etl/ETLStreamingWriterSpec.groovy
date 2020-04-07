@@ -7,25 +7,25 @@ import com.tdsops.etl.RowResult
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import groovy.json.JsonSlurper
-import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import spock.lang.Unroll
 
-@Mock([AssetEntity])
-class ETLStreamingWriterSpec extends ETLBaseSpec {
+class ETLStreamingWriterSpec extends ETLBaseSpec implements DataTest {
 
-    static doWithSpring = {
-        coreService(CoreService) {
-            grailsApplication = ref('grailsApplication')
-        }
-        fileSystemService(FileSystemService) {
-            coreService = ref('coreService')
-        }
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
         }
     }
 

@@ -1,57 +1,64 @@
-import { ActivatedRoute } from '@angular/router';
-import { Component, ViewChild } from '@angular/core';
-import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
-import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
-import { Observable } from 'rxjs/Observable';
-import {
-	CellClickEvent,
-	DetailCollapseEvent,
-	DetailExpandEvent,
-	GridComponent,
-	GridDataResult, PageChangeEvent
-} from '@progress/kendo-angular-grid';
-import { ReportsService } from '../../../reports/service/reports.service';
-import { TaskService } from '../../service/task.service';
+// Angular
+import {ActivatedRoute} from '@angular/router';
+import {Component, ComponentFactoryResolver, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
+// Model
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS, LOADER_IDLE_PERIOD,
 	ModalType
 } from '../../../../shared/model/constants';
-import { forkJoin } from 'rxjs';
-import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
-import { ColumnMenuService } from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
-import { SortUtils } from '../../../../shared/utils/sort.utils';
-import { taskListColumnsModel } from '../../model/task-list-columns.model';
-import { TaskDetailModel } from '../../model/task-detail.model';
-import { TaskDetailComponent } from '../detail/task-detail.component';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { ObjectUtils } from '../../../../shared/utils/object.utils';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { clone, hasIn } from 'ramda';
-import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
-import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
-import { TaskCreateComponent } from '../create/task-create.component';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { Store } from '@ngxs/store';
-import { SetEvent } from '../../../event/action/event.actions';
-import { TaskStatus } from '../../model/task-edit-create.model';
-import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
-import { TaskEditComponent } from '../edit/task-edit.component';
-import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { TaskActionInfoModel } from '../../model/task-action-info.model';
-import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {taskListColumnsModel} from '../../model/task-list-columns.model';
+import {TaskDetailModel} from '../../model/task-detail.model';
+import {SetEvent} from '../../../event/action/event.actions';
+import {TaskStatus} from '../../model/task-edit-create.model';
+import {TaskActionInfoModel} from '../../model/task-action-info.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {DialogService, HeaderActionButtonData, ModalSize} from 'tds-component-library';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+// Component
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
+import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
+// Service
+import {DataGridOperationsHelper, fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
+import {ReportsService} from '../../../reports/service/reports.service';
+import {TaskService} from '../../service/task.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {ColumnMenuService} from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+// Other
+import {Observable} from 'rxjs/Observable';
+import {map} from 'rxjs/operators';
+import {pathOr} from 'ramda';
+import {
+	DetailCollapseEvent,
+	DetailExpandEvent,
+	GridComponent,
+	GridDataResult, PageChangeEvent
+} from '@progress/kendo-angular-grid';
+import {forkJoin} from 'rxjs';
+import {hasIn} from 'ramda';
+import {Store} from '@ngxs/store';
+import {FilterDescriptor, SortDescriptor} from '@progress/kendo-data-query';
 
 @Component({
 	selector: 'task-list',
 	templateUrl: './task-list.component.html'
 })
-export class TaskListComponent {
-	@ViewChild('gridComponent') gridComponent: GridComponent;
+export class TaskListComponent implements OnInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
+	@ViewChild('gridComponent', {static: false}) gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
 	justRemaining: boolean;
@@ -64,15 +71,17 @@ export class TaskListComponent {
 	hideGrid: boolean;
 	selectedCustomColumn: any;
 	selectedEvent: any;
+	selectedEventId: any;
 	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
 	private dashboardFilters = ['filter', 'status', 'role', 'category'];
+	private dateValues = ['actStart', 'actFinish', 'dueDate', 'dateCreated', 'estStart', 'estFinish', 'lastUpdated', 'latestStart', 'latestFinish', 'statusUpdated'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
-	private allAvailableCustomColumns: Array<any>;
+	protected allAvailableCustomColumns: Array<any>;
 	private userContext: UserContextModel;
 	// Flag that indicates that one or more rows have been expanded
 	private rowsExpanded: boolean;
@@ -81,20 +90,28 @@ export class TaskListComponent {
 	// Contains the Action Bar Details for each row
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
 	public hasViewUnpublishedPermission = false;
+	public isFiltering  = false;
+	public allTasksPermission: boolean;
+	private timeZone: string;
+	private dateFormat: string;
+	protected gridMessage;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
 		private loaderService: UILoaderService,
 		private store: Store,
-		private dialogService: UIDialogService,
+		private permissionService: PermissionService,
+		private dialogService: DialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute,
-		private permissionService: PermissionService) {
+		private preferenceService: PreferenceService) {
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
-		this.justMyTasks = false;
+		this.allTasksPermission = this.permissionService.hasPermission(Permission.TaskManagerAllTasks);
+		this.justMyTasks = !this.allTasksPermission;
 		this.loading = true;
 		this.hideGrid = true;
 		this.rowsExpanded = false;
@@ -113,6 +130,31 @@ export class TaskListComponent {
 	}
 
 	/**
+	 * On Init: remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+	 */
+	ngOnInit(): void {
+		fixContentWrapper();
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.timeZone = this.preferenceService.getUserTimeZone();
+		this.dateFormat = this.preferenceService.getUserDateFormat();
+		this.headerActionButtons = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translate.transform('GLOBAL.CREATE'),
+				show: true,
+				onClick: this.onCreateTaskHandler.bind(this),
+			},
+			{
+				icon: 'pencil',
+				title: this.translate.transform('TASK_MANAGER.BULK_ACTION'),
+				show: true,
+				onClick: this.onBulkActionHandler.bind(this),
+			},
+		];
+	}
+
+	/**
 	 * On Custom Column configuration change. Set the new column configuration and reload the task list.
 	 * @param customColumn
 	 * @param newColumn
@@ -120,7 +162,7 @@ export class TaskListComponent {
 	 */
 	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
 		service.close();
-		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
+		let index = parseInt(customColumn.charAt(customColumn.length - 1), 10) + 1;
 		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
 			.subscribe(result => {
 				this.buildCustomColumns(result.customColumns, result.assetCommentFields);
@@ -131,7 +173,8 @@ export class TaskListComponent {
 	/**
 	 * On Event select change.
 	 */
-	onEventSelect(): void {
+	onEventSelect(selected: any): void {
+		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 10));
 		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
 		this.onFiltersChange();
 	}
@@ -175,16 +218,20 @@ export class TaskListComponent {
 				currentUserId: this.userContext.user.id
 			}
 		};
-		this.dialogService.extra(TaskCreateComponent, [
-			{ provide: TaskDetailModel, useValue: taskCreateModel }
-		]).then((result) => {
-			if (result) {
-				this.search();
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskEditCreateComponent,
+			data: {
+				taskDetailModel: taskCreateModel
+			},
+			modalConfiguration: {
+				title: 'Create Task',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
-		}).catch(result => {
-			if (result) {
-				// nothing
-			}
+		}).subscribe((data: any) => {
+			this.search();
 		});
 	}
 
@@ -199,25 +246,29 @@ export class TaskListComponent {
 				title: 'Task Detail'
 			}
 		};
-		this.dialogService.extra(TaskDetailComponent, [
-			{ provide: TaskDetailModel, useValue: taskDetailModel }
-		]).then((result) => {
-			if (result) {
-				if (result.isDeleted) {
-					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-						this.search();
-					});
-				} else if (result.shouldOpenTask) {
-					this.onOpenTaskDetailHandler(result.commentInstance);
-				} else if (result.shouldEdit) {
-					this.onOpenTaskEditHandler(result.id);
-				} else {
-					this.search(parseInt(taskRow.id, 0));
-				}
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: TaskDetailComponent,
+			data: {
+				taskDetailModel: taskDetailModel
+			},
+			modalConfiguration: {
+				title: 'Task Detail',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-task-modal-edit-view-create'
 			}
-		}).catch(result => {
-			if (result) {
-				this.search(parseInt(taskRow.id, 0));
+		}).subscribe((data: any) => {
+			if (data.isDeleted) {
+				this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+					this.search();
+				});
+			} else if (data.shouldOpenTask) {
+				this.onOpenTaskDetailHandler(data.commentInstance);
+			} else if (data.shouldEdit) {
+				this.onOpenTaskEditHandler(data.id);
+			} else {
+				this.search(parseInt(taskRow.id, 10));
 			}
 		});
 	}
@@ -231,7 +282,8 @@ export class TaskListComponent {
 					this.userContext.dateFormat,
 					this.taskService,
 					this.dialogService,
-					this.translate);
+					this.translate,
+					this.componentFactoryResolver);
 				taskDetailModel.detail = res;
 				taskDetailModel.modal = {
 					title: 'Task Edit',
@@ -241,21 +293,27 @@ export class TaskListComponent {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditComponent, [
-					{ provide: TaskDetailModel, useValue: clone(model) }
-				], false, false)
-					.then(result => {
-						if (result) {
-							if (result.isDeleted) {
-								this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-									this.search();
-								});
-							} else {
-								this.search(parseInt(taskRow.id, 0));
-							}
-						}
-					}).catch(result => {
-					// do nothing.
+
+				this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: TaskEditCreateComponent,
+					data: {
+						taskDetailModel: model
+					},
+					modalConfiguration: {
+						title: 'Task Edit',
+						draggable: true,
+						modalSize: ModalSize.CUSTOM,
+						modalCustomClass: 'custom-task-modal-edit-view-create'
+					}
+				}).subscribe((data: any) => {
+					if (data.isDeleted) {
+						this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+							this.search();
+						});
+					} else {
+						this.search(parseInt(taskRow.id, 10));
+					}
 				});
 			});
 	}
@@ -308,16 +366,22 @@ export class TaskListComponent {
 	 * @param assetClass: string
 	 */
 	onOpenAssetDetailHandler(taskRow: any): void {
-		this.dialogService.open(AssetShowComponent,
-			[UIDialogService,
-				{ provide: 'ID', useValue: taskRow.assetEntityId },
-				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
-				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.LG).then(result => {
-				// nothing
-		}).catch(result => {
-			console.error('rejected: ' + result);
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: taskRow.assetEntityId,
+				assetClass: taskRow.assetEntityAssetClass,
+				assetExplorerModule: AssetExplorerModule
+			},
+			modalConfiguration: {
+				title: 'Asset',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe();
+
 	}
 
 	/**
@@ -344,31 +408,52 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
-	 * @param $event: any
-	 */
-	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		this.loadTaskActionInfoModel($event.dataItem.id).subscribe(() => {
-			// loaded.
-		});
-		this.rowsExpandedMap[$event.index] = true;
-	}
-
-	/**
 	 * Responsible for fetching the latest data for the action bar
 	 * @param taskId
 	 */
 	refreshActionBar(taskId: any): void {
-		this.loadTaskActionInfoModel(taskId).subscribe(() => {
-			// loaded.
-		});	}
+		this.getInfoModelAndUpdateTaskActions([taskId])
+			.subscribe(() => {
+				// updated action bar row
+			});
+	}
 
 	/**
 	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
 	 */
 	onRowDetailCollapseHandler($event: DetailCollapseEvent): void {
-		this.rowsExpandedMap[$event.index] = false;
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onCollapseRow($event.index);
+			});
+	}
+
+	/**
+	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
+	 * @param $event: any
+	 */
+	onRowDetailExpandHandler($event: DetailExpandEvent): void {
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onExpandRow($event.index);
+			});
+	}
+
+	/**
+	 * Set the flag to Collapse of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onCollapseRow(index: number): void {
+		this.rowsExpandedMap[index] = false;
+	}
+
+	/**
+	 * Set the flag to Expand of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onExpandRow(index: number): void {
+		this.rowsExpandedMap[index] = true;
 	}
 
 	/**
@@ -426,21 +511,11 @@ export class TaskListComponent {
 				column.filter = '';
 			});
 		if (this.grid.state.filter && this.grid.state.filter.filters.length) {
-			this.grid.state.filter.filters
-				.forEach((filter: FilterDescriptor) => {
-					filter.value = '';
-				});
+			this.grid.state.filter.filters = [];
+			this.isFiltering = false;
 			// reset pagination to be on page 1
 			this.onPageChangeHandler({ skip: 0, take: this.pageSize });
 		}
-	}
-
-	/**
-	 * Determines if current columns has been filtered (contains value).
-	 */
-	areFiltersDirty(): boolean {
-		return (this.columnsModel
-			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
 	}
 
 	/**
@@ -451,27 +526,24 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
 			let taskIds = taskRows.map(task => task.id);
-			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
-				for (const taskId in result) {
-					if (result.hasOwnProperty(taskId)) {
-						const taskActionInfoModel = result[taskId];
-						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+			this.getInfoModelAndUpdateTaskActions(taskIds)
+				.subscribe(() => {
+					// take into account that grid could been filtered
+					const rowCounter = pathOr(0, ['gridData', 'data', 'length'], this.grid);
+					for (let i = 0; i < rowCounter; i++ ) {
+						if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+							this.gridComponent.expandRow(i);
+							this.rowsExpandedMap[i] = true;
+						}
 					}
-				}
-				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
-					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
-						this.gridComponent.expandRow(i);
-						this.rowsExpandedMap[i] = true;
-					}
-				}
-			});
-			this.rowsExpanded = true;
+					this.rowsExpanded = true;
+				});
 		} else {
 			taskRows.forEach((taskRow, index) => {
 				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(index);
 			});
 			this.rowsExpanded = false;
@@ -479,25 +551,20 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * On cell click open the task action bar except for when clicking on the assetName
-	 * @param $event: CellClickEvent
+	 * Ge the task actions of the selected task and updates is model
+	 * @param taskIds
 	 */
-	onCellClickHandler($event: CellClickEvent): void {
-		if ($event.columnIndex !== 0 && $event.columnIndex !== 1
-			&& this.currentCustomColumns[$event.column.field] !== 'assetName') {
-			let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
-			expandedEvent.index = $event.rowIndex;
-			expandedEvent.dataItem = $event.dataItem;
-			// collapse
-			if (this.rowsExpandedMap[$event.rowIndex]) {
-				this.onRowDetailCollapseHandler(expandedEvent);
-				this.gridComponent.collapseRow($event.rowIndex);
-				// expand
-			} else {
-				this.onRowDetailExpandHandler(expandedEvent);
-				this.gridComponent.expandRow($event.rowIndex);
-			}
-		}
+	getInfoModelAndUpdateTaskActions(taskIds: number[]): Observable<void> {
+		return this.taskService.getBulkTaskActionInfo(taskIds)
+			.pipe(map((result: any) => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				return;
+			}));
 	}
 
 	/**
@@ -542,10 +609,14 @@ export class TaskListComponent {
 		}
 		const filterColumn = { ...column };
 		if (filterColumn.property.startsWith('userSelectedCol')) {
+			// save the reference to the custom property name
+			column.customPropertyName =  this.currentCustomColumns[filterColumn.property];
+			// use the new property name
 			filterColumn.property = this.currentCustomColumns[filterColumn.property];
 		}
-		const filters = this.grid.getFilter(filterColumn);
-		this.grid.state.filter = filters;
+		const result = this.grid.getFilter(filterColumn);
+		result.filters = result.filters.filter((filter: any) => filter.value);
+		this.grid.state.filter = result;
 		// reset pagination to be on page 1
 		this.onPageChangeHandler({ skip: 0, take: this.pageSize });
 	}
@@ -574,6 +645,7 @@ export class TaskListComponent {
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 			this.selectedEvent = userContext.event;
+			this.selectedEventId = this.selectedEvent && this.selectedEvent.id || 0;
 		});
 		this.loading = true;
 		const observables = forkJoin(
@@ -589,7 +661,7 @@ export class TaskListComponent {
 					// Custom Columns, TaskPref
 					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
 					// Task list size
-					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					this.pageSize = listSize ? parseInt(listSize, 10) : GRID_DEFAULT_PAGE_SIZE;
 					this.grid.state.take = this.pageSize;
 					// Task View Unpublished
 					this.viewUnpublished = this.hasViewUnpublishedPermission && unpublished ? (unpublished === 'true' || unpublished === '1') : false;
@@ -616,7 +688,7 @@ export class TaskListComponent {
 	private loadEventListAndSearch(currentEventId: any): void {
 		this.reportService.getEventList().subscribe(result => {
 			this.eventList = [this.allEventsOption].concat(result.data);
-			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 0));
+			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 10));
 			if (match) {
 				this.selectedEvent = match;
 			} else {
@@ -639,7 +711,11 @@ export class TaskListComponent {
 		Object.values(customColumns).forEach((custom: string, index: number) => {
 			const column = `userSelectedCol${ index }`;
 			let match = this.columnsModel.find(item => item.property === column);
-			match.label = assetCommentFields[custom];
+			if (match) {
+				match.label = assetCommentFields[custom];
+				match.type = this.dateValues.includes(custom) ? 'date' : 'text';
+				match.format = this.dateFormat;
+			}
 			this.currentCustomColumns[column] = custom;
 		});
 		this.allAvailableCustomColumns = [];
@@ -683,21 +759,32 @@ export class TaskListComponent {
 		// Add field filters
 		if (this.grid.state.filter && this.grid.state.filter.filters.length > 0) {
 			this.grid.state.filter.filters.forEach((filter: FilterDescriptor) => {
-				request[filter.field as string] = filter.value;
+				if (!request[filter.field as string]) {
+					request[filter.field as string] = filter.value;
+				}
 			});
 		}
+		this.gridMessage = this.translate.transform('GLOBAL.LOADING_RECORDS');
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
-				this.reloadGridData(result.rows, result.totalCount);
-				this.loading = false;
-				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 				for (let i = 0; i < result.totalCount; i++) {
+					for (let j = 0; j < 5; j++) {
+						let colName = 'userSelectedCol' + j;
+						if (result.rows[i] && this.dateValues.includes(this.currentCustomColumns[colName])) {
+							result.rows[i][colName] = result.rows[i][colName] ?
+								DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.rows[i][colName]), DateUtils.SERVER_FORMAT_DATE) : '';
+						}
+					}
 					let info = result.rows[i] ? result.rows[i].actionBarInfo : null;
 					if (info) {
 						let actionBarModel = this.taskService.convertToTaskActionInfoModel(info);
 						this.taskActionInfoModels.set(result.rows[i].id.toString(), actionBarModel);
 					}
 				}
+				this.reloadGridData(result.rows, result.totalCount);
+				this.loading = false;
+				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+				this.gridMessage = (result.totalCount > 0) ? this.translate.transform('GLOBAL.NO_RECORDS') : '';
 			});
 		this.loaderService.stopProgress();
 
@@ -716,9 +803,9 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		for (let rowIndex in this.rowsExpandedMap) {
 			if (rowIndex) {
-				let rowNum = parseInt(rowIndex, 0);
+				let rowNum = parseInt(rowIndex, 10);
 				expandedEvent.index = rowNum;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(rowNum);
 			}
 		}
@@ -756,7 +843,7 @@ export class TaskListComponent {
 			taskId = taskId.toString();
 		}
 		return new Observable(observer => {
-			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+			this.taskService.getTaskActionInfo(parseInt(taskId, 10))
 				.subscribe((result: TaskActionInfoModel) => {
 					const taskActionInfoModel = result;
 					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
@@ -766,7 +853,7 @@ export class TaskListComponent {
 		});
 	}
 
-	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel): void {
 		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
 
 		// Update the grid row with new information from the endpoint (status, assignTo, etc)
@@ -795,5 +882,42 @@ export class TaskListComponent {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Toggle the flag to show/hide grid filters
+	 */
+	public toggleFiltering(): void {
+		this.isFiltering = !this.isFiltering;
+	}
+
+	/**
+	 * Get the current number of filters selected
+	 */
+	public filterCounter(): number {
+		return GridColumnModel.getFilterCounter(this.grid.state);
+	}
+
+	/**
+	 * pageChangeTaskGrid
+	 */
+	public pageChangeTaskGrid(event: PageChangeEvent): void {
+		// this.tasksPage = event;
+		// this.loadTasksGrid();
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.grid.clearAllFilters(this.columnsModel);
+		this.onFiltersChange();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCounter() === 0 && this.hasDashboardFilters() === false;
 	}
 }

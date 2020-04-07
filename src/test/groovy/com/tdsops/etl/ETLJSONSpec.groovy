@@ -1,21 +1,21 @@
 package com.tdsops.etl
 
 import com.tdsops.common.grails.ApplicationContextHolder
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import grails.test.mixin.Mock
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import spock.lang.See
 
 /**
@@ -26,28 +26,29 @@ import spock.lang.See
  *     <li><b>read labels on 2</b></li>
  * </ul>
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
-class ETLJSONSpec extends ETLBaseSpec {
+class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
         }
-	}
+    }
 
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model
 		String.mixin StringAppendElement
 	}
 
@@ -85,7 +86,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can switch from one rootNode to another in JSON DataSet'(){
@@ -113,7 +114,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels by default in first row by default for a JSON DataSet'(){
@@ -155,7 +156,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can define a quoted string for the JSON DataSet'(){
@@ -195,7 +196,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 		and:
 			etlProcessor.currentRowIndex == 1
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if rootNode is incorrect key in the JSON DataSet'(){
@@ -220,7 +221,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			e.message == 'Unrecognized command rootNode with args [10]'
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception rootNode is incorrect (not found) for a JSON DataSet'(){
@@ -245,7 +246,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			e.message == "Data was not found in JSON at rootNode 'Active Applications'"
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if rootNode name case is incorrect for a JSON DataSet'(){
@@ -270,7 +271,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			e.message == "Data was not found in JSON at rootNode 'applications'"
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels skipping rows for a JSON DataSet'(){
@@ -314,7 +315,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read iterate rows for a JSON DataSet'(){
@@ -358,7 +359,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read JSONObject fields iterating rows for a JSON DataSet'(){
@@ -422,7 +423,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read JSONObject fields for complex JSON DataSet'(){
@@ -511,7 +512,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -553,7 +554,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read iterate rows for more than one rootNode in a JSON DataSet'(){
@@ -618,7 +619,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read labels skipping rows before for a JSON DataSet'(){
@@ -656,7 +657,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			etlProcessor.getColumnByName('vendor name') != null
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can read rows ignoring rows in the middle of an iteration for a JSON DataSet'(){
@@ -700,7 +701,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11181')
@@ -777,7 +778,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -857,7 +858,7 @@ class ETLJSONSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 

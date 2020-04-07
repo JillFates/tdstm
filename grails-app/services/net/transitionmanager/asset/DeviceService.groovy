@@ -2,6 +2,7 @@ package net.transitionmanager.asset
 
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.DataViewMap
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
@@ -9,8 +10,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.UserPreferenceService
@@ -27,6 +28,7 @@ class DeviceService implements ServiceMethods {
 	RackService           rackService
 	RoomService           roomService
 	UserPreferenceService userPreferenceService
+	DataviewService       dataviewService
 
 	/**
 	 * Assigns a DEVICE asset to a location/room/rack appropriately. If the referenced room or rack
@@ -98,19 +100,24 @@ class DeviceService implements ServiceMethods {
 	Map getModelForShow(Project project, assetEntity, Map params) {
 
 		boolean deleteChassisWarning = false
+
 		if (assetEntity.isaChassis()) {
 			int count = AssetEntity.executeQuery(
 					"SELECT COUNT(*) FROM AssetEntity WHERE sourceChassis=:sc OR targetChassis=:tc",
 					[sc: assetEntity, tc: assetEntity])[0]
 			deleteChassisWarning = count > 0
 		}
+
 		Map commonModel = this.getCommonModel(false, project, assetEntity, params)
+		List fields =  dataviewService.fetch(DataViewMap.DEVICES.id).toMap(project, securityService.userLoginPerson).schema.columns.collect{it.label}
+
 		Map model = [
-			assetEntity: assetEntity,
+			assetEntity         : assetEntity,
 			/*label: frontEndLabel,*/
-			canEdit: securityService.hasPermission(Permission.AssetEdit),
+			canEdit             : securityService.hasPermission(Permission.AssetEdit),
 			deleteChassisWarning: deleteChassisWarning,
-			currentUserId: securityService.currentPersonId
+			currentUserId       : securityService.currentPersonId,
+			fields              : fields
 		] + commonModel
 
 		model.roomSource = null

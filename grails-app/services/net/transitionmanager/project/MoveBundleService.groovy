@@ -16,7 +16,6 @@ import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetOptions
@@ -27,9 +26,7 @@ import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.party.PartyType
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
@@ -113,7 +110,7 @@ class MoveBundleService implements ServiceMethods {
 				JOIN project p ON p.project_id = me.project_id
 				JOIN move_bundle mb ON mb.move_event_id = me.move_event_id
 				JOIN asset_transition atr ON atr.move_bundle_id = mb.move_bundle_id AND atr.voided=0
-			WHERE me.move_event_id=? AND atr.is_non_applicable = 0
+			WHERE me.move_event_id=?0 AND atr.is_non_applicable = 0
 				GROUP BY mb.move_bundle_id, atr.state_to
 			ORDER BY mb.move_bundle_id,started asc''', NumberUtil.toLong(moveEventId))
 
@@ -184,7 +181,7 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		try {
-			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",
+			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ?0 WHERE moveBundle = ?1",
 					[project.defaultBundle, moveBundle])
 			// remove bundle-associated data
 			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
@@ -211,6 +208,7 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties
 	 */
+	@Deprecated
 	def dependencyConsoleMap(
 		Project project,
 		Long moveBundleId,
@@ -333,63 +331,45 @@ class MoveBundleService implements ServiceMethods {
 
 		boolean showTabs = subsection != null
 
-		def entities = assetEntityService.entityInfo(project)
+		Map entities = assetEntityService.entityInfo(project)
 
 		// Used by the Assignment Dialog
-		def allMoveBundles = MoveBundle.findAllByProject(project, [sort: 'name'])
+		List<Map> allMoveBundles = MoveBundle.executeQuery("""
+			SELECT new Map(id as id, name as name, useForPlanning as useForPlanning) 
+			FROM MoveBundle 
+			WHERE project =:project 
+			ORDER BY name ASC""", [project: project]
+		)
+
 		def planningMoveBundles = allMoveBundles.findAll{return it.useForPlanning}
 		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def assetDependencyList = AssetDependencyBundle.executeQuery(
-				'SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=?', [project])
-
-		// JPM - don't think that this is required
-		// def personList = partyRelationshipService.getCompanyStaff(project.client?.id)
-		List<PartyGroup> companiesList = PartyGroup.findAllByPartyType(PartyType.load('COMPANY'), [sort: 'name'])
-
-		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 
 		def depGrpCrt = project.depConsoleCriteria ? JSON.parse(project.depConsoleCriteria) : [:]
-		def generatedDate = TimeUtil.formatDateTime(depGrpCrt.modifiedDate)
-		def staffRoles = taskService.getRolesForStaff()
-		def compactPref = userPreferenceService.getPreference(PREF.DEP_CONSOLE_COMPACT)
-		def map = [
-			company: project.client,
-			asset: 'apps',
-			date: generatedDate,
-			dependencyType: entities.dependencyType,
+		String generatedDate = TimeUtil.formatDateTime(depGrpCrt.modifiedDate)
+		String compactPref = userPreferenceService.getPreference(PREF.DEP_CONSOLE_COMPACT)
+
+		Map map = [
+			asset                : 'apps',
+			date                 : generatedDate,
+			dependencyType       : entities.dependencyType,
 			dependencyConsoleList: dependencyConsoleList,
-			dependencyStatus: entities.dependencyStatus,
-			assetDependency: new AssetDependency(),
-			moveBundle: planningMoveBundles,
-			allMoveBundles: allMoveBundles,
-			planStatusOptions: planStatusOptions,
-
-			gridStats:stats,
-
-			//assetDependencyList: 	assetDependencyList,
-			dependencyBundleCount: 	assetDependencyList.size(),
-			servers: entities.servers,
-			applications: entities.applications,
-			dbs: entities.dbs,
-			files: entities.files,
-			networks:entities.networks,
-
-			partyGroupList:companiesList,
-			// personList:personList,
-			staffRoles:staffRoles,
-			availabaleRoles:availabaleRoles,
-			moveBundleId : moveBundleId,
-			isAssigned:isAssigned,
-			moveBundleList:allMoveBundles,
-			depGrpCrt:depGrpCrt,
-			compactPref: compactPref,
-			showTabs:showTabs,
-			tabName: subsection,
-			groupId: groupId,
-			assetName: assetName,
-			// Tags Properties
-			tagIds: tagIds,
-			tagMatch: tagMatch
+			dependencyStatus     : entities.dependencyStatus,
+			assetDependency      : new AssetDependency(),
+			moveBundle           : planningMoveBundles,
+			allMoveBundles       : allMoveBundles,
+			planStatusOptions    : planStatusOptions,
+			gridStats            : stats,
+			isAssigned           : isAssigned,
+			moveBundleList       : allMoveBundles,
+			depGrpCrt            : depGrpCrt,
+			compactPref          : compactPref,
+			showTabs             : showTabs,
+			tabName              : subsection,
+			groupId              : groupId,
+			assetName            : assetName,
+			//Tags Properties
+			tagIds               : tagIds,
+			tagMatch             : tagMatch
 		]
 
 		log.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
@@ -409,6 +389,7 @@ class MoveBundleService implements ServiceMethods {
 	 *
 	 * @return A string that contains the dependency console query for counts, or tags.
 	 */
+	@Deprecated
 	String dependencyConsoleQuery(Project project, List<Long> tagIds, dependencyBundle, boolean includeTags = false) {
 		String physicalTypes = AssetType.physicalServerTypesAsString
 		String virtualTypes = AssetType.virtualServerTypesAsString
@@ -734,12 +715,8 @@ class MoveBundleService implements ServiceMethods {
 	 * @param projectId : related project
 	 */
 	private void cleanDependencyGroupsStatus(projectId) {
-		jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=0 WHERE project_id = $projectId ")
-
 		// Deleting previously generated dependency bundle table .
 		jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId")
-		// TODO: THIS SHOULD NOT BE NECESSARY GOING FORWARD - THIS COLUMN is being dropped.
-		jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId")
 
 		// Reset hibernate session since we just cleared out the data directly
 		GormUtil.flushAndClearSession()

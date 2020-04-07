@@ -27,10 +27,10 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 	}
 
 	ngOnInit() {
+		this.currentNoticeIndex = 0;
 		this.userContextService.getUserContext()
 		.subscribe((context) => {
 			this.notices = this.model.notices.filter((notice) => notice.needAcknowledgement);
-			this.currentNoticeIndex = 0;
 		});
 	}
 

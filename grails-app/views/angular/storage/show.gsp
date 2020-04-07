@@ -2,116 +2,152 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-handle-double-click (doubleClick)="onDoubleClick()" [ignoreClasses]="ignoreDoubleClickClasses" tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content tds-angular-component-content">
-	<div class="modal-header">
-		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
-		<h4 class="modal-title">Logical Storage Detail</h4>
+<div >
+	<div>
+		<div class="clr-row tab-scroll-container" [ngClass]="{'has-description': ${!!asset.description?.trim()}}">
+            <div class="clr-col-11">
+                <tds-tab-scroller>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>
+                            {{ showDetails ? "Details" : "Summary"}}
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Supports
+							<g:set var="supportsCounter" value="${supportAssets.size() as Integer}"/>
+							<g:if test="${supportsCounter > 0}">
+								<span class="badge" id="asset-detail-support-counter">
+									<g:if test="${supportsCounter > 99}">
+										99+
+									</g:if>
+									<g:else>
+										${supportsCounter}
+									</g:else>
+								</span>
+							</g:if>
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Depends On
+							<g:set var="dependentCounter" value="${dependentAssets.size() as Integer}"/>
+							<g:if test="${dependentCounter > 0}">
+								<span class="badge" id="asset-detail-dependent-counter">
+									<g:if test="${dependentCounter > 99}">
+										99+
+									</g:if>
+									<g:else>
+										${dependentCounter}
+									</g:else>
+								</span>
+							</g:if>
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Tasks
+                            <span class="badge" *ngIf="taskCount">
+                                {{ taskCount > 99 ? '99+' : taskCount }}
+                            </span>
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Comments
+                            <span class="badge" *ngIf='commentCount'>
+                                {{ commentCount > 99 ? '99+' : commentCount }}
+                            </span>
+                        </button>
+                    </tds-scroller-item>
+                </tds-tab-scroller>
+            </div>
+        </div>
 	</div>
-	<div class="modal-body">
-		<div>
-			<table>
-				<tr>
-					<td colspan="2" class="dialog-container">
-						<div class="dialog">
-						<g:if test="${errors}">
-							<div id="messageDivId" class="message">${errors}</div>
-						</g:if>
-						<table class="tds-asset-view-content-table">
-							<tbody>
-							<tr class="prop">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${filesInstance?.assetName}"/>
-								<td class="valueNW ${standardFieldSpecs.assetName.imp?:''}" colspan="3" style="	max-width: 400px; font-weight:bold;">${filesInstance.assetName}</td>
-								<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${filesInstance?.description}"/>
-								<td class="valueNW ${standardFieldSpecs.description.imp?:''}" colspan="3" style="max-width: 400px;">${filesInstance.description}</td>
-							</tr>
-							<tr class="prop">
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.fileFormat}" value="${filesInstance.fileFormat}"/>
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.LUN}" value="${filesInstance.LUN}"/>
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${filesInstance.supportType}"/>
-								<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-									<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-										${standardFieldSpecs.moveBundle.label} : Dep. Group
-									</label>
-								</td>
-								<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-									${filesInstance?.moveBundle}
-									<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
-								</td>
-							</tr>
-							<tr class="prop">
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.size}" value="${(filesInstance.size ? filesInstance.size : '') + ' ' + (filesInstance.scale ? filesInstance.scale : '')}"/>
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${filesInstance.environment}"/>
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}" tooltipDataPlacement="bottom"/>
-							</tr>
-							<tr>
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${filesInstance.rateOfChange}"/>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
-							</tr>
-							<g:render template="/angular/common/customShow" model="[assetEntity:filesInstance]"></g:render>
-                            <g:render template="/angular/common/assetTags"></g:render>
-						</table>
-						</div>
-					</td>
-				</tr>
+	<div class="asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+		<div tdsScrollSection class="clr-row">
+			<div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
+				<g:if test="${errors}">
+					<div id="messageDivId" class="message">${errors}</div>
+				</g:if>
+				<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
+					<tbody [ngClass]="{'one-column':!showDetails, 'three-column':showDetails}">
+						<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
+						<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
+						<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+						
+						<tr style="order: 30">
+							<th class="${standardFieldSpecs.moveBundle.imp?:''}">									
+								${standardFieldSpecs.moveBundle.label} : Dep. Group
+							</th>
+							<td>
+								${filesInstance?.moveBundle}
+								<g:if test="${dependencyBundleNumber}">:</g:if>
+								<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
+							</td>
+						</tr>
+						
+						<tds:clrRowDetail style="order: 35" field="${standardFieldSpecs.size}" value="${asset.size}" />
+						<tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+						<tds:clrRowDetail style="order: 45" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
+						<tds:clrRowDetail style="order: 50" field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
+						<tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
+						<tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.validation}" value="${asset.validation}" />
 
-				<tr>
-					<td colspan="2" class="dates-info-container">
-						<table class="dates-info" >
-							<tr>
-								<td class="date-created">Date created: ${dateCreated}</td>
-								<td class="last-updated">Last updated: ${lastUpdated}</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-
-				<tr id="deps">
-					<g:render template="/angular/common/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
-				</tr>
-				<tr id="commentListId">
-					<g:render template="/angular/common/commentList" model="['asset':filesInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, currentUserId: currentUserId]"></g:render>
-				</tr>
-			</table>
+						<g:render template="/angular/common/customShow" model="[assetEntity:filesInstance]"></g:render>
+					</tbody>
+				</table>
+				<g:render template="/angular/common/assetTags"></g:render>
+				<a (click)="showDetails = !showDetails" class="show-hide-link">
+					<span *ngIf="!showDetails">View All Fields</span>
+					<span *ngIf="showDetails">Hide Additional Fields</span>
+				</a>
+			</div>
+			<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
+				<tds-lib-diagram-layout
+						[data]="data$ | async"
+						[layout]="diagramLayout$ | async"
+						[linkTemplate]="linkTemplate$ | async"
+						(expandActionDispatched)="onExpandActionDispatched()"
+						[hideExpand]="false"
+						[hideOverview]="true"
+						[hideControlButtons]="true" #graph></tds-lib-diagram-layout>
+			</div>
 		</div>
-	</div>
-	<div class="modal-footer form-group-center">
-		<div class="asset-commands pull-left">
-			<tds-button-edit
-					tooltip="Edit Asset"
-					class="btn-primary"
-					[permissions]="['${Permission.AssetEdit}']"
-					(click)="showAssetEditView()">
-			</tds-button-edit>
-
-			<tds-button-clone
-					(click)="onCloneAsset()"
-					[permissions]="['${Permission.AssetCreate}']">
-			</tds-button-clone>
-
-			<tds-button-custom
-					icon="sitemap"
-					title="Arch Graph"
-					(click)="openGraphUrl()">
-			</tds-button-custom>
+		<div tdsScrollSection class="clr-row">
+			<div class="clr-col-12 table-data-section">
+				<g:render 
+					template="/angular/common/supportShow" 
+					model="[supportAssets:supportAssets]" >
+				</g:render>
+			</div>
 		</div>
-
-		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<tds-button-delete
-					tooltip="Delete Asset"
-					class="btn-danger"
-					[permissions]="['${Permission.AssetDelete}']"
-					(click)="onDeleteAsset()">
-			</tds-button-delete>
-		</tds:hasPermission>
-
-		<tds-button-close
-				class="pull-right"
-				(click)="cancelCloseDialog()">
-		</tds-button-close>
+		<div tdsScrollSection class="clr-row">
+			<div class="clr-col-12 table-data-section">
+				<g:render template="/angular/common/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
+			</div>
+		</div>
+		<div tdsScrollSection class="clr-row">
+			<g:render 
+				template="/angular/common/commentList" 
+				model="[
+					asset:filesInstance, 
+					prefValue: prefValue, 
+					viewUnpublishedValue: viewUnpublishedValue, 
+					currentUserId: currentUserId,
+					showTask:true,
+					showComment:false,
+				]" >
+			</g:render>
+		</div>
+		<div tdsScrollSection class="clr-row">
+			<g:render
+				template="/angular/common/commentList"
+				model="[
+					asset:filesInstance,
+					prefValue: prefValue,
+					viewUnpublishedValue: viewUnpublishedValue,
+					currentUserId: currentUserId,
+					showTask:false,
+					showComment:true,
+				]" >
+			</g:render>
+		</div>
 	</div>
 </div>

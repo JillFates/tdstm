@@ -4,6 +4,8 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.AESCodec
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.metaclass.CustomMethods
+import grails.plugin.springsecurity.SecurityFilterPosition
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Environment
 import net.transitionmanager.asset.AssetEntityAttributeLoaderService
 import net.transitionmanager.domain.constraint.OfSameProjectConstraint
@@ -26,6 +28,9 @@ class BootStrap {
 	LicenseAdminService licenseAdminService
 
 	def init = { servletContext ->
+		//Setting up Spring CSRF filter
+		SpringSecurityUtils.clientRegisterFilter('csrfFilter', SecurityFilterPosition.LAST.order - 100)
+
 		//TM-15254 Needed for the RSA encryption.
 		Security.addProvider(new BouncyCastleProvider())
 

@@ -29,19 +29,19 @@ class TagAssetServiceIntegrationSpec extends Specification{
 	TagEventService tagEventService
 
 	@Shared
-	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	AssetEntityTestHelper assetEntityTestHelper
 
 	@Shared
-	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
+	MoveEventTestHelper moveEventTestHelper
 
 	@Shared
 	FileSystemService fileSystemService
 
 	@Shared
-	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
+	test.helper.MoveBundleTestHelper moveBundleTestHelper
 
 	@Shared
-	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+	test.helper.ProjectTestHelper projectTestHelper
 
 	@Shared
 	Project project
@@ -122,6 +122,11 @@ class TagAssetServiceIntegrationSpec extends Specification{
 	Date now
 
 	void setup() {
+		projectTestHelper = new test.helper.ProjectTestHelper()
+		moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
+		moveEventTestHelper = new MoveEventTestHelper()
+		assetEntityTestHelper = new AssetEntityTestHelper()
+
 		project = projectTestHelper.createProject()
 		otherProject = projectTestHelper.createProject()
 

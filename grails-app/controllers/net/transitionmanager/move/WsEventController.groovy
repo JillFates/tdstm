@@ -71,7 +71,7 @@ class WsEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventView)
 	def getModelForViewEdit(Long moveEventId) {
-		ListCommand filter = populateCommandObject(ListCommand)
+		ListCommand filter = populateCommandObject(ListCommand, false)
 		Project project = getProjectForWs()
 		MoveEvent moveEvent
 
@@ -80,13 +80,6 @@ class WsEventController implements ControllerMethods {
 			// Fail if the move event doesn't exist or it doesn't belong to the user's current project.
 			moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
 			userPreferenceService.setPreference(UserPreferenceEnum.MOVE_EVENT, moveEventId)
-			Long moveBundleId = NumberUtil.toLong(userPreferenceService.moveBundleId)
-			if (moveBundleId) {
-				MoveBundle moveBundle = fetchDomain(MoveBundle, [id: moveBundleId], project)
-				if (moveBundle?.moveEvent?.id != moveEventId) {
-					userPreferenceService.removePreference(UserPreferenceEnum.CURR_BUNDLE)
-				}
-			}
 		} else {
 			moveEventId =  NumberUtil.toLong(userPreferenceService.getPreference(UserPreferenceEnum.MOVE_EVENT))
 			moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
@@ -119,7 +112,7 @@ class WsEventController implements ControllerMethods {
 		Project project = securityService.userCurrentProject
 		List<Map> bundles = moveBundleService.lookupList(project)
 		List runbookStatuses = GormUtil.getConstrainedProperties(MoveEvent).runbookStatus.inList
-		ListCommand filter = populateCommandObject(ListCommand)
+		ListCommand filter = populateCommandObject(ListCommand, false)
 		List<Map> tags = tagService.list(
 				projectForWs,
 				filter.name,
@@ -135,7 +128,7 @@ class WsEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventCreate)
 	def save(Long moveEventId) {
-		CreateEventCommand command = populateCommandObject(CreateEventCommand)
+		CreateEventCommand command = populateCommandObject(CreateEventCommand, false)
 		Project project = getProjectForWs()
 		MoveEvent moveEvent = moveEventService.createOrUpdate(project, command, moveEventId)
 		renderSuccessJson(GormUtil.domainObjectToMap(moveEvent))

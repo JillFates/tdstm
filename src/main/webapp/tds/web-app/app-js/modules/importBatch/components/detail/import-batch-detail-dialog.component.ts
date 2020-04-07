@@ -5,7 +5,11 @@ import {UIActiveDialogService, UIDialogService} from '../../../../shared/service
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
-import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {
+	COLUMN_MIN_WIDTH,
+	GridColumnModel,
+	SELECT_ALL_COLUMN_WIDTH
+} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
@@ -54,6 +58,8 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	protected NULL_OBJECT_PIPE = NULL_OBJECT_PIPE;
 	public dateTimeFormat: string;
 	private importBatchPreferences = {};
+	SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
+	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 
 	constructor(
 		public importBatchModel: ImportBatchModel,
@@ -190,9 +196,13 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 * Clear the batchRecordsFilter if needed (depending on column that was changed)
 	 * @param {GridColumnModel} column
 	 */
-	private preProcessFilter(column: GridColumnModel): void {
-		this.clearStatusFilter(column);
-		this.dataGridOperationsHelper.onFilter(column);
+	private preProcessFilter(value: any, column: GridColumnModel): void {
+		if (!value) {
+			this.preProcessClear(column);
+		} else {
+			this.clearStatusFilter(column);
+			this.dataGridOperationsHelper.onFilterWithValue(value, column);
+		}
 	}
 
 	/**

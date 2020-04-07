@@ -1,4 +1,3 @@
-@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
 /*!
  *   AdminLTE v2.3.0
  *   Author: Almsaeed Studio
@@ -311,55 +310,6 @@ a:focus {
 .content-header {
   position: relative;
   padding: 15px 15px 0 15px;
-}
-.content-header > h1 {
-  margin: 0;
-  font-size: 24px;
-}
-.content-header > h1 > small {
-  font-size: 15px;
-  display: inline-block;
-  padding-left: 4px;
-  font-weight: 300;
-}
-.content-header > .breadcrumb {
-  float: right;
-  background: transparent;
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 12px;
-  padding: 7px 5px;
-  position: absolute;
-  top: 15px;
-  right: 10px;
-  border-radius: 2px;
-}
-.content-header > .breadcrumb > li > a {
-  color: #444;
-  text-decoration: none;
-  display: inline-block;
-}
-.content-header > .breadcrumb > li > a > .fa,
-.content-header > .breadcrumb > li > a > .glyphicon,
-.content-header > .breadcrumb > li > a > .ion {
-  margin-right: 5px;
-}
-.content-header > .breadcrumb > li + li:before {
-  content: '>\00a0';
-}
-@media (max-width: 991px) {
-  .content-header > .breadcrumb {
-    position: relative;
-    margin-top: 5px;
-    top: 0;
-    right: 0;
-    float: none;
-    background: #d2d6de;
-    padding-left: 10px;
-  }
-  .content-header > .breadcrumb li:before {
-    color: #97a0b3;
-  }
 }
 .navbar-toggle {
   color: #fff;
@@ -1726,6 +1676,7 @@ a:focus {
   font-size: 18px;
   margin: 0;
   line-height: 1;
+  font-weight: 500;
 }
 .box-header > .fa,
 .box-header > .glyphicon,
@@ -3182,7 +3133,8 @@ table.text-center th {
 }
 .login-page,
 .register-page {
-  background: #d2d6de;
+  background: #fff url(/tdstm/assets/images/login-background.jpg) no-repeat;
+  background-size: cover;
 }
 .login-box,
 .register-box {
@@ -3206,6 +3158,9 @@ table.text-center th {
 .login-box-body .form-control-feedback,
 .register-box-body .form-control-feedback {
   color: #777;
+}
+.login-box-body .clr-input {
+    width: 100%;
 }
 .login-box-msg,
 .register-box-msg {

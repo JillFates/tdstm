@@ -1,190 +1,245 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 // Components
-import {NoticeViewEditComponent} from '../view-edit/notice-view-edit.component';
+import { NoticeViewEditComponent } from '../view-edit/notice-view-edit.component';
+import {DialogConfirmAction, DialogService, GridComponent, ModalSize} from 'tds-component-library';
 // Service
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {NotifierService} from '../../../../shared/services/notifier.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {NoticeService} from '../../service/notice.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { NoticeService } from '../../service/notice.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+
+import { PreferenceService } from '../../../../shared/services/preference.service';
 // Model
-import {Permission} from '../../../../shared/model/permission.model';
-import {NoticeColumnModel, NoticeModel, NoticeTypes, NOTICE_TYPE_PRE_LOGIN } from '../../model/notice.model';
-import {ActionType} from '../../../../shared/model/action-type.enum';
-import {YesNoList} from '../../../../shared/model/constants';
-import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
+import { Permission } from '../../../../shared/model/permission.model';
+import {
+	NoticeColumnModel,
+	NoticeModel,
+	NoticeTypes,
+} from '../../model/notice.model';
+import { ActionType } from '../../../../shared/model/action-type.enum';
+import {
+	GridRowAction,
+	HeaderActionButtonData,
+	ColumnHeaderData,
+	GridSettings,
+	GridModel,
+	DropdownFilterData,
+	DropdownData,
+} from 'tds-component-library';
+
 // Kendo
-import {CellClickEvent} from '@progress/kendo-angular-grid';
+import { CellClickEvent } from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'tds-notice-list',
-	templateUrl: 'notice-list.component.html'
+	templateUrl: 'notice-list.component.html',
 })
-
 export class NoticeListComponent implements OnInit {
-	protected gridSettings: DataGridOperationsHelper;
-	protected noticeColumnModel = null;
-	protected COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	protected noticeTypes = [];
-	protected yesNoList = [...YesNoList];
-	protected defaultNoticeType = {typeId: '', name: 'Please Select'};
-	protected defaultYesNoList = {value: null, name: 'Please Select'};
+	public gridRowActions: GridRowAction[];
 
-	protected PRE_LOGIN = NOTICE_TYPE_PRE_LOGIN;
+	public headerActions: HeaderActionButtonData[];
+
+	public gridSettings: GridSettings = {
+		defaultSort: [{ field: 'title', dir: 'asc' }],
+		sortSettings: { mode: 'single' },
+		selectableSettings: {enabled: true, mode: 'single'},
+		filterable: true,
+		pageable: true,
+		resizable: true,
+	};
+
+	protected columnModel: ColumnHeaderData[];
+
+	protected gridModel: GridModel;
+	protected noticeTypes = [];
 	protected actionType = ActionType;
 	protected dateFormat = '';
-	protected notices = [];
-	protected noticesTypeDescriptions = {};
 
-	/**
-	 * @constructor
-	 * @param {NoticeService} noticeService
-	 */
+	@ViewChild(GridComponent, { static: false }) gridComponent: GridComponent;
+
 	constructor(
-		private notifier: NotifierService,
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private noticeService: NoticeService,
-		private prompt: UIPromptService) {
+		private translateService: TranslatePipe
+	) {
 		this.noticeTypes = [...NoticeTypes];
 	}
 
 	/**
-	 * Get the notices list, the date format and based on it creates the column model
+	 * Initialize the grid settings.
 	 */
-	ngOnInit() {
-		this.notices = this.noticeTypes
-			.map((notice) => notice.name);
-
-		// Get the description text of the notices types
-		NoticeTypes.forEach((notice: any) => {
-			this.noticesTypeDescriptions[notice.typeId] = notice.name;
-		});
-
-		// Get the preferences to format dates
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-		.subscribe((dateFormat) => {
-			this.dateFormat = dateFormat;
-			this.noticeColumnModel = new NoticeColumnModel(`{0:${dateFormat}}`);
-			this.onLoad();
-		});
-	}
-
-	/**
-	 * Get the notices list and defines the gridSettings helper
-	 */
-	private onLoad(): void {
-		this.noticeService.getNoticesList()
-			.subscribe(
-			(result: any) => {
-				this.gridSettings = new DataGridOperationsHelper(result,
-					[{ dir: 'asc', field: 'name'}], // initial sort config.
-					{ mode: 'single', checkboxOnly: false}, // selectable config.
-					{ useColumn: 'id' } ); // checkbox config.
+	async ngOnInit() {
+		this.gridRowActions = [
+			{
+				name: 'Edit',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onEdit,
 			},
-			(err) => err && console.error(err));
-	}
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onDelete,
+			},
+		];
 
-	/**
-	 * Reloads the current notices list from grid.
-	 */
-	private reloadNotices(): void {
-		this.noticeService.getNoticesList()
-			.subscribe(
-			(result: any) => this.gridSettings.reloadData(result),
-			(err) => err && console.error(err));
-	}
+		this.headerActions = [
+			{
+				icon: 'plus',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateNotice,
+			},
+		];
 
-	/**
-	 * Reset the filter boolean type to the original value
-	 * @param {Any} column Column to reset the filter
-	*/
-	protected resetBooleanFilter(column: any): void {
-		this.gridSettings.clearValue(column);
-		column.filter = null;
-	}
+		this.gridModel = {
+			columnModel: this.columnModel,
+			gridRowActions: this.gridRowActions,
+			gridSettings: this.gridSettings,
+			headerActionButtons: this.headerActions,
+			loadData: this.loadData,
+		};
 
-	/**
-	 * On cell click open the notice dialog
-	 * @param {SelectionEvent} event
-	 */
-	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0 && this.isEditAvailable()) {
-			this.openNotice(event['dataItem'], ActionType.View);
-		}
-	}
+		this.dateFormat = await this.preferenceService
+			.getUserDatePreferenceAsKendoFormat()
+			.toPromise();
 
-	/**
-	 * Make the entire header clickable on Grid
-	 * @param event: any
-	 */
-	public onClickTemplate(event: any): void {
-		if (event.target && event.target.parentNode) {
-			event.target.parentNode.click();
-		}
-	}
-
-	/**
-	 * Delete the selected License
-	 * @param dataItem
-	 */
-	protected onDelete(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'You are about to delete the selected notice. Do you want to proceed?', 'Yes', 'No')
-			.then((confirmation: boolean) => {
-				if (confirmation) {
-					this.noticeService.deleteNotice(dataItem.id)
-					.subscribe(
-						(result) => this.reloadNotices(),
-						(err) => err && console.error(err)
-					);
-				}
-			});
-	}
-
-	/**
-	 * Open the dialog to create a new Notice
-	 * @listens onCreateNotice
-	 */
-	public onCreateNotice(): void {
-		this.dialogService.open(NoticeViewEditComponent, [
-			{provide: NoticeModel, useValue: new NoticeModel()},
-			{provide: Number, useValue: ActionType.Create}
-		]).then(result => this.reloadNotices(),
-			err =>  err && console.error(err)
+		let noticeDropdownData: DropdownData[] = [];
+		this.noticeTypes.forEach(x =>
+			// We need to use the name as the value, instead of the typeId, as
+			// we don't have a way of passing a formatting function to the tds-
+			// grid for this column;
+			noticeDropdownData.push({ text: x.name, value: x.name })
 		);
+
+		let noticeTypesDropdown: DropdownFilterData = {
+			data: noticeDropdownData,
+			defaultItem: { text: 'Please Select', value: null },
+		};
+
+		this.columnModel = new NoticeColumnModel(
+			this.dateFormat,
+			noticeTypesDropdown
+		).columns;
+
+		this.gridModel.columnModel = this.columnModel;
 	}
 
-	/**
-	 * Open the dialog with the notice details
-	 * @param {NoticeModel} dataItem Contain the notice object
-	 * @param {ActionType} action Mode in which open the view (Create, Edit, etc...)
-	 */
-	public openNotice(dataItem: NoticeModel, action: ActionType): void {
-		this.noticeService.getNotice(dataItem.id)
-			.subscribe((notice: NoticeModel) => {
-				this.dialogService.open(NoticeViewEditComponent, [
-					{provide: NoticeModel, useValue: notice as NoticeModel},
-					{provide: Number, useValue: action}
-				]).then(result => this.reloadNotices(),
-					err => err && console.error(err)
-				);
+	public async cellClick(event: CellClickEvent): Promise<void> {
+		if (event.columnIndex > 0 && this.isEditAvailable()) {
+			await this.openNotice(event.dataItem.id, ActionType.View, false);
+		}
+	}
+
+	public loadData = async (): Promise<NoticeModel[]> => {
+		try {
+			let data = await this.noticeService.getNoticesList().toPromise();
+			// Get the description text of the notices types
+			data.forEach((notice: NoticeModel) => {
+				notice.typeId = this.noticeTypes.find(
+					x => x.typeId === notice.typeId
+				).name;
 			});
+
+			return data;
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	public onEdit = async (dataItem: NoticeModel): Promise<void> => {
+		try {
+			if (this.isEditAvailable()) {
+				await this.openNotice(dataItem.id, ActionType.Edit, true);
+				await this.gridComponent.reloadData();
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	public onDelete = async (dataItem: NoticeModel): Promise<void> => {
+		try {
+			const confirmation = await this.dialogService.confirm(
+				'Confirmation Required',
+				'You are about to delete the selected notice. Do you want to proceed?',
+			).toPromise();
+			if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+				await this.noticeService
+					.deleteNotice(dataItem.id.toString())
+					.toPromise();
+				await this.gridComponent.reloadData();
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	public onCreateNotice = async (): Promise<void> => {
+		try {
+			const data = await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: NoticeViewEditComponent,
+				data: {
+					noticeModel: new NoticeModel(),
+					actionType: ActionType.Create,
+					openFromList: false
+				},
+				modalConfiguration: {
+					title: 'Notice Create',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-notice-edit-view-create'
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	public async openNotice(id: number, action: ActionType, openFromList = false): Promise<void> {
+		try {
+			const notice = await this.noticeService.getNotice(id).toPromise();
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: NoticeViewEditComponent,
+				data: {
+					noticeModel: notice as NoticeModel,
+					actionType: action,
+					openFromList: openFromList
+				},
+				modalConfiguration: {
+					title: 'Notice',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-notice-edit-view-create'
+				}
+			}).toPromise();
+			await this.gridComponent.reloadData();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Determine if the user has the permission to edit notices
-	*/
+	 */
 	protected isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NoticeEdit);
 	}
 
 	/**
 	 * Determine if the user has the permission to create notices
-	*/
+	 */
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NoticeCreate);
 	}

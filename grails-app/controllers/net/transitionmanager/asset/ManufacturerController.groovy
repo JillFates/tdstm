@@ -1,5 +1,6 @@
 package net.transitionmanager.asset
 
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.security.spring.HasPermission
@@ -18,10 +19,12 @@ import org.springframework.jdbc.core.JdbcTemplate
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ManufacturerController implements ControllerMethods, PaginationMethods {
 
-	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
+	static allowedMethods = [delete: 'POST', save: 'POST', update: 'PUT']
 	static defaultAction = 'list'
+    private final static DELETE_OK_MESSAGE = "Manufacturer deleted successfully.";
+    private final static DELETE_ERROR_MESSAGE = "Manufacturer not found.";
 
-	JdbcTemplate jdbcTemplate
+    JdbcTemplate jdbcTemplate
 	ManufacturerService manufacturerService
 
 	@HasPermission(Permission.ManufacturerList)
@@ -32,14 +35,11 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.ManufacturerList)
 	def listJson() {
-		String sortIndex = paginationOrderBy(Manufacturer, 'sidx', 'modelName')
+		String sortIndex = paginationOrderBy(Manufacturer, 'sidx', 'name')
 		String sortOrder  = paginationSortOrder('sord')
-		int maxRows = paginationMaxRowValue('rows')
- 		int currentPage = paginationPage()
-		int rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		session.MAN = [:]
-		List<Manufacturer> manufacturers = Manufacturer.createCriteria().list(max: maxRows, offset: rowOffset) {
+		List<Manufacturer> manufacturers = Manufacturer.createCriteria().list() {
 			if (params.name) {
 				ilike('name', "%$params.name%")
 			}
@@ -59,15 +59,16 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 			order((sortOrder == 'ASC' ? Order.asc(sortIndex) : Order.desc(sortIndex)).ignoreCase())
 		}
 
-		int totalRows = manufacturers.totalCount
-		def results = manufacturers.collect { [cell: [it.name, ManufacturerAlias.findAllByManufacturer(it)?.name,
-		                                              it.description, it.corporateName, it.corporateLocation,
-		                                              it.website, it.modelsCount, AssetEntity.countByManufacturer(it)],
-		                                        id: it.id] }
+		def results = manufacturers.collect {
+            Map<String, Object> data = [id: it.id, name: it.name, description: it.description, corporateName: it.corporateName, corporateLocation: it.corporateLocation,
+                                                                           website: it.website, modelsCount: it.modelsCount, assetCount: AssetEntity.countByManufacturer(it)]
 
-		def jsonData = [rows: results, page: currentPage, records: totalRows, total: Math.ceil(totalRows / maxRows)]
+            data.alias = WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer(it).name)
+            data.aliases = (it.getAliases()) ? it.getAliases() : null
+            data
+        }
 
-		render jsonData as JSON
+        renderSuccessJson([rows: results])
 	}
 
 	@HasPermission(Permission.ManufacturerView)
@@ -89,10 +90,10 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 		if (manufacturer) {
 			manufacturerService.delete(manufacturer)
 			flash.message = "Manufacturer ${manufacturer.name} deleted"
-			redirect(action: 'list')
+            renderSuccessJson([status: DELETE_OK_MESSAGE] )
 		} else {
 			flash.message = "Manufacturer not found with id ${params.id}"
-			redirect(action: 'list')
+            renderSuccessJson([status: DELETE_ERROR_MESSAGE] )
 		}
 	}
 
@@ -114,15 +115,15 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 		def manufacturer = Manufacturer.get(params.id)
 		if (manufacturer) {
 			try {
-				manufacturer.properties = params
-				String deletedAka = params.deletedAka
-				List<String> akaToSave = params.list('aka')
-				Map<String, String> akaToUpdate = params.subMap(params.findAll { it.key =~ /^aka_\d+$/ }.collect {
-					it.key
-				})
+                Map manufacturerRequest = request.JSON
+                List<String> aliasUpdated = (manufacturerRequest.aliasUpdated) ? manufacturerRequest.aliasUpdated : []
+				manufacturer.properties = request.JSON
+                String deletedAka = manufacturerRequest.aliasDeleted
+                List<String> akaToSave = (manufacturerRequest.aliasAdded) ? manufacturerRequest.aliasAdded.toString().split(',').toList() : []
+                Map<String, String> akaToUpdate = aliasUpdated.collectEntries {[it.id, it.name]}
 				if (manufacturerService.update(manufacturer, deletedAka, akaToSave, akaToUpdate)) {
 					flash.message = "Manufacturer ${params.id} updated"
-					redirect(action: "show", id: manufacturer.id)
+                    renderSuccessJson([manufacturer: manufacturer])
 				} else {
 					def manuAlias = ManufacturerAlias.findAllByManufacturer(manufacturer)
 					render(view: 'edit', model: [manufacturerInstance: manufacturer, manuAlias: manuAlias])
@@ -147,16 +148,17 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 
 	@HasPermission(Permission.ManufacturerCreate)
 	def save() {
-		def manufacturer = new Manufacturer(params)
+        Map manufacturerRequest = request.JSON
+        def aliasList = manufacturerRequest.aliasAdded.toString().split(',').toList()
+		def manufacturer = new Manufacturer(request.JSON)
 
 		try {
-			if (manufacturerService.save(manufacturer, params.list('aka'))) {
-				render(text: "Manufacturer ${HtmlUtil.escape(manufacturer.name)} created")
+			if (manufacturerService.save(manufacturer, aliasList)) {
+                renderSuccessJson([manufacturer: manufacturer])
 			} else {
-				render(view: 'create', model: [manufacturerInstance: manufacturer])
+                renderSuccessJson([manufacturer: manufacturer])
 			}
 		} catch (ServiceException e) {
-			//log.error(e.message, e)
 			render(text: HtmlUtil.escape(e.message))
 		}
 	}
@@ -173,7 +175,7 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 			manufacturers = Model.executeQuery('select m.manufacturer From Model m group by m.manufacturer order by m.manufacturer.name')
 		} else {
 			manufacturers = Model.executeQuery(
-					'select m.manufacturer From Model m where m.assetType = ? ' +
+					'select m.manufacturer From Model m where m.assetType = ?0 ' +
 					'group by m.manufacturer order by m.manufacturer.name',
 					[assetType])
 		}
@@ -187,8 +189,6 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 		}
 		render manufacturersList as JSON
 	}
-
-
 
 	/*
  	 *  Send List of Manufacturer to be able to select one to merge with the current manufacturer, as JSON object
@@ -217,8 +217,6 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 		}
 		render manufacturersList as JSON
 	}
-
-
 
 	/**
 	 *  Send Manufacturer details as JSON object
@@ -263,4 +261,36 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 	def autoCompleteManufacturer() {
 		[manufacturers: params.value ? Manufacturer.findAllByNameIlike(params.value + "%") : []]
 	}
+
+    /**
+     * Determine if a provider name is unique across projects
+     *
+     * @param name - the name to lookup.
+     */
+    @HasPermission(Permission.ManufacturerView)
+    def validateUniqueName(String name) {
+        Long id = NumberUtil.toLong(request.JSON.id)
+        boolean isUnique = manufacturerService.isValidName(request.JSON.name, id)
+        renderSuccessJson([isUnique: isUnique])
+    }
+
+    /**
+     * Validate whether requested manufactuer alias already exists in the database or not
+     * @param: alias, the new alias to be validated
+     * @param: id, id of manufacturer
+     * @param: parentName, name of the manufacturer to validate the alias with (not needed if the manufacturer's name hasn't changed)
+     * @return: "valid" if the alias is valid, "invalid" otherwise
+     */
+    @HasPermission(Permission.ManufacturerEdit)
+    def validateUniqueAlias() {
+        def alias = request.JSON.alias
+        Long manufacturerId = NumberUtil.toLong(request.JSON.id)
+        def newManufacturerName = request.JSON.name
+
+        // get the manufacturer if specified and call the service method for alias validation
+        def manufacturer = manufacturerId ? Manufacturer.read(manufacturerId) : null
+        def isValid = manufacturerService.isValidAlias(alias, manufacturer, true, newManufacturerName)
+        renderSuccessJson([isValid: isValid])
+
+    }
 }

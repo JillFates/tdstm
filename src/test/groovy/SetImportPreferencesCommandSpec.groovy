@@ -1,9 +1,6 @@
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.command.assetentity.SetImportPreferencesCommand
 import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
 class SetImportPreferencesCommandSpec extends Specification {
 
     void 'test command object validation'() {

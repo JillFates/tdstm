@@ -1,13 +1,42 @@
 .api-action-view-edit-component
+  min-height: 550px
+  display: flex
+  flex-direction: column
+  tds-check-action
+    button
+      min-width: unset
+      height: unset
+      line-height: 1.1rem
+  input[type="checkbox"]:disabled + label
+    cursor: not-allowed
+  .clr-form-control
+    margin-top: unset
+    .clr-control-container,
+    .clr-control-container .clr-textarea
+      width: 100%
+      max-width: unset
+  .popup-section
+    display: flex
+    tds-checkbox
+      margin-right: 5px
+  .checkbox
+    display: inline-block
+    input[type=checkbox]
+      position: unset
+      top: unset
+      left: unset
+      height: unset
+      width: unset
+      opacity: unset
   .check-container
     padding-top: 7px
     input.debug
       cursor: pointer
+    tds-checkbox
+      outline: none
   .is-remote-section
     .hide-if-remote-section
       display: none
-  .modal-body
-    padding-bottom: 0px
   .form-control.ng-invalid.k-dropdown
     // border: unset
   .k-widget.form-control .k-input, .form-control.k-block .k-input
@@ -37,15 +66,15 @@
         width: 90px
   .event-wrapper
     div.event-title
-      padding-top: 6px
+      //padding-top: 6px
       label
         font-size: 14px
-    .col-md-1,
+    //.col-md-1,
     .customize
       margin-right: -32px
-      padding-top: 8px
-    .col-md-2
-      width: 86px !important
+      //padding-top: 8px
+    //.col-md-2
+    //  width: 86px !important
     .col-md-3
       width: 128px !important
     .customize
@@ -53,8 +82,18 @@
       width: 112px !important
     .before-call
       width: 140px !important
+  api-action-view-edit-parameters
+    form
+      padding-top: 15px
   .api-action-parameters-form
     height: 430px
+    kendo-grid-toolbar
+      .tds-generic-button
+        max-width: 41px
+    .clr-form-control
+      margin-right: 10px
+    .k-dropdown
+      padding-top: 5px
     .group-boolean-fields
       .fa
         margin-left: 10px
@@ -70,9 +109,9 @@
     input.param-text-input-boolean
       margin-top: 8px
   .all-codemirrors
-    overflow-y: scroll
+    //overflow-y: scroll
     width: 100%
-    height: 391px
+    //height: 391px
     .reaction-section-event
       margin-top: 10px
       font-size: 14px
@@ -90,6 +129,11 @@
           line-height: 17px
           width: 12px
   .nav-tabs-custom
+    box-shadow: unset
+    .tab-content
+      padding: unset
+      .tab-pane
+        overflow: hidden
     .nav-tabs
       li
         a.tab-disabled
@@ -107,11 +151,13 @@
     visibility: visible
     width: 100%
     height: 100%
-  .modal-body.is-edit-mode
+  .is-edit-mode
     .required-field::after
       content: "*"
       color: $color-message-error--red
       margin-left: 4px
   .modal-footer
+    padding: 20px
+    display: block
     tds-button-custom
       margin-left: 5px

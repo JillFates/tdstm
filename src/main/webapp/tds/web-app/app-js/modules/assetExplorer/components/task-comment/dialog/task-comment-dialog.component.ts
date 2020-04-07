@@ -1,64 +1,99 @@
-import {Component, Inject} from '@angular/core';
-import {UIActiveDialogService} from '../../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, Input, OnInit} from '@angular/core';
+// Model
 import {AssetModalModel} from '../../../model/asset-modal.model';
+import {Dialog, DialogButtonType} from 'tds-component-library';
+// Other
+import * as R from 'ramda';
+import {ActionType} from '../../../../../shared/model/data-list-grid.model';
+import {TranslatePipe} from '../../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `tds-task-comment-dialog`,
 	template: `
-        <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="task-comment-dialog-component modal-content " id="task-comment-dialog-component">
-            <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                <h4 *ngIf="assetModalModel.modalType == 'COMMENT'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_COMMENTS' | translate}}</h4>
-                <h4 *ngIf="assetModalModel.modalType == 'TASK'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_TASKS' | translate}}</h4>
-            </div>
-            <div class="modal-body tds-angular-component-content">
-                <div class="box-body">
-                    <!-- -->
-                    <td colspan="2">
-                        <task-comment *ngIf="assetModalModel.modalType == 'COMMENT'"
-                                      [asset-id]="assetModalModel.assetId"
-                                      [has-publish-permission]="true"
-                                      [can-edit-comments]="true"
-                                      [can-edit-tasks]="true"
-                                      [asset-name]="assetModalModel.assetName"
-                                      [asset-type]="assetModalModel.assetType"
-                                      [show-comment]="true"
-                                      [user-id]="currentUserId">
-                        </task-comment>
-                        <task-comment *ngIf="assetModalModel.modalType == 'TASK'"
-                                      [asset-id]="assetModalModel.assetId"
-                                      [has-publish-permission]="true"
-                                      [can-edit-comments]="true"
-                                      [can-edit-tasks]="true"
-                                      [asset-name]="assetModalModel.assetName"
-                                      [asset-type]="assetModalModel.assetType"
-                                      [show-task]="true"
-                                      [user-id]="currentUserId">
-                        </task-comment>
-                    </td>
-                </div>
-            </div>
-            <div class="modal-footer form-group-center">
-                <button (click)="cancelCloseDialog()"
-                        type="button" class="btn btn-default pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
-                </button>
-            </div>
-        </div>
-
+		<div class="task-comment-dialog-component">
+			<div class="clr-row">
+				<div class="clr-col-12">
+					<task-comment *ngIf="assetModalModel.modalType == 'COMMENT'"
+								  [asset-id]="assetModalModel.assetId"
+								  [has-publish-permission]="true"
+								  [can-edit-comments]="true"
+								  [can-edit-tasks]="true"
+								  [asset-name]="assetModalModel.assetName"
+								  [asset-type]="assetModalModel.assetType"
+								  [show-comment]="true"
+								  [user-id]="currentUserId">
+					</task-comment>
+				</div>
+			</div>
+			<div class="clr-row">
+				<div class="clr-col-12">
+					<task-comment *ngIf="assetModalModel.modalType == 'TASK'"
+								  [asset-id]="assetModalModel.assetId"
+								  [has-publish-permission]="true"
+								  [can-edit-comments]="true"
+								  [can-edit-tasks]="true"
+								  [asset-name]="assetModalModel.assetName"
+								  [asset-type]="assetModalModel.assetType"
+								  [show-task]="true"
+								  [user-id]="currentUserId">
+					</task-comment>
+				</div>
+			</div>
+		</div>
 	`
 })
-export class TaskCommentDialogComponent {
-	constructor(
-		public assetModalModel: AssetModalModel,
-		public activeDialog: UIActiveDialogService,
-		@Inject('currentUserId') private currentUserId: number) {}
+export class TaskCommentDialogComponent extends Dialog implements OnInit {
+	@Input() data: any;
+	public assetModalModel: AssetModalModel;
+	public currentUserId: number;
+	constructor(private translatePipe: TranslatePipe) {
+		super();
+	}
+
+	ngOnInit(): void {
+		this.assetModalModel = R.clone(this.data.assetModalModel);
+		this.currentUserId = R.clone(this.data.currentUserId);
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle());
+		});
+	}
+
 	/**
 	 * Close the Dialog
 	 */
 	public cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		super.onCancelClose();
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ActionType} modalType
+	 * @returns {string}
+	 */
+	private getModalTitle(): string {
+		let title = '';
+		if (this.assetModalModel.modalType === 'COMMENT') {
+			title = this.translatePipe.transform('ASSET_EXPLORER.SHOW_COMMENTS');
+		} else if (this.assetModalModel.modalType === 'TASK') {
+			title = this.translatePipe.transform('ASSET_EXPLORER.SHOW_TASKS');
+		}
+		return title;
 	}
 }

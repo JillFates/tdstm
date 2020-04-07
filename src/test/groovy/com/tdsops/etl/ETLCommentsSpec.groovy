@@ -3,9 +3,7 @@ package com.tdsops.etl
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.ImportOperationEnum
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -23,26 +21,29 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import spock.lang.See
 
-@TestMixin(ControllerUnitTestMixin)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
-class ETLCommentsSpec extends ETLBaseSpec {
-
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
-        }
-	}
+class ETLCommentsSpec extends ETLBaseSpec implements DataTest {
 
 	DebugConsole debugConsole
 	Project GMDEMO
 	ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
+
+	void setupSpec(){
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions
+	}
 
 	def setup() {
 
@@ -109,7 +110,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -170,7 +171,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -232,7 +233,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -271,7 +272,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -321,7 +322,7 @@ class ETLCommentsSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 

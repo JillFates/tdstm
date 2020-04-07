@@ -10,7 +10,7 @@ import getl.json.JSONDataset
 import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -36,8 +36,7 @@ import spock.lang.Shared
  *     <li><b>skip</b></li>
  * </ul>
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
-class ETLIterateSpec extends ETLBaseSpec {
+class ETLIterateSpec extends ETLBaseSpec implements DataTest {
 
 	@Shared
 	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
@@ -59,20 +58,22 @@ class ETLIterateSpec extends ETLBaseSpec {
 	Project GMDEMO
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
         }
-	}
+    }
 
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model
 		csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
 		jsonConnection = new JSONConnection(config: 'json')
 		FileUtils.ValidPath(conParams.path)
@@ -382,7 +383,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -469,7 +470,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -546,8 +547,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
-
 }

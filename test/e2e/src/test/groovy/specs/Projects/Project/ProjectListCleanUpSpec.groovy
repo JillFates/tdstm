@@ -8,7 +8,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.error.RequiredPageContentNotPresent
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 /**
  * This class represents the new generic asset details
@@ -26,13 +26,13 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
     static projectName = "TM-Demo"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
         login(4,5) // test needs to be done by e2e_projects_user
         at MenuPage
-        projectsModule.goToProjectsActive()
+        waitFor(40){projectsModule.goToProjectsActive()}
     }
 
     def setup() {
@@ -72,6 +72,7 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
         given: 'The User is on the Project List Page'
             at ProjectListPage
         when: 'The user filters by project name starting with QAE2E'
+            clickFilterButton()
             filterByName baseName
         then: 'The user deletes active projects if there are'
             deleteProjects()
@@ -90,6 +91,9 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
             filterByName projectName
         and: 'The user clicks on project'
             clickOnProjectByName projectName
+            at ProjectDetailsPage
+            closeDetails()
+            at ProjectListPage
         then: 'The project should be selected'
             projectsModule.assertProjectName projectName
     }

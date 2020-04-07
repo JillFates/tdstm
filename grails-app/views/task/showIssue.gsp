@@ -39,37 +39,31 @@
 					<td valign="top" class="name">
 					<div id="predsTable_${assetComment.id}" class='assetImage' ${predCount <= 5 && sucCount <= 5 ? 'style="display:none;"' : '' }>
 						<h4 onclick="javascript:toogleGenDetails('${assetComment.id}')">Dependency details
-						<asset:image id="rightTriangle_${assetComment.id}" style="display: none;" src="images/triangle_right.png" />
-						<asset:image id="downTriangle_${assetComment.id}"  src="images/triangle_down.png" />
+						<asset:image src="images/triangle_right.png" />
+						<asset:image src="images/triangle_down.png" />
 						</h4>
 					</div>
 					<div id="predDivId_${assetComment.id}" ${predCount > 5 || sucCount > 5 ? 'style="display:none;"' : ''}>
 					<div style="width:400px; float:left">
 						<fieldset>
-							<div style="margin-bottom: 10px; border-bottom: 1px solid black">
-								<label>Predecessors</label>
-							</div>
-							<g:each in="${assetComment.taskDependencies}" var="task">
-								<div style="font-weight: normal; padding: 5px;cursor: pointer;"
-									 class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}"
-									 onclick="showAssetCommentMyTasks(${task.predecessor.id})">
-
-									${task.predecessor.taskNumber}: ${task.predecessor.comment} (${task.predecessor.category})
-								</div>
-							</g:each>
+						<legend>Predecessors</legend>
+						<g:each in="${assetComment.taskDependencies}" var="task">
+							<span class="${task.predecessor?.status ? 'task_'+task.predecessor?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.predecessor.id})">
+							${task.predecessor.taskNumber}:${task.predecessor.comment} (${task.predecessor.category})
+							</span>
+							<br/>
+						</g:each>
 						</fieldset>
 					</div>
 					<div style="width:400px; float:left; margin-left:30px;">
 						<fieldset>
-							<div style="margin-bottom: 10px; border-bottom: 1px solid black">
-								<label>Successors</label>
-								<br/>
-							</div>
-							<g:each in="${successor}" var="task">
-								<div style="font-weight: normal; padding: 5px" class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
-								${task.assetComment.taskNumber}: ${task.assetComment.comment} (${task.assetComment.category})
-								</div>
-							</g:each>
+						<legend>Successors</legend>
+						<g:each in="${successor}" var="task">
+							<span class="${task.assetComment?.status ? 'task_'+task.assetComment?.status?.toLowerCase() : 'task_na'}" onclick="showAssetCommentMyTasks(${task.assetComment.id})">
+							${task.assetComment.taskNumber}:${task.assetComment.comment} (${task.assetComment.category})
+							</span>
+							<br/>
+						</g:each>
 						</fieldset>
 					</div>
 					</div>
@@ -121,14 +115,11 @@
 			</tr>
 			<tr>
 				<g:if test="${assetComment.assetEntity}">
-		   			<td>Asset:</td>
-					<td>
-					<span class="assetLink" onclick="EntityCrud.showAssetDetailView('${assetComment.assetEntity?.assetClass}','${assetComment?.assetEntity.id}')">&nbsp;${assetComment?.assetEntity.assetName}</span>
-					</td>
+		   			<td>Asset:</td><td><span class="assetLink" onclick="EntityCrud.showAssetDetailView('${assetComment.assetEntity?.assetClass}','${assetComment?.assetEntity.id}')">&nbsp;${assetComment?.assetEntity.assetName}</span></td>
 		   		</g:if>
 		   	</tr>
 			<tr>
-		   		  <td>Instructions Link:</td><td style=""><tds:textAsLink text="${assetComment?.instructionsLink}" target="instructions"/></td>
+		   		  <td>Instructions Link:</td><td style="width: 1%"><tds:textAsLink text="${assetComment?.instructionsLink}" target="instructions"/></td>
 		   	</tr>
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>

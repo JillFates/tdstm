@@ -1,49 +1,45 @@
+import {FilterType} from 'tds-component-library';
+
 export class CredentialColumnModel {
 	columns: any[];
 
 	constructor(dateFormat: string) {
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 70,
-				locked: true
-			}, {
 				label: 'Name',
 				property: 'name',
-				type: 'text',
-				locked: true
+				filterType: FilterType.text
 			}, {
 				label: 'Description',
 				property: 'description',
-				type: 'text'
+				filterType: FilterType.text
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 200
 			}, {
 				label: 'Environment',
 				property: 'environment',
-				type: 'text',
-				width: 200
+				filterType: FilterType.text,
+				width: 130
 			}, {
 				label: 'Status',
 				property: 'status',
-				type: 'text',
+				filterType: FilterType.text,
 				width: 100
 			}, {
 				label: 'Auth Method',
 				property: 'authMethod',
-				type: 'text',
-				width: 200
+				filterType: FilterType.text,
+				width: 130
 			}, {
-				label: 'Created',
+				label: 'Date Created',
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				filterType: FilterType.date,
+				width: 150
 			}
 		];
 	}

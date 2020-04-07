@@ -24,6 +24,7 @@ import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelAlias
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
@@ -40,6 +41,9 @@ import test.helper.AssetEntityTestHelper
 class DataImportServiceIntegrationSpec extends Specification {
 	@Shared
 	AssetEntityTestHelper assetEntityTestHelper
+
+	@Shared
+	PartyRelationshipService partyRelationshipService
 
 	@Shared
     DataImportService dataImportService
@@ -97,16 +101,18 @@ class DataImportServiceIntegrationSpec extends Specification {
 		personTestHelper = new PersonTestHelper()
 		projectTestHelper = new ProjectTestHelper()
 		providerTestHelper = new ProviderTestHelper()
-		whom = personTestHelper.createPerson()
+
 		project = projectTestHelper.createProject()
+		whom = personTestHelper.createPerson()
 		otherProject = projectTestHelper.createProject()
+
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
 																	 moveBundleTestHelper.createBundle(otherProject, null))
 
-		def adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
+		UserLogin adminUser = personTestHelper.createUserLoginWithRoles(whom, ["${SecurityRole.ROLE_ADMIN}"])
 		securityService.assumeUserIdentity(adminUser.username, false)
 
 		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
@@ -841,7 +847,6 @@ class DataImportServiceIntegrationSpec extends Specification {
 			SizeScale scale = SizeScale.TB
 			Person clientStaff1 = personTestHelper.createPerson(whom, project.client, project)
 			Person clientStaff2 = personTestHelper.createPerson(whom, project.client, project)
-
 		and: 'a new asset is instanciated'
 			AssetEntity server = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		and: 'an import context is created for Devices'

@@ -1,6 +1,7 @@
 package net.transitionmanager.move
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.asset.Room
 import net.transitionmanager.command.MoveBundleCommand
@@ -35,8 +36,10 @@ class WsMoveBundleController implements ControllerMethods {
 	@HasPermission(Permission.BundleEdit)
 	def modelForEdit(Long moveBundleId) {
 		Project project = getProjectForWs()
+		MoveBundle moveBundle = fetchDomain(MoveBundle, [id: moveBundleId], project)
+		userPreferenceService.setPreference(UserPreferenceEnum.CURR_BUNDLE, moveBundleId)
 		renderSuccessJson([
-			moveBundleInstance: fetchDomain(MoveBundle, [id: moveBundleId], project).toMap(),
+			moveBundleInstance: moveBundle.toMap(),
 			projectId: project.id,
 			rooms: Room.findAllByProject(project)*.toMap()
 		])
@@ -96,7 +99,7 @@ class WsMoveBundleController implements ControllerMethods {
 	@HasPermission(Permission.BundleCreate)
 	def save(Long moveBundleId) {
 		Project project = getProjectForWs()
-		MoveBundleCommand moveBundleCommand = populateCommandObject(MoveBundleCommand)
+		MoveBundleCommand moveBundleCommand = populateCommandObject(MoveBundleCommand, false)
 		MoveBundle moveBundle = moveBundleService.saveOrUpdate(moveBundleCommand, project, moveBundleId)
 		renderSuccessJson(moveBundle.toMap())
 	}

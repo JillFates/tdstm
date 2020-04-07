@@ -33,6 +33,9 @@ export class AssetExplorerStates {
 	public static readonly REPORT_SHOW = {
 		url: 'views/:id/show'
 	};
+	public static readonly ARCHITECTURE_GRAPH = {
+		url: 'architecture-graph'
+	};
 }
 
 /**
@@ -124,7 +127,7 @@ export const AssetManagerRoute: Routes = [
 		},
 		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
-	},
+	}
 ];
 
 @NgModule({

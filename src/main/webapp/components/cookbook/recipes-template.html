@@ -1,9 +1,8 @@
 <form id="gridControls" class="row-fluid clearfix form-inline groups">
-	<div class="col-md-1 col-xs-1 form-group text-center">
-		<a class="btn btn-default" id="generateRecipe" ng-click="createRecipe()">
-			<img ng-src="{{applyRootPath('/assets/icons/script_add.png')}}" />
-			Create Recipe...
-		</a>
+	<div class="col-md-1 col-xs-1 form-group text-center recipe-add">
+		<button class="btn" id="generateRecipe"  ng-click="createRecipe()" title="Create Recipe">
+			<img ng-src="{{applyRootPath('/assets/icons/svg/plus-circle-line.svg')}}" height="18px" />
+		</button>
 	</div>
 	<div class="col-md-4 col-xs-4 form-group pull-right archiveCheckWrapper">
 			<label class="pull-right">

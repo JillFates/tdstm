@@ -11,7 +11,7 @@ import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.tfs.TFS
 import getl.utils.FileUtils
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -31,7 +31,6 @@ import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
 import spock.util.mop.ConfineMetaClassChanges
-
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -42,8 +41,7 @@ import spock.util.mop.ConfineMetaClassChanges
  *     <li><b>ignore record</b></li>
  * </ul>
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
-class ETLExtractLoadSpec extends ETLBaseSpec {
+class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 	@Shared
 	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
@@ -64,20 +62,22 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	Project GMDEMO
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-		applicationContextHolder(ApplicationContextHolder) { bean ->
-			bean.factoryMethod = 'getInstance'
+	Closure doWithSpring() {
+		{ ->
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+			}
+			applicationContextHolder(ApplicationContextHolder) { bean ->
+				bean.factoryMethod = 'getInstance'
+			}
 		}
 	}
 
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions
 		csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
 		jsonConnection = new JSONConnection(config: 'json')
 		FileUtils.ValidPath(conParams.path)
@@ -1279,7 +1279,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1460,7 +1460,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([Room])
@@ -1512,7 +1512,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1619,7 +1619,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1652,7 +1652,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: java.lang.String.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
+			e.message == 'No signature of method: java.lang.String.unknownMethod() is applicable for argument types: (String) values: [Mi]'
 	}
 
 	void 'test can evaluate a value loaded into the SOURCE.property'() {
@@ -1737,7 +1737,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
+			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (String) values: [NGM]'
 	}
 
 	void 'test can ignore current row based on some condition'() {
@@ -2074,7 +2074,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2134,7 +2134,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2203,7 +2203,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2293,7 +2293,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2353,7 +2353,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2414,7 +2414,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2451,7 +2451,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2509,7 +2509,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2560,7 +2560,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2610,7 +2610,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2667,7 +2667,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2852,7 +2852,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2934,7 +2934,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3023,7 +3023,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3093,7 +3093,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3137,7 +3137,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3176,7 +3176,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3215,7 +3215,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3263,7 +3263,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3312,7 +3312,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3487,7 +3487,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3564,7 +3564,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3605,7 +3605,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3697,7 +3697,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 }

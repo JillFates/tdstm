@@ -1,16 +1,19 @@
-import {ReportsService} from '../../service/reports.service';
-import {Component} from '@angular/core';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver} from '@angular/core';
+// Component
 import {ReportComponent} from '../report.component';
+// Service
+import {ReportsService} from '../../service/reports.service';
+import {DialogService} from 'tds-component-library';
 
 @Component({
 	selector: 'tds-activity-metrics-report',
 	template: `
-		<div class="content body">
+		<div class="content body activity-metrics-report">
 			<tds-report-toggle-filters
 				[hideFilters]="hideFilters"
 				(reload)="onReload()"
-				(toggle)="toggleFilters($event)"
+				(toggle)="toggleFilters()"
 				[disabled]="!generatedReport">
 			</tds-report-toggle-filters>
 			<section class="box-body">
@@ -72,7 +75,6 @@ import {ReportComponent} from '../report.component';
 									<div class="form-group row ">
 										<div class="col-sm-2 col-sm-offset-2 buttons">
 											<tds-button-export
-												class="btn-primary"
 												[disabled]="loadingLists"
 												(click)="onGenerateReport()"
 												title="Export to Excel"
@@ -99,9 +101,10 @@ export class ActivityMetricsReportComponent extends ReportComponent {
 	private readonly allProjectsOption = {id: -1, name: 'All'};
 
 	constructor(
+		componentFactoryResolver: ComponentFactoryResolver,
 		reportsService: ReportsService,
-		dialogService: UIDialogService) {
-		super(reportsService, dialogService);
+		dialogService: DialogService) {
+		super(componentFactoryResolver, reportsService, dialogService);
 		this.selectedProjects = [this.allProjectsOption];
 		this.onLoad();
 	}

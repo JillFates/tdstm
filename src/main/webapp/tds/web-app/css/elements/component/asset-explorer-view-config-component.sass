@@ -1,4 +1,115 @@
 .page-asset-explorer-config
+  .fa-start-o.disabled,
+  .far-start.disabled
+    cursor: not-allowed
+    opacity: 0.5
+    filter: alpha(opacity = 50)
+  #btnCancel
+    margin-left: 15px
+  .view-override-button
+    font-size: 19px
+    margin: 0
+    padding: 2px 0 0 0
+  tds-button.btn-success
+    background: none
+    &:hover
+      background: none
+  .button-bar
+    margin-top: 15px
+    tds-asset-view-selector
+      display: inline-block
+    tds-asset-view-config-save-button
+      margin-left: 12px
+      tds-button
+        background: none
+    tds-button-custom.favorite-button
+      margin-left: -10px
+      button
+        color: #f39c12
+        &:hover
+          color: inherit
+  .tabs-button-bar
+    height: 0
+    tds-button-custom.toggle
+      position: relative
+      top: 23px
+      right: 9px
+      z-index: 9
+    tds-button.preview
+      background: none
+      position: relative
+      top: 21px
+      z-index: 9
+  .tabs-section
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08)
+    kendo-tabstrip
+      div[role="tabpanel"]
+        font-size: 12px
+        color: inherit
+        margin-top: 20px
+        padding-left: 15px
+        margin-bottom: 20px
+        label.title
+          font-size: 14px
+        .clr-control-label
+          color: inherit
+          font-size: inherit
+        .asset-domain-section
+          tds-ui-svg-icon
+            top: 3px
+            position: relative
+        .fields-section
+          .filters-bar
+            margin-bottom: 20px
+            tds-filter-input
+              display: inline-block
+              margin-right: 10px
+              width: 300px
+              position: relative
+              top: 1px
+              clr-input-container
+                margin-top: 0
+                display: inline
+                .clr-control-container
+                  width: 100%
+                  .clr-input
+                    width: 100%
+              tds-button[icon="times-circle"]
+                margin-left: -30px
+            tds-button
+              padding-top: 0
+              .tds-button
+                margin-top: 0
+            clr-select-container
+              margin-right: 10px
+              margin-top: 0
+          .fields-checkboxes
+            margin-top: 15px
+            position: relative
+            height: 375px
+            overflow-x: auto
+            .field-group-title
+              text-decoration: underline
+              margin-left: 10px
+              font-weight: bold
+              cursor: default
+            .field-checkbox
+              width: 100%
+              input[type=checkbox]+label::before
+                left: 3px
+                background-color: #fff
+              input[type=checkbox]:checked+label::before
+                background-color: #0077b8
+                border: 0
+              input[type=checkbox]:checked+label::after
+                left: 7px
+        .columns-section
+          kendo-sortable
+            margin-top: 15px
+
+  .grid-section
+    margin-top: 10px
+
   .pd-top-5
     padding-top: 5px
   .disabled
@@ -48,6 +159,7 @@
     margin-left: 15px
 
   .view-override-button
-    font-size: 19px
-    margin: 0
-    padding: 2px 0 0 0
+    .btn
+      font-size: 15px !important
+      margin-bottom: 0
+      margin-top: 3px

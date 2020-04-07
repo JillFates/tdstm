@@ -1,35 +1,78 @@
 // Angular
-import {Component} from '@angular/core';
-
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 // Service
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {EventsService} from '../../service/events.service';
-import {DisplayOptionGeneric, DisplayOptionUser} from '../../model/news.model';
-
-// Model
-import {NewsDetailModel, CommentType, DisplayOptions} from '../../model/news.model';
-import {Permission} from '../../../../shared/model/permission.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Model
+import {DisplayOptionGeneric, DisplayOptionUser} from '../../model/news.model';
+import {NewsDetailModel, CommentType} from '../../model/news.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+import * as R from 'ramda';
+import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: 'tds-news-create-edit',
 	templateUrl: 'news-create-edit.component.html'
 })
-export class NewsCreateEditComponent {
+export class NewsCreateEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
+	@ViewChild('newsForm', {read: NgForm, static: true}) newsForm: NgForm;
+
 	public commentType: string;
 	public optionGeneric = DisplayOptionGeneric;
 	public optionUser = DisplayOptionUser;
+	public model: NewsDetailModel;
+	private dataSignature: string;
 
 	constructor(
-		public model: NewsDetailModel,
-		public activeDialog: UIActiveDialogService,
-		private promptService: UIPromptService,
+		public dialogService: DialogService,
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private eventsService: EventsService) {
-			this.commentType = CommentType[model.commentType];
+		super();
+	}
+
+	ngOnInit(): void {
+		this.model = R.clone(this.data.newsDetailModel);
+		this.commentType = CommentType[this.model.commentType];
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => true,
+			disabled: () => !this.newsForm.form.valid || this.newsForm.form.pristine,
+			type: DialogButtonType.ACTION,
+			action: this.onSave.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => !this.isCreate(),
+			disabled: () => !this.isDeleteAvailable(),
+			type: DialogButtonType.ACTION,
+			action: this.onDelete.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		setTimeout(() => {
+			let title = this.translatePipe.transform('NEWS.EDIT_NEWS');
+			if (this.isCreate()) {
+				title = this.translatePipe.transform('NEWS.CREATE_NEWS');
+			}
+			this.dataSignature = JSON.stringify(this.model);
+			this.setTitle(title);
+		});
 	}
 
 	/**
@@ -37,20 +80,17 @@ export class NewsCreateEditComponent {
 	*/
 	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
-			this.promptService.open(
+			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
 			)
-				.then(confirm => {
-					if (confirm) {
-						this.activeDialog.dismiss();
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						this.onCancelClose();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
-			this.activeDialog.dismiss();
+			this.onCancelClose();
 		}
 	}
 
@@ -59,12 +99,15 @@ export class NewsCreateEditComponent {
 	 * if the user decides continue call the endpoint to delete the record
 	*/
 	public onDelete(): void {
-		this.promptService.open('Confirmation Required', 'You are about to delete the selected item. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
+		this.dialogService.confirm(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			'You are about to delete the selected item. Do you want to proceed?'
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.eventsService.deleteNews(this.getPayloadFromModel())
 						.subscribe(
-							res => this.activeDialog.close(),
+							res => this.onCancelClose(),
 							error => console.error(error));
 				}
 			});
@@ -103,7 +146,7 @@ export class NewsCreateEditComponent {
 
 		updateMethod
 			.subscribe((val) => {
-				this.activeDialog.close();
+				this.onCancelClose();
 			}, (error) => {
 				console.error('Error:', error);
 			});
@@ -139,7 +182,7 @@ export class NewsCreateEditComponent {
 	 * @returns {boolean}
 	 */
 	public isDirty(): boolean {
-		return false;
+		return this.dataSignature !== JSON.stringify(this.model);
 	}
 
 	/**
@@ -149,5 +192,12 @@ export class NewsCreateEditComponent {
 	 */
 	public isCreate(): boolean {
 		return !Boolean(this.model.commentObject.id);
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

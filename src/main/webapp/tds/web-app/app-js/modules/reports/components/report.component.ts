@@ -1,9 +1,14 @@
-import {ReportsService} from '../service/reports.service';
+// Angular
 import {SafeHtml} from '@angular/platform-browser';
-import {UIDialogService} from '../../../shared/services/ui-dialog.service';
-import {AssetShowComponent} from '../../assetExplorer/components/asset/asset-show.component';
+import {ComponentFactoryResolver} from '@angular/core';
+// Model
+import {DialogService, ModalSize} from 'tds-component-library';
+// Module
 import {AssetExplorerModule} from '../../assetExplorer/asset-explorer.module';
-import {DIALOG_SIZE} from '../../../shared/model/constants';
+// Service
+import {ReportsService} from '../service/reports.service';
+// Component
+import {AssetShowComponent} from '../../assetExplorer/components/asset/asset-show.component';
 
 export abstract class ReportComponent {
 	// Shared variables
@@ -12,7 +17,11 @@ export abstract class ReportComponent {
 	loadingLists = false;
 	generatedReport = false;
 
-	constructor(protected reportsService: ReportsService, protected dialogService: UIDialogService) {
+	constructor(
+		protected componentFactoryResolver: ComponentFactoryResolver,
+		protected reportsService: ReportsService,
+		protected dialogService: DialogService
+	) {
 		// Silence is golden.
 	}
 
@@ -42,16 +51,21 @@ export abstract class ReportComponent {
 	 * @param assetClass: string
 	 */
 	private onOpenLinkAsset(assetId: number, assetClass: string) {
-		this.dialogService.open(AssetShowComponent,
-			[UIDialogService,
-				{ provide: 'ID', useValue: assetId },
-				{ provide: 'ASSET', useValue: assetClass },
-				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.LG).then(result => {
-			// Do nothing
-		}).catch(result => {
-			// Do nothing
-		});
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: AssetShowComponent,
+			data: {
+				assetId: assetId,
+				assetClass: assetClass,
+				assetExplorerModule: AssetExplorerModule
+			},
+			modalConfiguration: {
+				title: 'Asset',
+				draggable: true,
+				modalSize: ModalSize.CUSTOM,
+				modalCustomClass: 'custom-asset-modal-dialog'
+			}
+		}).subscribe();
 	}
 
 	abstract onGenerateReport();

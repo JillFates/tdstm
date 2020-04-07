@@ -73,7 +73,7 @@ class DataviewServiceIntegrationSpec extends Specification {
 			dataviewService.create(person, null, dataviewJson)
 		then:
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property project of class net.transitionmanager.imports.Dataview cannot be null.*/
+			e.message ==~ /.*Property project cannot be null.*/
 	}
 
 	void '2. test create dataview with duplicate name within same project throws exception'() {

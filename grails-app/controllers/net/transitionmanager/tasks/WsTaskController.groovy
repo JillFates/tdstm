@@ -9,6 +9,9 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.task.TaskCommand
+import net.transitionmanager.exception.UnauthorizedException
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.task.Task
 import org.grails.web.json.JSONArray
@@ -84,7 +87,6 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.RecipeGenerateTasks)
 	def generateTasks() {
 		TaskGenerationCommand context = populateCommandObject(TaskGenerationCommand)
-		validateCommandObject(context)
 		Project project = securityService.userCurrentProject
 
 		def result = taskService.initiateCreateTasksWithRecipe(context, project)
@@ -469,6 +471,39 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	def actionLookUp(Long taskId) {
 		Project project = securityService.userCurrentProject
 		render view: 'actionLookUp', model: [apiAction: taskActionService.actionLookup(taskId, project)]
+	}
+
+	/**
+	 * Create or update a task.
+	 * @return
+	 */
+	@HasPermission(Permission.TaskView)
+	def saveTask() {
+		Project project = getProjectForWs()
+		UserLogin userLogin = securityService.userLogin
+
+		TaskCommand taskCommand = populateCommandObject(TaskCommand)
+		validateCommandObject(taskCommand)
+
+		String errorMsg = null
+
+
+		if (taskCommand.id) {
+			if (!securityService.hasPermission(userLogin, Permission.TaskEdit, true)) {
+				errorMsg = "The user doesn't have permissions to update tasks."
+			}
+		} else {
+			if (!securityService.hasPermission(userLogin, Permission.TaskCreate, true)) {
+				errorMsg = "The user doesn't have permissions to create tasks."
+			}
+		}
+
+		if (errorMsg) {
+			throw new UnauthorizedException(errorMsg)
+		}
+
+		renderSuccessJson(taskService.createOrUpdateTask(project, taskCommand))
+
 	}
 
 }

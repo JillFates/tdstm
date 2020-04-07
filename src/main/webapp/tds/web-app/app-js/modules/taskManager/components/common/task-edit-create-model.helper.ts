@@ -8,8 +8,10 @@ import {ModalType} from '../../../../shared/model/constants';
 import {SingleNoteModel} from '../../../assetExplorer/components/single-note/model/single-note.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskService} from '../../service/task.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {ComponentFactoryResolver} from '@angular/core';
 
 export class TaskEditCreateModelHelper {
 	model: any;
@@ -20,13 +22,16 @@ export class TaskEditCreateModelHelper {
 	public STATUS = TaskStatus;
 	CREATE_PREDECESSOR = '';
 	CREATE_SUCCESSOR = '';
+	ADD_PREDECESSOR = '';
+	ADD_SUCCESSOR = '';
 
 	constructor(
 		userTimeZone: string,
 		userCurrentDateFormat: string,
 		private taskManagerService: TaskService,
-		private dialogService: UIDialogService,
-		private translate: TranslatePipe) {
+		private dialogService: DialogService,
+		private translate: TranslatePipe,
+		private componentFactoryResolver: ComponentFactoryResolver) {
 		this.model = {};
 
 		this.userTimeZone = userTimeZone;
@@ -34,6 +39,8 @@ export class TaskEditCreateModelHelper {
 		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 		this.CREATE_PREDECESSOR = this.translate.transform('TASK_MANAGER.CREATE_PREDECESSOR');
 		this.CREATE_SUCCESSOR = this.translate.transform('TASK_MANAGER.CREATE_SUCCESSOR');
+		this.ADD_PREDECESSOR = this.translate.transform('TASK_MANAGER.ADD_PREDECESSOR');
+		this.ADD_SUCCESSOR = this.translate.transform('TASK_MANAGER.ADD_SUCCESSOR');
 	}
 
 	/**
@@ -46,6 +53,11 @@ export class TaskEditCreateModelHelper {
 		this.model.estimatedStart = this.model.estimatedStart ? new Date(this.model.estimatedStart) : null;
 		this.model.estimatedFinish = this.model.estimatedFinish ? new Date(this.model.estimatedFinish) : null;
 		this.model.dueDate = this.model.dueDate ? DateUtils.getDateFromFormat(this.model.dueDate, this.userCurrentDateFormat) : null;
+
+		// validate null access
+		if (this.model.event && this.model.event.id === null || this.model.event.id === undefined) {
+			this.model.event.id = '';
+		}
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
@@ -126,12 +138,20 @@ export class TaskEditCreateModelHelper {
 			asset: {id: detailModel.detail.assetEntity, text: detailModel.detail.assetName},
 			assignedTo: {id : parseInt(detailModel.detail.currentUserId, 10), text: ''},
 			assignedTeam: {id: '', text: ''},
-			event: {id: '', text: ''},
+			event: detailModel.detail.event ||  {id: '', text: ''},
 			category: 'general',
 			apiAction: {id: '', text: ''},
 			deletedPredecessorList: [],
 			deletedSuccessorList: []
 		};
+
+		// validate null access
+		if (this.model.event.id === null || this.model.event.id === undefined) {
+			this.model.event.id = '';
+		}
+
+		// should be an string
+		this.model.event.id = this.model.event.id.toString();
 
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 
@@ -155,6 +175,8 @@ export class TaskEditCreateModelHelper {
 		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
+			dtCreated: detail.dtCreated || '',
+			lastUpdated: detail.lastUpdated || '',
 			apiActionInvokedAt: assetComment.apiActionInvokedAt || detail.apiActionInvokedAt,
 			percentageComplete: detail.percentageComplete,
 			apiActionCompletedAt: assetComment.apiActionCompletedAt,
@@ -169,7 +191,7 @@ export class TaskEditCreateModelHelper {
 			actualDuration: detail.actualDuration || '',
 			dateCreated: assetComment.dateCreated,
 			taskSpec: assetComment.taskSpec,
-			lastUpdated: assetComment.lastUpdated,
+			// lastUpdated: assetComment.lastUpdated,
 			taskSpecId: detail.taskSpecId || '',
 			taskNumber: assetComment.taskNumber,
 			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
@@ -206,7 +228,7 @@ export class TaskEditCreateModelHelper {
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: PriorityList,
 			asset: {id: asset.id, text: asset.name},
-			assignedTo: {id : (assetComment.assignedTo) || null, text: detail.assignedTo},
+			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
 			event: {id: (assetComment.moveEvent) || null, text: detail.eventName},
 			category: assetComment.category,
@@ -683,16 +705,6 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
-	 * Change the background color based on the task status
-	 * @param {any} context
-	 * @returns {string}
-	 */
-	public rowStatusColor(context: any) {
-		const status = context.dataItem && context.dataItem.status || '';
-		return 'task-' + status.toLowerCase();
-	}
-
-	/**
 	 * Add a note
 	 */
 	protected createNote(id: string, note: string): Observable<any> {
@@ -706,24 +718,31 @@ export class TaskEditCreateModelHelper {
 		return Observable.create((observer) => {
 			let singleNoteModel: SingleNoteModel = {
 				modal: {
-					title: 'Create Note',
+					title: 'Note Create',
 					type: ModalType.CREATE
 				},
 				note: ''
 			};
 
-			this.dialogService.extra(SingleNoteComponent, [
-				{provide: SingleNoteModel, useValue: singleNoteModel}
-			], false, false)
-				.then(addedNote => {
-					this.createNote(this.model.id, addedNote)
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: SingleNoteComponent,
+				data: {
+					singleNoteModel: singleNoteModel
+				},
+				modalConfiguration: {
+					title: 'Note Create',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).subscribe((data: any) => {
+				if (data.status === DialogExit.ACCEPT) {
+					this.createNote(this.model.id, data.note)
 						.subscribe((result) => {
 							console.log('The result is:', result);
 							observer.next(result);
 						});
-				}).catch(result => {
-				console.log(result);
-				observer.next(null);
+				}
 			});
 		});
 	}

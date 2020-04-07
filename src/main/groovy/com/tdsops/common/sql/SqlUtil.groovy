@@ -1,6 +1,6 @@
 package com.tdsops.common.sql
 
-
+import com.tdsops.tm.enums.ControlType
 import com.tdssrc.grails.DateTimeFilterUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -71,10 +71,10 @@ class SqlUtil {
 	 * assert SqlUtil.matchWords('a', ['x','y','z'], true, false) == '(a like ? and a like ? and a like ?)'
 	 * assert SqlUtil.matchWords('a', ['x','y','z'], false, true) == '(a=? or a=? or a=?)'
 	 */
-	static String matchWords(String property, List words, boolean matchAll=false, boolean exact=false) {
+	static String matchWords(String property, List words, boolean matchAll=false, boolean exact=false, int index) {
 		String andOr = matchAll ? 'and' : 'or'
 		StringBuilder query = new StringBuilder()
-		String criteria = exact ? property + '=?' : property + ' like ?'
+		String criteria = exact ? property + "=?$index" : property + " like ?$index"
 		int size = words.size()
 		if (size) {
 			query << criteria
@@ -640,7 +640,9 @@ class SqlUtil {
 		String expression
 		if (operator == 'LIKE' && isNumber) {
 			expression =  column + " LIKE CONCAT(:$fieldSearchData.columnAlias, '%')"
-		} else {
+		} else if(operator == '=' && isNumber){
+			expression =  column + " = :$fieldSearchData.columnAlias"
+		}else {
 			expression = getSingleValueExpression(column, fieldSearchData.columnAlias, operator)
 		}
 		fieldSearchData.sqlSearchExpression = expression
@@ -834,6 +836,10 @@ class SqlUtil {
 		boolean isNumeric = false
 
 		FieldSpec fieldSpec = fsd.searchInfo?.fieldSpec
+
+		if(fieldSpec?.control == ControlType.NUMBER.value()){
+			return true
+		}
 
 		if(fieldSpec?.isCustom()){
 			isNumeric = fieldSpec.isNumeric()

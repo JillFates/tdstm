@@ -5,9 +5,11 @@
 			<div class="col-sm-8 col-md-8 col-lg-8">
 				<div class="form-group">
 					<label class="col-title" for="eventSelect">Event:</label>
-					<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected(true)" ng-options="item as item.name for item in contexts.eventsArray">
-						<option value="">Please select</option>
-					</select>
+					<div class="clr-select-wrapper">
+						<select class="form-control" name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected(true)" ng-options="item as item.name for item in contexts.eventsArray">
+							<option value="">Please select</option>
+						</select>
+					</div>
 				</div>
 			</div>
 		</div>

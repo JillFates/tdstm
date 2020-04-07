@@ -1,23 +1,21 @@
-/**
- *  The component is being used dynamically, some vars will show as not being used or referenced but they could be part
- *  of the GSP
- *
- *  Use angular/views/TheAssetType as reference
- */
-import {Component, Inject, OnInit} from '@angular/core';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
+// Model
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+// Component
+import {AssetCommonEdit} from '../asset/asset-common-edit';
+// Service
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import * as R from 'ramda';
 import {TagService} from '../../../assetTags/service/tag.service';
-import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {AssetCommonEdit} from '../asset/asset-common-edit';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DialogService} from 'tds-component-library';
+// Other
+import * as R from 'ramda';
 
-export function DatabaseEditComponent(template, editModel, metadata: any) {
+export function DatabaseEditComponent(template, editModel, metadata: any, parentDialog: any) {
 
 	@Component({
 		selector: `tds-database-edit`,
@@ -28,17 +26,16 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 	}) class DatabaseShowComponent extends AssetCommonEdit implements OnInit {
 		constructor(
 			@Inject('model') model: any,
-			activeDialog: UIActiveDialogService,
+			componentFactoryResolver: ComponentFactoryResolver,
 			userContextService: UserContextService,
 			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
-			dialogService: UIDialogService,
+			dialogService: DialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 		) {
-			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
+			super(componentFactoryResolver, model, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, translatePipe, parentDialog);
 		}
 
 		ngOnInit() {

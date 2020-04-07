@@ -1015,7 +1015,7 @@ class RackLayoutsController implements ControllerMethods {
 		def value = params.value
 		switch (field) {
 			case "rack":
-				data = Rack.executeQuery('select distinct r.tag from Rack r where r.source = 0 and r.project=?', [project])
+				data = Rack.executeQuery('select distinct r.tag from Rack r where r.source = 0 and r.project=?0', [project])
 				break
 			case "isValidRack":
 				data = Rack.findAllWhere(tag: value, source: 0, project: project)

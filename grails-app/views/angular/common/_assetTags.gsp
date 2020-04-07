@@ -1,15 +1,13 @@
 <!-- Asset Tags -->
-<tr>
-    <td class="label N" nowrap="nowrap">
-        <label>
-            Tags
-        </label>
-    </td>
-    <td nowrap="nowrap" class="N" colspan="4">
-        <span *ngFor="let tag of assetTags" class="label tag"
-              [ngClass]="tag.css"
-              style="">
-            {{tag.name}}
-        </span>
-    </td>
-</tr>
+<table class="tdr-detail-list tag-list-view">
+    <tr>
+        <th class="N">Tags</th>
+        <td class="fit-tags-to-view">
+                <span *ngFor="let tag of assetTags" class="label tag"
+                      [ngClass]="tag.css">
+                    {{tag.name}}
+                </span>
+        </td>
+    </tr>
+</table>
+

@@ -168,14 +168,6 @@ class Model {
 		}
 	}
 
-	def beforeDelete = {
-		// <SL> moved to ModelService
-		/*withNewSession {
-			executeUpdate('update AssetEntity set model=null where model=?', [this])
-			executeUpdate('delete ModelAlias where model=?', [this])
-		}*/
-	}
-
 	int getNoOfConnectors() {
 		ModelConnector.countByModel(this)
 	}
@@ -269,5 +261,5 @@ class Model {
 		productLine: 'Product Line', modelFamily: 'Model Family', endOfLifeDate: 'End Of Life Date',
 		endOfLifeStatus: 'endOfLifeStatus', modelConnectors: 'No Of Connectors', roomObject: 'roomObject',
 		createdBy: 'Created By', updatedBy: 'Updated By', validatedBy: 'Validated By', dateCreated: 'Date Created',
-		lastModified: 'Last Modified', sourceURL: 'Source URL'].asImmutable()
+		lastModified: 'Last Updated', sourceURL: 'Source URL'].asImmutable()
 }

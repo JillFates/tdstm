@@ -1,7 +1,10 @@
 <div tds-autofocus tds-handle-escape
-     class="modal-content notice-eula-html-content">
+     class="tds-modal-content notice-eula-html-content standard-notices">
     <div class="modal-header">
-        <h4 class="modal-title">{{'NOTICE.NOTICES' | translate }}</h4>
+		<button (click)="onCancel()" type="button" class="close" aria-label="Close">
+			<clr-icon aria-hidden="true" shape="close"></clr-icon>
+		</button>
+       <h4 class="modal-title">{{'NOTICE.NOTICES' | translate }}</h4>
     </div>
     <div class="modal-body">
         <form name="form"

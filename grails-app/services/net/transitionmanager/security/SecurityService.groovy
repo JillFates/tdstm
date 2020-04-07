@@ -53,6 +53,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserCache
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.util.Assert
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -83,6 +84,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	SpringSecurityService    springSecurityService
 	UserPreferenceService    userPreferenceService
 	JdbcTemplate             jdbcTemplate
+	PasswordEncoder          passwordEncoder
 
 	private Map ldapConfigMap
 	private Map loginConfigMap
@@ -931,17 +933,34 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @return true if the period of time between password changes has been met
 	 */
 	boolean verifyPasswordHistory(UserLogin userLogin, String newPassword) {
-		// Check to see if minimum period is a requirement first
+		int passwordHistoryRetentionCount = userLocalConfig.passwordHistoryRetentionCount
+		int passwordHistoryRetentionDays = userLocalConfig.passwordHistoryRetentionDays
+		List<String> passwords
 
-		if (userLocalConfig.passwordHistoryRetentionCount > 0) {
+
+		if (passwordHistoryRetentionCount > 0) {
 			// Check to see if the password was used in the past # passwords
-			return 0 == PasswordHistory.countByUserLoginAndPassword(userLogin, newPassword,  [max: 10, sort: 'createdDate', order: 'desc'])
+			passwords = PasswordHistory.where{
+				userLogin == userLogin
+			}.list([max: passwordHistoryRetentionCount, sort: 'createdDate', order: 'desc'])*.password
+
+			for (String password : passwords) {
+				if (passwordEncoder.matches(newPassword, password)) {
+					return false
+				}
+			}
 		}
 
-		if (userLocalConfig.passwordHistoryRetentionDays > 0) {
+		if (passwordHistoryRetentionDays > 0) {
 			// Check to see if the password was used in the past # of days
-			Date dateSince = new Date() - userLocalConfig.passwordHistoryRetentionDays.intValue()
-			return 0 == PasswordHistory.countByUserLoginAndPasswordAndCreatedDateGreaterThan(userLogin, newPassword, dateSince, [max: 10])
+			Date dateSince = new Date() - passwordHistoryRetentionDays.intValue()
+			passwords = PasswordHistory.where {userLogin == userLogin && createdDate > dateSince}.list()*.password
+
+			for (String password : passwords) {
+				if (passwordEncoder.matches(newPassword, password)) {
+					return false
+				}
+			}
 		}
 
 		return true
@@ -952,28 +971,28 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * and meets the password history requirements otherwise it will thrown an exception.
 	 * If the password is set we should set also the expirity date of the password using calculatePasswordExpiration
 	 * @param userLogin - the UserLogin object to set the password on
-	 * @param unhashedPassword - the cleartext password to set
+	 * @param clearTextPassword - the cleartext password to set
 	 * @throws DomainUpdateException
 	 */
 	@Transactional
-	void setUserLoginPassword(UserLogin userLogin, String unhashedPassword, String confirmPassword, Boolean isNewUser=false) throws DomainUpdateException, InvalidParamException {
+	void setUserLoginPassword(UserLogin userLogin, String clearTextPassword, String confirmPassword, Boolean isNewUser=false) throws DomainUpdateException, InvalidParamException {
 		// Check for password confirmation
-		if (!(unhashedPassword == confirmPassword)) {
+		if (!(clearTextPassword == confirmPassword)) {
 			throw new InvalidParamException('The password and the password confirmation do not match')
 		}
 		// Make sure that the password strength is legitimate
-		if (!validPasswordStrength(userLogin.username, unhashedPassword)) {
+		if (!validPasswordStrength(userLogin.username, clearTextPassword)) {
 			throw new InvalidParamException('The new password does not comply with password requirements')
 		}
 
 		String currentPassword = userLogin.password
-		String hashedPassword = userLogin.applyPassword(unhashedPassword)
+		userLogin.applyPassword(clearTextPassword)
 
-		if (currentPassword == hashedPassword) {
+		if (currentPassword && passwordEncoder.matches(clearTextPassword, currentPassword)) {
 			throw new InvalidParamException('New password must be different from the existing one')
 		}
 
-		if (!isNewUser && !verifyPasswordHistory(userLogin, hashedPassword)) {
+		if (!isNewUser && !verifyPasswordHistory(userLogin, clearTextPassword)) {
 			throw new DomainUpdateException('Please provide a new password that was not previously used')
 		}
 
@@ -1268,10 +1287,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			throw new InvalidParamException("The $dateField field has invalid format")
 		}
 
-		// Try to save the user changes
-		if (!userLogin.save(flush: true, failOnError: false)) {
-			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
-		}
+
 
 		// When enabling user - enable Person
 		// When disable user - do NOT change Person
@@ -1301,11 +1317,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			throw new DomainUpdateException('Unable to update user security roles')
 		}
 
-		//
-		// Set the default project preference for the user
-		//
-		if (!userPreferenceService.setPreference(userLogin, PREF.CURR_PROJ, (String) params.projectId)) {
-			throw new DomainUpdateException('Unable to save selected project')
+		if (params.projectId) {
+			personService.addToProject(byWhom, (String) params.projectId, person.id.toString())
+		}
+
+		// Try to save the user changes
+		if (!userLogin.save(flush: true, failOnError: false)) {
+			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
 		}
 
 		if (isNewUser) {
@@ -1318,8 +1336,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			auditService.saveUserAudit(UserAuditBuilder.newUserLogin(userLogin.username))
 		}
 
-		if (params.projectId) {
-			personService.addToProject(byWhom, (String) params.projectId, person.id.toString())
+		//
+		// Set the default project preference for the user
+		//
+		if (!userPreferenceService.setPreference(userLogin, PREF.CURR_PROJ, (String) params.projectId)) {
+			throw new DomainUpdateException('Unable to save selected project')
 		}
 
 		return userLogin
@@ -1914,9 +1935,9 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		RoleType.executeQuery('''
 			from RoleType
 			where id not in (select roleType.id from PartyRole
-			                 where party=?
+			                 where party=?0
 			                 group by roleType.id)
-			  and (type = ? OR type = ?)
+			  and (type = ?1 OR type = ?2)
 			order by description
 		''', [person, RoleType.TYPE_TEAM, RoleType.TYPE_SECURITY])
 	}

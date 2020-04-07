@@ -12,7 +12,7 @@ import getl.json.JSONDataset
 import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -26,6 +26,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight
 import spock.lang.See
 import spock.lang.Shared
+import spock.lang.Unroll
 
 /**
  * Test about ETLProcessor commands:
@@ -33,9 +34,7 @@ import spock.lang.Shared
  *     <li><b>transform</b></li>
  * </ul>
  */
-
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database])
-class ETLTransformSpec extends ETLBaseSpec {
+class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 
 	@Shared
 	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
@@ -61,20 +60,22 @@ class ETLTransformSpec extends ETLBaseSpec {
 	ETLFieldsValidator applicationFieldsValidator
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-		applicationContextHolder(ApplicationContextHolder) { bean ->
-			bean.factoryMethod = 'getInstance'
+	Closure doWithSpring() {
+		{ ->
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+			}
+			applicationContextHolder(ApplicationContextHolder) { bean ->
+				bean.factoryMethod = 'getInstance'
+			}
 		}
 	}
 
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database
 		csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
 		jsonConnection = new JSONConnection(config: 'json')
 		FileUtils.ValidPath(conParams.path)
@@ -1422,20 +1423,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 	}
 
 	@See('TM-10726')
+	@Unroll
 	void 'test ETLTransformation concat'() {
 		expect: 'concatenation build correctly'
 
-			ETLTransformation.concat(separator, values) == result
+			ETLTransformation.concat(separator, values) == results
 
 		where:
-			separator | values                                  | result
-			''        | ['one', 'two', 'three']                 | 'onetwothree'
-			','       | ['one', 'two', 'three']                 | 'one,two,three'
-			','       | ['one', '', 'three']                    | 'one,three'
-			','       | ['one', '', 'three', true]              | 'one,,three'
-			','       | ['one', null, 'three', true]            | 'one,,three'
-			','       | ['one', 'two', ['three', 'four']]       | 'one,two,three,four'
-			','       | ['one', 'two', ['three', 'four', null]] | 'one,two,three,four'
+			separator | values                                  || results
+			''        | ['one', 'two', 'three']                 || 'onetwothree'
+			','       | ['one', 'two', 'three']                 || 'one,two,three'
+			','       | ['one', '', 'three']                    || 'one,three'
+			','       | ['one', '', 'three', true]              || 'one,,three'
+			','       | ['one', null, 'three', true]            || 'one,,three'
+			','       | ['one', 'two', ['three', 'four']]       || 'one,two,three,four'
+			','       | ['one', 'two', ['three', 'four', null]] || 'one,two,three,four'
 
 	}
 
@@ -1578,7 +1580,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 
 	}
@@ -1671,7 +1673,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 
 	}
@@ -1772,7 +1774,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1838,7 +1840,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1900,7 +1902,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1958,7 +1960,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				getFileSystemServiceTestBean().deleteTemporaryFile(fileName)
 			}
 	}
 }

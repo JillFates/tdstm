@@ -2,21 +2,13 @@ import { GridColumnModel } from '../../../shared/model/data-list-grid.model';
 
 export const taskListColumnsModel: Array<GridColumnModel> = [
 	{
-		label: '',
-		property: 'actionColumn',
-		type: 'action',
-		width: 30,
-		locked: false,
-		sortable: false,
-		headerClass: ['no-sort-header']
-	},
-	{
 		label: 'Task',
 		property: 'taskNumber',
 		type: 'text',
-		width: 80,
+		width: 180,
 		locked: false,
 		filterable: true,
+		cellClass: 'is-grid-link',
 		resizable: true
 	},
 	{
@@ -52,17 +44,16 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Updated',
 		property: 'updatedTime',
 		type: 'text',
-		width: 100,
+		width: 120,
+		filterable: false,
 		locked: false,
-		cellClass: 'task-updated',
-		sortable: false,
 		resizable: true
 	},
 	{
 		label: 'Due Date',
 		property: 'dueDate',
-		type: 'text',
-		width: 100,
+		type: 'date',
+		width: 180,
 		locked: false,
 		filterable: true,
 		resizable: true
@@ -71,7 +62,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Status',
 		property: 'status',
 		type: 'text',
-		width: 80,
+		width: 180,
 		locked: false,
 		cellClass: 'task-status',
 		filterable: true,
@@ -84,8 +75,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		width: 180,
 		locked: false,
 		columnMenu: true,
-		filterable: true,
-		resizable: true
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol3',
@@ -111,7 +101,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Suc.',
 		property: 'successors',
 		type: 'number',
-		width: 80,
+		width: 180,
 		locked: false,
 		resizable: true
 	},
@@ -119,7 +109,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Score',
 		property: 'score',
 		type: 'number',
-		width: 80,
+		width: 180,
 		locked: false,
 		resizable: true
 	},

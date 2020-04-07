@@ -84,7 +84,7 @@ export class AuthService {
 		return this.http.post(AUTH_API_URLS.SIGN_IN, JSON.stringify(params)).pipe(
 			map((result: any) => {
 				if (result.userContext && result.userContext.user) {
-					return {...result.userContext, notices: result.notices};
+					return {...result.userContext, notices: result.notices, csrf: result.csrf};
 				}
 				if (result.error) {
 					return result;

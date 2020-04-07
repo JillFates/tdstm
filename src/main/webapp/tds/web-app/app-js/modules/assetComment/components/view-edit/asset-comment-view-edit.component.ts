@@ -1,56 +1,117 @@
-import {Component, OnInit} from '@angular/core';
+// Angular
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+// Model
 import {AssetCommentModel} from '../../model/asset-comment.model';
 import {ModalType} from '../../../../shared/model/constants';
-import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
+// Service
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {Permission} from '../../../../shared/model/permission.model';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import * as R from 'ramda';
+import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: `asset-comment-view-edit`,
 	templateUrl: 'asset-comment-view-edit.component.html',
-	styles: []
+	styles: [],
 })
-export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnInit {
+export class AssetCommentViewEditComponent extends Dialog implements OnInit {
+	@Input() data: any;
+
+	// Forms
+	@ViewChild('dependentForm', {static: false}) dependentForm: NgForm;
 
 	public modalType = ModalType;
-	public dateFormatTime: string;
+	public userDateTimeFormat: string;
+	public userTimeZone: string;
 	public assetClassOptions: any[];
 	public commentCategories: string[];
+	public assetCommentModel: AssetCommentModel;
 	private dataSignature: string;
 
 	constructor(
-		private translate: TranslatePipe,
-		public assetCommentModel: AssetCommentModel,
+		private dialogService: DialogService,
 		public userPreferenceService: PreferenceService,
 		public taskManagerService: TaskService,
 		public assetExplorerService: AssetExplorerService,
 		private translatePipe: TranslatePipe,
-		public promptService: UIPromptService,
-		private permissionService: PermissionService) {
-		super('#asset-comment-view-edit-component');
+		private permissionService: PermissionService
+	) {
+		super();
 	}
 
 	ngOnInit(): void {
-		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
+		this.assetCommentModel = R.clone(this.data.assetCommentModel);
+
+		this.buttons.push({
+			name: 'edit',
+			icon: 'pencil',
+			show: () => (this.assetCommentModel.modal.type === this.modalType.VIEW || this.assetCommentModel.modal.type === this.modalType.EDIT) && this.isCommentEditAvailable(),
+			active: () => this.assetCommentModel.modal.type === this.modalType.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.onEdit.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'save',
+			icon: 'floppy',
+			show: () => this.assetCommentModel.modal.type !== this.modalType.VIEW,
+			disabled: () => !this.dependentForm.dirty || !this.dependentForm.valid,
+			type: DialogButtonType.ACTION,
+			action: this.onSave.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.isCommentDeleteAvailable() && this.assetCommentModel.modal.type !== this.modalType.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.onDelete.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => this.assetCommentModel.modal.type === this.modalType.VIEW || this.assetCommentModel.modal.type === this.modalType.CREATE,
+			type: DialogButtonType.ACTION,
+			action: this.closeDialog.bind(this)
+		});
+
+		this.buttons.push({
+			name: 'cancel',
+			icon: 'ban',
+			show: () => this.assetCommentModel.modal.type === this.modalType.EDIT,
+			type: DialogButtonType.ACTION,
+			action: this.closeDialog.bind(this)
+		});
+
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+		this.userDateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
 		// ModalType.VIEW doesn't need the categories,
 		// in fact we need not to load them in that case for permission issues
 		if (this.assetCommentModel.modal.type !== ModalType.VIEW) {
 			this.loadCommentCategories();
 		}
+
+		setTimeout(() => {
+			this.setTitle(this.getModalTitle(this.assetCommentModel.modal.type));
+		});
 	}
 
 	/**
 	 * Load All Comment Categories
 	 */
 	private loadCommentCategories(): void {
-		this.taskManagerService.getAssetCommentCategories().subscribe((res) => {
+		this.taskManagerService.getAssetCommentCategories().subscribe(res => {
 			this.commentCategories = res;
-			if (!this.assetCommentModel.category || this.assetCommentModel.category === null) {
+			if (
+				!this.assetCommentModel.category ||
+				this.assetCommentModel.category === null
+			) {
 				this.assetCommentModel.category = this.commentCategories[0];
 			}
 			this.dataSignature = JSON.stringify(this.getModelFields());
@@ -62,7 +123,8 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.getModelFields());
+		return this.assetCommentModel.modal.type === ModalType.VIEW ?
+			false : this.dataSignature !== JSON.stringify(this.getModelFields());
 	}
 
 	/**
@@ -70,66 +132,76 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 */
 	protected onEdit(): void {
 		this.assetCommentModel.modal.type = ModalType.EDIT;
+		this.setTitle(this.getModalTitle(this.assetCommentModel.modal.type));
 		this.loadCommentCategories();
 	}
 
 	protected onSave(): void {
-		this.taskManagerService.saveComment(this.assetCommentModel).subscribe((res) => {
-			this.close();
-		});
+		this.taskManagerService
+			.saveComment(this.assetCommentModel)
+			.subscribe(res => {
+				super.onCancelClose();
+			});
 	}
 
 	/**
 	 * Get only the fields relevants to the model
 	 */
 	getModelFields(): any {
-		const {id, archive, comment, category, assetClass, asset} = this.assetCommentModel;
+		const {
+			id,
+			archive,
+			comment,
+			category,
+			assetClass,
+			asset,
+		} = this.assetCommentModel;
 
-		return {id, archive, comment, category, assetClass, asset};
+		return { id, archive, comment, category, assetClass, asset };
 	}
 
 	/**
 	 * Delete the Asset Comment
 	 */
 	protected onDelete(): void {
-		this.promptService.open(
-			'Confirmation Required',
-			'Confirm deletion of this record. There is no undo for this action?',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
-					this.taskManagerService.deleteTaskComment(this.assetCommentModel.id).subscribe((res) => {
-						this.close();
-					});
+		this.dialogService.confirm(
+			this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+			),
+			'Confirm deletion of this record. There is no undo for this action.'
+		)
+			.subscribe((data: any) => {
+				if (data.confirm === DialogConfirmAction.CONFIRM) {
+					this.taskManagerService
+						.deleteTaskComment(this.assetCommentModel.id)
+						.subscribe(res => {
+							super.onCancelClose();
+						});
 				}
-			})
-			.catch((error) => console.log(error));
+			});
 	}
 
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	public cancelDialog(): void {
-		if (this.isDirty()) {
-			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
-			)
-				.then(confirm => {
-					if (confirm) {
-						this.dismiss();
-					}
-				})
-				.catch((error) => console.log(error));
-		} else {
-			this.dismiss();
-		}
-	}
-
 	public closeDialog(): void {
-		this.dismiss();
+		if (this.isDirty()) {
+			this.dialogService.confirm(
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				),
+				this.translatePipe.transform(
+					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
+				)
+			)
+				.subscribe((data: any) => {
+					if (data.confirm === DialogConfirmAction.CONFIRM) {
+						super.onCancelClose();
+					}
+				});
+		} else {
+			super.onCancelClose();
+		}
 	}
 
 	/**
@@ -138,19 +210,20 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 * @returns {string}
 	 */
 	getModalTitle(modalType: ModalType): string {
+		let title = '';
 		if (modalType === ModalType.EDIT) {
-			return this.translate.transform('COMMENT.EDIT_COMMENT');
+			title = this.translatePipe.transform('COMMENT.EDIT_COMMENT');
 		}
 
 		if (modalType === ModalType.CREATE) {
-			return this.translate.transform('COMMENT.CREATE_COMMENT');
+			title = this.translatePipe.transform('COMMENT.CREATE_COMMENT');
 		}
 
 		if (modalType === ModalType.VIEW) {
-			return this.translate.transform('COMMENT.SHOW_COMMENT');
+			title = this.translatePipe.transform('COMMENT.SHOW_COMMENT');
 		}
 
-		return '';
+		return title;
 	}
 
 	protected isCommentEditAvailable(): boolean {
@@ -159,5 +232,12 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 
 	protected isCommentDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.CommentDelete);
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.closeDialog();
 	}
 }

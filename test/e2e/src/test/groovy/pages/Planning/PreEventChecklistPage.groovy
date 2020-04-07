@@ -12,9 +12,9 @@ class PreEventChecklistPage extends Page {
     }
 
     static content = {
-        preEventPageTitle { $("section", class:"content-header").find("h1")}
+        preEventPageTitle { $("section", class:"content-header").find("h2")}
         planningModule { module PlanningMenuModule}
-        preEventChecklistPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
+        preEventChecklistPageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
     }
 
 

@@ -3,7 +3,7 @@ package com.tdsops.etl
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -21,8 +21,7 @@ import spock.lang.See
 /**
  * Test about ETLProcessorResults and JSON transformation:
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model])
-class ETLResultsSpec extends ETLBaseSpec {
+class ETLResultsSpec extends ETLBaseSpec implements DataTest {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
@@ -33,20 +32,22 @@ class ETLResultsSpec extends ETLBaseSpec {
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
         }
-	}
+    }
 
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model
 		String.mixin StringAppendElement
 	}
 
@@ -202,7 +203,6 @@ class ETLResultsSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
-
 }

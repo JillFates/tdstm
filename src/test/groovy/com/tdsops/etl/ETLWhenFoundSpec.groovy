@@ -3,7 +3,7 @@ package com.tdsops.etl
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -26,9 +26,7 @@ import spock.util.mop.ConfineMetaClassChanges
  *     <li><b>whenNotFound</b></li>
  * </ul>
  */
-
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model, AssetOptions, Room])
-class ETLWhenFoundSpec extends ETLBaseSpec {
+class ETLWhenFoundSpec extends ETLBaseSpec implements DataTest {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
@@ -37,20 +35,22 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
         }
-	}
+    }
 
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model, AssetOptions, Room
 		String.mixin StringAppendElement
 	}
 
@@ -204,7 +204,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -285,7 +285,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -365,7 +365,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -478,7 +478,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -553,7 +553,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 		cleanup:
 			if(fileName){
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -597,7 +597,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 
 	    cleanup:
 		    if (fileName) {
-			    fileSystemService.deleteTemporaryFile(fileName)
+			    fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 		    }
     }
 

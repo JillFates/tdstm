@@ -1,164 +1,184 @@
-<div class="modal fade in asset-dependency-component" id="assetDependency" data-backdrop="static" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title">{{(!isEditing ? 'ASSET_EXPLORER.DEPENDENCY_DETAIL' : 'ASSET_EXPLORER.DEPENDENCY_EDIT')|translate}}</h4>
-            </div>
-            <div class="modal-body comment-dialog-content">
-                <table class="table table-striped" style="border: 0px; margin-bottom: 0px;">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Class</th>
-                            <th>Environment</th>
-                            <th>Bundle</th>
-                            <th>Plan Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{assetDependency?.assetA?.name}}</td>
-                            <td>{{assetDependency?.assetA?.assetClass}}</td>
-                            <td>{{assetDependency?.assetA?.environment}}</td>
-                            <td>{{assetDependency?.assetA?.bundle}}</td>
-                            <td>{{assetDependency?.assetA?.planStatus}}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" class="lbl-asset-dependency-direction">
-                                <span *ngIf="dependencyA?.id && !dependencyB?.id">
-                                    <i class="fa fa-fw fa-long-arrow-down"></i> Depends On</span>
-                                <span *ngIf="dependencyA?.id && dependencyB?.id">
-                                    <i class="fa fa-fw fa-arrows-v"></i> Bi-Directional Dependencies</span>
-                                <span *ngIf="!dependencyA?.id && !dependencyB?.id" class="error">
-                                    <span class="glyphicon glyphicon-remove"></span> Dependency was not found.</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{{assetDependency?.assetB?.name}}</td>
-                            <td>{{assetDependency?.assetB?.assetClass}}</td>
-                            <td>{{assetDependency?.assetB?.environment}}</td>
-                            <td>{{assetDependency?.assetB?.bundle}}</td>
-                            <td>{{assetDependency?.assetB?.planStatus}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+<div
+	class="asset-dependency-component"
+	tds-handle-escape (escPressed)="cancelCloseDialog()"
+	[ngClass]="{
+		'dependency-show': !isEditing,
+		'dependency-edit': isEditing,
+		'uni-directional': !(dependencyA?.id && dependencyB?.id),
+		'bi-directional': dependencyA?.id && dependencyB?.id
+	}" id="assetDependency">
 
-                <div class="dependencies"
-                     [ngClass]="{'has-dependency-a': dependencyA, 'has-dependency-b': dependencyB}"
-                     *ngIf="dependencyA?.id || dependencyB?.id">
-                    <div class="dependency-row has-both-dependencies" 
-                        *ngIf="dependencyA?.id && dependencyB?.id">
+	<div class="comment-dialog-content">
+		<div class="tds-table">
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Class</th>
+						<th>Environment</th>
+						<th>Bundle</th>
+						<th>Plan Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{{ assetDependency?.assetA?.name }}</td>
+						<td>
+							{{ assetDependency?.assetA?.assetClass }}
+						</td>
+						<td>
+							{{ assetDependency?.assetA?.environment }}
+						</td>
+						<td>{{ assetDependency?.assetA?.bundle }}</td>
+						<td>
+							{{ assetDependency?.assetA?.planStatus }}
+						</td>
+					</tr>
+					<tr>
+						<td
+							style="border-width: 1px;"
+							colspan="5"
+							class="lbl-asset-dependency-direction"
+						>
+							<span
+								*ngIf="
+									dependencyA?.id && !dependencyB?.id
+								"
+							>
+								<i
+									class="fa fa-fw fa-long-arrow-down"
+								></i>
+								Depends On</span
+							>
+							<span
+								*ngIf="
+									dependencyA?.id && dependencyB?.id
+								"
+							>
+								<i class="fa fa-fw fa-arrows-v"></i>
+								Bi-Directional Dependencies</span
+							>
+							<span
+								*ngIf="
+									!dependencyA?.id && !dependencyB?.id
+								"
+								class="error"
+							>
+								<span
+									class="glyphicon glyphicon-remove"
+								></span>
+								Dependency was not found.</span
+							>
+						</td>
+					</tr>
+					<tr>
+						<td>{{ assetDependency?.assetB?.name }}</td>
+						<td>
+							{{ assetDependency?.assetB?.assetClass }}
+						</td>
+						<td>
+							{{ assetDependency?.assetB?.environment }}
+						</td>
+						<td>{{ assetDependency?.assetB?.bundle }}</td>
+						<td>
+							{{ assetDependency?.assetB?.planStatus }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-                        <div class="dependency-row-legend"></div>
+		<div
+			class="dependencies"
+			*ngIf="dependencyA?.id || dependencyB?.id"
+		>
+			<div
+				class="dependency-row has-both-dependencies"
+				*ngIf="dependencyA?.id && dependencyB?.id"
+			>
+				<div class="dependency-a" style="grid-column-start: 2;">
+					{{ assetDependency.assetA.name }} <br />
+					<i class="fa fa-fw fa-long-arrow-down"></i>
+					<span class="depends-on">Depends On</span><br />
+					{{ assetDependency.assetB.name }}
+				</div>
+				<div class="dependency-b" style="grid-column-start: 3;">
+					{{ assetDependency.assetB.name }} <br />
+					<i class="fa fa-fw fa-long-arrow-down"></i>
+					<span class="depends-on">Depends On</span><br />
+					{{ assetDependency.assetA.name }}
+				</div>
+			</div>
 
-                        <div>
-                            {{assetDependency.assetA.name}} <br />
-                            <i class="fa fa-fw fa-long-arrow-down"></i> <span class="depends-on">Depends On</span><br />
-                            {{assetDependency.assetB.name}}
-                        </div>
-                        <div>
-                            {{assetDependency.assetB.name}} <br />
-                            <i class="fa fa-fw fa-long-arrow-down"></i> <span class="depends-on">Depends On</span><br />
-                            {{assetDependency.assetA.name}}
-                        </div>
-                    </div>
+			<asset-dependency-show
+				*ngIf="!isEditing; else editDependenciesTemplate"
+				(deleteDependency)="onDeleteDependency($event)"
+				[dependencyA]="dependencyA"
+				[dependencyB]="dependencyB"
+			>
+			</asset-dependency-show>
 
-	                <asset-dependency-show
-			                *ngIf="!isEditing; else editDependenciesTemplate"
-                            (deleteDependency)="onDeleteDependency($event)"
-                            [dependencyA]="dependencyA"
-                            [dependencyB]="dependencyB">
-                    </asset-dependency-show>
+			<ng-template #editDependenciesTemplate>
+				<asset-dependency-edit
+					[dependencyA]="dependencyA"
+					[dependencyB]="dependencyB"
+					[frequencyList]="frequencyList"
+					[statusList]="statusList"
+					[typeList]="typeList"
+					[directionList]="directionList"
+					(change)="onChangeDependencies($event)"
+				></asset-dependency-edit>
+			</ng-template>
+		</div>
 
-                    <ng-template #editDependenciesTemplate>
-                        <asset-dependency-edit
-                                [dependencyA]="dependencyA"
-                                [dependencyB]="dependencyB"
-                                [frequencyList]="frequencyList"
-                                [statusList]="statusList"
-                                [typeList]="typeList"
-                                [directionList]="directionList"
-                                (change)="onChangeDependencies($event)"
-                        ></asset-dependency-edit>
-                    </ng-template>
+		<div
+			class="dependencies"
+			*ngIf="dependencyA?.id || dependencyB?.id"
+		>
+			<div class="dependency-row">
+				<div class="dependency-row-legend">Created by</div>
+				<div class="dependency-a">
+					<label
+						class="dependency-label created-dates"
+						*ngIf="dependencyA && dependencyA.createdBy"
+					>
+						{{ getPersonName(dependencyA.createdBy) }} at
+						{{ dependencyA?.dateCreated }}
+					</label>
+				</div>
+				<div class="dependency-b">
+					<label
+						class="dependency-label created-dates"
+						*ngIf="dependencyB && dependencyB.createdBy"
+					>
+						{{ getPersonName(dependencyB.createdBy) }} at
+						{{ dependencyB?.dateCreated }}
+					</label>
+				</div>
+			</div>
 
-                </div>
+			<div class="dependency-row">
+				<div class="dependency-row-legend">Updated by</div>
+				<div class="dependency-a">
+					<label
+						class="dependency-label updated-dates"
+						*ngIf="dependencyA && dependencyA.updatedBy"
+					>
+						{{ getPersonName(dependencyA.updatedBy) }} at
+						{{ dependencyA?.lastUpdated }}
+					</label>
+				</div>
+				<div class="dependency-b">
+					<label
+						class="dependency-label updated-dates"
+						*ngIf="dependencyB && dependencyB.updatedBy"
+					>
+						{{ getPersonName(dependencyB.updatedBy) }} at
+						{{ dependencyB?.lastUpdated }}
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
 
-	            <div class="dependencies"
-                     [ngClass]="{'has-dependency-a': dependencyA, 'has-dependency-b': dependencyB}">
-
-                    <div class="dependency-row">
-                        <div class="dependency-row-legend">Created by</div>
-                        <div class="dependency-a">
-                            <label class="dependency-label created-dates" *ngIf="dependencyA && dependencyA.createdBy">
-                            {{getPersonName(dependencyA.createdBy)}} at {{dependencyA?.dateCreated}}
-                            </label></div>
-                        <div class="dependency-b">
-                            <label class="dependency-label created-dates" *ngIf="dependencyB && dependencyB.createdBy">
-                                {{getPersonName(dependencyB.createdBy)}} at {{dependencyB?.dateCreated}}
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="dependency-row">
-                        <div class="dependency-row-legend">Updated by</div>
-                        <div class="dependency-a">
-                            <label class="dependency-label updated-dates" *ngIf="dependencyA && dependencyA.updatedBy">
-                                {{getPersonName(dependencyA.updatedBy)}} at {{dependencyA?.lastUpdated}}
-                            </label>
-                        </div>
-                        <div class="dependency-b">
-                            <label class="dependency-label updated-dates" *ngIf="dependencyB && dependencyB.updatedBy">
-                                {{getPersonName(dependencyB.updatedBy)}} at {{dependencyB?.lastUpdated}}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer form-group-center">
-                <div *ngIf="!isEditing; else buttonsEditModeTemplate">
-                    <div class="pull-left">
-                        <tds-button-edit
-                                [disabled]="!isEditAvailable()"
-                                class="btn-primary"
-                                tooltip="Edit dependencies"
-                                (click)="setEditMode(true)">
-                        </tds-button-edit>
-                    </div>
-
-                    <tds-button-delete  *ngIf="dependencyA && !dependencyB"
-                                        [disabled]="!isDeleteAvailable()"
-                                        class="btn-danger"
-                                        (click)="onDeleteDependency(DependencyType.dependencyA)"
-                                        tooltip="Delete dependency">
-                    </tds-button-delete>
-
-	                <div class="pull-right">
-                        <tds-button-close tooltip="Close" (click)="cancelCloseDialog()">
-                        </tds-button-close>
-                    </div>
-
-                </div>
-
-	            <ng-template #buttonsEditModeTemplate>
-                    <tds-button-save
-                            [disabled]="!editedDependencies.dependencies"
-                            class="btn-primary pull-left"
-                            tooltip="Save changes"
-                            (click)="saveChanges()">
-                    </tds-button-save>
-
-                    <tds-button-cancel
-                            tooltip="Cancel editing"
-                            class="pull-right"
-                            (click)="cancelEdit(false)">
-                    </tds-button-cancel>
-
-                </ng-template>
-            </div>
-        </div>
-    </div>
 </div>

@@ -2,7 +2,7 @@ package com.tdsops.etl
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -28,29 +28,29 @@ import spock.util.mop.ConfineMetaClassChanges
  *     <li><b>lookup</b></li>
  * </ul>
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
-class ETLLookupSpec extends ETLBaseSpec {
-
+class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
         }
-	}
+    }
 
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions
 		String.mixin StringAppendElement
 	}
 
@@ -101,7 +101,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'unknown').message
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used LOOKUP found to check results'() {
@@ -185,7 +185,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@Issue("https://support.transitionmanager.com/browse/TM-10625")
@@ -245,7 +245,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used LOOKUP notFound to check results'() {
@@ -324,7 +324,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test that when the lookup finds previous results that the current result is the earlier one'() {
@@ -407,7 +407,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test lookup with multiple criteria'() {
@@ -477,7 +477,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used !LOOKUP to check results'() {
@@ -555,7 +555,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-15257')
@@ -633,7 +633,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('found=true') == 1
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([Application])
@@ -747,7 +747,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test the ETLProcessorResult lookupInReference method'() {

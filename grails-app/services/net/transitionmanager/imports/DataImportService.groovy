@@ -44,6 +44,8 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.tag.TagService
@@ -346,27 +348,26 @@ class DataImportService implements ServiceMethods, EventPublisher {
 
 		DataScript dataScript = GormUtil.findInProject(importContext.project, DataScript, importContext.etlInfo.dataScriptId)
 
-		ImportBatch batch = new ImportBatch(
-			project: importContext.project,
-			status: importContext.status,
-			groupGuid: importContext.guid,
-			queuedAt: new Date(),
-			queuedBy: importContext.userLogin.username,
-			sendNotification: importContext.sendResultsByEmail,
-			dataScript: dataScript,
-			provider: dataScript?.provider,
-			domainClassName: importContext.domainClass,
-			createdBy: importContext.userLogin.person,
-			autoProcess: (importContext.etlInfo.autoProcess ?: 0),
-			dateFormat: (importContext.etlInfo.dataFormat ?: ''),
-			fieldNameList: JsonUtil.toJson(importContext.fieldNames),
-			fieldLabelMap: JsonUtil.toJson(importContext.fieldLabelMap),
-			nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
-			originalFilename: (importContext.etlInfo.originalFilename ?: ''),
-			overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
-			timezone: (importContext.etlInfo.timezone ?: 'GMT'),
-			warnOnChangesAfter: warnOnChangesAfter
-		)
+		ImportBatch batch = new ImportBatch()
+		batch.project = importContext.project
+		batch.status = importContext.status
+        batch.groupGuid = importContext.guid
+        batch.queuedAt = new Date()
+        batch.queuedBy = importContext.userLogin.username
+        batch.sendNotification = importContext.sendResultsByEmail
+		batch.dataScript = dataScript
+		batch.provider = dataScript?.provider
+		batch.domainClassName = importContext.domainClass
+		batch.createdBy = importContext.userLogin.person
+		batch.autoProcess = (importContext.etlInfo.autoProcess ?: 0)
+		batch.dateFormat = (importContext.etlInfo.dataFormat ?: '')
+		batch.fieldNameList = JsonUtil.toJson(importContext.fieldNames)
+		batch.fieldLabelMap = JsonUtil.toJson(importContext.fieldLabelMap)
+		batch.nullIndicator = (importContext.etlInfo.nullIndicator ?: '')
+		batch.originalFilename = (importContext.etlInfo.originalFilename ?: '')
+		batch.overwriteWithBlanks = (importContext.etlInfo.overwriteWithBlanks ?: 1)
+		batch.timezone = (importContext.etlInfo.timezone ?: 'GMT')
+		batch.warnOnChangesAfter = warnOnChangesAfter
 
 		// Check if the transfer batch is valid, report the error if not.
 		if (!batch.save(failOnError: false)) {
@@ -1389,7 +1390,15 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				// TODO : JPM 6/2018 : Concern -- may have or not a newValue or find results -- this logic won't always error
 				// Object refObjectOrErrorMsg = findDomainReferenceProperty(domain, fieldName, newValue, fieldsInfo, context)
 				Class refDomain = GormUtil.getDomainPropertyType(domainClass, fieldName)
+
+
 				valueToSet = SearchQueryHelper.findEntityByMetaData(fieldName, fieldsInfo, context, domain)
+
+				//TM-16914 fixes an issue where the value already exists in this session, and the valueToSet becomes detached.
+				if(!valueToSet.isAttached() && valueToSet.id == existingValue.id){
+					valueToSet = existingValue
+				}
+
 				recordAnySearchQueryHelperErrors(fieldName, fieldsInfo, context)
 				log.debug 'bindFieldsInfoValuesToEntity() {} {} {} {}',
 					fieldName, refDomain.getName(), (valueToSet ? valueToSet.getClass().getName() : null), valueToSet

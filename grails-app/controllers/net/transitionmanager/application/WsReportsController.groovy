@@ -1,28 +1,20 @@
 package net.transitionmanager.application
 
-import com.tdsops.common.security.spring.HasPermission
+
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
-import net.transitionmanager.asset.Room
 import net.transitionmanager.command.ApplicationMigrationCommand
-import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.command.reports.ApplicationConflictsCommand
 import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.ServiceException
-import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
@@ -33,7 +25,6 @@ import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
-import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
 
 @Secured("isAuthenticated()")
@@ -216,7 +207,7 @@ class WsReportsController implements ControllerMethods {
      */
     def generateApplicationMigration(Long moveBundleId) {
         Project project = getProjectForWs()
-        ApplicationMigrationCommand command = populateCommandObject(ApplicationMigrationCommand)
+        ApplicationMigrationCommand command = populateCommandObject(ApplicationMigrationCommand, false)
         Map applicationMigrationMap = reportsService.generateApplicationMigration(project, command)
         render(view: "/reports/generateApplicationMigration" , model: applicationMigrationMap)
     }
@@ -255,7 +246,7 @@ class WsReportsController implements ControllerMethods {
      */
     def getApplicationConflicts() {
         Project project = getProjectForWs()
-        ApplicationConflictsCommand command = populateCommandObject(ApplicationConflictsCommand)
+        ApplicationConflictsCommand command = populateCommandObject(ApplicationConflictsCommand, false)
         boolean useForPlanning = command.moveBundle == 'useForPlanning'
         if (command.moveBundle && command.moveBundle != 'useForPlanning') {
             Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
@@ -276,7 +267,7 @@ class WsReportsController implements ControllerMethods {
      */
     def getDatabaseConflicts() {
         Project project = getProjectForWs()
-        DatabaseConflictsCommand command = populateCommandObject(DatabaseConflictsCommand)
+        DatabaseConflictsCommand command = populateCommandObject(DatabaseConflictsCommand, false)
         if (command.moveBundle.isNumber()) {
             MoveBundle moveBundle = fetchDomain(MoveBundle, [id: command.moveBundle], project)
             if (moveBundle) {
@@ -295,7 +286,7 @@ class WsReportsController implements ControllerMethods {
      */
     def generateApplicationProfiles() {
         Project project = getProjectForWs()
-        ApplicationProfilesCommand command = populateCommandObject(ApplicationProfilesCommand)
+        ApplicationProfilesCommand command = populateCommandObject(ApplicationProfilesCommand, false)
         Map model = reportsService.generateApplicationProfiles(project, command)
         render(view: "/reports/generateApplicationProfiles" , model: model)
     }
@@ -326,7 +317,7 @@ class WsReportsController implements ControllerMethods {
      * @returns The rendered gsp view.
      */
     def generateProjectMetrics() {
-        ActivityMetricsCommand command = populateCommandObject(ActivityMetricsCommand)
+        ActivityMetricsCommand command = populateCommandObject(ActivityMetricsCommand, false)
         reportsService.generateProjectActivityMetrics(command, response)
     }
 }

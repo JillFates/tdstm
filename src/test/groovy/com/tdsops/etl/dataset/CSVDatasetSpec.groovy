@@ -1,37 +1,39 @@
 package com.tdsops.etl.dataset
 
 import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.etl.*
+import com.tdsops.etl.DebugConsole
+import com.tdsops.etl.DomainResult
+import com.tdsops.etl.ETLBaseSpec
+import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLFieldsValidator
+import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.Element
 import com.tdsops.tm.enums.domain.ImportOperationEnum
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
-import net.transitionmanager.asset.AssetEntity
+import grails.testing.gorm.DataTest
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.project.Project
 import spock.lang.See
 
-@TestMixin(ControllerUnitTestMixin)
-@Mock([AssetEntity])
-class CSVDatasetSpec extends ETLBaseSpec {
-
-    static doWithSpring = {
-        coreService(CoreService) {
-            grailsApplication = ref('grailsApplication')
-        }
-        fileSystemService(FileSystemService) {
-            coreService = ref('coreService')
-            transactionManager = ref('transactionManager')
-        }
-        applicationContextHolder(ApplicationContextHolder) { bean ->
-            bean.factoryMethod = 'getInstance'
-        }
-    }
+class CSVDatasetSpec extends ETLBaseSpec implements DataTest {
 
     DebugConsole debugConsole
     Project GMDEMO
     ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
     def setup() {
         GMDEMO = Mock(Project)
@@ -81,7 +83,7 @@ class CSVDatasetSpec extends ETLBaseSpec {
 
         cleanup:
             if (fileName) {
-                fileSystemService.deleteTemporaryFile(fileName)
+                fileSystemServiceTestBean.deleteTemporaryFile(fileName)
             }
     }
 
@@ -129,7 +131,7 @@ class CSVDatasetSpec extends ETLBaseSpec {
 
         cleanup:
             if (fileName) {
-                fileSystemService.deleteTemporaryFile(fileName)
+                fileSystemServiceTestBean.deleteTemporaryFile(fileName)
             }
     }
 
@@ -169,7 +171,7 @@ class CSVDatasetSpec extends ETLBaseSpec {
 
         cleanup:
             if (fileName) {
-                fileSystemService.deleteTemporaryFile(fileName)
+                fileSystemServiceTestBean.deleteTemporaryFile(fileName)
             }
     }
 
@@ -209,7 +211,7 @@ class CSVDatasetSpec extends ETLBaseSpec {
 
         cleanup:
             if (fileName) {
-                fileSystemService.deleteTemporaryFile(fileName)
+                fileSystemServiceTestBean.deleteTemporaryFile(fileName)
             }
     }
 

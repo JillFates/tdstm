@@ -702,9 +702,9 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		if (assetEntity.model) {
 			// Set to connectors to blank if associated
 			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='$AssetCableStatus.UNKNOWN',assetTo=null,
-				assetToPort=null where assetTo = ? """,[assetEntity])
+				assetToPort=null where assetTo = ?0 """,[assetEntity])
 			// Delete AssetCableMap for this asset
-			AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?",[assetEntity])
+			AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?0",[assetEntity])
 			// Create new connectors
 			def assetConnectors = ModelConnector.findAllByModel(assetEntity.model)
 			assetConnectors.each {

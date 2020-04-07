@@ -13,7 +13,7 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import utils.CommonActions
 
-import geb.driver.CachingDriverFactory
+// import geb.driver.CachingDriverFactory
 
 @Stepwise
 class CreateEventNoBundleSpec extends GebReportingSpec {
@@ -29,7 +29,7 @@ class CreateEventNoBundleSpec extends GebReportingSpec {
     static maxNumberOfBundles = 1
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        // CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

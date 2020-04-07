@@ -134,7 +134,7 @@ class PlanningDashboardData {
 		return [
 			movedAppPerc: percentageMetrics.movedAppPerc,
 			movedServerPerc: percentageMetrics.serversCompletedPercentage,
-			moveEventList: moveEventList,
+			moveEventList: moveEventList*.toMap(),
 			openTasks: moveEventMetrics.metrics['openTasks'],
 			unassignedAppCount: basicMetrics.unassignedApplicationCount,
 			unassignedAppPerc: percentageMetrics.unassignedAppPerc,

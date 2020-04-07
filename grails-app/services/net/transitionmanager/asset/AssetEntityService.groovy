@@ -1111,7 +1111,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	List getDependentAssets(asset) {
 		if (asset?.id) {
-			AssetDependency.executeQuery('FROM AssetDependency WHERE asset=? ' +
+			AssetDependency.executeQuery('FROM AssetDependency WHERE asset=?0 ' +
 			                             'ORDER BY dependent.assetType, dependent.assetName', [asset])
 		}
 	}
@@ -1123,7 +1123,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	List<AssetDependency> getSupportingAssets(AssetEntity asset) {
 		if (asset?.id) {
-			AssetDependency.executeQuery('FROM AssetDependency WHERE dependent=? ' +
+			AssetDependency.executeQuery('FROM AssetDependency WHERE dependent=?0 ' +
 			                             'ORDER BY asset.assetType, asset.assetName', [asset])
 		}
 	}
@@ -1428,7 +1428,7 @@ class AssetEntityService implements ServiceMethods {
 		def assetComment
 		// TODO : JPM 7/2017 : getCommonModelForShows - determine what this AssetComment logic is doing as it looks obsolete
 		if (AssetComment.executeQuery('select count(*) from AssetComment ' +
-			'where assetEntity=? and commentType=? and dateResolved=?',
+			'where assetEntity=?0 and commentType=?1 and dateResolved=?2',
 			[assetEntity, 'issue', null])[0])
 		{
 			assetComment = "issue"
@@ -1462,7 +1462,8 @@ class AssetEntityService implements ServiceMethods {
             assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
         }
 
-		[   assetId: assetEntity?.id,
+		[
+			assetId: assetEntity?.id,
 		    assetComment: assetComment,
 		    assetCommentList: assetCommentList,
 		    dateFormat: userPreferenceService.getDateFormat(),
@@ -1477,8 +1478,6 @@ class AssetEntityService implements ServiceMethods {
 			supportAssets: supportAssets,
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
-			hasCreateTaskPermission: securityService.hasPermission(Permission.TaskCreate),
-			hasTaskManagerViewPermission: securityService.hasPermission(Permission.TaskManagerView),
 			customs: customFields,
 			dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.dateCreated, formatter),
 			lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),
@@ -1803,9 +1802,9 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	def updateCablingOfAssets(modelAssetsList) {
 		modelAssetsList.each { assetEntity ->
-			AssetCableMap.executeUpdate("Update AssetCableMap set cableStatus=?, assetTo=null, assetToPort=null where assetTo=?",[AssetCableStatus.UNKNOWN, assetEntity])
+			AssetCableMap.executeUpdate("Update AssetCableMap set cableStatus=?0, assetTo=null, assetToPort=null where assetTo=?1",[AssetCableStatus.UNKNOWN, assetEntity])
 
-			AssetCableMap.executeUpdate("Delete AssetCableMap where assetFrom=?",[assetEntity])
+			AssetCableMap.executeUpdate("Delete AssetCableMap where assetFrom=?0",[assetEntity])
 
 			assetEntityAttributeLoaderService.createModelConnectors(assetEntity)
 		}
@@ -2011,7 +2010,7 @@ class AssetEntityService implements ServiceMethods {
 								if (previousCable !=assetCable) {
 									// Release the connection from other port to connect with FromPorts
 									AssetCableMap.executeUpdate("""Update AssetCableMap set assetTo=null,assetToPort=null, cableColor=null
-										where assetTo = ? and assetToPort = ? """,[toAsset, toConnector])
+										where assetTo = ?0 and assetToPort = ?1 """,[toAsset, toConnector])
 								}
 								assetCable.assetToPort = toConnector
 							}
@@ -2077,7 +2076,7 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	List<Manufacturer> getManufacturers(assetType) {
-		return Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+		return Model.findAll("From Model where assetType = ?0 group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 	}
 
 	/**
@@ -2103,7 +2102,7 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	def getRooms(Project project) {
-		Room.executeQuery('FROM Room WHERE project=? order by location, roomName', [project])
+		Room.executeQuery('FROM Room WHERE project=?0 order by location, roomName', [project])
 	}
 
 	/**
@@ -2661,6 +2660,7 @@ class AssetEntityService implements ServiceMethods {
 		def manufacturer
 		def result = []
 		List words = []
+		int index = 0
 
 		def manuId = NumberUtil.toLong(manufacturerId)
 		if (manuId) {
@@ -2674,13 +2674,15 @@ class AssetEntityService implements ServiceMethods {
 		StringBuilder where = new StringBuilder()
 
 		if (manufacturer) {
-			SqlUtil.appendToWhere(where, "m.manufacturer=?", 'AND')
+			SqlUtil.appendToWhere(where, "m.manufacturer=?$index", 'AND')
 			params << manufacturer
+			index++
 		}
 
 		if (StringUtils.isNotBlank(assetType)) {
-			SqlUtil.appendToWhere(where, "m.assetType=?", 'AND')
+			SqlUtil.appendToWhere(where, "m.assetType=?$index", 'AND')
 			params << assetType
+			index++
 		}
 
 		if (StringUtils.isNotBlank(term)) {
@@ -2690,16 +2692,16 @@ class AssetEntityService implements ServiceMethods {
 
 			if (!manufacturer) {
 				SqlUtil.appendToWhere(where, 'm.manufacturer.id = man.id', 'AND')
-				SqlUtil.appendToWhere(search, SqlUtil.matchWords('man.name', words, false, false), 'OR')
+				SqlUtil.appendToWhere(search, SqlUtil.matchWords('man.name', words, false, false, index), 'OR')
 				params.addAll(likeWords)
 			}
 
 			if (!assetType) {
-				SqlUtil.appendToWhere(search, SqlUtil.matchWords('m.assetType', words, false, false), 'OR')
+				SqlUtil.appendToWhere(search, SqlUtil.matchWords('m.assetType', words, false, false, index), 'OR')
 				params.addAll(likeWords)
 			}
 
-			SqlUtil.appendToWhere(search, SqlUtil.matchWords('m.modelName', words, false, false), 'OR')
+			SqlUtil.appendToWhere(search, SqlUtil.matchWords('m.modelName', words, false, false, index), 'OR')
 			params.addAll(likeWords)
 
 			SqlUtil.appendToWhere(where, '(' + search + ')', 'AND')
@@ -2825,14 +2827,16 @@ class AssetEntityService implements ServiceMethods {
 		def joinTables = " "
 		def condition = ""
 		def hqlParams = []
+		int queryParamIndex = 0
 
 		if (StringUtils.isNotBlank(term)) {
-			condition = condition + "AND m.assetType LIKE ?"
+			condition = condition + "AND m.assetType LIKE ?$queryParamIndex"
 			hqlParams.add("%" + term + "%")
+			queryParamIndex++
 		}
 
 		if (StringUtils.isNotBlank(manufacturerId) && manufacturerId.isLong()) {
-			condition = condition + "AND m.manufacturer.id = ?"
+			condition = condition + "AND m.manufacturer.id = ?$queryParamIndex"
 			hqlParams.add(manufacturerId.toLong())
 		}
 

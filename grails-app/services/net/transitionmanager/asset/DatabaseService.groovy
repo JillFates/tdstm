@@ -1,12 +1,12 @@
 package net.transitionmanager.asset
 
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.DataViewMap
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.asset.AssetType
-import net.transitionmanager.asset.Database
 import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
 
@@ -14,6 +14,7 @@ import net.transitionmanager.service.ServiceMethods
 class DatabaseService implements ServiceMethods {
 
 	AssetEntityService assetEntityService
+	DataviewService    dataviewService
 
 	/**
 	 * Used to retrieve a model map of the properties to display a database asset
@@ -24,8 +25,13 @@ class DatabaseService implements ServiceMethods {
 	@NotTransactional
 	Map getModelForShow(Project project, Database db, Map params) {
 		Map commonModel = assetEntityService.getCommonModel(false, project, db, 'Database', params)
+		List fields =  dataviewService.fetch(DataViewMap.DATABASES.id).toMap(project, securityService.userLoginPerson).schema.columns.collect{it.label}
 
-		[databaseInstance: db, currentUserId: securityService.currentPersonId] + commonModel
+		return [
+				   databaseInstance: db,
+				   currentUserId   : securityService.currentPersonId,
+				   fields          : fields
+			   ] + commonModel
 	}
 
 	/**

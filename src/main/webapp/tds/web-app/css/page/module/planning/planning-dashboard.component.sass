@@ -1,5 +1,4 @@
 .planning-dashboard-component
-  font-family: helvetica, arial, sans-serif
   line-height: 12px
   a
     color: black
@@ -104,8 +103,13 @@
     vertical-align: middle
   .execution-data-column
     text-align: right
+    &.execution-percentage
+      min-width: 94px
   .dashboard-right-table
     width: auto
+    .dashboard-stat-exec-td
+      .dashboard-stat-exec-div-unassigned
+        text-align: right
   @media (min-width: 1201px)
     .execution-phase
       flex-basis: 67%

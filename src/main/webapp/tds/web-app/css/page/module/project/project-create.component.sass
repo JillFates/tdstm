@@ -1,34 +1,40 @@
 .project-create-component
   font-size: 12px
-  font-family: helvetica, arial, sans-serif
-  .modal-body-container
-    select
-      width: 180px
-    .required
-      float: right
-      font-size: 9px
-      color: red
-    table
-      width: 100%
-      .name
-        white-space: nowrap
-        width: 15%
-        font-weight: bold
-      .value
-        width: 85%
-        .k-dateinput-wrap input
-          font-size: 12px !important
-        input[type=text]
-          width: 180px
-        .k-dropdown
-          width: 180px
-        textarea
-          width: 100%
-          height: 40px
-      td
-        line-height: 12px
-        padding: 4px 5px
-        text-align: left
-        vertical-align: top
-    #collectReportingMetrics
-      margin-top: 0px!important
+  .clr-form-control
+    margin-top: unset
+  .clr-control-container
+    width: 100%
+  select
+    width: 180px
+  .required
+    float: right
+    font-size: 9px
+    color: red
+  table
+    width: 100%
+    .name
+      white-space: nowrap
+      width: 15%
+      font-weight: bold
+    .value
+      width: 85%
+      .k-dateinput-wrap input
+        font-size: 12px !important
+      input[type=text]
+        width: 180px
+      .k-dropdown
+        width: 180px
+      .k-dropzone
+        max-width: 400px
+      textarea
+        width: 100%
+        height: 40px
+    td
+      line-height: 12px
+      padding: 4px 5px
+      text-align: left
+      vertical-align: top
+      &.time-zone
+        padding-top: 12px
+  #collectReportingMetrics
+    margin-top: 0px!important

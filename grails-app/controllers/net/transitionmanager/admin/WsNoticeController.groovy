@@ -62,7 +62,6 @@ class WsNoticeController implements ControllerMethods {
 	@HasPermission(Permission.NoticeCreate)
 	def create() {
 		NoticeCommand command = populateCommandObject(NoticeCommand.class)
-		validateCommandObject(command)
 
 		Notice notice = noticeService.saveOrUpdate(command)
 
@@ -73,7 +72,6 @@ class WsNoticeController implements ControllerMethods {
 	def update(Long id) {
 		NoticeCommand command = populateCommandObject(NoticeCommand.class)
 		command.id = id
-		validateCommandObject(command)
 
 		Notice notice = noticeService.saveOrUpdate(command, id)
 

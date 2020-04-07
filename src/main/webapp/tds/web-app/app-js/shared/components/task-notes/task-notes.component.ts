@@ -1,8 +1,9 @@
 import {Component, Input, Output, EventEmitter,  OnInit } from '@angular/core';
 import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
 import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
-import {Permission} from "../../model/permission.model";
-import {PermissionService} from "../../services/permission.service";
+import {Permission} from '../../model/permission.model';
+import {PermissionService} from '../../services/permission.service';
+import { COLUMN_MIN_WIDTH } from 'tds-component-library';
 
 @Component({
 	selector: `tds-task-notes`,
@@ -17,14 +18,18 @@ import {PermissionService} from "../../services/permission.service";
                         (sortChange)="dataGridTaskNotesHelper.sortChange($event)">
                 <!-- Toolbar Template -->
                 <ng-template kendoGridToolbarTemplate [position]="'top'">
-                    <label class="pad-top-2 pad-left-10 mar-bottom-0">Task Notes ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
-                    <tds-button-add class="button-header-grid float-right"
-                                    [title]="'Create'"
-                                    [tooltip]="'Create a note'"
-                                    [id]="'btnAddNote'"
+					<div class="table-container">
+                        <label class="table-title">Task Notes ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
+                        <tds-button-add [title]="'Create'"
+										[displayLabel]="false"
+										[small]="true"
+										iconClass="is-solid"
+                                        [tooltip]="'Create a note'"
+                                        [id]="'btnAddNote'"
 									[disabled]="!hasEditTaskPermission"
-                                    (click)="onCreateNote()">
-                    </tds-button-add>
+                                        (click)="onCreateNote()">
+                        </tds-button-add>
+					</div>
                 </ng-template>
                 <!-- Columns -->
                 <kendo-grid-column *ngFor="let column of taskNotesColumnsModel.columns"
@@ -51,7 +56,7 @@ export class TaskNotesComponent implements OnInit {
 	@Output() create: EventEmitter<void> = new EventEmitter<void>();
 	protected taskNotesColumnsModel = new TaskNotesColumnsModel();
 	public hasEditTaskPermission = false;
-
+	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 
 	constructor(
 		private permissionService: PermissionService

@@ -8,8 +8,10 @@ import getl.excel.ExcelDataset
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.utils.FileUtils
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import org.apache.poi.hssf.usermodel.HSSFRow
@@ -20,15 +22,20 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.spockframework.runtime.SpockAssertionError
 import spock.lang.Specification
 
-abstract class ETLBaseSpec extends Specification {
+abstract class ETLBaseSpec extends Specification implements DataTest {
 
-    FileSystemService fileSystemService
+    FileSystemService fileSystemServiceTestBean
 
-    FileSystemService getFileSystemService() {
-        if (!fileSystemService) {
-            fileSystemService = applicationContext.getBean('fileSystemService')
+    FileSystemService getFileSystemServiceTestBean() {
+        if (!this.@fileSystemServiceTestBean) {
+            this.@fileSystemServiceTestBean = new FileSystemService()
+            this.@fileSystemServiceTestBean.coreService = new CoreService()
+            this.@fileSystemServiceTestBean.coreService.grailsApplication = grailsApplication
+            this.@fileSystemServiceTestBean.coreService.temporaryDirectory = grailsApplication.config.graph.tmpDir
+            this.@fileSystemServiceTestBean.transactionManager = transactionManager
+
         }
-        return fileSystemService
+        return this.@fileSystemServiceTestBean
     }
 
     /**
@@ -116,7 +123,7 @@ abstract class ETLBaseSpec extends Specification {
      */
     protected List buildSpreadSheetXLSXDataSet(String sheetName, String sheetContent) {
 
-        def (String fileName, OutputStream outputStream) = getFileSystemService().createTemporaryFile('unit-test-', 'xlsx')
+        def (String fileName, OutputStream outputStream) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'xlsx')
         Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
 
         addSheetInXLSXWorkBook(workbook, sheetName, sheetContent)
@@ -124,7 +131,7 @@ abstract class ETLBaseSpec extends Specification {
         WorkbookUtil.saveToOutputStream(workbook, outputStream)
 
         ExcelConnection con = new ExcelConnection(
-                path: getFileSystemService().temporaryDirectory,
+                path: getFileSystemServiceTestBean().temporaryDirectory,
                 fileName: fileName,
                 driver: TDSExcelDriver)
         ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
@@ -140,7 +147,7 @@ abstract class ETLBaseSpec extends Specification {
      */
     protected List buildSpreadSheetXLSDataSet(String sheetName, String sheetContent) {
 
-        def (String fileName, OutputStream outputStream) = getFileSystemService().createTemporaryFile('unit-test-', 'xls')
+        def (String fileName, OutputStream outputStream) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'xls')
         Workbook workbook = WorkbookUtil.createWorkbook('xls')
 
         addSheetInXLSWorkBook(workbook, sheetName, sheetContent)
@@ -148,7 +155,7 @@ abstract class ETLBaseSpec extends Specification {
         WorkbookUtil.saveToOutputStream(workbook, outputStream)
 
         ExcelConnection con = new ExcelConnection(
-                path: getFileSystemService().temporaryDirectory,
+                path: getFileSystemServiceTestBean().temporaryDirectory,
                 fileName: fileName,
                 driver: TDSExcelDriver)
         ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
@@ -196,7 +203,7 @@ abstract class ETLBaseSpec extends Specification {
      */
     protected List buildSpreadSheetDataSetWithMultipleSheets(Map<String, String> sheetsContent) {
 
-        def (String fileName, OutputStream outputStream) = getFileSystemService().createTemporaryFile('unit-test-', 'xlsx')
+        def (String fileName, OutputStream outputStream) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'xlsx')
         Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
 
         // Getting the Sheet at index zero
@@ -214,7 +221,7 @@ abstract class ETLBaseSpec extends Specification {
         WorkbookUtil.saveToOutputStream(workbook, outputStream)
 
         ExcelConnection con = new ExcelConnection(
-                path: getFileSystemService().temporaryDirectory,
+                path: getFileSystemServiceTestBean().temporaryDirectory,
                 fileName: fileName,
                 driver: TDSExcelDriver)
         ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
@@ -257,11 +264,11 @@ abstract class ETLBaseSpec extends Specification {
      */
     protected String createCSVFIle(String csvContent) {
 
-        def (String fileName, OutputStream dataSetOS) = getFileSystemService().createTemporaryFile('unit-test-', 'csv')
+        def (String fileName, OutputStream dataSetOS) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'csv')
         dataSetOS << csvContent.stripIndent().trim()
         dataSetOS.close()
 
-        return getFileSystemService().getTemporaryFullFilename(fileName)
+        return getFileSystemServiceTestBean().getTemporaryFullFilename(fileName)
     }
 
     /**
@@ -272,11 +279,11 @@ abstract class ETLBaseSpec extends Specification {
      */
     protected List buildJSONDataSet(String jsonContent) {
 
-        def (String fileName, OutputStream dataSetOS) = getFileSystemService().createTemporaryFile('unit-test-', 'json')
+        def (String fileName, OutputStream dataSetOS) = getFileSystemServiceTestBean().createTemporaryFile('unit-test-', 'json')
         dataSetOS << jsonContent
         dataSetOS.close()
 
-        String fullName = getFileSystemService().getTemporaryFullFilename(fileName)
+        String fullName = getFileSystemServiceTestBean().getTemporaryFullFilename(fileName)
 
         JSONConnection jsonCon = new JSONConnection(config: "json", path: FileUtils.PathFromFile(fullName), driver: TDSJSONDriver)
         JSONDataset dataSet = new JSONDataset(connection: jsonCon, rootNode: "", fileName: FileUtils.FileName(fullName))
