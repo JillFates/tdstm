@@ -315,7 +315,8 @@ class AssetService implements ServiceMethods{
 
 		Closure transformDependency = { String status, String type, AssetEntity depAsset ->
 			return [
-					assetClass: AssetClass.getClassOptionValueForAsset(depAsset),
+					assetClass: AssetClass.getDomainForAssetType(depAsset.class.getSimpleName()),
+					assetType: depAsset.assetType,
 					id: depAsset.id,
 					moveBundle: depAsset.moveBundleName,
 					name: depAsset.assetName,
@@ -333,6 +334,10 @@ class AssetService implements ServiceMethods{
 		}
 
 		return [
+				asset: [
+				        id: asset.id,
+						moveBundleId: asset.moveBundle.id
+				],
 		        supports: supports,
 				dependents: dependents
 		]
