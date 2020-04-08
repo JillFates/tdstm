@@ -329,11 +329,11 @@ class AssetService implements ServiceMethods{
 		}
 
 		List<Map> supports = asset.supportedDependencies().collect { AssetDependency dependency ->
-			transformDependency(dependency.status, dependency.type, dependency.asset)
+			transformDependency(dependency.status, dependency.type, dependency.id, dependency.asset)
 		}
 
 		List<Map> dependents = asset.requiredDependencies().collect { AssetDependency dependency ->
-			transformDependency(dependency.status, dependency.type, dependency.dependent)
+			transformDependency(dependency.status, dependency.type, dependency.id, dependency.dependent)
 		}
 
 		return [
