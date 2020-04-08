@@ -438,6 +438,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
+		let assetClassReadable = assetEntityType.charAt(0).toUpperCase() + assetEntityType.slice(1).toLowerCase();
+
 		this.dialogService.open({
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: AssetCreateComponent,
@@ -446,7 +448,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				openFromList: true
 			},
 			modalConfiguration: {
-				title: 'Create',
+				title: 'Create ' + assetClassReadable,
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'

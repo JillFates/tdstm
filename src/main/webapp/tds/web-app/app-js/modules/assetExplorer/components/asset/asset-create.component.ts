@@ -24,8 +24,10 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 // Other
 import {Observable} from 'rxjs';
-import {DialogButtonType} from 'tds-component-library';
+import {DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 import {AssetCommonEdit} from './asset-common-edit';
+import {equals as ramdaEquals} from 'ramda';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `tds-asset-all-create`,
@@ -36,6 +38,7 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 	@ViewChild('view', {read: ViewContainerRef, static: true}) view: ViewContainerRef;
 
 	public asset;
+	public childComponent;
 
 	constructor(
 		inj: Injector,
@@ -43,6 +46,8 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 		mod: NgModuleRef<any>,
 		private http: HttpClient,
 		private tagService: TagService,
+		private translatePipe: TranslatePipe,
+		private dialogService: DialogService,
 		private permissionService: PermissionService) {
 		super(inj, comp, mod);
 	}
@@ -81,18 +86,29 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 					setTimeout( () => {
 						switch (this.asset) {
 							case 'APPLICATION':
-								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
+								this.registerAndCreate(ApplicationCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => {
+									this.prepareButtonsReference(componentRef);
+									this.childComponent = componentRef;
+								});
 								break;
 							case 'DATABASE':
-								this.registerAndCreate(DatabaseCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
+								this.childComponent = this.registerAndCreate(DatabaseCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => {
+									this.prepareButtonsReference(componentRef);
+									this.childComponent = componentRef;
+								});
 								break;
 							case 'DEVICE':
-								this.registerAndCreate(DeviceCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
+								this.childComponent = this.registerAndCreate(DeviceCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => {
+									this.prepareButtonsReference(componentRef);
+									this.childComponent = componentRef;
+								});
 								break;
 							case 'STORAGE':
-								this.registerAndCreate(StorageCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => this.prepareButtonsReference(componentRef));
+								this.childComponent = this.registerAndCreate(StorageCreateComponent(template, model, metadata, this), this.view).subscribe(componentRef => {
+									this.prepareButtonsReference(componentRef);
+									this.childComponent = componentRef;
+								});
 								break;
-
 						}
 					}, 700);
 				}, (error) => {
@@ -156,6 +172,21 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 
 	private isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetEdit);
+	}
+
+	onDismiss() {
+		if (this.childComponent.instance.isDirty()) {
+			this.dialogService.confirm(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
+			).subscribe((result: any) => {
+				if (result.confirm === DialogConfirmAction.CONFIRM) {
+					super.onDismiss();
+				}
+			});
+		} else {
+			super.onDismiss();
+		}
 	}
 
 	private handleError(error: string): void {
