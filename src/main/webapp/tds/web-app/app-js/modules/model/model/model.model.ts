@@ -1,6 +1,6 @@
 import {FilterType} from 'tds-component-library';
-import {Connector} from "../../../shared/components/connector/model/connector.model";
-import {Aka, AkaChanges} from "../../../shared/components/aka/model/aka.model";
+import {Connector} from '../../../shared/components/connector/model/connector.model';
+import {Aka, AkaChanges} from '../../../shared/components/aka/model/aka.model';
 
 export class ModelColumnModel {
 	columns: any[];
