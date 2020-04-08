@@ -313,12 +313,16 @@ class AssetService implements ServiceMethods{
 	Map getDependenciesMapForAsset(Project project, Long assetId) {
 		AssetEntity asset = get(AssetEntity, assetId, project)
 
-		Closure transformDependency = { String status, String type, AssetEntity depAsset ->
+		Closure transformDependency = { String status, String type, Long depId, AssetEntity depAsset ->
 			return [
 					assetClass: AssetClass.getDomainForAssetType(depAsset.class.getSimpleName()),
 					assetType: depAsset.assetType,
-					id: depAsset.id,
-					moveBundle: depAsset.moveBundleName,
+					assetId: depAsset.id,
+					id: depId,
+					moveBundle: [
+					        id: depAsset.moveBundle.id,
+							name: depAsset.moveBundle.name
+					],
 					name: depAsset.assetName,
 			        status: status,
 					type: type
