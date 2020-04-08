@@ -27,7 +27,7 @@ declare var jQuery: any;
 	template: `
 		<div class="{{classComponent}}">
 		    <kendo-switch *ngIf="showSwitch && switchVisible"
-		            class=""
+		            class="asset-tag-selector-switch"
 		            [(ngModel)]="assetSelectorModel.switch"
 		            [onLabel]="'ALL'"
 		            [offLabel]="'ANY'"

@@ -604,15 +604,9 @@ export class TaskService {
 	 * @param queryObj
 	 */
 	findTasksByQuery(queryObj: ITaskHighlightQuery): Observable<HttpResponse<any>> {
-		const params = new HttpParams()
-			.set('eventId', `${queryObj.eventId}`)
-			.set('viewUnpublished', `${queryObj.viewUnpublished ? '1' : '0'}`)
-			.set('taskText', queryObj.taskText)
-			.set('assignedPersonId', `${queryObj.assignedPersonId}`)
-			.set('teams', queryObj.teams)
-			.set('ownerSmeId', queryObj.ownerSmeId);
-		return this.http.get<any>(`${this.TASK_BY_QUERY}`,
-			{ params, observe: 'response' });
+		return this.http.post<any>(`${this.TASK_BY_QUERY}`,
+			queryObj,
+			{ observe: 'response' });
 	}
 
 	highlightOptions(eventId: number, viewUnpublished: boolean): Observable<HttpResponse<ITaskHighlightOptionsResponseBody>> {

@@ -67,17 +67,22 @@ import {TaskService} from '../../service/task.service';
 					                  #environmentCombobox>
 	                  </kendo-combobox>
                   </div>
-<!--                  <div class="popup-option">-->
-<!--	                  <label class="popup-label">Tags assigned to Assets:</label>-->
-<!--	                  <kendo-combobox-->
-<!--					                  [data]="highlightOptions?.environments"-->
-<!--					                  [(value)]="environment"-->
-<!--	                          [valueField]="'name'"-->
-<!--	                          [textField]="'name'"-->
-<!--	                          (valueChange)="tasksByQuery()"-->
-<!--					                  #environmentCombobox>-->
-<!--	                  </kendo-combobox>-->
-<!--                  </div>-->
+                  <div class="popup-option">
+	                  <label class="popup-label">Tags assigned to Assets:</label>
+	                  <tds-asset-tag-selector
+					                  [class]="'highlight-tag-list-container'"
+					                  [tagList]="highlightOptions?.tags"
+					                  (valueChange)="onTagValueChange($event)"
+	                  ></tds-asset-tag-selector>
+                  </div>
+                  <div class="popup-option">
+                      <label class="popup-label">Critical Path Mode:</label>
+                      <kendo-combobox
+                              [data]="['', 'Baseline', 'Realtime']"
+                              [(value)]="criticalPathMode"
+                              #environmentCombobox>
+                      </kendo-combobox>
+                  </div>
 		              <br/>
 
                   <label class="task-chk-container">
@@ -140,10 +145,11 @@ export class TaskHighlightFilter {
 	person: any;
 	selectedTeam: any;
 	appOwner: any;
-	tag: any;
+	tags: any;
 	environment: any;
 	filterQueryObj: ITaskHighlightQuery;
 	show: boolean;
+	criticalPathMode: string;
 
 	constructor(private taskService: TaskService) {
 		this.subscribeToHighlightFilter();
@@ -170,8 +176,9 @@ export class TaskHighlightFilter {
 			teams: this.selectedTeam && this.selectedTeam.name || '',
 			ownerSmeId: this.appOwner && this.appOwner.id || '',
 			environments: this.environment && this.environment.name || '',
-			tagIds: [],
-			tagMatch: '',
+			tagIds: this.tags.tagIds,
+			tagMatch: this.tags.operator,
+			criticalPathMode: this.criticalPathMode,
 			cyclicalPath: this.highlightOptions.showCycles ? '1' : '0',
 			withActions: this.highlightOptions.withActions ? '1' : '0',
 			withTmdActions: this.highlightOptions.withTmdActions ? '1' : '0'
@@ -204,6 +211,13 @@ export class TaskHighlightFilter {
 
 	togglePopup(): void {
 		this.show = !this.show;
+	}
+
+	onTagValueChange(event: any): void {
+		this.tags = {
+			tagIds: event.tags.map(t => t.id),
+			operator: event.operator
+		};
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

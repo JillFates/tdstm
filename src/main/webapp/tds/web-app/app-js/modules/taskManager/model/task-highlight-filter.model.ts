@@ -8,6 +8,7 @@ export interface ITaskHighlightQuery {
 	taskText?: string;
 	tagIds?: [];
 	tagMatch?: string;
+	criticalPathMode?: string;
 	cyclicalPath?: any;
 	withActions?: any;
 	withTmdActions?: any;
@@ -18,6 +19,7 @@ export interface ITaskHighlightOption {
 	teams?: IFilterOption[];
 	ownersAndSmes?: IFilterOption[];
 	environments?: IFilterOption[];
+	tags?: any[];
 	showCycles?: boolean;
 	withActions?: boolean;
 	withTmdActions?: boolean;

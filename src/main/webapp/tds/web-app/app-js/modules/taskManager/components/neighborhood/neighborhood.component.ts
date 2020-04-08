@@ -11,7 +11,6 @@ import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {distinctUntilChanged, map, skip, takeUntil, timeout} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
-import {clone} from 'ramda';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DropDownButtonComponent} from '@progress/kendo-angular-buttons/dist/es2015/dropdownbutton/dropdownbutton.component';
 
@@ -44,15 +43,16 @@ import {TaskTeam} from '../common/constants/task-team.constant';
 import {DiagramCacheService} from '../../../../shared/services/diagram-cache.service';
 import {SetEvent} from '../../../event/action/event.actions';
 import {Store} from '@ngxs/store';
-import {IFilterOption, ITaskHighlightOption} from '../../model/task-highlight-filter.model';
+import {ITaskHighlightOption} from '../../model/task-highlight-filter.model';
 import {TaskGraphDiagramHelper} from './task-graph-diagram.helper';
-import {Diagram, Node, Point, Rect, Spot} from 'gojs';
+import {Diagram, Node, Spot} from 'gojs';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {
 	ITdsContextMenuModel
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {DiagramEventAction} from 'tds-component-library/lib/diagram-layout/model/diagram-event.constant';
 import {DialogService, ModalSize} from 'tds-component-library';
+import {TagService} from '../../../assetTags/service/tag.service';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -122,7 +122,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			private titleService: Title,
 			private diagramCacheService: DiagramCacheService,
 			private permissionService: PermissionService,
-			private store: Store
+			private store: Store,
+			private tagsService: TagService
 		) {
 				this.setTaskGraphDiagramExtras();
 				this.activatedRoute.queryParams
@@ -363,6 +364,18 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					this.highlightOptions$.next(data);
 				}
 			});
+		Observable.forkJoin([
+			this.taskService.highlightOptions(this.selectedEvent.id, this.viewUnpublished),
+			this.tagsService.getTagList()
+		]).subscribe(res => {
+			const [options, tags] = res;
+			if ((options.body && options.body.data) && tags) {
+				this.highlightOptions$.next({
+					...options.body.data,
+					tags: tags
+				});
+			}
+		})
 	}
 
 	/**
