@@ -3,33 +3,34 @@
 	<div class="row">
 		<div class="col-md-12">
 			<tds-check-action
-					[disabled]="isTestDisabled()"
-					[name]="'Test'"
-					(onClick)="onTestScript()"
-					[(model)]="operationStatus.test">
+				[disabled]="isTestDisabled()"
+				[name]="'Test'"
+				(onClick)="onTestScript()"
+				[(model)]="operationStatus.test">
 			</tds-check-action>
 			<tds-check-action
-					[disabled]="isCheckSyntaxDisabled()"
-					[name]="'Check Syntax'"
-					(onClick)="onCheckScriptSyntax()"
-					[(model)]="operationStatus.syntax">
+				[disabled]="isCheckSyntaxDisabled()"
+				[name]="'Check Syntax'"
+				(onClick)="onCheckScriptSyntax()"
+				[(model)]="operationStatus.syntax">
 			</tds-check-action>
 			<button
-					type="button"
-					(click)="onLoadSampleData()"
-					[disabled]="!canLoadSampleData()"
-					class="btn btn-default">
+				type="button"
+				(click)="onLoadSampleData()"
+				[disabled]="!canLoadSampleData()"
+				class="btn btn-default">
 				{{'DATA_INGESTION.DATASCRIPT.DESIGNER.LOAD_SAMPLE_DATA'| translate}}
 			</button>
 			<button
-					type="button"
-					[disabled]="!scriptTestResult.consoleLog"
-					(click)="onViewConsole()"
-					class="btn btn-default">
+				type="button"
+				[disabled]="!scriptTestResult.consoleLog"
+				(click)="onViewConsole()"
+				class="btn btn-default">
 				{{'DATA_INGESTION.DATASCRIPT.DESIGNER.VIEW_CONSOLE'| translate}}
 			</button>
 			<button class="pull-right btn btn-default" (click)="toggleSection('code')">
-				<i class="fa " [ngClass]="{ 'fa-angle-double-down': !collapsed.code, 'fa-angle-double-right': collapsed.code }" style="padding-right:0px"></i>
+				<i class="fa " [ngClass]="{ 'fa-angle-double-down': !collapsed.code, 'fa-angle-double-right': collapsed.code }"
+					 style="padding-right:0px"></i>
 			</button>
 		</div>
 	</div>
@@ -77,9 +78,9 @@
 	>
 		<div class="col-md-12">
 			<span class="pull-left" style="color: #a94442;"
-				><b>{{
-					'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS'
-						| translate
+			><b>{{
+				'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS'
+					| translate
 				}}</b></span
 			>
 			<span
@@ -115,7 +116,7 @@
 				rows="3"
 				readonly
 				style="cursor: default; resize: vertical;"
-				>{{ getSyntaxErrors() }}</textarea
+			>{{ getSyntaxErrors() }}</textarea
 			>
 			<textarea
 				*ngIf="sampleDataHasErrors()"
@@ -128,7 +129,7 @@
 			></textarea>
 		</div>
 	</div>
-	<hr />
+	<hr/>
 	<!-- Sample Preview Panels -->
 	<div class="data-preview">
 		<!-- Sample Data -->
@@ -136,8 +137,8 @@
 			<div class="col-md-12 sample-preview">
 				<h4 class="pull-left">
 					{{
-						'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW'
-							| translate
+					'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW'
+						| translate
 					}}
 				</h4>
 				<span
@@ -204,9 +205,9 @@
 								}}"
 							>
 								{{
-									dataItem[column.property]
-										| utils
-											: OBJECT_OR_LIST_PIPE
+								dataItem[column.property]
+									| utils
+									: OBJECT_OR_LIST_PIPE
 								}}
 							</div>
 						</ng-template>
@@ -214,14 +215,14 @@
 				</kendo-grid>
 			</div>
 		</div>
-		<hr />
+		<hr/>
 		<!-- Transformed Test Data -->
 		<div class="row" *ngIf="scriptTestResult.domains && scriptTestResult.domains.length > 0">
 			<label class="col-md-12">
 				<h4 class="pull-left">
 					{{
-						'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW'
-							| translate
+					'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW'
+						| translate
 					}}
 				</h4>
 				<button
@@ -241,15 +242,10 @@
 				</button>
 			</label>
 			<div class="col-md-12 collapse in collapsible">
-				<kendo-tabstrip>
-					<kendo-tabstrip-tab
-						[title]="domain.domain"
-						[selected]="i === 0"
-						*ngFor="
-							let domain of scriptTestResult.domains;
-							let i = index
-						"
-					>
+				<kendo-tabstrip (tabSelect)="onDomainTabSelected($event)">
+					<kendo-tabstrip-tab [title]="getDomainTabTitle(domain)"
+															[selected]="i === 0"
+															*ngFor="let domain of scriptTestResult.domains;let i = index">
 						<ng-template kendoTabContent>
 							<div
 								*ngIf="
@@ -369,12 +365,12 @@
 													style="width: 100%;"
 												>
 													{{
-														getInitOrValue(
-															dataItem
-																.fields[
-																column
+													getInitOrValue(
+														dataItem
+															.fields[
+															column
 															]
-														)
+													)
 													}}
 													<i
 														*ngIf="
