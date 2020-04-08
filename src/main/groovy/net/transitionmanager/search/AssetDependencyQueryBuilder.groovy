@@ -229,7 +229,7 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder implements TagSearc
 	 */
 	@Override
 	protected String getGroupByProperty() {
-		return "dep.id"
+		return ""
 	}
 
 	/**
