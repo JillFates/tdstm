@@ -90,7 +90,7 @@ export class SupportDependentsOnViewColumnsModel {
 			},
 			{
 				label: 'Bundle',
-				property: 'moveBundle',
+				property: 'moveBundle.name',
 				type: 'text',
 				width: 90
 			},
