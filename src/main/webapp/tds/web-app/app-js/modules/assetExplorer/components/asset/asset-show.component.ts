@@ -48,6 +48,7 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 					.subscribe((response: any) => {
 						let template = response[0];
 						let dependencies = response[1].data;
+						metadata.asset = dependencies.asset;
 						metadata.supports = dependencies.supports;
 						metadata.dependents = dependencies.dependents;
 

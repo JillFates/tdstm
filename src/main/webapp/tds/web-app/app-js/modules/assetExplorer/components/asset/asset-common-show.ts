@@ -26,6 +26,7 @@ export class AssetCommonShow implements OnInit {
 	protected userDateFormat: string;
 	protected userTimeZone: string;
 	protected mainAsset;
+	protected currentShowAsset = {asset: {moveBundleId: 0}};
 	protected assetType: DOMAIN;
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
@@ -67,6 +68,8 @@ export class AssetCommonShow implements OnInit {
 
 			this.supportOnColumnModel = new SupportDependentsOnViewColumnsModel();
 			this.dependentOnColumnModel = new SupportDependentsOnViewColumnsModel();
+
+			this.currentShowAsset = metadata.asset;
 	}
 
 	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {

@@ -78,7 +78,7 @@ export class SupportDependentsOnViewColumnsModel {
 		this.columns = [
 			{
 				label: 'Class',
-				property: 'assetClass',
+				property: 'assetType',
 				type: 'text',
 				width: 90
 			},
