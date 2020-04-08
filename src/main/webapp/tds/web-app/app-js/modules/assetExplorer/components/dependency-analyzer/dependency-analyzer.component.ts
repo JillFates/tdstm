@@ -16,7 +16,7 @@ export class DependencyAnalyzerComponent implements OnInit {
 
 	private userContext: any;
 	public gridModel: GridModel;
-	public showOnlyWIP;
+	public showOnlyWIP = false;
 	icons = FA_ICONS;
 	selectedBundle;
 	teamHighlights$;
@@ -34,6 +34,9 @@ export class DependencyAnalyzerComponent implements OnInit {
 	selectedColumn = '';
 	selectedData;
 	planningBundles;
+	tagMatch = 'ANY';
+	isAssigned = false;
+	public defaultBundleItem = {name: 'All Planning', id: null};
 
 	constructor(
 		private userContextService: UserContextService,
@@ -45,8 +48,6 @@ export class DependencyAnalyzerComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.getInitialData();
-		this.columns.push('Groups');
-		this.classes.push('');
 	}
 
 	getInitialData() {
@@ -55,18 +56,27 @@ export class DependencyAnalyzerComponent implements OnInit {
 			this.planningBundles = res.planningBundles;
 			this.dependencyType = res.dependencyType;
 			this.dependencyStatus = res.dependencyStatus;
-			this.columns = this.columns.concat(res.dependencyConsole.group);
-			this.classes = this.classes.concat(res.dependencyConsole.statusClass);
-			this.gridData.push(['Application', ...res.dependencyConsole.application]);
-			this.gridData.push(['Servers Physical', ...res.dependencyConsole.serversPhysical]);
-			this.gridData.push(['Servers Virtual', ...res.dependencyConsole.serversVirtual]);
-			this.gridData.push(['Databases', ...res.dependencyConsole.databases]);
-			this.gridData.push(['Storage', ...res.dependencyConsole.storage]);
-
+			this.setData(res);
 		});
 		this.tagService.getTags().subscribe((res: any) => {
 			this.allTags = res.data;
 		});
+	}
+
+	setData(res) {
+		this.isAssigned = res.isAssigned;
+		this.gridData = [];
+		this.columns = [];
+		this.classes = [];
+		this.columns.push('Groups');
+		this.classes.push('');
+		this.columns = this.columns.concat(res.dependencyConsole.group);
+		this.classes = this.classes.concat(res.dependencyConsole.statusClass);
+		this.gridData.push(['Application', ...res.dependencyConsole.application]);
+		this.gridData.push(['Servers Physical', ...res.dependencyConsole.serversPhysical]);
+		this.gridData.push(['Servers Virtual', ...res.dependencyConsole.serversVirtual]);
+		this.gridData.push(['Databases', ...res.dependencyConsole.databases]);
+		this.gridData.push(['Storage', ...res.dependencyConsole.storage]);
 	}
 
 	openGroupInfoModal(event) {
@@ -118,16 +128,30 @@ export class DependencyAnalyzerComponent implements OnInit {
 	}
 
 	onBundleSelect(event) {
-		// console.log('bundle selected: ', event);
+		this.selectedBundle = event.id;
+		this.getFilteredData();
+	}
+
+	getFilteredData() {
+		this.dependencyAnalyzerService.getFilteredData({
+			bundle: this.selectedBundle || '',
+			tagIds: this.selectedTags || [],
+			tagMatch: this.tagMatch,
+			assignedGroup: this.isAssigned ? 1 : 0
+		}).subscribe( (data: DependencyAnalyzerDataModel) => {
+			this.setData(data);
+		})
 	}
 
 	onAssetTagChange(event) {
-		// console.log(event, this.selectedTags);
-		// console.log(event);
+		this.tagMatch = event.operator;
+		this.selectedTags = event.tags.map( x => x.id);
+		this.getFilteredData();
+		// request data here too
 	}
 
 	onShowOnlyWIPChange(event) {
-		// change data source or hide non complete columns
+		this.getFilteredData();
 	}
 
 	onRefeshData() {

@@ -8,13 +8,12 @@
 			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.BUNDLE' | translate}}:</label>
 			<kendo-dropdownlist
 				id="dependency-analyzer-teams-dropdown"
-				textField="name"
-				valueField="id"
 				[ngClass]="'dependency-analyzer-custom-dropdown'"
-				[value]="selectedBundle"
+				[textField]="'name'"
+				[valueField]="'id'"
+				[defaultItem]="defaultBundleItem"
 				[data]="allMoveBundles"
 				(selectionChange)="onBundleSelect($event)"
-				[(ngModel)]="selectedBundle"
                 #teamHighlightDropdown>
 			</kendo-dropdownlist>
 		</div>
@@ -37,7 +36,7 @@
 					type="checkbox"
 					name="showWIPonly"
 					class="component-action-just-planning"
-					[(ngModel)]="showOnlyWIP"
+					[(ngModel)]="isAssigned"
 					(change)="onShowOnlyWIPChange($event)"/>
 				<label
 					class="clr-control-label clr-control-label-sm inline"
@@ -61,7 +60,7 @@
 	<kendo-grid
 		#grid
 		[data]="gridData">
-		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]" [width]="i < 4 ? '60' : '40'">
+		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]" [width]="i < 4 ? '60' : '30'">
 			<ng-template kendoGridHeaderTemplate>
 				<div *ngIf="col === 'Groups'" class="group-column" (click)="openGroupInfoModal($event)">
 					{{col}} <fa-icon [icon]="icons.faQuestion" size="md"></fa-icon>
@@ -75,11 +74,10 @@
 					{{dataItem[i]}}
 				</div>
 				<div class="data-item-columns" *ngIf="i > 0">
-					{{dataItem[i]}}
+					{{dataItem[i] !== 0 ? dataItem[i] : '' }}
 				</div>
 			</ng-template>
 		</kendo-grid-column>
-
 	</kendo-grid>
 
 	<p>{{'Column selected:' + (selectedData | json)}}</p>
