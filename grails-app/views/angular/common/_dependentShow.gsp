@@ -67,7 +67,7 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
                     <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, currentShowAsset.id)">
                         {{dataItem.type}}
-                        <img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comments.png" border="0" title="{{dataItem.comment}}">
+                        <img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
                     </div>
                 </ng-template>
 
