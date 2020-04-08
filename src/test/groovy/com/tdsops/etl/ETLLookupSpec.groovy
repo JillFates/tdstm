@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
@@ -10,6 +11,8 @@ import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
@@ -27,11 +30,24 @@ import spock.util.mop.ConfineMetaClassChanges
  */
 class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 
-
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions
@@ -103,8 +119,10 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
+						
 						iterate {
 							extract 'server' load 'Name' set nameVar
 							extract 'model' load 'model'
@@ -186,6 +204,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
 
@@ -244,6 +263,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -322,6 +342,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -404,6 +425,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup 
 						read labels
 						domain Device
 						set lookupFieldNameVar with 'assetName'
@@ -473,6 +495,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						console on
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -550,7 +573,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-						
+						enable lookup
 						read labels
 						domain Device
 						iterate {
@@ -635,6 +658,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
+					enable lookup
 
 					read labels
 					iterate {
@@ -737,6 +761,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 				validator)
 			String firstAssetName = 'xraysrv01'
 			String secondAssetName = 'zuludb01'
+			etlProcessor.result.isLookupEnable = true
 			ETLDomain domain = ETLDomain.Device
 			etlProcessor.result.addCurrentSelectedDomain(domain)
 			etlProcessor.iterateIndex = new IterateIndex(3)
@@ -752,8 +777,6 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 			createResultReference(etlProcessor, domain, [assetName: secondAssetName])
 		then: 'calling lookupInReference for the 2nd server name should find a result'
 			etlProcessor.result.lookupInReference(['assetName'], [secondAssetName])
-		and: 'the resultIndex in the process should be pointing to the 2nd asset'
-			1 == etlProcessor.result.resultIndex
 
 		when: 'there is another result that has the same name as the first with a different assetType'
 			createResultReference(etlProcessor, domain, [assetName: firstAssetName, assetType: 'Blade'])
@@ -767,9 +790,6 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 			found = etlProcessor.result.lookupInReference(['assetName', 'assetType'], [firstAssetName, 'Blade'])
 		then: 'one should be found'
 			found
-		and: 'the resultIndex should be pointing to the 3rd result'
-			2 == etlProcessor.result.resultIndex
-
 	}
 
 	void 'test setting a variable at ETLProcessor level'() {
@@ -882,6 +902,7 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 	 */
 	private void createResultReference(ETLProcessor etlProcessor, ETLDomain domain, Map fieldValueMap) {
 		etlProcessor.result.startRow()
+        etlProcessor.currentRowIndex++
 		etlProcessor.result.findOrCreateCurrentRow()
 		// Add each element
 		fieldValueMap.each { String fieldName, Object value ->

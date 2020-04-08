@@ -149,7 +149,11 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidIgnoreCommand() {
-        new ETLProcessorException('You cannot use ignore records in an empty results')
+        new ETLProcessorException("Incorrect use of 'ignore record' command")
+    }
+
+    static ETLProcessorException invalidEnableLookupCommand() {
+        new ETLProcessorException("Incorrect use of 'enable lookup' command")
     }
 
     static ETLProcessorException invalidSheetCommand() {
@@ -185,7 +189,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidReadCommand() {
-        return new ETLProcessorException("Incorrect use of 'read labels' command'")
+        return new ETLProcessorException("Incorrect use of 'read labels' command")
     }
 
     /**
@@ -210,10 +214,6 @@ class ETLProcessorException extends GroovyRuntimeException {
 
     static ETLProcessorException invalidUseOfMethod(String methodName, Object value) {
         new ETLProcessorException("${methodName} function only supported for String values (${value} : ${value.class})")
-    }
-
-    static ETLProcessorException ignoreOnlyAllowOnNewRows() {
-        new ETLProcessorException('ignore command only when processing new rows')
     }
 
     static ETLProcessorException domainOnlyAllowOnNewRows() {

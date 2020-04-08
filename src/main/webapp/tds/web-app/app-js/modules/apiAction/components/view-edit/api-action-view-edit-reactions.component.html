@@ -58,8 +58,8 @@
 							</tds-checkbox>
 						</div>
 					</div>
-					<div class="col-md-1 customize event-title hide-if-remote-section"><label>Customize:</label></div>
-					<div class="col-md-2  hide-if-remote-section">
+					<div class="col-md-1 customize event-title "><label>Customize:</label></div>
+					<div class="col-md-2 before-call">
 						<tds-checkbox [name]="'apiActionBeforeCall'"
 									  [(inputModel)]="eventReactions[EventReactions.BeforeInvocation].selected"
 									  (change)="onEventReactionSelect(eventReactions[EventReactions.BeforeInvocation])"
@@ -67,7 +67,7 @@
 									  [title]="'Before Invocation'">
 						</tds-checkbox>
 					</div>
-					<div class="col-md-2  hide-if-remote-section">
+					<div class="col-md-2">
 						<tds-checkbox [name]="'apiActionAfterCall'"
 									  [(inputModel)]="eventReactions[EventReactions.PostInvocation].selected"
 									  [disabled]="eventReactions[EventReactions.PostInvocation].value.length > 0 || modalType === actionTypes.VIEW"
@@ -146,7 +146,7 @@
 													 [(model)]="eventReactions[EventReactions.Success].value"></code-mirror>
 							<div *ngIf="eventReactions[EventReactions.Success].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxSuccess"
 													[ngModel]="eventReactions[EventReactions.Success].error" readonly></textarea>
 							</div>
 						</div>
@@ -182,7 +182,7 @@
 													 [(model)]="eventReactions[EventReactions.Default].value"></code-mirror>
 							<div *ngIf="eventReactions[EventReactions.Default].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea  class="form-control script-error" name="apiActionSyntaxDefault"
 													 [ngModel]="eventReactions[EventReactions.Default].error" readonly></textarea>
 							</div>
 						</div>
@@ -219,7 +219,7 @@
 													 [(model)]="eventReactions[EventReactions.Error].value"></code-mirror>
 							<div *ngIf="eventReactions[EventReactions.Error].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea  class="form-control script-error" name="apiActionSyntaxError"
 													 [ngModel]="eventReactions[EventReactions.Error].error" readonly></textarea>
 							</div>
 						</div>
@@ -255,12 +255,13 @@
 							</code-mirror>
 							<div *ngIf="eventReactions[EventReactions.Failed].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea  class="form-control script-error" name="apiActionSyntaxFailed"
 													 [ngModel]="eventReactions[EventReactions.Failed].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
+				<!-- Lapsed Reaction Event -->
 				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.Lapsed].selected && isPolling">
 					<div class="form-group">
 						<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed
@@ -290,12 +291,13 @@
 													 [(model)]="eventReactions[EventReactions.Lapsed].value"></code-mirror>
 							<div *ngIf="eventReactions[EventReactions.Lapsed].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxLapsed"
 													[ngModel]="eventReactions[EventReactions.Lapsed].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
+				<!-- Stalled Reaction Event -->
 				<div class="col-md-12 codemirror-wrapper hide-if-remote-section"
 						 *ngIf="eventReactions[EventReactions.Stalled].selected && isPolling">
 					<div class="form-group">
@@ -329,15 +331,16 @@
 													 [(model)]="eventReactions[EventReactions.Stalled].value"></code-mirror>
 							<div *ngIf="eventReactions[EventReactions.Stalled].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxStalled"
 													[ngModel]="eventReactions[EventReactions.Stalled].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
-				<label class="col-md-12 reaction-section-event hide-if-remote-section"
+				<label class="col-md-12 reaction-section-event"
 							 *ngIf="showsCustomizeLabel()">Customize:
 				</label>
+				<!-- Before Invocation Reaction Event -->
 				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.BeforeInvocation].selected">
 					<div class="form-group">
 						<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before Invocation
@@ -369,12 +372,13 @@
 													 [(model)]="eventReactions[EventReactions.BeforeInvocation].value"></code-mirror>
 							<div *ngIf="eventReactions[EventReactions.BeforeInvocation].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxBeforeCall"
 													[ngModel]="eventReactions[EventReactions.BeforeInvocation].error" readonly></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
+				<!-- Post Invocation Reaction Event -->
 				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.PostInvocation].selected">
 					<div class="form-group">
 						<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Invocation
@@ -406,7 +410,7 @@
 													 [(model)]="eventReactions[EventReactions.PostInvocation].value"></code-mirror>
 							<div *ngIf="eventReactions[EventReactions.PostInvocation].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
-								<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination"
+								<textarea class="form-control script-error" name="apiActionSyntaxAfterCall"
 													[ngModel]="eventReactions[EventReactions.PostInvocation].error" readonly></textarea>
 							</div>
 						</div>

@@ -47,7 +47,8 @@ class AssetTestHelper {
 			assetName: RandomStringUtils.randomAlphabetic(15),
 			project: project,
 			moveBundle: moveBundle,
-			assetType: assetType.toString()
+			assetType: assetType.toString(),
+			custom7: "something"
 		)
 
 		if (!device.save(flush: true)) {
@@ -67,7 +68,8 @@ class AssetTestHelper {
 		Database database = new Database(
 			assetName: RandomStringUtils.randomAlphabetic(15),
 			project: project,
-			moveBundle: bundle?: project.projectDefaultBundle
+			moveBundle: bundle?: project.projectDefaultBundle,
+			custom7: "something"
 		)
 
 		if (!database.save(flush: true)) {
@@ -88,7 +90,8 @@ class AssetTestHelper {
 		Files storage = new Files(
 			assetName: RandomStringUtils.randomAlphabetic(15),
 			project: project,
-			moveBundle: bundle?: project.projectDefaultBundle
+			moveBundle: bundle?: project.projectDefaultBundle,
+			custom7: 'something'
 		)
 
 		if (!storage.save(flush: true)) {
@@ -118,7 +121,8 @@ class AssetTestHelper {
 			shutdownBy: pRef,
 			startupBy: pRef,
 			testingBy: pRef,
-			moveBundle: bundle?: projectService.getDefaultBundle(project)
+			moveBundle: bundle?: projectService.getDefaultBundle(project),
+			custom7: "something"
 		)
 
 		if (!app.save(flush: true)) {
@@ -172,6 +176,7 @@ class AssetTestHelper {
 			targetRackPosition : "",
 			sourceBladePosition: "",
 			targetBladePosition: "",
+			custom7            : "something",
 			project            : project,
 			owner              : project.client,
 			assetClass         : AssetClass.DEVICE,

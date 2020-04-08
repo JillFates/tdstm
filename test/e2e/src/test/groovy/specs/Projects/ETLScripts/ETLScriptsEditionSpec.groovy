@@ -34,16 +34,14 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
         at ETLScriptsPage
         createBtn.click()
         at CreateETLScriptsPage
+        datascriptDescField = datascriptDescription
+        datascriptNameField = datascriptName
         waitFor{providerDropdown.click()}
         //We select the latest provider that was created
         waitFor{latestProvider.click()}
         waitFor{datascriptDescField.click()}
-        datascriptDescField = datascriptDescription
-        datascriptNameField = datascriptName
         waitFor {datascriptSaveBtn.isDisplayed()}
         waitFor {datascriptSaveBtn.click()}
-        at ETLScriptsDetailsPage
-        waitFor {dsDetailXIcon.click()}
     }
 
     def setup() {
@@ -59,7 +57,9 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
         given: 'The User is on the ETLScripts Page'
             at ETLScriptsPage
         and: 'Filters by the ETLScripts Name'
-            filterByName datascriptName
+            clickOnFilterButton()
+            filterByName(datascriptName)
+            waitFor{firstDS.text().contains(datascriptName)}
         when: 'The user clicks the created ETLScripts'
             clickOnFirstGridRow()
         then: 'We verify that the ETLScripts Details pop up is displayed'
@@ -108,7 +108,8 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
         given: 'The User is on the ETLScripts Page'
             at ETLScriptsPage
         when: 'Filters by the ETLScripts Name'
-            filterByName datascriptName
+            filterByName(datascriptName)
+            waitFor{firstDS.text().contains(datascriptName)}
             datascriptInfo = collectFirstDSInfoDisplayedInGrid()
         then: 'Updated data is properly displayed'
             datascriptInfo.name == datascriptName
@@ -145,7 +146,8 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
         given: 'The User is on the ETLScripts Page'
             at ETLScriptsPage
         when: 'Filters by the ETLScripts Name'
-            filterByName datascriptName
+            filterByName(datascriptName)
+            waitFor{firstDS.text().contains(datascriptName)}
             datascriptInfo = collectFirstDSInfoDisplayedInGrid()
         then: 'Updated data is properly displayed'
             datascriptInfo.name == datascriptName

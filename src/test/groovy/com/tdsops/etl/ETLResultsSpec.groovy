@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.testing.gorm.DataTest
@@ -9,6 +10,8 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
@@ -28,6 +31,20 @@ class ETLResultsSpec extends ETLBaseSpec implements DataTest {
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model

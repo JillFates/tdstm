@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.dataset.CSVDataset
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
@@ -19,6 +20,8 @@ import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
@@ -58,6 +61,20 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	DebugConsole debugConsole
 	Project GMDEMO
 	ETLFieldsValidator validator
+
+	Closure doWithSpring() {
+		{ ->
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+			}
+			applicationContextHolder(ApplicationContextHolder) { bean ->
+				bean.factoryMethod = 'getInstance'
+			}
+		}
+	}
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions
@@ -324,16 +341,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			""".stripIndent())
 
 		then: 'A column map is created'
-			etlProcessor.column('device id').index == 0
-			etlProcessor.column(0).label == 'device id'
+			etlProcessor.getColumnByName('device id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'device id'
 
 		and:
-			etlProcessor.column('model name').index == 1
-			etlProcessor.column(1).label == 'model name'
+			etlProcessor.getColumnByName('model name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'model name'
 
 		and:
-			etlProcessor.column('manufacturer name').index == 2
-			etlProcessor.column(2).label == 'manufacturer name'
+			etlProcessor.getColumnByName('manufacturer name').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'manufacturer name'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -543,31 +560,31 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					}
 
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						fields.keySet().size() == 2
-						assertWith(fields.appVendor, FieldResult) {
+						assertWith(fields.appVendor) {
 							value == 'Microsoft'
 							originalValue == 'Microsoft'
 							init == null
 						}
-						assertWith(fields.appTech, FieldResult) {
+						assertWith(fields.appTech) {
 							value == '(xlsx updated)'
 							originalValue == '(xlsx updated)'
 							init == null
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						fields.keySet().size() == 2
-						assertWith(fields.appVendor, FieldResult) {
+						assertWith(fields.appVendor) {
 							value == 'Mozilla'
 							originalValue == 'Mozilla'
 						}
-						assertWith(fields.appTech, FieldResult) {
+						assertWith(fields.appTech) {
 							value == 'NGM'
 							originalValue == 'NGM'
 							init == null
@@ -612,7 +629,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					}
 
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -621,7 +638,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.environment) {
@@ -670,7 +687,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -687,7 +704,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.appVendor) {
@@ -750,7 +767,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -767,7 +784,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.appVendor) {
@@ -900,7 +917,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -917,7 +934,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.appVendor) {
@@ -976,7 +993,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						appVendor: 'Vendor'
 						environment: 'Environment'
 					}
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -985,7 +1002,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.environment) {
@@ -1024,7 +1041,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						description == 'Description'
 					}
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -1033,7 +1050,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.description) {
@@ -1042,7 +1059,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.appVendor) {
@@ -1051,7 +1068,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.description) {
@@ -1148,7 +1165,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						id == 'Id'
 						appVendor == 'Vendor'
 					}
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -1157,7 +1174,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.appVendor) {
@@ -1207,7 +1224,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						manufacturer == 'Manufacturer'
 						model == 'Model'
 					}
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -1224,7 +1241,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -1241,7 +1258,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[2], RowResult) {
+					assertWith(data[2]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 3
 						assertWith(fields.assetName) {
@@ -1300,7 +1317,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					assertWith(fieldLabelMap) {
 						appVendor == 'Vendor'
 					}
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.environment) {
@@ -1309,7 +1326,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.id) {
@@ -1318,7 +1335,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -1327,7 +1344,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.environment) {
@@ -1336,7 +1353,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.id) {
@@ -1345,7 +1362,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -1360,7 +1377,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.id) {
@@ -1369,7 +1386,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.description) {
@@ -1378,7 +1395,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.id) {
@@ -1387,7 +1404,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.description) {
@@ -1528,7 +1545,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['appVendor', 'environment'] as Set
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -1537,7 +1554,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.environment) {
@@ -1546,7 +1563,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.appVendor) {
@@ -1555,7 +1572,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.environment) {
@@ -1757,7 +1774,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.id) {
@@ -1776,7 +1793,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['id', 'assetName'] as Set
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.id) {
@@ -1834,7 +1851,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Application.name()
 					fieldNames == ['id', 'appVendor'] as Set
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.id) {
@@ -1934,6 +1951,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				domain Application
 				iterate {
 					extract 'technology'
+					log CE
 					if( CE != 'NGM') {
 						ignore record
 					} else {
@@ -2034,7 +2052,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -2043,7 +2061,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -2094,7 +2112,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -2103,7 +2121,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -2155,7 +2173,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['environment', 'assetName'] as Set
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.environment) {
@@ -2168,7 +2186,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.environment) {
@@ -2229,7 +2247,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -2250,7 +2268,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -2315,17 +2333,17 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			assertWith(etlProcessor.finalResult()) {
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						assertWith(fields, Map) {
 
-							assertWith(assetName, FieldResult) {
+							assertWith(assetName) {
 								value == 'fubar'
 								originalValue == 'fubar'
 							}
 
-							assertWith(custom1, FieldResult) {
-								Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+							assertWith(custom1) {
+								Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601_2)
 								//assert date != null: "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
 							}
 						}
@@ -2374,7 +2392,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -2383,7 +2401,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -2471,8 +2489,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					data.size() == 2
-					assertWith(data[0], RowResult) {
+					data.size() == 1
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -2480,11 +2498,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 							originalValue == 'xraysrv01'
 							init == null
 						}
-					}
-
-					assertWith(data[1], RowResult) {
-						op == ImportOperationEnum.INSERT.toString()
-						rowNum == 1
 						assertWith(fields.model) {
 							value == 'PE2950'
 							originalValue == 'PE2950'
@@ -2492,7 +2505,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 				}
-
 			}
 
 		cleanup:
@@ -2534,10 +2546,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == ''
 							originalValue == ''
 							init == null
@@ -2585,9 +2597,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						rowNum == 1
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == null
 							originalValue == null
 							init == ''
@@ -2636,15 +2648,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 1
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						assertWith(fields.assetName, FieldResult) {
+						assertWith(fields.assetName) {
 							value == null
 							originalValue == null
 							init == ''
 						}
-						assertWith(fields.manufacturer, FieldResult) {
+						assertWith(fields.manufacturer) {
 							value == ''
 							originalValue == ''
 							init == null
@@ -2686,7 +2698,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.environment) {
@@ -2694,7 +2706,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 							value == 'Microsoft,ACME Data Center'
 						}
 					}
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.environment) {
@@ -2734,7 +2746,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Application.name()
 					data.size() == 2
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.environment) {
@@ -2742,7 +2754,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 							value == 'Microsoft-Prod'
 						}
 					}
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.environment) {
@@ -2776,6 +2788,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		when: 'The ETL script is evaluated'
 			etlProcessor
 				.evaluate("""
+						enable lookup
 						read labels
 						iterate {
 							domain Device
@@ -2798,7 +2811,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					data.size() == 3
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -2810,7 +2823,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 							value == '1.2.3.4, 1.3.5.1'
 						}
 					}
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -2822,7 +2835,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 							value == '4.5.4.2'
 						}
 					}
-					assertWith(data[2], RowResult) {
+					assertWith(data[2]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 4
 						assertWith(fields.assetName) {
@@ -2908,10 +2921,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Application.name()
 					data.size() == 1
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
-						assertWith(fields.description, FieldResult) {
+						assertWith(fields.description) {
 							originalValue == 'Tony Baker'
 							value == 'Tony Baker'
 						}
@@ -2964,20 +2977,20 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields) {
-							assertWith(it.assetName, FieldResult) {
+							assertWith(it.assetName) {
 								originalValue == 'xraysrv01'
 								value == 'xraysrv01'
 							}
-							assertWith(it.custom1, FieldResult) {
+							assertWith(it.custom1) {
 								originalValue == '2'
 								value == '2'
 							}
 
-							assertWith(it.retireDate, FieldResult) {
+							assertWith(it.retireDate) {
 								value == new Date(2018 - 1900, 6 - 1, 25)
 								init == null
 								errors == []
@@ -2987,17 +3000,17 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields) {
-							assertWith(it.assetName, FieldResult) {
+							assertWith(it.assetName) {
 								originalValue == 'zuludb01'
 								value == 'zuludb01'
 							}
 							it.custom1 == null
 
-							assertWith(it.description, FieldResult) {
+							assertWith(it.description) {
 								originalValue == 'Some description'
 								value == 'Some description'
 							}
@@ -3049,26 +3062,26 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					data.size() == 2
 
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields) {
-							assertWith(it.assetName, FieldResult) {
+							assertWith(it.assetName) {
 								originalValue == 'xraysrv01'
 								value == 'xraysrv01'
 							}
-							assertWith(it.custom1, FieldResult) {
+							assertWith(it.custom1) {
 								originalValue == '100'
 								value == 100
 							}
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields) {
-							assertWith(it.assetName, FieldResult) {
+							assertWith(it.assetName) {
 								originalValue == 'zuludb01'
 								value == 'zuludb01'
 							}
@@ -3234,7 +3247,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		then: 'Results should contain Device Name assigment'
 			assertWith(etlProcessor.finalResult()) {
 				assertWith(domains[0], DomainResult) {
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -3283,7 +3296,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		then: 'Results should contain Device Name assigment'
 			assertWith(etlProcessor.finalResult()) {
 				assertWith(domains[0], DomainResult) {
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -3521,7 +3534,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					domain == ETLDomain.Device.name()
 					fieldNames == ['assetName'] as Set
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.assetName) {
@@ -3534,7 +3547,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.assetName) {
@@ -3646,7 +3659,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						appVendor == 'Vendor'
 					}
 					data.size() == 2
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 1
 						assertWith(fields.appVendor) {
@@ -3663,7 +3676,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 						}
 					}
 
-					assertWith(data[1], RowResult) {
+					assertWith(data[1]) {
 						op == ImportOperationEnum.INSERT.toString()
 						rowNum == 2
 						assertWith(fields.appVendor) {

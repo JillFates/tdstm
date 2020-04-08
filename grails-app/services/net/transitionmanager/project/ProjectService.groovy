@@ -28,7 +28,7 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.command.ProjectCommand
+import net.transitionmanager.command.ProjectCreateOrUpdateCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.KeyValue
@@ -1910,7 +1910,7 @@ class ProjectService implements ServiceMethods {
 	 * @return
 	 */
 	@Transactional
-	Project createOrUpdateProject(ProjectCommand projectCommand) {
+	Project createOrUpdateProject(ProjectCreateOrUpdateCommand projectCommand) {
 		Project project
 		if (projectCommand.id > 0) {
 			if (securityService.hasAccessToProject(projectCommand.id)) {
