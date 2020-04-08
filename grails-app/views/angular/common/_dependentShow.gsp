@@ -52,14 +52,14 @@
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
                     <div style="background-color: lightpink;" *ngIf="dataItem.id != currentShowAsset?.asset?.moveBundleId && dataItem.status === 'Validated'" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                     </div>
                     <div *ngIf="dataItem.id !== currentShowAsset?.asset?.moveBundle.id; else normalBundleName" class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                     </div>
                     <ng-template #normalBundleName>
                         <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-
+                            {{dataItem.moveBundle.name}}
                         </div>
                     </ng-template>
                 </ng-template>
@@ -67,6 +67,7 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
                     <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, currentShowAsset.id)">
                         {{dataItem.type}}
+                        <img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comments.png" border="0" title="{{dataItem.comment}}">
                     </div>
                 </ng-template>
 
@@ -133,14 +134,14 @@
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
                     <div style="background-color: lightpink;" *ngIf="dataItem.assetId != currentShowAsset?.asset?.moveBundleId && dataItem.status === 'Validated'" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                     </div>
                     <div *ngIf="dataItem.assetId !== currentShowAsset?.asset?.moveBundle.id; else normalBundleName" class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                     </div>
                     <ng-template #normalBundleName>
                         <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-
+                            {{dataItem.moveBundle.name}}
                         </div>
                     </ng-template>
                 </ng-template>
@@ -148,6 +149,7 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
                     <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(currentShowAsset.id, dataItem.assetId)">
                         {{dataItem.type}}
+                        <img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
                     </div>
                 </ng-template>
 
