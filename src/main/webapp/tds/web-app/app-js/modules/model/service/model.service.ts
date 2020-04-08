@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ModelModel} from '../model/model.model';
-import {Aka} from "../../../shared/components/aka/model/aka.model";
 
 @Injectable()
 export class ModelService {

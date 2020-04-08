@@ -98,7 +98,6 @@ export class ModelListComponent implements OnInit {
 		this.gridModel.columnModel = this.columnModel;
 
 		// fetch additional collections
-		this.getAssetTypeList();
 		this.getManufacturerList();
 	}
 
@@ -107,10 +106,6 @@ export class ModelListComponent implements OnInit {
 			.subscribe((list: any) => {
 				this.manufacturerList = list;
 			})
-	}
-
-	private getAssetTypeList(): void {
-
 	}
 
 	private loadData = async (): Promise<ModelModel[]> => {
