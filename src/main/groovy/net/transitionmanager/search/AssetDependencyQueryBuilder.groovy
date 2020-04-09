@@ -224,12 +224,12 @@ class AssetDependencyQueryBuilder extends DomainQueryBuilder implements TagSearc
 	}
 
 	/**
-	 * Return the 'dep.id' as the property for the group by.
+	 * Return an empty string, as no group by is required.
 	 * @return
 	 */
 	@Override
 	protected String getGroupByProperty() {
-		return "dep.id"
+		return ""
 	}
 
 	/**
