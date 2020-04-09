@@ -108,7 +108,16 @@ export class ExportAssetComponent implements OnInit {
 			}
 		});
 		this.selectedAll = totalSelected === this.userPreferences.length;
+		console.log(totalSelected);
 		return true;
+	}
+
+	/**
+	 * Get the selected items counter
+	 */
+	getSelectedCounter(): number {
+		const userPreferences = this.userPreferences || [];
+		return userPreferences.filter((item: any) => item.selected).length;
 	}
 
 	/**

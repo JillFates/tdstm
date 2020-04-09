@@ -5,8 +5,8 @@
 		<div>
 			<form id="exportForm" name="exportForm" role="form">
 				<div class="export-assets">
-					<div class="export-assets-grid">
-						<div>
+					<div class="clr-row">
+						<div class="clr-col-6">
 							<label for="bundleId" class="label-for-export-asset"
 								>{{
 									translatePipe.transform(
@@ -36,7 +36,7 @@
 								>
 							</select>
 						</div>
-						<div class="" *ngIf="userPreferences.length > 0">
+						<div class="clr-col-4" *ngIf="userPreferences.length > 0">
 							<label
 								for="checkboxGroup"
 								class="label-for-export-asset"
@@ -267,27 +267,28 @@
 								</clr-checkbox-wrapper>
 							</clr-checkbox-container>
 						</div>
-					</div>
-					<div class="pull-right">
-						<tds-button-custom
-							[icon]="'download-cloud'"
-							[theme]="'primary'"
-							[title]="
+						<div class="clr-col-2 action-column">
+							<tds-button-custom
+                                    [disabled]="!getSelectedCounter()"
+									[icon]="'download-cloud'"
+									[theme]="'primary'"
+									[title]="
 								translatePipe.transform(
 									'ASSET_EXPORT.EXPORT_BUTTON'
 								)
 							"
-							(click)="exportData()"
-							[type]="'submit'"
-							id="exportButton"
-							aria-hidden="true"
-						>
-						</tds-button-custom>
-						<div
-							class="form-group error-bundle"
-							*ngIf="this.errorMessage"
-						>
-							{{ this.errorMessage }}
+									(click)="exportData()"
+									[type]="'submit'"
+									id="exportButton"
+									aria-hidden="true"
+							>
+							</tds-button-custom>
+							<div
+									class="form-group error-bundle"
+									*ngIf="this.errorMessage"
+							>
+								{{ this.errorMessage }}
+							</div>
 						</div>
 					</div>
 				</div>
