@@ -108,7 +108,6 @@ export class ExportAssetComponent implements OnInit {
 			}
 		});
 		this.selectedAll = totalSelected === this.userPreferences.length;
-		console.log(totalSelected);
 		return true;
 	}
 
