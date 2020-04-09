@@ -34,7 +34,7 @@ export const AssetExplorerRoute: Routes = [
 		path: AssetExplorerStates.ARCHITECTURE_GRAPH.url,
 		data: {
 			page: {
-				title: 'ARCHITECTURE.ARCHITECTURE_GRAPH', instruction: '',
+				title: 'ARCHITECTURE.GOJSARCHITECTUREGRAPH', instruction: '',
 				menu: ['ASSETS.ASSETS', 'ARCHITECTURE.GOJSARCHITECTUREGRAPH'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-architecture-graph-gojs', subMenu: false }
 			}
