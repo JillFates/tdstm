@@ -4,7 +4,7 @@ import {
 	EventEmitter,
 	HostListener,
 	Input,
-	Output,
+	Output, Renderer2,
 	ViewChild
 } from '@angular/core';
 import {ReplaySubject} from 'rxjs';
@@ -13,6 +13,7 @@ import {IGraphTask} from '../../model/graph-task.model';
 import {ITaskHighlightOption, ITaskHighlightQuery} from '../../model/task-highlight-filter.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {TaskService} from '../../service/task.service';
+import {Collision} from '@progress/kendo-angular-popup';
 
 @Component({
 	selector: 'task-highlight-filter',
@@ -23,8 +24,8 @@ import {TaskService} from '../../service/task.service';
                   <fa-icon [icon]="icons.faFilter"></fa-icon>
               </button>
               <kendo-popup
+				              [collision]="collision"
                       [anchor]="anchor"
-                      (anchorViewportLeave)="show = false"
                       [ngClass]="'highlight-filter-popup'"
                       *ngIf="show">
 		              <div class="popup-option">
@@ -119,6 +120,7 @@ import {TaskService} from '../../service/task.service';
                       class="form-control highlight-filter-control"
                       placeholder="Highlight filter"
                       [(ngModel)]="filterText"
+                      (keydown)="onTextFilterChange()"
                       #highlightFilterText
               />
           </div>
@@ -137,6 +139,8 @@ export class TaskHighlightFilter {
 	@Input('viewUnpublished') viewUnpublished: boolean;
 	@Output() filteredTasks: EventEmitter<IGraphTask[]> = new EventEmitter();
 	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
+	@ViewChild('highlightFilterContainer', {static: false}) highlightFilterContainer: ElementRef<HTMLElement>;
+	collision: Collision = { horizontal: 'flip', vertical: 'fit'};
 	icons = FA_ICONS;
 	filterText: string;
 	textFilter: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -151,7 +155,7 @@ export class TaskHighlightFilter {
 	show: boolean;
 	criticalPathMode: string;
 
-	constructor(private taskService: TaskService) {
+	constructor(private taskService: TaskService, private renderer: Renderer2) {
 		this.subscribeToHighlightFilter();
 	}
 
@@ -162,9 +166,9 @@ export class TaskHighlightFilter {
 		this.textFilter
 			.pipe(
 				takeUntil(this.unsubscribe$),
-				skip(2),
+				skip(3),
 				distinctUntilChanged()
-			).subscribe(this.tasksByQuery);
+			).subscribe(text => this.tasksByQuery(text));
 	}
 
 	tasksByQuery(text?: string): void {
@@ -176,12 +180,12 @@ export class TaskHighlightFilter {
 			teams: this.selectedTeam && this.selectedTeam.name || '',
 			ownerSmeId: this.appOwner && this.appOwner.id || '',
 			environments: this.environment && this.environment.name || '',
-			tagIds: this.tags.tagIds,
-			tagMatch: this.tags.operator,
+			tagIds: this.tags && this.tags.tagIds || [],
+			tagMatch: this.tags && this.tags.operator,
 			criticalPathMode: this.criticalPathMode,
-			cyclicalPath: this.highlightOptions.showCycles ? '1' : '0',
-			withActions: this.highlightOptions.withActions ? '1' : '0',
-			withTmdActions: this.highlightOptions.withTmdActions ? '1' : '0'
+			cyclicalPath: this.highlightOptions && this.highlightOptions.showCycles ? '1' : '0',
+			withActions: this.highlightOptions && this.highlightOptions.withActions ? '1' : '0',
+			withTmdActions: this.highlightOptions && this.highlightOptions.withTmdActions ? '1' : '0'
 		};
 		this.taskService.findTasksByQuery(this.filterQueryObj)
 			.subscribe(res => {
@@ -218,6 +222,14 @@ export class TaskHighlightFilter {
 			tagIds: event.tags.map(t => t.id),
 			operator: event.operator
 		};
+	}
+
+	hideHighlightFilterPopup(): void {
+		this.show = false;
+	}
+
+	onTextFilterChange(): void {
+		this.textFilter.next(this.filterText);
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

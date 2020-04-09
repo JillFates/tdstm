@@ -596,6 +596,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	highlightTasks(tasks: any): void {
 		if (tasks && tasks.length > 0) {
 			this.graph.highlightNodes((n: Node) => tasks && tasks.includes(n.data.id));
+		} else {
+			this.graph.clearHighlights();
 		}
 	}
 
@@ -1101,7 +1103,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Show loader
 	 */
 	showLoader(): void {
-		console.log('gif init');
 		this.notifierService.broadcast({
 			name: 'httpRequestInitial'
 		});
@@ -1111,7 +1112,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Hide loader
 	 */
 	hideLoader(): void {
-		console.log('gif completed');
 		this.notifierService.broadcast({
 			name: 'httpRequestCompleted'
 		});
