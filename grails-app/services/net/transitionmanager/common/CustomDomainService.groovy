@@ -306,7 +306,7 @@ class CustomDomainService implements ServiceMethods {
             }
         }
 
-        fieldSpecsCacheService.removeFieldSpecs(project, domain)
+        fieldSpecsCacheService.clearCache(project)
     }
 
     /**
