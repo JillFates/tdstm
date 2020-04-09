@@ -12,7 +12,6 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -1438,9 +1437,6 @@ class AssetEntityService implements ServiceMethods {
 			assetComment = "blank"
 		}
 
-		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
-		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
-
 		String userTzId = userPreferenceService.timeZone
 		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 
@@ -1467,14 +1463,12 @@ class AssetEntityService implements ServiceMethods {
 		    assetCommentList: assetCommentList,
 		    dateFormat: userPreferenceService.getDateFormat(),
 			dependencyBundleNumber: depBundle,
-			dependentAssets: dependentAssets,
 			errors: params.errors,
 			escapedName: getEscapedName(assetEntity),
 			prefValue: prefValue,
 			project: project,
 			client: project.client,
 			redirectTo: params.redirectTo,
-			supportAssets: supportAssets,
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
 			hasCreateTaskPermission: securityService.hasPermission(Permission.TaskCreate),

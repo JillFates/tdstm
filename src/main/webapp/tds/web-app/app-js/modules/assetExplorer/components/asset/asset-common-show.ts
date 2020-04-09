@@ -13,6 +13,11 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {AssetEditComponent} from './asset-edit.component';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {
+	SupportDependentsOnViewColumnsModel,
+	SupportOnColumnsModel
+} from '../../../../shared/components/supports-depends/model/support-on-columns.model';
 
 declare var jQuery: any;
 
@@ -21,11 +26,18 @@ export class AssetCommonShow implements OnInit {
 	protected userDateFormat: string;
 	protected userTimeZone: string;
 	protected mainAsset;
+	protected currentShowAsset = {asset: {moveBundleId: 0}};
 	protected assetType: DOMAIN;
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
 	public ignoreDoubleClickClasses =
 		['btn', 'clickableText', 'table-responsive', 'task-comment-component'];
+
+	public gridSupportsData: DataGridOperationsHelper;
+	public gridDependenciesData: DataGridOperationsHelper;
+
+	private supportOnColumnModel: SupportOnColumnsModel;
+	private dependentOnColumnModel: SupportOnColumnsModel;
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
@@ -35,13 +47,29 @@ export class AssetCommonShow implements OnInit {
 		protected assetExplorerService: AssetExplorerService,
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
-		protected windowService: WindowService) {
+		protected windowService: WindowService,
+		private metadata: any) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
 				.subscribe((userContext: UserContextModel) => {
 					this.userDateFormat = userContext.dateFormat;
 					this.userTimeZone = userContext.timezone;
 				});
+
+			this.gridSupportsData = new DataGridOperationsHelper(this.metadata.supports, [{
+				dir: 'asc',
+				field: 'name'
+			}], {mode: 'single', checkboxOnly: false}, {useColumn: 'id'}, 25);
+
+			this.gridDependenciesData = new DataGridOperationsHelper(this.metadata.dependents, [{
+				dir: 'asc',
+				field: 'name'
+			}], {mode: 'single', checkboxOnly: false}, {useColumn: 'id'}, 25);
+
+			this.supportOnColumnModel = new SupportDependentsOnViewColumnsModel();
+			this.dependentOnColumnModel = new SupportDependentsOnViewColumnsModel();
+
+			this.currentShowAsset = metadata.asset;
 	}
 
 	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {

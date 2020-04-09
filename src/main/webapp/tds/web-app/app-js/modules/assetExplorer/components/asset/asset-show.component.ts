@@ -20,6 +20,7 @@ import {StorageShowComponent} from '../storage/storage-show.component';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {AssetExplorerModule} from '../../asset-explorer.module';
+import {Observable} from 'rxjs';
 
 @Component({
 	selector: `tds-asset-all-show`,
@@ -41,25 +42,36 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {
-			this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}).subscribe((response: any) => {
-				let template = response;
-				const additionalImports = [AssetExplorerModule];
-				switch (this.asset) {
-					case 'APPLICATION':
-						this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata), this.view, additionalImports);
-						break;
-					case 'DATABASE':
-						this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata), this.view, additionalImports);
-						break;
-					case 'DEVICE':
-						this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata), this.view, additionalImports);
-						break;
-					case 'STORAGE':
-						this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata), this.view, additionalImports);
-						break;
-				}
+			Observable.zip(
+				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}),
+				this.http.get(`../ws/asset/dependenciesForShow/${this.modelId}`))
+					.subscribe((response: any) => {
+						let template = response[0];
+						let dependencies = response[1].data;
+						metadata.asset = dependencies.asset;
+						metadata.supports = dependencies.supports;
+						metadata.dependents = dependencies.dependents;
+
+						const additionalImports = [AssetExplorerModule];
+						switch (this.asset) {
+							case 'APPLICATION':
+								this.registerAndCreate(ApplicationShowComponent(template, this.modelId, metadata), this.view, additionalImports);
+								break;
+							case 'DATABASE':
+								this.registerAndCreate(DatabaseShowComponent(template, this.modelId, metadata), this.view, additionalImports);
+								break;
+							case 'DEVICE':
+								this.registerAndCreate(DeviceShowComponent(template, this.modelId, metadata), this.view, additionalImports);
+								break;
+							case 'STORAGE':
+								this.registerAndCreate(StorageShowComponent(template, this.modelId, metadata), this.view, additionalImports);
+								break;
+						}
+					});
+			}, (error) => {
+				console.error('Error: ');
+				console.error(error);
 			});
-		});
 	}
 
 	/**

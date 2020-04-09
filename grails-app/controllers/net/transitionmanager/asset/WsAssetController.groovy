@@ -649,4 +649,10 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson(key: key)
 	}
 
+	@HasPermission(Permission.AssetView)
+	def dependenciesForAsset(Long assetId) {
+		Project project = getProjectForWs()
+		renderSuccessJson(assetService.getDependenciesMapForAsset(project, assetId))
+	}
+
 }

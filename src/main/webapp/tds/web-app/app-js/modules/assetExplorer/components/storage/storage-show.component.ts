@@ -28,7 +28,7 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
+				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService, metadata);
 				this.mainAsset = modelId;
 				this.assetType = DOMAIN.STORAGE;
 				this.assetTags = metadata.assetTags;

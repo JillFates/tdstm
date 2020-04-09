@@ -3,7 +3,7 @@
  * So this is not in the Asset Explorer Module and belongs here instead.
  */
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
+import {DataGridOperationsHelper, RecordState} from '../../utils/data-grid-operations.helper';
 import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
 import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
@@ -20,11 +20,16 @@ declare var jQuery: any;
 	selector: 'tds-supports-depends',
 	template: `
         <kendo-grid
-                *ngIf="dataGridSupportsOnHelper"
+                *ngIf="dataGridSupportsOnHelper && dataGridSupportsOnHelper.gridData; let gridDataSupports"
                 class="dependents-grid"
+                [pageSize]="dataGridSupportsOnHelper.state.take"
+                [skip]="dataGridSupportsOnHelper.state.skip"
+         		[filterable]="true"
+                [pageable]="gridDataSupports.total === 0 ? false : {pageSizes: dataGridSupportsOnHelper.defaultPageOptions, info: true}"
+                (pageChange)="dataGridSupportsOnHelper.pageChange($event)"
                 [data]="dataGridSupportsOnHelper.gridData"
                 [sort]="dataGridSupportsOnHelper.state.sort"
-								[sortable]="false"
+				[sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
 
@@ -48,6 +53,21 @@ declare var jQuery: any;
                                [class]="column.cellClass ? column.cellClass : ''"
                                [style]="column.cellStyle ? column.cellStyle : ''"
                                [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+                <!-- Default Generic Filter Template -->
+                <ng-template kendoGridFilterCellTemplate let-filter>
+                    <div class="has-feedback" style="margin-bottom:0px;">
+                        <div *ngIf="column.property !== 'action'">
+                            <input type="text" (keyup)="dataGridSupportsOnHelper.onFilter(column)" class="form-control"
+                                   name="{{column.property}}" [(ngModel)]="column.filter"
+                                   placeholder="Filter" value="">
+                            <span *ngIf="column.filter" (click)="dataGridSupportsOnHelper.clearValue(column)"
+                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </ng-template>
+
 
                 <!-- Header Template -->
                 <ng-template kendoGridHeaderTemplate>
@@ -75,16 +95,17 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
                             [(ngModel)]="dataItem.dataFlowFreq"
+                            (valueChange)="updateRecordState(dataItem)"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClassName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="dependencyClassList"
                             [textField]="'text'"
                             [valueField]="'id'"
@@ -103,12 +124,13 @@ declare var jQuery: any;
                     </tds-combobox>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundleName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                                        class="form-control" style="width: 100%;"
                                         [data]="moveBundleList"
                                         [textField]="'text'"
                                         [valueField]="'id'"
+                                        (valueChange)="this.updateRecordState(dataItem)"
                                         [(ngModel)]="dataItem.assetDepend.moveBundle"
                                         [ngClass]="getMoveBundleColor(dataItem)"
                                         (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
@@ -118,8 +140,9 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="typeList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.type"
                             required>
                     </kendo-dropdownlist>
@@ -127,8 +150,9 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="statusList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.status"
                             required>
                     </kendo-dropdownlist>
@@ -138,9 +162,14 @@ declare var jQuery: any;
         </kendo-grid>
 
         <kendo-grid
-                *ngIf="dataGridDependsOnHelper"
+                *ngIf="dataGridDependsOnHelper && dataGridDependsOnHelper.gridData; let gridDataDependent"
                 class="dependents-grid is-dependent-on"
                 [data]="dataGridDependsOnHelper.gridData"
+                [filterable]="true"
+                [pageable]="gridDataDependent.total === 0 ? false : {pageSizes: dataGridDependsOnHelper.defaultPageOptions, info: true}"
+                [pageSize]="dataGridDependsOnHelper.state.take"
+                [skip]="dataGridDependsOnHelper.state.skip"
+                (pageChange)="dataGridDependsOnHelper.pageChange($event)"
                 [sortable]="false"
                 [resizable]="true"
                 (sortChange)="dataGridDependsOnHelper.sortChange($event)">
@@ -158,7 +187,7 @@ declare var jQuery: any;
             </ng-template>
 
             <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
+            <kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
                                field="{{column.property}}"
                                [headerClass]="column.headerClass ? column.headerClass : ''"
                                [headerStyle]="column.headerStyle ? column.headerStyle : ''"
@@ -169,6 +198,20 @@ declare var jQuery: any;
                 <!-- Header Template -->
                 <ng-template kendoGridHeaderTemplate>
                     <label>{{column.label}}</label>
+                </ng-template>
+
+                <!-- Default Generic Filter Template -->
+                <ng-template kendoGridFilterCellTemplate let-filter>
+                    <div class="has-feedback" style="margin-bottom:0px;">
+                        <div *ngIf="column.property !== 'action'">
+                            <input type="text" (keyup)="dataGridDependsOnHelper.onFilter(column)" class="form-control"
+                                   name="{{column.property}}" [(ngModel)]="column.filter"
+                                   placeholder="Filter" value="">
+                            <span *ngIf="column.filter" (click)="dataGridDependsOnHelper.clearValue(column)"
+                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
                 </ng-template>
 
                 <!-- Action -->
@@ -192,16 +235,17 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							class="form-control" style="width: 100%;"
                             [data]="dataFlowFreqList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.dataFlowFreq"
                             required>
                     </kendo-dropdownlist>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClassName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							class="form-control" style="width: 100%;"
                             [data]="dependencyClassList"
                             [textField]="'text'"
                             [valueField]="'id'"
@@ -220,12 +264,13 @@ declare var jQuery: any;
                     </tds-combobox>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundleName'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                                        class="form-control" style="width: 100%;"
                                         [data]="moveBundleList"
                                         [textField]="'text'"
                                         [valueField]="'id'"
+                                        (valueChange)="this.updateRecordState(dataItem)"
                                         [(ngModel)]="dataItem.assetDepend.moveBundle"
                                         [ngClass]="getMoveBundleColor(dataItem)"
                                         (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
@@ -235,8 +280,9 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="typeList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.type"
                             required>
                     </kendo-dropdownlist>
@@ -244,8 +290,9 @@ declare var jQuery: any;
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
                     <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+                            class="form-control" style="width: 100%;"
                             [data]="statusList"
+                            (valueChange)="this.updateRecordState(dataItem)"
                             [(ngModel)]="dataItem.status"
                             required>
                     </kendo-dropdownlist>
@@ -263,6 +310,7 @@ export class SupportsDependsComponent implements OnInit {
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 	@Output('initDone')  initDone: EventEmitter<any> = new EventEmitter();
 	private supportOnColumnModel: SupportOnColumnsModel;
+	private dependentOnColumnModel: SupportOnColumnsModel;
 	private dataFlowFreqList = [];
 	private dependencyClassList = [];
 	private typeList = [];
@@ -302,7 +350,7 @@ export class SupportsDependsComponent implements OnInit {
 
 		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+			this.model.dependencyMap.supportAssets = [];
 			if (this.dataGridDependsOnHelper) {
 				this.initDone.emit(this.model);
 			}
@@ -310,7 +358,7 @@ export class SupportsDependsComponent implements OnInit {
 
 		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.dependentAssets = [];
 			if (this.dataGridSupportsOnHelper) {
 				this.initDone.emit(this.model);
 			}
@@ -324,6 +372,7 @@ export class SupportsDependsComponent implements OnInit {
 	private getDependencyList(dependencyMap: string, dependencyType): Observable<DataGridOperationsHelper> {
 		return new Observable(observer => {
 			this.supportOnColumnModel = new SupportOnColumnsModel();
+			this.dependentOnColumnModel = new SupportOnColumnsModel();
 			let dependencies = [];
 			if (this.model.dependencyMap && this.model.dependencyMap[dependencyMap]) {
 				let assets = R.clone(this.model.dependencyMap[dependencyMap]);
@@ -331,6 +380,7 @@ export class SupportsDependsComponent implements OnInit {
 					let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
 					let dependencySupportModel: DependencySupportModel = {
 						id: dependency.id,
+						recordState: RecordState.pristine,
 						dataFlowFreq: dependency.dataFlowFreq,
 						assetClass: assetClass,
 						assetDepend: {
@@ -338,6 +388,9 @@ export class SupportsDependsComponent implements OnInit {
 							text: dependency.asset.name,
 							moveBundle: R.clone(dependency.asset.moveBundle)
 						},
+						assetName: dependency.asset.name,
+						assetClassName: assetClass.text,
+						moveBundleName: dependency.asset.moveBundle.name,
 						type: dependency.type,
 						status: dependency.status,
 						dependencyType: dependencyType,
@@ -346,8 +399,28 @@ export class SupportsDependsComponent implements OnInit {
 					dependencies.push(dependencySupportModel);
 				});
 			}
-			observer.next(new DataGridOperationsHelper(dependencies, null, null, null, 2000));
+			observer.next(new DataGridOperationsHelper(dependencies,
+				[{ dir: 'asc', field: 'name'}],
+				{ mode: 'single', checkboxOnly: false},
+				{ useColumn: 'id' },
+				25));
 		});
+	}
+
+	/**
+	 * Set the flag indicating the record state (updated, created)
+	 * after that updates the internal model
+	 * @param dataItem
+	 */
+
+	public updateRecordState(dataItem: DependencySupportModel): void {
+		if (dataItem.recordState === RecordState.created) {
+			this.onChangeInternalModel();
+			return;
+		} else {
+			dataItem.recordState = RecordState.updated;
+			this.onChangeInternalModel();
+		}
 	}
 
 	/**
@@ -360,6 +433,7 @@ export class SupportsDependsComponent implements OnInit {
 		}
 		let dependencySupportModel: DependencySupportModel = {
 			id: 0,
+			recordState: RecordState.created,
 			dataFlowFreq: this.dataFlowFreqList[0],
 			assetClass: this.dependencyClassList[0],
 			assetDepend: {
@@ -376,8 +450,9 @@ export class SupportsDependsComponent implements OnInit {
 			comment: ''
 		};
 
-		dataGrid.addDataItem(dependencySupportModel);
+		dataGrid.addResultSetItem(dependencySupportModel);
 		this.onChangeInternalModel();
+		this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
 	}
 
 	/**
@@ -390,7 +465,7 @@ export class SupportsDependsComponent implements OnInit {
 			text: '',
 			moveBundle: dataItem.assetDepend.moveBundle
 		};
-		this.onChangeInternalModel();
+		this.updateRecordState(dataItem);
 	}
 
 	/**
@@ -398,6 +473,8 @@ export class SupportsDependsComponent implements OnInit {
 	 * @param {DependencySupportModel} dataItem
 	 */
 	public onDependencyChange(dependency: any, dataItem: DependencySupportModel): void {
+		this.updateRecordState(dataItem);
+
 		if (dependency) {
 			let changeParams = {
 				assetId: dependency.id,
@@ -455,7 +532,7 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		}
 
-		dataGrid.removeDataItem(dataItem);
+		dataGrid.removeResultSetItem(dataItem);
 		this.onChangeInternalModel();
 	}
 
@@ -477,6 +554,7 @@ export class SupportsDependsComponent implements OnInit {
 			], true, false)
 			.then((result) => {
 				dataItem.comment = result.comment;
+				this.updateRecordState(dataItem);
 			}).catch((error) => console.log(error));
 	}
 
@@ -524,8 +602,8 @@ export class SupportsDependsComponent implements OnInit {
 		});
 
 		if (validForm) {
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.getCreatedUpdatedRecords();
+			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
 			this.model.dependencyMap.dependentsToDelete = this.dependentsToDelete;
 			this.model.dependencyMap.supportsToDelete = this.supportsToDelete;
 		}

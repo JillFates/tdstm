@@ -108,20 +108,20 @@ enum AssetClass {
 
 	/**
 	 * @todo @see getDomainNameForAssetType()
-	 * This method determines the domain for a given Asset Type.
+	 * This method determines the domain for a given Asset Class.
 	 * Presently, the only domains supported are:
 	 *	- Application
 	 *	- Storage
 	 *	- Database
 	 *	- Device
-	 * @param assetType : string with the given asset type
+	 * @param assetClazz : string with the given Class Simple Name
 	 * @return domain
 	 */
-	static String getDomainForAssetType(String assetType) {
+	static String getDomainForAssetType(String assetClazz) {
 		String domain
-		if(!StringUtil.isBlank(assetType)){
-			assetType = assetType.toUpperCase()
-			switch (assetType) {
+		if(!StringUtil.isBlank(assetClazz)){
+			assetClazz = assetClazz.toUpperCase()
+			switch (assetClazz) {
 				case "APPLICATION":
 					domain = "Application"
 					break
