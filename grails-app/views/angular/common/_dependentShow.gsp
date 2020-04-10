@@ -144,7 +144,7 @@
                         </div>
                     </div>
                     <ng-template #normalBundleNameDependent>
-                        <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                        <div class="cell-template dep-{{dataItem.status}} bundle" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                             {{dataItem.moveBundle.name}}
                         </div>
                     </ng-template>
