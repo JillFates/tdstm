@@ -164,7 +164,7 @@ class TaskSearch {
 
         if (taskSearchCommand.taskText) {
             String comment = "%${taskSearchCommand.taskText}%"
-            taskWhereClauses.add('comment = :taskText')
+            taskWhereClauses.add('comment LIKE :taskText')
             queryParams['taskText'] = comment
         }
 
