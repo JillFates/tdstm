@@ -3697,6 +3697,173 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 		cleanup:
 			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-17516')
+	void 'test all fields in SOURCE objects are String type for a CSV dataset'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				name,version
+				'FUBAR',1
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					load 'Name' with SOURCE.name
+					load 'Version' with SOURCE.version
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'appVersion'] as Set
+					assertWith(data[0]) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							value == 'FUBAR'
+							originalValue == 'FUBAR'
+						}
+						assertWith(fields.appVersion) {
+							value == '1'
+							originalValue == '1'
+						}
+					}
+				}
+			}
+
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-17516')
+	void 'test all fields in SOURCE objects are String type for a Excel dataset'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', """
+					name,version
+					FUBAR,1
+				""".stripIndent().trim()
+			)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				sheet 'Applications'
+				read labels
+				domain Application
+				iterate {
+					load 'Name' with SOURCE.name
+					load 'Version' with SOURCE.version
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'appVersion'] as Set
+					assertWith(data[0]) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							value == 'FUBAR'
+							originalValue == 'FUBAR'
+						}
+						assertWith(fields.appVersion) {
+							value == '1'
+							originalValue == '1'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-17516')
+	void 'test all fields in SOURCE objects are String type for a JSON dataset'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				[
+					{
+						"name": "FUBAR",
+						"version": 1
+					}
+				]
+			'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					load 'Name' with SOURCE.name
+					load 'Version' with SOURCE.version
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'appVersion'] as Set
+					assertWith(data[0]) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							value == 'FUBAR'
+							originalValue == 'FUBAR'
+						}
+						assertWith(fields.appVersion) {
+							value == 1
+							originalValue == 1
+						}
+					}
+				}
+			}
+
+
+		cleanup:
+			if (fileName) {
 				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
