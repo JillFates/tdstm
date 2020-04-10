@@ -133,6 +133,12 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 				if (this.taskDetailModel.modal.type === ModalType.CREATE) {
 					this.model.assignedTo = this.model.personList[0];
 					this.model.assignedTeam = this.model.teamList[0];
+				} else if (this.model.assignedTeam.text) {
+					// If on EDIT mode and we have a team already set on model, search for the full item from the teamList.
+					const match = this.model.teamList.find(team => team.text === this.model.assignedTeam.text);
+					if (match) {
+						this.model.assignedTeam = match;
+					}
 				}
 				this.dateFormat = dateFormat;
 				this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
