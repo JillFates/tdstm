@@ -24,9 +24,12 @@
           cursor: pointer
           padding: 0px !important
           .cell-template
-            height: 30px
+            height: 100%
             padding-top: 9px
             padding-left: 2px
+            &.bundle
+              height: 100%
+              padding-top: unset
             &.dep-Validated
               background: LightGreen
             &.dep-Unknown

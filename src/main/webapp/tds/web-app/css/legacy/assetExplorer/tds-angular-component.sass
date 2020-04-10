@@ -364,6 +364,13 @@
   span.k-input, li.move-bundle-item, .dependent-show
     background-color: $color--red !important
     color: white !important
+.dependent-show
+  white-space: normal
+  height: 100%
+  display: flex
+  justify-content: flex-start
+  align-items: center
+  padding: 2px
 
 .bundle-dep-validated,
 .bundle-dep-unknown,
@@ -371,12 +378,7 @@
 .bundle-dep-not, .bundle-dep-archived, .bundle-dep-future,
 .bundle-dep-no-valid
   height: 100%
-  .dependent-show
-    height: 100%
-    display: flex
-    justify-content: flex-start
-    align-items: center
-    padding-left: 3px
+
   span.k-input
     height: 29.2px !important
   li.move-bundle-item .k-state-selected

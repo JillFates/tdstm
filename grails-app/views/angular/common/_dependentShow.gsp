@@ -53,13 +53,14 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
                     <div *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleNameSupport"
                          [ngClass]="getMoveBundleClass(dataItem, currentShowAsset)"
+                        class="cell-template bundle"
                          (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                         <div class="dependent-show">
                             {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                         </div>
                     </div>
                     <ng-template #normalBundleNameSupport>
-                        <div class="cell-template dep-{{dataItem.status}}"
+                        <div class="cell-template dep-{{dataItem.status}} bundle"
                              (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                             {{dataItem.moveBundle.name}}
                         </div>
@@ -136,6 +137,7 @@
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
                     <div [ngClass]="getMoveBundleClass(dataItem, currentShowAsset)"
                          *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleNameDependent"
+                         class="cell-template bundle"
                          (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                         <div class="dependent-show">
                             {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
