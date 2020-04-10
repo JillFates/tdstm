@@ -536,7 +536,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	protected onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
 		if (dataItem && !dataItem.isNew && fieldTypeChange) {
 			this.dialogService.confirm(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
 				fieldTypeChange.conversion.getWarningMessage()
 			).subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
@@ -560,7 +560,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		const previousControl = dataItem.control;
 		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
 			this.dialogService.confirm(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
 				'Changing the control will lose all List options. Click Ok to continue otherwise Cancel'
 			).subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {

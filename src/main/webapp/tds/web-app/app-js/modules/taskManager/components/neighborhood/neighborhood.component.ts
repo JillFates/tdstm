@@ -1062,7 +1062,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Show loader
 	 */
 	showLoader(): void {
-		console.log('gif init');
 		this.notifierService.broadcast({
 			name: 'httpRequestInitial'
 		});
@@ -1072,7 +1071,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Hide loader
 	 */
 	hideLoader(): void {
-		console.log('gif completed');
 		this.notifierService.broadcast({
 			name: 'httpRequestCompleted'
 		});
