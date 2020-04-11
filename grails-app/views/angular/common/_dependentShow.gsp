@@ -51,14 +51,17 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
-                    <div style="background-color: lightpink;" *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId && dataItem.status === 'Validated'" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                    <div *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleNameSupport"
+                         [ngClass]="getMoveBundleClass(dataItem, currentShowAsset)"
+                        class="cell-template bundle"
+                         (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                        <div class="dependent-show">
+                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        </div>
                     </div>
-                    <div *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleName" class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
-                    </div>
-                    <ng-template #normalBundleName>
-                        <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                    <ng-template #normalBundleNameSupport>
+                        <div class="cell-template dep-{{dataItem.status}} bundle"
+                             (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                             {{dataItem.moveBundle.name}}
                         </div>
                     </ng-template>
@@ -76,7 +79,6 @@
                         {{dataItem.status}}
                     </div>
                 </ng-template>
-
             </kendo-grid-column>
         </kendo-grid>
     </div>
@@ -133,14 +135,16 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
-                    <div style="background-color: lightpink;" *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId && dataItem.status === 'Validated'" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                    <div [ngClass]="getMoveBundleClass(dataItem, currentShowAsset)"
+                         *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleNameDependent"
+                         class="cell-template bundle"
+                         (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                        <div class="dependent-show">
+                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        </div>
                     </div>
-                    <div *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleName" class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
-                    </div>
-                    <ng-template #normalBundleName>
-                        <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                    <ng-template #normalBundleNameDependent>
+                        <div class="cell-template dep-{{dataItem.status}} bundle" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                             {{dataItem.moveBundle.name}}
                         </div>
                     </ng-template>

@@ -157,4 +157,16 @@ export class AssetCommonShow implements OnInit {
 	openGraphUrl() {
 		this.windowService.getWindow().open(this.getGraphUrl(), '_blank');
 	}
+
+	/**
+	 * Calculate the class for the Move Bundle
+	 * @returns {string}
+	 */
+	public getMoveBundleClass(dataItem: any, currentShowAsset: any): string {
+		if (dataItem.moveBundle.id !== currentShowAsset && currentShowAsset.moveBundleId && dataItem.status === 'Validated') {
+			return 'bundle-dep-no-valid';
+		} else {
+			return 'cell-template dep-' + dataItem.status;
+		}
+	}
 }
