@@ -184,7 +184,7 @@ export class AssetCommonShow implements OnInit {
 	 */
 	public getMoveBundleClass(dataItem: any, currentShowAsset: any): string {
 		if (dataItem.moveBundle.id !== currentShowAsset && currentShowAsset.moveBundleId && dataItem.status === 'Validated') {
-			return 'bundle-dep-no-valid';
+			return 'bundle-dep-questioned';
 		} else {
 			return 'cell-template dep-' + dataItem.status;
 		}
