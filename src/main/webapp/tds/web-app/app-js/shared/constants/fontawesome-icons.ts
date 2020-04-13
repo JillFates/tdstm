@@ -16,7 +16,7 @@ import {
 	faSearchMinus,
 	faCubes,
 	faSitemap,
-	faListUl, faMinus, faCheck, faForward, faSignal, faStream, faUsers, faWindowClose, faFilter
+	faListUl, faMinus, faCheck, faForward, faSignal, faStream, faUsers, faWindowClose, faFilter, faQuestion
 } from '@fortawesome/free-solid-svg-icons';
 
 export const FA_ICONS = {
@@ -44,5 +44,6 @@ export const FA_ICONS = {
 	faStream: faStream,
 	faUsers: faUsers,
 	faWindowClose: faWindowClose,
-	faFilter: faFilter
+	faFilter: faFilter,
+	faQuestion: faQuestion,
 };

@@ -160,7 +160,9 @@ class WsProjectController implements ControllerMethods {
 				  isDeleteable         : isDeleteable,
 				  planMethodology      : planMethodology,
 				  projectTypes         : projectTypes,
-				  planMethodologies    : planMethodologies
+				  planMethodologies    : planMethodologies,
+				  startDate			   : project.startDate,
+				  completionDate	   : project.completionDate
 		])
 	}
 

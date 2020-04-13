@@ -512,7 +512,10 @@ class UrlMappings {
 
 		"/ws/model" {
 			controller = "wsModel"
-			action = [POST: "save"]
+			action = [
+					POST: "save",
+					PUT: "update"
+			]
 		}
 
 		"/ws/model/$id" {

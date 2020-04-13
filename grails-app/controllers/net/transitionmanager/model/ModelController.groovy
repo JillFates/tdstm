@@ -1,31 +1,35 @@
 package net.transitionmanager.model
 
+import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.ExportUtil
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
+import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.asset.AssetCableMap
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityAttributeLoaderService
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.ModelService
-import net.transitionmanager.exception.ServiceException
-import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.tm.enums.domain.AssetCableStatus
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.*
-import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.security.Permission
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.MediaType
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.web.multipart.MultipartFile
+
 import java.text.DateFormat
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -33,6 +37,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	static allowedMethods = [save: 'POST', update: 'POST', delete: 'POST']
 	static defaultAction = 'list'
 	static final OK_CONTENTS = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+	private final static DELETE_OK_MESSAGE = "Model deleted successfully."
+	private final static DELETE_ERROR_MESSAGE = "Model not found."
 
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	AssetEntityService                assetEntityService
@@ -55,7 +61,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.ModelList)
 	def listJson() {
 
-		// This map contains all the possible fileds that the user could be sorting or filtering on
+		// This map contains all the possible fields that the user could be sorting or filtering on
 		Map<String, String> filterParams = [
 			modelName: params.modelName, manufacturer: params.manufacturer, description: params.description,
 			assetType: params.assetType, powerUse: params.powerUse, modelConnectors: params.modelConnectors,
@@ -75,26 +81,18 @@ class ModelController implements ControllerMethods, PaginationMethods {
 
 		List modelInstanceList = modelService.listOfFilteredModels(filterParams, paginationAsObject() )
 
-		// Limit the returned results to the user's page size and number
-		Integer maxRows = paginationMaxRowValue('rows', null, false)
-		Integer currentPage = paginationPage()
-		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
-		Integer totalRows = modelInstanceList.size()
-		Integer numberOfPages = Math.ceil(totalRows / maxRows)
+        def results = modelInstanceList?.collect {
+            Map<String, Object> data = [id: it.modelId, modelName: it.modelName, manufacturer: it.manufacturer,
+                    description: displayModelValues(modelPref["1"], it),
+                    assetType: displayModelValues(modelPref["2"], it),
+                    lastModified: displayModelValues(modelPref["3"], it),
+                    connectors: displayModelValues(modelPref["4"], it),
+                    assetsCount:  it.assetsCount, sourceTDSVersion:  it.sourceTDSVersion,
+                    sourceTDS:  it.sourceTDS, modelStatus: it.modelStatus]
+            data
+        }
 
-		// Get the subset of all records based on the pagination
-		modelInstanceList = (totalRows > 0) ? modelInstanceList = modelInstanceList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)] : []
-
-		// Reformat the list to allow jqgrid to use it
-		def results = modelInstanceList?.collect {[
-			id: it.modelId,
-			cell: [it.modelName, it.manufacturer, displayModelValues(modelPref["1"], it),
-			       displayModelValues(modelPref["2"], it), displayModelValues(modelPref["3"], it),
-			       displayModelValues(modelPref["4"], it), it.assetsCount, it.sourceTDSVersion,
-			       it.sourceTDS, it.modelStatus]
-		]}
-
-		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
+            renderSuccessJson([rows: results])
 	}
 
 	@HasPermission(Permission.ModelCreate)
@@ -115,31 +113,17 @@ class ModelController implements ControllerMethods, PaginationMethods {
 	}
 
 	@HasPermission(Permission.ModelCreate)
-	def create(String modelId) {
-		List<ModelConnector> modelConnectors
-		Model modelTemplate
+	def create() {
 
-
-		if (modelId) {
-			modelTemplate = Model.get(modelId)
-			modelConnectors = ModelConnector.findAllByModel(modelTemplate)
-		}
-
-		List<Integer> otherConnectors = []
-		int existingConnectors = modelConnectors ? modelConnectors.size() + 1 : 1
-
-		for (int i = existingConnectors; i < 51; i++) {
-			otherConnectors << i
-		}
-
-		[
-			modelInstance  : new Model(),
-			modelConnectors: modelConnectors,
-			otherConnectors: otherConnectors,
-			modelTemplate  : modelTemplate,
-			powerType      : userPreferenceService.getPreference(PREF.CURR_POWER_TYPE),
-			assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
-		]
+		renderSuccessJson([
+				modelInstance  : new Model(),
+				modelConnectors: null,
+				otherConnectors: (1..50).collect {it},
+				modelTemplate  : null,
+				powerType      : userPreferenceService.getPreference(PREF.CURR_POWER_TYPE),
+				assetTypes     : AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value,
+				usizeList      : GormUtil.getConstrainedProperties(Model).usize.inList
+		])
 	}
 
 	private boolean isValidImage(MultipartFile file) {
@@ -147,101 +131,6 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			return OK_CONTENTS.contains(file.getContentType())
 		}
 		return false
-	}
-
-	@HasPermission(Permission.ModelEdit)
-	def save() {
-		try {
-			def modelId = params.modelId
-			def powerNameplate = params.float("powerNameplate", 0f)
-			def powerDesign = params.float("powerDesign", 0f)
-			def powerUsed = params.float("powerUse", 0f)
-			def powerType = params.powerType
-			def endOfLifeDate = params.endOfLifeDate
-			def memorySize = params.double("memorySize", 0f)
-			def storageSize = params.double("storageSize", 0f)
-
-			if (endOfLifeDate) {
-				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
-			}
-
-			if (powerType == "Amps") {
-				powerNameplate *= 120
-				powerDesign *= 120
-				powerUsed *= 120
-			}
-
-			Model modelTemplate = modelId ? Model.get(modelId) : null
-			params.useImage = params.boolean("useImage", false) ? 1 : 0
-			params.sourceTDS = params.boolean("sourceTDS", false) ? 1 : 0
-			params.roomObject = params.boolean("roomObject", false)
-			params.powerUse = powerUsed
-
-			def modelInstance = new Model(params)
-			modelInstance.powerUse = powerUsed
-			modelInstance.powerDesign = powerDesign
-			modelInstance.powerNameplate = powerNameplate
-			modelInstance.memorySize = memorySize
-			modelInstance.storageSize = storageSize
-
-			if (params.modelStatus == 'valid') {
-				modelInstance.validatedBy = securityService.loadCurrentPerson()
-			}
-
-			def frontImage = request.getFile('frontImage')
-			if (frontImage && frontImage?.bytes?.size() > 0) {
-				if (!isValidImage(frontImage)) {
-					flash.message = "Front Image must be one of: ${OK_CONTENTS}"
-					render(view: "create", model: [modelInstance: modelInstance])
-					return
-				}
-			} else if (modelTemplate) {
-				modelInstance.frontImage = modelTemplate.frontImage
-			} else {
-				modelInstance.frontImage = null
-			}
-
-			def rearImage = request.getFile('rearImage')
-			if (rearImage && rearImage?.bytes?.size() > 0) {
-				if (!isValidImage(rearImage)) {
-					flash.message = "Rear Image must be one of: ${OK_CONTENTS}"
-					render(view: "create", model: [modelInstance: modelInstance])
-					return
-				}
-			} else if (modelTemplate) {
-				modelInstance.rearImage = modelTemplate.rearImage
-			} else {
-				modelInstance.rearImage = null
-			}
-
-			if (modelService.save(modelInstance, params)) {
-				flash.message = "${modelInstance.modelName} created"
-				redirect(action: "list", id: modelInstance.id)
-			} else {
-				modelInstance.errors.allErrors.each {  log.error it }
-
-				def modelConnectors = modelTemplate ? ModelConnector.findAllByModel(modelTemplate) : null
-				def otherConnectors = []
-				def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
-				for (int i = existingConnectors ; i<51; i++) { // <SL> magic number 51?
-					otherConnectors << i
-				}
-
-				Map modelPref = assetEntityService.getExistingPref(PREF.Model_Columns)
-				Map attributes = Model.getModelFieldsAndlabels()
-				Map columnLabelpref = [:]
-				modelPref.each { key, value -> columnLabelpref[key] = attributes[value] }
-				render(view: "list", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
-											 otherConnectors:otherConnectors, modelTemplate:modelTemplate,
-											 modelPref: modelPref,
-											 attributesList: attributes.keySet().sort(),
-											 columnLabelpref: columnLabelpref ] )
-			}
-		} catch (ServiceException e) {
-			//log.error(e.message, e)
-			flash.message = e.message
-			redirect(action: 'list')
-		}
 	}
 
 	@HasPermission(Permission.ModelView)
@@ -253,16 +142,27 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				flash.message = "Model not found with Id $params.id"
 				redirect(action: "list")
 			} else {
+				def userList = Person.getAll()
 				def modelConnectors = ModelConnector.findAllByModel(model,[sort:"id"])
 				def modelAkas = WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(model, [sort:'name']).name)
+                def modelAkas2 = ModelAlias.findAllByModel(model, [sort:'name'])
+                def powerType = userPreferenceService.getPreference(PREF.CURR_POWER_TYPE) ?: 'Watts'
 
-				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas,
+				def usizeList = com.tdssrc.grails.GormUtil.getConstrainedProperties(model.class).usize.inList
+				def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+
+
+				def paramsMap = [modelInstance: model, modelConnectors: modelConnectors, modelAkas: modelAkas2,
 				                 modelHasPermission: securityService.hasPermission(Permission.ModelValidate),
-				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model)]
+				                 redirectTo: params.redirectTo, modelRef: AssetEntity.findByModel(model),
+								 usizeList: usizeList, assetTypes: assetTypes, userList: userList,
+								 modelCreatedBy: model.getCreatedByName(), modelUpdatedBy: model.getUpdatedByName(),
+								 modelValidatedBy: model.getValidatedByName(), powerType: powerType]
 
-				def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
+				// def view = params.redirectTo == "assetAudit" ? "_modelAuditView" : (params.redirectTo == "modelDialog" ? "_show" : "show")
 
-				render(view: view, model: paramsMap)
+				// render(view: view, model: paramsMap)
+				renderSuccessJson(paramsMap)
 			}
 		} else {
 			if (params.redirectTo == "assetAudit") {
@@ -317,130 +217,6 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			}
 		} else {
 			flash.message = "Model id $params.id is not a valid Id "
-			redirect(action: "list")
-		}
-	}
-
-	@HasPermission(Permission.ModelEdit)
-	def update() {
-		try{
-			def modelInstance = Model.get(params.id)
-			def modelStatus = modelInstance?.modelStatus
-			def endOfLifeDate = params.endOfLifeDate
-
-			Person person = null
-			if (securityService.loggedIn) {
-				person = securityService.userLoginPerson
-			}
-
-			if (endOfLifeDate) {
-				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
-			}
-
-			if (modelInstance) {
-				def powerNameplate = params.float("powerNameplate", 0f)
-				def powerDesign = params.float("powerDesign", 0f)
-				def powerUsed = params.float("powerUse", 0f)
-				def powerType = params.powerType
-				def memorySize = params.double("memorySize", 0f)
-				def storageSize = params.double("storageSize", 0f)
-
-				if (powerType == "Amps") {
-					powerNameplate = powerNameplate * 120
-					powerDesign = powerDesign * 120
-					powerUsed = powerUsed * 120
-				}
-
-				params.useImage = params.boolean("useImage", false) ? 1 : 0
-				params.sourceTDS = params.boolean("sourceTDS", false) ? 1 : 0
-				params.powerNameplate = powerNameplate
-				params.powerDesign = powerDesign
-				params.powerUse = powerUsed
-				params.memorySize = memorySize
-				params.storageSize = storageSize
-
-				def frontImage = request.getFile("frontImage")
-				if (frontImage && frontImage?.getBytes()?.getSize() > 0) {
-					if (!isValidImage(frontImage)) {
-						flash.message = "Front Image must be one of: ${OK_CONTENTS}"
-						render(view: "create", model: [modelInstance: modelInstance])
-						return
-					}
-					frontImage = frontImage.bytes
-				} else {
-					frontImage = modelInstance.frontImage
-				}
-
-				def rearImage = request?.getFile('rearImage')
-				if (request && rearImage?.getBytes()?.getSize() > 0) {
-						if (!isValidImage(rearImage)) {
-							flash.message = "Rear Image must be one of: ${OK_CONTENTS}"
-							render(view: "create", model: [modelInstance: modelInstance])
-							return
-						}
-						rearImage = rearImage.bytes
-				} else {
-					rearImage = modelInstance.rearImage
-				}
-
-				modelInstance.height = params.double("modelHeight", 0).round()
-				modelInstance.weight = params.double("modelWeight", 0).round()
-				modelInstance.depth = params.double("modelDepth", 0).round()
-				modelInstance.width = params.double("modelWidth", 0).round()
-
-				if (params.modelStatus == 'valid' && modelStatus == 'full') {
-					modelInstance.validatedBy = person
-					modelInstance.updatedBy = modelInstance.updatedBy
-				} else {
-					modelInstance.updatedBy = person
-				}
-
-				modelInstance.properties = params
-				modelInstance.rearImage = rearImage
-				modelInstance.frontImage = frontImage
-
-				try {
-					if (modelService.update(modelInstance, params)) {
-						flash.message = "$modelInstance.modelName Updated"
-						if (params.redirectTo == "assetAudit") {
-							render(template: "modelAuditView", model: [modelInstance: modelInstance])
-						} else {
-							forward(action: "show", params: [id: modelInstance.id])
-						}
-					} else {
-						modelInstance.errors.allErrors.each { log.error it }
-						flash.message = "Unable to update model."
-						forward(action: "edit", params: [id: modelInstance.id])
-					}
-				} catch (ServiceException e) {
-					//log.error(e.message, e)
-					flash.message = e.message
-					forward(action: "edit", params: [id: modelInstance.id])
-				}
-			} else {
-				flash.message = "Model not found with Id ${params.id}"
-				redirect(action: "list")
-			}
-		} catch(RuntimeException rte) {
-			//log.error(rte.message, rte)
-			flash.message = rte.message
-			redirect(controller:'model', action: 'list')
-		}
-	}
-
-	@HasPermission(Permission.ModelDelete)
-	def delete() {
-		Model model = Model.get(params.id)
-		try {
-			modelService.delete(model)
-			flash.message = "${model} deleted"
-			redirect(action: "list")
-		} catch (DataIntegrityViolationException e) {
-			//log.error(e.message, e)
-			flash.message = "${model} not deleted"
-			redirect(action: "show", id: params.id)
-		} catch (ServiceException e) {
-			//log.error(e.message, e)
 			redirect(action: "list")
 		}
 	}

@@ -225,7 +225,6 @@ export class UserContextState {
 	@Action(SetPageChange)
 	setPageChange(ctx: StateContext<UserContextModel>, {payload}: SetPageChange) {
 		const state = ctx.getState();
-		const notices = state.notices;
 		ctx.setState({
 			...state,
 			notices: {

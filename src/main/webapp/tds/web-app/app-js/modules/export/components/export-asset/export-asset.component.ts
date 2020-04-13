@@ -112,6 +112,14 @@ export class ExportAssetComponent implements OnInit {
 	}
 
 	/**
+	 * Get the selected items counter
+	 */
+	getSelectedCounter(): number {
+		const userPreferences = this.userPreferences || [];
+		return userPreferences.filter((item: any) => item.selected).length;
+	}
+
+	/**
 	 * Setup the data we will send to the backend to export the selected assets
 	 * Added validation to make sure at least one bundle is selected
 	 */
