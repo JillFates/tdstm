@@ -1418,7 +1418,7 @@ class AssetEntityService implements ServiceMethods {
 	 * The default/common properties shared between all of the Asset Show views
 	 */
 	@Transactional(readOnly = true)
-	Map getCommonModelForShows(String type, Project project, Map params, assetEntity = null) {
+	Map getCommonModelForShows(String type, Project project, Map params, assetEntity = null, boolean includeDependencies = true) {
 
 		// log.debug "### getCommonModelForShows() type=$type, project=$project.id, asset=${assetEntity? assetEntity.id : 'null'}"
 		if (assetEntity == null) {
@@ -1459,7 +1459,7 @@ class AssetEntityService implements ServiceMethods {
             assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
         }
 
-		[
+		Map model = [
 			assetId: assetEntity?.id,
 		    assetComment: assetComment,
 		    assetCommentList: assetCommentList,
@@ -1478,6 +1478,13 @@ class AssetEntityService implements ServiceMethods {
 			lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),
 			standardFieldSpecs: standardFieldSpecs
 		]
+
+		if (includeDependencies) {
+			model['dependentAssets'] = assetEntity.requiredDependencies()
+			model['supportAssets'] = assetEntity.supportedDependencies()
+		}
+
+		return model
 	}
 
 	/**
@@ -3073,15 +3080,16 @@ class AssetEntityService implements ServiceMethods {
 	 * @param project - the project of the user
 	 * @param assetEntity - current asset
 	 * @param params - request parameters
+	 * @param includeDependencies - whether or not dependencies should be included in the model.
 	 * @return a map of the properties containing the list values to populate the list controls
 	 */
-	Map getCommonModel(Boolean forCreate, Project project, AssetEntity assetEntity, String domain , Map params) {
+	Map getCommonModel(Boolean forCreate, Project project, AssetEntity assetEntity, String domain , Map params, boolean includeDependencies = true) {
 		Map commonModel
 
 		if (forCreate) {
 			commonModel = getCommonModelForCreate(domain, project, assetEntity)
 		} else {
-			commonModel = getCommonModelForShows(domain, project, params)
+			commonModel = getCommonModelForShows(domain, project, params, assetEntity, includeDependencies)
 		}
 
 		// add the list values needed to render this controls as regular control from ControlAngularTab lib

@@ -241,19 +241,19 @@ class WsAssetController implements ControllerMethods {
 
 		switch (domainName) {
 			case "APPLICATION":
-				model << applicationService.getModelForShow(asset.project, asset, params)
+				model << applicationService.getModelForShow(asset.project, asset, params, false)
 				break
 			case "DEVICE":
-				model << deviceService.getModelForShow(asset.project, asset, params)
+				model << deviceService.getModelForShow(asset.project, asset, params, false)
 				break
 			case "STORAGE":
-				model << storageService.getModelForShow(asset.project, asset, params)
+				model << storageService.getModelForShow(asset.project, asset, params, false)
 				break
 			case "DATABASE":
-				model << databaseService.getModelForShow(asset.project, asset, params)
+				model << databaseService.getModelForShow(asset.project, asset, params, false)
 				break
 			default:
-				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params, asset,false)
 				break
 		}
 
