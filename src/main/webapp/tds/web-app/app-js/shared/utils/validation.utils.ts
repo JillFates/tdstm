@@ -66,12 +66,12 @@ export class ValidationUtils {
 	}
 
 	/**
-	 *  Determine if a string is an URL
+	 * Determine if a string is an URL (forces url to start with "https://" or "http://")
 	 * @param url {string}
 	 * @returns {boolean}
 	 */
 	public static isValidURL(url: string): boolean {
-		let pattern = new RegExp('^(https?:\\/\\/)?' +
+		let pattern = new RegExp('^https:\\/\\/|http:\\/\\/?' +
 			'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
 			'((\\d{1,3}\\.){3}\\d{1,3}))' +
 			'(\\:\\d+)?' +
