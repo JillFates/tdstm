@@ -206,9 +206,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 			return this.prompt.open(
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_MESSAGE'),
-				this.translate.transform('GLOBAL.YES'),
-				this.translate.transform('GLOBAL.NO'),
-				true);
+				this.translate.transform('GLOBAL.OK'),
+				this.translate.transform('GLOBAL.CANCEL'));
 		}
 
 		return Promise.resolve(true);

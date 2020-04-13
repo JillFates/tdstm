@@ -32,12 +32,15 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
-                           name="{{column.property}}" [(ngModel)]="column.filter"
-                           placeholder="Filter" value="">
-                    <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)"
-                          style="cursor:pointer;color:#656565;pointer-events:all"
-                          class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    <div *ngIf="column.property !== 'filter'; else normalFilter">
+                        <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
+                               name="{{column.property}}" [(ngModel)]="column.filter"
+                               placeholder="Filter" value="">
+                        <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                    <ng-template #normalBundleName>
+                        <i class="fas fa-filter"></i>
+                    </ng-template>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
@@ -47,37 +50,40 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem let-rowIndex="rowIndex">
-                    <div style="background-color: lightpink;" *ngIf="dataItem.id != currentShowAsset?.asset?.moveBundleId && dataItem.status === 'Validated'" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                    <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                        {{dataItem.name}}
                     </div>
-                    <div *ngIf="dataItem.id !== currentShowAsset?.asset?.moveBundle.id; else normalBundleName" class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
-                    </div>
-                    <ng-template #normalBundleName>
-                        <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                </ng-template>
 
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
+                    <div *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleNameSupport"
+                         [ngClass]="getMoveBundleClass(dataItem, currentShowAsset)"
+                        class="cell-template bundle"
+                         (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                        <div class="dependent-show">
+                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        </div>
+                    </div>
+                    <ng-template #normalBundleNameSupport>
+                        <div class="cell-template dep-{{dataItem.status}} bundle"
+                             (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                            {{dataItem.moveBundle.name}}
                         </div>
                     </ng-template>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-
-                    </div>
-                </ng-template>
-
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, dataItem.id)">
+                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, currentShowAsset.id)">
                         {{dataItem.type}}
+                        <img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
                     </div>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, dataItem.id)">
+                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, currentShowAsset.id)">
                         {{dataItem.status}}
                     </div>
                 </ng-template>
-
             </kendo-grid-column>
         </kendo-grid>
     </div>
@@ -115,12 +121,15 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
-                           name="{{column.property}}" [(ngModel)]="column.filter"
-                           placeholder="Filter" value="">
-                    <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)"
-                          style="cursor:pointer;color:#656565;pointer-events:all"
-                          class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    <div *ngIf="column.property !== 'filter'; else normalFilter">
+                        <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control"
+                               name="{{column.property}}" [(ngModel)]="column.filter"
+                               placeholder="Filter" value="">
+                        <span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                    <ng-template #normalBundleName>
+                        <i class="fas fa-filter"></i>
+                    </ng-template>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
@@ -130,33 +139,36 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem let-rowIndex="rowIndex">
-                    <div style="background-color: lightpink;" *ngIf="dataItem.assetId != currentShowAsset?.asset?.moveBundleId && dataItem.status === 'Validated'" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                    <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                        {{dataItem.name}}
                     </div>
-                    <div *ngIf="dataItem.assetId !== currentShowAsset?.asset?.moveBundle.id; else normalBundleName" class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-                        {{dataItem.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
-                    </div>
-                    <ng-template #normalBundleName>
-                        <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                </ng-template>
 
+                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
+                    <div [ngClass]="getMoveBundleClass(dataItem, currentShowAsset)"
+                         *ngIf="dataItem.moveBundle.id != currentShowAsset?.moveBundleId; else normalBundleNameDependent"
+                         class="cell-template bundle"
+                         (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                        <div class="dependent-show">
+                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                        </div>
+                    </div>
+                    <ng-template #normalBundleNameDependent>
+                        <div class="cell-template dep-{{dataItem.status}} bundle" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+                            {{dataItem.moveBundle.name}}
                         </div>
                     </ng-template>
                 </ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-
-                    </div>
-                </ng-template>
-
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, dataItem.id)">
+                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(currentShowAsset.id, dataItem.assetId)">
                         {{dataItem.type}}
+                        <img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
                     </div>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dataItem.assetId, dataItem.id)">
+                    <div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(currentShowAsset.id, dataItem.assetId)">
                         {{dataItem.status}}
                     </div>
                 </ng-template>
