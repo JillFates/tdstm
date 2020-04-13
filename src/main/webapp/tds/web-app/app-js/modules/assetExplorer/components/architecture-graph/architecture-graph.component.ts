@@ -149,12 +149,19 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		let assetId = null;
+		let levelsUp = null;
+		let levelsDown = null;
+
 		// If it comes from asset explorer
 		if (this.urlParams && this.urlParams.assetId) {
 			this.assetId = this.urlParams.assetId;
+			assetId = this.assetId;
+			levelsUp = this.urlParams.levelsUp;
+			levelsDown = this.urlParams.levelsDown;
 			this.loadData(true);
 		}
-		this.getArchitectureGraphPreferences();
+		this.getArchitectureGraphPreferences(assetId, levelsUp, levelsDown);
 		this.initSearchModel();
 		this.loadAssetsForDropDown();
 	}
@@ -173,22 +180,24 @@ export class ArchitectureGraphComponent implements OnInit {
 		/**
 	 * A call to the Architecture graph service for getting the default graph data for the current user
 	 */
-	getArchitectureGraphPreferences() {
+	getArchitectureGraphPreferences(assetId = null, levelsUp = null, levelsDown = null) {
 		this.architectureGraphService
 			.getArchitectureGraphPreferences()
 			.subscribe((res: any) => {
 				this.dataForSelect = res.assetClassesForSelect;
-				this.levelsUp = +res.graphPrefs.levelsUp;
-				this.levelsDown = +res.graphPrefs.levelsDown;
+
+				this.levelsUp = levelsUp === null ? this.levelsUp = +res.graphPrefs.levelsUp  : levelsUp;
+				this.levelsDown = levelsDown === null ? this.levelsDown = +res.graphPrefs.levelsDown  : levelsDown;
+
 				this.showCycles = res.graphPrefs.showCycles;
 				this.appLbl = res.graphPrefs.appLbl;
 				this.labelOffset = res.graphPrefs.labelOffset;
 				this.assetClasses = res.graphPrefs.assetClasses;
-				// this.assetId = res.graphPrefs.assetClass;
-				// this.asset = res.graphPrefs.selectedAsset;
-				this.selectedAsset = res.graphPrefs.selectedAsset;
 				this.assetClass = res.graphPrefs.assetClass;
-				this.assetId = this.selectedAsset && this.selectedAsset.id || '';
+				if (assetId === null) {
+					this.selectedAsset = res.graphPrefs.selectedAsset;
+					this.assetId = this.selectedAsset && this.selectedAsset.id || '';
+				}
 				this.loadData();
 
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
