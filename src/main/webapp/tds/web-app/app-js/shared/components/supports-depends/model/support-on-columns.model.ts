@@ -20,36 +20,42 @@ export class SupportOnColumnsModel {
 				label: 'Frequency',
 				property: 'dataFlowFreq',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Class',
 				property: 'assetClassName',
 				type: 'text',
+				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Name',
 				property: 'assetName',
 				type: 'text',
+				filterable: true,
 				width: 235
 			},
 			{
 				label: 'Bundle',
 				property: 'moveBundleName',
 				type: 'text',
+				filterable: true,
 				width: 195
 			},
 			{
 				label: 'Type',
 				property: 'type',
 				type: 'text',
+				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
+				filterable: true,
 				width: 120
 			}
 		];

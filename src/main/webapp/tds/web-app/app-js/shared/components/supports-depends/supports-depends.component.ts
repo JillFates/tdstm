@@ -67,7 +67,7 @@ declare var jQuery: any;
                                    name="{{column.property}}" [(ngModel)]="column.filter"
                                    placeholder="Filter" value="">
                             <span *ngIf="column.filter" (click)="dataGridSupportsOnHelper.clearValue(column)"
-                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  style="cursor:pointer;color:#656565;pointer-events:all;margin-top: -3px;"
                                   class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
@@ -218,7 +218,7 @@ declare var jQuery: any;
                                    name="{{column.property}}" [(ngModel)]="column.filter"
                                    placeholder="Filter" value="">
                             <span *ngIf="column.filter" (click)="dataGridDependsOnHelper.clearValue(column)"
-                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  style="cursor:pointer;color:#656565;pointer-events:all;margin-top: -3px;"
                                   class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
