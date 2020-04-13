@@ -163,6 +163,15 @@ declare var jQuery: any;
                     </kendo-dropdownlist>
                 </ng-template>
             </kendo-grid-column>
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                <kendo-pager-prev-buttons *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-prev-buttons>
+                <kendo-pager-numeric-buttons [buttonCount]="10" *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-numeric-buttons>
+                <kendo-pager-next-buttons *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-next-buttons>
+                <kendo-pager-page-sizes [pageSizes]="dataGridSupportsOnHelper.pageSizes" *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': dataGridSupportsOnHelper.gridData.total <= 25, 'pager-default ': dataGridSupportsOnHelper.gridData.total > 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
             <kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
         </kendo-grid>
 
@@ -309,6 +318,15 @@ declare var jQuery: any;
                 </ng-template>
 
             </kendo-grid-column>
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                <kendo-pager-prev-buttons *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-prev-buttons>
+                <kendo-pager-numeric-buttons [buttonCount]="10" *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-numeric-buttons>
+                <kendo-pager-next-buttons *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-next-buttons>
+                <kendo-pager-page-sizes [pageSizes]="dataGridDependsOnHelper.pageSizes" *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': dataGridDependsOnHelper.gridData.total <= 25, 'pager-default ': dataGridDependsOnHelper.gridData.total > 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
             <kendo-grid-messages noRecords="There are no Dependent Assets to display."> </kendo-grid-messages>
         </kendo-grid>
 	`,
