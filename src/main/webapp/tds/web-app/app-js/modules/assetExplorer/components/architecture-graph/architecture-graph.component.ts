@@ -464,8 +464,11 @@ export class ArchitectureGraphComponent implements OnInit {
 			levelsUp: this.levelsUp,
 			levelsDown: this.levelsDown,
 			showCycles: this.showCycles,
-			selectedAsset: this.selectedAsset,
 		};
+
+		if (this.selectedAsset && this.selectedAsset.id) {
+			valueData['selectedAsset'] = this.selectedAsset;
+		}
 
 		const selectedLabels = this.getSelectedCategories()
 			.map((item: any) => {
