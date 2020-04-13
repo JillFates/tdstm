@@ -78,7 +78,7 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 			projectName: '',
 			description: '',
 			startDate: new Date(),
-			completionDate: new Date(today.setMonth(today.getMonth() + 2)),
+			completionDate: new Date(today.setMonth(today.getMonth() + 12)),
 			partners: [],
 			projectLogo: '',
 			projectManagerId: 0,
