@@ -86,13 +86,11 @@
                 </ng-template>
             </kendo-grid-column>
             <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
-                <div *ngIf="gridSupportsData.gridData.data.length > 25">
-                    <kendo-pager-prev-buttons></kendo-pager-prev-buttons>
-                    <kendo-pager-numeric-buttons [buttonCount]="10"></kendo-pager-numeric-buttons>
-                    <kendo-pager-next-buttons></kendo-pager-next-buttons>
-                    <kendo-pager-page-sizes [pageSizes]="gridSupportsData.pageSizes"></kendo-pager-page-sizes>
-                </div>
-                <div [ngClass]="{ 'pager-default-height': gridSupportsData.gridData.data.length <= 25}">
+                <kendo-pager-prev-buttons *ngIf="metadata.supports.length > 25"></kendo-pager-prev-buttons>
+                <kendo-pager-numeric-buttons [buttonCount]="4" *ngIf="metadata.supports.length > 25"></kendo-pager-numeric-buttons>
+                <kendo-pager-next-buttons *ngIf="metadata.supports.length > 25"></kendo-pager-next-buttons>
+                <kendo-pager-page-sizes [pageSizes]="gridSupportsData.pageSizes" *ngIf="metadata.supports.length > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': metadata.supports.length <= 25}">
                     <kendo-pager-info></kendo-pager-info>
                 </div>
             </ng-template>
@@ -187,13 +185,11 @@
             </kendo-grid-column>
 
             <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
-                 <div *ngIf="gridDependenciesData.gridData.data.length > 25">
-                    <kendo-pager-prev-buttons></kendo-pager-prev-buttons>
-                    <kendo-pager-numeric-buttons [buttonCount]="10"></kendo-pager-numeric-buttons>
-                    <kendo-pager-next-buttons></kendo-pager-next-buttons>
-                    <kendo-pager-page-sizes [pageSizes]="gridDependenciesData.pageSizes"></kendo-pager-page-sizes>
-                 </div>
-                <div [ngClass]="{ 'pager-default-height': gridDependenciesData.gridData.data.length <= 25}">
+                    <kendo-pager-prev-buttons *ngIf="metadata.dependents.length > 25"></kendo-pager-prev-buttons>
+                    <kendo-pager-numeric-buttons [buttonCount]="4" *ngIf="metadata.dependents.length > 25"></kendo-pager-numeric-buttons>
+                    <kendo-pager-next-buttons *ngIf="metadata.dependents.length > 25"></kendo-pager-next-buttons>
+                    <kendo-pager-page-sizes [pageSizes]="gridDependenciesData.pageSizes" *ngIf="metadata.dependents.length > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': metadata.dependents.length <= 25, 'pager-default ': metadata.dependents.length > 25}">
                     <kendo-pager-info></kendo-pager-info>
                 </div>
             </ng-template>

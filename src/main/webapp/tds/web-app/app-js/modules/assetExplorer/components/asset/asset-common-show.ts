@@ -50,7 +50,7 @@ export class AssetCommonShow implements OnInit {
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
 		protected windowService: WindowService,
-		private metadata: any) {
+		public metadata: any) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
 				.subscribe((userContext: UserContextModel) => {
