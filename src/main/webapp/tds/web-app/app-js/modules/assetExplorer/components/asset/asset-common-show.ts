@@ -31,7 +31,7 @@ export class AssetCommonShow implements OnInit {
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
 	public ignoreDoubleClickClasses =
-		['btn', 'clickableText', 'table-responsive', 'task-comment-component'];
+		['btn', 'clickableText', 'table-responsive', 'task-comment-component', 'view-dependencies'];
 
 	public gridSupportsData: DataGridOperationsHelper;
 	public gridDependenciesData: DataGridOperationsHelper;
