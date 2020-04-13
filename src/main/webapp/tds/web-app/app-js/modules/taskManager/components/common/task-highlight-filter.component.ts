@@ -8,9 +8,12 @@ import {
 	ViewChild
 } from '@angular/core';
 import {ReplaySubject} from 'rxjs';
-import {distinctUntilChanged, skip, takeUntil} from 'rxjs/operators';
+import {distinctUntilChanged, filter, skip, takeUntil} from 'rxjs/operators';
 import {IGraphTask} from '../../model/graph-task.model';
-import {ITaskHighlightOption, ITaskHighlightQuery} from '../../model/task-highlight-filter.model';
+import {
+	ITaskHighlightOption, ITaskHighlightQuery,
+	TaskHighlightQueryModel
+} from '../../model/task-highlight-filter.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {TaskService} from '../../service/task.service';
 import {Collision} from '@progress/kendo-angular-popup';
@@ -32,8 +35,9 @@ import {Collision} from '@progress/kendo-angular-popup';
                     <label class="popup-label">Assigned Person:</label>
                     <kendo-combobox
                             [data]="highlightOptions?.persons"
-                            [(value)]="person"
-                            [valueField]="'name'"
+                            [(ngModel)]="filterQueryObj.assignedPersonId"
+                            [valueField]="'id'"
+                            [valuePrimitive]="true"
                             [textField]="'name'"
                             #personsCombobox>
                     </kendo-combobox>
@@ -42,8 +46,9 @@ import {Collision} from '@progress/kendo-angular-popup';
 	                  <label class="popup-label">Designated Team:</label>
 	                  <kendo-combobox
 					                  [data]="highlightOptions?.teams"
-					                  [(value)]="selectedTeam"
-	                          [valueField]="'name'"
+					                  [(ngModel)]="filterQueryObj.teams"
+	                          [valueField]="'id'"
+                            [valuePrimitive]="true"
 	                          [textField]="'name'"
 					                  #teamCombobox>
 	                  </kendo-combobox>
@@ -52,8 +57,9 @@ import {Collision} from '@progress/kendo-angular-popup';
 	                  <label class="popup-label">Application Owner or SMEs:</label>
 	                  <kendo-combobox
 					                  [data]="highlightOptions?.ownersAndSmes"
-					                  [(value)]="appOwner"
-	                          [valueField]="'name'"
+					                  [(ngModel)]="filterQueryObj.ownerSmeId"
+	                          [valueField]="'id'"
+                            [valuePrimitive]="true"
 	                          [textField]="'name'"
 					                  #ownerCombobox>
 	                  </kendo-combobox>
@@ -62,8 +68,9 @@ import {Collision} from '@progress/kendo-angular-popup';
 	                  <label class="popup-label">Environment of Assets:</label>
 	                  <kendo-combobox
 					                  [data]="highlightOptions?.environments"
-					                  [(value)]="environment"
+					                  [(ngModel)]="filterQueryObj.environments"
 	                          [valueField]="'name'"
+                            [valuePrimitive]="true"
 	                          [textField]="'name'"
 					                  #environmentCombobox>
 	                  </kendo-combobox>
@@ -80,7 +87,7 @@ import {Collision} from '@progress/kendo-angular-popup';
                       <label class="popup-label">Critical Path Mode:</label>
                       <kendo-combobox
                               [data]="['', 'Baseline', 'Realtime']"
-                              [(value)]="criticalPathMode"
+                              [(ngModel)]="filterQueryObj.criticalPathMode"
                               #environmentCombobox>
                       </kendo-combobox>
                   </div>
@@ -89,7 +96,7 @@ import {Collision} from '@progress/kendo-angular-popup';
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="highlightOptions.showCycles"/>
+				                      [(ngModel)]="filterQueryObj.cyclicalPath"/>
                       <span class="highlight-checkmark"></span>
                       Cyclical Paths
                   </label>
@@ -97,7 +104,7 @@ import {Collision} from '@progress/kendo-angular-popup';
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="highlightOptions.withActions"/>
+				                      [(ngModel)]="filterQueryObj.withActions"/>
                       <span class="highlight-checkmark"></span>
                       With Actions
                   </label>
@@ -105,12 +112,13 @@ import {Collision} from '@progress/kendo-angular-popup';
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="highlightOptions.withTmdActions"/>
+				                      [(ngModel)]="filterQueryObj.withTmdActions"/>
                       <span class="highlight-checkmark"></span>
                       With Actions requiring TMD
                   </label>
 		              <div class="popup-option">
-                      <button class="btn"(click)="tasksByQuery()">Search</button>
+                      <button class="btn" (click)="tasksByQuery()">Search</button>
+                      <button class="btn" (click)="clearForm()">Clear</button>
 		              </div>
               </kendo-popup>
 		      </div>
@@ -120,9 +128,9 @@ import {Collision} from '@progress/kendo-angular-popup';
                       class="form-control highlight-filter-control"
                       placeholder="Highlight filter"
                       [(ngModel)]="filterText"
-                      (keydown)="onTextFilterChange()"
-                      #highlightFilterText
-              />
+                      (ngModelChange)="onTextFilterChange()"
+                      [disabled]="!filterQueryObj"
+                      #highlightFilterText/>
           </div>
           <div class="disp-table-cell">
               <fa-icon
@@ -140,20 +148,15 @@ export class TaskHighlightFilter {
 	@Output() filteredTasks: EventEmitter<IGraphTask[]> = new EventEmitter();
 	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
 	@ViewChild('highlightFilterContainer', {static: false}) highlightFilterContainer: ElementRef<HTMLElement>;
-	collision: Collision = { horizontal: 'flip', vertical: 'fit'};
+	collision: Collision = { horizontal: 'flip', vertical: 'flip'};
 	icons = FA_ICONS;
 	filterText: string;
 	textFilter: ReplaySubject<string> = new ReplaySubject<string>(1);
 	unsubscribe$: ReplaySubject<void> = new ReplaySubject(1);
 	teamHighlights$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
-	person: any;
-	selectedTeam: any;
-	appOwner: any;
 	tags: any;
-	environment: any;
-	filterQueryObj: ITaskHighlightQuery;
+	filterQueryObj: ITaskHighlightQuery = new TaskHighlightQueryModel();
 	show: boolean;
-	criticalPathMode: string;
 
 	constructor(private taskService: TaskService, private renderer: Renderer2) {
 		this.subscribeToHighlightFilter();
@@ -166,28 +169,29 @@ export class TaskHighlightFilter {
 		this.textFilter
 			.pipe(
 				takeUntil(this.unsubscribe$),
-				skip(3),
-				distinctUntilChanged()
+				skip(2),
+				distinctUntilChanged(),
+				filter(d => d && d.length > 2)
 			).subscribe(text => this.tasksByQuery(text));
 	}
 
+	/**
+	 * search tasks by query
+	 * @param text
+	 */
 	tasksByQuery(text?: string): void {
-		this.filterQueryObj = {
+
+		const query = {
+			...this.filterQueryObj,
 			eventId: this.eventId,
-			viewUnpublished: this.viewUnpublished ? 1 : 0,
-			taskText: text || this.filterText || '',
-			assignedPersonId: this.person && this.person.id || '',
-			teams: this.selectedTeam && this.selectedTeam.name || '',
-			ownerSmeId: this.appOwner && this.appOwner.id || '',
-			environments: this.environment && this.environment.name || '',
-			tagIds: this.tags && this.tags.tagIds || [],
-			tagMatch: this.tags && this.tags.operator,
-			criticalPathMode: this.criticalPathMode,
-			cyclicalPath: this.highlightOptions && this.highlightOptions.showCycles ? '1' : '0',
-			withActions: this.highlightOptions && this.highlightOptions.withActions ? '1' : '0',
-			withTmdActions: this.highlightOptions && this.highlightOptions.withTmdActions ? '1' : '0'
+			viewUnpublished: this.viewUnpublished ? 1 : 0
 		};
-		this.taskService.findTasksByQuery(this.filterQueryObj)
+
+		if (text || this.filterText) {
+			query['taskText'] = text || this.filterText;
+		}
+
+		this.taskService.findTasksByQuery(query)
 			.subscribe(res => {
 				const data = res.body && res.body.data.taskIds;
 				if (data) {
@@ -213,10 +217,17 @@ export class TaskHighlightFilter {
 		this.textFilter.next(null);
 	}
 
+	/**
+	 * toggle popup visibility
+	 */
 	togglePopup(): void {
 		this.show = !this.show;
 	}
 
+	/**
+	 * update tags on change
+	 * @param event
+	 */
 	onTagValueChange(event: any): void {
 		this.tags = {
 			tagIds: event.tags.map(t => t.id),
@@ -224,12 +235,25 @@ export class TaskHighlightFilter {
 		};
 	}
 
+	/**
+	 * Hides the filter popup
+	 */
 	hideHighlightFilterPopup(): void {
 		this.show = false;
 	}
 
+	/**
+	 * on text filter change, search matching tasks
+	 */
 	onTextFilterChange(): void {
 		this.textFilter.next(this.filterText);
+	}
+
+	/**
+	 * Clear form data
+	 */
+	clearForm(): void {
+		this.filterQueryObj = new TaskHighlightQueryModel();
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

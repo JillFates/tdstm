@@ -9,9 +9,27 @@ export interface ITaskHighlightQuery {
 	tagIds?: [];
 	tagMatch?: string;
 	criticalPathMode?: string;
-	cyclicalPath?: any;
-	withActions?: any;
-	withTmdActions?: any;
+	cyclicalPath?: number;
+	withActions?: number;
+	withTmdActions?: number;
+}
+
+export class TaskHighlightQueryModel implements ITaskHighlightQuery {
+	constructor(
+		public eventId?: number,
+		public viewUnpublished?: number,
+		public assignedPersonId?: number,
+		public teams?: string,
+		public ownerSmeId?: string,
+		public environments?: string,
+		public taskText?: string,
+		public tagIds?: [],
+		public tagMatch?: string,
+		public criticalPathMode?: string,
+		public cyclicalPath = 0,
+		public withActions = 0,
+		public withTmdActions = 0,
+	) {}
 }
 
 export interface ITaskHighlightOption {
