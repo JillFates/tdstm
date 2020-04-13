@@ -32,10 +32,15 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
-                           name="{{column.property}}" [(ngModel)]="column.filter"
-                           placeholder="Filter" value="">
-                   <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    <div *ngIf="column.property !== 'filter'; else normalFilter">
+                        <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
+                               name="{{column.property}}" [(ngModel)]="column.filter"
+                               placeholder="Filter" value="">
+                        <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                    <ng-template #normalBundleName>
+                        <i class="fas fa-filter"></i>
+                    </ng-template>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
@@ -116,10 +121,15 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control"
-                           name="{{column.property}}" [(ngModel)]="column.filter"
-                           placeholder="Filter" value="">
-                    <span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    <div *ngIf="column.property !== 'filter'; else normalFilter">
+                        <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control"
+                               name="{{column.property}}" [(ngModel)]="column.filter"
+                               placeholder="Filter" value="">
+                        <span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                    <ng-template #normalBundleName>
+                        <i class="fas fa-filter"></i>
+                    </ng-template>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
