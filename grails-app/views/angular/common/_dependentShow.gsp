@@ -13,9 +13,14 @@
                 [resizable]="true"
                 (sortChange)="gridSupportsData.sortChange($event)"
                 [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+                [ngClass]="{ 'hide-filter': !showFilterSup}"
             >
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports:</label>
+
+                <div class="btn-filter-dependencies" (click)="showFilterSupports()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
             <!-- Columns -->
             <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
@@ -32,15 +37,10 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <div *ngIf="column.property !== 'filter'; else normalFilter">
-                        <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
-                               name="{{column.property}}" [(ngModel)]="column.filter"
-                               placeholder="Filter" value="">
+                    <div *ngIf="column.property !== 'filter' && showFilterSup">
+                        <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter" value="">
                         <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                     </div>
-                    <ng-template #normalBundleName>
-                        <i class="fas fa-filter"></i>
-                    </ng-template>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
@@ -102,9 +102,14 @@
                 [resizable]="true"
                 (sortChange)="gridDependenciesData.sortChange($event)"
                 [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+                [ngClass]="{ 'hide-filter': !showFilterDep}"
         >
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Is dependent on:</label>
+
+                <div class="btn-filter-dependencies" (click)="showFilterDependents()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
             <!-- Columns -->
             <kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
@@ -121,15 +126,10 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <div *ngIf="column.property !== 'filter'; else normalFilter">
-                        <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control"
-                               name="{{column.property}}" [(ngModel)]="column.filter"
-                               placeholder="Filter" value="">
+                    <div *ngIf="column.property !== 'filter' && showFilterDep">
+                        <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter" value="">
                         <span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                     </div>
-                    <ng-template #normalBundleName>
-                        <i class="fas fa-filter"></i>
-                    </ng-template>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">

@@ -35,6 +35,8 @@ export class AssetCommonShow implements OnInit {
 
 	public gridSupportsData: DataGridOperationsHelper;
 	public gridDependenciesData: DataGridOperationsHelper;
+	public showFilterDep = false;
+	public showFilterSup = false;
 
 	private supportOnColumnModel: SupportOnColumnsModel;
 	private dependentOnColumnModel: SupportOnColumnsModel;
@@ -89,6 +91,24 @@ export class AssetCommonShow implements OnInit {
 
 		return this.dialogService
 			.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+	}
+
+	public showFilterSupports(): void {
+		if (this.showFilterSup) {
+			this.showFilterSup = false;
+			this.gridSupportsData.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterSup = true;
+		}
+	}
+
+	showFilterDependents(): void {
+		if (this.showFilterDep) {
+			this.showFilterDep = false;
+			this.gridDependenciesData.clearAllFilters(this.dependentOnColumnModel.columns);
+		} else {
+			this.showFilterDep = true;
+		}
 	}
 
 	/**

@@ -77,39 +77,38 @@ export class SupportDependentsOnViewColumnsModel {
 	constructor() {
 		this.columns = [
 			{
-				label: '',
-				property: 'filter',
-				type: 'text',
-				width: 50
-			},
-			{
 				label: 'Class',
 				property: 'assetType',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Name',
 				property: 'name',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Bundle',
 				property: 'moveBundle.name',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Type',
 				property: 'type',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
+				filterable: true,
 				width: 90
 			}
 		];
