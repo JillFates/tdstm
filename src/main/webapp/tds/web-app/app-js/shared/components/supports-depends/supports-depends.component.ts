@@ -31,7 +31,9 @@ declare var jQuery: any;
                 [sort]="dataGridSupportsOnHelper.state.sort"
 				[sortable]="false"
                 [resizable]="true"
-                (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
+                (sortChange)="dataGridSupportsOnHelper.sortChange($event)"
+                [ngClass]="{ 'hide-filter': !showFilterSup}"
+		>
 
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -43,6 +45,9 @@ declare var jQuery: any;
 						[tabIndex]="449"
                         (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
                 </tds-button-add>
+                <div class="btn-filter-dependencies" (click)="showFilterSupports()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
 
             <!-- Columns -->
@@ -172,7 +177,9 @@ declare var jQuery: any;
                 (pageChange)="dataGridDependsOnHelper.pageChange($event)"
                 [sortable]="false"
                 [resizable]="true"
-                (sortChange)="dataGridDependsOnHelper.sortChange($event)">
+                (sortChange)="dataGridDependsOnHelper.sortChange($event)"
+                [ngClass]="{ 'hide-filter': !showFilterDep}"
+		>
 
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -184,6 +191,9 @@ declare var jQuery: any;
 						[tabIndex]="450"
                         (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
                 </tds-button-add>
+                <div class="btn-filter-dependencies" (click)="showFilterDependents()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
 
             <!-- Columns -->
@@ -324,6 +334,9 @@ export class SupportsDependsComponent implements OnInit {
 	public readonly SUPPORTS = 'Supports';
 	public readonly DEPENDENT = 'Dependent';
 
+	public showFilterDep = false;
+	public showFilterSup = false;
+
 	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
 	}
@@ -364,6 +377,30 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		});
 
+	}
+
+	/**
+	 * Clears the filter on supports
+	 */
+	public showFilterSupports(): void {
+		if (this.showFilterSup) {
+			this.showFilterSup = false;
+			this.dataGridSupportsOnHelper.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterSup = true;
+		}
+	}
+
+	/**
+	 * Clears the Dependent filter
+	 */
+	showFilterDependents(): void {
+		if (this.showFilterDep) {
+			this.showFilterDep = false;
+			this.dataGridDependsOnHelper.clearAllFilters(this.dependentOnColumnModel.columns);
+		} else {
+			this.showFilterDep = true;
+		}
 	}
 
 	/**

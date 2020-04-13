@@ -93,6 +93,9 @@ export class AssetCommonShow implements OnInit {
 			.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
 	}
 
+	/**
+	 * Clears the filter on supports
+	 */
 	public showFilterSupports(): void {
 		if (this.showFilterSup) {
 			this.showFilterSup = false;
@@ -102,6 +105,9 @@ export class AssetCommonShow implements OnInit {
 		}
 	}
 
+	/**
+	 * Clears the Dependent filter
+	 */
 	showFilterDependents(): void {
 		if (this.showFilterDep) {
 			this.showFilterDep = false;
