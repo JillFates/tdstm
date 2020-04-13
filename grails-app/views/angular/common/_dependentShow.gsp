@@ -3,7 +3,7 @@
     <div class="view-dependencies">
         <kendo-grid
                 class="dependents-grid"
-                [pageSize]="gridDependenciesData.state.take"
+                [pageSize]="gridSupportsData.state.take"
                 [skip]="gridSupportsData.state.skip"
                 [filterable]="true"
                 (pageChange)="gridSupportsData.pageChange($event)"
@@ -85,6 +85,17 @@
                     </div>
                 </ng-template>
             </kendo-grid-column>
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                <div *ngIf="gridSupportsData.gridData.data.length > 25">
+                    <kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+                    <kendo-pager-numeric-buttons [buttonCount]="10"></kendo-pager-numeric-buttons>
+                    <kendo-pager-next-buttons></kendo-pager-next-buttons>
+                    <kendo-pager-page-sizes [pageSizes]="gridSupportsData.pageSizes"></kendo-pager-page-sizes>
+                </div>
+                <div [ngClass]="{ 'pager-default-height': gridSupportsData.gridData.data.length <= 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
         </kendo-grid>
     </div>
 </td>
@@ -174,6 +185,19 @@
                 </ng-template>
 
             </kendo-grid-column>
+
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                 <div *ngIf="gridDependenciesData.gridData.data.length > 25">
+                    <kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+                    <kendo-pager-numeric-buttons [buttonCount]="10"></kendo-pager-numeric-buttons>
+                    <kendo-pager-next-buttons></kendo-pager-next-buttons>
+                    <kendo-pager-page-sizes [pageSizes]="gridDependenciesData.pageSizes"></kendo-pager-page-sizes>
+                 </div>
+                <div [ngClass]="{ 'pager-default-height': gridDependenciesData.gridData.data.length <= 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
+
         </kendo-grid>
 
 

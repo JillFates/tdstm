@@ -35,6 +35,7 @@ export class DataGridOperationsHelper {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE
 	};
+	public pageSizes = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.index) >= 0;
 	public selectedRows = [];
 	public bulkItems: any = {};
