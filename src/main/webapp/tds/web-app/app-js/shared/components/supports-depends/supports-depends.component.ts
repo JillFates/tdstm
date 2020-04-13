@@ -31,7 +31,9 @@ declare var jQuery: any;
                 [sort]="dataGridSupportsOnHelper.state.sort"
 				[sortable]="false"
                 [resizable]="true"
-                (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
+                (sortChange)="dataGridSupportsOnHelper.sortChange($event)"
+                [ngClass]="{ 'hide-filter': !showFilterSup}"
+		>
 
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -43,6 +45,9 @@ declare var jQuery: any;
 						[tabIndex]="449"
                         (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
                 </tds-button-add>
+                <div class="btn-filter-dependencies" (click)="showFilterSupports()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
 
             <!-- Columns -->
@@ -62,7 +67,7 @@ declare var jQuery: any;
                                    name="{{column.property}}" [(ngModel)]="column.filter"
                                    placeholder="Filter" value="">
                             <span *ngIf="column.filter" (click)="dataGridSupportsOnHelper.clearValue(column)"
-                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  style="cursor:pointer;color:#656565;pointer-events:all;margin-top: -3px;"
                                   class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
@@ -158,6 +163,15 @@ declare var jQuery: any;
                     </kendo-dropdownlist>
                 </ng-template>
             </kendo-grid-column>
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                <kendo-pager-prev-buttons *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-prev-buttons>
+                <kendo-pager-numeric-buttons [buttonCount]="10" *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-numeric-buttons>
+                <kendo-pager-next-buttons *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-next-buttons>
+                <kendo-pager-page-sizes [pageSizes]="dataGridSupportsOnHelper.pageSizes" *ngIf="dataGridSupportsOnHelper.gridData.total > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': dataGridSupportsOnHelper.gridData.total <= 25, 'pager-default ': dataGridSupportsOnHelper.gridData.total > 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
             <kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
         </kendo-grid>
 
@@ -172,7 +186,9 @@ declare var jQuery: any;
                 (pageChange)="dataGridDependsOnHelper.pageChange($event)"
                 [sortable]="false"
                 [resizable]="true"
-                (sortChange)="dataGridDependsOnHelper.sortChange($event)">
+                (sortChange)="dataGridDependsOnHelper.sortChange($event)"
+                [ngClass]="{ 'hide-filter': !showFilterDep}"
+		>
 
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -184,6 +200,9 @@ declare var jQuery: any;
 						[tabIndex]="450"
                         (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
                 </tds-button-add>
+                <div class="btn-filter-dependencies" (click)="showFilterDependents()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
 
             <!-- Columns -->
@@ -208,7 +227,7 @@ declare var jQuery: any;
                                    name="{{column.property}}" [(ngModel)]="column.filter"
                                    placeholder="Filter" value="">
                             <span *ngIf="column.filter" (click)="dataGridDependsOnHelper.clearValue(column)"
-                                  style="cursor:pointer;color:#656565;pointer-events:all"
+                                  style="cursor:pointer;color:#656565;pointer-events:all;margin-top: -3px;"
                                   class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
@@ -299,6 +318,15 @@ declare var jQuery: any;
                 </ng-template>
 
             </kendo-grid-column>
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                <kendo-pager-prev-buttons *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-prev-buttons>
+                <kendo-pager-numeric-buttons [buttonCount]="10" *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-numeric-buttons>
+                <kendo-pager-next-buttons *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-next-buttons>
+                <kendo-pager-page-sizes [pageSizes]="dataGridDependsOnHelper.pageSizes" *ngIf="dataGridDependsOnHelper.gridData.total > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': dataGridDependsOnHelper.gridData.total <= 25, 'pager-default ': dataGridDependsOnHelper.gridData.total > 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
             <kendo-grid-messages noRecords="There are no Dependent Assets to display."> </kendo-grid-messages>
         </kendo-grid>
 	`,
@@ -323,6 +351,9 @@ export class SupportsDependsComponent implements OnInit {
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
 	public readonly SUPPORTS = 'Supports';
 	public readonly DEPENDENT = 'Dependent';
+
+	public showFilterDep = false;
+	public showFilterSup = false;
 
 	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
@@ -364,6 +395,30 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		});
 
+	}
+
+	/**
+	 * Clears the filter on supports
+	 */
+	public showFilterSupports(): void {
+		if (this.showFilterSup) {
+			this.showFilterSup = false;
+			this.dataGridSupportsOnHelper.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterSup = true;
+		}
+	}
+
+	/**
+	 * Clears the Dependent filter
+	 */
+	showFilterDependents(): void {
+		if (this.showFilterDep) {
+			this.showFilterDep = false;
+			this.dataGridDependsOnHelper.clearAllFilters(this.dependentOnColumnModel.columns);
+		} else {
+			this.showFilterDep = true;
+		}
 	}
 
 	/**
