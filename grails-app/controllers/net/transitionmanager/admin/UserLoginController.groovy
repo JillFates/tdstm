@@ -342,7 +342,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		}
 
 		UserLogin createUser = new UserLogin(params)
-		createUser.expiryDate = new Date(System.currentTimeMillis() + 7776000000) // 3 Months
+		createUser.expiryDate = new Date(System.currentTimeMillis() + 31536000000) // 1 Year
         def roleList = RoleType.where {
             type == RoleType.TYPE_SECURITY
         }.list()
