@@ -12,6 +12,7 @@ import {ITask} from '../model/task-edit-create.model';
 import {IGraphNode, IGraphTask, IMoveEventTask} from '../model/graph-task.model';
 import {IMoveEvent} from '../model/move-event.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
+import {ITaskHighlightQuery, ITaskHighlightOption} from '../model/task-highlight-filter.model';
 
 export interface IGrapTaskResponseBody {
 	status: string;
@@ -25,7 +26,12 @@ export interface IMoveEventTaskResponseBody {
 
 export interface ITaskResponseBody {
 	status: string;
-	data: ITask[];
+	data: number[];
+}
+
+export interface ITaskHighlightOptionsResponseBody {
+	status: string;
+	data: ITaskHighlightOption;
 }
 
 export interface IMoveEventResponseBody {
@@ -48,6 +54,8 @@ export class TaskService {
 	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
 	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/wsTimeline/timeline`;
+	private readonly TASK_BY_QUERY = `${ this.baseURL }/ws/taskGraph/taskSearch`;
+	private readonly TASK_HIGHLIGHT_OPTIONS = `${ this.baseURL }/ws/taskGraph/taskHighlightOptions`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -567,6 +575,11 @@ export class TaskService {
 			{ params, observe: 'response' });
 	}
 
+	/**
+	 * GET - Find task by move event id
+	 * @param {number} id
+	 * @param filters
+	 */
 	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<IMoveEventTask> {
 		const extraParams = { ...filters };
 		extraParams.id = id;
@@ -583,6 +596,27 @@ export class TaskService {
 			{ params, observe: 'response' })
 			.map(res => {
 				return res.body.data;
+			});
+	}
+
+	/**
+	 * GET - Find task for neighborhood component
+	 * @param queryObj
+	 */
+	findTasksByQuery(queryObj: ITaskHighlightQuery): Observable<HttpResponse<any>> {
+		return this.http.post<any>(`${this.TASK_BY_QUERY}`,
+			queryObj,
+			{ observe: 'response' });
+	}
+
+	highlightOptions(eventId: number, viewUnpublished: boolean): Observable<HttpResponse<ITaskHighlightOptionsResponseBody>> {
+		const params = new HttpParams()
+			.set('eventId', `${eventId}`)
+			.set('viewUnpublished', `${viewUnpublished ? '1' : '0'}`);
+		return this.http.get<ITaskHighlightOptionsResponseBody>(`${this.TASK_HIGHLIGHT_OPTIONS}`,
+			{
+				params,
+				observe: 'response'
 			});
 	}
 
