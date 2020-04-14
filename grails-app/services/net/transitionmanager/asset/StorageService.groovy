@@ -17,9 +17,10 @@ class StorageService implements ServiceMethods {
 	 * @param project - the project that the user is associated with
 	 * @param storage - the database object that the user is attempting to look at
 	 * @param params - parameters coming from the request
+	 * @param includeDependencies - whether or not dependencies should be included in the model.
 	 */
-	Map getModelForShow(Project project, Files storage, Map params) {
-		Map commonModel = assetEntityService.getCommonModel(false, project, storage, 'Files', params)
+	Map getModelForShow(Project project, Files storage, Map params, boolean includeDependencies = true) {
+		Map commonModel = assetEntityService.getCommonModel(false, project, storage, 'Files', params, includeDependencies)
 		[filesInstance: storage, currentUserId: securityService.currentPersonId] + commonModel
 	}
 

@@ -13,6 +13,18 @@
     margin-left: 4px
 
 .view-dependencies
+  .hide-filter
+    .k-filter-row
+      display: none
+  .btn-filter-dependencies
+    float: right
+    margin-right: 11px
+    margin-top: 3px
+    cursor: pointer
+  .pager-default-height
+    height: 25px
+    padding-top: 5px
+    flex: 1
   kendo-grid
     .k-grid-header-wrap
       table
@@ -29,8 +41,12 @@
             padding-left: 2px
             &.bundle
               height: 100%
-            &.bundle.bundle-dep-no-valid
+            &.bundle.bundle-dep-questioned
               padding-top: unset
+              padding-left: unset
+              .dependent-show
+                padding-left: 2px
+                padding-top: 4px
             &.dep-Validated
               background: LightGreen
             &.dep-Unknown
@@ -43,9 +59,24 @@
               background: #EEE
             &.dep-Future
               background: #EEE
+
   kendo-grid-filter-cell-operators
     display: none
   kendo-pager
     font-size: 10px !important
+    kendo-pager-page-sizes
+      width: 123px
+      margin-right: 0px
+      select
+        width: 40px !important
+    kendo-pager-info
+      margin-left: 0px !important
+      margin-right: 0px !important
+      width: 90px
+    .pager-default-height
+      kendo-pager-info
+        float: right
+        padding-right: 15px
+
 
 

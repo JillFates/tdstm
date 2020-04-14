@@ -20,10 +20,11 @@ class DatabaseService implements ServiceMethods {
 	 * @param project - the project that the user is associated with
 	 * @param db - the database object that the user is attempting to look at
 	 * @param params - request parameters
+	 * @param includeDependencies - whether or not dependencies should be included in the model.
 	 */
 	@NotTransactional
-	Map getModelForShow(Project project, Database db, Map params) {
-		Map commonModel = assetEntityService.getCommonModel(false, project, db, 'Database', params)
+	Map getModelForShow(Project project, Database db, Map params, boolean includeDependencies = true) {
+		Map commonModel = assetEntityService.getCommonModel(false, project, db, 'Database', params, includeDependencies)
 
 		[databaseInstance: db, currentUserId: securityService.currentPersonId] + commonModel
 	}

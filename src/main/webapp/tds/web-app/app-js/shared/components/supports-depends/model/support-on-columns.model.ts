@@ -20,36 +20,42 @@ export class SupportOnColumnsModel {
 				label: 'Frequency',
 				property: 'dataFlowFreq',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Class',
 				property: 'assetClassName',
 				type: 'text',
+				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Name',
 				property: 'assetName',
 				type: 'text',
+				filterable: true,
 				width: 235
 			},
 			{
 				label: 'Bundle',
 				property: 'moveBundleName',
 				type: 'text',
+				filterable: true,
 				width: 195
 			},
 			{
 				label: 'Type',
 				property: 'type',
 				type: 'text',
+				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
+				filterable: true,
 				width: 120
 			}
 		];
@@ -80,30 +86,35 @@ export class SupportDependentsOnViewColumnsModel {
 				label: 'Class',
 				property: 'assetType',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Name',
 				property: 'name',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Bundle',
 				property: 'moveBundle.name',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Type',
 				property: 'type',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
+				filterable: true,
 				width: 90
 			}
 		];

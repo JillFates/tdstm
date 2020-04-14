@@ -3,7 +3,7 @@
     <div class="view-dependencies">
         <kendo-grid
                 class="dependents-grid"
-                [pageSize]="gridDependenciesData.state.take"
+                [pageSize]="gridSupportsData.state.take"
                 [skip]="gridSupportsData.state.skip"
                 [filterable]="true"
                 (pageChange)="gridSupportsData.pageChange($event)"
@@ -13,9 +13,14 @@
                 [resizable]="true"
                 (sortChange)="gridSupportsData.sortChange($event)"
                 [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+                [ngClass]="{ 'hide-filter': !showFilterSup}"
             >
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Supports:</label>
+
+                <div class="btn-filter-dependencies" (click)="showFilterSupports()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
             <!-- Columns -->
             <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
@@ -32,10 +37,10 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control"
-                           name="{{column.property}}" [(ngModel)]="column.filter"
-                           placeholder="Filter" value="">
-                   <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    <div *ngIf="column.property !== 'filter' && showFilterSup">
+                        <input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter" value="">
+                        <span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    </div>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
@@ -56,7 +61,8 @@
                         class="cell-template bundle"
                          (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                         <div class="dependent-show">
-                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                            <span>{{dataItem.moveBundle.name}} </span>
+                            <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                         </div>
                     </div>
                     <ng-template #normalBundleNameSupport>
@@ -80,6 +86,15 @@
                     </div>
                 </ng-template>
             </kendo-grid-column>
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                <kendo-pager-prev-buttons *ngIf="metadata.supports.length > 25"></kendo-pager-prev-buttons>
+                <kendo-pager-numeric-buttons [buttonCount]="4" *ngIf="metadata.supports.length > 25"></kendo-pager-numeric-buttons>
+                <kendo-pager-next-buttons *ngIf="metadata.supports.length > 25"></kendo-pager-next-buttons>
+                <kendo-pager-page-sizes [pageSizes]="gridSupportsData.pageSizes" *ngIf="metadata.supports.length > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': metadata.supports.length <= 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
         </kendo-grid>
     </div>
 </td>
@@ -97,9 +112,14 @@
                 [resizable]="true"
                 (sortChange)="gridDependenciesData.sortChange($event)"
                 [pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+                [ngClass]="{ 'hide-filter': !showFilterDep}"
         >
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <label class="pad-top-2 pad-left-10 mar-bottom-3">Is dependent on:</label>
+
+                <div class="btn-filter-dependencies" (click)="showFilterDependents()">
+                    <i class="fa fa-fw fa-filter"></i>
+                </div>
             </ng-template>
             <!-- Columns -->
             <kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
@@ -116,10 +136,10 @@
 
                 <!-- Default Generic Filter Template -->
                 <ng-template kendoGridFilterCellTemplate let-filter>
-                    <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control"
-                           name="{{column.property}}" [(ngModel)]="column.filter"
-                           placeholder="Filter" value="">
-                    <span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    <div *ngIf="column.property !== 'filter' && showFilterDep">
+                        <input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter" value="">
+                        <span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                    </div>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
@@ -140,7 +160,8 @@
                          class="cell-template bundle"
                          (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                         <div class="dependent-show">
-                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                            <span>{{dataItem.moveBundle.name}}</span>
+                            <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                         </div>
                     </div>
                     <ng-template #normalBundleNameDependent>
@@ -164,6 +185,17 @@
                 </ng-template>
 
             </kendo-grid-column>
+
+            <ng-template kendoPagerTemplate let-totalPages="totalPages" let-currentPage="currentPage">
+                    <kendo-pager-prev-buttons *ngIf="metadata.dependents.length > 25"></kendo-pager-prev-buttons>
+                    <kendo-pager-numeric-buttons [buttonCount]="4" *ngIf="metadata.dependents.length > 25"></kendo-pager-numeric-buttons>
+                    <kendo-pager-next-buttons *ngIf="metadata.dependents.length > 25"></kendo-pager-next-buttons>
+                    <kendo-pager-page-sizes [pageSizes]="gridDependenciesData.pageSizes" *ngIf="metadata.dependents.length > 25"></kendo-pager-page-sizes>
+                <div [ngClass]="{ 'pager-default-height': metadata.dependents.length <= 25, 'pager-default ': metadata.dependents.length > 25}">
+                    <kendo-pager-info></kendo-pager-info>
+                </div>
+            </ng-template>
+
         </kendo-grid>
 
 

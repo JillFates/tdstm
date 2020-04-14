@@ -31,10 +31,12 @@ export class AssetCommonShow implements OnInit {
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
 	public ignoreDoubleClickClasses =
-		['btn', 'clickableText', 'table-responsive', 'task-comment-component'];
+		['btn', 'clickableText', 'table-responsive', 'task-comment-component', 'view-dependencies'];
 
 	public gridSupportsData: DataGridOperationsHelper;
 	public gridDependenciesData: DataGridOperationsHelper;
+	public showFilterDep = false;
+	public showFilterSup = false;
 
 	private supportOnColumnModel: SupportOnColumnsModel;
 	private dependentOnColumnModel: SupportOnColumnsModel;
@@ -48,7 +50,7 @@ export class AssetCommonShow implements OnInit {
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
 		protected windowService: WindowService,
-		private metadata: any) {
+		public metadata: any) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
 				.subscribe((userContext: UserContextModel) => {
@@ -89,6 +91,30 @@ export class AssetCommonShow implements OnInit {
 
 		return this.dialogService
 			.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+	}
+
+	/**
+	 * Clears the filter on supports
+	 */
+	public showFilterSupports(): void {
+		if (this.showFilterSup) {
+			this.showFilterSup = false;
+			this.gridSupportsData.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterSup = true;
+		}
+	}
+
+	/**
+	 * Clears the Dependent filter
+	 */
+	showFilterDependents(): void {
+		if (this.showFilterDep) {
+			this.showFilterDep = false;
+			this.gridDependenciesData.clearAllFilters(this.dependentOnColumnModel.columns);
+		} else {
+			this.showFilterDep = true;
+		}
 	}
 
 	/**
@@ -164,7 +190,7 @@ export class AssetCommonShow implements OnInit {
 	 */
 	public getMoveBundleClass(dataItem: any, currentShowAsset: any): string {
 		if (dataItem.moveBundle.id !== currentShowAsset && currentShowAsset.moveBundleId && dataItem.status === 'Validated') {
-			return 'bundle-dep-no-valid';
+			return 'bundle-dep-questioned';
 		} else {
 			return 'cell-template dep-' + dataItem.status;
 		}
