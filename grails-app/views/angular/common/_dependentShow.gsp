@@ -61,7 +61,8 @@
                         class="cell-template bundle"
                          (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                         <div class="dependent-show">
-                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                            <span>{{dataItem.moveBundle.name}} </span>
+                            <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                         </div>
                     </div>
                     <ng-template #normalBundleNameSupport>
@@ -159,7 +160,8 @@
                          class="cell-template bundle"
                          (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
                         <div class="dependent-show">
-                            {{dataItem.moveBundle.name}} <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+                            <span>{{dataItem.moveBundle.name}}</span>
+                            <img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
                         </div>
                     </div>
                     <ng-template #normalBundleNameDependent>
