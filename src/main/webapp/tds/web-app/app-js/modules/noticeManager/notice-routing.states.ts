@@ -27,9 +27,9 @@ export const NoticeManagerRoute: Routes = [
 		path: NoticeManagerStates.NOTICE_LIST.url,
 		data: {
 			page: {
-				title: 'NOTICE.NOTICE_ADMINISTRATION',
+				title: 'NOTICE.NOTICES',
 				instruction: '',
-				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE_LIST'],
+				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICES'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-admin-notice-manager', subMenu: true }
 			},
 			requiresAuth: true,
