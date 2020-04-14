@@ -9,44 +9,89 @@
 
 <div class="form-group row checkboxes">
 	<div class="col-sm-6 col-sm-offset-2">
-		<label for="bundleConflicts">
-			<input [checked]="filters.bundleConflicts" (change)="filters.bundleConflicts = !filters.bundleConflicts"
-				id="bundleConflicts" name="bundleConflicts" type="checkbox">
+		<clr-checkbox-wrapper class="inline">
+			<input
+				clrCheckbox
+				id="bundleConflicts"
+				type="checkbox"
+				name="bundleConflicts"
+				class="component-action-just-planning"
+				[checked]="filters.bundleConflicts" 
+				(change)="filters.bundleConflicts = !filters.bundleConflicts"			
+			/>
+			<label
+				class="clr-control-label clr-control-label-sm inline"
+				for="bundleConflicts"
+			>
 			Bundle Conflict - Having dependency references to assets assigned to unrelated bundles
-		</label>
+			</label>
+		</clr-checkbox-wrapper>
 	</div>
 </div>
 
 <div class="form-group row checkboxes">
 	<div class="col-sm-6 col-sm-offset-2">
-		<label for="unresolvedDependencies">
-			<input [checked]="filters.unresolvedDependencies"
-			(change)="filters.unresolvedDependencies = !filters.unresolvedDependencies" id="unresolvedDependencies"
-			name="unresolvedDependencies" type="checkbox">
+		<clr-checkbox-wrapper class="inline">
+			<input
+				clrCheckbox
+				id="unresolvedDependencies"
+				type="checkbox"
+				name="unresolvedDependencies"
+				class="component-action-just-planning"
+				[checked]="filters.unresolvedDependencies"
+				(change)="filters.unresolvedDependencies = !filters.unresolvedDependencies"			
+			/>
+			<label
+				class="clr-control-label clr-control-label-sm inline"
+				for="unresolvedDependencies"
+			>
 			Unresolved Dependencies - Having dependencies with status Unknown or Questioned
-		</label>
+			</label>
+		</clr-checkbox-wrapper>
 	</div>
 </div>
 
 <div class="form-group row checkboxes">
 	<div class="col-sm-5 col-sm-offset-2">
-		<label for="missingApplications">
-			<input [checked]="filters.missingApplications"
-				(change)="filters.missingApplications = !filters.missingApplications" id="missingApplications"
-				name="missingApplications" type="checkbox">
+		<clr-checkbox-wrapper class="inline">
+			<input
+				clrCheckbox
+				id="missingApplications"
+				type="checkbox"
+				name="missingApplications"
+				class="component-action-just-planning"
+				[checked]="filters.missingApplications"
+				(change)="filters.missingApplications = !filters.missingApplications"
+				/>
+			<label
+				class="clr-control-label clr-control-label-sm inline"
+				for="missingApplications"
+			>
 			Missing Applications - Having no Supports dependency to application(s)
-		</label>
+			</label>
+		</clr-checkbox-wrapper>		
 	</div>
 </div>
 
 <div class="form-group row">
 	<div class="col-sm-5 col-sm-offset-2">
-		<label for="unsupported">		
-			<input [checked]="filters.unsupportedDependencies"
-				(change)="filters.unsupported = !filters.unsupported" id="unsupported"
-				name="unsupported" type="checkbox">
+		<clr-checkbox-wrapper class="inline">
+			<input
+				clrCheckbox
+				id="unsupported"
+				type="checkbox"
+				name="unsupported"
+				class="component-action-just-planning"
+				[checked]="filters.unsupportedDependencies"
+				(change)="filters.unsupported = !filters.unsupported"
+			/>
+			<label
+				class="clr-control-label clr-control-label-sm inline"
+				for="unsupported"
+			>
 			Unsupported - Having no Requires dependency indication where database resides
-		</label>
+			</label>
+		</clr-checkbox-wrapper>		
 	</div>
 </div>
 

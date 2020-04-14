@@ -66,10 +66,22 @@ import {DialogService} from 'tds-component-library';
 									</div>
 									<div class="form-group row checkboxes">
 										<div class="col-sm-2 col-sm-offset-2">
-											<label for="one">
-												<input type="checkbox" name="one" id="one" [(ngModel)]="includeNonPlanning">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="one"
+													type="checkbox"
+													name="one"
+													class="component-action-just-planning"
+													[(ngModel)]="includeNonPlanning"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="one"
+												>
 												Include Non-planning
-											</label>
+												</label>
+	                						</clr-checkbox-wrapper>
 										</div>
 									</div>
 									<div class="form-group row ">
