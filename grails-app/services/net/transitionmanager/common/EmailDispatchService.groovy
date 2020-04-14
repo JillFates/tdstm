@@ -6,6 +6,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ServiceMethods
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -21,6 +22,15 @@ class EmailDispatchService implements ServiceMethods {
 	Scheduler quartzScheduler
 
 	static SimpleEmailDispatchJob = "EmailDispatchJob"
+
+	// A Map containing [name: template view]
+	static 	Map<String, String> EMAIL_TEMPLATES = [
+			passwordReset			: "/auth/_forgotPasswordEmail",
+			passwordResetNotif		: "/auth/_resetPasswordNotificationEmail",
+			accountActivation		: "/auth/_accountActivationNotificationEmail",
+			"adminResetPassword"	: "/admin/_ResetPasswordNotificationEmail",
+			"batchPostingResults"	: "/auth/_importBatchPostingResultsEmail"
+	].asImmutable()
 
 	/**
 	 * Creates a new EmailDispatch entity initializing all attributes
@@ -166,16 +176,16 @@ class EmailDispatchService implements ServiceMethods {
 
 	/**
 	 * Look up for the template for the given email dispatch
+	 * @param ed  The <code>EmailDispatch</code> that contains the email template name.
+	 * @return  The email template view
+	 *
 	 */
-	private String getTemplateView(ed) {
-		//TODO: here we should create a model for each. This should be changed to a OOP approach
-		switch (ed.bodyTemplate) {
-			case "passwordReset": return "/auth/_forgotPasswordEmail"
-			case "passwordResetNotif": return "/auth/_resetPasswordNotificationEmail"
-			case "accountActivation": return "/auth/_accountActivationNotificationEmail"
-			case "adminResetPassword": return "/admin/_ResetPasswordNotificationEmail"
-			case "batchPostingResults": return "/auth/_importBatchPostingResultsEmail"
+	String getTemplateView(EmailDispatch ed) {
+		String templateView = EMAIL_TEMPLATES[ed.bodyTemplate]
+		if (!templateView) {
+			throw new InvalidParamException("Invalid email template name $ed.bodyTemplate")
 		}
+		return templateView
 	}
 
 	/**
