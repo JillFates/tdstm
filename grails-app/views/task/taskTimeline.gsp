@@ -20,6 +20,81 @@
 		<g:javascript src="keyevent_constants.js" />
 		<g:javascript src="graph.js" />
 		<g:javascript src="task-timeline.js" />
+<style>
+.container-checkbox {
+	display: inline-block;
+	position: relative;
+	padding-left: 35px;
+	margin-bottom: 12px;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.container-checkbox input {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+	height: 0;
+	width: 0;
+}
+
+.checkmark {	
+	position: absolute;
+	top: -5px;
+	left: 12px;
+	height: 17px;
+	width: 17px;
+	background-color: #fff;	
+	border-radius: .125rem;
+
+	-webkit-transition: all 0.30s ease-in-out;
+	-moz-transition: all 0.30s ease-in-out;
+	-ms-transition: all 0.30s ease-in-out;
+	-o-transition: all 0.30s ease-in-out;
+	outline: none;
+	padding: 3px 0px 3px 3px;
+	margin: 5px 1px 3px 0px;
+	border: 1px solid #999;
+}
+
+.container-checkbox input:checked ~ .checkmark {
+	background: #0077b8;
+}
+
+.container-checkbox input:focus ~ .checkmark {
+	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+	padding: 3px 0px 3px 3px;
+	margin: 5px 1px 3px 0px;
+	border: 1px solid rgba(81, 203, 238, 1);
+}
+
+.checkmark:after {
+	content: "";
+	position: absolute;
+	display: none;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.container-checkbox input:checked ~ .checkmark:after {
+	display: block;
+}
+
+.container-checkbox .checkmark:after {
+	left: 5px;
+	top: 2px;
+	width: 5px;
+	height: 10px;
+	border: solid white;
+	border-width: 0 1.5px 1.5px 0;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+
+	</style>
 	</head>
 	<body>
 		<tds:subHeader title="Task Timeline" crumbs="['Task','Timeline']"/>
@@ -54,8 +129,10 @@
 						<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin"><i class="fas fa-search-plus"></i></div>
 						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer"><i class="fas fa-search-minus"></i></div>
 						<span class="controlSpan checkboxContainer">
-							<input type="checkbox" id="highlightCriticalPathId" class="pointer" checked="checked"/>
-							<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
+							<label class="container-checkbox" for="highlightCriticalPathId">Highlight Critical Path
+								<input id="highlightCriticalPathId" name="highlightCriticalPathId" class="pointer" type="checkbox" checked="checked" />
+								<span class="checkmark"></span>
+							</label>
 						</span>
 						<span class="controlSpan radioboxContainer">
 							<input type="radio" name="mode" value="C" checked id="modecId"> <label for="modecId" class="pointer">&nbsp;Current Plan</label>

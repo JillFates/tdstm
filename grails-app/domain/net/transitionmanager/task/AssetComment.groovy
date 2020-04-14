@@ -636,7 +636,7 @@ class AssetComment {
 			assetEntityId: assetEntity?.id,
 			assetName    : assetEntity?.assetName,
 			assetType    : assetEntity?.assetType,
-			createdBy    : [id: createdBy.id, name: createdBy.toString()],
+			createdBy    : createdBy ? [id: createdBy.id, name: createdBy.toString()] : null,
 			comment      : comment,
 			commentType  : commentType,
 			taskNumber   : taskNumber,
