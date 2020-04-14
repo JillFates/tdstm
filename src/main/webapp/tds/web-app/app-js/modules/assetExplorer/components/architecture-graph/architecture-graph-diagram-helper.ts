@@ -118,6 +118,9 @@ export class ArchitectureGraphDiagramHelper {
 		textBlock.stroke = '#000';
 		textBlock.bind(new Binding('text', 'name'));
 
+		// hide if the node if the name is empty
+		textBlock.bind(new Binding('visible', 'name', (val: string) => !!val));
+
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
