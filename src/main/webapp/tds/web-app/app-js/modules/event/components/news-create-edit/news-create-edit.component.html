@@ -8,7 +8,7 @@
 		<div class="box-body">
 			<div *ngIf="!isCreate()">
 				<div class="form-group">
-					<label class="col-sm-4 control-label required-field"
+					<label class="col-sm-4 control-label"
 						>Created At:</label
 					>
 					<div class="col-sm-8 label-value">
@@ -16,7 +16,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-4 control-label required-field"
+					<label class="col-sm-4 control-label"
 						>Created By:</label
 					>
 					<div class="col-sm-8 label-value">
@@ -24,7 +24,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-4 control-label required-field"
+					<label class="col-sm-4 control-label"
 						>Comment Type:</label
 					>
 					<div class="col-sm-8 label-value">
@@ -107,14 +107,13 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-sm-4 control-label required-field"
+				<label class="col-sm-4 control-label"
 					>Resolution:</label
 				>
 				<div class="col-sm-8 label-value">
 					<textarea
 						name="resolution"
 						rows="3"
-						required
 						[(ngModel)]="model.commentObject.resolution"
 					>
 					</textarea>
@@ -122,7 +121,7 @@
 			</div>
 			<div *ngIf="!isCreate()">
 				<div class="form-group">
-					<label class="col-sm-4 control-label required-field"
+					<label class="col-sm-4 control-label"
 						>Resolved At:</label
 					>
 					<div class="col-sm-8 label-value">
@@ -131,7 +130,7 @@
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-4 control-label required-field"
+					<label class="col-sm-4 control-label"
 						>Resolved By:</label
 					>
 					<div class="col-sm-8 label-value">
