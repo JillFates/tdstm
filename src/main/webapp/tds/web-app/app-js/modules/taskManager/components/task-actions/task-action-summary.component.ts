@@ -58,7 +58,14 @@ import { TaskService } from '../../service/task.service';
 												<label>Is Remote:</label>
 											</div>
 											<div class="col-md-10">
-												<input type="checkbox" [checked]="taskActionSummary.isRemote" [disabled]="true"/>
+												<clr-checkbox-wrapper class="inline">
+													<input
+														clrCheckbox
+														type="checkbox"
+														[checked]="taskActionSummary.isRemote"
+														[disabled]="true"
+													/>
+                								</clr-checkbox-wrapper>
 											</div>
 										</div>
 										<div *ngIf="taskActionSummary && taskActionSummary.isRemote" class="row">

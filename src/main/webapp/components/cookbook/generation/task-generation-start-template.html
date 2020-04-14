@@ -29,15 +29,15 @@
 	</div>
 
 	<div>
-		<label for="autoPublishTasks">
-			<input type="checkbox" name="autoPublishTasks" id="autoPublishTasks" ng-model="tasks.generateOpts.autoPublish">
-			Automatically publish tasks
+		<label class="container-checkbox" for="autoPublishTasks">Automatically publish tasks
+			<input type="checkbox" name="autoPublishTasks" id="autoPublishTasks" ng-model="tasks.generateOpts.autoPublish">			
+			<span class="checkmark"></span>
 		</label>
 	</div>	
 	<div ng-show="currentSelectedRecipe.hasWIP">	
-		<label for="generateUsingWIP">
-			<input type="checkbox" name="generateUsingWIP" id="generateUsingWIP" ng-model="tasks.generateOpts.useWIP">
-			Generate using WIP recipe
+		<label class="container-checkbox" for="generateUsingWIP">Generate using WIP recipe
+			<input type="checkbox" name="generateUsingWIP" id="generateUsingWIP" ng-model="tasks.generateOpts.useWIP">			
+			<span class="checkmark"></span>
 		</label>
 	</div>	
 	<div class="generateWrapper">

@@ -127,11 +127,16 @@
                             <div class="form-group">
                                 <div class="col-md-2">Room Object:</div>
                                 <div class="col-md-4">
-                                    <input class="checkbox"
-                                           tabindex="9"
-                                           name="roomObject"
-                                           type="checkbox"
-                                           [(ngModel)]="model.roomObject">
+                                        <clr-checkbox-wrapper class="inline">
+                                            <input
+                                                clrCheckbox
+                                                class="checkbox"
+                                                tabindex="9"
+                                                name="roomObject"
+                                                type="checkbox"
+                                                [(ngModel)]="model.roomObject"
+                                            />
+                                        </clr-checkbox-wrapper>
                                 </div>
                                 <div class="col-md-2">CPU Count:</div>
                                 <div class="col-md-4">
@@ -213,11 +218,16 @@
                              <div class="form-group">
                                 <div class="col-md-2">Source TDS:</div>
                                 <div class="col-md-4">
-                                    <input class="checkbox"
-                                           tabindex="9"
-                                           name="sourceTDS"
-                                           type="checkbox"
-                                           [(ngModel)]="model.sourceTDS">
+                                        <clr-checkbox-wrapper class="inline">
+                                            <input
+                                                clrCheckbox
+                                                class="checkbox"
+                                                tabindex="9"
+                                                name="sourceTDS"
+                                                type="checkbox"
+                                                [(ngModel)]="model.sourceTDS"
+                                            />
+                                        </clr-checkbox-wrapper>
                                 </div>
                                 <div class="col-md-2">Source URL:</div>
                                 <div class="col-md-4">

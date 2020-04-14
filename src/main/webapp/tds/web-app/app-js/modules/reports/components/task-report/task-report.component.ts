@@ -40,26 +40,65 @@ import {Observable} from 'rxjs';
 									</div>
 									<div class="form-group row checkboxes">
 										<div class="col-sm-5 col-sm-offset-2">
-											<label for="one">
-												<input type="checkbox" name="one" id="one" [(ngModel)]="includeComments">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="one"
+													type="checkbox"
+													name="one"
+													class="component-action-just-planning"
+													[(ngModel)]="includeComments"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="one"
+												>
 												Include comments in report
-											</label>
+												</label>
+                							</clr-checkbox-wrapper>
+
 										</div>
 									</div>
 									<div class="form-group row checkboxes">
 										<div class="col-sm-5 col-sm-offset-2">
-											<label for="two">
-												<input type="checkbox" name="two" id="two" [(ngModel)]="includeOnlyRemaining">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="two"
+													type="checkbox"
+													name="two"
+													class="component-action-just-planning"
+													[(ngModel)]="includeOnlyRemaining"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="two"
+												>
 												Include only remaining tasks in report
-											</label>
+												</label>
+                							</clr-checkbox-wrapper>
 										</div>
 									</div>
 									<div class="form-group row">
 										<div class="col-sm-5 col-sm-offset-2">
-											<label for="three">
-												<input type="checkbox" name="three" id="three" [(ngModel)]="includeUnpublished">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="three"
+													type="checkbox"
+													name="three"
+													class="component-action-just-planning"
+													[(ngModel)]="includeUnpublished"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="three"
+												>
 												Include Unpublished Tasks
-											</label>
+												</label>
+                							</clr-checkbox-wrapper>
+
+
 										</div>
 									</div>
 									<div class="form-group row ">
