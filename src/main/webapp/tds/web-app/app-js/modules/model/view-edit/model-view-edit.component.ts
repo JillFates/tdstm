@@ -168,6 +168,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	}
 
 	private preLoadData(): void {
+		this.dataSignature = JSON.stringify(this.modelModel);
 		this.modelService.getPreData()
 			.subscribe((response: any) => {
 				this.assetTypeList = response.assetTypes;
