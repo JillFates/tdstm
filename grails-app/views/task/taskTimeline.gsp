@@ -21,12 +21,26 @@
 		<g:javascript src="graph.js" />
 		<g:javascript src="task-timeline.js" />
 <style>
+
+h2 {
+	font-family: 'Roboto', Metropolis, "Avenir Next", "Helvetica Neue", Arial, sans-serif, 'Glyphicons Halflings', FontAwesome, 'WebComponentsIcons' !important;
+	font-weight: 200;
+	line-height: 2rem;
+	font-size: x-large;
+	color: #000;
+	letter-spacing: normal;
+}
+
 .container-checkbox {
 	display: inline-block;
 	position: relative;
 	padding-left: 35px;
 	margin-bottom: 12px;
 	cursor: pointer;
+	font-size: 12px;
+	font-weight: 400;
+	font-family: 'Roboto', Metropolis, "Avenir Next", "Helvetica Neue", Arial, sans-serif, 'Glyphicons Halflings', FontAwesome, 'WebComponentsIcons' !important;
+
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -37,8 +51,9 @@
 	position: absolute;
 	opacity: 0;
 	cursor: pointer;
-	height: 0;
-	width: 0;
+	line-height: normal;
+	height: .66667rem;
+	width: .66667rem;
 }
 
 .checkmark {	
@@ -50,10 +65,6 @@
 	background-color: #fff;	
 	border-radius: .125rem;
 
-	-webkit-transition: all 0.30s ease-in-out;
-	-moz-transition: all 0.30s ease-in-out;
-	-ms-transition: all 0.30s ease-in-out;
-	-o-transition: all 0.30s ease-in-out;
 	outline: none;
 	padding: 3px 0px 3px 3px;
 	margin: 5px 1px 3px 0px;
