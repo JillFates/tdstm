@@ -445,8 +445,8 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'NEWS': {
-		'EDIT_NEWS': 'News Edit',
-		'CREATE_NEWS': 'News Create'
+		'EDIT_NEWS': 'Event News Edit',
+		'CREATE_NEWS': 'Event News Create'
 	},
 	'LOGIN': {
 		'BACK_TO_LOGIN': 'Back to Login',
