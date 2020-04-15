@@ -101,4 +101,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_2/20200206-add-license-lastcompliance-column.groovy'
     include file: 'version/v4_7_2/20200129-remove-null-fields.groovy'
 	include file: 'version/v4_7_2/20200218-drop-dataview-unique-index.groovy'
+	include file: 'version/v5_0_0/20200414-resize-dependency-group-column-on-manage-views.groovy'
 }
