@@ -7,7 +7,8 @@ import {TagModel} from '../model/tag.model';
 @Injectable()
 export class TagService {
 
-	private readonly tagURL = '../ws/tag';
+	private readonly baseURL = '/tdstm';
+	private readonly tagURL = `${ this.baseURL }/ws/tag`;
 
 	constructor(private http: HttpClient) {}
 
@@ -25,6 +26,18 @@ export class TagService {
 					model.lastModified = ((model.lastModified) ? new Date(model.lastModified) : null);
 				});
 				return response;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * GET - List of Tags
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	getTagList(): Observable<any[]> {
+		return this.http.get(this.tagURL)
+			.map((response: any) => {
+				return (response && response.status === ApiResponseModel.API_SUCCESS && response.data) && response.data;
 			})
 			.catch((error: any) => error);
 	}
