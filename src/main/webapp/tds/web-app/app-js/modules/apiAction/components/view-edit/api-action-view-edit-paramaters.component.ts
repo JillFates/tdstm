@@ -53,9 +53,17 @@ import { NgForm } from '@angular/forms';
 												 let-rowIndex="rowIndex">
 							<div
 								*ngIf="dataItem !== null && (column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded'))">
-								<input clrCheckbox (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean"
-											 name="{{column.property + columnIndex + rowIndex}}-param" (change)="onValuesChange()"
-											 [(ngModel)]="dataItem[column.property]"/>
+								<clr-checkbox-wrapper class="inline">
+									<input
+										clrCheckbox
+										(keypress)="getOnInputKey($event)"
+										type="checkbox"
+										class="param-text-input-boolean"
+										name="{{column.property + columnIndex + rowIndex}}-param"
+										(change)="onValuesChange()"
+										[(ngModel)]="dataItem[column.property]"
+									/>
+                				</clr-checkbox-wrapper>
 							</div>
 							<div *ngIf="dataItem !== null && (column.type === 'text' && column.property === 'paramName')">
 								<!-- Name -->

@@ -37,34 +37,84 @@ import {DialogService} from 'tds-component-library';
 									</div>
 									<div class="form-group row checkboxes">
 										<div class="col-sm-5 col-sm-offset-2">
-											<label for="one">
-												<input type="checkbox" name="one" id="one" [(ngModel)]="bundleConflict">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="one"
+													type="checkbox"
+													name="one"
+													class="component-action-just-planning"
+													[(ngModel)]="bundleConflict"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="one"
+												>
 												Bundle Conflict - Having dependency references to assets assigned to unrelated bundles
-											</label>
+												</label>
+                							</clr-checkbox-wrapper>
 										</div>
 									</div>
 									<div class="form-group row checkboxes">
 										<div class="col-sm-5 col-sm-offset-2">
-											<label for="two">
-												<input type="checkbox" name="two" id="two" [(ngModel)]="unresolvedDependencies">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="two"
+													type="checkbox"
+													name="two"
+													class="component-action-just-planning"
+													[(ngModel)]="unresolvedDependencies"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="justPlanning"
+												>
 												Unresolved Dependencies - Having dependencies with status Unknown or Questioned
-											</label>
+												</label>
+                							</clr-checkbox-wrapper>
+
 										</div>
 									</div>
 									<div class="form-group row checkboxes">
 										<div class="col-sm-5 col-sm-offset-2">
-											<label for="three">
-												<input type="checkbox" name="three" id="three" [(ngModel)]="noSupportDependencies">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="three"
+													type="checkbox"
+													name="three"
+													class="component-action-just-planning"
+													[(ngModel)]="noSupportDependencies"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="three"
+												>
 												No Supports Dependencies - Having no Supports relationship depicting its purpose
-											</label>
+												</label>
+                							</clr-checkbox-wrapper>
+
 										</div>
 									</div>
 									<div class="form-group row">
 										<div class="col-sm-5 col-sm-offset-2">
-											<label for="four">
-												<input type="checkbox" name="three" id="three" [(ngModel)]="noVmHost">
+											<clr-checkbox-wrapper class="inline">
+												<input
+													clrCheckbox
+													id="four"
+													type="checkbox"
+													name="four"
+													class="component-action-just-planning"
+													[(ngModel)]="noVmHost"
+												/>
+												<label
+													class="clr-control-label clr-control-label-sm inline"
+													for="four"
+												>
 												No VM Host- VMs with no associated Host environment
-											</label>
+												</label>
+                							</clr-checkbox-wrapper>
 										</div>
 									</div>
 									<div class="form-group row">

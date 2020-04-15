@@ -41,8 +41,16 @@ import * as R from 'ramda';
 							<label for="includeDependencies" class="col-sm-4 control-label"> Include
 								Dependencies</label>
 							<div class="col-sm-2 align-controls">
-								<input type="checkbox" id="includeDependencies" name="includeDependencies"
-									   #includeDependencies/>
+								<clr-checkbox-wrapper class="inline">
+								<input
+									clrCheckbox
+									type="checkbox"
+									id="includeDependencies"
+									name="includeDependencies"
+									#includeDependencies
+								/>
+                				</clr-checkbox-wrapper>
+
 								<tds-popup-asset-message
 										[message]="'Clone all existing dependencies as well but will change the status of each to Questioned.'"></tds-popup-asset-message>
 							</div>

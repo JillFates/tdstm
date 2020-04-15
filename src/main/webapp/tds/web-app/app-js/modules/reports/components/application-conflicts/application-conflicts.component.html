@@ -29,28 +29,64 @@
 							</div>
 							<div class="form-group row checkboxes">
 								<div class="col-sm-6 col-sm-offset-2">
-									<label for="one">
-										<input type="checkbox" name="one" id="one" [checked]="model.bundleConflict" (change)="model.bundleConflict = !model.bundleConflict">
+									<clr-checkbox-wrapper class="inline">
+										<input
+											clrCheckbox
+											id="one"
+											type="checkbox"
+											name="one"
+											class="component-action-just-planning"
+											[checked]="model.bundleConflict" 
+											(change)="model.bundleConflict = !model.bundleConflict"										/>
+										<label
+											class="clr-control-label clr-control-label-sm inline"
+											for="one"
+										>
 										Bundle Conflict - Having dependency references to assets assigned to unrelated bundles
-									</label>
+										</label>
+									</clr-checkbox-wrapper>
 								</div>
 							</div>
 							<div class="form-group row checkboxes">
 								<div class="col-sm-6 col-sm-offset-2">
-									<label for="two">
-										<input type="checkbox" name="two" id="two" [checked]="model.unresolvedDependencies"
-													 (change)="model.unresolvedDependencies = !model.unresolvedDependencies">
+									<clr-checkbox-wrapper class="inline">
+										<input
+											clrCheckbox
+											id="two"
+											type="checkbox"
+											name="two"
+											class="component-action-just-planning"
+											[checked]="model.unresolvedDependencies"
+											(change)="model.unresolvedDependencies = !model.unresolvedDependencies"
+										/>
+										<label
+											class="clr-control-label clr-control-label-sm inline"
+											for="two"
+										>
 										Unresolved Dependencies - Having dependencies with status Unknown or Questioned
-									</label>
+										</label>
+									</clr-checkbox-wrapper>
 								</div>
 							</div>
 							<div class="form-group row ">
 								<div class="col-sm-6 col-sm-offset-2">
-									<label for="three">
-										<input type="checkbox" name="three" id="three" [checked]="model.missingDependencies"
-													 (change)="model.missingDependencies = !model.missingDependencies" >
+									<clr-checkbox-wrapper class="inline">
+										<input
+											clrCheckbox
+											id="three"
+											type="checkbox"
+											name="three"
+											class="component-action-just-planning"
+											[checked]="model.missingDependencies"
+											(change)="model.missingDependencies = !model.missingDependencies"
+										/>
+										<label
+											class="clr-control-label clr-control-label-sm inline"
+											for="three"
+										>
 										Missing Dependencies - Having no defined Supports or Requires dependencies
-									</label>
+										</label>
+									</clr-checkbox-wrapper>
 								</div>
 							</div>
 							<div class="form-group row">

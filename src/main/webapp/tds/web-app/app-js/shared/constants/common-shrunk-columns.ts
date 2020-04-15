@@ -1,8 +1,6 @@
 // Common columns that should be shrunk to allow more space for primary info
 export const COMMON_SHRUNK_COLUMNS = [
 	'Archived',
-	'Validation',
-	'Plan Status',
 	'Created',
 	'Asset Type',
 	'Created By',
@@ -21,6 +19,8 @@ export const EXTRA_WIDTH_COLUMNS = [
 	'External Ref Id',
 	'Last Modified',
 	'Date Create',
-	'Last Updated'
+	'Last Updated',
+	'Validation',
+	'Plan Status',
 ];
 export const EXTRA_COLUMN_WIDTH = 150;

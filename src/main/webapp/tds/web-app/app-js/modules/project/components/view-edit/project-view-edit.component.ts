@@ -258,11 +258,11 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
 				this.savedProjectLogoId = this.projectLogoId;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
-				this.projectModel.startDate = this.projectModel.startDate ? DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate)) : null
+				this.projectModel.startDate = data.startDate ? DateUtils.adjustDateTimezoneOffset(new Date(data.startDate)) : null;
 				if (this.projectModel.startDate) {
 					this.projectModel.startDate.setHours(0, 0, 0, 0);
 				}
-				this.projectModel.completionDate = this.projectModel.completionDate ? DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate)) : null;
+				this.projectModel.completionDate = data.completionDate ? DateUtils.adjustDateTimezoneOffset(new Date(data.completionDate)) : null;
 				if (this.projectModel.completionDate) {
 					this.projectModel.completionDate.setHours(0, 0, 0, 0);
 				}
@@ -323,7 +323,6 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename, this.projectId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
-					this.editing = false;
 					this.projectLogoId = result.data.projectLogoForProject ? result.data.projectLogoForProject.id : 0;
 					this.savedProjectLogoId = this.projectLogoId;
 					this.retrieveImageTimestamp = (new Date()).getTime();
@@ -334,6 +333,7 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 						this.projectModel.projectName,
 						this.projectService.getProjectImagePath(projectImage)
 					);
+					this.cancelCloseDialog();
 				}
 			});
 		}

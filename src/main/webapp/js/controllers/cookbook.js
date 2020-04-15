@@ -1308,10 +1308,13 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 		'</a>'+
 		'</div>';
 	var checkboxTemplate = '<div class="gridIcon">'+
-		'<span class="actions" style="text-align: center;">'+
+		'<span class="actions" style="text-align: center;">' +
+		'<label class="container-checkbox" for="isPublished">'+
 		'<input type="checkbox" name="isPublished" ng-checked="row.entity.isPublished"'+
 			'id="isPublished" ng-model="row.entity.isPublishedValue" ng-readonly="true"'+
-			'ng-click="tasks.tasksGridActions(row, \'publishUnpublish\', $event)"/>'+
+		'ng-click="tasks.tasksGridActions(row, \'publishUnpublish\', $event)"/>' +
+		'<span class="checkmark"></span>'+
+		'</label>'+
 		'</span>'+
 		'</div>';
 	var recipeTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><a href="#/recipes/{{row.entity.recipeId}}/code/logs">{{row.entity.recipeName}}</a></div>';

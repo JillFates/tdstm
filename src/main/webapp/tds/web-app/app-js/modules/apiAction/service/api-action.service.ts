@@ -268,18 +268,23 @@ export class APIActionService {
 
 		if (parameterList && parameterList.length > 0) {
 			let requestParameterListData = R.clone(parameterList);
-			requestParameterListData.forEach( (param) => {
-				if (param.fieldName && param.fieldName.field) {
-					param.fieldName = param.fieldName.field;
+			requestParameterListData.forEach( (param, index) => {
+				if (param) {
+					if (param.fieldName && param.fieldName.field) {
+						param.fieldName = param.fieldName.field;
+					}
+					if (param.context && param.context.assetClass) {
+						param.context = param.context.assetClass;
+					}
+					if (param.context === DOMAIN.COMMON) {
+						param.context = 'ASSET';
+					}
+					delete param.sourceFieldList;
+					delete param.currentFieldList;
+				} else {
+					// on this point param should be empty at all so we need to clean that data from the paramList (to prevent endpoint NPE issues)
+					requestParameterListData.splice(index, 1);
 				}
-				if (param.context && param.context.assetClass) {
-					param.context = param.context.assetClass;
-				}
-				if (param.context === DOMAIN.COMMON) {
-					param.context = 'ASSET';
-				}
-				delete param.sourceFieldList;
-				delete param.currentFieldList;
 			});
 			postRequest['methodParams'] = JSON.stringify(requestParameterListData);
 		}

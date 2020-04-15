@@ -12,7 +12,15 @@ import {HeaderService} from '../../services/header.service';
 			                <label for="hidePasswords">Hide Password:</label>
 			            </td>
 			            <td valign="top" class="value">
-			                <input type="checkbox" id="hidePasswordsId" name="hidePasswords" [(ngModel)]="hidePasswordFields"/>
+							<clr-checkbox-wrapper class="inline">
+								<input
+									clrCheckbox
+									id="hidePasswordsId"
+									type="checkbox"
+									name="hidePasswords"
+									[(ngModel)]="hidePasswordFields"
+								/>
+                			</clr-checkbox-wrapper>
 			            </td>
 			        </tr>
 			        <tr class="prop">
