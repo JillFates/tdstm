@@ -118,7 +118,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			{
 				icon: 'cog',
 				title: this.translateService.transform('ASSET_EXPLORER.CONFIGURE_VIEW'),
-				show: true,
+				show: this.isEditAvailable(),
 				onClick: this.onEdit.bind(this),
 			},
 		];
