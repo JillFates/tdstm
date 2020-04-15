@@ -168,7 +168,7 @@
                                 </li>
                                 <li class="menu-child-item menu-parent-assets-asset-manager">
                                     <g:link class="mmlink" controller="module" action="asset" id="views">
-                                        <i class="fa fa-cog" style="font-size:20px; margin-right: 0px;"></i> View Manager
+                                        <i class="fa fa-cog" style="font-size:20px; margin-right: 0px;"></i> Manage Views
                                     </g:link>
                                 </li>
                                 <li class="divider"></li>
