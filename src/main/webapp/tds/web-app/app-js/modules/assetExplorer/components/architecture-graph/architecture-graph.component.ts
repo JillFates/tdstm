@@ -43,7 +43,8 @@ export class ArchitectureGraphComponent implements OnInit {
 	public urlParams: IArchitectureGraphParams;
 	private currentNodesData;
 	public categories;
-	public assetClass: any = {id: 'ALL', value: 'All Classes'};
+	private readonly initialAssetClass = {id: 'ALL', value: 'All Classes'};
+	public assetClass: any;
 	public asset: any = {id: '', text: ''};
 	protected getAssetList: Function;
 
@@ -149,6 +150,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.assetClass = this.initialAssetClass;
 		let assetId = null;
 		let levelsUp = null;
 		let levelsDown = null;
@@ -193,10 +195,12 @@ export class ArchitectureGraphComponent implements OnInit {
 				this.appLbl = res.graphPrefs.appLbl;
 				this.labelOffset = res.graphPrefs.labelOffset;
 				this.assetClasses = res.graphPrefs.assetClasses;
-				this.assetClass = res.graphPrefs.assetClass;
 				if (assetId === null) {
+					this.assetClass = res.graphPrefs.assetClass || this.initialAssetClass;
 					this.selectedAsset = res.graphPrefs.selectedAsset;
 					this.assetId = this.selectedAsset && this.selectedAsset.id || '';
+				} else {
+					this.assetClass = this.initialAssetClass;
 				}
 				this.loadData();
 
