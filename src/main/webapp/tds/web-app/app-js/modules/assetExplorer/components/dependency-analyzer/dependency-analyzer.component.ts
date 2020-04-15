@@ -1,12 +1,10 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {GridModel} from 'tds-component-library';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DependencyAnalyzerService} from './service/dependency-analyzer.service';
 import {DependencyAnalyzerDataModel, DependencyBundleModel} from './model/dependency-analyzer-data.model';
 import {TagService} from '../../../assetTags/service/tag.service';
-import { GridComponent } from '@progress/kendo-angular-grid';
-declare var jQuery: any;
 
 @Component({
 	selector: 'tds-dependency-analyzer',
@@ -84,10 +82,7 @@ export class DependencyAnalyzerComponent implements OnInit {
 	}
 
 	columnClicked(event, index) {
-		let headers = document.querySelectorAll('th');
-		for (let i = 0; i < headers.length; i++) {
-			headers[i].classList.remove('active-column-header');
-		}
+		this.clearHeaders();
 		let tmp = event.target as HTMLElement;
 		tmp.parentElement.classList.add('active-column-header');
 		this.showBottomGrid = true;
@@ -96,25 +91,34 @@ export class DependencyAnalyzerComponent implements OnInit {
 		this.addClassToSelectedColumn(index);
 	}
 	addClassToSelectedColumn(index) {
-		// remove class from others if present
-		let cells = document.querySelectorAll('td');
-		for (let i = 0; i < cells.length; i++) {
-			cells[i].classList.remove('active-column');
-			cells[i].classList.remove('last-active-cell');
-		}
-
-		cells = document.querySelectorAll('td:nth-child(' + (index + 1) + ')');
+		this.clearAllCells();
+		let cells = document.querySelectorAll('td:nth-child(' + (index + 1) + ')');
 		for (let i = 0 ; i < cells.length ; i++) {
-			if (cells[i].textContent.trim() > '') {
+			// if (cells[i].textContent.trim() > '') {
 				if (i === (cells.length - 1)) {
 					cells[i].classList.add('active-column');
 					cells[i].classList.add('last-active-cell');
 				} else {
 					cells[i].classList.add('active-column');
 				}
-			}
+			// }
 		}
-}
+	}
+
+	clearHeaders() {
+		let headers = document.querySelectorAll('th');
+		for (let i = 0; i < headers.length; i++) {
+			headers[i].classList.remove('active-column-header');
+		}
+	}
+
+	clearAllCells() {
+		let cells = document.querySelectorAll('td');
+		for (let i = 0; i < cells.length; i++) {
+			cells[i].classList.remove('active-column');
+			cells[i].classList.remove('last-active-cell');
+		}
+	}
 
 	getDataFromIndex(index) {
 		const retVal = {};
@@ -151,15 +155,13 @@ export class DependencyAnalyzerComponent implements OnInit {
 	}
 
 	onShowOnlyWIPChange(event) {
+		this.clearAllCells();
+		this.clearHeaders();
 		this.getFilteredData();
 	}
 
 	onRefeshData() {
 		this.getInitialData();
-	}
-
-	refreshDiagram() {
-		// console.log('refresh diagram');
 	}
 
 	onTabSelect(event) {

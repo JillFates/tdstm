@@ -39,3 +39,20 @@
   border-bottom: 3px #ffa500 solid !important;
   font-weight: bold !important;
 }
+
+.dependency-analyzer-custom-dropdown, .tag-selector-for-da {
+  display: inline-block !important;
+}
+
+.dependency-analyzer-control-label, .dependency-analyzer-control-btn {
+  margin-left: 25px;
+  margin-right: 5px;
+}
+
+tds-asset-tag-selector {
+  width: 20%;
+}
+
+.asset-tag-selector-component.tag-selector-for-da {
+  width: 100%;
+}
