@@ -318,7 +318,7 @@ class AssetService implements ServiceMethods{
 					assetClass: AssetClass.getDomainForAssetType(depAsset.class.getSimpleName()),
 					assetType: depAsset.assetType,
 					assetId: depAsset.id,
-					comment: dependency.comment?: '', // send an empty string where there's no comment to make front-end validations easier.
+					comment: dependency.comment?: '', // send an empty string when there's no comment, to make front-end validations easier.
 					id: dependency.id,
 					moveBundle: [
 					        id: depAsset.moveBundle.id,
