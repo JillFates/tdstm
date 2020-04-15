@@ -68,7 +68,7 @@ export class HeaderComponent {
 			.subscribe((userContext: UserContextModel) => {
 				if (!userContext.user) {
 					this.pageMetaData.hideTopNav = true;
-				} else if (userContext.project !=null && !userContext.project.logoUrl) {
+				} else if (userContext.project && !userContext.project.logoUrl) {
 					const project = Object.assign({}, userContext.project);
 					project.logoUrl = '/tdstm/tds/web-app/assets/images/transitionLogo.svg';
 					this.store.dispatch(new SetProject(project));
