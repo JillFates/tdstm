@@ -475,6 +475,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 				(result: any) => {
 					if (result) {
+						this.dataSignature = JSON.stringify(this.apiActionModel);
 						super.onAcceptSuccess(result);
 					}
 				},
