@@ -436,7 +436,7 @@ export class ArchitectureGraphComponent implements OnInit {
 				} else if (!categories.includes('SERVERPHYSICAL') &&
 					ArchitectureGraphDiagramHelper.isDeviceServer(type)) {
 					node.name = '';
-				} else if (!categories.includes('OTHER')) {
+				} else if (!categories.includes('OTHER') && type === 'other') {
 					node.name = '';
 				} else {
 					console.log('Not found');
