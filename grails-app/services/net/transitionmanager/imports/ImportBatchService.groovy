@@ -614,10 +614,9 @@ class ImportBatchService implements ServiceMethods {
 
 		try {
 			quartzScheduler.scheduleJob(trigger)
+			log.info('scheduleJob() {} kicked of an batch import process for batch ({})', securityService.currentUsername, batchId)
 		} catch (Exception e) {
-			log.info('Could not schedule import batch. {}\\n{}', e.message, ExceptionUtil.stackTraceToString(e))
+			log.info('Import batch {} could not be started because another batch is currently being processed. It will be queue to be processed afterward.', batchId)
 		}
-
-		log.info('scheduleJob() {} kicked of an batch import process for batch ({})', securityService.currentUsername, batchId)
 	}
 }
