@@ -109,7 +109,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		{
 			icon: 'storageLogical',
 			label: 'Logical Storage',
-			value: 'storageLogical',
+			value: 'storage',
 			tagLabel: this.TAG_STORAGE_LOGICAL,
 			checked: false
 		},
@@ -422,12 +422,12 @@ export class ArchitectureGraphComponent implements OnInit {
 
 		clonedNodes.nodes.forEach(node => {
 			// Clear the node name if the assetClass is not included on the categories selected
-			if (node.assetClass === 'DEVICE' || node.assetClass === 'STORAGE') {
+			if (node.assetClass === 'DEVICE' /*|| node.assetClass === 'STORAGE'*/) {
 				const type = node.type.toLowerCase();
 				if (!categories.includes('SERVERVIRTUAL') &&
 					ArchitectureGraphDiagramHelper.isDeviceVirtualServer(type)) {
 					node.name = '';
-				} else if (!categories.includes('STORAGELOGICAL') &&
+				} else if (!categories.includes('STORAGEPHYSICAL') &&
 					ArchitectureGraphDiagramHelper.isDeviceStorage(type)) {
 					node.name = '';
 				} else if (!categories.includes('NETWORKLOGICAL') &&
@@ -437,8 +437,7 @@ export class ArchitectureGraphComponent implements OnInit {
 					ArchitectureGraphDiagramHelper.isDeviceServer(type)) {
 					node.name = '';
 				} else if (!categories.includes('OTHER')) {
-					console.log('other');
-					// node.name = '';
+					node.name = '';
 				} else {
 					console.log('Not found');
 				}
