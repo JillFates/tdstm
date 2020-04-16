@@ -448,7 +448,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				openFromList: true
 			},
 			modalConfiguration: {
-				title: 'Create ' + assetClassReadable,
+				title: assetClassReadable + ' Create',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'
