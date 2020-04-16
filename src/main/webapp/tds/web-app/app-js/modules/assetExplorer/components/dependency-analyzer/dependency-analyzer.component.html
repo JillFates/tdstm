@@ -3,7 +3,7 @@
 		<div class="col-md-12  ">
 			<label class="">{{'DEPENDENCY_ANALYZER.DEPENDENCY_GROUPS' | translate}}
 				:</label>
-			<tds-button>{{ 'DEPENDENCY_ANALYZER.REGENERATE' | translate}}</tds-button>
+			<tds-button (click)="regenerate()" >{{ 'DEPENDENCY_ANALYZER.REGENERATE' | translate}}</tds-button>
 			<label class="dependency-analyzer-control-label"
 				   for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.BUNDLE' | translate}}:</label>
 			<kendo-dropdownlist

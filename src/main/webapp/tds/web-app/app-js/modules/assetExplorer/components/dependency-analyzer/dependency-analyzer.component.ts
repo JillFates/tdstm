@@ -1,10 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
 import {UserContextService} from '../../../auth/service/user-context.service';
-import {GridModel} from 'tds-component-library';
+import {DialogService, GridModel, ModalSize} from 'tds-component-library';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DependencyAnalyzerService} from './service/dependency-analyzer.service';
 import {DependencyAnalyzerDataModel, DependencyBundleModel} from './model/dependency-analyzer-data.model';
 import {TagService} from '../../../assetTags/service/tag.service';
+import {RegenerateComponent} from './components/regenerate/regenerate.component';
 
 @Component({
 	selector: 'tds-dependency-analyzer',
@@ -39,7 +40,9 @@ export class DependencyAnalyzerComponent implements OnInit {
 	constructor(
 		private userContextService: UserContextService,
 		private dependencyAnalyzerService: DependencyAnalyzerService,
-		private tagService: TagService
+		private tagService: TagService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 	) {
 		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
@@ -223,5 +226,29 @@ export class DependencyAnalyzerComponent implements OnInit {
 	 * */
 	onTabSelect(event) {
 		// console.log(event);
+	}
+
+	regenerate() {
+		// open modal
+		try {
+			console.log('regenerate');
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: RegenerateComponent,
+				data: {
+					dependencyType: this.dependencyType,
+					dependencyStatus: this.dependencyStatus,
+				},
+				modalConfiguration: {
+					title: 'Provider',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			}).subscribe((data: any) => {
+				console.log('Basic Dialog was closed successfully: ', data);
+			});
+		} catch (error) {
+		console.error(error);
+	}
 	}
 }
