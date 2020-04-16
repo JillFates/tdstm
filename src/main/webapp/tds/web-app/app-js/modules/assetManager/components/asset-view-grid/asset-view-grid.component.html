@@ -99,7 +99,8 @@
 							<a
 								clrDropdownItem
 								(click)="showAssetEditView(dataItem, rowIndex)"
-								[disabled]="!isEditAvailable()">
+								[disabled]="!isEditAvailable()"
+								title="Edit">
 								Edit
 							</a>
 							<a
@@ -107,6 +108,7 @@
 								(click)="createTask(dataItem, rowIndex)"
 								*ngIf="!hasTasks"
 								[disabled]="!isTaskCreateAvailable()"
+								title="Create Task"
 							>
 								Create Task
 							</a>
@@ -114,6 +116,7 @@
 								clrDropdownItem
 								(click)="showTask(dataItem, rowIndex)"
 								*ngIf="hasTasks"
+								title="Show Tasks"
 							>
 								Show Tasks
 							</a>
@@ -122,6 +125,7 @@
 								(click)="createComment(dataItem, rowIndex)"
 								*ngIf="!hasComments"
 								[disabled]="!isCommentCreateAvailable()"
+								title="Create Comment"
 							>
 								Create Comment
 							</a>
@@ -129,6 +133,7 @@
 								clrDropdownItem
 								(click)="showComment(dataItem, rowIndex)"
 								*ngIf="hasComments"
+								title="Show Comments"
 							>
 								Show Comments
 							</a>
@@ -136,6 +141,7 @@
 								clrDropdownItem
 								(click)="showAssetCloneView(dataItem, rowIndex)"
 								[disabled]="!isAssetCloneAvailable()"
+								title="Clone"
 							>
 								Clone
 							</a>

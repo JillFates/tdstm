@@ -354,7 +354,7 @@ class CustomTagLib implements InitializingBean {
 
 		out << "<!-- Content Header (Page header) -->"
 		out << "<section class=\"content-header\"><div class=\"clr-row\">"
-		out << "<div class=\"clr-col-4 clr-align-content-center\"><div class=\"legacy-content-middle\"><h2> " << title
+		out << "<div class=\"clr-col-4 clr-align-content-center\"><div class=\"legacy-content-middle\"><h2 style=\"font-family: 'Roboto', Metropolis, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif, 'Glyphicons Halflings', FontAwesome, 'WebComponentsIcons' !important; font-weight: 200;line-height: 2rem;font-size: x-large;color: #000;letter-spacing: normal;\"> " << title
 		if (justPlanningOptIn) {
 			Boolean justPlanning  = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING))
 			out << " <span style=\"margin-left: 15px; font-size: 15px;\"><input type=\"checkbox\" id=\"justPlanning\" onclick=\"toggleJustPlanning(\$(this))\" "
