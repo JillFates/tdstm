@@ -27,8 +27,8 @@ class EmailDispatchService implements ServiceMethods {
 			passwordReset			: "/auth/_forgotPasswordEmail",
 			passwordResetNotif		: "/auth/_resetPasswordNotificationEmail",
 			accountActivation		: "/auth/_accountActivationNotificationEmail",
-			"adminResetPassword"	: "/admin/_ResetPasswordNotificationEmail",
-			"batchPostingResults"	: "/auth/_importBatchPostingResultsEmail"
+			adminResetPassword		: "/admin/_ResetPasswordNotificationEmail",
+			batchPostingResults		: "/auth/_importBatchPostingResultsEmail"
 	].asImmutable()
 
 	/**
