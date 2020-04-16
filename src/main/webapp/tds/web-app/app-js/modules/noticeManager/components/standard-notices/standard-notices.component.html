@@ -23,11 +23,12 @@
 					</div>
 					<div class="form-group container-dontshow-again">
 							<div class="col-sm-12">
-								<label for="agreement-{{idx}}" class="pull-left aligned-label dontshow-again"> 
-									<input type="checkbox"  class="aligned-checkbox"
-										name="agreement-{{idx}}" 
-										id="agreement-{{idx}}" 
-										[(ngModel)]="notice.notShowAgain"> {{ 'NOTICE.DO_NOT_SHOW_AGAIN' | translate }}
+								<input type="checkbox"  class="aligned-checkbox"
+									   name="agreement-{{idx}}"
+									   id="agreement-{{idx}}"
+									   [(ngModel)]="notice.notShowAgain">
+								<label for="agreement-{{idx}}" class="aligned-label dontshow-again">
+									{{ 'NOTICE.DO_NOT_SHOW_AGAIN' | translate }}
 								</label>
 							</div>
 					</div>
