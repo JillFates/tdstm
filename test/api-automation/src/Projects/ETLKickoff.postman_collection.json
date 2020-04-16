@@ -1,0 +1,793 @@
+{
+	"info": {
+		"_postman_id": "1b589c5c-79d3-4d4f-972e-957feccdadb6",
+		"name": "ETL Kickoff",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login - Public API - ETL Kickoff",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "74e1464e-f8e4-4a5f-b513-4faf93ca5615",
+						"exec": [
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/api/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login - ETL Script",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2b17bc48-14e9-43d1-bed2-e730da57442f",
+						"exec": [
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
+							"});",
+							"",
+							"var data = pm.response.json();",
+							"",
+							"",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "REST API - Token Validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5abda34c-60f1-4a77-9027-e31bf45fa976",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Version",
+						"type": "text",
+						"value": "1.0"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/api/validate",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"api",
+						"validate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Providers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa8e308f-24ca-46fb-9260-b7562e1a0b9c",
+						"exec": [
+							"//We need a provider value for the Api Action",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var providerId = jsonObject.data[0].id; ",
+							"var providerName = jsonObject.data[0].name;",
+							"",
+							"pm.environment.set(\"providerId\", providerId);",
+							"pm.environment.set(\"providerName\", providerName);",
+							"",
+							"var etlScriptNewName = \"API ETL Script \" + _.random(1, 1000) + _.random(1, 1000) ;",
+							"",
+							"pm.environment.set(\"etlScriptNewName\", etlScriptNewName);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						"list"
+					]
+				},
+				"description": "Find all the providers for the user's current project."
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Unique Name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f1b65d13-bf35-4297-87d1-b19159727bda",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Unique Name\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"true\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"{{etlScriptNewName}}\" ,\n\t\"providerId\": {{providerId}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/validateUnique/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						"validateUnique",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create ETL Script",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bdd5f066-bf3c-4bb9-b1a0-c8604ba6e7e1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"ETL Script Creation\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"API ETL Script\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var etlScriptId = jsonObject.data.dataScript.id; ",
+							"var etlScriptName = jsonObject.data.dataScript.name; ",
+							"pm.environment.set(\"etlScriptId\", etlScriptId);",
+							"pm.environment.set(\"etlScriptName\", etlScriptName);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\":{{etlScriptNewName}},\"description\":\"\",\"mode\":\"Import\",\"providerId\":{{providerId}}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ETL Script Edit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bdd5f066-bf3c-4bb9-b1a0-c8604ba6e7e1",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"ETL Script Creation\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"API ETL Script\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var etlScriptId = jsonObject.data.dataScript.id; ",
+							"var etlScriptName = jsonObject.data.dataScript.name; ",
+							"pm.environment.set(\"etlScriptId\", etlScriptId);",
+							"pm.environment.set(\"etlScriptName\", etlScriptName);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"type": "text",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":{{etlScriptId}},\"script\":\"read labels\\ndomain Application\\niterate {\\n\\textract 'name' load 'assetName' set name\\n    find Application by 'assetName' eq name into 'id'\\n  \\n    load 'description' with \\\"Imported At ${NOW}\\\"\\n}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataScript/saveScript",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataScript",
+						"saveScript"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Import ETL with dataScriptId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5abda34c-60f1-4a77-9027-e31bf45fa976",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Progresskey not empty\", function () {",
+							"    var response = JSON.parse(responseBody);",
+							"    var progress = response.data.progress;",
+							"    pm.expect(progress).to.not.eql(null);",
+							"}); "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Version",
+						"type": "text",
+						"value": "1.0"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "sendNotification",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "dataScriptId",
+							"value": "{{etlScriptId}}",
+							"type": "text"
+						},
+						{
+							"key": "project.id",
+							"value": "2445",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "src/Projects/TM-17073.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/api/import/processFile",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"api",
+						"import",
+						"processFile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Import ETL with dataScriptName",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5abda34c-60f1-4a77-9027-e31bf45fa976",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Progresskey not empty\", function () {",
+							"    var response = JSON.parse(responseBody);",
+							"    var progress = response.data.progress;",
+							"    pm.expect(progress).to.not.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Version",
+						"type": "text",
+						"value": "1.0"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "sendNotification",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "dataScriptName",
+							"value": "{{etlScriptName}}",
+							"type": "text"
+						},
+						{
+							"key": "providerName",
+							"value": "{{providerName}}",
+							"type": "text"
+						},
+						{
+							"key": "project.id",
+							"value": "2445",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "src/Projects/TM-17073.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/api/import/processFile",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"api",
+						"import",
+						"processFile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete ETL Script",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0f1cfe32-970a-4ecd-85c0-2e74acefee6b",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.environment.unset(\"etlScriptNewName\");",
+							"pm.environment.unset(\"providerId\");",
+							"pm.environment.unset(\"etlScriptId\");",
+							"pm.environment.unset(\"etlScriptNewName\");",
+							"pm.environment.unset(\"etlScriptName\");",
+							"pm.environment.unset(\"fileName\");",
+							"pm.environment.unset(\"progressKey\");",
+							"pm.environment.unset(\"etlOutputName\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");",
+							"pm.environment.unset(\"providerName\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/datascript/list"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"type": "text",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/{{etlScriptId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"datascript",
+						"{{etlScriptId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "adf8aa1f-6ef1-44e7-8fe7-1a9d2bf2ad4f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1f5a30f6-29c8-4268-a863-ec2505598571",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

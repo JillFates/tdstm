@@ -1523,13 +1523,29 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	/**
 	 * Used to validate if the current user has any of a list of permissions
 	 * @parameter permissions - the list of permissions to check for
-	 * @return true if the user has anyone of the specified permission
+	 * @return true if the user has any of the specified permission
 	 */
 	Boolean hasAnyPermission(List<String> permissions) {
 		Boolean permitted = false
 		for (String perm in permissions) {
 			permitted = hasPermission(perm)
 			if (permitted) {
+				break
+			}
+		}
+		return permitted
+	}
+
+	/**
+	 * Used to validate if the current user has ALL of the permissions provided in the list
+	 * @parameter permissions - the list of permissions to check for
+	 * @return true if the user has ALL of the specified permission
+	 */
+	Boolean hasAllPermission(List<String> permissions) {
+		Boolean permitted = true
+		for (String perm in permissions) {
+			if (! hasPermission(perm)) {
+				permitted = false
 				break
 			}
 		}

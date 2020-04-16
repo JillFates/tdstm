@@ -11,15 +11,15 @@ class ETLScriptsDesignerPage extends Page{
     }
 
     static content = {
-        modalContainer {$("data-script-etl-builder div.modal-content")}
-        modalTitle {modalContainer.find("div", class:"modal-header").find("h4" , class:"modal-title")}
-        dsTestButton {modalContainer.find("tds-check-action button", text: contains("Test"))}
-        dsCheckSyntaxButton {modalContainer.find("tds-check-action button", text: contains("Check Syntax"))}
-        dsLoadDataDesignerButton {modalContainer.find("button", text: contains("Load Sample Data"))}
-        dsViewConsoleDesignerButton {modalContainer.find("button", text: contains("View Console"))}
+        modalContainer {$("div.modal-dialog.modal-xl.resize-enabled")}
+        modalTitle {modalContainer.find("h3")[0]}
+        dsTestButton {$(find("span", text: contains("TEST"))).closest("button")[0]}
+        dsCheckSyntaxButton {$(find("span", text: contains("CHECK SYNTAX"))).closest("button")[0]}
+        dsLoadDataDesignerButton {$(find("button", text: contains("LOAD SAMPLE DATA")))[0]}
+        dsViewConsoleDesignerButton {$(find("button", text: contains("VIEW CONSOLE")))}
         dsCodeContainer {modalContainer.find('div.CodeMirror div textarea')}
         noRecordsRow {modalContainer.find("tr.k-grid-norecords td")}
-        dsSaveDesignerButton {modalContainer.find("button", text: contains("Save"))}
+        dsSaveDesignerButton { $('clr-icon[shape="floppy"]').closest("button")[0]}
         dsSampleDataRows {$("div.data-preview kendo-grid-list table")[0].find("tr[kendogridlogicalrow]")}
         dsTransformedDataRows {$("div.data-preview kendo-grid-list table")[1].find("tr[kendogridlogicalrow]")}
         commonsModule {module CommonsModule}

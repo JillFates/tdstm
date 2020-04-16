@@ -121,21 +121,25 @@ export class TaskColumnModel {
 				width: 20
 			},*/ {
 				label: 'Task',
+				cssClass: 'task',
 				property: 'task',
 				type: 'text',
 				width: '*'
 			}, {
 				label: 'Related',
+				cssClass: 'related',
 				property: 'related',
 				type: 'text',
 				width: '*'
 			}, {
 				label: 'Due/Est Finish',
+				cssClass: 'est-finish',
 				property: 'dueEstFinish',
 				width: '*',
 				type: 'text',
 			}, {
 				label: 'Status',
+				cssClass: 'status-column',
 				property: 'status',
 				type: 'text',
 				width: 100

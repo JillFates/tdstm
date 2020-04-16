@@ -62,6 +62,7 @@ export class TaskCommentComponent implements OnInit {
 	private showAllTasks: boolean;
 	private taskCommentsList: any[] = [];
 	private userDateFormat;
+	public hasTaskManagerViewPermission: boolean;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -85,6 +86,7 @@ export class TaskCommentComponent implements OnInit {
 			});
 		this.showAllComments = false;
 		this.showAllTasks = false;
+		this.hasTaskManagerViewPermission = Boolean(this.permissionService.hasPermission(Permission.TaskManagerView));
 		this.createDataGrids();
 	}
 
@@ -99,12 +101,16 @@ export class TaskCommentComponent implements OnInit {
 				this.dataGridTaskHelper = new DataGridOperationsHelper(
 					this.getTaskWithFilter(),
 					null,
-					null
+					null,
+					null,
+					2000,
 				);
 				this.dataGridCommentHelper = new DataGridOperationsHelper(
 					this.getCommentsWithFilter(),
 					null,
-					null
+					null,
+					null,
+					2000,
 				);
 				this.outputCommentCount();
 				this.outputTaskCount();
@@ -536,9 +542,6 @@ export class TaskCommentComponent implements OnInit {
 	// because the Show and Edit functions on Tasks are not loosely coupled in the FE.
 	// I'm adding this method here, that should be removed once this is taken care of in a sepparate ticket.
 	protected canOpenTaskDetail(): boolean {
-		return (
-			this.permissionService.hasPermission(Permission.CommentCreate) &&
-			this.permissionService.hasPermission(Permission.TaskCreate)
-		);
+		return this.permissionService.hasPermission(Permission.TaskView) && this.hasTaskManagerViewPermission;
 	}
 }

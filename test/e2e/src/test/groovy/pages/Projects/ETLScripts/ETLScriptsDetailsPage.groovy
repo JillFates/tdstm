@@ -12,15 +12,14 @@ class ETLScriptsDetailsPage extends Page{
     }
 
     static content = {
-        detailsModal { $("div.data-script-view-edit-component")}
-        datascriptDetail { detailsModal.find('div.modal-header h4[_ngcontent-c7]')}
-        dsDetailXIcon { detailsModal.find('button.close')}
-        datascriptEditBtn  { detailsModal.find("button", text: contains("Edit"))}
+        detailsModal { $("div.modal-dialog.resize-disabled")}
+        datascriptDetail { detailsModal.find("h3")[0]}
+        dsDetailXIcon { $('clr-icon[shape="close"]').closest("button")[0]}
+        datascriptEditBtn  { $('clr-icon[shape="pencil"]').closest("button")[0]}
         dsProvider { detailsModal.find('.label-detail')[0]}
         dsName { detailsModal.find('.label-detail')[1]}
-        dsMode { detailsModal.find('.label-detail')[2]}
-        dsDescription { detailsModal.find('.label-detail')[3]}
-        dsDesignerButton { detailsModal.find("button", text: contains("Edit Script"))}
+        dsDescription { detailsModal.find('.label-detail')[2]}
+        dsDesignerButton { $('clr-icon[shape="code"]').closest("button")[0]}
         commonsModule { module CommonsModule }
     }
 

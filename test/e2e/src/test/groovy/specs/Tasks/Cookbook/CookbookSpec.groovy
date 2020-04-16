@@ -48,7 +48,7 @@ class CookbookSpec extends GebReportingSpec {
             at CookbookPage
             commonsModule.blockCookbookLoadingIndicator() // disable loading for this spec
         then: 'Active Elements should be present'
-            pageTitle.text().trim() == "Cookbook"
+            pageTitle.text().trim() == "Recipes"
             taskGenerationTab.parent(".active")
             recipeGridHeaderCols.getAt(0).text().trim() == "Actions"
             recipeGridHeaderCols.getAt(1).text().trim() == "Recipe"

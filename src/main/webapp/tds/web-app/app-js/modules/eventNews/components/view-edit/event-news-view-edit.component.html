@@ -6,6 +6,9 @@
             #eventNewsForm="ngForm"
             class="form-horizontal left-alignment"
     >
+        <!-- Added for the sake of having an input rendered first and achieve the autofocus on the textarea control -->
+        <input id="hidden" name="hidden" type="hidden" value="">
+        <!-- -->
         <div class="box-body">
             <div class="row">
                 <div class="col-md-12">
@@ -65,6 +68,7 @@
                                 *ngIf="modalType !== actionTypes.VIEW"
                         >
                             <textarea
+                                    tds-autofocus
                                     clrTextarea
                                     id="comment"
                                     name="comment"

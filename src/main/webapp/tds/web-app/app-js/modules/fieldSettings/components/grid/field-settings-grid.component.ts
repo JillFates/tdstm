@@ -144,6 +144,12 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		this.fieldsSettings = this.data.fields;
 		this.refresh();
 		this.domains = [].concat.apply([], this.domainsList);
+		localStorage.setItem('formDirty', 'false');
+		window.onbeforeunload = (event) => {
+			if (localStorage.getItem('formDirty') === 'true') {
+				event.returnValue = this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED');
+			}
+		}
 	}
 
 	public dataStateChange(state: DataStateChangeEvent): void {
@@ -274,6 +280,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 				}
 			},
 		});
+		localStorage.setItem('formDirty', 'false');
 	}
 
 	/**
@@ -348,8 +355,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	}
 
 	protected onAddCustom(): void {
-		this.setIsDirty(true);
 		this.formHasError = true;
+		this.setIsDirty(true);
 
 		this.addEmitter.emit(custom => {
 			this.state.sort = [
@@ -529,7 +536,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	protected onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
 		if (dataItem && !dataItem.isNew && fieldTypeChange) {
 			this.dialogService.confirm(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
 				fieldTypeChange.conversion.getWarningMessage()
 			).subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
@@ -553,7 +560,7 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 		const previousControl = dataItem.control;
 		if (dataItem.control === CUSTOM_FIELD_CONTROL_TYPE.List) {
 			this.dialogService.confirm(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
 				'Changing the control will lose all List options. Click Ok to continue otherwise Cancel'
 			).subscribe((data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
@@ -782,11 +789,9 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	/**
 	 * Set the flag to indicate the form is dirty
 	 */
-	protected setIsDirty(value: boolean):
-		void {
+	protected setIsDirty(value: boolean): void {
 		this.isDirty = value;
-		const val = this.formHasError === null && value;
-		localStorage.setItem('formDirty', val.toString());
+		localStorage.setItem('formDirty', value.toString());
 	}
 
 	/**
@@ -801,6 +806,8 @@ export class FieldSettingsGridComponent implements OnInit, OnDestroy {
 	 * Destroy any subscribed observable
 	 */
 	ngOnDestroy(): void {
+		localStorage.setItem('formDirty', 'false');
+		window.onbeforeunload = null;
 		// Globally Destroy anything attached to it
 		this.atComponentDestroy.unsubscribe();
 	}

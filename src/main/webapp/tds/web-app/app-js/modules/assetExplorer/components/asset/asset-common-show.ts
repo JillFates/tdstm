@@ -20,7 +20,7 @@ import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.com
 import {AssetCommonHelper} from './asset-common-helper';
 // Other
 import {ReplaySubject} from 'rxjs';
-import {Layout, Link} from 'gojs';
+import {Diagram, Layout, Link} from 'gojs';
 
 declare var jQuery: any;
 
@@ -168,7 +168,10 @@ export class AssetCommonShow implements OnInit {
 					currentUserId: this.currentUser.id,
 					data: res,
 					iconsOnly: true,
-					extras: {}
+					extras: {
+						initialAutoScale: Diagram.Uniform,
+						allowZoom: false
+					}
 				}));
 			});
 	}

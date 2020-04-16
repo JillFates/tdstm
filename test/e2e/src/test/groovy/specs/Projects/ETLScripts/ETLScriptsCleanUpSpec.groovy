@@ -67,7 +67,8 @@ class ETLScriptsCleanUpSpec extends GebReportingSpec{
     def "1. The user deletes ETLScripts"() {
         given: 'The User is on the ETLScripts Page'
             at ETLScriptsPage
-            filterByName(baseName)
+            clickOnFilterButton()
+            waitFor{filterByName(baseName)}
         when: 'The user deletes ETLScripts'
             def validateResult = deleteETLScripts()
         then: 'The operation is successful'

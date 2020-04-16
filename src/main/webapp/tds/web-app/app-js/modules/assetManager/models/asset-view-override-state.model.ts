@@ -17,7 +17,7 @@ export const ASSET_OVERRIDE_CHILD_STATE: OverrideState = {
 export const ASSET_OVERRIDE_PARENT_STATE: OverrideState = {
 	icon: faLayerPlus,
 	color: 'blue',
-	isOverwritten: false,
+	isOverwritten: true,
 	tooltip: 'Display Personal System View'
 };
 export const ASSET_NOT_OVERRIDE_STATE: OverrideState = {

@@ -240,37 +240,39 @@ export class TaskListComponent implements OnInit {
 	 * @param taskRow: any
 	 */
 	onOpenTaskDetailHandler(taskRow: any): void {
-		let taskDetailModel: TaskDetailModel = {
-			id: taskRow.id,
-			modal: {
-				title: 'Task Detail'
-			}
-		};
-		this.dialogService.open({
-			componentFactoryResolver: this.componentFactoryResolver,
-			component: TaskDetailComponent,
-			data: {
-				taskDetailModel: taskDetailModel
-			},
-			modalConfiguration: {
-				title: 'Task Detail',
-				draggable: true,
-				modalSize: ModalSize.CUSTOM,
-				modalCustomClass: 'custom-task-modal-edit-view-create'
-			}
-		}).subscribe((data: any) => {
-			if (data.isDeleted) {
-				this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-					this.search();
-				});
-			} else if (data.shouldOpenTask) {
-				this.onOpenTaskDetailHandler(data.commentInstance);
-			} else if (data.shouldEdit) {
-				this.onOpenTaskEditHandler(data.id);
-			} else {
-				this.search(parseInt(taskRow.id, 10));
-			}
-		});
+		setTimeout(() => {
+			let taskDetailModel: TaskDetailModel = {
+				id: taskRow.id,
+				modal: {
+					title: 'Task Detail'
+				}
+			};
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: TaskDetailComponent,
+				data: {
+					taskDetailModel: taskDetailModel
+				},
+				modalConfiguration: {
+					title: 'Task Detail',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-task-modal-edit-view-create'
+				}
+			}).subscribe((data: any) => {
+				if (data.isDeleted) {
+					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+						this.search();
+					});
+				} else if (data.shouldOpenTask) {
+					this.onOpenTaskDetailHandler(data.commentInstance);
+				} else if (data.shouldEdit) {
+					this.onOpenTaskEditHandler(data.id);
+				} else {
+					this.search(parseInt(taskRow.id, 10));
+				}
+			});
+		}, 500);
 	}
 
 	public onOpenTaskEditHandler(taskRow: any): void {

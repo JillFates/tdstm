@@ -310,7 +310,7 @@
 						field="{{ column.property }}"
 						format="{{ column.format }}"
 						[width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
-						[class]="column.property == 'status' ? 'status-column' : ''">
+						[class]="column.cssClass">
 
 						<ng-template kendoGridHeaderTemplate>{{ column.label }}</ng-template>
 

@@ -1,4 +1,13 @@
 .task-comment-component {
+  div.has-not-task-manager-permission {
+    .k-grid.tds-task-grid {
+      td,
+      td a{
+        cursor: auto;
+      }
+    }
+  }
+
   .k-grid-content {
     overflow-y: auto;
   }

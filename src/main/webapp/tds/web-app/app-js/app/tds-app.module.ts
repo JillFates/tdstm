@@ -20,10 +20,11 @@ import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 import {AuthModule} from '../modules/auth/auth.module';
 import {UserContextState} from '../modules/auth/state/user-context.state';
 import { ProjectService } from '../modules/project/service/project.service';
+import {environment} from '../environment/environment';
 
 @NgModule({
 	imports: [
-	NgxsModule.forRoot([TDSAppState, UserContextState]),
+	NgxsModule.forRoot([TDSAppState, UserContextState], { developmentMode: !environment.production }),
 		NgxsReduxDevtoolsPluginModule.forRoot(),
 		NgxsLoggerPluginModule.forRoot({disabled: true}),
 		// Angular Modules

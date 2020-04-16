@@ -34,7 +34,7 @@ export class CredentialColumnModel {
 				filterType: FilterType.text,
 				width: 130
 			}, {
-				label: 'Created',
+				label: 'Date Created',
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,

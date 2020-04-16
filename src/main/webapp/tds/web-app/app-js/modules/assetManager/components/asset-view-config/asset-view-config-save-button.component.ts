@@ -45,7 +45,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 			<tds-button [id]="'btnSave'"
 									*ngIf="( (model.id && !isSystemView()) || (model.id && isSystemView() && model.isOwner && isSystemSaveAvailable(true)))"
 									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
-									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
+									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success': (isValid && isDirty() && this.assetExplorerService.isSaveAvailable(this.model))}"
 									(click)="onSave()">
 				{{ 'GLOBAL.SAVE' | translate }}
 			</tds-button>
@@ -79,26 +79,47 @@ export class AssetViewConfigSaveButtonComponent {
 		return result;
 	}
 
+	/**
+	 * Check is user has permissions to Save As (create) a view.
+	 */
 	isSaveAsAvailable(): boolean {
 		return this.model.id ?
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) :
-			this.assetExplorerService.isSaveAvailable(this.model);
+			(	this.model.isSystem ?
+					this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) && this.canCreateViews() :
+					this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) && this.canCreateViews()
+			)
+			: this.assetExplorerService.isSaveAvailable(this.model);
 	}
 
+	/**
+	 * Check if user has AssetExplorerCreate permission.
+	 */
+	canCreateViews(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+	}
+
+	/**
+	 * Check if user has permissions to Save a view.
+	 * @param edit
+	 */
 	isSystemSaveAvailable(edit): boolean {
 		return edit ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
 	}
 
+	/**
+	 * On Save As button clicked, emit.
+	 */
 	onSaveAs(): void {
 		if (this.isSaveAsAvailable()) {
 			this.saveAs.emit();
 		}
 	}
 
+	/**
+	 * On Save button clicked, emit.
+	 */
 	onSave() {
 		if (this.assetExplorerService.isSaveAvailable(this.model)) {
 			this.save.emit();

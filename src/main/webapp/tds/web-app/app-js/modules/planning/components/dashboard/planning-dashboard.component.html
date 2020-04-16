@@ -11,7 +11,7 @@
                             <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.discovery.appsValidatedPercentage+'%'"></div>
                             <div class="percentage-bar-text">
                                 <b> {{planningDashboardModel.discovery.appsValidatedPercentage}}% </b>
-                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'Validated',  _ufp: 'true'}">
+                                <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_validation:'-Unknown',  _ufp: 'true'}">
                                     Applications Validated
                                 </a>
                             </div>
@@ -72,7 +72,7 @@
                         <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.analysis.assignedAppPerc+'%'"></div>
                         <div class="percentage-bar-text">
                             <b> {{planningDashboardModel.analysis.assignedAppPerc}}% </b>
-                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'=Assigned', _ufp: 'true'}">Applications Assigned</a>
+                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'!Unassigned', _ufp: 'true'}">Applications Assigned</a>
                         </div>
 
                     </td>
@@ -82,7 +82,7 @@
                         <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.analysis.confirmedAppPerc+'%'"></div>
                         <div class="percentage-bar-text">
                             <b> {{planningDashboardModel.analysis.confirmedAppPerc}}% </b>
-                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'Confirmed', _ufp: 'true'}">Applications Confirmed</a>
+                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'Confirmed\|Moved\|Locked', _ufp: 'true'}">Applications Confirmed</a>
                         </div>
                     </td>
                 </tr>

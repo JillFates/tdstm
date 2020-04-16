@@ -6,13 +6,17 @@ import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.etl.dataset.ETLIterator
 import com.tdsops.etl.etlmap.DefineETLMapCommand
 import com.tdsops.etl.etlmap.ETLMap
+import com.tdsops.etl.fieldspec.FieldLookupCommand
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
 import groovy.transform.TimedInterrupt
+
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.ScriptExpressionChecker
 import org.apache.commons.lang3.RandomStringUtils
@@ -25,6 +29,7 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
+import org.codehaus.groovy.runtime.MethodClosure
 
 import static org.codehaus.groovy.syntax.Types.*
 
@@ -135,7 +140,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     Map<String, Tuple2<String, String>> columnNamePartsCache = [:]
     /**
      * ETLMap definitions used by defineETLMap command
-     * @see ETLProcessor#defineMap(java.lang.String, groovy.lang.Closure)
+     * @see ETLProcessor#defineMap(com.tdsops.etl.ETLDomain)
+     * @see ETLProcessor#loadMap(java.lang.String)
      */
     Map<String, ETLMap> etlMaps = [:]
 
@@ -175,36 +181,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * A set of Global transformations that will be apply over each iteration
      */
-    Set<Closure> globalTransformers = new HashSet<Closure>()
-
-    /**
-     * Safe Global transformation that checks the type before applying a transformation
-     */
-    static Trimmer = { Element element ->
-        if (element.value instanceof CharSequence) {
-            element.trim()
-        }
-    }
-
-    /**
-     * Safe Global transformation that checks the type before applying a transformation
-     */
-    static Sanitizer = { Element element ->
-        if (element.value instanceof CharSequence) {
-            element.sanitize()
-        }
-    }
-
-    /**
-     * Safe Global transformation that checks the type before applying a transformation
-     */
-    static Replacer = { String regex, String replacement ->
-        return { Element element ->
-            if (element.value instanceof CharSequence) {
-                element.replace(regex, replacement)
-            }
-        }
-    }
+    ETLGlobalTransformation globalTransformation
 
     /**
      * After completing a load 'comments' command, this methods adds results in {@code ETLProcessorResult}
@@ -222,13 +199,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     String getFilename() {
         return dataset != null ? dataset.filename() : dataSetFacade.fileName()
     }
-/**
- * Some words to be used in an ETL script.
- * <b> read labels</b>
- * <b> console on/off</b>
- * <b> ignore record</b>
- * <b> ... transform with ...</b>
- */
+
+    /**
+     * Some words to be used in an ETL script.
+     * <b> read labels</b>
+     * <b> console on/off</b>
+     * <b> ignore record</b>
+     * <b> ... transform with ...</b>
+     */
     static enum ReservedWord {
 
         labels, with, on, off, record, ControlCharacters, populated
@@ -308,6 +286,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     Element domain(LocalVariableDefinition localVariableDefinition) {
         throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
     }
+
     /**
      * <p>Selects a domain</p>
      * <p>Every domain command also clean up bound variables and results in the lookup command</p>
@@ -340,16 +319,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     DomainBuilder domain(Element element) {
         return domain(element.value)
-    }
-
-    /**
-     * <p>Selects a domain based on an instance of {@code LocalVariableFacade}</p>
-     * <p>Every domain command also clean up bound variables and results in the lookup command</p>
-     * @param element an instance of {@code LocalVariableFacade} class
-     * @return an instance of {@code DomainBuilder} to continue with methods chain
-     */
-    DomainBuilder domain(LocalVariableFacade localVariableFacade) {
-        return domain(localVariableFacade.wrappedObject)
     }
 
     /**
@@ -392,17 +361,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         return this
     }
 
-    /*
+    /**
      * Iterate command from one row to another one using their position in the DataSet.
      * <code>
-     *  from 1 to 3 iterate {
+     *  from 1 to 3 iterate //{ //
      *  	...
-     *	}
-     *<code>
+     * 	//}//
+     * <code>
      * @param from
      * @return a Map with the next steps in this command.
      */
-
     Map<String, ?> from(int from) {
         validateStack()
         return [to: { int to ->
@@ -443,23 +411,26 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Aborts processing of the current row for the domain in the context
      * <pre>
-     *  if (SOURCE.Env == 'Development) {*  	ignore record
-     *}* </pre>
+     *  if (SOURCE.Env == 'Development) { //
+     *      ignore record
+     *  //} //
+     * </pre>
      * @param label just a label to detect if the command was used with 'row' label
      * @return current instance of ETLProcessor
      */
 
     ETLProcessor ignore(ReservedWord reservedWord) {
         validateStack()
-        if (reservedWord == ReservedWord.record) {
-            if (!hasSelectedDomain()) {
-                throw ETLProcessorException.domainMustBeSpecified()
-            }
-            result.ignoreCurrentRow()
-            debugConsole.info("Ignore record ${currentRowIndex}")
-        } else {
-            // TODO: add validation for invalid use of this command
+
+        if (reservedWord != ReservedWord.record) {
+            throw ETLProcessorException.invalidIgnoreCommand()
         }
+
+        if (!hasSelectedDomain()) {
+            throw ETLProcessorException.domainMustBeSpecified()
+        }
+        result.ignoreCurrentRow()
+        debugConsole.info("Ignore record ${currentRowIndex}")
 
         return this
     }
@@ -550,7 +521,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
                 this.currentRow = new Row(row, this)
                 rows.add(this.currentRow)
                 closure(this.currentRow)
-                bottomOfIterate(this.currentRowIndex, this.dataset.rowsSize())
+                this.bottomOfIterate(this.currentRowIndex, this.dataset.rowsSize())
                 this.currentRowIndex++
                 iterateIndex.next()
                 this.binding.removeAllDynamicVariables()
@@ -591,13 +562,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor trim(ReservedWord reservedWord) {
-
         if (reservedWord == ReservedWord.on) {
-            globalTransformers.add(Trimmer)
+            globalTransformation.trimmer == true
         } else if (reservedWord == ReservedWord.off) {
-            globalTransformers.remove(Trimmer)
+            globalTransformation.trimmer == false
         }
-
         debugConsole.info "Global trim status changed: $reservedWord"
         return this
     }
@@ -608,13 +577,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor sanitize(ReservedWord reservedWord) {
-
         if (reservedWord == ReservedWord.on) {
-            globalTransformers.add(Sanitizer)
+            globalTransformation.sanitizer = true
         } else if (reservedWord == ReservedWord.off) {
-            globalTransformers.remove(Sanitizer)
+            globalTransformation.sanitizer = true
         }
-
         debugConsole.info "Global sanitize status changed: $reservedWord"
         return this
     }
@@ -623,10 +590,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * Global replace method given a regex and a replacement content
      * @param regex
      * @param replacement
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor replace(String regex, String replacement) {
-        globalTransformers.add(Replacer(regex, replacement))
+        globalTransformation.addReplacer(regex, replacement)
         debugConsole.info "Global replace regex: $regex wuth replacement: $replacement"
         return this
     }
@@ -637,11 +604,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return
      */
     Map<String, ?> replace(ReservedWord reservedWord) {
-        debugConsole.info "Global trm status changed: $reservedWord"
         if (reservedWord == ReservedWord.ControlCharacters) {
             return [
-                    with: { y ->
-                        globalTransformers.add(Replacer(ControlCharactersRegex, y))
+                    with: { replacement ->
+                        replace(ControlCharactersRegex, replacement)
                     }
             ]
         } else {
@@ -670,7 +636,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Skip a fixed amount of row for the iterate process
      * @param amount
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor skip(Integer amount) {
         currentRowIndex += amount
@@ -687,7 +653,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Defines the sheet name to be used in an ETl script
      * @param sheetName
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor sheet(String sheetName) {
         currentRowIndex = 0
@@ -698,7 +664,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Defines the sheetNumber to be used in an ETl script
      * @param sheetNumber
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor sheet(Integer sheetNumber) {
         currentRowIndex = 0
@@ -709,7 +675,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Defines the rootNode XPath to be used in an ETl script and a JSON dataset
      * @param sheetName
-     * @return
+     * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor rootNode(String rootNode) {
         currentRowIndex = 0
@@ -736,6 +702,26 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         rangeCheck(index, currentRow.size())
 
         doExtract(index)
+    }
+
+    /**
+     * Converts a local variable in an instance of {@link Element}
+     * enabling user to evaluate transformations on that variable.
+     * <pre>
+     *  extract 'name' set name
+     *  assert (name instanceof String)
+     *  element name transform with left(3) set shortName
+     *  assert shortName.size() == 3
+     * </pre>
+     * @param value
+     * @return an instance of {@link Element}
+     */
+    Element element(Object value) {
+        return bindCurrentElement(new Element(
+                originalValue: value,
+                value: value,
+                processor: this)
+        )
     }
 
     @Deprecated
@@ -948,6 +934,30 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     }
 
     /**
+     * Enable lookup command.
+     * <pre>
+     *  enable lookup
+     *  read labels
+     *  iterate { //
+     *      domain Device
+     *      ...
+     *      lookup 'assetName' with dependsOnVar
+     *  //}//
+     * </pre>
+     * @param methodClosure an instance of {@link MethodClosure}
+     * @return the instance of ETLProcessor who received this message
+     * @see ETLProcessor#lookup(java.lang.Object)
+     */
+    ETLProcessor enable(MethodClosure methodClosure) {
+        if (methodClosure.method != 'lookup') {
+            throw ETLProcessorException.invalidEnableLookupCommand()
+        }
+
+        this.result.enableLookup()
+        return this
+    }
+
+    /**
      * Lookup ETL command for multiple parameters implementation:
      * <pre>
      *  set lookupNameVar = 'assetName'
@@ -1077,29 +1087,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     }
 
     /**
-     * Create a Find object for a particular Domain instance name
-     * <pre>
-     *  Map map = [
-     * 	    'App': Application,
-     * 		'Srv': Device
-     * 	]
-     *  extract 'type' transform with substitute(map) set domainClassVar
-     *  find domainClassVar.value by 'Name' with nameVar into 'id'
-     * </pre>
-     * If the String is an invalid Domain, it throws an Exception.
-     * @param domainName a domain class name
-     * @return an instance of {@code ETLFindElement}
-     */
-    @CompileStatic
-    ETLFindElement find(LocalVariableFacade localVariableFacade) {
-        ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedObject.toString())
-        if (domain) {
-            return find(domain)
-        }
-        throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedObject.toString())
-    }
-
-    /**
      * Adds another find results in the current find element.
      * <pre>
      *  find Application by 'Name' with nameVar into 'id'
@@ -1137,30 +1124,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     ETLProcessor elseFind(Element element) {
         return elseFind(element.value)
-    }
-
-    /**
-     * Adds another find results in the current find element
-     * for a particular Domain instance name
-     * <pre>
-     *  Map map = [
-     * 	    'App': Application,
-     * 		'Srv': Device
-     * 	]
-     *  extract 'type' transform with substitute(map) set domainClassVar
-     *  find domainClassVar.value by 'Name' with nameVar into 'id'
-     *  elseFind domainClassVar.value by 'appVersion' with appVersionVar into 'id'
-     * </pre>
-     * If the String is an invalid Domain, it throws an Exception.
-     * @param domainName a domain class name
-     * @return an instance of {@code ETLProcessor}
-     */
-    ETLProcessor elseFind(LocalVariableFacade localVariableFacade) {
-        ETLDomain domain = ETLDomain.lookup(localVariableFacade.wrappedObject)
-        if (domain) {
-            return elseFind(domain)
-        }
-        throw ETLProcessorException.invalidDomain(localVariableFacade.wrappedObject)
     }
 
     /**
@@ -1407,6 +1370,21 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     void addETLMap(String name, ETLMap etlMap) {
         // Validates map name previously defined
         this.etlMaps[name] = etlMap
+    }
+
+    /**
+     * Defines an instance of {@code FieldLookupCommand}
+     * to resolve {@link ETLProcessor#fieldLookup(com.tdsops.etl.ETLDomain)} command.
+     * <pre>
+     *  fieldLookup Application with 'TCO - Current Cost' set tcoCurrentCostField
+     * </pre>
+     * @param domain a an instance of {@link ETLDomain}
+     *
+     * @return current instance of {@code FieldLookupCommand}
+     */
+    @CompileStatic
+    FieldLookupCommand fieldLookup(ETLDomain domain) {
+        return new FieldLookupCommand(domain, this)
     }
     /**
      * <b>Cache ETL command.</b><br>
@@ -1769,14 +1747,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     @CompileStatic
     void applyGlobalTransformations(Element element) {
-        globalTransformers.each { transformer ->
-            transformer(element)
-        }
+        globalTransformation.applyAll(element)
     }
 
     private void initializeDefaultGlobalTransformations() {
-        globalTransformers.add(Trimmer)
-        globalTransformers.add(Sanitizer)
+        globalTransformation = new ETLGlobalTransformation()
     }
 
     /**
@@ -1885,8 +1860,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         // if there is an element found after a lookup invokation,
         // let's return that element so the commands like append has access
         // to the found elemnts
-        if (result.resultIndex >= 0) {
-            rr = result.currentRow()
+        rr = result.currentRow()
+        if (rr) {
             if (rr.fields.containsKey(fieldDefinition.name)) {
                 FieldResult fieldResult = rr.fields[fieldDefinition.name]
                 currentElement = new Element(
@@ -1971,12 +1946,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         return columnNamePartsCache[columnName]
     }
 
-    Column column(String columnName) {
+    Column getColumnByName(String columnName) {
         return columnsMap[columnName]
     }
 
-    Column column(Integer columnName) {
-        return columns[columnName]
+    Column getColumnByPosition(Integer ordinalPosition) {
+        return columns[ordinalPosition]
     }
 
     Row getCurrentRow() {
@@ -2058,6 +2033,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
                     'org.apache.commons.lang3.RegExUtils',
                     'org.apache.commons.lang3.StringUtils',
                     'org.springframework.beans.factory.annotation.Autowired',
+                    'com.tdssrc.grails.NumberUtil',
+                    'com.tdssrc.grails.StringUtil'
             ]
             starImportsWhitelist = []
             // Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
@@ -2076,7 +2053,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
             receiversClassesWhiteList = [
                     Object, // TODO: This is too much generic class.
                     Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
-                    Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils
+                    Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils, NumberUtil, StringUtil
             ].asImmutable()
         }
 
@@ -2085,6 +2062,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         customizer.addImport('RandomUtils', 'org.apache.commons.lang3.RandomUtils')
         customizer.addImport('RegExUtils', 'org.apache.commons.lang3.RegExUtils')
         customizer.addImport('StringUtils', 'org.apache.commons.lang3.StringUtils')
+        customizer.addImport('StringUtil', 'com.tdssrc.grails.StringUtil')
+        customizer.addImport('NumberUtil', 'com.tdssrc.grails.NumberUtil')
 
         secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
         CompilerConfiguration configuration = new CompilerConfiguration()
@@ -2198,14 +2177,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         this.stopWatch.begin(tag)
 
         script = preProcess(script)
-        Object result = new GroovyShell(
+        Object evaluationResult = new GroovyShell(
                 this.class.classLoader,
                 this.binding,
                 configuration
         ).evaluate(script, ETLScriptName)
 
+        result.scriptFinished()
+
         logMeasurements(this.stopWatch.lap(tag))
-        return result
+        return evaluationResult
     }
 
     /**
@@ -2259,12 +2240,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         long totalRecords = 0
         // Dump out the results
         for (domain in result.domains) {
-            totalRecords += domain.data.size()
-            debugConsole.info("Domain ${domain.domain} ${domain.data.size()} records, fields: ${domain.fieldNames}")
+            totalRecords += domain.dataSize
+            debugConsole.info("Domain ${domain.domain} ${domain.dataSize} records, fields: ${domain.fieldNames}")
         }
         String avgPerRec = String.format('%.4f', timeDuration.toMilliseconds() / (totalRecords > 0 ? totalRecords : 1))
         debugConsole.info("Process time/record ${avgPerRec} msec")
-
     }
     /**
      * Using an instance of GroovyShell, it checks syntax of an ETL script content

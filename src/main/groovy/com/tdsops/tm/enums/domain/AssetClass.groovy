@@ -33,7 +33,7 @@ enum AssetClass {
 			'STORAGE-DEVICE' : 'Storage Devices',
 			'STORAGE-LOGICAL': 'Logical Storage',
 			'OTHER-DEVICE'   : 'Other Devices'
-	] as TreeMap).asImmutable()
+	] as TreeMap).asImmutable() as Map<String, String>
 
 	private final Class domainClass
 

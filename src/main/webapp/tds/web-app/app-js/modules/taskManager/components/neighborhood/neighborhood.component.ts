@@ -11,7 +11,6 @@ import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {distinctUntilChanged, map, skip, takeUntil, timeout} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
-import {clone} from 'ramda';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DropDownButtonComponent} from '@progress/kendo-angular-buttons/dist/es2015/dropdownbutton/dropdownbutton.component';
 
@@ -44,14 +43,16 @@ import {TaskTeam} from '../common/constants/task-team.constant';
 import {DiagramCacheService} from '../../../../shared/services/diagram-cache.service';
 import {SetEvent} from '../../../event/action/event.actions';
 import {Store} from '@ngxs/store';
+import {ITaskHighlightOption} from '../../model/task-highlight-filter.model';
 import {TaskGraphDiagramHelper} from './task-graph-diagram.helper';
-import {Diagram, Node, Point, Rect, Spot} from 'gojs';
+import {Diagram, Node, Spot} from 'gojs';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {
 	ITdsContextMenuModel
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {DiagramEventAction} from 'tds-component-library/lib/diagram-layout/model/diagram-event.constant';
 import {DialogService, ModalSize} from 'tds-component-library';
+import {TagService} from '../../../assetTags/service/tag.service';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -102,6 +103,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	hasCycles: boolean;
 	showCycles: boolean;
 	rootId: number;
+	highlightOptions$: ReplaySubject<ITaskHighlightOption> = new ReplaySubject<ITaskHighlightOption>(1);
 	neighborId: any;
 	taskGraphDiagramExtras: any;
 	lastDiagramPos: any;
@@ -120,7 +122,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			private titleService: Title,
 			private diagramCacheService: DiagramCacheService,
 			private permissionService: PermissionService,
-			private store: Store
+			private store: Store,
+			private tagsService: TagService
 		) {
 				this.setTaskGraphDiagramExtras();
 				this.activatedRoute.queryParams
@@ -231,6 +234,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		} else {
 			this.loadFromSelectedEvent();
 		}
+		this.loadHighlightOptions();
 	}
 
 	/**
@@ -347,6 +351,31 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
+	}
+
+	/**
+	 * load highlight options
+	 */
+	loadHighlightOptions(): void {
+		this.taskService.highlightOptions(this.selectedEvent.id, this.viewUnpublished)
+			.subscribe(res => {
+				const data = res.body && res.body.data;
+				if (data) {
+					this.highlightOptions$.next(data);
+				}
+			});
+		Observable.forkJoin([
+			this.taskService.highlightOptions(this.selectedEvent.id, this.viewUnpublished),
+			this.tagsService.getTagList()
+		]).subscribe(res => {
+			const [options, tags] = res;
+			if ((options.body && options.body.data) && tags) {
+				this.highlightOptions$.next({
+					...options.body.data,
+					tags: tags
+				});
+			}
+		})
 	}
 
 	/**
@@ -554,7 +583,19 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if ((this.taskCycles && this.taskCycles.length > 0) && this.showCycles) {
 			const cycles = [];
 			this.taskCycles.forEach(arr => cycles.push(...arr));
-			this.graph.highlightNodes((n: Node) => cycles.includes(n.data.id), true);
+			this.graph.highlightNodes((n: Node) => cycles && cycles.includes(n.data.id), true);
+		} else {
+			this.graph.clearHighlights();
+		}
+	}
+
+	/**
+	 * Highlight nodes
+	 * @param {any} tasks
+	 */
+	highlightTasks(tasks: any): void {
+		if (tasks && tasks.length > 0) {
+			this.graph.highlightNodes((n: Node) => tasks && tasks.includes(n.data.id));
 		} else {
 			this.graph.clearHighlights();
 		}
@@ -1028,7 +1069,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if (this.refreshTriggered) {
 			this.taskGraphDiagramExtras.contentAlignment = Spot.None;
 			this.taskGraphDiagramExtras.initialAutoScale = Diagram.None;
-			this.taskGraphDiagramExtras.initialScale = (this.graph && this.graph.diagram) && this.graph.diagram.scale;
+			this.taskGraphDiagramExtras.scale = (this.graph && this.graph.diagram) && this.graph.diagram.scale;
 			this.lastDiagramPos = Object.assign({}, (this.graph && this.graph.diagram) && this.graph.diagram.position);
 		} else {
 			this.setTaskGraphDiagramExtras();
@@ -1039,7 +1080,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			currentUserId: this.userContext.user.id,
 			nodeDataArray,
 			linkDataArray,
-			extras: this.taskGraphDiagramExtras
+			extras: this.taskGraphDiagramExtras,
+			isRefreshTriggered: this.refreshTriggered
 		}));
 	}
 
@@ -1061,7 +1103,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Show loader
 	 */
 	showLoader(): void {
-		console.log('gif init');
 		this.notifierService.broadcast({
 			name: 'httpRequestInitial'
 		});
@@ -1071,7 +1112,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Hide loader
 	 */
 	hideLoader(): void {
-		console.log('gif completed');
 		this.notifierService.broadcast({
 			name: 'httpRequestCompleted'
 		});

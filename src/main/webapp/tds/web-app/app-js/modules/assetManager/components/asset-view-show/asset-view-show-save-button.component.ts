@@ -5,7 +5,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 	selector: 'tds-asset-show-save-button',
 	template: `
 		<div *ngIf="config.canShowSaveButton" class="btn-group">
-			<tds-button [ngClass]="{'btn-secondary':!config.isDirty,'btn-success':config.isDirty}"
+			<tds-button [ngClass]="{'btn-secondary':!config.isDirty, 'btn-success': (config.isDirty && !config.disableSaveButton)}"
 									[id]="config.saveButtonId"
 									[disabled]="config.disableSaveButton"
 									[title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')"

@@ -41,7 +41,11 @@ import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-m
 import {Permission} from '../../../../shared/model/permission.model';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../../assetExplorer/model/asset-entity.model';
 import {AssetModalModel} from '../../../assetExplorer/model/asset-modal.model';
-import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {
+	COMMON_SHRUNK_COLUMNS,
+	COMMON_SHRUNK_COLUMNS_WIDTH, EXTRA_COLUMN_WIDTH,
+	EXTRA_WIDTH_COLUMNS
+} from '../../../../shared/constants/common-shrunk-columns';
 import {DialogService, ModalSize} from 'tds-component-library';
 // Component
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
@@ -140,6 +144,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	private canCreateAssets: boolean;
 	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
+	EXTRA_WIDTH_COLUMNS = EXTRA_WIDTH_COLUMNS;
+	EXTRA_COLUMN_WIDTH = EXTRA_COLUMN_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
@@ -432,6 +438,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
+		let assetClassReadable = assetEntityType.charAt(0).toUpperCase() + assetEntityType.slice(1).toLowerCase();
+
 		this.dialogService.open({
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: AssetCreateComponent,
@@ -440,7 +448,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				openFromList: true
 			},
 			modalConfiguration: {
-				title: 'Create',
+				title: assetClassReadable + ' Create',
 				draggable: true,
 				modalSize: ModalSize.CUSTOM,
 				modalCustomClass: 'custom-asset-modal-dialog'

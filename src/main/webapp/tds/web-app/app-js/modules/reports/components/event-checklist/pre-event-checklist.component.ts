@@ -45,10 +45,23 @@ declare var jQuery: any;
 								</div>
 								<div class="form-group row checkboxes">
 									<div class="col-sm-5 col-sm-offset-2">
-										<label for="one">
-											<input type="checkbox" name="one" title="Include Unpublished Tasks in the Report" id="one" [(ngModel)]="includeUnpublished">
-											Include Unpublished
-										</label>
+										<clr-checkbox-wrapper class="inline">
+											<input
+												clrCheckbox
+												id="one"
+												type="checkbox"
+												name="one"
+												title="Include Unpublished Tasks in the Report"
+												class="component-action-just-planning"
+												[(ngModel)]="includeUnpublished"
+											/>
+											<label
+												class="clr-control-label clr-control-label-sm inline"
+												for="one"
+											>
+												Include Unpublished
+											</label>
+                						</clr-checkbox-wrapper>
 									</div>
 								</div>
 								<div class="form-group row">

@@ -33,8 +33,23 @@ import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
 			</kendo-combobox>
 			<div class="clr-control-container">
 				<div class="clr-checkbox-wrapper" style="display: flex">
-					<input clrcheckbox="" type="checkbox" clrCheckbox [checked]="!!isFixed" [disabled]="!model || isTeamItemSelected()" (change)="onChangeFixed($event)" />
-					<label class="clr-control-label">Fixed</label>
+					<clr-checkbox-wrapper class="inline">
+                    <input
+                        clrCheckbox
+                        type="checkbox"
+						clrcheckbox=""
+						[checked]="!!isFixed"
+						[disabled]="!model || isTeamItemSelected()"
+						(change)="onChangeFixed($event)"
+                    />
+                    <label
+                        class="clr-control-label clr-control-label-sm inline"
+                        for="justPlanning"
+                    >
+					Fixed
+                    </label>
+                	</clr-checkbox-wrapper>
+
 				</div>
 			</div>
         </div>

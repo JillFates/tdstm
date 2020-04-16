@@ -771,7 +771,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	 *   - dtvList
 	 *   - project
 	 */
-	def findAndValidateAsset(
+	AssetEntity findAndValidateAsset(
 		Project project,
 		UserLogin userLogin,
 		Class clazz,
@@ -786,8 +786,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	) {
 		// Try loading the application and make sure it is associated to the current project
 		def asset
-		def clazzName = clazz.name.tokenize('.')[-1]
-		def clazzMap = [AssetEntity: 'Server', Database: 'Database', Application: 'Application', Files:'Files']
+		String clazzName = clazz.simpleName
 
 		if (assetId) {
 			asset = clazz.get(assetId)
@@ -817,9 +816,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 			// Look for the id property and see if there is an error on it
 			// Map idDtv = dtvList.find { it.fieldName == 'id' }
-//println "findAndValidateAsset() $idDtv"
-//def x=5/0
-			// if (idDtv && idDtv.hasError) {
+
 			if (dtvList[0].hasError) {
 				errorCount++
 				// ignoredAssets << "${idDtv.errorText} (row $rowNum)".toString()
@@ -833,8 +830,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			asset = clazz.newInstance()
 			asset.project = project
 			asset.owner = project.client
-			asset.assetType = clazzMap[clazzName]
-
 			log.debug 'findAndValidateAsset() Created {}', clazzName
 		}
 

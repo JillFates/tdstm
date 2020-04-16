@@ -1,5 +1,6 @@
 package com.tdsops.etl.etlmap
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.Column
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainResult
@@ -30,6 +31,9 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
             }
             fileSystemService(FileSystemService) {
                 coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
             }
         }
     }
@@ -633,7 +637,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['assetName'], 'acmevmprod01', 'acmevmprod01')
 					}
@@ -678,7 +682,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['assetName'], 'acmevmprod01', 'ACMEVMPROD01')
 					}
@@ -723,7 +727,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['assetName'], 'acmevmprod01', 'acme')
 					}
@@ -768,7 +772,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['environment'], 'PROD', 'Production')
 					}
@@ -813,7 +817,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				domains.size() == 1
 				assertWith(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
-					assertWith(data[0], RowResult) {
+					assertWith(data[0]) {
 						fields.size() == 1
 						assertFieldResult(fields['environment'], 'prod', 'Production')
 					}

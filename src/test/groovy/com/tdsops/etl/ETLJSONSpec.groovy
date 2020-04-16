@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -8,12 +9,15 @@ import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import spock.lang.See
+
 /**
  * Using JSON Object in ETL script. It manages the following commands:
  * <ul>
@@ -28,6 +32,20 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model
@@ -122,16 +140,16 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name').index != null
+			etlProcessor.getColumnByName('vendor name').index != null
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -164,16 +182,16 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name') != null
+			etlProcessor.getColumnByName('vendor name') != null
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -281,16 +299,16 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name') != null
+			etlProcessor.getColumnByName('vendor name') != null
 
 		and:
 			etlProcessor.currentRowIndex == 2
@@ -394,13 +412,13 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				assertWith(data[0].fields.appVendor) {
-					originalValue.value == 'Microsoft'
-					value.value == 'Microsoft'
+					originalValue == '[value:Microsoft]'
+					value == '[value:Microsoft]'
 				}
 
 				assertWith(data[1].fields.appVendor) {
-					originalValue.value == 'Mozilla'
-					value.value == 'Mozilla'
+					originalValue == '[value:Mozilla]'
+					value == '[value:Mozilla]'
 				}
 			}
 
@@ -552,8 +570,7 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					rootNode 'Applications'
 					read labels
 					domain Application
@@ -567,8 +584,7 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 					iterate {
 						extract 'name' load 'Name'
 					}
-					""".stripIndent(),
-						  ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'DATASET was modified by the ETL script'
 			etlProcessor.finalResult().domains.size() == 2
@@ -629,16 +645,16 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 			etlProcessor.finalResult().domains.size() == 0
 
 		and: 'Results contains values'
-			etlProcessor.column('application id') != null
+			etlProcessor.getColumnByName('application id') != null
 
 		and:
-			etlProcessor.column('location') != null
+			etlProcessor.getColumnByName('location') != null
 
 		and:
-			etlProcessor.column('Technology') != null
+			etlProcessor.getColumnByName('Technology') != null
 
 		and:
-			etlProcessor.column('vendor name') != null
+			etlProcessor.getColumnByName('vendor name') != null
 
 		cleanup:
 			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
@@ -735,25 +751,25 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				assertWith(data[0], RowResult) {
+				assertWith(data[0]) {
 					rowNum == 1
 
-					assertWith(fields.id, FieldResult) {
+					assertWith(fields.id) {
 						originalValue == 123
 						value == 123
 					}
 
-					assertWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					assertWith(data[0].fields.custom2) {
+					assertWith(fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					assertWith(data[0].fields.custom3) {
+					assertWith(fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}
@@ -815,25 +831,25 @@ class ETLJSONSpec extends ETLBaseSpec implements DataTest {
 				domain == ETLDomain.Device.name()
 				data.size() == 1
 
-				assertWith(data[0], RowResult) {
+				assertWith(data[0]) {
 					rowNum == 1
 
-					assertWith(fields.id, FieldResult) {
+					assertWith(fields.id) {
 						originalValue == 123
 						value == 123
 					}
 
-					assertWith(fields.custom1, FieldResult) {
+					assertWith(fields.custom1) {
 						originalValue == 4096
 						value == 4096
 					}
 
-					assertWith(data[0].fields.custom2) {
+					assertWith(fields.custom2) {
 						originalValue == 2
 						value == 2
 					}
 
-					assertWith(data[0].fields.custom3) {
+					assertWith(fields.custom3) {
 						originalValue == 'zulu01'
 						value == 'zulu01'
 					}

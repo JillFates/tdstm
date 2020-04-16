@@ -1,0 +1,106 @@
+.highlight-filter-popup {
+  z-index: 70;
+  border-radius: .2rem;
+  padding: 2px 2px 2px 2px;
+}
+
+.popup-option {
+  align-self: center;
+  margin-bottom: 10px;
+  font-size: 0.5rem;
+
+  .btn {
+    margin-left: .5rem;
+  }
+}
+
+.popup-label {
+  color: #3c8dbc;
+}
+
+.advanced-filter-btn {
+  border-radius: 1rem;
+  border: 1px solid #999;
+}
+
+.disp-table-cell {
+  display: table-cell;
+}
+
+.clear-icon-button {
+  cursor: pointer;
+}
+
+.k-icon {
+  font-family: "WebComponentsIcons", serif !important;
+}
+
+.task-chk-container {
+   display: table-cell;
+   position: relative;
+   padding-left: 25px;
+   margin-bottom: 12px;
+   cursor: pointer;
+   font-size: 14px;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+   margin-left: 0.5em;
+ }
+
+.task-chk-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.highlight-checkmark {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.task-chk-container:hover input ~ .highlight-checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.task-chk-container input:checked ~ .highlight-checkmark {
+  background-color: #2196F3;
+}
+/* Create the checkmark/indicator (hidden when not checked) */
+.highlight-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.task-chk-container input:checked ~ .highlight-checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.task-chk-container .highlight-checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.highlight-tag-list-container {
+  max-width: 180px !important;
+}

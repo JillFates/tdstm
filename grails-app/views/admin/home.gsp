@@ -23,7 +23,7 @@ a:hover {
 	<tr>
 		<td style="vertical-align:top">
 			<div>
-			<h1 style="margin-right: 0px;"><b>Recent Users</b></h1>
+			<h1 style="margin-right: 0px;font-family: 'Roboto', Metropolis, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif, 'Glyphicons Halflings', FontAwesome, 'WebComponentsIcons' !important; font-weight: 200;line-height: 2rem;font-size: x-large;color: #000;letter-spacing: normal;"><b>Recent Users</b></h1>
 			<table class="admin-home">
 				<thead>
 					<tr>
@@ -49,7 +49,7 @@ a:hover {
 		</td>
 		<td style="vertical-align:top">
 			<div>
-			<h1 style="margin-right: 0px;"><b>Current and Recent Events</b></h1>
+			<h1 style="margin-right: 0px;font-family: 'Roboto', Metropolis, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif, 'Glyphicons Halflings', FontAwesome, 'WebComponentsIcons' !important; font-weight: 200;line-height: 2rem;font-size: x-large;color: #000;letter-spacing: normal;"><b>Current and Recent Events</b></h1>
 			<table class="admin-home">
 				<thead>
 					<thead>
@@ -80,7 +80,7 @@ a:hover {
 			</div>
 			<br/>
 			<div>
-				<h1 style="margin-right: 0px;"><b>Upcoming Events</b></h1>
+				<h1 style="margin-right: 0px;font-family: 'Roboto', Metropolis, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif, 'Glyphicons Halflings', FontAwesome, 'WebComponentsIcons' !important; font-weight: 200;line-height: 2rem;font-size: x-large;color: #000;letter-spacing: normal;"><b>Upcoming Events</b></h1>
 				<table class="admin-home">
 					<thead>
 						<tr>
@@ -107,7 +107,7 @@ a:hover {
 			</div>
 			<br />
 			<div>
-				<h1 style="margin-right: 0px;"><b>Misc Administrative Functions</b></h1>
+				<h1 style="margin-right: 0px;font-family: 'Roboto', Metropolis, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif, 'Glyphicons Halflings', FontAwesome, 'WebComponentsIcons' !important; font-weight: 200;line-height: 2rem;font-size: x-large;color: #000;letter-spacing: normal;"><b>Misc Administrative Functions</b></h1>
 				<table class="admin-home">
 					<thead>
 						<tr>
