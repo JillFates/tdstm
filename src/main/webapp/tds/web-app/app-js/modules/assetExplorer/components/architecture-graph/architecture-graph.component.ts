@@ -81,56 +81,56 @@ export class ArchitectureGraphComponent implements OnInit {
 		{
 			icon: 'application',
 			label: 'Application',
-			value: 'APPLICATION',
+			value: 'application',
 			tagLabel: this.TAG_APPLICATION,
 			checked: false
 		},
 		{
 			icon: 'database',
 			label: 'Database',
-			value: 'DATABASE',
+			value: 'database',
 			tagLabel: this.TAG_DATABASE,
 			checked: false
 		},
 		{
 			icon: 'serverPhysical',
 			label: 'Physical Server',
-			value: 'physical server',
+			value: 'serverPhysical',
 			tagLabel: this.TAG_PHYSICAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'serverVirtual',
 			label: 'Virtual Server',
-			value: 'Device',
+			value: 'serverVirtual',
 			tagLabel: this.TAG_VIRTUAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'storageLogical',
 			label: 'Logical Storage',
-			value: 'Logical Storage',
+			value: 'storageLogical',
 			tagLabel: this.TAG_STORAGE_LOGICAL,
 			checked: false
 		},
 		{
 			icon: 'storagePhysical',
 			label: 'Storage Device',
-			value: 'Storage Device',
+			value: 'storagePhysical',
 			tagLabel: this.TAG_STORAGE_DEVICE,
 			checked: false
 		},
 		{
 			icon: 'networkLogical',
 			label: 'Network Device',
-			value: 'Network Device',
+			value: 'networkLogical',
 			tagLabel: this.TAG_NETWORK_LOGICAl,
 			checked: false
 		},
 		{
 			icon: 'other',
 			label: 'Other Device',
-			value: 'DEVICE',
+			value: 'other',
 			tagLabel: this.TAG_OTHER_DEVICES,
 			checked: false
 		}
@@ -422,8 +422,30 @@ export class ArchitectureGraphComponent implements OnInit {
 
 		clonedNodes.nodes.forEach(node => {
 			// Clear the node name if the assetClass is not included on the categories selected
-			if (!categories.includes(node.assetClass)) {
-				node.name = '';
+			if (node.assetClass === 'DEVICE' || node.assetClass === 'STORAGE') {
+				const type = node.type.toLowerCase();
+				if (!categories.includes('SERVERVIRTUAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceVirtualServer(type)) {
+					node.name = '';
+				} else if (!categories.includes('STORAGELOGICAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceStorage(type)) {
+					node.name = '';
+				} else if (!categories.includes('NETWORKLOGICAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceNetwork(type)) {
+					node.name = '';
+				} else if (!categories.includes('SERVERPHYSICAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceServer(type)) {
+					node.name = '';
+				} else if (!categories.includes('OTHER')) {
+					console.log('other');
+					// node.name = '';
+				} else {
+					console.log('Not found');
+				}
+			} else {
+				if (!categories.includes(node.assetClass)) {
+					node.name = '';
+				}
 			}
 		});
 		// }

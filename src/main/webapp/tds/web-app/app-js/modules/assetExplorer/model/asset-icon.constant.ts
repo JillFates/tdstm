@@ -39,6 +39,13 @@ export const ASSET_ICONS: IconModel = {
 		color: '#fff',
 		background: '#0b63a8'
 	},
+	physicalStorage: {
+		iconAlt: '\uf00c',
+		// tslint:disable-next-line:max-line-length
+		icon: '../assets/icons/png/storagePhysical.png',
+		color: '#fff',
+		background: '#0b63a8'
+	},
 	device: {
 		iconAlt: '\uf04e',
 		// tslint:disable-next-line:max-line-length
@@ -49,7 +56,7 @@ export const ASSET_ICONS: IconModel = {
 	storage: {
 		iconAlt: '\uf04e',
 		// tslint:disable-next-line:max-line-length
-		icon: '../assets/icons/png/other.png',
+		icon: '../assets/icons/png/storageLogical.png',
 		color: '#fff',
 		background: '#99d9ea'
 	},

@@ -197,7 +197,7 @@ export class ArchitectureGraphDiagramHelper {
 			} else if (ArchitectureGraphDiagramHelper.isDeviceServer(type)) {
 				icon = ASSET_ICONS['server'];
 			} else if (ArchitectureGraphDiagramHelper.isDeviceStorage(type)) {
-				icon = ASSET_ICONS['logicalStorage'];
+				icon = ASSET_ICONS['physicalStorage'];
 			} else if (ArchitectureGraphDiagramHelper.isDeviceNetwork(type)) {
 				icon = ASSET_ICONS['network'];
 			} else {
