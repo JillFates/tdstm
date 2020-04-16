@@ -297,7 +297,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			notify(ImportBatchJobSchedulerEventDetails.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
 		}
 
-		progressCalculator.finish()
+		progressCalculator.finish(importContext.guid)
 		return importResults
 	}
 

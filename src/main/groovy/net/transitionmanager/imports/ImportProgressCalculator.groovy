@@ -68,11 +68,13 @@ class ImportProgressCalculator {
     /**
      * Starts progressKey with status 'COMPLETED'
      */
-    void finish() {
+    void finish(String groupGuid) {
         progressService.update(progressKey,
                 100,
                 ProgressCallback.ProgressStatus.COMPLETED.name(),
-                "Total amount of rows:$totalRows processed"
+                "Total amount of rows:$totalRows processed",
+                null,
+                [groupGuid: groupGuid]
         )
     }
 
