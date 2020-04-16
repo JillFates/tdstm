@@ -12,7 +12,7 @@ import {DependencyAnalyzerDataModel} from '../model/dependency-analyzer-data.mod
 @Injectable()
 export class DependencyAnalyzerService {
 	private readonly baseURL = '/tdstm/ws/dependencyConsole';
-	private readonly GRAPH_PREFERENCES = `${this.baseURL}/preferences/`;
+	private readonly DEPENDENCY_BUNDLE_DETAILS = `${this.baseURL}/dependencyBundleDetails/`;
 	private readonly DEPENDENCY_ANALYZER_URL = `${this.baseURL}`;
 
 	// Resolve HTTP using the constructor
@@ -20,12 +20,23 @@ export class DependencyAnalyzerService {
 	}
 
 	/**
-	 * Get events list
+	 * Get DA Data
 	 * @returns {Observable<any>}
-	 * TODO: @sam please use the previously already implemented getEvents() from task.service.ts.
 	 */
 	getDependencyAnalyzerData(): Observable<DependencyAnalyzerDataModel> {
 		return this.http.get(`${this.DEPENDENCY_ANALYZER_URL}`)
+			.map((response: any) => {
+				return response;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Get filtered data with bundles and tags
+	 * @returns {Observable<any>}
+	 */
+	getFilteredData(data): Observable<DependencyAnalyzerDataModel> {
+		return this.http.post(`${this.DEPENDENCY_BUNDLE_DETAILS}`, data)
 			.map((response: any) => {
 				return response;
 			})
