@@ -75,7 +75,7 @@
 		"ramda": "0.25.0",
 		"rxjs": "6.4.0",
 		"rxjs-compat": "6.4.0",
-		"tds-component-library": "file: ../../../../../../../ui-components/dist/libs/tds-component-library/tds-component-library-0.1.44.tgz",
+		"tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.1.43.tgz",
 		"zone.js": "0.10.0"
 	},
 	"devDependencies": {
