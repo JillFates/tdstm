@@ -5,7 +5,6 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.common.EmailDispatch
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.service.ServiceMethods
 import org.quartz.Scheduler
