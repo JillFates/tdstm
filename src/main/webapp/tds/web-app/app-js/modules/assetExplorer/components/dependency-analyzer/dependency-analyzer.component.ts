@@ -48,6 +48,10 @@ export class DependencyAnalyzerComponent implements OnInit {
 		this.getInitialData();
 	}
 
+	/**
+	 * Gets the initial data to be displayed on the grid
+	 * Fills the Bundle dropdowns and the tagsList
+	 * * */
 	getInitialData() {
 		this.dependencyAnalyzerService.getDependencyAnalyzerData().subscribe(( res: DependencyAnalyzerDataModel) => {
 			this.allMoveBundles = res.allMoveBundles;
@@ -61,6 +65,11 @@ export class DependencyAnalyzerComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Converts the data that comes from the BE into usable row for the table
+	 * @param res: DependencyAnalyzerDataModel
+	 * Set the initial data empty to make sure no old data is present
+	 * */
 	setData(res) {
 		this.isAssigned = res.isAssigned;
 		this.gridData = [];
@@ -77,10 +86,19 @@ export class DependencyAnalyzerComponent implements OnInit {
 		this.gridData.push(['Storage', ...res.dependencyConsole.storage]);
 	}
 
+	/**
+	 * TODO: Show information modal for groups click
+	 * */
 	openGroupInfoModal(event) {
 		// Open informative modal here
 	}
 
+	/**
+	 * When a column is clicked, this will add the css to the row
+	 * this will also set the selected data to the electedData variable
+	 * @param event: HTML reference to the clicked column
+	 * @param index: number the index of the clicked column
+	 * */
 	columnClicked(event, index) {
 		this.clearHeaders();
 		let tmp = event.target as HTMLElement;
@@ -90,6 +108,11 @@ export class DependencyAnalyzerComponent implements OnInit {
 		this.selectedData = this.getDataFromIndex(index);
 		this.addClassToSelectedColumn(index);
 	}
+
+	/**
+	 * Adds the border class to the selected Column
+	 * @param index: number index of the column that will get the selected class
+	 * */
 	addClassToSelectedColumn(index) {
 		this.clearAllCells();
 		let cells = document.querySelectorAll('td:nth-child(' + (index + 1) + ')');
@@ -105,6 +128,10 @@ export class DependencyAnalyzerComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * This only clears the headers of the table from the selected class
+	 * but not the table cells
+	 * */
 	clearHeaders() {
 		let headers = document.querySelectorAll('th');
 		for (let i = 0; i < headers.length; i++) {
@@ -112,6 +139,9 @@ export class DependencyAnalyzerComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Clears all the cell of the table from the selected class
+	 * */
 	clearAllCells() {
 		let cells = document.querySelectorAll('td');
 		for (let i = 0; i < cells.length; i++) {
@@ -120,6 +150,11 @@ export class DependencyAnalyzerComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Gets all the data when a column is selected
+	 * @param index: number
+	 * @return object with all the data of the selected item
+	 * */
 	getDataFromIndex(index) {
 		const retVal = {};
 		retVal['group'] = this.columns[index];
@@ -131,11 +166,19 @@ export class DependencyAnalyzerComponent implements OnInit {
 		return retVal;
 	}
 
+	/**
+	 * Triggers when a bundle is selected
+	 * @param event: object contains the selected bundle
+	 * */
 	onBundleSelect(event) {
 		this.selectedBundle = event.id;
 		this.getFilteredData();
 	}
 
+	/**
+	 * Triggers when a filter is being used
+	 * filter being: Bundles, Tags, and Show only work in progress dependencies
+	 * */
 	getFilteredData() {
 		this.dependencyAnalyzerService.getFilteredData({
 			bundle: this.selectedBundle || '',
@@ -147,6 +190,11 @@ export class DependencyAnalyzerComponent implements OnInit {
 		})
 	}
 
+	/**
+	 * When a tag o multiple tags are selected, the filters data is set and
+	 * the filtered data method is activated to retrieve new information.
+	 * @event event: Object which contains the info that comes from the selected data
+	 * */
 	onAssetTagChange(event) {
 		this.tagMatch = event.operator;
 		this.selectedTags = event.tags.map( x => x.id);
@@ -154,16 +202,25 @@ export class DependencyAnalyzerComponent implements OnInit {
 		// request data here too
 	}
 
+	/**
+	 * Activates when the user only wants to see the work in progress data
+	 * */
 	onShowOnlyWIPChange(event) {
 		this.clearAllCells();
 		this.clearHeaders();
 		this.getFilteredData();
 	}
 
+	/**
+	 * Refreshes the data of the table
+	 * */
 	onRefeshData() {
 		this.getInitialData();
 	}
 
+	/**
+	 * These will be used for whoever works on the tabs (which could also include me)
+	 * */
 	onTabSelect(event) {
 		// console.log(event);
 	}
