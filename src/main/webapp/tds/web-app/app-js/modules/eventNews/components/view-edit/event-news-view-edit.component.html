@@ -95,15 +95,17 @@
                                 class="col-sm-9"
                                 *ngIf="modalType !== actionTypes.VIEW"
                         >
+                        <clr-checkbox-wrapper class="inline clarity-checkbox-margin-top">
                             <input
-                                    clrCheckbox
-                                    type="checkbox"
-                                    id="resolved"
-                                    name="resolved"
-                                    class="form-control"
-                                    [checked]="eventNewsModel.isArchived"
-                                    [(ngModel)]="eventNewsModel.isArchived"
-                            />
+                                clrCheckbox
+                                id="resolved"
+                                type="checkbox"
+                                name="resolved"
+                                class="form-control"
+                                [checked]="eventNewsModel.isArchived"
+                                [(ngModel)]="eventNewsModel.isArchived"
+                        />
+                        </clr-checkbox-wrapper>
                         </div>
                         <div
                                 class="col-sm-9"
