@@ -209,6 +209,13 @@ export class ApiActionViewEditParamatersComponent {
 	 * Add a new argument to the list of parameters and refresh the list.
 	 */
 	onAddParameter(): void {
+		if (this.parameterList) {
+			if (this.parameterList.length > 0) {
+				if (this.parameterList[this.parameterList.length - 1] === null) {
+					this.parameterList.pop();
+				}
+			}
+		}
 		this.parameterList.push({
 			paramName: '',
 			desc: '',
@@ -221,6 +228,7 @@ export class ApiActionViewEditParamatersComponent {
 			required: false,
 			encoded: false
 		});
+		this.parameterList.push(null);
 		this.onValuesChange();
 	}
 
