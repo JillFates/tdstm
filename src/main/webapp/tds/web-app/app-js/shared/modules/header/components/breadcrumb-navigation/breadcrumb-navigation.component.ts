@@ -20,8 +20,7 @@ declare var jQuery: any;
 	selector: 'tds-breadcrumb-navigation',
 	template: `
 <!-- Content Header (Page header) -->
-<!-- userContext.license && userContext.license.banner-->
-		<div *ngIf="{hasBanner: false}; let settings;">
+		<div *ngIf="{hasBanner: userContext.license && userContext.license.banner}; let settings;">
             <section class="content-header" *ngIf="!pageMetaData.hideTopNav">
                 <ng-container *ngIf="pageMetaData">
                     <div class="clr-row">
