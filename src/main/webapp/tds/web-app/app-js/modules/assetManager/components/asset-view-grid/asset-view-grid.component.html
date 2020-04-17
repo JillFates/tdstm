@@ -38,23 +38,25 @@
 				</tds-indeterminate-checkbox>
 			</ng-template>
 			<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-				<label class="selectall-checkbox-column text-center">
-					<input
-						clrCheckbox
-						type="checkbox"
-						id="checkbox_{{ dataItem.common_id }}"
-						[ngStyle]="{
-						cursor: isBulkSelectAvailable() ? 'pointer' : 'text'
-					}"
-						[disabled]="!isBulkSelectAvailable()"
-						[checked]="
-						bulkCheckboxService.getValueBulkItem(dataItem.common_id)
-					"
-						(change)="
-						checkItem(dataItem.common_id, $event.target.checked)
-					"
-						name="checkbox_{{ dataItem.common_id }}"
-					/>
+				<label class="selectall-checkbox-column text-center">					
+					<clr-checkbox-wrapper class="inline">
+						<input
+							clrCheckbox
+							type="checkbox"
+							id="checkbox_{{ dataItem.common_id }}"
+							[ngStyle]="{
+							cursor: isBulkSelectAvailable() ? 'pointer' : 'text'
+						}"
+							[disabled]="!isBulkSelectAvailable()"
+							[checked]="
+							bulkCheckboxService.getValueBulkItem(dataItem.common_id)
+						"
+							(change)="
+							checkItem(dataItem.common_id, $event.target.checked)
+						"
+							name="checkbox_{{ dataItem.common_id }}"
+						/>
+					</clr-checkbox-wrapper>
 				</label>
 			</ng-template>
 		</kendo-grid-column>
@@ -97,7 +99,8 @@
 							<a
 								clrDropdownItem
 								(click)="showAssetEditView(dataItem, rowIndex)"
-								[disabled]="!isEditAvailable()">
+								[disabled]="!isEditAvailable()"
+								title="Edit">
 								Edit
 							</a>
 							<a
@@ -105,6 +108,7 @@
 								(click)="createTask(dataItem, rowIndex)"
 								*ngIf="!hasTasks"
 								[disabled]="!isTaskCreateAvailable()"
+								title="Create Task"
 							>
 								Create Task
 							</a>
@@ -112,6 +116,7 @@
 								clrDropdownItem
 								(click)="showTask(dataItem, rowIndex)"
 								*ngIf="hasTasks"
+								title="Show Tasks"
 							>
 								Show Tasks
 							</a>
@@ -120,6 +125,7 @@
 								(click)="createComment(dataItem, rowIndex)"
 								*ngIf="!hasComments"
 								[disabled]="!isCommentCreateAvailable()"
+								title="Create Comment"
 							>
 								Create Comment
 							</a>
@@ -127,6 +133,7 @@
 								clrDropdownItem
 								(click)="showComment(dataItem, rowIndex)"
 								*ngIf="hasComments"
+								title="Show Comments"
 							>
 								Show Comments
 							</a>
@@ -134,6 +141,7 @@
 								clrDropdownItem
 								(click)="showAssetCloneView(dataItem, rowIndex)"
 								[disabled]="!isAssetCloneAvailable()"
+								title="Clone"
 							>
 								Clone
 							</a>

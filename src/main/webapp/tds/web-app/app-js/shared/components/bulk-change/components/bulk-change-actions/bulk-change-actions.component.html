@@ -39,17 +39,21 @@
 									<div class="form-group">
 										<div class="col-sm-12">
 											<div class= "checkbox">
-												<label for="sendEmailNotification">
+												<clr-checkbox-wrapper class="inline">
 													<input
+														clrCheckbox
 														id="sendEmailNotification"
-														name="sendEmailNotification"
 														type="checkbox"
-														[(ngModel)]="sendEmailNotification" />
-														<span class ="checkbox-label">
-															Email results to me
-														</span>
-
-												</label>
+														name="sendEmailNotification"
+														[(ngModel)]="sendEmailNotification"
+													/>
+													<label
+														class="checkbox-label clr-control-label clr-control-label-sm inline"
+														for="sendEmailNotification"
+													>
+													Email results to me
+													</label>
+												</clr-checkbox-wrapper>
 											</div>
 										</div>
 									</div>

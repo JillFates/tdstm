@@ -53,9 +53,17 @@ import { NgForm } from '@angular/forms';
 												 let-rowIndex="rowIndex">
 							<div
 								*ngIf="dataItem !== null && (column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded'))">
-								<input clrCheckbox (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean"
-											 name="{{column.property + columnIndex + rowIndex}}-param" (change)="onValuesChange()"
-											 [(ngModel)]="dataItem[column.property]"/>
+								<clr-checkbox-wrapper class="inline">
+									<input
+										clrCheckbox
+										(keypress)="getOnInputKey($event)"
+										type="checkbox"
+										class="param-text-input-boolean"
+										name="{{column.property + columnIndex + rowIndex}}-param"
+										(change)="onValuesChange()"
+										[(ngModel)]="dataItem[column.property]"
+									/>
+                				</clr-checkbox-wrapper>
 							</div>
 							<div *ngIf="dataItem !== null && (column.type === 'text' && column.property === 'paramName')">
 								<!-- Name -->
@@ -201,6 +209,13 @@ export class ApiActionViewEditParamatersComponent {
 	 * Add a new argument to the list of parameters and refresh the list.
 	 */
 	onAddParameter(): void {
+		if (this.parameterList) {
+			if (this.parameterList.length > 0) {
+				if (this.parameterList[this.parameterList.length - 1] === null) {
+					this.parameterList.pop();
+				}
+			}
+		}
 		this.parameterList.push({
 			paramName: '',
 			desc: '',
@@ -213,6 +228,7 @@ export class ApiActionViewEditParamatersComponent {
 			required: false,
 			encoded: false
 		});
+		this.parameterList.push(null);
 		this.onValuesChange();
 	}
 

@@ -29,44 +29,44 @@ export class ModelColumnModel {
 				label: 'Asset Type',
 				property: 'assetType',
 				filterType: FilterType.text,
-				width: 'auto',
+				width: 200,
 			},
 			{
 				label: 'Last Modified',
 				property: 'lastModified',
 				filterType: FilterType.date,
 				format: dateFormat,
-				width: 120
+				width: 150
 			},
 			{
 				label: 'No Of Connectors',
 				property: 'connectors',
 				filterType: FilterType.number,
-				width: 'auto',
+				width: 150,
 			},
 			{
 				label: 'Assets',
 				property: 'assetsCount',
 				filterType: FilterType.number,
-				width: 'auto',
+				width: 100,
 			},
 			{
 				label: 'Version',
 				property: 'sourceTDSVersion',
 				filterType: FilterType.number,
-				width: 'auto',
+				width: 100,
 			},
 			{
 				label: 'Source TDS',
 				property: 'sourceTDS',
 				filterType: FilterType.number,
-				width: 'auto',
+				width: 100,
 			},
 			{
 				label: 'Model Status',
 				property: 'modelStatus',
 				filterType: FilterType.text,
-				width: 'auto',
+				width: 140,
 			},
 		];
 	}
