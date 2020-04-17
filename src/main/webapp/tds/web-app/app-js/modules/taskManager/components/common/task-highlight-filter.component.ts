@@ -203,7 +203,7 @@ export class TaskHighlightFilter {
 
 		this.taskService.findTasksByQuery(query)
 			.subscribe(res => {
-				const data = (res.body && res.body.data) && res.body.taskIds;
+				const data = (res.body && res.body.data) && res.body.data.taskIds;
 				if (data) {
 					this.filteredTasks.emit(data);
 				}
