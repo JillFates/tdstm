@@ -55,8 +55,13 @@ export class TaskEditCreateModelHelper {
 		this.model.dueDate = this.model.dueDate ? DateUtils.getDateFromFormat(this.model.dueDate, this.userCurrentDateFormat) : null;
 
 		// validate null access
-		if (this.model.event && this.model.event.id === null || this.model.event.id === undefined) {
-			this.model.event.id = '';
+		if (this.model && !this.model.event || !this.model.event.id) {
+			if (!this.model.event) {
+				this.model.event = {id: ''};
+			} else {
+				this.model.event.id = '';
+			}
+
 		}
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
