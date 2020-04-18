@@ -1,169 +1,155 @@
-<div tds-autofocus class="tds-modal-content has-side-nav">
-	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-			<clr-icon aria-hidden="true" shape="close"></clr-icon>
-		</button>
-		<h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName}}</h4>
-	</div>
-	<div class="modal-body" style="height: 100%; overflow: none;">
-		<div class="modal-body-container">
-			<!-- Batch Records Grid -->
-			<section>
-				<div class="box-body box-with-empty-header">
-					<kendo-grid *ngIf="dataGridOperationsHelper"
-											class="narrow-rows clickable-rows"
-											[ngClass]="{ 'hide-filter': !dataGridOperationsHelper.showFilters }"
-											[height]="550"
-											[data]="dataGridOperationsHelper.gridData"
-											[filterable]="true"
-											[sort]="dataGridOperationsHelper.state.sort"
-											[sortable]="{mode:'single'}"
-											(sortChange)="dataGridOperationsHelper.sortChange($event)"
-											[skip]="dataGridOperationsHelper.state.skip"
-											[pageSize]="dataGridOperationsHelper.state.take"
-											[pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
-											[resizable]="true"
-											[selectable]="selectableSettings"
-											[rowSelected]="dataGridOperationsHelper.isRowSelected"
-											(cellClick)="openBatchRecordDetail($event)">
-
-						<!-- Toolbar Template -->
-						<ng-template kendoGridToolbarTemplate [position]="'top'">
-							<div class="clr-row button-toolbar">
-								<div class="clr-col-12">
-									<div class="pull-right">
-										<kendo-dropdownlist id="batchRecorsdFilter" name="batchRecordsFilter"
-																				[data]="batchRecordsFilter.options"
-																				[textField]="'name'"
-																				[valueField]="'id'"
-																				[(ngModel)]="batchRecordsFilter.selected"
-																				(valueChange)="onStatusFilter($event)"
-																				placeholder="Filter"
-																				class="toolbar-dropdown inline">
-										</kendo-dropdownlist>
-										<tds-button-custom [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-																			 (click)="onProcess()"
-																			 [icon]="'two-way-arrows'"
-																			 [tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_IMMEDIATE_PROCESS' | translate">
-										</tds-button-custom>
-										<tds-button-custom [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-																			 (click)="onIgnore()"
-																			 [icon]="'eye-hide'"
-																			 [tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_TOGGLE_IGNORE' | translate">
-										</tds-button-custom>
-									</div>
-								</div>
-							</div>
-						</ng-template>
-
-						<!-- Select All -->
-						<kendo-grid-column [locked]="true"
-															 [filterable]="false"
-															 [width]="70"
-															 [resizable]="false">
-							<ng-template kendoGridHeaderTemplate>
-								<div class="select-all-header">
-									<label>
-										<input clrCheckbox type="checkbox"
-													 [(ngModel)]="dataGridOperationsHelper.selectAllCheckboxes"
-													 name="selectAll"
-													 (change)="dataGridOperationsHelper.onSelectAllCheckboxes()">
-									</label>
-									<tds-button [flat]="true" (click)="dataGridOperationsHelper.toggleFilters()">
-										<clr-icon shape="filter" class="grid-filter-button is-solid">
-										<span
-											*ngIf="dataGridOperationsHelper.getFilterCounter()"
-											class="badge badge-warning">
-											{{ dataGridOperationsHelper.getFilterCounter() }}
-										</span>
-										</clr-icon>
-									</tds-button>
-								</div>
-							</ng-template>
-							<ng-template kendoGridCellTemplate let-dataItem>
-								<label
-									*ngIf="dataItem.status.code !== BatchStatus.RUNNING && dataItem.status.code !== BatchStatus.STALLED && dataItem.status.code !== BatchStatus.QUEUED"
-									class="selectall-checkbox-column text-center k-grid-ignore-click">
-									<input clrCheckbox type="checkbox"
-												 [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
-												 name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
-												 (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
-								</label>
-							</ng-template>
-						</kendo-grid-column>
-
-						<!-- Batch Record - Dynamic Columns -->
-						<kendo-grid-column *ngFor="let column of columnsModel.columns"
-															 field="{{column.property}}"
-															 [locked]="column.locked"
-															 [hidden]="column.hidden"
-															 format="{{column.format}}"
-															 [headerClass]="column.headerClass ? column.headerClass : ''"
-															 [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-															 [class]="column.cellClass ? column.cellClass : ''"
-															 [style]="column.cellStyle ? column.cellStyle : ''"
-															 [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-
-							<!-- Header Template -->
-							<ng-template kendoGridHeaderTemplate>
-								<label>
-									{{column.label}}
-								</label>
-							</ng-template>
-
-							<!-- Filter -->
-							<ng-template kendoGridFilterCellTemplate let-filter>
-								<div class="filter-input">
-									<tds-grid-filter-input
-										name="{{column.property}}"
-										[value]="column.filter || ''"
-										[filterType]="column.type"
-										placeholder="{{'GLOBAL.FILTER' | translate}}"
-										(filter)="preProcessFilter($event, column)">
-									</tds-grid-filter-input>
-								</div>
-							</ng-template>
-
-							<!-- Cell Templates -->
-							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status.label'" let-dataItem>
-								<span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.status.label}}</span>
-							</ng-template>
-							<ng-template kendoGridCellTemplate *ngIf="column.property === 'errorCount'" let-dataItem>
-								<span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.errorCount}}</span>
-							</ng-template>
-							<ng-template kendoGridCellTemplate *ngIf="column.type === 'dynamicValue'" let-dataItem>
-                                <span [ngClass]="{'has-init': hasInitVal(dataItem, column)}">
-                                    {{ getInitOrValue(dataItem, column) }}
-                                </span>
-								<i *ngIf="hasInitVal(dataItem, column)" style="padding-left: 5px;" class="fa fa-w fa-info has-init"
-									 [title]="'DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED' | translate"></i>
-							</ng-template>
-
-						</kendo-grid-column>
-
-						<!-- Pagination Footer -->
-						<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
-							<div class="clr-col-4"></div>
-							<div class="clr-col-8">
-								<tds-grid-pager
-									[total]="total"
-									[totalPages]="totalPages"
-									[currentPage]="currentPage"
+<div class="import-batch-detail">
+	<!-- Batch Records Grid -->
+	<section>
+		<div class="box-body box-with-empty-header">
+			<kendo-grid *ngIf="dataGridOperationsHelper"
+									class="narrow-rows clickable-rows"
+									[ngClass]="{ 'hide-filter': !dataGridOperationsHelper.showFilters }"
+									[height]="550"
+									[data]="dataGridOperationsHelper.gridData"
+									[filterable]="true"
+									[sort]="dataGridOperationsHelper.state.sort"
+									[sortable]="{mode:'single'}"
+									(sortChange)="dataGridOperationsHelper.sortChange($event)"
+									[skip]="dataGridOperationsHelper.state.skip"
 									[pageSize]="dataGridOperationsHelper.state.take"
-									[pageSizes]="dataGridOperationsHelper.defaultPageOptions"
-									(pageChange)="dataGridOperationsHelper.pageChange($event)">
-								</tds-grid-pager>
-							</div>
-						</ng-template>
+									[pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
+									[resizable]="true"
+									[selectable]="selectableSettings"
+									[rowSelected]="dataGridOperationsHelper.isRowSelected"
+									(cellClick)="openBatchRecordDetail($event)">
 
-					</kendo-grid>
-				</div>
-			</section>
+				<!-- Toolbar Template -->
+				<ng-template kendoGridToolbarTemplate [position]="'top'">
+					<div class="clr-row button-toolbar">
+						<div class="clr-col-12">
+							<div class="pull-right">
+								<kendo-dropdownlist id="batchRecorsdFilter" name="batchRecordsFilter"
+																		[data]="batchRecordsFilter.options"
+																		[textField]="'name'"
+																		[valueField]="'id'"
+																		[(ngModel)]="batchRecordsFilter.selected"
+																		(valueChange)="onStatusFilter($event)"
+																		placeholder="Filter"
+																		class="toolbar-dropdown inline">
+								</kendo-dropdownlist>
+								<tds-button-custom [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+																	 (click)="onProcess()"
+																	 [icon]="'two-way-arrows'"
+																	 [tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_IMMEDIATE_PROCESS' | translate">
+								</tds-button-custom>
+								<tds-button-custom [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+																	 (click)="onIgnore()"
+																	 [icon]="'eye-hide'"
+																	 [tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_TOGGLE_IGNORE' | translate">
+								</tds-button-custom>
+							</div>
+						</div>
+					</div>
+				</ng-template>
+
+				<!-- Select All -->
+				<kendo-grid-column [locked]="true"
+													 [filterable]="false"
+													 [width]="70"
+													 [resizable]="false">
+					<ng-template kendoGridHeaderTemplate>
+						<div class="select-all-header">
+							<label>
+								<input clrCheckbox type="checkbox"
+											 [(ngModel)]="dataGridOperationsHelper.selectAllCheckboxes"
+											 name="selectAll"
+											 (change)="dataGridOperationsHelper.onSelectAllCheckboxes()">
+							</label>
+							<tds-button [flat]="true" (click)="dataGridOperationsHelper.toggleFilters()">
+								<clr-icon shape="filter" class="grid-filter-button is-solid">
+								<span
+									*ngIf="dataGridOperationsHelper.getFilterCounter()"
+									class="badge badge-warning">
+									{{ dataGridOperationsHelper.getFilterCounter() }}
+								</span>
+								</clr-icon>
+							</tds-button>
+						</div>
+					</ng-template>
+					<ng-template kendoGridCellTemplate let-dataItem>
+						<label
+							*ngIf="dataItem.status.code !== BatchStatus.RUNNING && dataItem.status.code !== BatchStatus.STALLED && dataItem.status.code !== BatchStatus.QUEUED"
+							class="selectall-checkbox-column text-center k-grid-ignore-click">
+							<input clrCheckbox type="checkbox"
+										 [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
+										 name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
+										 (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+						</label>
+					</ng-template>
+				</kendo-grid-column>
+
+				<!-- Batch Record - Dynamic Columns -->
+				<kendo-grid-column *ngFor="let column of columnsModel.columns"
+													 field="{{column.property}}"
+													 [locked]="column.locked"
+													 [hidden]="column.hidden"
+													 format="{{column.format}}"
+													 [headerClass]="column.headerClass ? column.headerClass : ''"
+													 [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+													 [class]="column.cellClass ? column.cellClass : ''"
+													 [style]="column.cellStyle ? column.cellStyle : ''"
+													 [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+					<!-- Header Template -->
+					<ng-template kendoGridHeaderTemplate>
+						<label>
+							{{column.label}}
+						</label>
+					</ng-template>
+
+					<!-- Filter -->
+					<ng-template kendoGridFilterCellTemplate let-filter>
+						<div class="filter-input">
+							<tds-grid-filter-input
+								name="{{column.property}}"
+								[value]="column.filter || ''"
+								[filterType]="column.type"
+								placeholder="{{'GLOBAL.FILTER' | translate}}"
+								(filter)="preProcessFilter($event, column)">
+							</tds-grid-filter-input>
+						</div>
+					</ng-template>
+
+					<!-- Cell Templates -->
+					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status.label'" let-dataItem>
+						<span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.status.label}}</span>
+					</ng-template>
+					<ng-template kendoGridCellTemplate *ngIf="column.property === 'errorCount'" let-dataItem>
+						<span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.errorCount}}</span>
+					</ng-template>
+					<ng-template kendoGridCellTemplate *ngIf="column.type === 'dynamicValue'" let-dataItem>
+						<span [ngClass]="{'has-init': hasInitVal(dataItem, column)}">
+							{{ getInitOrValue(dataItem, column) }}
+						</span>
+						<i *ngIf="hasInitVal(dataItem, column)" style="padding-left: 5px;" class="fa fa-w fa-info has-init"
+							 [title]="'DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED' | translate"></i>
+					</ng-template>
+
+				</kendo-grid-column>
+
+				<!-- Pagination Footer -->
+				<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+					<div class="clr-col-4"></div>
+					<div class="clr-col-8">
+						<tds-grid-pager
+							[total]="total"
+							[totalPages]="totalPages"
+							[currentPage]="currentPage"
+							[pageSize]="dataGridOperationsHelper.state.take"
+							[pageSizes]="dataGridOperationsHelper.defaultPageOptions"
+							(pageChange)="dataGridOperationsHelper.pageChange($event)">
+						</tds-grid-pager>
+					</div>
+				</ng-template>
+
+			</kendo-grid>
 		</div>
-	</div>
-	<div class="modal-sidenav form-group-center">
-		<nav class="modal-sidenav btn-link">
-			<tds-button-close (click)="cancelCloseDialog()"></tds-button-close>
-		</nav>
-	</div>
+	</section>
 </div>
+
