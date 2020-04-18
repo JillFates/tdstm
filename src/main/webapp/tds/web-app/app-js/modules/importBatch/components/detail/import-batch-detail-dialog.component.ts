@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, Input, OnInit} from '@angular/core';
 // Model
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
@@ -9,13 +9,11 @@ import {
 	SELECT_ALL_COLUMN_WIDTH
 } from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {Dialog, DialogButtonType} from 'tds-component-library';
+import {Dialog, DialogButtonType, DialogExit, DialogService, ModalSize} from 'tds-component-library';
 // Component
 import {ImportBatchRecordDialogComponent} from '../record/import-batch-record-dialog.component';
 // Service
 import {ImportBatchService} from '../../service/import-batch.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
 import {
@@ -24,8 +22,6 @@ import {
 	PreferenceService
 } from '../../../../shared/services/preference.service';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 // Other
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 
@@ -78,8 +74,9 @@ export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
 	public importBatchModel: ImportBatchModel;
 
 	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private importBatchService: ImportBatchService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private userPreferenceService: PreferenceService) {
 		super();
 	}
@@ -169,7 +166,7 @@ export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
 	 * On Row Click open the record detail extra popup.
 	 * @param $event
 	 */
-	private openBatchRecordDetail(cellClick: CellClickEvent): void {
+	private async openBatchRecordDetail(cellClick: CellClickEvent): Promise<void> {
 		// prevent open detail on column 0
 		if (cellClick.columnIndex === 0) {
 			return;
@@ -180,18 +177,24 @@ export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
 		if (!selectedBatchRecord || !selectedBatchRecord.id) {
 			return;
 		}
-		this.dialogService.extra(ImportBatchRecordDialogComponent, [
-			{provide: ImportBatchModel, useValue: this.importBatchModel},
-			{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
-		], false, false)
-			.then((result) => {
-				if (result === 'reload') {
-					this.reloadSingleBatchRecord(selectedBatchRecord);
-					this.batchRecordsUpdatedFlag = true;
-				}
-			}).catch(result => {
-			console.log('dismissed');
-		});
+		const result = await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ImportBatchRecordDialogComponent,
+			data: {
+				importBatchModel: this.importBatchModel,
+				importBatchRecordModel:  selectedBatchRecord
+			},
+			modalConfiguration: {
+				title: `Record Detail`,
+				draggable: true,
+				modalSize: ModalSize.XL
+			}
+		}).toPromise();
+
+		if (result.status === DialogExit.ACCEPT && result.reloadRecords) {
+			this.reloadSingleBatchRecord(selectedBatchRecord);
+			this.batchRecordsUpdatedFlag = true;
+		}
 	}
 
 	/**
