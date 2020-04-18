@@ -23,7 +23,7 @@ declare var jQuery: any;
 		<div *ngIf="{hasBanner: userContext.license && userContext.license.banner}; let settings;">
             <section class="content-header" *ngIf="!pageMetaData.hideTopNav">
                 <ng-container *ngIf="pageMetaData">
-                    <div style="" class="breadcrumb-navigation-container">
+                    <div class="breadcrumb-navigation-container">
                         <div class="header-section">
 							<h2 [style.color]="pageMetaData?.titleColor" [style.fontWeight]="pageMetaData?.titleFontWeight">
 								{{ pageMetaData.title | translate }}
