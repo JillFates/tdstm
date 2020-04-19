@@ -44,7 +44,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	public modelConnectorsControls: Connector[] = [];
 	public modelAkas;
 	public powerType: string;
-	public powerTypes = ['Amp', 'Watts'];
+	public powerTypes = ['Amps', 'Watts'];
 	public modelAkasDisplay: string;
 	public manufacturerName: string;
 	public usizeList: number[] = [];
@@ -284,6 +284,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 
 		this.renderer.appendChild(this.d1.nativeElement, tr);
 		this.modelForm.form.markAsDirty();
+		this.modelConnectorCount++;
 	}
 
 	/**
@@ -317,7 +318,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			} else {
 				const arrayItem = this.aliasAdded.find(i => i === event.target.value);
 				if (!arrayItem) {
-					this.aliasAdded.push(event.target.value);
+					this.aliasAdded.push({id: 0, name: event.target.value});
 				}
 			}
 		} else {
@@ -325,7 +326,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			if (alreadyAdded) {
 				this.aliasAdded[index].name = event.target.value;
 			} else {
-				this.aliasAdded.push({id: index, name: event.target.value});
+				this.aliasAdded.push({id: 0, name: event.target.value});
 			}
 		}
 	}
@@ -361,9 +362,13 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.getModelConnectors();
 		this.modelModel.connectorCount = this.modelConnectorCount;
 		this.modelModel.modelConnectors = this.modelConnectorsControls;
-		this.modelModel.removedConnectors = this.modelConnectors;
+		this.modelModel.removedConnectors = (this.modalType === this.actionTypes.EDIT) ? this.modelConnectors : [];
 		this.modelModel.sourceTDS = (this.sourceTDS) ? 1 : 0;
 		this.modelModel.akaChanges = { added: this.aliasAdded, deleted: this.aliasDeleted, edited: this.aliasUpdated };
+		this.modelModel.endOfLifeDate =
+			(this.modelModel.endOfLifeDate) ?
+				DateUtils.formatDate(this.modelModel.endOfLifeDate, DateUtils.SERVER_FORMAT_DATE) :
+				'';
 		this.modelService.saveModel(this.modelModel)
 			.subscribe(
 			(result: any) => {
@@ -440,8 +445,8 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			connector.type = child.children[i].children[0].children[0].value;
 			connector.label = child.children[i + 1].children[0].value;
 			connector.labelPosition = child.children[i + 2].children[0].children[0].value;
-			connector.connectorPosX = child.children[i + 3].children[0].value;
-			connector.connectorPosY = child.children[i + 4].children[0].value;
+			connector.connectorPosX = parseInt(child.children[i + 3].children[0].value, 10);
+			connector.connectorPosY = parseInt(child.children[i + 4].children[0].value, 10);
 
 			// this.modelConnectors.push(connector);
 			this.modelConnectorsControls.push(connector);

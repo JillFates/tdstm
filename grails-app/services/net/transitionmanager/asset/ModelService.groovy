@@ -561,8 +561,8 @@ class ModelService implements ServiceMethods {
 				label = connectorInfo.label
 				type = connectorInfo.type
 				labelPosition = connectorInfo.labelPosition
-				connectorPosX = connectorInfo.xPosition
-				connectorPosY = connectorInfo.yPosition
+				connectorPosX = connectorInfo.connectorPosX
+				connectorPosY = connectorInfo.connectorPosY
 				connector = connectorInfo.connector
 			}
 
@@ -608,7 +608,7 @@ class ModelService implements ServiceMethods {
 				modelAlias = new ModelAlias([model: model])
 			}
 			modelAlias.with {
-				manufacturer = model.manufacturer
+				manufacturer = modelCommand.manufacturer
 				name = akaInfo.name
 			}
 			modelAlias.save()
