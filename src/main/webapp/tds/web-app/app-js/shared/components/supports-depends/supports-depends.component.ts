@@ -20,16 +20,16 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-supports-depends',
 	template: `
-        	<kendo-grid
-                *ngIf="dataGridSupportsOnHelper"
-                class="tds-table"
-                [data]="dataGridSupportsOnHelper.gridData"
-                [sort]="dataGridSupportsOnHelper.state.sort"
+			<kendo-grid
+				*ngIf="dataGridSupportsOnHelper"
+				class="tds-table"
+				[data]="dataGridSupportsOnHelper.gridData"
+				[sort]="dataGridSupportsOnHelper.state.sort"
 								[sortable]="false"
-                [resizable]="true"
-                (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
+				[resizable]="true"
+				(sortChange)="dataGridSupportsOnHelper.sortChange($event)">
 
-            <!-- Toolbar Template -->
+			<!-- Toolbar Template -->
 			<ng-template kendoGridToolbarTemplate [position]="'top'">
 				<div class="clr-row">
 					<div class="grid-label clr-col-4">
@@ -45,134 +45,141 @@ declare var jQuery: any;
 						</div>
 					</div>
 				</div>
-            </ng-template>
+			</ng-template>
 
-            <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
-                               field="{{column.property}}"
-                               [headerClass]="column.headerClass ? column.headerClass : ''"
-                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-                               [class]="column.cellClass ? column.cellClass : ''"
-                               [style]="column.cellStyle ? column.cellStyle : ''"
-                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+			<!-- Columns -->
+			<kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
+							   field="{{column.property}}"
+							   [headerClass]="column.headerClass ? column.headerClass : ''"
+							   [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+							   [class]="column.cellClass ? column.cellClass : ''"
+							   [style]="column.cellStyle ? column.cellStyle : ''"
+							   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 
-                <!-- Header Template -->
-                <ng-template kendoGridHeaderTemplate>
-                    <label>{{column.label}}</label>
-                </ng-template>
+				<!-- Header Template -->
+				<ng-template kendoGridHeaderTemplate>
+					<label>{{column.label}}</label>
+				</ng-template>
 
-                <!-- Action -->
-                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
+				<!-- Action -->
+				<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
 					<div class="action-button btn-link">
 						<clr-dropdown>
-							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+							<tds-button icon="ellipsis-vertical" clrDropdownTrigger [tabindex]="this.baseSupportsGridTabIndex"></tds-button>
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
 								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
-                </ng-template>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dataFlowFreqList"
-                            [(ngModel)]="dataItem.dataFlowFreq"
-                            (valueChange)="onChangeInternalModel()"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="dataFlowFreqList"
+							[(ngModel)]="dataItem.dataFlowFreq"
+							(valueChange)="onChangeInternalModel()"
+                            [tabindex]="this.baseSupportsGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dependencyClassList"
-                            [textField]="'text'"
-                            [valueField]="'id'"
-                            [(ngModel)]="dataItem.assetClass"
-                            (valueChange)="onDependencyClassChange(dataItem)"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="dependencyClassList"
+							[textField]="'text'"
+							[valueField]="'id'"
+							[(ngModel)]="dataItem.assetClass"
+							(valueChange)="onDependencyClassChange(dataItem)"
+                            [tabindex]="this.baseSupportsGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
-                    <tds-combobox
-		                    [required]="true"
-		                    [allowEmptyValue]="true"
-                            [(model)]="dataItem.assetDepend"
-                            [(metaParam)]="dataItem.assetClass.id"
-                            [serviceRequest]="getAssetListForComboBox"
-                            (valueChange)="onDependencyChange($event, dataItem)">
-                    </tds-combobox>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
+					<tds-combobox
+							[required]="true"
+							[allowEmptyValue]="true"
+							[(model)]="dataItem.assetDepend"
+							[(metaParam)]="dataItem.assetClass.id"
+							[serviceRequest]="getAssetListForComboBox"
+							(valueChange)="onDependencyChange($event, dataItem)"
+                            [tabindex]="this.baseSupportsGridTabIndex">
+					</tds-combobox>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                                        [data]="moveBundleList"
-                                        [textField]="'text'"
-                                        [valueField]="'id'"
-                                        [(ngModel)]="dataItem.assetDepend.moveBundle"
-                                        [ngClass]="getMoveBundleColor(dataItem)"
-                                        (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
-                                        (valueChange)="onChangeInternalModel()"
-                                        required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist #dropdownFooter
+										name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+										[data]="moveBundleList"
+										[textField]="'text'"
+										[valueField]="'id'"
+										[(ngModel)]="dataItem.assetDepend.moveBundle"
+										[ngClass]="getMoveBundleColor(dataItem)"
+										(open)="onOpenMoveBundle(dropdownFooter, dataItem)"
+										(valueChange)="onChangeInternalModel()"
+                                        [tabindex]="this.baseSupportsGridTabIndex"
+										required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="typeList"
-                            [(ngModel)]="dataItem.type"
-                            (valueChange)="onChangeInternalModel()"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="typeList"
+							[(ngModel)]="dataItem.type"
+							(valueChange)="onChangeInternalModel()"
+                            [tabindex]="this.baseSupportsGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="statusList"
-                            [(ngModel)]="dataItem.status"
-                            (valueChange)="onChangeInternalModel()"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
-        </kendo-grid>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="statusList"
+							[(ngModel)]="dataItem.status"
+							(valueChange)="onChangeInternalModel()"
+                            [tabindex]="this.baseSupportsGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
+			</kendo-grid-column>
+			<kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
+		</kendo-grid>
 
-        	<kendo-grid
-                *ngIf="dataGridDependsOnHelper"
-                class="tds-table"
-                [data]="dataGridDependsOnHelper.gridData"
-                [sortable]="false"
-                [resizable]="true"
-                (sortChange)="dataGridDependsOnHelper.sortChange($event)">
+			<kendo-grid
+				*ngIf="dataGridDependsOnHelper"
+				class="tds-table"
+				[data]="dataGridDependsOnHelper.gridData"
+				[sortable]="false"
+				[resizable]="true"
+				(sortChange)="dataGridDependsOnHelper.sortChange($event)">
 
-            <!-- Toolbar Template -->
+			<!-- Toolbar Template -->
 			<ng-template kendoGridToolbarTemplate [position]="'top'">
 				<div class="clr-row">
 					<div class="grid-label clr-col-4">
-						<strong>Dependent On</strong>
+						<strong>
+							Dependent On</strong>
 					</div>
 					<div class="grid-actions clr-col-8">
 						<div class="btn-sm">
 							<tds-button-add
 								[tooltip]="'Add link to Dependent Asset'"
 								id="dependent-support"
-								[tabIndex]="450"(click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
+								[tabIndex]="650"(click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
 							</tds-button-add>
 						</div>
 					</div>
 				</div>
 			</ng-template>
 
-            <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
+			<!-- Columns -->
+			<kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
 				field="{{column.property}}"
 				[headerClass]="column.headerClass ? column.headerClass : ''"
 				[headerStyle]="column.headerStyle ? column.headerStyle : ''"
@@ -180,91 +187,97 @@ declare var jQuery: any;
 				[style]="column.cellStyle ? column.cellStyle : ''"
 				[width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 
-                <!-- Header Template -->
-                <ng-template kendoGridHeaderTemplate>
-                    <label>{{column.label}}</label>
-                </ng-template>
+				<!-- Header Template -->
+				<ng-template kendoGridHeaderTemplate>
+					<label>{{column.label}}</label>
+				</ng-template>
 
-                <!-- Action -->
+				<!-- Action -->
 				<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
 					<div class="action-button btn-link">
 						<clr-dropdown>
-							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+							<tds-button icon="ellipsis-vertical" clrDropdownTrigger [tabindex]="this.baseDependentGridTabIndex"></tds-button>
 							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
+								<a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
 								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
-                </ng-template>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dataFlowFreqList"
-                            [(ngModel)]="dataItem.dataFlowFreq"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="dataFlowFreqList"
+							[(ngModel)]="dataItem.dataFlowFreq"
+                            [tabindex]="this.baseDependentGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dependencyClassList"
-                            [textField]="'text'"
-                            [valueField]="'id'"
-                            [(ngModel)]="dataItem.assetClass"
-                            (valueChange)="onDependencyClassChange(dataItem)"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="dependencyClassList"
+							[textField]="'text'"
+							[valueField]="'id'"
+							[(ngModel)]="dataItem.assetClass"
+							(valueChange)="onDependencyClassChange(dataItem)"
+                            [tabindex]="this.baseDependentGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
-                    <tds-combobox
-                            [required]="true"
-                            [allowEmptyValue]="true"
-                            [(model)]="dataItem.assetDepend"
-                            [(metaParam)]="dataItem.assetClass.id"
-                            [serviceRequest]="getAssetListForComboBox"
-                            (selectionChange)="onDependencyChange($event, dataItem)">
-                    </tds-combobox>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
+					<tds-combobox
+							[required]="true"
+							[allowEmptyValue]="true"
+							[(model)]="dataItem.assetDepend"
+							[(metaParam)]="dataItem.assetClass.id"
+							[serviceRequest]="getAssetListForComboBox"
+							(selectionChange)="onDependencyChange($event, dataItem)"
+                            [tabindex]="this.baseDependentGridTabIndex">
+					</tds-combobox>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                                        [data]="moveBundleList"
-                                        [textField]="'text'"
-                                        [valueField]="'id'"
-                                        [(ngModel)]="dataItem.assetDepend.moveBundle"
-                                        [ngClass]="getMoveBundleColor(dataItem)"
-                                        (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
-                                        required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist #dropdownFooter
+										name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+										[data]="moveBundleList"
+										[textField]="'text'"
+										[valueField]="'id'"
+										[(ngModel)]="dataItem.assetDepend.moveBundle"
+										[ngClass]="getMoveBundleColor(dataItem)"
+										(open)="onOpenMoveBundle(dropdownFooter, dataItem)"
+                                        [tabindex]="this.baseDependentGridTabIndex"
+										required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="typeList"
-                            [(ngModel)]="dataItem.type"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="typeList"
+							[(ngModel)]="dataItem.type"
+                            [tabindex]="this.baseDependentGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="statusList"
-                            [(ngModel)]="dataItem.status"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
+				<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
+					<kendo-dropdownlist
+							name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+							[data]="statusList"
+							[(ngModel)]="dataItem.status"
+                            [tabindex]="this.baseDependentGridTabIndex"
+							required>
+					</kendo-dropdownlist>
+				</ng-template>
 
-            </kendo-grid-column>
-            <kendo-grid-messages noRecords="There are no Dependent Assets to display."> </kendo-grid-messages>
-        </kendo-grid>
+			</kendo-grid-column>
+			<kendo-grid-messages noRecords="There are no Dependent Assets to display."> </kendo-grid-messages>
+		</kendo-grid>
 	`,
 	styles: []
 })
@@ -282,6 +295,9 @@ export class SupportsDependsComponent implements OnInit {
 	public dependencyType = DEPENDENCY_TYPE;
 	public dataGridDependsOnHelper: DataGridOperationsHelper;
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
+
+	private baseSupportsGridTabIndex = 449;
+	private baseDependentGridTabIndex = 650;
 
 	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService, private tdsDialogService: DialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
@@ -361,6 +377,12 @@ export class SupportsDependsComponent implements OnInit {
 	 * Add a new Dependency
 	 */
 	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
+		/*if (dependencyType === DEPENDENCY_TYPE.SUPPORT) {
+			this.baseSupportsGridTabIndex++;
+		}
+		if (dependencyType === DEPENDENCY_TYPE.DEPENDENT) {
+			this.baseDependentGridTabIndex++;
+		}*/
 		let unknownIndex = this.statusList.indexOf('Unknown');
 		if (unknownIndex === -1) {
 			unknownIndex = 0
@@ -452,7 +474,6 @@ export class SupportsDependsComponent implements OnInit {
 
 	/**
 	 * Confirm before delete
-	 * 
 	 * **/
 	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper): void {
 		this.tdsDialogService.confirm(
