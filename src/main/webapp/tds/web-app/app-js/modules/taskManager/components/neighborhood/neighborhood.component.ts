@@ -53,6 +53,7 @@ import {
 import {DiagramEventAction} from 'tds-component-library/lib/diagram-layout/model/diagram-event.constant';
 import {DialogService, ModalSize} from 'tds-component-library';
 import {TagService} from '../../../assetTags/service/tag.service';
+import {TaskHighlightFilter} from '../common/task-highlight-filter.component';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -66,7 +67,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	@ViewChild('graph', {static: false}) graph: any;
 	@ViewChild('eventsDropdown', {static: false}) eventsDropdown: DropDownListComponent;
 	@ViewChild('teamHighlightDropdown', {static: false}) teamHighlightDropdown: DropDownButtonComponent;
-	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
+	@ViewChild('taskHighlightFilter', {static: false}) taskHighlightFilter: TaskHighlightFilter;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
@@ -78,8 +79,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		completed: 'completed'
 	};
 	opened: boolean;
-	filterText: string;
-	textFilter: ReplaySubject<string> = new ReplaySubject<string>(1);
 	icons = FA_ICONS;
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
@@ -147,7 +146,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	loadAll(): void {
-		this.subscribeToHighlightFilter();
 		this.loadUserContext();
 		this.loadFilters();
 		this.loadEventList();
@@ -573,7 +571,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * highlight nodes by team on the diagram
 	 **/
 	highlightByTeam(team: any): void {
-		this.teamTextFilter(this.filterText, team && team.label);
+		this.teamTextFilter(this.taskHighlightFilter && this.taskHighlightFilter.filterText, team && team.label);
 	}
 
 	/**
@@ -613,27 +611,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	zoomOut() {
 		this.graph.zoomOut();
-	}
-
-	/**
-	 * When highlight filter change update search
-	 **/
-	highlightFilterChange(): void {
-		this.textFilter.next(this.filterText);
-	}
-
-	/**
-	 * Highlight filter subscription
-	 **/
-	subscribeToHighlightFilter(): void {
-		this.textFilter
-			.pipe(
-				takeUntil(this.unsubscribe$),
-				skip(2),
-				distinctUntilChanged()
-			).subscribe(match => {
-				this.teamTextFilter(match, this.selectedTeam && this.selectedTeam.label);
-		});
 	}
 
 	/**
@@ -677,7 +654,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 */
 	refreshDiagram(): void {
 		this.refreshTriggered = true;
-		this.subscribeToHighlightFilter();
 		this.loadData();
 	}
 
@@ -846,7 +822,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					componentFactoryResolver: this.componentFactoryResolver,
 					component: TaskEditCreateComponent,
 					data: {
-						taskDetailModel: taskDetailModel
+						taskDetailModel: model
 					},
 					modalConfiguration: {
 						title: 'Task Edit',
@@ -986,16 +962,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Clear text filter
-	 */
-	clearTextFilter(): void {
-		if (!this.filterText) { return; }
-		this.highlightFilterText.nativeElement.nodeValue = '';
-		this.filterText = '';
-		this.textFilter.next(null);
-	}
-
-	/**
 	 * View full graph from cache
 	 */
 	viewFullGraphFromCache(): void {
@@ -1115,6 +1081,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		this.notifierService.broadcast({
 			name: 'httpRequestCompleted'
 		});
+	}
+
+	/**
+	 * Clear Highlights from filter
+	 */
+	clearHighlightFilters(): void {
+		this.graph.clearHighlights();
 	}
 
 	@HostListener('window:beforeunload', ['$event'])
