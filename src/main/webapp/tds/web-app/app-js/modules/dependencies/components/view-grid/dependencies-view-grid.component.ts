@@ -36,7 +36,7 @@ import {
 } from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import { CheckboxStates } from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
-import { HeaderActionButtonData } from 'tds-component-library';
+import { COLUMN_MIN_WIDTH, HeaderActionButtonData } from 'tds-component-library';
 import { DependencyResults } from '../../model/dependencies.model';
 import {
 	GridColumnModel,
@@ -89,6 +89,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private openAssetsHandler = null;
 	SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
 	protected showFilters = false;
+	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 
 	constructor(
 		private route: ActivatedRoute,

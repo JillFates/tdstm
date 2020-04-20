@@ -24,7 +24,7 @@ export class DependenciesColumnModel {
 				label: 'Asset Bundle',
 				property: 'assetBundle',
 				type: 'text',
-				width: 120
+				width: 160
 			},
 			{
 				label: 'Asset Tags',
@@ -48,13 +48,13 @@ export class DependenciesColumnModel {
 				label: 'Dep Asset Type',
 				property: 'dependentType',
 				type: 'text',
-				width: 140
+				width: 160
 			},
 			{
 				label: 'Dep Asset Bundle',
 				property: 'dependentBundle',
 				type: 'text',
-				width: 140
+				width: 180
 			},
 			{
 				label: 'Dep Asset Tags',
@@ -84,7 +84,7 @@ export class DependenciesColumnModel {
 				label: 'Direction',
 				property: 'direction',
 				type: 'text',
-				width: 100
+				width: 140
 			},
 			{
 				label: 'C1',
