@@ -11,6 +11,7 @@ import {
 	OnDestroy, HostListener, ComponentFactoryResolver
 } from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
+import {Location} from '@angular/common';
 // Model
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
@@ -91,6 +92,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() justPlanning: boolean;
 	@Input() gridState: State;
 	@Output() modelChange = new EventEmitter<void>();
+	@Output() removeGlobalQueryParam = new EventEmitter<string>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Output() hiddenFiltersChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
@@ -149,6 +151,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
+		private location: Location,
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,
@@ -294,6 +297,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			this.tagSelector.reset();
 		}
 		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		this.removeGlobalQueryParam.emit('*');
 	}
 
 	/**
@@ -323,7 +327,11 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	*/
 	public setFilter(search: string, column: ViewColumn): void {
 		column.filter = search;
-		this.onFilter();
+		const urlFilterName = `${column.domain}_${column.property}`;
+		this.removeGlobalQueryParam.emit(urlFilterName);
+		setTimeout(() => {
+			this.onFilter();
+		}, 1000);
 	}
 
 	/**

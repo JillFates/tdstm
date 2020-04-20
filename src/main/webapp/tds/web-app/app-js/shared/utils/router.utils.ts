@@ -57,4 +57,35 @@ export class RouterUtils {
 		return value;
 	}
 
+	/**
+	 * Remove from an url an specific query string parameter
+	 * @param url
+	 * @param paramName
+	 */
+	public static getUrlExcludingParamName(url: string, paramName: string) {
+		let resultingUrl = '';
+
+		if (url.indexOf(paramName) !== -1) {
+			const queryStringStart = url.indexOf('?');
+			if (queryStringStart !== -1) {
+				const baseUrl = url.substring(0, queryStringStart);
+				const queryString = url.substring(queryStringStart).replace('?', '');
+				const queryParams = queryString.split('&');
+				resultingUrl = baseUrl;
+				if (queryParams.length) {
+					resultingUrl += '?';
+					queryParams.forEach((item: string, index: number) => {
+						if (!item.startsWith(paramName)) {
+							resultingUrl += item;
+							if (index < queryParams.length - 1) {
+								resultingUrl += '&';
+							}
+						}
+					})
+				}
+			}
+		}
+		return resultingUrl;
+	}
+
 }

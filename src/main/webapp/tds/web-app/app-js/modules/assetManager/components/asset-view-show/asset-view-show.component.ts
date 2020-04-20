@@ -1,5 +1,6 @@
 // Angular
 import {Component, ViewChild, OnInit, OnDestroy, ComponentFactoryResolver} from '@angular/core';
+import {Location} from '@angular/common';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
 // Model
 import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
@@ -36,6 +37,7 @@ import {
 	ASSET_OVERRIDE_CHILD_STATE,
 	ASSET_OVERRIDE_PARENT_STATE, OverrideState
 } from '../../models/asset-view-override-state.model';
+import {RouterUtils}  from '../../../../shared/utils/router.utils';
 
 declare var jQuery: any;
 
@@ -77,6 +79,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private queryParams: any = {};
 
 	constructor(
+		private location: Location,
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private route: ActivatedRoute,
 		private router: Router,
@@ -137,6 +140,34 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			const _override = !params._override || params._override === 'true' || params._override === true;
 			this.queryParams = { _override };
 		});
+	}
+
+	/**
+	 * Deletes a params from the global query param object
+	 * Passing the * character removes all global filters
+	 * @param name
+	 */
+	public onRemoveGlobalQueryParam(name: string): void {
+		if (name === '*') {
+			for (let [key, value] of Object.entries(this.globalQueryParams)) {
+				this.removeGlobalQueryParam(key);
+			}
+		} else if (this.globalQueryParams.hasOwnProperty(name)) {
+			this.removeGlobalQueryParam(name);
+		}
+	}
+
+	/**
+	 * Deletes a params from the global query param object
+	 * @param name
+	 */
+	public removeGlobalQueryParam(name: string): void {
+			const newParams = Object.assign({}, this.globalQueryParams);
+			delete newParams[name];
+			this.globalQueryParams = newParams;
+			const newUrl = RouterUtils.getUrlExcludingParamName(this.location.path(), name) ;
+			console.log(newUrl);
+			this.location.replaceState(newUrl);
 	}
 
 	/**
