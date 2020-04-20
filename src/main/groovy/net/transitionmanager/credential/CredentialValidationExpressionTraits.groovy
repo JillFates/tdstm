@@ -35,4 +35,8 @@ trait CredentialValidationExpressionTraits {
 	def methodMissing(String methodName, args) {
 		throw new InvalidSyntaxException( CredentialValidationExpression.INVALID_EXPRESSION_MSG )
 	}
+
+	def propertyMissing(String propertyName) {
+		throw new InvalidSyntaxException( CredentialValidationExpression.UNRECOGNIZED_SYNTAX_MSG + " '$propertyName'")
+	}
 }

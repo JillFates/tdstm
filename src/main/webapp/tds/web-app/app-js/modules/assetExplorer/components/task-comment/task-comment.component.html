@@ -1,8 +1,9 @@
-<div class="task-comment-component dialog-container">
-	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
+<div class="task-comment-component dialog-container" >
+	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content"
+		 [ngClass]="{'has-not-task-manager-permission': !hasTaskManagerViewPermission}">
 		<kendo-grid
 			*ngIf="dataGridTaskHelper"
-			class="tds-table"
+			class="tds-table tds-task-grid"
 			[data]="dataGridTaskHelper.gridData"
 			[sort]="dataGridTaskHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -82,7 +83,7 @@
 								<a
 									clrDropdownItem
 									(click)="openTaskEdit(dataItem)"
-									[disabled]="!isTaskEditAvailable()"
+									[disabled]="!isTaskEditAvailable() || !hasTaskManagerViewPermission"
 									>Edit Task</a
 								>
 								<a

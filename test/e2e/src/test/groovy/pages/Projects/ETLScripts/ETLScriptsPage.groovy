@@ -13,33 +13,39 @@ class ETLScriptsPage extends Page {
     }
 
     static content = {
-        pageHeaderName { $("section", class:"content-header").find("h2")}
-        createBtn(wait:true) { $('button#btnCreateDataScript')}
+        pageHeaderName { $(".content-header").find("h2")[0]}
+        createBtn(wait:true) { $('clr-icon[shape="plus"]').closest("button")[0]}
         pageBreadcrumbs { $("ol", class:"breadcrumb-container").find("li")}
-        nameFilter(wait:true) { $("input" ,  placeholder:"Filter Name")}
-        dateCreateFilter { $("input", class:"k-input")[0]}
-        descriptionFilter { $("input", placeholder:"Filter Description")}
-        providerFilter { $("input", placeholder:"Filter Provider")}
-        modeFilter { $("input", placeholder:"Filter Mode")}
-        removeFilterNameIcon { $('input[placeholder="Filter Name"] + span.fa-times')}
-        removeFilterDescriptionIcon { $('input[placeholder="Filter Description"] + span.fa-times')}
+        filterButton{ $('clr-icon[shape="filter"]').closest("button")[0]}
+        nameFilter(required:false) { $("input")[0]}
+        providerFilter (required:false) { $("input")[1]}
+        descriptionFilter (required:false) { $("input")[2]}
+        modeFilter (required:false) { $("input")[3]}
+        dateCreateFilter (required:false) { $("input")[4]}
+        lastUpdatedFilter(required:false) { $("input")[5]}
+        removeFilterNameIcon { $('clr-icon[shape="times-circle"]').closest("button")[1]}
+        removeFilterDescriptionIcon { $('clr-icon[shape="times-circle"]').closest("button")[1]}
         removeFilterProviderIcon { $('input[placeholder="Filter Provider"] + span.fa-times')}
         removeFilterModeIcon { $('input[placeholder="Filter Mode"] + span.fa-times')}
         nameGridHeader { $('th', "aria-colindex": "2")}
         commonsModule { module CommonsModule }
         //First Element of the Datascripts Table
-        firstDS(wait:true) { $("tr" ,  class:"k-state-selected").find("td")[1]}
-        dsTableRows (required:false){ $("DIV.k-grid-table-wrap")[1].find("tr")}
-        refreshGridIcon { $('span.glyphicon-refresh')}
+        firstDS(wait:true) { dsTableRows[0]}
+        dsTableRows (required:false){ $(".k-grid-table")[0].find("tr")}
+        refreshGridIcon { $('button[title="Refresh"]')}
+        //refresh button { $('input[shape="sync"]')}
         firstDSName { dsTableRows[0].find("td", "aria-colindex": "2")}
         firstDSProvider { dsTableRows[0].find("td", "aria-colindex": "3")}
         firstDSDescription { dsTableRows[0].find("td", "aria-colindex": "4")}
         firstDSMode { dsTableRows[0].find("td", "aria-colindex": "5")}
-        firstDSEditButton { $("div", class:"tds-action-button-set").find("tds-button-edit")}
         projectsModule { module ProjectsMenuModule}
-        trashIconList {$(".fa.fa-fw.fa-trash")}
-        confirmationModal {$("div.modal-dialog.modal-sm")}
-        confirmYes {confirmationModal.find("button.btn.btn-primary.pull-left")}
+        actionsList { $('tds-button[icon="ellipsis-vertical"]')}
+        viewAction (required:false) {$("a.dropdown-item")[0]}
+        editAction (required:false) {$("a.dropdown-item")[1]}
+        editScriptAction (required:false) {$("a.dropdown-item")[2]}
+        deleteAction (required:false) {$("a.dropdown-item")[3]}
+        confirmationModal (required:false) {$("div.modal-dialog.modal-confirm")}
+        confirmYes (required:false) { $('clr-icon[shape="check"]').closest("button")[0]}
         noRecordsMessage (required:false){$("tr.k-grid-norecords", text:"No records available.")}
 
 
@@ -50,18 +56,24 @@ class ETLScriptsPage extends Page {
      * @author ingrid
      */
     def deleteByPosition(position){
-        trashIconList[position].click()
+        waitFor{actionsList[position].click()}
+        deleteAction.click()
         waitFor{confirmYes.click()}
     }
 
+    def clickOnFilterButton(){
+        waitFor{filterButton.click()}
+    }
 
     def filterByName(name){
         scrollLeft()
         nameFilter = name
+        return name
     }
 
     def clickOnEditButtonForFirstDS(){
-        waitFor{firstDSEditButton.click()}
+        waitFor{actionsList[0].click()}
+        editAction.click()
     }
 
     def clickOnFirstGridRow(){
@@ -109,7 +121,7 @@ class ETLScriptsPage extends Page {
 
     def clickOnNameHeader(){
         scrollLeft()
-        waitFor{nameGridHeader.find("a span").click()}
+        waitFor{nameGridHeader.click()}
     }
 
     def getFirstRowDSName(){

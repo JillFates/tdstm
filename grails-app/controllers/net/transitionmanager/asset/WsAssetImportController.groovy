@@ -18,7 +18,6 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import org.apache.commons.io.FilenameUtils
-import org.grails.web.json.JSONObject
 
 /**
  * Handles WS calls of the ApplicationService.
@@ -91,11 +90,12 @@ class WsAssetImportController implements ControllerMethods {
 	 * Used to invoke the process that will read in the results of the ETL transformation and load the data into the
 	 * data ingestion batch import tables. This will create a batch for each asset class in the JSON data. The results
 	 * of the import will be returned from the method.
+	 *
 	 * @param filename - the name of the temporary ETL output JSON file
 	 * @return JSON map containing the following:
-	 * 		status: <String> indicates results of process (success|error)
-	 * 		errors: <List><String> list of the errors
-	 * 		batchesCreated: <Integer> the number of batches created
+	 * 		progressKey: <String> progress key used to retrieve progress of
+	 * 			{@link DataImportService#scheduleETLTransformDataJob(net.transitionmanager.project.Project, java.lang.Long, java.lang.String, java.lang.Boolean)},
+	 * 		jobTriggerName: <String> Trigger name of the executed.
 	 */
 	@HasPermission(Permission.AssetImport)
 	def loadData(String filename) {
@@ -110,20 +110,8 @@ class WsAssetImportController implements ControllerMethods {
 			throw new InvalidParamException('File must be JSON format')
 		}
 
-		InputStream inputStream = fileSystemService.openTemporaryFile(filename)
-		if (!inputStream) {
-			throw new InvalidParamException('Specified input file not found')
-		}
-
-		JSONObject importJson = JsonUtil.parseFile(inputStream)
-
-		inputStream.close()
-
-		Map importResults = dataImportService.loadETLJsonIntoImportBatch(project, person.userLogin, importJson)
-
-		log.debug "Results of loadData() $importResults"
-
-		renderSuccessJson(importResults)
+		Map result = dataImportService.scheduleImportDataJob(project, person.userLogin, filename)
+		renderSuccessJson(result)
 	}
 
 	/**
@@ -251,7 +239,7 @@ class WsAssetImportController implements ControllerMethods {
 		}
 
 		if(FilenameUtils.getExtension(filename) == 'json') { // TODO: Add support for Excel/CSV file JSON responses in WS.
-			renderSuccessJson(JsonUtil.parseFile(is))
+			renderSuccessJson(JsonUtil.parseInputStream(is))
 		} else {
 			renderErrorJson("Error: Preview must be in JSON format.")
 		}

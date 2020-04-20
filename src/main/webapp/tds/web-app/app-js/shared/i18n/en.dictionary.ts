@@ -136,8 +136,8 @@ export const en_DICTIONARY: Object = {
 			'FAVORITE': 'Favorite',
 			'NAME': 'Name',
 			'CREATED_BY': 'Created By',
-			'CREATED_ON': 'Created On',
-			'UPDATED_ON': 'Updated On',
+			'CREATED_ON': 'Date Created',
+			'UPDATED_ON': 'Last Updated',
 			'GLOBAL': 'Global',
 			'SHARED': 'Shared',
 			'SYSTEM': 'System',
@@ -282,8 +282,8 @@ export const en_DICTIONARY: Object = {
 		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
 	'ARCHITECTURE': {
-		'ARCHITECTURE_GRAPH': 'Architecture Graph',
-		'GOJSARCHITECTUREGRAPH': 'Go JS Architecture Graph',
+		'ARCHITECTURE_GRAPH': 'GoJS Architecture Graph',
+		'GOJSARCHITECTUREGRAPH': 'GoJS Architecture Graph',
 		'CONTROL_PANEL': 'Control Panel',
 		'LEGEND': 'Legend',
 		'FULLSCREEN': 'Fullscreen',
@@ -301,7 +301,7 @@ export const en_DICTIONARY: Object = {
 		'ASSET_CLASSES': 'Asset Classes: '
 	},
 	'DEPENDENCY_ANALYZER': {
-		'DEPENDENCY_ANALYZER': 'GO JS Dependency Analyzer',
+		'DEPENDENCY_ANALYZER': 'Angular Dependency Analyzer',
 		'DEPENDENCY_GROUPS': 'Dependency Groups',
 		'REGENERATE': 'Regenerate',
 		'BUNDLE': 'Bundle',
@@ -445,8 +445,8 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'NEWS': {
-		'EDIT_NEWS': 'News Edit',
-		'CREATE_NEWS': 'News Create'
+		'EDIT_NEWS': 'Event News Edit',
+		'CREATE_NEWS': 'Event News Create'
 	},
 	'LOGIN': {
 		'BACK_TO_LOGIN': 'Back to Login',
@@ -517,6 +517,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'PROVIDERS': 'Providers',
 	},
 	'MODEL': {
+		'MODELS': 'Model List',
 		'DELETE_MODEL' : 'Are you sure you want to delete this model? There is no undo for this action',
 	},
 	'TASK_MANAGER': {
@@ -530,6 +531,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
 		'CREATE_PREDECESSOR': 'Create new predecessor task',
 		'CREATE_SUCCESSOR': 'Create new successor task',
+		'ADD_PREDECESSOR': 'Add link to an existing predecessor task',
+		'ADD_SUCCESSOR': 'Add link to an existing successor task',
 		'EDIT': {
 			'REQUIRED_FIELD': 'Field is required',
 			'ERROR_DUPLICATE_ENTRIES': 'There are duplicate entries',

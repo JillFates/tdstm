@@ -22,6 +22,8 @@ export class TaskEditCreateModelHelper {
 	public STATUS = TaskStatus;
 	CREATE_PREDECESSOR = '';
 	CREATE_SUCCESSOR = '';
+	ADD_PREDECESSOR = '';
+	ADD_SUCCESSOR = '';
 
 	constructor(
 		userTimeZone: string,
@@ -37,6 +39,8 @@ export class TaskEditCreateModelHelper {
 		this.userCurrentDateTimeFormat =  `${userCurrentDateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 		this.CREATE_PREDECESSOR = this.translate.transform('TASK_MANAGER.CREATE_PREDECESSOR');
 		this.CREATE_SUCCESSOR = this.translate.transform('TASK_MANAGER.CREATE_SUCCESSOR');
+		this.ADD_PREDECESSOR = this.translate.transform('TASK_MANAGER.ADD_PREDECESSOR');
+		this.ADD_SUCCESSOR = this.translate.transform('TASK_MANAGER.ADD_SUCCESSOR');
 	}
 
 	/**
@@ -51,8 +55,13 @@ export class TaskEditCreateModelHelper {
 		this.model.dueDate = this.model.dueDate ? DateUtils.getDateFromFormat(this.model.dueDate, this.userCurrentDateFormat) : null;
 
 		// validate null access
-		if (this.model.event && this.model.event.id === null || this.model.event.id === undefined) {
-			this.model.event.id = '';
+		if (this.model && !this.model.event || !this.model.event.id) {
+			if (!this.model.event) {
+				this.model.event = {id: ''};
+			} else {
+				this.model.event.id = '';
+			}
+
 		}
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
@@ -327,7 +336,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: hardAssigned === No ? '0' : '1',
 			sendNotification: sendNotification ===  No ? '0' : '1',
 			isResolved: '0', /* ? */
-			instructionsLink: this.addProtocolToLabelURL(instructionLink),
+			instructionsLink: instructionLink,
 			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
 			mustVerify: '0',
 			override: '0',
@@ -412,7 +421,7 @@ export class TaskEditCreateModelHelper {
 			hardAssigned: hardAssigned === No ? '0' : '1',
 			sendNotification: sendNotification ===  No ? '0' : '1',
 			isResolved: '0', /* ? */
-			instructionsLink: this.addProtocolToLabelURL(instructionLink),
+			instructionsLink: instructionLink,
 			moveEvent: this.getEmptyStringIfNull(event && event.id).toString(),
 			mustVerify: '0',
 			override: '0',
@@ -506,28 +515,6 @@ export class TaskEditCreateModelHelper {
 		});
 
 		return ids;
-	}
-
-	/**
-	 * Add protocol in case is not present
-	 * @param {string} labelURL
-	 * @returns {string}
-	 */
-	private addProtocolToLabelURL(labelURL = ''): string {
-		const separator = '|';
-		let isJustURL = false;
-		let [label, url] = labelURL.split(separator);
-
-		if (!url) {
-			isJustURL = true;
-			url = label;
-		}
-		url = url.toLowerCase();
-		if (url && !url.startsWith('http://') && !url.startsWith('https://') ) {
-			url = 'http://' + url;
-		}
-
-		return isJustURL ? url : [label, url].join(separator);
 	}
 
 	/**

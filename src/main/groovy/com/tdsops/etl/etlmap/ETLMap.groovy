@@ -3,8 +3,8 @@ package com.tdsops.etl.etlmap
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.Element
-import org.codehaus.groovy.runtime.InvokerHelper
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
  * The intent of this class is to maintenance 'defineETLMap' command.<BR>
@@ -61,9 +61,11 @@ class ETLMap {
     void load(ETLProcessor processor) {
 
         processor.domain(this.domain)
+        List<Element> rowElements = []
         for (ETLMapInstruction instruction in instructions) {
-            loadInstruction(instruction, processor)
+            rowElements.add(createElementFromInstruction(instruction, processor))
         }
+        processor.result.loadElements(rowElements)
     }
 
     /**
@@ -73,17 +75,25 @@ class ETLMap {
      * <p>'transform with' command:If there are instances of {@code ETLMapTransform} in {@code ETLMapInstruction#transformations},
      * it uses that information to invoke transformation through the {@code InvokerHelper}</p>
      * <p>'load' command: Finally, it load instance of {@code Element} created through the
-     * {@code ETLProcessor#addElementLoaded}. NOTE: Peviously populate {@code Element#fieldDefinition}
+     * {@code ETLProcessor#addElementLoaded}. NOTE: Previously populate {@code Element#fieldDefinition}
      * to avoid the validation do it by {@code ETLProcessor}. This is to avoid twice invocation
-     * for the loopup of a domain property name.</p>
+     * for the lookup of a domain property name.</p>
      *
      * @param instruction an instance of {@code ETLMapInstruction}
      * @param processor an instance of {@code ETLProcessor}
      */
-    private void loadInstruction(ETLMapInstruction instruction, ETLProcessor processor) {
+    private Element createElementFromInstruction(ETLMapInstruction instruction, ETLProcessor processor) {
 
         // 1) 'extract' command
-        Element element = processor.doExtract(instruction.column.index)
+        //Object value = processor.currentRow.getDataSetElement(instruction.column.index)
+        Object value = processor.currentRow.dataSetValues[instruction.column.index]
+
+        Element element = new Element(
+                originalValue: value,
+                value: value,
+                processor: processor)
+
+        processor.applyGlobalTransformations(element)
 
         // 2) 'transform with' command
         for (ETLMapTransform transformation in instruction.transformations) {
@@ -99,9 +109,8 @@ class ETLMap {
 
         }
 
-        //3) 'load' command
         element.fieldDefinition = instruction.domainProperty
-        processor.addElementLoaded(element)
+        return element
     }
 
 }

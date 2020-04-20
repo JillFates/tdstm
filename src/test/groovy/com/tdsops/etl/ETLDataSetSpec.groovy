@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -17,6 +18,7 @@ import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
@@ -46,6 +48,20 @@ class ETLDataSetSpec extends ETLBaseSpec implements  DataTest, ServiceUnitTest<F
 	ETLFieldsValidator applicationFieldsValidator
 	Project GMDEMO
 	ETLFieldsValidator validator
+
+	Closure doWithSpring() {
+		{ ->
+			coreService(CoreService) {
+				grailsApplication = ref('grailsApplication')
+			}
+			fileSystemService(FileSystemService) {
+				coreService = ref('coreService')
+			}
+			applicationContextHolder(ApplicationContextHolder) { bean ->
+				bean.factoryMethod = 'getInstance'
+			}
+		}
+	}
 
 	def setupSpec() {
 		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model
@@ -162,16 +178,16 @@ class ETLDataSetSpec extends ETLBaseSpec implements  DataTest, ServiceUnitTest<F
 					""".stripIndent())
 
 		then: 'A column map is created'
-			etlProcessor.column('device id').index == 0
-			etlProcessor.column(0).label == 'device id'
+			etlProcessor.getColumnByName('device id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'device id'
 
 		and:
-			etlProcessor.column('model name').index == 1
-			etlProcessor.column(1).label == 'model name'
+			etlProcessor.getColumnByName('model name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'model name'
 
 		and:
-			etlProcessor.column('manufacturer name').index == 2
-			etlProcessor.column(2).label == 'manufacturer name'
+			etlProcessor.getColumnByName('manufacturer name').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'manufacturer name'
 
 		and:
 			etlProcessor.currentRowIndex == 1
@@ -200,15 +216,15 @@ class ETLDataSetSpec extends ETLBaseSpec implements  DataTest, ServiceUnitTest<F
 
 			// Auto detecting JSON headers.
 		and : 'A column map is created in alphanumeric order (Json Map)'
-			etlProcessor.column('device id').index == 0
-			etlProcessor.column(0).label == 'device id'
+			etlProcessor.getColumnByName('device id').index == 0
+			etlProcessor.getColumnByPosition(0).label == 'device id'
 
 		and:
-			etlProcessor.column('manufacturer name').index == 1
-			etlProcessor.column(1).label == 'manufacturer name'
+			etlProcessor.getColumnByName('manufacturer name').index == 1
+			etlProcessor.getColumnByPosition(1).label == 'manufacturer name'
 
 		and:
-			etlProcessor.column('model name').index == 2
-			etlProcessor.column(2).label == 'model name'
+			etlProcessor.getColumnByName('model name').index == 2
+			etlProcessor.getColumnByPosition(2).label == 'model name'
 	}
 }

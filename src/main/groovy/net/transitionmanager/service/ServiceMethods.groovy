@@ -239,6 +239,7 @@ trait ServiceMethods {
 	void throwSwitchNotHandledException(String switchValue) {
 		throwException(LogicException.class,
 				   'core.logic.switchCaseUnhandled',
+					[switchValue],
 				   "The programming logic encounted an unexpected switch value of ${switchValue}"
 		)
 	}

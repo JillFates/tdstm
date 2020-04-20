@@ -34,6 +34,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'taskManager', loadChildren: '../modules/taskManager/task-manager.module#TaskManagerModule'},
 	{path: 'export', loadChildren: '../modules/export/export.module#ExportModule'},
 	{path: 'manufacturer', loadChildren: '../modules/manufacturer/manufacturer.module#ManufacturerModule'},
+	{path: 'model', loadChildren: '../modules/model/model.module#ModelModule'},
 	{path: '**', redirectTo: 'auth' },
 ];
 

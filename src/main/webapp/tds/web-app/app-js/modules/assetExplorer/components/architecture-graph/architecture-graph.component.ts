@@ -18,6 +18,7 @@ import {
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {NgForm} from '@angular/forms';
 
 declare var jQuery: any;
 
@@ -28,10 +29,12 @@ declare var jQuery: any;
 export class ArchitectureGraphComponent implements OnInit {
 	// References
 	@ViewChild('graph', {static: false}) graph: any;
+	@ViewChild('archGraphForm', { static: false }) protected form: NgForm;
+
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 	public datasource: any[] = [{id: '', text: ''}];
-	public showControlPanel = false;
+	public showControlPanel = true;
 	public data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	public ctxOpts:  ITdsContextMenuOption;
 	public diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
@@ -61,56 +64,73 @@ export class ArchitectureGraphComponent implements OnInit {
 	public showLegend = false;
 	public assetIconsPath = ASSET_ICONS;
 	public toggleFullScreen = true;
+	public selectedAsset = null;
 
 	public assetItem;
+	private TAG_APPLICATION = 'appLbl';
+	private TAG_DATABASE = 'dbLbl';
+	private TAG_PHYSICAL_SERVER = 'svrLbl';
+	private TAG_VIRTUAL_SERVER = 'svrLbl';
+	private TAG_STORAGE_LOGICAL = 'slLbl';
+	private TAG_STORAGE_DEVICE = 'slpLbl';
+	private TAG_NETWORK_LOGICAl = 'netLbl';
+	private TAG_OTHER_DEVICES = 'oLbl';
 
 	public graphLabels = [
 		{
 			icon: 'application',
 			label: 'Application',
 			value: 'APPLICATION',
+			tagLabel: this.TAG_APPLICATION,
 			checked: false
 		},
 		{
 			icon: 'database',
 			label: 'Database',
 			value: 'DATABASE',
+			tagLabel: this.TAG_DATABASE,
 			checked: false
 		},
 		{
 			icon: 'serverPhysical',
 			label: 'Physical Server',
 			value: 'physical server',
+			tagLabel: this.TAG_PHYSICAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'serverVirtual',
 			label: 'Virtual Server',
 			value: 'Device',
+			tagLabel: this.TAG_VIRTUAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'storageLogical',
 			label: 'Logical Storage',
 			value: 'Logical Storage',
+			tagLabel: this.TAG_STORAGE_LOGICAL,
 			checked: false
 		},
 		{
 			icon: 'storagePhysical',
 			label: 'Storage Device',
 			value: 'Storage Device',
+			tagLabel: this.TAG_STORAGE_DEVICE,
 			checked: false
 		},
 		{
 			icon: 'networkLogical',
 			label: 'Network Device',
 			value: 'Network Device',
+			tagLabel: this.TAG_NETWORK_LOGICAl,
 			checked: false
 		},
 		{
 			icon: 'other',
 			label: 'Other Device',
 			value: 'DEVICE',
+			tagLabel: this.TAG_OTHER_DEVICES,
 			checked: false
 		}
 	];
@@ -154,15 +174,47 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * A call to the Architecture graph service for getting the default graph data for the current user
 	 */
 	getArchitectureGraphPreferences() {
-		this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
-			this.dataForSelect = res.assetClassesForSelect;
-			this.levelsUp = +res.graphPrefs.levelsUp;
-			this.levelsDown = +res.graphPrefs.levelsDown;
-			this.showCycles = res.graphPrefs.showCycles;
-			this.appLbl = res.graphPrefs.appLbl;
-			this.labelOffset = res.graphPrefs.labelOffset;
-			this.assetClasses = res.graphPrefs.assetClasses;
+		this.architectureGraphService
+			.getArchitectureGraphPreferences()
+			.subscribe((res: any) => {
+				this.dataForSelect = res.assetClassesForSelect;
+				this.levelsUp = +res.graphPrefs.levelsUp;
+				this.levelsDown = +res.graphPrefs.levelsDown;
+				this.showCycles = res.graphPrefs.showCycles;
+				this.appLbl = res.graphPrefs.appLbl;
+				this.labelOffset = res.graphPrefs.labelOffset;
+				this.assetClasses = res.graphPrefs.assetClasses;
+				// this.assetId = res.graphPrefs.assetClass;
+				// this.asset = res.graphPrefs.selectedAsset;
+				this.selectedAsset = res.graphPrefs.selectedAsset;
+				this.assetClass = res.graphPrefs.assetClass;
+				this.assetId = this.selectedAsset && this.selectedAsset.id || '';
+				this.loadData();
+
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_DATABASE);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_PHYSICAL_SERVER);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_VIRTUAL_SERVER);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_STORAGE_LOGICAL);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_STORAGE_DEVICE);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_NETWORK_LOGICAl);
+				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_OTHER_DEVICES);
 		});
+	}
+
+	/**
+	 * Based on the preference value, check/uncheck the label item
+	 * @param preferences current preference array
+	 * @param label  Label of the preference being evaluated
+	 */
+	markAsPreferenceChecked(preferences: any, label: string): void {
+		if (preferences[label] === 'true') {
+			this.graphLabels.forEach((item: any) => {
+				if (item.tagLabel === label) {
+					item.checked = true;
+				}
+			});
+		}
 	}
 
 	/**
@@ -179,12 +231,21 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	/**
 	 *  Sets the selected asset ID for retrieving it's graph data
+	 *  When asset is cleared out reset the current assets selected
 	 */
 	onAssetSelected(event) {
 		if (event) {
 			this.assetId = event.id;
+			this.selectedAsset = event;
+			// this.asset = event;
 			this.loadData();
+		} else {
+			// reset assets selected
+			this.assetId = null;
+			this.selectedAsset = {id: '', text: ''};
+			// this.asset = this.selectedAsset;
 		}
+		this.form.controls['assetClass'].markAsDirty();
 	}
 
 	/**
@@ -193,21 +254,27 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param setInitialAsset When true set the initial value for the selected asset
 	 * */
 	loadData(setInitialAsset = false): void {
-		this.architectureGraphService
-			.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
+		if (this.assetId) {
+			this.architectureGraphService
+				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
 					this.updateNodeData(this.currentNodesData, false);
 					if (setInitialAsset && res && res.nodes) {
 						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
 						if (selectedAsset) {
-							this.asset = {
+							this.selectedAsset = {
 								id: selectedAsset.id,
 								text: selectedAsset.name,
 							};
+							// this.asset = {
+							// 	id: selectedAsset.id,
+							// 	text: selectedAsset.name,
+							// };
 						}
 					}
 				});
+		}
 	}
 
 	/**
@@ -226,6 +293,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	extractLevelsUp() {
 		if (this.levelsUp > 0) {
 			this.levelsUp--;
+			this.form.controls.levelsUp.markAsDirty();
 			this.loadData();
 		}
 	}
@@ -235,6 +303,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	addLevelsUp() {
 		this.levelsUp++;
+		this.form.controls.levelsUp.markAsDirty();
 		this.loadData();
 	}
 
@@ -243,6 +312,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	addLevelsDown() {
 		this.levelsDown++;
+		this.form.controls.levelsDown.markAsDirty();
 		this.loadData();
 	}
 
@@ -252,6 +322,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	extractLevelsDown() {
 		if (this.levelsDown > 0) {
 			this.levelsDown--;
+			this.form.controls.levelsDown.markAsDirty();
 			this.loadData();
 		}
 	}
@@ -319,16 +390,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param index of the selected checkbox
 	 */
 	updateGraphLabels(index) {
-		this.toggleGraphLabel(index);
-		this.updateNodeData(this.currentNodesData, false);
-	}
-
-	/**
-	 * Check/uncheck the value for an specific graph label
-	 * @param index  Index of the array to be modified
-	 */
-	toggleGraphLabel(index: number): void {
-		this.graphLabels[index].checked = !this.graphLabels[index].checked;
+		if (this.assetId) {
+			this.updateNodeData(this.currentNodesData, false);
+		}
 	}
 
 	/**
@@ -340,7 +404,9 @@ export class ArchitectureGraphComponent implements OnInit {
 	removeNodeNamesForNotSelectedCategories(data: any): any {
 		let clonedNodes = JSON.parse(JSON.stringify(data));
 
-		const categories = this.getSelectedCategories(); // this.categories || [];
+		const categories = this.getSelectedCategories() // this.categories || [];
+					.map( label => label.value.toUpperCase());
+
 		clonedNodes.nodes.forEach(node => {
 			// Clear the node name if the assetClass is not included on the categories selected
 			if (!categories.includes(node.assetClass)) {
@@ -356,8 +422,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	getSelectedCategories(): any[] {
 		return this.graphLabels
-			.filter( label => label.checked)
-			.map( label => label.value.toUpperCase());
+			.filter( label => label.checked);
 	}
 
 	/**
@@ -385,9 +450,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
-		if (this.assetId) {
-			this.loadData();
-		}
+		this.loadData();
 		this.graph.showFullGraphBtn = false;
 		this.graph.nodeMove = false;
 	}
@@ -396,19 +459,37 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Save the preferences changed on the control panel
 	*/
 	savePreferences() {
-		if (this.categories) {
-			const valueData = {
-				assetClass: 'ALL',
-				levelsUp: this.levelsUp,
-				levelsDown: this.levelsDown,
-				showCycles: this.showCycles,
-				appLbl: this.categories.length > 0
-			};
-			this.preferenceService.setPreference('ARCH_GRAPH', JSON.stringify(valueData)).subscribe( res => {
+		const valueData = {
+			assetClass: this.assetClass,
+			levelsUp: this.levelsUp,
+			levelsDown: this.levelsDown,
+			showCycles: this.showCycles,
+			selectedAsset: this.selectedAsset,
+		};
+
+		const selectedLabels = this.getSelectedCategories()
+			.map((item: any) => {
+				valueData[item.tagLabel] = 'true';
+			});
+
+		this.preferenceService
+			.setPreference('ARCH_GRAPH', JSON.stringify({...valueData, ...selectedLabels}))
+			.subscribe( res => {
+				this.resetForm();
 				if (res.status === 'success') {
 					console.log('Preferences saved correctly');
 				}
 			})
+	}
+
+	/**
+	 * Reset the form controls int the pristine state
+	 */
+	private resetForm() {
+		for (let name in this.form.controls) {
+			if (name) {
+				this.form.controls[name].markAsPristine();
+			}
 		}
 	}
 

@@ -65,6 +65,11 @@
 	.task-summary .k-grid
 		max-height: 800px
 		min-height: 200px
+		.task,
+		.est-finish,
+		.status-column
+			cursor: initial
+
 	.k-grid
 		//margin-top: 24px
 		//max-height: 400px
@@ -80,7 +85,6 @@
 			text-decoration: none
 			cursor: pointer
 		.k-grid-content
-			font-family: helvetica, arial, sans-serif
 			font-size: 12px
 		tr.k-detail-row > .k-hierarchy-cell
 			border-right: 0
@@ -108,6 +112,11 @@
 		clr-icon
 			position: relative
 			top: 1px
+	.tds-table
+		table
+			tbody
+				tr
+					cursor: auto !important
 
 
 

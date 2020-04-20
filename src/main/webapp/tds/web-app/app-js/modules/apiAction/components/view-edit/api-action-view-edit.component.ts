@@ -273,6 +273,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			super.onSetUpFocus();
 		});
 	}
 
@@ -462,6 +463,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.commonFieldSpecs = result;
 		if (this.modalType !== ActionType.CREATE) {
 			this.getParameters();
+			this.parameterList.push(null);
 		}
 	}
 
@@ -473,6 +475,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 				(result: any) => {
 					if (result) {
+						this.dataSignature = JSON.stringify(this.apiActionModel);
 						super.onAcceptSuccess(result);
 					}
 				},

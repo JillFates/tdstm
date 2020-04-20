@@ -1,6 +1,8 @@
 // Angular
 import {Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
 import {NgForm, Form} from '@angular/forms';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'tds-plan-versus-status',
@@ -14,6 +16,8 @@ export class PlanVersusStatusComponent implements OnChanges {
 	@Output() changeProgress: EventEmitter<number> = new EventEmitter<number>();
 	public progress = 0;
 	public showEditControl = false;
+
+	constructor(private permissionService: PermissionService) { }
 
 	/**
 	 * On host input changes get the reference to the curren progress
@@ -45,7 +49,7 @@ export class PlanVersusStatusComponent implements OnChanges {
 	 * On click chart, toggle the edit controls
 	*/
 	public onClickChart() {
-		if (!this.isDisabled) {
+		if (!this.isDisabled && this.isEditAvailable()) {
 			this.showEditControl = !this.showEditControl;
 		}
 	}
@@ -71,5 +75,9 @@ export class PlanVersusStatusComponent implements OnChanges {
 		}
 
 		return progress;
+	}
+
+	protected isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.EventEdit);
 	}
 }

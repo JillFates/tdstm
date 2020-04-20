@@ -150,9 +150,9 @@ export class APIActionService {
 	 */
 	getParameters(model: APIActionModel): Observable<APIActionParameterModel[]> {
 		return new Observable(observer => {
+			let result: Array<any> = [];
 			if (model.methodParams && model.methodParams !== null && model.methodParams !== '') {
-				let parameterList = JSON.parse(model.methodParams);
-				parameterList.forEach( (param) => {
+				JSON.parse(model.methodParams).forEach( (param) => {
 					if (param.property && param.property.field) {
 						param.property = param.property.field;
 					}
@@ -161,10 +161,16 @@ export class APIActionService {
 					}
 					delete param.sourceFieldList;
 					delete param.currentFieldList;
+					result.push(param);
 				});
-
-				observer.next(parameterList);
+				observer.next(result);
 			}
+			// double check parameter list doesn't go out with null empty items, that causes form go nuts.
+			result.forEach( (param, index) => {
+				if (!param) {
+					result.splice(index, 1);
+				}
+			});
 			observer.complete();
 		});
 	}
@@ -268,18 +274,23 @@ export class APIActionService {
 
 		if (parameterList && parameterList.length > 0) {
 			let requestParameterListData = R.clone(parameterList);
-			requestParameterListData.forEach( (param) => {
-				if (param.fieldName && param.fieldName.field) {
-					param.fieldName = param.fieldName.field;
+			requestParameterListData.forEach( (param, index) => {
+				if (param) {
+					if (param.fieldName && param.fieldName.field) {
+						param.fieldName = param.fieldName.field;
+					}
+					if (param.context && param.context.assetClass) {
+						param.context = param.context.assetClass;
+					}
+					if (param.context === DOMAIN.COMMON) {
+						param.context = 'ASSET';
+					}
+					delete param.sourceFieldList;
+					delete param.currentFieldList;
+				} else {
+					// on this point param should be empty at all so we need to clean that data from the paramList (to prevent endpoint NPE issues)
+					requestParameterListData.splice(index, 1);
 				}
-				if (param.context && param.context.assetClass) {
-					param.context = param.context.assetClass;
-				}
-				if (param.context === DOMAIN.COMMON) {
-					param.context = 'ASSET';
-				}
-				delete param.sourceFieldList;
-				delete param.currentFieldList;
 			});
 			postRequest['methodParams'] = JSON.stringify(requestParameterListData);
 		}

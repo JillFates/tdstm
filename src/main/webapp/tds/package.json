@@ -75,7 +75,7 @@
 		"ramda": "0.25.0",
 		"rxjs": "6.4.0",
 		"rxjs-compat": "6.4.0",
-		"tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.1.32.tgz",
+		"tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.1.44.tgz",
 		"zone.js": "0.10.0"
 	},
 	"devDependencies": {
@@ -96,6 +96,7 @@
 		"browserify": "16.2.3",
 		"canonical-path": "0.0.2",
 		"concurrently": "3.5.1",
+		"copy-webpack-plugin": "5.1.1",
 		"gulp": "4.0.2",
 		"gulp-autoprefixer": "5.0.0",
 		"gulp-sass": "4.0.1",

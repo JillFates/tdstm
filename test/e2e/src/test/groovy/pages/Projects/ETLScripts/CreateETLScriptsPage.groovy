@@ -15,12 +15,12 @@ class CreateETLScriptsPage extends Page{
     }
 
     static content = {
-        modaltitle(required:false) { $("div", class:"modal-header").find("h4" , class:"modal-title")[0]}
+        modaltitle(required:false) { $("div", class:"modal-header").find("h3" , class:"modal-title")[0]}
         providerDdownName { $("label", for:"dataScriptProvider")}
         datascriptName { $("label", for:"dataScriptName")}
         datascriptDesc { $("label", for:"dataScriptDescription")}
-        datascriptSaveBtn  { $("button", class:"btn btn-primary pull-left", type:"button")}
-        datascriptXIcon {$("div", class:"modal-header").find("button","aria-label":"Close", class:"close")[0]}
+        datascriptSaveBtn  { $('clr-icon[shape="floppy"]').closest("button")[0]}
+        datascriptXIcon { $('clr-icon[shape="close"]').closest("button")[0]}
         providerDropdown {$('#dataScriptProvider span.k-select')}
 
         //This gives you the latest created provider

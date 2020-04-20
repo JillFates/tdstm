@@ -492,4 +492,23 @@ class StringUtil {
 		return UUID.randomUUID()
 	}
 
+	/**
+	 * Join all the given arguments into a single string using the given separator.
+	 * ignoring null or white space elements. i.e.:
+	 * join(['Hello', null, '', '    ', 'World', ' '], ',') == "Hello,World"
+	 * @param args - a list of strings to join
+	 * @param joinStr - a separator
+	 * @return a string with the values appropriately joined.
+	 */
+	static String join (Collection<String> args, String joinStr=' ') {
+		List<String> strings = []
+		for (String arg in args) {
+			String trimmed = arg?.trim()
+			if (trimmed) {
+				strings.add(trimmed)
+			}
+		}
+		return strings.join(joinStr)
+	}
+
 }

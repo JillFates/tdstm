@@ -22,11 +22,11 @@ class ModelConnector {
 	static belongsTo = [model: Model]
 
 	static constraints = {
-		connector blank: false, unique: 'model'
+		connector blank: false
 		connectorPosX nullable: true
 		connectorPosY nullable: true
 		dateCreated nullable: true
-		label nullable: true, unique: 'model'
+		label nullable: true
 		labelPosition nullable: true
 		lastModified nullable: true
 		option nullable: true

@@ -1,0 +1,430 @@
+<div class="model-view-edit-component">
+    <form
+            name="modelForm"
+            role="form"
+            data-toggle="validator"
+            #modelForm="ngForm"
+            class="form-horizontal left-alignment"
+    >
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="modelManufacturer" class="col-sm-4 control-label"
+                                [ngClass]="{'required-field': modalType !== actionTypes.VIEW}">
+                            Manufacturer:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <clr-select-container>
+                                <select clrSelect id="modelManufacturer" name="modelManufacturer" (change)="onChangeManufacturer($event)" required [(ngModel)]="manufacturerId">
+                                    <option *ngFor="let item of manufacturerList" value="{{item.id}}">{{item.name}}</option>
+                                </select>
+                            </clr-select-container>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+                            <label class="control-label label-detail">
+                                {{manufacturerName}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelManufacturer" class="col-sm-4 control-label">
+                            AKA:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <div class="clr-row" *ngFor="let item of aliasControls; let i = index">
+                                <div class="clr-col-9">
+                                    <input clrInput type="text" value="{{item.name}}" style="width: 100%;" (focusout)="focusOutAlias($event, item, i)"/>
+                                    <span #aliasSpan style="color: red; font-weight: bold; display: none">Alias name must be unique</span
+                                    >
+                                </div>
+                                <div class="clr-col-3">
+                                    <button class="btn btn-icon btn-danger btn-sm" (click)="removeAlias(i, item.id)"><clr-icon shape="times"></clr-icon></button>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-sm" (click)="addAlias()">Add AKA</button>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+                            <label class="control-label label-detail">{{modelAkasDisplay}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelUSize" class="col-sm-4 control-label">
+                            Usize:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <clr-select-container>
+                                <select clrSelect id="modelUSize" name="modelUSize" [(ngModel)]="modelModel.usize">
+                                    <option *ngFor="let item of usizeList" value="{{item}}">{{item}}</option>
+                                </select>
+                            </clr-select-container>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+                            <label class="control-label label-detail">{{modelModel.usize}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelWeight" class="col-sm-4 control-label">
+                            Weight (lbs):
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="number" id="modelWeight" name="modelWeight" class="form-control"
+                                   [(ngModel)]="modelModel.weight"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.weight}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelProductLine" class="col-sm-4 control-label">
+                            Product Line:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelProductLine" name="modelProductLine" class="form-control"
+                                   [(ngModel)]="modelModel.productLine"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.productLine}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelEndOfLifeDate" class="col-sm-4 control-label">
+                            End of Life Date:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrDate type="date" id="modelEndOfLifeDate" name="modelEndOfLifeDate" class="form-control"
+                                   [ngModel]="modelModel.endOfLifeDate | date: dateFormat"
+                                   (ngModelChange)="modelModel.endOfLifeDate = $event"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.endOfLifeDate | date: dateFormat}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelCPUType" class="col-sm-4 control-label">
+                            CPU Type:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelCPUType" name="modelCPUType" class="form-control"
+                                   [(ngModel)]="modelModel.cpuType"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.cpuType}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelCPUCount" class="col-sm-4 control-label">
+                            CPU Count:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="number" id="modelCPUCount" name="modelCPUCount" class="form-control"
+                                   [(ngModel)]="modelModel.cpuCount"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.cpuCount}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelPower" class="col-sm-4 control-label">
+                            Power (max/design/avg):
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <input clrInput type="number" id="modelPowerNameplate" name="modelPowerNameplate" class="form-control"
+                                           [(ngModel)]="modelModel.powerNameplate"/>
+                                </div>
+                                <div class="col-sm-3">
+                                    <input clrInput type="number" id="modelPowerDesign" name="modelPowerDesign" class="form-control"
+                                           [(ngModel)]="modelModel.powerDesign"/>
+                                </div>
+                                <div class="col-sm-3">
+                                    <input clrInput type="number" id="modelPowerUse" name="modelPowerUse" class="form-control"
+                                           [(ngModel)]="modelModel.powerUse"/>
+                                </div>
+                                <div class="col-sm-3">
+                                    <clr-select-container style="display: inline-block">
+                                        <select clrSelect id="powerTypeEdit" name="powerTypeEdit" [(ngModel)]="powerType">
+                                            <option *ngFor="let item of powerTypes" value="{{item}}">{{item}}</option>
+                                        </select>
+                                    </clr-select-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+                            <label class="control-label label-detail power-label">{{modelModel.powerNameplate}}</label>
+                            <label class="control-label label-detail power-label">{{modelModel.powerDesign}}</label>
+                            <label class="control-label label-detail power-label">{{modelModel.powerUse}}</label>
+                            <label class="control-label label-detail power-label">{{powerType}}</label>
+<!--                            <clr-select-container style="display: inline-block">-->
+<!--                                <select clrSelect id="powerType" name="powerType" disabled>-->
+<!--                                    <option *ngFor="let item of powerTypes" value="{{item}}">{{item}}</option>-->
+<!--                                </select>-->
+<!--                            </clr-select-container>-->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelRoomObject" class="col-sm-4 control-label">
+                            Room Object:
+                        </label>
+                        <div class="col-sm-8">
+                            <input clrCheckbox type="checkbox" id="modelRoomObject" name="modelRoomObject" class="form-control"
+                                   [(ngModel)]="modelModel.roomObject" [disabled]="modalType === actionTypes.VIEW"/>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="modalType === actionTypes.VIEW">
+                        <label class="col-sm-4 control-label">
+                            Created By:
+                        </label>
+                        <div class="col-sm-8">
+                            <label class="control-label label-detail">{{modelCreatedBy}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="modalType === actionTypes.VIEW" >
+                        <label class="col-sm-4 control-label">
+                            Validated By:
+                        </label>
+                        <!--<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelValidatedBy" name="modelValidatedBy" class="form-control"
+                                   [(ngModel)]="modelModel.validatedBy"/>
+                        </div>-->
+                        <div class="col-sm-8">
+                            <label class="control-label label-detail">{{modelValidatedBy}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="modalType === actionTypes.VIEW">
+                        <label class="col-sm-4 control-label">
+                            Updated By:
+                        </label>
+                        <!--<div class="col-sm-8">
+                            <input clrInput type="text" id="modelUpdatedBy" name="modelUpdatedBy" class="form-control"
+                                   [(ngModel)]="modelModel.updatedBy"/>
+                        </div>-->
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelUpdatedBy}}</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="modelName"
+                                class="col-sm-4 control-label"
+                                [ngClass]="{'required-field': modalType !== actionTypes.VIEW}">
+                            Model Name:
+                        </label>
+                        <div
+                                class="col-sm-8"
+                                *ngIf="modalType !== actionTypes.VIEW"
+                        >
+                            <input
+                                    clrInput
+                                    #modelNameElement
+                                    type="text"
+                                    id="modelName"
+                                    name="modelName"
+                                    class="form-control"
+                                    [(ngModel)]="modelModel.modelName"
+                                    required
+                                    [ngClass]="{
+									'has-error': !modelForm.form.valid
+								}"
+                            />
+                            <span
+                                    *ngIf="!isUnique && !isEmptyValue()"
+                                    style="color: red; font-weight: bold;"
+                            >Model name must be unique</span
+                            >
+                        </div>
+                        <div
+                                class="col-sm-8"
+                                *ngIf="modalType === actionTypes.VIEW"
+                        >
+                            <label class="control-label label-detail">{{
+                                modelModel.modelName
+                                }}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="assetType" class="col-sm-4 control-label">
+                            Asset Type:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <clr-select-container>
+                                <select clrSelect id="assetType" name="assetType" [(ngModel)]="modelModel.assetType">
+                                    <option *ngFor="let item of assetTypeList" value="{{item}}">{{item}}</option>
+                                </select>
+                            </clr-select-container>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+                            <label class="control-label label-detail">{{modelModel.assetType}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelName" class="col-sm-4 control-label">
+                            Dimensions (inches):
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <input clrInput type="number" id="modelHeight" name="modelHeight" class="form-control"
+                                           [(ngModel)]="modelModel.height"/>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input clrInput type="number" id="modelWidth" name="modelWidth" class="form-control"
+                                           [(ngModel)]="modelModel.width"/>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input clrInput type="number" id="modelDepth" name="modelDepth" class="form-control"
+                                           [(ngModel)]="modelModel.depth"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+                            <label class="control-label label-detail power-label">H:{{modelModel.height}}</label>
+                            <label class="control-label label-detail power-label">W:{{modelModel.width}}</label>
+                            <label class="control-label label-detail power-label">D:{{modelModel.depth}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelLayoutStyle" class="col-sm-4 control-label">
+                            Layout Style:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelLayoutStyle" name="modelLayoutStyle" class="form-control"
+                                   [(ngModel)]="modelModel.layoutStyle"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.layoutStyle}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelFamily" class="col-sm-4 control-label">
+                            Model Family:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelFamily" name="modelFamily" class="form-control"
+                                   [(ngModel)]="modelModel.modelFamily"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.modelFamily}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelEndOfLifeStatus" class="col-sm-4 control-label">
+                            End of Life Status:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelEndOfLifeStatus" name="modelEndOfLifeStatus" class="form-control"
+                                   [(ngModel)]="modelModel.endOfLifeStatus"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.endOfLifeStatus}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelMemorySize" class="col-sm-4 control-label">
+                            Memory Size:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="number" id="modelMemorySize" name="modelMemorySize" class="form-control"
+                                   [(ngModel)]="modelModel.memorySize"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.memorySize}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelStorageSize" class="col-sm-4 control-label">
+                            Storage Size:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="number" id="modelStorageSize" name="modelStorageSize" class="form-control"
+                                   [(ngModel)]="modelModel.storageSize"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.storageSize}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelDescription" class="col-sm-4 control-label">
+                            Notes:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelDescription" name="modelDescription" class="form-control"
+                                   [(ngModel)]="modelModel.description"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.description}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelSourceTDS" class="col-sm-4 control-label">
+                            Source TDS:
+                        </label>
+                        <div class="col-sm-8">
+                            <input clrCheckbox type="checkbox" id="modelSourceTDS" name="modelSourceTDS" class="form-control"
+                                   [(ngModel)]="sourceTDS" [disabled]="modalType === actionTypes.VIEW"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelSourceURL" class="col-sm-4 control-label">
+                            Source URL:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <input clrInput type="text" id="modelSourceURL" name="modelSourceURL" class="form-control"
+                                   [(ngModel)]="modelModel.sourceURL"/>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW" >
+                            <label class="control-label label-detail">{{modelModel.sourceURL}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelStatus" class="col-sm-4 control-label">
+                            Model Status:
+                        </label>
+                        <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+                            <clr-select-container>
+                                <select clrSelect id="modelStatus" name="modelStatus" [(ngModel)]="modelModel.modelStatus">
+                                    <option *ngFor="let item of ['new', 'full', 'valid']" value="{{item}}">{{item}}</option>
+                                </select>
+                            </clr-select-container>
+                        </div>
+                        <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+                            <label class="control-label label-detail">{{modelModel.modelStatus}}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <button *ngIf="modalType !== actionTypes.VIEW" class="btn btn-primary btn-sm" (click)="addConnector()">Add Connector</button>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th *ngIf="modalType !== actionTypes.VIEW"></th>
+                            <th>Type</th>
+                            <th>Label</th>
+                            <th>Label Position</th>
+                            <th>Conn Pos X</th>
+                            <th>Conn Pos Y</th>
+                        </tr>
+                        </thead>
+                        <tbody #modelConnectorTableBody>
+                        <tr *ngFor="let connector of modelConnectorsControls">
+                            <td *ngIf="modalType === actionTypes.EDIT">
+                                <clr-icon shape="times" style="cursor:pointer; color: red;"
+                                          (click)="removeConnector(connector)"></clr-icon>
+                            </td>
+                            <td>{{connector.type}}</td>
+                            <td>{{connector.label}}</td>
+                            <td>{{connector.labelPosition}}</td>
+                            <td>{{connector.connectorPosX}}</td>
+                            <td>{{connector.connectorPosY}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

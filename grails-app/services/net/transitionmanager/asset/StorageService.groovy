@@ -23,7 +23,7 @@ class StorageService implements ServiceMethods {
 	 */
 	Map getModelForShow(Project project, Files storage, Map params) {
 		Map commonModel = assetEntityService.getCommonModel(false, project, storage, 'Files', params)
-		List fields =  dataviewService.fetch(DataViewMap.SERVERS.id).toMap(securityService.currentPersonId).schema.columns.collect{it.label}
+		List fields =  dataviewService.fetch(DataViewMap.SERVERS.id).toMap(project, securityService.userLoginPerson).schema.columns.collect{it.label}
 
 		return [
 				   filesInstance: storage,

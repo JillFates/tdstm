@@ -74,11 +74,11 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 		let today = new Date();
 		this.projectModel = new ProjectModel();
 		this.defaultModel = {
-			clientId: 0,
+			clientId: null,
 			projectName: '',
 			description: '',
 			startDate: new Date(),
-			completionDate: new Date(today.setMonth(today.getMonth() + 2)),
+			completionDate: new Date(today.setMonth(today.getMonth() + 12)),
 			partners: [],
 			projectLogo: '',
 			projectManagerId: 0,

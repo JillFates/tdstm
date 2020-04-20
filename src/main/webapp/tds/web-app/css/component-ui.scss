@@ -13,7 +13,15 @@
 	}
 }
 
-// override of the grid page-height, calculation totally valid and free to replicate on any particular grid neeeded
+// override of the grid page-height, calculation totally valid and free to replicate on any particular grid needed
 .task-list kendo-grid.page-height {
   --subtraction-height: 325px;
+}
+
+.align-ellipses-center {
+	text-align: center;
+}
+
+.pad-ellipses-center {
+	padding-left: 4px;
 }

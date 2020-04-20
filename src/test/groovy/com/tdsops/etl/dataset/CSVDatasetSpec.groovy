@@ -1,5 +1,6 @@
 package com.tdsops.etl.dataset
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLBaseSpec
@@ -7,10 +8,10 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.Element
-import com.tdsops.etl.FieldResult
-import com.tdsops.etl.RowResult
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.testing.gorm.DataTest
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.project.Project
 import spock.lang.See
 
@@ -19,6 +20,20 @@ class CSVDatasetSpec extends ETLBaseSpec implements DataTest {
     DebugConsole debugConsole
     Project GMDEMO
     ETLFieldsValidator validator
+
+    Closure doWithSpring() {
+        { ->
+            coreService(CoreService) {
+                grailsApplication = ref('grailsApplication')
+            }
+            fileSystemService(FileSystemService) {
+                coreService = ref('coreService')
+            }
+            applicationContextHolder(ApplicationContextHolder) { bean ->
+                bean.factoryMethod = 'getInstance'
+            }
+        }
+    }
 
     def setup() {
         GMDEMO = Mock(Project)
@@ -52,16 +67,16 @@ class CSVDatasetSpec extends ETLBaseSpec implements DataTest {
 			""".stripIndent())
 
         then: 'A column map is created'
-            etlProcessor.column('name').index == 0
-            etlProcessor.column(0).label == 'name'
+            etlProcessor.getColumnByName('name').index == 0
+            etlProcessor.getColumnByPosition(0).label == 'name'
 
         and:
-            etlProcessor.column('cpu').index == 1
-            etlProcessor.column(1).label == 'cpu'
+            etlProcessor.getColumnByName('cpu').index == 1
+            etlProcessor.getColumnByPosition(1).label == 'cpu'
 
         and:
-            etlProcessor.column('description').index == 2
-            etlProcessor.column(2).label == 'description'
+            etlProcessor.getColumnByName('description').index == 2
+            etlProcessor.getColumnByPosition(2).label == 'description'
 
         and:
             etlProcessor.currentRowIndex == 1
@@ -100,16 +115,16 @@ class CSVDatasetSpec extends ETLBaseSpec implements DataTest {
 			""".stripIndent())
 
         then: 'A column map is created'
-            etlProcessor.column('name').index == 0
-            etlProcessor.column(0).label == 'name'
+            etlProcessor.getColumnByName('name').index == 0
+            etlProcessor.getColumnByPosition(0).label == 'name'
 
         and:
-            etlProcessor.column('cpu').index == 1
-            etlProcessor.column(1).label == 'cpu'
+            etlProcessor.getColumnByName('cpu').index == 1
+            etlProcessor.getColumnByPosition(1).label == 'cpu'
 
         and:
-            etlProcessor.column('description').index == 2
-            etlProcessor.column(2).label == 'description'
+            etlProcessor.getColumnByName('description').index == 2
+            etlProcessor.getColumnByPosition(2).label == 'description'
 
         and:
             etlProcessor.currentRowIndex == 3
@@ -240,31 +255,31 @@ class CSVDatasetSpec extends ETLBaseSpec implements DataTest {
                     }
 
                     data.size() == 2
-                    assertWith(data[0], RowResult) {
+                    assertWith(data[0]) {
                         op == ImportOperationEnum.INSERT.toString()
                         rowNum == 1
                         fields.keySet().size() == 2
-                        assertWith(fields.appVendor, FieldResult) {
+                        assertWith(fields.appVendor) {
                             value == 'Microsoft'
                             originalValue == 'Microsoft'
                             init == null
                         }
-                        assertWith(fields.appTech, FieldResult) {
+                        assertWith(fields.appTech) {
                             value == '(xlsx updated)'
                             originalValue == '(xlsx updated)'
                             init == null
                         }
                     }
 
-                    assertWith(data[1], RowResult) {
+                    assertWith(data[1]) {
                         op == ImportOperationEnum.INSERT.toString()
                         rowNum == 2
                         fields.keySet().size() == 2
-                        assertWith(fields.appVendor, FieldResult) {
+                        assertWith(fields.appVendor) {
                             value == 'Mozilla'
                             originalValue == 'Mozilla'
                         }
-                        assertWith(fields.appTech, FieldResult) {
+                        assertWith(fields.appTech) {
                             value == 'NGM'
                             originalValue == 'NGM'
                             init == null
@@ -312,26 +327,26 @@ class CSVDatasetSpec extends ETLBaseSpec implements DataTest {
                     fieldNames == ['id', 'assetName', 'description', 'sme'] as Set
 
                     data.size() == 2
-                    assertWith(data[0], RowResult) {
+                    assertWith(data[0]) {
                         op == ImportOperationEnum.INSERT.toString()
                         rowNum == 1
                         fields.keySet().size() == 2
-                        assertWith(fields.id, FieldResult) {
+                        assertWith(fields.id) {
                             value == '123'
                             originalValue == '123'
                             init == null
                         }
-                        assertWith(fields.assetName, FieldResult) {
+                        assertWith(fields.assetName) {
                             value == 'Foo'
                             originalValue == 'Foo'
                             init == null
                         }
-                        assertWith(fields.description, FieldResult) {
+                        assertWith(fields.description) {
                             value == 'This, That, and the other'
                             originalValue == 'This, That, and the other'
                             init == null
                         }
-                        assertWith(fields.sme, FieldResult) {
+                        assertWith(fields.sme) {
                             value == 'Jim Beam'
                             originalValue == 'Jim Beam'
                             init == null

@@ -512,7 +512,10 @@ class UrlMappings {
 
 		"/ws/model" {
 			controller = "wsModel"
-			action = [POST: "save"]
+			action = [
+					POST: "save",
+					PUT: "update"
+			]
 		}
 
 		"/ws/model/$id" {
@@ -628,6 +631,16 @@ class UrlMappings {
 		"/ws/timeline/$id/timeline" {
 			controller = "wsTimeLine"
 			action = [GET:"timeline"]
+		}
+
+		"/ws/taskGraph/taskHighlightOptions" {
+			controller = "wsTaskGraph"
+			action = [GET: "taskHighlightOptions"]
+		}
+
+		"/ws/taskGraph/taskSearch" {
+			controller = "wsTaskGraph"
+			action = [POST: "taskSearch"]
 		}
 		
 		/*"/ws/timeline/$id/updateStatus" {

@@ -41,9 +41,9 @@ import { NgForm } from '@angular/forms';
 						</ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
                             <div class="action-button btn-link">
-                                <clr-dropdown *ngIf="dataItem.required === 0  || dataItem.required === false">
-                                    <tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-                                    <clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+                                <clr-dropdown *ngIf="dataItem?.required === 0  || dataItem?.required === false">
+									<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+									<clr-dropdown-menu [clrPosition]="determinePositionClrDropdown(rowIndex, parameterList)" *clrIfOpen>
                                         <a clrDropdownItem (click)="onDeleteParameter($event, dataItem)">Delete</a>
                                     </clr-dropdown-menu>
                                 </clr-dropdown>
@@ -52,21 +52,29 @@ import { NgForm } from '@angular/forms';
 						<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem
 												 let-rowIndex="rowIndex">
 							<div
-								*ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-								<input clrCheckbox (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean"
-											 name="{{column.property + columnIndex + rowIndex}}-param" (change)="onValuesChange()"
-											 [(ngModel)]="dataItem[column.property]"/>
+								*ngIf="dataItem !== null && (column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded'))">
+								<clr-checkbox-wrapper class="inline">
+									<input
+										clrCheckbox
+										(keypress)="getOnInputKey($event)"
+										type="checkbox"
+										class="param-text-input-boolean"
+										name="{{column.property + columnIndex + rowIndex}}-param"
+										(change)="onValuesChange()"
+										[(ngModel)]="dataItem[column.property]"
+									/>
+                				</clr-checkbox-wrapper>
 							</div>
-							<div *ngIf="column.type === 'text' && column.property === 'paramName'">
+							<div *ngIf="dataItem !== null && (column.type === 'text' && column.property === 'paramName')">
 								<!-- Name -->
 								<input (keypress)="getOnInputKey($event)"
 								       clrInput type="text" required class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-param"
 											 (change)="onValuesChange()"
 											 [(ngModel)]="dataItem.paramName"
-											 [ngClass]="{'has-error': dataItem.paramName?.length <= 0}"/>
+											 [ngClass]="{'has-error': dataItem?.paramName?.length <= 0}"/>
 							</div>
-							<div *ngIf="column.type === 'text' && column.property === 'context.value'">
+							<div *ngIf="dataItem !== null && (column.type === 'text' && column.property === 'context.value')">
 								<!-- Context -->
 								<kendo-dropdownlist
 									name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
@@ -77,22 +85,22 @@ import { NgForm } from '@angular/forms';
 									[(ngModel)]="dataItem.context"
 									[valuePrimitive]="true"
 									required
-									[ngClass]="{'has-error': dataItem.paramName?.length <= 0 && (!dataItem.context || dataItem.context.value === '')}">
+									[ngClass]="{'has-error': dataItem?.paramName?.length <= 0 && (!dataItem?.context || dataItem?.context.value === '')}">
 								</kendo-dropdownlist>
 							</div>
-							<div *ngIf="column.type === 'text' && column.property === 'value'">
+							<div *ngIf="dataItem !== null && (column.type === 'text' && column.property === 'value')">
 								<!-- Value -->
 								<input (keypress)="getOnInputKey($event)" clrInput
-											 *ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'"
+											 *ngIf="dataItem?.context === 'USER_DEF' || dataItem?.context?.assetClass === 'USER_DEF'"
 											 type="text" class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-user-defined"
 											 (change)="onValuesChange()"
 											 [(ngModel)]="dataItem.value"
-											 [disabled]="!dataItem.context || dataItem.context.value === '' || dataItem.readonly === 1  || dataItem.readonly === true"/>
+											 [disabled]="!dataItem?.context || dataItem?.context.value === '' || dataItem?.readonly === 1  || dataItem?.readonly === true"/>
 								<!-- Value -->
-								<kendo-combobox *ngIf="dataItem.context !== 'USER_DEF' && dataItem.context?.assetClass !== 'USER_DEF'"
+								<kendo-combobox *ngIf="dataItem?.context !== 'USER_DEF' && dataItem?.context?.assetClass !== 'USER_DEF'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
-																[data]="dataItem.currentFieldList"
+																[data]="dataItem?.currentFieldList"
 																[filterable]="true"
 																(filterChange)="filterChange($event, dataItem)"
 																[textField]="'label'"
@@ -101,13 +109,13 @@ import { NgForm } from '@angular/forms';
 																[valuePrimitive]="true"
 																(keypress)="getOnInputKey($event)"
 																(valueChange)="onValuesChange()"
-																[disabled]="!dataItem.context || dataItem.context.value === '' || dataItem.readonly === 1  || dataItem.readonly === true"
+																[disabled]="!dataItem?.context || dataItem?.context.value === '' || dataItem?.readonly === 1  || dataItem?.readonly === true"
 																required
-																[ngClass]="{'has-error': (dataItem.context && dataItem.context.value !== '' && !dataItem.fieldName)}">
+																[ngClass]="{'has-error': (dataItem?.context && dataItem?.context.value !== '' && !dataItem?.fieldName)}">
 								</kendo-combobox>
 							</div>
 							<!-- Description -->
-							<div *ngIf="column.type === 'text' && column.property === 'desc'">
+							<div *ngIf="dataItem !== null && (column.type === 'text' && column.property === 'desc')">
 								<input (keypress)="getOnInputKey($event)" type="text" clrInput class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.description"/>
 							</div>
@@ -117,30 +125,30 @@ import { NgForm } from '@angular/forms';
 							<div class="group-boolean-fields"
 									 *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
 								<span *ngIf="column.property === 'required'"><span
-									*ngIf="dataItem.required === 1  || dataItem.required === true"><i
+									*ngIf="dataItem?.required === 1  || dataItem?.required === true"><i
 									class="fa fa-fw fa-check"></i></span></span>
 								<span *ngIf="column.property === 'readonly'"><span
-									*ngIf="dataItem.readonly === 1  || dataItem.readonly === true"><i
+									*ngIf="dataItem?.readonly === 1  || dataItem?.readonly === true"><i
 									class="fa fa-fw fa-check"></i></span></span>
 								<span *ngIf="column.property === 'encoded'"><span
-									*ngIf="dataItem.encoded === 1  || dataItem.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
+									*ngIf="dataItem?.encoded === 1  || dataItem?.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'paramName'">
-								<span>{{dataItem.paramName}}</span>
+								<span>{{dataItem?.paramName}}</span>
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'context.value'">
-								<span>{{getAssetClassValue(dataItem.context)}}</span>
+								<span>{{getAssetClassValue(dataItem?.context)}}</span>
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'value'">
 								<span
-									*ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'">{{dataItem.value}}</span>
+									*ngIf="dataItem?.context === 'USER_DEF' || dataItem?.context?.assetClass === 'USER_DEF'">{{dataItem?.value}}</span>
 								<span
-									*ngIf="dataItem.context !== 'USER_DEF' && dataItem.context?.assetClass !== 'USER_DEF'">
+									*ngIf="dataItem?.context !== 'USER_DEF' && dataItem?.context?.assetClass !== 'USER_DEF'">
 									{{getFieldLabel(dataItem)}}
 								</span>
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'desc'">
-								<span>{{dataItem.description}}</span>
+								<span>{{dataItem?.description}}</span>
 							</div>
 						</ng-template>
 					</kendo-grid-column>
@@ -151,7 +159,7 @@ import { NgForm } from '@angular/forms';
 	styles: [`
       .has-error, .has-error:focus {
           border: 1px #f00 solid;
-      }
+	  }
 	`]
 })
 export class ApiActionViewEditParamatersComponent {
@@ -191,9 +199,23 @@ export class ApiActionViewEditParamatersComponent {
 	isFormValid = true;
 
 	/**
+	 * determines the position of the clr dropdown
+	 * **/
+	determinePositionClrDropdown(rowIndex, parameterList): string {
+		return rowIndex + 1 === parameterList.length - 1 ? 'right-top' : 'bottom-left';
+	}
+
+	/**
 	 * Add a new argument to the list of parameters and refresh the list.
 	 */
 	onAddParameter(): void {
+		if (this.parameterList) {
+			if (this.parameterList.length > 0) {
+				if (this.parameterList[this.parameterList.length - 1] === null) {
+					this.parameterList.pop();
+				}
+			}
+		}
 		this.parameterList.push({
 			paramName: '',
 			desc: '',
@@ -206,6 +228,7 @@ export class ApiActionViewEditParamatersComponent {
 			required: false,
 			encoded: false
 		});
+		this.parameterList.push(null);
 		this.onValuesChange();
 	}
 
@@ -226,7 +249,7 @@ export class ApiActionViewEditParamatersComponent {
 	 * Make the Field from Context, filterable
 	 * @param filter
 	 */
-	filterChange(filter: any, dataItem: any): void {
+	filterChange(filter: any, dataItem?: any): void {
 		dataItem.currentFieldList = dataItem.sourceFieldList.filter((s) => s.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1);
 	}
 
@@ -234,7 +257,7 @@ export class ApiActionViewEditParamatersComponent {
 	 * When the Context has change, we should load the list of params associate with the Asset Class,
 	 * if the value is USER_DEF, the field will become a text input field
 	 */
-	onContextValueChange(dataItem: APIActionParameterModel): void {
+	onContextValueChange(dataItem?: APIActionParameterModel): void {
 		if (dataItem && dataItem.context) {
 			let context = (dataItem.context['assetClass']) ? dataItem.context['assetClass'] : dataItem.context;
 			let fieldSpecs = this.commonFieldSpecs.find((spec) => {
@@ -259,7 +282,7 @@ export class ApiActionViewEditParamatersComponent {
 	 * Delete from the paramaters the argument passed.
 	 * @param dataItem
 	 */
-	onDeleteParameter(event: any, dataItem: APIActionParameterModel): void {
+	onDeleteParameter(event: any, dataItem?: APIActionParameterModel): void {
 		let parameterIndex = this.parameterList.indexOf(dataItem);
 		if (parameterIndex >= 0) {
 			this.parameterList.splice(parameterIndex, 1);
@@ -272,12 +295,14 @@ export class ApiActionViewEditParamatersComponent {
 	 * @param context
 	 * @returns {string}
 	 */
-	getAssetClassValue(context: any): string {
-		let assetClass = this.assetClassesForParameters.find((param) => {
-			return param.assetClass === context || param.assetClass === context.assetClass;
-		});
-		if (assetClass && assetClass.value) {
-			return assetClass.value;
+	getAssetClassValue(context?: any): string {
+		if (context) {
+			let assetClass = this.assetClassesForParameters.find((param) => {
+				return param.assetClass === context || param.assetClass === context.assetClass;
+			});
+			if (assetClass && assetClass.value) {
+				return assetClass.value;
+			}
 		}
 		return context;
 	};
@@ -286,9 +311,11 @@ export class ApiActionViewEditParamatersComponent {
 	 * Returns field label from current field list.
 	 * @param dataItem
 	 */
-	getFieldLabel(dataItem: APIActionParameterModel): string {
-		const field = dataItem.currentFieldList.find(item => item.field === dataItem.fieldName);
-		return field ? field.label : dataItem.fieldName;
+	getFieldLabel(dataItem?: APIActionParameterModel): string {
+		if (dataItem) {
+			const field = dataItem.currentFieldList.find(item => item.field === dataItem.fieldName);
+			return field ? field.label : dataItem.fieldName;
+		}
 	}
 
 	/**
@@ -297,7 +324,9 @@ export class ApiActionViewEditParamatersComponent {
 	onValuesChange(): void {
 		this.isFormValid = this.apiActionParametersForm && this.apiActionParametersForm.valid;
 		const invalidParams = this.parameterList.filter(item => {
-			return item.context !== 'USER_DEF' && !item.fieldName;
+			if (item) {
+				return item.context !== 'USER_DEF' && !item.fieldName;
+			} else { return true; }
 		});
 		this.isFormValid = this.isFormValid && invalidParams.length === 0;
 		this.onValuesChangeEmitter.emit({parameterList: this.parameterList, isFormValid: this.isFormValid});

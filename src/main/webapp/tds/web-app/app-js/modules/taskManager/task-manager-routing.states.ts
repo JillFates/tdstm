@@ -50,9 +50,7 @@ export const TaskManagerRoute: Routes = [
 		path: TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url,
 		data: {
 			page: {
-				title: 'Task Graph',
-				titleColor: '#3c8dbc',
-				titleFontWeight: 'bold',
+				title: 'GoJS Task Graph',
 				instruction: '',
 				menu: ['Task', 'GoJS Task Graph'],
 				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-gojs-task-graph', subMenu: true}

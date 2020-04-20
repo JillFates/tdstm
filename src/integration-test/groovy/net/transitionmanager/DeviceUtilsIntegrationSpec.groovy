@@ -54,8 +54,8 @@ class DeviceUtilsIntegrationSpec extends Specification{
 			Rack rack1 = new Rack(project: project, room: room1, model: model1, location: 'Location 1', source: 1, tag: 'Rack 1').save(flush: true)
 			Rack rack2 = new Rack(project: project, room: room2, model: model2, location: 'Location 2', source: 0, tag: 'Rack 2').save(flush: true)
 
-			AssetEntity assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis').save(flush: true)
-			AssetEntity assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis').save(flush: true)
+			AssetEntity assetEntity1 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room1, roomTarget: room1, model: model3, assetName: 'Asset 1', assetTag: 'AT1', assetType: 'Chassis', custom7: 'something').save(flush: true)
+			AssetEntity assetEntity2 = new AssetEntity(project: project, moveBundle: moveBundle, roomSource: room2, roomTarget: room2, model: model4, assetName: 'Asset 2', assetTag: 'AT2', assetType: 'Blade Chassis',, custom7: 'something').save(flush: true)
 
 			room1.addToRacks(rack1).save(flush: true)
 			room2.addToRacks(rack2).save(flush: true)

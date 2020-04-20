@@ -3,6 +3,7 @@ import {Component, ComponentFactoryResolver} from '@angular/core';
 import {FormGroup, FormControl} from '@angular/forms';
 // NGXS
 import {Store} from '@ngxs/store';
+import {SetProject} from '../../../../../modules/project/actions/project.actions';
 import {Logout} from '../../../../../modules/auth/action/login.actions';
 // Component
 import {UserPreferencesComponent} from '../preferences/user-preferences.component';
@@ -67,9 +68,10 @@ export class HeaderComponent {
 			.subscribe((userContext: UserContextModel) => {
 				if (!userContext.user) {
 					this.pageMetaData.hideTopNav = true;
-				} else if (!userContext.project.logoUrl) {
-					userContext.project.logoUrl =
-						'/tdstm/tds/web-app/assets/images/transitionLogo.svg';
+				} else if (userContext.project && !userContext.project.logoUrl) {
+					const project = Object.assign({}, userContext.project);
+					project.logoUrl = '/tdstm/tds/web-app/assets/images/transitionLogo.svg';
+					this.store.dispatch(new SetProject(project));
 				}
 				this.userContext = userContext;
 				const fName = userContext.person && userContext.person.fullName;

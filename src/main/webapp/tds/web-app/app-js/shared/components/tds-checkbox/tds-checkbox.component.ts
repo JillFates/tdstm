@@ -4,14 +4,23 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 	selector: 'tds-checkbox',
 	template: `
 <!--        (change)="onChange($event)"-->
-			<input clrCheckbox
-				   type="checkbox"
-				   [name]="name"
-			       [id]="name"
-				   [(ngModel)]="inputModel"
-			       (ngModelChange)="inputModelChange.emit(inputModel)"
-				   [disabled]="disabled">
-			<label [for]="name">{{title}}</label>
+			<clr-checkbox-wrapper class="inline">
+                    <input
+                        clrCheckbox
+                        [id]="name"
+                        type="checkbox"
+                        [name]="name"
+						[(ngModel)]="inputModel"
+				       (ngModelChange)="inputModelChange.emit(inputModel)"
+						[disabled]="disabled"
+                    />
+                    <label
+                        class="clr-control-label clr-control-label-sm inline"
+                        [for]="name"
+                    >{{title}}
+                    </label>
+            </clr-checkbox-wrapper>
+
 	`,
 	styles: [
 		`
