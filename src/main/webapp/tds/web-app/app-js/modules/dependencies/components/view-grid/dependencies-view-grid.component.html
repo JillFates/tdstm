@@ -193,6 +193,15 @@
 			<div class="clr-col-4 selected-assets-counter">
 				<clr-icon class="icon" shape="check"></clr-icon>
 				<h6 class="inline">{{ getSelectedItemsCount() }}</h6>
+				<tds-bulk-change-button
+						#tdsBulkChangeButton
+						[enabled]="bulkCheckboxService.hasSelectedItems()"
+						[showDelete]="true"
+						[showEdit]="false"
+						[bulkChangeType]="bulkChangeType"
+						(clickBulk)="onClickBulkButton()"
+						(operationResult)="onBulkOperationResult($event)">
+				</tds-bulk-change-button>
 			</div>
 			<div class="clr-col-8">
 				<tds-grid-pager
