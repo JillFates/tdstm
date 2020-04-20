@@ -115,7 +115,6 @@
 <!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
 <!--                            </a>-->
                         </div>
-
                         <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showAutoProcessElements">
                             <label class="col-sm-{{uiConfig.labelColSize}} control-label">
                             </label>
@@ -131,7 +130,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- Progress bar-->
                         <div class="form-group row progressBar-row" *ngIf="uiConfig.showManualProcessElements">
                             <div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
@@ -149,7 +147,7 @@
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
                            </label>
                             <div class="col-sm-{{uiConfig.inputColSize}}">
-                                <kendo-grid *ngIf="!importInProcess && importResult?.status === 'success'"
+                                <kendo-grid *ngIf="!importProgress.inProgress && importResult?.status === 'success'"
                                         [data]="importResult.data.domains"
                                         [pageSize]="100">
                                     <kendo-grid-column title="Batch Id" field="batchId">
@@ -168,7 +166,7 @@
                                    (click)="onImport()"
                                    class="col-sm-{{uiConfig.buttonColSize}}">
                                <i aria-hidden="true" class="fa"
-                                  [ngClass]="{'fa-fw fa-spinner fast-right-spinner': importInProcess,
+                                  [ngClass]="{'fa-fw fa-spinner fast-right-spinner': importProgress.inProgress,
                                                'fa-check green': importResult?.status === 'success',
                                                'fa-thumbs-down red': importResult?.status === 'error'}"></i>
                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}</span>
@@ -177,6 +175,16 @@
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
                            </a>
                         </div>
+											<!-- Progress bar-->
+											<div class="form-group row progressBar-row">
+												<div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
+                                        col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
+													<div *ngIf="importProgress.inProgress" class="progress">
+														<div class="progress-bar progress-bar-striped active"
+																 [style.width.%]="importProgress.currentProgress"></div>
+													</div>
+												</div>
+											</div>
                         <!-- Clear Button Row -->
                         <div class="row clear-button">
                            <tds-button (click)="onClear()"

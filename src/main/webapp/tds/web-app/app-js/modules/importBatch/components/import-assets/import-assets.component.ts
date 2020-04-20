@@ -17,8 +17,7 @@ import {
 
 } from '../../../../shared/model/constants';
 import {ImportBatchStates} from '../../import-batch-routing.states';
-
-declare var jQuery: any;
+import { ImportBatchService } from '../../service/import-batch.service';
 
 @Component({
 	selector: 'import-assets',
@@ -37,8 +36,6 @@ export class ImportAssetsComponent implements OnInit {
 	public selectedScriptOption = this.dataScriptOptions[0];
 	public selectedActionOption = -1;
 	private transformInterval: any;
-	public importResult: any;
-	public importInProcess = false;
 	public fetchFileContent: any;
 	public transformFileContent: any;
 
@@ -69,9 +66,17 @@ export class ImportAssetsComponent implements OnInit {
 	};
 
 	public uiConfig: any = {...this.UI_CONFIG};
+	private importInterval: any;
+	importResult: any;
+	importProgress = {
+		progressKey: null,
+		currentProgress: 0,
+		inProgress: false
+	};
 
 	constructor(
 		private importAssetsService: ImportAssetsService,
+		private importBatchService: ImportBatchService,
 		private notifier: NotifierService,
 		private dataIngestionService: DataScriptService) {
 			this.file.fileUID = null;
@@ -224,41 +229,132 @@ export class ImportAssetsComponent implements OnInit {
 	 * Calls Import process on endpoint.
 	 */
 	public onImport(): void {
-		let service: any, filename: any;
-		this.importInProcess = true;
+		let filename: any;
+		this.importProgress.inProgress = true;
 		this.importResult = null;
 		if (this.selectedScriptOption.isAutoProcess) {
-			filename = this.fetchResult.filename;
-			service = this.importAssetsService.postTransform(this.selectedScriptOption, filename, this.uiConfig.sendNotification);
+			this.runAutoImport(this.fetchResult.filename);
 		} else {
 			filename = this.transformResult.data.filename;
-			service = this.importAssetsService.postImport(filename);
+			this.importAssetsService.postImport(filename).subscribe(result => {
+				if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
+					this.importProgress.progressKey = result.data.progressKey;
+					this.setImportProgressInterval();
+				} else {
+					this.handleImportResultError()
+				}
+			});
 		}
+	}
 
-		service.subscribe(( result: any ) => {
-			this.importResult = result;
-			this.postImportResult();
-			this.importInProcess = false;
-			if (this.uiConfig.showAutoProcessElements) {
-				this.onClear();
-				this.notifier.broadcast({
-					name: AlertType.SUCCESS,
-					message: 'The ETL import process was succesfully initiated'
-				});
-			}
-		}, (err) => {
-			console.log(err);
+	/**
+	 * Runs auto import process.
+	 * @param filename
+	 */
+	runAutoImport(filename: string): void {
+		this.importAssetsService.postTransform(this.selectedScriptOption, filename, this.uiConfig.sendNotification)
+			.subscribe(( result: any ) => {
+				this.importResult = result;
+				if (this.importResult.data.domains && this.importResult.data.domains.length > 0) {
+					this.importResult.data.domains.forEach( (item: any) => {
+						if (!item.batchId) {
+							item.batchId = null;
+						}
+					});
+				}
+				this.importProgress.inProgress = false;
+				if (this.uiConfig.showAutoProcessElements) {
+					this.onClear();
+					this.notifier.broadcast({
+						name: AlertType.SUCCESS,
+						message: 'The ETL import process was succesfully initiated'
+					});
+				}
+			}, (err) => {
+				console.log(err);
+			});
+	}
+
+	/**
+	 * Creates an interval loop to retrieve Import current progress.
+	 */
+	private setImportProgressInterval(): void {
+		this.importProgress.currentProgress = 1;
+		this.importInterval = setInterval(() => {
+			this.getImportProgress();
+		}, PROGRESSBAR_INTERVAL_TIME);
+	}
+
+	/**
+	 * Operation of the Test Script interval that will be executed n times in a loop.
+	 */
+	private getImportProgress(): void {
+		this.dataIngestionService.getJobProgress(this.importProgress.progressKey)
+			.subscribe( (response: ApiResponseModel) => {
+				let currentProgress = response.data.percentComp;
+				this.importProgress.currentProgress = currentProgress;
+				// On Fail
+				if (response.data.status === PROGRESSBAR_FAIL_STATUS) {
+					this.handleImportResultError(response.data.detail);
+					this.importProgress.inProgress = false;
+					this.clearImportProgressInterval();
+				} else if (currentProgress === 100 && response.data.status === PROGRESSBAR_COMPLETED_STATUS) {
+					// On finish without filename output (Fail)
+					if (!response.data.detail || !response.data.data || !response.data.data.groupGuid) {
+						this.handleImportResultError();
+						this.importProgress.inProgress = false;
+					} else {
+						// On Success
+						setTimeout( () => {
+							this.importBatchService.getImportBatches(response.data.data.groupGuid)
+								.subscribe(result => {
+									this.postImportResult(result);
+									this.importResult.status = ApiResponseModel.API_SUCCESS;
+									this.importProgress.inProgress = false;
+									console.log(result);
+								});
+						}, 500);
+					}
+					this.clearImportProgressInterval();
+				}
+			});
+	}
+
+	/**
+	 * Clears out the Transform interval loop.
+	 */
+	private clearImportProgressInterval(): void {
+		clearInterval(this.importInterval);
+	}
+
+	/**
+	 * Handle and display Import result error message.
+	 * @param errorMessage
+	 */
+	private handleImportResultError(errorMessage: string = null): void {
+		this.importResult = {};
+		this.importResult.status = ApiResponseModel.API_ERROR;
+		this.notifier.broadcast({
+			name: AlertType.DANGER,
+			message: errorMessage || 'An error occurred during the import process'
 		});
 	}
 
 	/**
-	 * Add a batchId = null if no batchId property comes from import batch domain result.
+	 * Process the import result from import batch endpoint call to build json result.
 	 */
-	private postImportResult(): void {
-		if (this.importResult.data.domains && this.importResult.data.domains.length > 0) {
-			this.importResult.data.domains.forEach( (item: any) => {
-				if (!item.batchId) {
-					item.batchId = null;
+	private postImportResult(result: any): void {
+		this.importResult = {
+			data: {
+				domains: []
+			}
+		};
+		if (result.data && result.data.length > 0) {
+			this.importResult.data.domains = result.data.map(item => {
+				return {
+					domainClass: item.domainClassName,
+					batchId: item.id,
+					rowsCreated: item.recordsSummary ? item.recordsSummary.count : 0
 				}
 			});
 		}
@@ -327,11 +423,10 @@ export class ImportAssetsComponent implements OnInit {
 		this.selectedScriptOption = this.dataScriptOptionsInitial;
 		this.selectedActionOption = -1;
 		this.clearFileList();
-		this.importResult = null;
-		this.importInProcess = false;
 		this.transformInProcess = false;
 		this.transformResult = null;
 		this.importResult = null;
+		this.importProgress.inProgress = false;
 	}
 
 	public disableTransformButton() {
