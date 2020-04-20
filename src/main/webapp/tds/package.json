@@ -96,6 +96,7 @@
 		"browserify": "16.2.3",
 		"canonical-path": "0.0.2",
 		"concurrently": "3.5.1",
+		"copy-webpack-plugin": "5.1.1",
 		"gulp": "4.0.2",
 		"gulp-autoprefixer": "5.0.0",
 		"gulp-sass": "4.0.1",
