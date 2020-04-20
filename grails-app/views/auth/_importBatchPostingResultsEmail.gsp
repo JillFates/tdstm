@@ -1,12 +1,57 @@
 <%@ page contentType="text/html" %>
 <html>
-<head></head>
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/@clr/ui/clr-ui.min.css" />
+    <!--CLARITY ICONS STYLE-->
+    <link rel="stylesheet" href="${resource(dir:'dist/css/clarity',file:'clr-icons.min.css')}">
+    <!--CLARITY ICONS API & ALL ICON SETS-->
+    <script src="${resource(dir:'dist/js/vendors/clarity',file:'clr-icons.min.js')}"></script>
+</head>
 <body>
 
 Hi ${person},<br>
 
 <p>The following ETL Import Batch(es) have been processed:</p>
-
+<table class="table clarity-table-grid fixed-header">
+    <thead>
+        <tr>
+            <th>Batch ID</th>
+            <th>Status</th>
+            <th>Doamin</th>
+            <th>Records</th>
+            <th>Processed</th>
+            <th>Pending</th>
+            <th>Erred</th>
+            <th>Ignored</th>
+            <th>Inserted</th>
+            <th>Updated</th>
+            <th>Unchanged</th>
+            <th>Deleted</th>
+            <th>TBD</th>
+        </tr>
+    </thead>
+    <tbody>
+        <g:each var="batch" in="${batches}">
+        <tr>
+            <td>
+                <a href="${serverURL}/module/importbatch/list/${batch.id}">${batch.id}</a>
+            </td>
+            <td>${batch.status}</td>
+            <td>${batch.domain}</td>
+            <td>${batch.records}</td>
+            <td>${batch.processed}</td>
+            <td>${batch.pending}</td>
+            <td>${batch.erred}</td>
+            <td>${batch.ignored}</td>
+            <td>${batch.inserted}</td>
+            <td>${batch.updated}</td>
+            <td>${batch.unchanged}</td>
+            <td>${batch.deleted}</td>
+            <td>${batch.tbd}</td>
+        </tr>
+        </g:each>
+    </tbody>
+</table>
 <table style="border-collapse: collapse;margin: 5px 0 5px 2px;width: auto;">
     <tbody>
         <tr>
