@@ -11,7 +11,6 @@ import {
 	OnDestroy, HostListener, ComponentFactoryResolver
 } from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
-import {Location} from '@angular/common';
 // Model
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
@@ -151,7 +150,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
-		private location: Location,
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private preferenceService: PreferenceService,
 		private bulkCheckboxService: BulkCheckboxService,
