@@ -92,7 +92,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() justPlanning: boolean;
 	@Input() gridState: State;
 	@Output() modelChange = new EventEmitter<void>();
-	@Output() removeGlobalQueryParam = new EventEmitter<string>();
+	@Output() removeGlobalQueryParam = new EventEmitter<{domain?: string, property: string}>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Output() hiddenFiltersChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
@@ -293,7 +293,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 * First removes the global query parameters
 	 */
 	public onClearFilters(): void {
-		this.removeGlobalQueryParam.emit('*');
+		this.removeGlobalQueryParam.emit({property: '*'});
 
 		setTimeout(() => {
 			this.model.columns.forEach((c: ViewColumn) => {
@@ -336,9 +336,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	public setFilter(search: string, column: ViewColumn): void {
 		column.filter = search;
 		if (search === null || search === '') {
-			const urlFilterName = `${column.domain}_${column.property}`;
 			// removes the filter from the globals in case
-			this.removeGlobalQueryParam.emit(urlFilterName);
+			this.removeGlobalQueryParam.emit({domain: column.domain, property: column.property});
 			// update the filters
 			setTimeout(() => {
 				this.onFilter();

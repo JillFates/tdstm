@@ -145,16 +145,19 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	/**
 	 * Deletes a params from the global query param object
 	 * Passing the * character removes all global filters and resets the just planning
-	 * @param name
+	 * @param params contains the domain and the property of the param to be deleted
 	 */
-	public onRemoveGlobalQueryParam(name: string): void {
-		if (name === '*') {
+	public onRemoveGlobalQueryParam(params: {domain?: string, property: string}): void {
+		if (params.property === '*') {
 			for (let [key, value] of Object.entries(this.globalQueryParams)) {
 				this.removeGlobalQueryParam(key);
 			}
 			this.justPlanning = false;
 		} else {
-			this.removeGlobalQueryParam(name);
+			// find and remove it by domain and property
+			this.removeGlobalQueryParam(`${params.domain}_${params.property}`);
+			// find and remove it just by property
+			this.removeGlobalQueryParam(`_${params.property}`);
 		}
 	}
 
@@ -162,7 +165,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Deletes a params from the global query param object
 	 * @param name
 	 */
-	public removeGlobalQueryParam(name: string): void {
+	public removeGlobalQueryParam(name: string = null): void {
 		if (this.globalQueryParams.hasOwnProperty(name)) {
 			const newParams = Object.assign({}, this.globalQueryParams);
 			delete newParams[name];
