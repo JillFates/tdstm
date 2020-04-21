@@ -130,7 +130,6 @@ export class ArchitectureGraphDiagramHelper {
 		iconPicture.desiredSize = new Size(50, 50);
 		iconPicture.bind(new Binding('source', '',
 			(val: string) => {
-				console.log(val);
 				return this.getIconPath(val);
 				}
 		));
