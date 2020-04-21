@@ -16,16 +16,6 @@ export class ImportBatchService {
 
 	/**
 	 * GET - List of all Import Batches
-	 * @returns {Observable<any>}
-	 */
-	// getImportBatches(): Observable<any> {
-	// 	return this.http.get(this.importBatchesUrl)
-	// 		.map( (response: any) => response)
-	// 		.catch((error: any) => error);
-	// }
-
-	/**
-	 * GET - List of all Import Batches
 	 * @param groupGuid
 	 */
 	getImportBatches(groupGuid: string = null): Observable<any> {
