@@ -144,7 +144,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Deletes a params from the global query param object
-	 * Passing the * character removes all global filters
+	 * Passing the * character removes all global filters and resets the just planning
 	 * @param name
 	 */
 	public onRemoveGlobalQueryParam(name: string): void {
@@ -152,6 +152,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			for (let [key, value] of Object.entries(this.globalQueryParams)) {
 				this.removeGlobalQueryParam(key);
 			}
+			this.justPlanning = false;
 		} else if (this.globalQueryParams.hasOwnProperty(name)) {
 			this.removeGlobalQueryParam(name);
 		}
