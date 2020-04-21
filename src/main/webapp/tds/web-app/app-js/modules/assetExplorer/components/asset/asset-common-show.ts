@@ -49,7 +49,8 @@ export class AssetCommonShow implements OnInit {
 		protected userContextService: UserContextService,
 		protected windowService: WindowService,
 		protected architectureGraphService: ArchitectureGraphService,
-		private parentDialog: any
+		private parentDialog: any,
+		private metadata: any
 	) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()

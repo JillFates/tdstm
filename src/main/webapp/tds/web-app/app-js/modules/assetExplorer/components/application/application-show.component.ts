@@ -39,7 +39,8 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 					userContextService,
 					windowService,
 					architectureGraphService,
-					parentDialog
+					parentDialog,
+					metadata
 				);
 				this.mainAsset = modelId;
 				this.assetTags = metadata.assetTags;
