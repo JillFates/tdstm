@@ -153,7 +153,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				this.removeGlobalQueryParam(key);
 			}
 			this.justPlanning = false;
-		} else if (this.globalQueryParams.hasOwnProperty(name)) {
+		} else {
 			this.removeGlobalQueryParam(name);
 		}
 	}
@@ -163,12 +163,13 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * @param name
 	 */
 	public removeGlobalQueryParam(name: string): void {
+		if (this.globalQueryParams.hasOwnProperty(name)) {
 			const newParams = Object.assign({}, this.globalQueryParams);
 			delete newParams[name];
 			this.globalQueryParams = newParams;
 			const newUrl = RouterUtils.getUrlExcludingParamName(this.location.path(), name) ;
-			console.log(newUrl);
 			this.location.replaceState(newUrl);
+		}
 	}
 
 	/**

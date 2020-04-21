@@ -288,16 +288,23 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		return obj;
 	}
 
+	/**
+	 * Removes all the fiilters selected
+	 * First removes the global query parameters
+	 */
 	public onClearFilters(): void {
-		this.model.columns.forEach((c: ViewColumn) => {
-			c.filter = '';
-		});
-		this.onFilter();
-		if (this.tagSelector) {
-			this.tagSelector.reset();
-		}
-		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 		this.removeGlobalQueryParam.emit('*');
+
+		setTimeout(() => {
+			this.model.columns.forEach((c: ViewColumn) => {
+				c.filter = '';
+			});
+			this.onFilter();
+			if (this.tagSelector) {
+				this.tagSelector.reset();
+			}
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		}, 500);
 	}
 
 	/**
@@ -322,16 +329,23 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	/**
 	 * Set the filter value to the new search string and start off the filtering process
+	 * if the search value is empty, notify to the host component ir order to remove the global query params
 	 * @param {string} search - Current search value
 	 * @param {ViewColumn} column - Column of the datagrid which threw the event
 	*/
 	public setFilter(search: string, column: ViewColumn): void {
 		column.filter = search;
-		const urlFilterName = `${column.domain}_${column.property}`;
-		this.removeGlobalQueryParam.emit(urlFilterName);
-		setTimeout(() => {
+		if (search === null || search === '') {
+			const urlFilterName = `${column.domain}_${column.property}`;
+			// removes the filter from the globals in case
+			this.removeGlobalQueryParam.emit(urlFilterName);
+			// update the filters
+			setTimeout(() => {
+				this.onFilter();
+			}, 500);
+		} else {
 			this.onFilter();
-		}, 1000);
+		}
 	}
 
 	/**
