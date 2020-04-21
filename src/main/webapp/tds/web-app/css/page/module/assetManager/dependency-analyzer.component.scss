@@ -1,41 +1,60 @@
-.depGroupConflict {
-  background-color: yellow !important;
-  cursor: pointer !important;
-}
+.dependency-analyzer-container {
+  .depGroupConflict {
+    background-color: yellow !important;
+    cursor: pointer !important;
+  }
 
-.depGroupDone {
-  background-color: #5f9fcf !important;
-  cursor: pointer !important;
-}
+  .depGroupDone {
+    background-color: #5f9fcf !important;
+    cursor: pointer !important;
+  }
 
-.depGroup {
-  background-color: #e0e0e0 !important;
-  cursor: pointer !important;
-}
+  .depGroup {
+    background-color: #e0e0e0 !important;
+    cursor: pointer !important;
+  }
 
-.depGroupReady {
-  background-color: lightgreen !important;
-  cursor: pointer !important;
-}
+  .depGroupReady {
+    background-color: lightgreen !important;
+    cursor: pointer !important;
+  }
 
-.data-columns, .data-item-columns {
-  text-align: center;
-}
+  .data-columns, .data-item-columns {
+    text-align: center;
+  }
 
-.active-column {
-  border-left: 3px #ffa500 solid !important;
-  border-right: 3px #ffa500 solid !important;
-  font-weight: bold !important;
-}
+  .active-column {
+    border-left: 3px #ffa500 solid !important;
+    border-right: 3px #ffa500 solid !important;
+    font-weight: bold !important;
+  }
 
-.active-column-header {
-  border-left: 3px #ffa500 solid !important;
-  border-top: 3px #ffa500 solid !important;
-  border-right: 3px #ffa500 solid !important;
-  font-weight: bold !important;
-}
+  .active-column-header {
+    border-left: 3px #ffa500 solid !important;
+    border-top: 3px #ffa500 solid !important;
+    border-right: 3px #ffa500 solid !important;
+    font-weight: bold !important;
+  }
 
-.last-active-cell {
-  border-bottom: 3px #ffa500 solid !important;
-  font-weight: bold !important;
+  .last-active-cell {
+    border-bottom: 3px #ffa500 solid !important;
+    font-weight: bold !important;
+  }
+
+  .dependency-analyzer-custom-dropdown, .tag-selector-for-da {
+    display: inline-block !important;
+  }
+
+  .dependency-analyzer-control-label, .dependency-analyzer-control-btn {
+    margin-left: 25px;
+    margin-right: 5px;
+  }
+
+  tds-asset-tag-selector {
+    width: 20%;
+  }
+
+  .asset-tag-selector-component.tag-selector-for-da {
+    width: 100%;
+  }
 }

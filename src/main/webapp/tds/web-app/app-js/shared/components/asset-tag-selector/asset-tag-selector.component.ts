@@ -27,7 +27,7 @@ declare var jQuery: any;
 	template: `
 		<div class="{{classComponent}}">
 		    <kendo-switch *ngIf="showSwitch && switchVisible"
-		            class=""
+		            class="asset-tag-selector-switch"
 		            [(ngModel)]="assetSelectorModel.switch"
 		            [onLabel]="'ALL'"
 		            [offLabel]="'ANY'"
@@ -155,13 +155,13 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 * @param {SimpleChanges} changes
 	 */
 	ngOnChanges(changes: SimpleChanges) {
-		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue && !changes['model'].isFirstChange()) {
+		if ((changes['model'] && changes['model'].currentValue) && changes['model'].currentValue !== changes['model'].previousValue && !changes['model'].isFirstChange()) {
 			// Do something if the model change, like modify the this.assetSelectorModel.tags and the this.assetSelectorModel.switch
 		}
-		if (changes['viewFilterModel'] && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue) {
+		if ((changes['viewFilterModel'] && changes['viewFilterModel'].currentValue) && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue) {
 			// Do something if the View filter Model change
 		}
-		if (changes['sourceTagList'] && changes['sourceTagList'].currentValue !== changes['sourceTagList'].previousValue) {
+		if ((changes['sourceTagList'] && changes['sourceTagList'].currentValue) && changes['sourceTagList'].currentValue !== changes['sourceTagList'].previousValue) {
 			// Do something if the tagList change like clearing the selectedTags or defaulting the switch to false
 			this.tagList = changes['sourceTagList'].currentValue.slice();
 		}

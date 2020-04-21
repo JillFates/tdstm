@@ -49,25 +49,14 @@
       </kendo-dropdownlist>
     </div>
     <div class="col-md-2">
-      <div class="highlight-filter-container">
-        <div class="disp-table-cell">
-          <input
-            type="text"
-            class="form-control highlight-filter-control"
-            placeholder="Highlight filter"
-            [(ngModel)]="filterText"
-            (ngModelChange)="highlightFilterChange()"
-            #highlightFilterText
-          />
-        </div>
-        <div class="disp-table-cell">
-          <fa-icon
-            [icon]="icons.faWindowClose"
-            (click)="clearTextFilter()"
-            [ngClass]="['clear-icon-button']"
-            [hidden]="!filterText || filterText.length < 1"></fa-icon>
-        </div>
-      </div>
+      <task-highlight-filter
+              [highlightOptions]="highlightOptions$ | async"
+              [eventId]="selectedEvent?.id"
+              [viewUnpublished]="viewUnpublished"
+              (filteredTasks)="this.highlightTasks($event)"
+              (clearFilters)="clearHighlightFilters()"
+              #taskHighlightFilter
+      ></task-highlight-filter>
     </div>
 
     <div class="col-md-6 chk-filter-container">

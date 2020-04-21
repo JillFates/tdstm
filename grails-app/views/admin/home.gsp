@@ -23,7 +23,7 @@ a:hover {
 	<tr>
 		<td style="vertical-align:top">
 			<div>
-			<h1 style="margin-right: 0px;"><b>Recent Users</b></h1>
+			<h1 class="table-clarity-header"><b>Recent Users</b></h1>
 			<table class="admin-home">
 				<thead>
 					<tr>
@@ -49,7 +49,7 @@ a:hover {
 		</td>
 		<td style="vertical-align:top">
 			<div>
-			<h1 style="margin-right: 0px;"><b>Current and Recent Events</b></h1>
+			<h1 class="table-clarity-header"><b>Current and Recent Events</b></h1>
 			<table class="admin-home">
 				<thead>
 					<thead>
@@ -80,7 +80,7 @@ a:hover {
 			</div>
 			<br/>
 			<div>
-				<h1 style="margin-right: 0px;"><b>Upcoming Events</b></h1>
+				<h1 class="table-clarity-header"><b>Upcoming Events</b></h1>
 				<table class="admin-home">
 					<thead>
 						<tr>
@@ -107,7 +107,7 @@ a:hover {
 			</div>
 			<br />
 			<div>
-				<h1 style="margin-right: 0px;"><b>Misc Administrative Functions</b></h1>
+				<h1 class="table-clarity-header"><b>Misc Administrative Functions</b></h1>
 				<table class="admin-home">
 					<thead>
 						<tr>

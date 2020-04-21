@@ -276,20 +276,20 @@ $asset-tag-selector-default-label-color: #656565
               color: inherit !important
               margin-right: 4px
               background-color: transparent !important
-            .k-switch-handle
-              width: 2.3em
-              height: 2.2em
-              background-color: #5f9fcf !important
-            .k-switch-label-on, .k-switch-label-off
-              right: 4px
-              font-size: 10px
-              width: 100%
-              font-weight: 600
-            &.k-switch-on
-              .k-switch-label-on
-                right: -6px
               .k-switch-handle
-                left: calc(100% - 2.3em)
+                width: 2.3em
+                height: 2.2em
+                background-color: #5f9fcf !important
+              .k-switch-label-on, .k-switch-label-off
+                right: 4px
+                font-size: 10px
+                width: 100%
+                font-weight: 600
+              &.k-switch-on
+                .k-switch-label-on
+                  right: -6px
+                .k-switch-handle
+                  left: calc(100% - 2.3em)
 
   .show-full-tags
     max-height: unset
@@ -315,3 +315,9 @@ kendo-popup.grid-filter-tag-selector
       @include asset-tag-font-style
       @include asset-tag-style
       margin-bottom: 2px !important
+
+.asset-tag-selector-switch
+  .k-switch-label-on
+    left: 5px
+  .k-switch-label-off
+    right: 5px

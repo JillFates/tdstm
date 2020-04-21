@@ -640,7 +640,7 @@ class UrlMappings {
 
 		"/ws/taskGraph/taskSearch" {
 			controller = "wsTaskGraph"
-			action = [GET: "taskSearch"]
+			action = [POST: "taskSearch"]
 		}
 		
 		/*"/ws/timeline/$id/updateStatus" {

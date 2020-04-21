@@ -133,8 +133,16 @@
                         </tr>
                         <tr class="prop">
                             <td valign="top" class="name"><span>Can Travel:</span></td>
-                            <td valign="top" class="value" colspan="2">
-                                <input type="checkbox" [disabled]="!editing" name="canTravel" [(ngModel)]="personModel.travelOK"/>
+                            <td valign="top" class="value" colspan="2">                                
+                                <clr-checkbox-wrapper class="inline">
+                                    <input
+                                        clrCheckbox
+                                        type="checkbox"
+                                        [disabled]="!editing"
+                                        name="canTravel"
+                                        [(ngModel)]="personModel.travelOK"
+                                    />
+                                </clr-checkbox-wrapper>
                             </td>
                         </tr>
 

@@ -1,89 +1,78 @@
 <div class="dependency-analyzer-container content body">
 	<div class="row task-manager-sub-header">
-		<div class="col-md-2  ">
-			<label class="dependency-analyzer-control-label">{{'DEPENDENCY_ANALYZER.DEPENDENCY_GROUPS' | translate}}:</label>
+		<div class="col-md-12  ">
+			<label class="">{{'DEPENDENCY_ANALYZER.DEPENDENCY_GROUPS' | translate}}
+				:</label>
 			<tds-button>{{ 'DEPENDENCY_ANALYZER.REGENERATE' | translate}}</tds-button>
-		</div>
-		<div class="col-md-2 ">
-			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.BUNDLE' | translate}}:</label>
+			<label class="dependency-analyzer-control-label"
+				   for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.BUNDLE' | translate}}:</label>
 			<kendo-dropdownlist
 				id="dependency-analyzer-teams-dropdown"
-				textField="name"
-				valueField="id"
 				[ngClass]="'dependency-analyzer-custom-dropdown'"
-				[value]="selectedBundle"
+				[textField]="'name'"
+				[valueField]="'id'"
+				[defaultItem]="defaultBundleItem"
 				[data]="allMoveBundles"
 				(selectionChange)="onBundleSelect($event)"
-				[(ngModel)]="selectedBundle"
                 #teamHighlightDropdown>
 			</kendo-dropdownlist>
-		</div>
 
-		<div class="col-md-2 " *ngIf="allTags">
-			<label class="dependency-analyzer-control-label" for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.TAGS' | translate}}:</label>
-			<tds-asset-tag-selector
+			<label class="dependency-analyzer-control-label "
+				   for="dependency-analyzer-teams-dropdown">{{'DEPENDENCY_ANALYZER.TAGS' | translate}}:</label>
+			<tds-asset-tag-selector *ngIf="allTags"
 				[tagList]="allTags"
 				[model]="selectedTags"
 				[showSwitch]="true"
+				class="tag-selector-for-da"
 				(valueChange)="onAssetTagChange($event)"
 			></tds-asset-tag-selector>
-		</div>
 
-		<div class="col-md-4 chk-filter-container">
-			<clr-checkbox-wrapper class="inline">
+			<clr-checkbox-wrapper class="inline dependency-analyzer-control-label ">
 				<input
 					clrCheckbox
 					id="showWIPonly"
 					type="checkbox"
 					name="showWIPonly"
 					class="component-action-just-planning"
-					[(ngModel)]="showOnlyWIP"
+					[(ngModel)]="isAssigned"
 					(change)="onShowOnlyWIPChange($event)"/>
 				<label
 					class="clr-control-label clr-control-label-sm inline"
 					for="showWIPonly"
 				>{{'DEPENDENCY_ANALYZER.SHOW_ONLY_WIP' | translate}}</label>
 			</clr-checkbox-wrapper>
-		</div>
 
-		<div class="col-md-2">
-			<button class="refresh-container-btn btn" (click)="refreshDiagram()">
+			<button class="refresh-container-btn btn dependency-analyzer-control-btn " (click)="onRefeshData()" title="Refresh Data">
 				<fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
 			</button>
 		</div>
-
-<!--			<label class="task-chk-container">-->
-<!--				<input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />-->
-<!--				<span class="checkmark"></span>-->
-<!--				Minimize Auto Tasks-->
-<!--			</label>-->
 	</div>
 	<kendo-grid
-		#grid
+        #grid
 		[data]="gridData">
-		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]" [width]="i < 4 ? '60' : '40'">
+		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]"
+						   [width]="i < 4 ? '70' : '30'">
 			<ng-template kendoGridHeaderTemplate>
 				<div *ngIf="col === 'Groups'" class="group-column" (click)="openGroupInfoModal($event)">
-					{{col}} <fa-icon [icon]="icons.faQuestion" size="md"></fa-icon>
+					{{col}}
+					<fa-icon [icon]="icons.faQuestion" size="md"></fa-icon>
 				</div>
 				<div *ngIf="col !== 'Groups'" class="data-columns" (click)="columnClicked($event, i)">
 					{{col}}
 				</div>
 			</ng-template>
-			<ng-template kendoGridCellTemplate let-dataItem >
+			<ng-template kendoGridCellTemplate let-dataItem>
 				<div *ngIf="i === 0">
 					{{dataItem[i]}}
 				</div>
 				<div class="data-item-columns" *ngIf="i > 0">
-					{{dataItem[i]}}
+					{{dataItem[i] !== 0 ? dataItem[i] : ' ' }}
 				</div>
 			</ng-template>
 		</kendo-grid-column>
-
 	</kendo-grid>
 
-	<p>{{'Column selected:' + (selectedData | json)}}</p>
-	<form *ngIf="showBottomGrid">
+	<form *ngIf="showBottomGrid" style="margin-top: 50px;">
 		<kendo-tabstrip [keepTabContent]="true">
 			<kendo-tabstrip-tab [title]="'Tab 1'" [selected]="true">
 				<ng-template kendoTabContent>

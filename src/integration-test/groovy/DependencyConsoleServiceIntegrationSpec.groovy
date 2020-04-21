@@ -292,13 +292,13 @@ class DependencyConsoleServiceIntegrationSpec extends Specification {
 			Map dependencyConsole = dependencyConsoleService.dependencyConsoleMap(project, pBundle.id, null, null, "1", null)
 		then: ''
 			dependencyConsole.dependencyConsole == [
-				group          : ['All', 'Grouped', 2, 3],
-				application    : [0, 0, 0, 0],
-				serversPhysical: [8, 8, 2, 2],
-				serversVirtual : [0, 0, 0, 0],
-				databases      : [0, 0, 0, 0],
-				storage        : [0, 0, 0, 0],
-				statusClass    : [null, null, 'depGroupConflict', 'depGroupConflict']
+				group          : ['All', 'Remnants', 'Grouped', 1, 2, 3],
+				application    : [0, 0, 0, 0, 0, 0],
+				serversPhysical: [10, 2, 8, 4, 2, 2],
+				serversVirtual : [0, 0, 0, 0, 0, 0],
+				databases      : [0, 0, 0, 0, 0, 0],
+				storage        : [0, 0, 0, 0, 0, 0],
+				statusClass    : [null, null, null, 'depGroupConflict', 'depGroupConflict', 'depGroupConflict']
 			]
 
 			dependencyConsole.allMoveBundles == [[name: 'Non-planning Bundle', id: npBundle.id, useForPlanning: false], [name: 'Planning Bundle', id: pBundle.id, useForPlanning: true]]

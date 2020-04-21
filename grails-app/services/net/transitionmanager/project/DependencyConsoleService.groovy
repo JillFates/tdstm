@@ -307,7 +307,7 @@ class DependencyConsoleService implements ServiceMethods {
 			dependencyConsole: combineStatsAndConsoleMap(dependencyConsole, stats, isAssigned),
 			dependencyStatus : entities.dependencyStatus,
 			assetDependency  : new AssetDependency(),
-			planningBundles   : allMoveBundles.findAll { return it.useForPlanning },
+			planningBundles  : allMoveBundles.findAll { return it.useForPlanning },
 			allMoveBundles   : allMoveBundles,
 			planStatusOptions: assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION),
 			isAssigned       : isAssigned,
@@ -338,18 +338,6 @@ class DependencyConsoleService implements ServiceMethods {
 	void accumulateDependencyConsoleListAndStats(List<Map<String, Object>> dependList, Map<String, List> dependencyConsole, Map<String, Map> stats, boolean isAssigned) {
 		dependList.eachWithIndex { Map<String, Object> group, Integer index ->
 
-			if (isAssigned && index == 0) {
-				return
-			}
-
-			// Loop through the list to create map to be used by the view
-			dependencyConsole.group << group.dependencyBundle
-			dependencyConsole.application << group.appCount
-			dependencyConsole.serversPhysical << group.serverCount
-			dependencyConsole.serversVirtual << group.vmCount
-			dependencyConsole.databases << group.dbCount
-			dependencyConsole.storage << group.storageCount
-			dependencyConsole.statusClass << getStatusClass(group)
 
 			// Accumulate the totals for ALL and 1+ (aka All - 0)
 			stats.application.all += group.appCount
@@ -365,6 +353,20 @@ class DependencyConsoleService implements ServiceMethods {
 				stats.databases.grouped += group.dbCount
 				stats.storage.grouped += group.storageCount
 			}
+
+			String statusClass = getStatusClass(group)
+			if (isAssigned && (statusClass == 'depGroupReady' || statusClass == 'depGroupDone')) {
+				return
+			}
+
+			// Loop through the list to create map to be used by the view
+			dependencyConsole.group << group.dependencyBundle
+			dependencyConsole.application << group.appCount
+			dependencyConsole.serversPhysical << group.serverCount
+			dependencyConsole.serversVirtual << group.vmCount
+			dependencyConsole.databases << group.dbCount
+			dependencyConsole.storage << group.storageCount
+			dependencyConsole.statusClass << statusClass
 		}
 	}
 
@@ -492,21 +494,18 @@ class DependencyConsoleService implements ServiceMethods {
 	Map<String, List> combineStatsAndConsoleMap(Map<String, List> dependencyConsole, Map<String, Map> stats, boolean isAssigned) {
 		Map<String, List> dependencyConsoleMap = dependencyConsole.clone()
 		final List<String> groupNames = ['All', 'Remnants', 'Grouped']
-		final List<String> assignedGroups = ['All', 'Grouped']
 		final List<String> styles = [null, null, null]
 
 		dependencyConsole.each { String key, List value ->
 			List values = value.size() > 1 ? value[1..-1] : value
 			if (key == 'group') {
-				dependencyConsoleMap[key] = isAssigned ? assignedGroups + values : groupNames + values
+				dependencyConsoleMap[key] = groupNames + values
 			} else if (key == 'statusClass') {
-				dependencyConsoleMap[key] = isAssigned ? styles[1..-1] + values : styles + values
+				dependencyConsoleMap[key] = styles + values
 			} else {
-				if (isAssigned) {
-					dependencyConsoleMap[key] = [stats[key].all, stats[key].grouped] + values
-				} else {
-					dependencyConsoleMap[key] = [stats[key].all, value[0], stats[key].grouped] + values
-				}
+
+				dependencyConsoleMap[key] = [stats[key].all, value[0], stats[key].grouped] + values
+
 			}
 		}
 
