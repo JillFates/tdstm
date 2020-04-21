@@ -1,8 +1,15 @@
 <%@ page contentType="text/html"%>
 <html>
+<head>
+	<link rel="stylesheet" href="https://unpkg.com/@clr/ui/clr-ui.min.css" />
+	<!--CLARITY ICONS STYLE-->
+	<link rel="stylesheet" href="${resource(dir:'dist/css/clarity',file:'clr-icons.min.css')}">
+	<!--CLARITY ICONS API & ALL ICON SETS-->
+	<script src="${resource(dir:'dist/js/vendors/clarity',file:'clr-icons.min.js')}"></script>
+</head>
 <body> 
 <div style="font:courier ">
-	<table style="border: 1px solid green;font-family:courier;">
+	<table style="border: 1px solid green;font-family:courier;" class="table">
 		<tr class="prop" style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="projectName"><b>Project:</b></label></td>
 			<td valign="top" class="value" id="projectNameId" >${projectName ? projectName : ''}</td>
@@ -15,7 +22,7 @@
 		<tr class="prop" style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="comment"><b>Task:</b></label></td>
 			<td valign="top" class="value" colspan="2">
-				<textarea cols="80" rows="4" id="commentTdId" readonly="readonly">${assetComment.comment}</textarea>
+				<textarea clrTextarea cols="80" rows="4" id="commentTdId" readonly="readonly">${assetComment.comment}</textarea>
 			</td>
 		</tr>
 		<tr style="margin-top: 10px">
@@ -65,7 +72,7 @@
 		<tr style="margin-top: 10px">
 			<td valign="top" class="name"  colspan="2"><a href="${createLink(controller:'task',  action:'listUserTasks',  absolute:"true")}">See my tasks</a></td>
 	   </tr>
-	</table>
+	</>
 	</div>
 	</body>
 	</html>

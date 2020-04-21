@@ -12,48 +12,9 @@
 Hi ${person},<br>
 
 <p>The following ETL Import Batch(es) have been processed:</p>
-<table class="table clarity-table-grid fixed-header">
+
+<table style="border-collapse: collapse;margin: 5px 0 5px 2px;width: auto;" class="table clarity-table-grid fixed-header">
     <thead>
-        <tr>
-            <th>Batch ID</th>
-            <th>Status</th>
-            <th>Doamin</th>
-            <th>Records</th>
-            <th>Processed</th>
-            <th>Pending</th>
-            <th>Erred</th>
-            <th>Ignored</th>
-            <th>Inserted</th>
-            <th>Updated</th>
-            <th>Unchanged</th>
-            <th>Deleted</th>
-            <th>TBD</th>
-        </tr>
-    </thead>
-    <tbody>
-        <g:each var="batch" in="${batches}">
-        <tr>
-            <td>
-                <a href="${serverURL}/module/importbatch/list/${batch.id}">${batch.id}</a>
-            </td>
-            <td>${batch.status}</td>
-            <td>${batch.domain}</td>
-            <td>${batch.records}</td>
-            <td>${batch.processed}</td>
-            <td>${batch.pending}</td>
-            <td>${batch.erred}</td>
-            <td>${batch.ignored}</td>
-            <td>${batch.inserted}</td>
-            <td>${batch.updated}</td>
-            <td>${batch.unchanged}</td>
-            <td>${batch.deleted}</td>
-            <td>${batch.tbd}</td>
-        </tr>
-        </g:each>
-    </tbody>
-</table>
-<table style="border-collapse: collapse;margin: 5px 0 5px 2px;width: auto;">
-    <tbody>
         <tr>
             <th style="border: 1px solid #c1c7d0;background: #f4f5f7;padding: 6px 8px 5px 8px;text-align: center;">Batch ID</th>
             <th style="border: 1px solid #c1c7d0;background: #f4f5f7;padding: 6px 8px 5px 8px;text-align: center;">Status</th>
@@ -69,6 +30,8 @@ Hi ${person},<br>
             <th style="border: 1px solid #c1c7d0;background: #f4f5f7;padding: 6px 8px 5px 8px;text-align: center;">Deleted</th>
             <th style="border: 1px solid #c1c7d0;background: #f4f5f7;padding: 6px 8px 5px 8px;text-align: center;">TBD</th>
         </tr>
+    </thead>
+    <tbody>
         <g:each var="batch" in="${batches}">
             <tr>
                 <td style="border: 1px solid #c1c7d0;padding: 6px 8px 5px 8px;">
