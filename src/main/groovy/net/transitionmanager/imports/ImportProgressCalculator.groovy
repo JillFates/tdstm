@@ -29,14 +29,18 @@ class ImportProgressCalculator {
 
     Integer progress = 0
 
+    String groupGuid
+
     ProgressService progressService
 
-    ImportProgressCalculator(String progressKey, Integer totalRows, ProgressService progressService) {
+    ImportProgressCalculator(String progressKey, Integer totalRows, ProgressService progressService, String groupGuid) {
         this.progressKey = progressKey
         this.totalRows = totalRows
         this.progressService = progressService
         this.factorStepFrequency = totalRows / 100
+        this.groupGuid = groupGuid
     }
+
     /**
      * Starts progressKey with status 'RUNNING'
      */
@@ -44,7 +48,9 @@ class ImportProgressCalculator {
         progressService.update(progressKey,
                 0,
                 ProgressCallback.ProgressStatus.RUNNING.name(),
-                ''
+                '',
+                null,
+                [groupGuid: groupGuid]
         )
     }
 
@@ -58,7 +64,9 @@ class ImportProgressCalculator {
             progressService.update(progressKey,
                     progress,
                     ProgressCallback.ProgressStatus.RUNNING.name(),
-                    "TotalRows:$totalRows. RowsProcessed:$rowsProcessed. Progress:${progress++}%"
+                    "TotalRows:$totalRows. RowsProcessed:$rowsProcessed. Progress:${progress++}%",
+                    null,
+                    [groupGuid: groupGuid]
             )
             frequencyCounter = 0
         }
@@ -68,7 +76,7 @@ class ImportProgressCalculator {
     /**
      * Starts progressKey with status 'COMPLETED'
      */
-    void finish(String groupGuid) {
+    void finish() {
         progressService.update(progressKey,
                 100,
                 ProgressCallback.ProgressStatus.COMPLETED.name(),
@@ -77,5 +85,4 @@ class ImportProgressCalculator {
                 [groupGuid: groupGuid]
         )
     }
-
 }

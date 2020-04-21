@@ -226,7 +226,8 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				new ImportProgressCalculator(
 						progressKey,
 						importJsonData.domains.sum { (it?.dataSize)?:0 },
-						progressService
+						progressService,
+						importContext.guid
 				)
 
 		progressCalculator.start()
@@ -297,7 +298,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			notify(ImportBatchJobSchedulerEventDetails.NEXT_BATCH_READY, new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
 		}
 
-		progressCalculator.finish(importContext.guid)
+		progressCalculator.finish()
 		return importResults
 	}
 
