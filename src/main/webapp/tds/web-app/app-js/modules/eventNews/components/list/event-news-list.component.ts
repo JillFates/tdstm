@@ -76,7 +76,11 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 	async ngOnInit() {
 		this.headerEventData = this.loadHeaderData();
 		this.headerEventData.then(eventList => {
-			this.eventId = eventList[0].id;
+			if (eventList[0]) {
+				if (eventList[0].id) {
+					this.eventId = eventList[0].id;
+				}
+			}
 			this.gridComponent.reloadData();
 			// Insert the dropdown controls on the grid toolbar
 			this.elementRef.nativeElement
