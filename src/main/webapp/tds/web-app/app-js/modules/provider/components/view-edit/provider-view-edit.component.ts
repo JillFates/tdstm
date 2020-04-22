@@ -63,6 +63,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 		this.providerService.saveProvider(this.providerModel).subscribe(
 			(result: any) => {
 				this.onAcceptSuccess(result);
+				this.onCancelClose();
 			},
 			err => console.log(err)
 		);
