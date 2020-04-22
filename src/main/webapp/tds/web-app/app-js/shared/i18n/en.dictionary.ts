@@ -519,6 +519,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 	'MODEL': {
 		'MODELS': 'Model List',
 		'DELETE_MODEL' : 'Are you sure you want to delete this model? There is no undo for this action',
+		'EXPORT_MANUFACTURER_MODELS': 'Export Mfg & Models'
 	},
 	'TASK_MANAGER': {
 		'BULK_ACTION': 'Bulk Action',
