@@ -98,19 +98,7 @@
 						[hideControlButtons]="true" #graph></tds-lib-diagram-layout>
 			</div>
 		</div>
-		<div tdsScrollSection class="clr-row">
-			<div class="clr-col-12 table-data-section">
-				<g:render 
-					template="/angular/common/supportShow" 
-					model="[supportAssets:supportAssets]" >
-				</g:render>
-			</div>
-		</div>
-		<div tdsScrollSection class="clr-row">
-			<div class="clr-col-12 table-data-section">
-				<g:render template="/angular/common/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
-			</div>
-		</div>
+		<g:render template="/angular/common/dependenciesShow"></g:render>
 		<div tdsScrollSection class="clr-row">
 			<g:render 
 				template="/angular/common/commentList" 

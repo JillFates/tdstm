@@ -110,6 +110,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 					const templateTitleData = response[1];
 
 					let dependencies = response[2].data;
+					metadata.asset = dependencies.asset;
 					metadata.supports = dependencies.supports;
 					metadata.dependents = dependencies.dependents;
 

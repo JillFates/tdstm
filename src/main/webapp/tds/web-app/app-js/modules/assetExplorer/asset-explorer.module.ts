@@ -45,6 +45,7 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 import {AssetExplorerRouteModule} from './asset-explorer.route';
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 import {DependencyAnalyzerComponent} from './components/dependency-analyzer/dependency-analyzer.component';
+import {DependentsComponent} from './components/dependents/dependents.component';
 
 @NgModule({
 	imports: [
@@ -85,7 +86,8 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		TaskNotesComponent,
 		TaskActionSummaryComponent,
 		ArchitectureGraphComponent,
-		DependencyAnalyzerComponent
+		DependencyAnalyzerComponent,
+		DependentsComponent
 	],
 	providers: [
 		// Services
@@ -109,7 +111,8 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		TaskCommentDialogComponent,
 		TaskCommentComponent,
 		TaskActionsComponent,
-		TaskActionSummaryComponent
+		TaskActionSummaryComponent,
+		DependentsComponent
 	],
 	entryComponents: [
 		AssetShowComponent,

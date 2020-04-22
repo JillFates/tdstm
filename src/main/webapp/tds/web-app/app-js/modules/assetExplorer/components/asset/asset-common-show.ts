@@ -36,6 +36,11 @@ export class AssetCommonShow implements OnInit {
 	protected currentUser: any;
 	protected commentCount: number;
 	protected taskCount: number;
+	protected dependencies = {
+		asset: {},
+		supports: [],
+		dependents: []
+	};
 	protected data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	protected diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
 	protected linkTemplate$: ReplaySubject<Link> = new ReplaySubject(1);
@@ -59,6 +64,9 @@ export class AssetCommonShow implements OnInit {
 					this.userTimeZone = userContext.timezone;
 					this.currentUser = userContext.user;
 				});
+			this.dependencies.asset = metadata.asset;
+			this.dependencies.supports = metadata.supports;
+			this.dependencies.dependents = metadata.supports;
 	}
 
 	/**
