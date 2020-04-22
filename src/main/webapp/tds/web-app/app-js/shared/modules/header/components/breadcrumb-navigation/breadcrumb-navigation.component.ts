@@ -24,20 +24,20 @@ declare var jQuery: any;
             <section class="content-header" *ngIf="!pageMetaData.hideTopNav">
                 <ng-container *ngIf="pageMetaData">
                     <div class="breadcrumb-navigation-container">
-                        <div class="header-section">
+                        <div class="header-section" [ngClass]="{'wide': !settings.hasBanner}">
 							<h2 [style.color]="pageMetaData?.titleColor" [style.fontWeight]="pageMetaData?.titleFontWeight">
 								{{ pageMetaData.title | translate }}
 								<small *ngIf="pageMetaData.instruction">{{pageMetaData.instruction | translate}}</small>
 							</h2>
                         </div>
-						<div class="license-manager-section">
-                            <div class="licensing-banner-message" *ngIf="settings.hasBanner">
+						<div class="license-manager-section" *ngIf="settings.hasBanner">
+                            <div class="licensing-banner-message">
                                 <div class="callout">
                                     {{ userContext.license?.banner }}
                                 </div>
                             </div>
                         </div>
-                        <div class="breadcrumb-section">
+                        <div class="breadcrumb-section" [ngClass]="{'wide': !settings.hasBanner}">
 							<ol class="breadcrumb-container pull-right">
 								<li *ngFor="let menu of pageMetaData.menu; let last = last" [ngClass]="{ active: last }">
 									<a *ngIf="!last && menu.navigateTo"
