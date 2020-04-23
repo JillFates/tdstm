@@ -1,13 +1,4 @@
-.task-comment-component {
-  div.has-not-task-manager-permission {
-    .k-grid.tds-task-grid {
-      td,
-      td a{
-        cursor: auto;
-      }
-    }
-  }
-
+.dependents-component {
   .k-grid-content {
     overflow-y: auto;
   }
@@ -25,7 +16,14 @@
     text-align: center;
   }
 
-  .tds-table table thead th.text-center {
-    padding-left: 0px;
+  .tds-table {
+    .grid-label {
+      line-height: 33px;
+    }
+
+    table thead th.text-center {
+      padding-left: 0px;
+    }
   }
+
 }

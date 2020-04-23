@@ -10,35 +10,35 @@ export class SupportDependentsColumnsModel {
 				property: 'assetType',
 				type: 'text',
 				filterable: true,
-				width: 90
+				width: 180
 			},
 			{
 				label: 'Name',
 				property: 'name',
 				type: 'text',
 				filterable: true,
-				width: 90
+				width: 280
 			},
 			{
 				label: 'Bundle',
 				property: 'moveBundle.name',
 				type: 'text',
 				filterable: true,
-				width: 90
+				width: 320
 			},
 			{
 				label: 'Type',
 				property: 'type',
 				type: 'text',
 				filterable: true,
-				width: 90
+				width: 150
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
 				filterable: true,
-				width: 90
+				width: 150
 			}
 		];
 	}

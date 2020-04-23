@@ -8,91 +8,152 @@
 					</div>
 				</div>
 				<div class="view-dependencies">
-				<kendo-grid
-						class="dependents-grid"
-						[pageSize]="gridSupportsData.state.take"
-						[skip]="gridSupportsData.state.skip"
-						[filterable]="true"
-						(pageChange)="gridSupportsData.pageChange($event)"
-						[data]="gridSupportsData.gridData"
-						[sort]="gridSupportsData.state.sort"
-						[sortable]="false"
-						[resizable]="true"
-						(sortChange)="gridSupportsData.sortChange($event)"
-						[pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+					<kendo-grid
+						*ngIf="gridSupportsData"
+						class="tds-table narrow-rows clickable-rows"
 						[ngClass]="{ 'hide-filter': !showFilterSup}"
-				>
-					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<div class="btn-filter-dependencies" (click)="showFilterSupports()">
-							<i class="fa fa-fw fa-filter"></i>
-						</div>
-					</ng-template>
-					<!-- Columns -->
-					<kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
-									   field="{{column.property}}"
-									   [headerClass]="column.headerClass ? column.headerClass : ''"
-									   [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-									   [class]="column.cellClass ? column.cellClass : ''"
-									   [style]="column.cellStyle ? column.cellStyle : ''"
-									   [width]="column.width">
-						<!-- Header Template -->
-						<ng-template kendoGridHeaderTemplate>
-							<label>{{column.label}}</label>
-						</ng-template>
-
-						<!-- Default Generic Filter Template -->
-						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div *ngIf="column.property !== 'filter' && showFilterSup">
-								<input type="text" (keyup)="gridSupportsData.onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter" value="">
-								<span *ngIf="column.filter" (click)="gridSupportsData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-								{{dataItem.assetType}}
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-								{{dataItem.name}}
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
-							<div *ngIf="dataItem?.moveBundle.id != dependencies.asset?.moveBundleId; else normalBundleNameSupport"
-								 [ngClass]="getMoveBundleClass(dataItem)"
-								 class="cell-template bundle"
-								 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-								<div class="dependent-show">
-									<span>{{dataItem.moveBundle.name}} </span>
-									<img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
-								</div>
-							</div>
-							<ng-template #normalBundleNameSupport>
-								<div class="cell-template dep-{{dataItem.status}} bundle"
-									 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-									{{dataItem.moveBundle.name}}
+						[data]="gridSupportsData.gridData"
+						[filterable]="true"
+						[sort]="gridSupportsData.state.sort"
+						[sortable]="{mode:'single'}"
+						(sortChange)="gridSupportsData.sortChange($event)"
+						[skip]="gridSupportsData.state.skip"
+						[pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+						[pageSize]="gridSupportsData.state.take"
+						[resizable]="true"
+					>
+						<!-- Show Filters / Actions column -->
+						<kendo-grid-column
+								[field]="'_showFilters'"
+								[headerClass]="'text-center'"
+								[sortable]="false"
+								[class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+								[width]="80"
+								[minResizableWidth]="80">
+							<!-- Toggle Filters button -->
+							<ng-template kendoGridHeaderTemplate>
+								<tds-grid-show-hide-filters-button
+										[filterCount]="gridSupportsData.getFilterCounter()" (toggleFilters)="showFilterSupports()">
+								</tds-grid-show-hide-filters-button>
+							</ng-template>
+							<!-- Clear all Filters button -->
+							<ng-template kendoGridFilterCellTemplate let-filter>
+								<tds-grid-clear-all-filters-button
+										[show]="gridSupportsData.getFilterCounter()" (clearFilters)="onClearSupportFilters()">
+								</tds-grid-clear-all-filters-button>
+							</ng-template>
+							<ng-template
+									kendoGridCellTemplate
+									let-dataItem
+									let-rowIndex="rowIndex"
+							>
+								<div class="action-button btn-link">
+									<clr-dropdown #dropdown>
+										<tds-button icon="ellipsis-vertical"
+													clrDropdownTrigger
+													tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"></tds-button>
+										<clr-dropdown-menu *clrIfOpen>
+											<a clrDropdownItem
+											   (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)"
+											>Show Asset</a>
+											<a clrDropdownItem
+											   (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)"
+											>Show Dependency</a>
+										</clr-dropdown-menu>
+									</clr-dropdown>
 								</div>
 							</ng-template>
-						</ng-template>
+						</kendo-grid-column>
+						<!-- All Columns -->
+						<kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
+										   field="{{column.property}}"
+										   [headerClass]="column.headerClass ? column.headerClass : ''"
+										   [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+										   [class]="column.cellClass ? column.cellClass : ''"
+										   [style]="column.cellStyle ? column.cellStyle : ''"
+										   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+							<!-- Header Template -->
+							<ng-template kendoGridHeaderTemplate>
+								<a class="k-link ng-star-inserted" href="#" tabindex="-1">
+									<span>{{column.label}}</span>
+								</a>
+							</ng-template>
 
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)">
-								{{dataItem.type}}
-								<img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
+							<!-- Filter Template -->
+							<ng-template kendoGridFilterCellTemplate let-filter>
+								<div class="filter-input"
+									 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )">
+									<tds-grid-filter-input
+											[name]="column.property"
+											[value]="column.filter || ''"
+											[filterType]="column.type"
+											[dateFormat]="column.format"
+											[placeholder]="'GLOBAL.FILTER' | translate"
+											(filter)="gridSupportsData.onFilterWithValue($event, column)">
+									</tds-grid-filter-input>
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+									{{dataItem.assetType}}
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+									{{dataItem.name}}
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
+								<div *ngIf="dataItem?.moveBundle.id != dependencies.asset?.moveBundleId; else normalBundleNameSupport"
+									 [ngClass]="getMoveBundleClass(dataItem)"
+									 class="cell-template bundle"
+									 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+									<div class="dependent-show">
+										<span>{{dataItem.moveBundle.name}} </span>
+										<img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+									</div>
+								</div>
+								<ng-template #normalBundleNameSupport>
+									<div class="cell-template dep-{{dataItem.status}} bundle"
+										 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+										{{dataItem.moveBundle.name}}
+									</div>
+								</ng-template>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)">
+									{{dataItem.type}}
+									<img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)">
+									{{dataItem.status}}
+								</div>
+							</ng-template>
+						</kendo-grid-column>
+						<!-- Pagination Footer -->
+						<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+							<div class="clr-col-4"></div>
+							<div class="clr-col-8">
+								<tds-grid-pager
+										[total]="total"
+										[totalPages]="totalPages"
+										[currentPage]="currentPage"
+										[pageSize]="gridSupportsData.state.take"
+										[pageSizes]="gridSupportsData.defaultPageOptions"
+										(pageChange)="gridSupportsData.pageChange($event)">
+								</tds-grid-pager>
 							</div>
 						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)">
-								{{dataItem.status}}
-							</div>
-						</ng-template>
-					</kendo-grid-column>
-				</kendo-grid>
-			</div>
+						<kendo-grid-messages noRecords="There are no records to display."></kendo-grid-messages>
+					</kendo-grid>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -105,91 +166,151 @@
 					</div>
 				</div>
 				<div class="view-dependencies">
-				<kendo-grid
-						class="dependents-grid"
-						[pageSize]="gridDependenciesData.state.take"
-						[skip]="gridDependenciesData.state.skip"
-						[filterable]="true"
-						(pageChange)="gridDependenciesData.pageChange($event)"
-						[data]="gridDependenciesData.gridData"
-						[sort]="gridDependenciesData.state.sort"
-						[sortable]="false"
-						[resizable]="true"
-						(sortChange)="gridDependenciesData.sortChange($event)"
-						[pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+					<kendo-grid
+						*ngIf="gridDependenciesData"
+						class="tds-table narrow-rows clickable-rows"
 						[ngClass]="{ 'hide-filter': !showFilterDep}"
-				>
-					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<div class="btn-filter-dependencies" (click)="showFilterDependents()">
-							<i class="fa fa-fw fa-filter"></i>
-						</div>
-					</ng-template>
-					<!-- Columns -->
-					<kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
-									   field="{{column.property}}"
-									   [headerClass]="column.headerClass ? column.headerClass : ''"
-									   [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-									   [class]="column.cellClass ? column.cellClass : ''"
-									   [style]="column.cellStyle ? column.cellStyle : ''"
-									   [width]="column.width">
-						<!-- Header Template -->
-						<ng-template kendoGridHeaderTemplate>
-							<label>{{column.label}}</label>
-						</ng-template>
-
-						<!-- Default Generic Filter Template -->
-						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div *ngIf="column.property !== 'filter' && showFilterDep">
-								<input type="text" (keyup)="gridDependenciesData.onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter" value="">
-								<span *ngIf="column.filter" (click)="gridDependenciesData.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;  margin-top: 3px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-								{{dataItem.assetType}}
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-								{{dataItem.name}}
-							</div>
-						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
-							<div [ngClass]="getMoveBundleClass(dataItem)" *ngIf="dataItem?.moveBundle.id != dependencies.asset?.moveBundleId; else normalBundleNameDependent"
-								 class="cell-template bundle"
-								 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-								<div class="dependent-show">
-									<span>{{dataItem.moveBundle.name}}</span>
-									<img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
-								</div>
-							</div>
-							<ng-template #normalBundleNameDependent>
-								<div class="cell-template dep-{{dataItem.status}} bundle" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
-									{{dataItem.moveBundle.name}}
+						[data]="gridDependenciesData.gridData"
+						[filterable]="true"
+						[sort]="gridDependenciesData.state.sort"
+						[sortable]="{mode:'single'}"
+						(sortChange)="gridDependenciesData.sortChange($event)"
+						[skip]="gridDependenciesData.state.skip"
+						[pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+						[pageSize]="gridDependenciesData.state.take"
+						[resizable]="true"
+					>
+						<!-- Show Filters / Actions column -->
+						<kendo-grid-column
+								[field]="'_showFilters'"
+								[headerClass]="'text-center'"
+								[sortable]="false"
+								[class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+								[width]="80"
+								[minResizableWidth]="80">
+							<!-- Toggle Filters button -->
+							<ng-template kendoGridHeaderTemplate>
+								<tds-grid-show-hide-filters-button
+										[filterCount]="gridDependenciesData.getFilterCounter()" (toggleFilters)="showFilterDependents()">
+								</tds-grid-show-hide-filters-button>
+							</ng-template>
+							<!-- Clear all Filters button -->
+							<ng-template kendoGridFilterCellTemplate let-filter>
+								<tds-grid-clear-all-filters-button
+										[show]="gridDependenciesData.getFilterCounter()" (clearFilters)="onClearDependentFilters()">
+								</tds-grid-clear-all-filters-button>
+							</ng-template>
+							<ng-template
+									kendoGridCellTemplate
+									let-dataItem
+									let-rowIndex="rowIndex"
+							>
+								<div class="action-button btn-link">
+									<clr-dropdown #dropdown>
+										<tds-button icon="ellipsis-vertical"
+													clrDropdownTrigger
+													tdsGridContextMenuFixedPosition [clrDropdown]="dropdown"></tds-button>
+										<clr-dropdown-menu *clrIfOpen>
+											<a clrDropdownItem
+											   (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)"
+											>Show Asset</a>
+											<a clrDropdownItem
+											   (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)"
+											>Show Dependency</a>
+										</clr-dropdown-menu>
+									</clr-dropdown>
 								</div>
 							</ng-template>
-						</ng-template>
+						</kendo-grid-column>
+						<!-- All Columns -->
+						<kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns"
+										   field="{{column.property}}"
+										   [headerClass]="column.headerClass ? column.headerClass : ''"
+										   [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+										   [class]="column.cellClass ? column.cellClass : ''"
+										   [style]="column.cellStyle ? column.cellStyle : ''"
+										   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+							<!-- Header Template -->
+							<ng-template kendoGridHeaderTemplate>
+								<a class="k-link ng-star-inserted" href="#" tabindex="-1">
+									<span>{{column.label}}</span>
+								</a>
+							</ng-template>
 
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)">
-								{{dataItem.type}}
-								<img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
+							<!-- Filter Template -->
+							<ng-template kendoGridFilterCellTemplate let-filter>
+								<div class="filter-input"
+									 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )">
+									<tds-grid-filter-input
+											[name]="column.property"
+											[value]="column.filter || ''"
+											[filterType]="column.type"
+											[dateFormat]="column.format"
+											[placeholder]="'GLOBAL.FILTER' | translate"
+											(filter)="gridDependenciesData.onFilterWithValue($event, column)">
+									</tds-grid-filter-input>
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetType'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+									{{dataItem.assetType}}
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'name'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+									{{dataItem.name}}
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
+								<div [ngClass]="getMoveBundleClass(dataItem)" *ngIf="dataItem?.moveBundle.id != dependencies.asset?.moveBundleId; else normalBundleNameDependent"
+									 class="cell-template bundle"
+									 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+									<div class="dependent-show">
+										<span>{{dataItem.moveBundle.name}}</span>
+										<img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+									</div>
+								</div>
+								<ng-template #normalBundleNameDependent>
+									<div class="cell-template dep-{{dataItem.status}} bundle" (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
+										{{dataItem.moveBundle.name}}
+									</div>
+								</ng-template>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)">
+									{{dataItem.type}}
+									<img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)">
+									{{dataItem.status}}
+								</div>
+							</ng-template>
+
+						</kendo-grid-column>
+						<!-- Pagination Footer -->
+						<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+							<div class="clr-col-4"></div>
+							<div class="clr-col-8">
+								<tds-grid-pager
+										[total]="total"
+										[totalPages]="totalPages"
+										[currentPage]="currentPage"
+										[pageSize]="gridDependenciesData.state.take"
+										[pageSizes]="gridDependenciesData.defaultPageOptions"
+										(pageChange)="gridDependenciesData.pageChange($event)">
+								</tds-grid-pager>
 							</div>
 						</ng-template>
-
-						<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-							<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)">
-								{{dataItem.status}}
-							</div>
-						</ng-template>
-
-					</kendo-grid-column>
-
-				</kendo-grid>
-			</div>
+						<kendo-grid-messages noRecords="There are no records to display."></kendo-grid-messages>
+					</kendo-grid>
+				</div>
 			</div>
 		</div>
 	</div>

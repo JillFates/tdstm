@@ -66,7 +66,7 @@ export class AssetCommonShow implements OnInit {
 				});
 			this.dependencies.asset = metadata.asset;
 			this.dependencies.supports = metadata.supports;
-			this.dependencies.dependents = metadata.supports;
+			this.dependencies.dependents = metadata.dependents;
 	}
 
 	/**

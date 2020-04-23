@@ -12,6 +12,7 @@ export class TaskColumnsModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
+				headerClass: ['text-center'],
 				width: 60,
 				locked: true
 			},
