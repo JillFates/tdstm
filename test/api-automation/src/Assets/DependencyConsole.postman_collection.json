@@ -1,0 +1,802 @@
+{
+	"info": {
+		"_postman_id": "96703f3e-7bfc-44b0-88d3-c876c87e9e6f",
+		"name": "Dependency Console",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login - Dependency Console",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b4f18c3e-477e-4e6a-b38b-29da6b0d3a39",
+						"exec": [
+							"var data = pm.response.json();",
+							"",
+							"postman.clearGlobalVariable(\"jwt_token\");",
+							"postman.setGlobalVariable(\"jwt_token\", data.access_token);",
+							"postman.setGlobalVariable(\"tokenHeaderName\",data.csrf.tokenHeaderName);",
+							"postman.setGlobalVariable(\"token\",data.csrf.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Bundles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Save bundle id\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var bundleId = jsonObject.data[0].id;",
+							"    pm.environment.set(\"bundleId\", bundleId);",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains the Success Status\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/reports/moveBundles",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"reports",
+						"moveBundles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dependency Console",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3e3091a9-6918-42a6-8bb0-457ffa89f82d",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The chosen bundle is part of the response\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    ",
+							"    var firstBundleId = jsonObject.allMoveBundles[0].id;",
+							"    pm.expect(firstBundleId).to.eql((pm.variables.get(\"bundleId\")));",
+							"",
+							"});",
+							"",
+							"pm.test(\"Response contains the dependency groups\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"dependencyConsole\");",
+							"});",
+							"",
+							"pm.test(\"Response contains the Planning Bundles\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"planningBundles\");",
+							"});",
+							"",
+							"pm.test(\"Response contains the Plan Status Options\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"planStatusOptions\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Version",
+						"value": "1.0"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dependencyConsole/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dependencyConsole",
+						""
+					]
+				},
+				"description": "Endpoint previewQuery\n\nRequest:\n  URI: /tdstm/ws/assetExplorer/previewQuery\n\n{\n  \"offset\": 5,\n  \"limit\": 25,\n  \"sortDomain\": \"application\",\n  \"sortField\": \"sme',\n  \"sortOrder\": \"a\",\n  \"viewSpec: {\n    \"domains\": [\"application\", \"device\"],\n    \"columns\": [ { \"domain\": \"common\", \"property\": \"environment\", \"filter\": \"production\" } ],\n  }\n}"
+			},
+			"response": [
+				{
+					"name": "All Assets",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Version",
+								"value": "1.0"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offset\": 0,\n    \"limit\": 25,\n    \"sortDomain\": \"common\",\n    \"sortProperty\": \"assetName\",\n    \"sortOrder\": \"a\",\n    \"filters\": {\n        \"domains\": [\n            \"common\",\n            \"application\",\n            \"database\",\n            \"device\",\n            \"storage\"\n        ],\n        \"columns\": [\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Name\",\n                \"locked\": true,\n                \"property\": \"assetName\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Asset Class\",\n                \"locked\": true,\n                \"property\": \"assetClass\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Description\",\n                \"locked\": false,\n                \"property\": \"description\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Environment\",\n                \"locked\": false,\n                \"property\": \"environment\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Bundle\",\n                \"locked\": false,\n                \"property\": \"moveBundle\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Tags\",\n                \"locked\": false,\n                \"property\": \"tagAssets\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Validation\",\n                \"locked\": false,\n                \"property\": \"validation\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Plan Status\",\n                \"locked\": false,\n                \"property\": \"planStatus\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Support\",\n                \"locked\": false,\n                \"property\": \"supportType\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"External Ref Id\",\n                \"locked\": false,\n                \"property\": \"externalRefId\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Modified Date\",\n                \"locked\": false,\n                \"property\": \"lastUpdated\",\n                \"width\": 140\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/tdstm/ws/assetExplorer/query/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"tdstm",
+								"ws",
+								"assetExplorer",
+								"query",
+								"1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Application-Context",
+							"value": "application:development"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Apr 2019 16:11:05 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"pagination\": {\n            \"offset\": 0,\n            \"max\": 25,\n            \"total\": 1896\n        },\n        \"assets\": [\n            {\n                \"common_assetName\": \"01 test it with task\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Buildout\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 729,\n                        \"name\": \"anotherTestingTag1660\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 1133,\n                        \"description\": \"Description55\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Assigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": null,\n                \"common_lastUpdated\": \"2019-03-25T20:22:26Z\",\n                \"common_id\": 165386,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"111-JIM-111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 639,\n                        \"name\": \"Dalai Lama\",\n                        \"color\": \"Red\",\n                        \"tagId\": 6,\n                        \"description\": \"The tag returns\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 638,\n                        \"name\": \"Dolly Llama\",\n                        \"color\": \"Green\",\n                        \"tagId\": 317,\n                        \"description\": \"The most wholly of holies\",\n                        \"css\": \"tag-green\"\n                    },\n                    {\n                        \"id\": 368,\n                        \"name\": \"Tag - by CN\",\n                        \"color\": \"Red\",\n                        \"tagId\": 520,\n                        \"description\": \"Knowing what I can grab for E2E Testing purposes\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 483,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2018-08-22T06:29:31Z\",\n                \"common_id\": 144762,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"1111111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 653,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2019-03-19T19:00:51Z\",\n                \"common_id\": 145977,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 719,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2019-03-19T15:57:26Z\",\n                \"common_id\": 113835,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 640,\n                        \"name\": \"QAE2E odI Tag\",\n                        \"color\": \"Pink\",\n                        \"tagId\": 545,\n                        \"description\": \"Custom QAE2E odI Tag description\",\n                        \"css\": \"tag-pink\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T19:43:15Z\",\n                \"common_id\": 144764,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 650,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:37:26Z\",\n                \"common_id\": 144778,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:33Z\",\n                \"common_id\": 144779,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 646,\n                        \"name\": \"Got the cool\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 592,\n                        \"description\": \"Description of a new tag.\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 666,\n                        \"name\": \"createTag769\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 662,\n                        \"description\": \"Description\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 667,\n                        \"name\": \"anotherTestingTag170\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 721,\n                        \"description\": \"Description766\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-13T17:51:12Z\",\n                \"common_id\": 144780,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 652,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:38:00Z\",\n                \"common_id\": 144781,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-14T13:53:55Z\",\n                \"common_id\": 145058,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 582,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 145059,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 643,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:32Z\",\n                \"common_id\": 145808,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 403,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113836\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113836,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 400,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"ddd\",\n                \"common_externalRefId\": \"113833\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113833,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 401,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113834\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113834,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 398,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113831\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113831,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 399,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113832\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113832,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 396,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113829\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113829,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 397,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113830\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113830,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 381,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113777\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113777,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 383,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113784\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113784,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 394,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113827\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113827,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 395,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113828\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113828,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 392,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": \"113825\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113825,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 393,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113826\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113826,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Get Tags",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6ba4cebc-4d45-4dc4-97d4-42dd512a8156",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success Status\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"});",
+							"",
+							"pm.test(\"Save Tag id\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var tagId = jsonObject.data[0].id;",
+							"    pm.environment.set(\"tagId\", tagId);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/tag",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dependency Bundle Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8d45fdd9-6964-4d73-a634-2457bcaa55c8",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains the dependency groups\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"dependencyConsole\");",
+							"});",
+							"",
+							"pm.test(\"Response contains the Planning Bundles\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"planningBundles\");",
+							"});",
+							"",
+							"pm.test(\"Response contains the Plan Status Options\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"planStatusOptions\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Version",
+						"value": "1.0"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"type": "text",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"bundle\":\"\",\n\t\"tagIds\":[],\n\t\"tagMatch\":\"ANY\",\n\t\"assignedGroup\":0\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dependencyConsole/dependencyBundleDetails",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dependencyConsole",
+						"dependencyBundleDetails"
+					]
+				},
+				"description": "Endpoint previewQuery\n\nRequest:\n  URI: /tdstm/ws/assetExplorer/previewQuery\n\n{\n  \"offset\": 5,\n  \"limit\": 25,\n  \"sortDomain\": \"application\",\n  \"sortField\": \"sme',\n  \"sortOrder\": \"a\",\n  \"viewSpec: {\n    \"domains\": [\"application\", \"device\"],\n    \"columns\": [ { \"domain\": \"common\", \"property\": \"environment\", \"filter\": \"production\" } ],\n  }\n}"
+			},
+			"response": [
+				{
+					"name": "All Assets",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Version",
+								"value": "1.0"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offset\": 0,\n    \"limit\": 25,\n    \"sortDomain\": \"common\",\n    \"sortProperty\": \"assetName\",\n    \"sortOrder\": \"a\",\n    \"filters\": {\n        \"domains\": [\n            \"common\",\n            \"application\",\n            \"database\",\n            \"device\",\n            \"storage\"\n        ],\n        \"columns\": [\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Name\",\n                \"locked\": true,\n                \"property\": \"assetName\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Asset Class\",\n                \"locked\": true,\n                \"property\": \"assetClass\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Description\",\n                \"locked\": false,\n                \"property\": \"description\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Environment\",\n                \"locked\": false,\n                \"property\": \"environment\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Bundle\",\n                \"locked\": false,\n                \"property\": \"moveBundle\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Tags\",\n                \"locked\": false,\n                \"property\": \"tagAssets\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Validation\",\n                \"locked\": false,\n                \"property\": \"validation\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Plan Status\",\n                \"locked\": false,\n                \"property\": \"planStatus\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Support\",\n                \"locked\": false,\n                \"property\": \"supportType\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"External Ref Id\",\n                \"locked\": false,\n                \"property\": \"externalRefId\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Modified Date\",\n                \"locked\": false,\n                \"property\": \"lastUpdated\",\n                \"width\": 140\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/tdstm/ws/assetExplorer/query/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"tdstm",
+								"ws",
+								"assetExplorer",
+								"query",
+								"1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Application-Context",
+							"value": "application:development"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Apr 2019 16:11:05 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"pagination\": {\n            \"offset\": 0,\n            \"max\": 25,\n            \"total\": 1896\n        },\n        \"assets\": [\n            {\n                \"common_assetName\": \"01 test it with task\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Buildout\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 729,\n                        \"name\": \"anotherTestingTag1660\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 1133,\n                        \"description\": \"Description55\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Assigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": null,\n                \"common_lastUpdated\": \"2019-03-25T20:22:26Z\",\n                \"common_id\": 165386,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"111-JIM-111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 639,\n                        \"name\": \"Dalai Lama\",\n                        \"color\": \"Red\",\n                        \"tagId\": 6,\n                        \"description\": \"The tag returns\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 638,\n                        \"name\": \"Dolly Llama\",\n                        \"color\": \"Green\",\n                        \"tagId\": 317,\n                        \"description\": \"The most wholly of holies\",\n                        \"css\": \"tag-green\"\n                    },\n                    {\n                        \"id\": 368,\n                        \"name\": \"Tag - by CN\",\n                        \"color\": \"Red\",\n                        \"tagId\": 520,\n                        \"description\": \"Knowing what I can grab for E2E Testing purposes\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 483,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2018-08-22T06:29:31Z\",\n                \"common_id\": 144762,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"1111111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 653,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2019-03-19T19:00:51Z\",\n                \"common_id\": 145977,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 719,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2019-03-19T15:57:26Z\",\n                \"common_id\": 113835,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 640,\n                        \"name\": \"QAE2E odI Tag\",\n                        \"color\": \"Pink\",\n                        \"tagId\": 545,\n                        \"description\": \"Custom QAE2E odI Tag description\",\n                        \"css\": \"tag-pink\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T19:43:15Z\",\n                \"common_id\": 144764,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 650,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:37:26Z\",\n                \"common_id\": 144778,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:33Z\",\n                \"common_id\": 144779,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 646,\n                        \"name\": \"Got the cool\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 592,\n                        \"description\": \"Description of a new tag.\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 666,\n                        \"name\": \"createTag769\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 662,\n                        \"description\": \"Description\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 667,\n                        \"name\": \"anotherTestingTag170\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 721,\n                        \"description\": \"Description766\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-13T17:51:12Z\",\n                \"common_id\": 144780,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 652,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:38:00Z\",\n                \"common_id\": 144781,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-14T13:53:55Z\",\n                \"common_id\": 145058,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 582,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 145059,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 643,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:32Z\",\n                \"common_id\": 145808,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 403,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113836\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113836,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 400,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"ddd\",\n                \"common_externalRefId\": \"113833\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113833,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 401,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113834\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113834,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 398,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113831\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113831,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 399,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113832\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113832,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 396,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113829\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113829,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 397,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113830\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113830,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 381,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113777\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113777,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 383,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113784\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113784,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 394,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113827\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113827,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 395,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113828\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113828,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 392,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": \"113825\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113825,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 393,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113826\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113826,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "List Devices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Save device info\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    var devFirstId = jsonObject.rows[0].id; ",
+							"    var devSecondId = jsonObject.rows[1].id; ",
+							"    pm.environment.set(\"devFirstId\", devFirstId);",
+							"    pm.environment.set(\"devSecondId\", devSecondId);",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1\n\n",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"assetEntity",
+						"listJson"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "all"
+						},
+						{
+							"key": "event",
+							"value": ""
+						},
+						{
+							"key": "type",
+							"value": ""
+						},
+						{
+							"key": "plannedStatus",
+							"value": ""
+						},
+						{
+							"key": "assetName",
+							"value": ""
+						},
+						{
+							"key": "planStatus",
+							"value": ""
+						},
+						{
+							"key": "moveBundle",
+							"value": ""
+						},
+						{
+							"key": "assetType",
+							"value": ""
+						},
+						{
+							"key": "model",
+							"value": ""
+						},
+						{
+							"key": "sourceLocationName",
+							"value": ""
+						},
+						{
+							"key": "sourceRackName",
+							"value": ""
+						},
+						{
+							"key": "targetLocationName",
+							"value": ""
+						},
+						{
+							"key": "targetRackName",
+							"value": ""
+						},
+						{
+							"key": "assetTag",
+							"value": ""
+						},
+						{
+							"key": "serialNumber",
+							"value": ""
+						},
+						{
+							"key": "moveBundleId",
+							"value": ""
+						},
+						{
+							"key": "manufacturer",
+							"value": ""
+						},
+						{
+							"key": "unassigned",
+							"value": ""
+						},
+						{
+							"key": "rows",
+							"value": "100"
+						},
+						{
+							"key": "page",
+							"value": "1\n\n"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assets Assignment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8d45fdd9-6964-4d73-a634-2457bcaa55c8",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Version",
+						"value": "1.0"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"type": "text",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"assetType\": \"apps\",\n\t\"bundleSession\": null,\n\t\"tagMatch\": \"ANY\",\n\t\"tagIds\": {{tagId}},\n\t\"moveBundle\": {{bundleId}},\n\t\"planStatus\": \"Assigned\",\n\t\"bundles\": \"planningBundle\",\n\t\"assets\": [{{devFirstId}},{{devSecondId}}]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dependencyConsole/assetsAssignment",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dependencyConsole",
+						"assetsAssignment"
+					]
+				},
+				"description": "Endpoint previewQuery\n\nRequest:\n  URI: /tdstm/ws/assetExplorer/previewQuery\n\n{\n  \"offset\": 5,\n  \"limit\": 25,\n  \"sortDomain\": \"application\",\n  \"sortField\": \"sme',\n  \"sortOrder\": \"a\",\n  \"viewSpec: {\n    \"domains\": [\"application\", \"device\"],\n    \"columns\": [ { \"domain\": \"common\", \"property\": \"environment\", \"filter\": \"production\" } ],\n  }\n}"
+			},
+			"response": [
+				{
+					"name": "All Assets",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Version",
+								"value": "1.0"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offset\": 0,\n    \"limit\": 25,\n    \"sortDomain\": \"common\",\n    \"sortProperty\": \"assetName\",\n    \"sortOrder\": \"a\",\n    \"filters\": {\n        \"domains\": [\n            \"common\",\n            \"application\",\n            \"database\",\n            \"device\",\n            \"storage\"\n        ],\n        \"columns\": [\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Name\",\n                \"locked\": true,\n                \"property\": \"assetName\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Asset Class\",\n                \"locked\": true,\n                \"property\": \"assetClass\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Description\",\n                \"locked\": false,\n                \"property\": \"description\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Environment\",\n                \"locked\": false,\n                \"property\": \"environment\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Bundle\",\n                \"locked\": false,\n                \"property\": \"moveBundle\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Tags\",\n                \"locked\": false,\n                \"property\": \"tagAssets\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Validation\",\n                \"locked\": false,\n                \"property\": \"validation\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Plan Status\",\n                \"locked\": false,\n                \"property\": \"planStatus\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Support\",\n                \"locked\": false,\n                \"property\": \"supportType\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"External Ref Id\",\n                \"locked\": false,\n                \"property\": \"externalRefId\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Modified Date\",\n                \"locked\": false,\n                \"property\": \"lastUpdated\",\n                \"width\": 140\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/tdstm/ws/assetExplorer/query/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"tdstm",
+								"ws",
+								"assetExplorer",
+								"query",
+								"1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Application-Context",
+							"value": "application:development"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Apr 2019 16:11:05 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"pagination\": {\n            \"offset\": 0,\n            \"max\": 25,\n            \"total\": 1896\n        },\n        \"assets\": [\n            {\n                \"common_assetName\": \"01 test it with task\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Buildout\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 729,\n                        \"name\": \"anotherTestingTag1660\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 1133,\n                        \"description\": \"Description55\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Assigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": null,\n                \"common_lastUpdated\": \"2019-03-25T20:22:26Z\",\n                \"common_id\": 165386,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"111-JIM-111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 639,\n                        \"name\": \"Dalai Lama\",\n                        \"color\": \"Red\",\n                        \"tagId\": 6,\n                        \"description\": \"The tag returns\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 638,\n                        \"name\": \"Dolly Llama\",\n                        \"color\": \"Green\",\n                        \"tagId\": 317,\n                        \"description\": \"The most wholly of holies\",\n                        \"css\": \"tag-green\"\n                    },\n                    {\n                        \"id\": 368,\n                        \"name\": \"Tag - by CN\",\n                        \"color\": \"Red\",\n                        \"tagId\": 520,\n                        \"description\": \"Knowing what I can grab for E2E Testing purposes\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 483,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2018-08-22T06:29:31Z\",\n                \"common_id\": 144762,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"1111111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 653,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2019-03-19T19:00:51Z\",\n                \"common_id\": 145977,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 719,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2019-03-19T15:57:26Z\",\n                \"common_id\": 113835,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 640,\n                        \"name\": \"QAE2E odI Tag\",\n                        \"color\": \"Pink\",\n                        \"tagId\": 545,\n                        \"description\": \"Custom QAE2E odI Tag description\",\n                        \"css\": \"tag-pink\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T19:43:15Z\",\n                \"common_id\": 144764,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 650,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:37:26Z\",\n                \"common_id\": 144778,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:33Z\",\n                \"common_id\": 144779,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 646,\n                        \"name\": \"Got the cool\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 592,\n                        \"description\": \"Description of a new tag.\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 666,\n                        \"name\": \"createTag769\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 662,\n                        \"description\": \"Description\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 667,\n                        \"name\": \"anotherTestingTag170\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 721,\n                        \"description\": \"Description766\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-13T17:51:12Z\",\n                \"common_id\": 144780,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 652,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:38:00Z\",\n                \"common_id\": 144781,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-14T13:53:55Z\",\n                \"common_id\": 145058,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 582,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 145059,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 643,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:32Z\",\n                \"common_id\": 145808,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 403,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113836\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113836,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 400,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"ddd\",\n                \"common_externalRefId\": \"113833\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113833,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 401,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113834\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113834,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 398,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113831\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113831,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 399,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113832\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113832,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 396,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113829\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113829,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 397,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113830\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113830,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 381,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113777\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113777,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 383,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113784\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113784,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 394,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113827\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113827,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 395,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113828\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113828,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 392,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": \"113825\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113825,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 393,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113826\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113826,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Assets Assignment - Negative Scenario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8d45fdd9-6964-4d73-a634-2457bcaa55c8",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"error\");",
+							"});",
+							"",
+							"",
+							"pm.environment.unset(\"bundleId\");",
+							"pm.environment.unset(\"tagId\");",
+							"pm.environment.unset(\"devFirstId\");",
+							"pm.environment.unset(\"devSecondId\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept-Version",
+						"value": "1.0"
+					},
+					{
+						"key": "{{tokenHeaderName}}",
+						"type": "text",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"assetType\": \"apps\",\n\t\"bundleSession\": null,\n\t\"tagMatch\": \"ANY\",\n\t\"tagIds\": {{tagId}},\n\t\"moveBundle\": {{bundleId}},\n\t\"planStatus\": \"Assigned\",\n\t\"bundles\": \"planningBundle\",\n\t\"assets\": [999999999999,9999999999999]\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dependencyConsole/assetsAssignment",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dependencyConsole",
+						"assetsAssignment"
+					]
+				},
+				"description": "Endpoint previewQuery\n\nRequest:\n  URI: /tdstm/ws/assetExplorer/previewQuery\n\n{\n  \"offset\": 5,\n  \"limit\": 25,\n  \"sortDomain\": \"application\",\n  \"sortField\": \"sme',\n  \"sortOrder\": \"a\",\n  \"viewSpec: {\n    \"domains\": [\"application\", \"device\"],\n    \"columns\": [ { \"domain\": \"common\", \"property\": \"environment\", \"filter\": \"production\" } ],\n  }\n}"
+			},
+			"response": [
+				{
+					"name": "All Assets",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Version",
+								"value": "1.0"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"offset\": 0,\n    \"limit\": 25,\n    \"sortDomain\": \"common\",\n    \"sortProperty\": \"assetName\",\n    \"sortOrder\": \"a\",\n    \"filters\": {\n        \"domains\": [\n            \"common\",\n            \"application\",\n            \"database\",\n            \"device\",\n            \"storage\"\n        ],\n        \"columns\": [\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Name\",\n                \"locked\": true,\n                \"property\": \"assetName\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Asset Class\",\n                \"locked\": true,\n                \"property\": \"assetClass\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Description\",\n                \"locked\": false,\n                \"property\": \"description\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Environment\",\n                \"locked\": false,\n                \"property\": \"environment\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Bundle\",\n                \"locked\": false,\n                \"property\": \"moveBundle\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Tags\",\n                \"locked\": false,\n                \"property\": \"tagAssets\",\n                \"width\": 220\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Validation\",\n                \"locked\": false,\n                \"property\": \"validation\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Plan Status\",\n                \"locked\": false,\n                \"property\": \"planStatus\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Support\",\n                \"locked\": false,\n                \"property\": \"supportType\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"External Ref Id\",\n                \"locked\": false,\n                \"property\": \"externalRefId\",\n                \"width\": 140\n            },\n            {\n                \"domain\": \"common\",\n                \"edit\": false,\n                \"filter\": \"\",\n                \"label\": \"Modified Date\",\n                \"locked\": false,\n                \"property\": \"lastUpdated\",\n                \"width\": 140\n            }\n        ]\n    }\n}"
+						},
+						"url": {
+							"raw": "{{host}}/tdstm/ws/assetExplorer/query/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"tdstm",
+								"ws",
+								"assetExplorer",
+								"query",
+								"1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Application-Context",
+							"value": "application:development"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Apr 2019 16:11:05 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"pagination\": {\n            \"offset\": 0,\n            \"max\": 25,\n            \"total\": 1896\n        },\n        \"assets\": [\n            {\n                \"common_assetName\": \"01 test it with task\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Buildout\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 729,\n                        \"name\": \"anotherTestingTag1660\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 1133,\n                        \"description\": \"Description55\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Assigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": null,\n                \"common_lastUpdated\": \"2019-03-25T20:22:26Z\",\n                \"common_id\": 165386,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"111-JIM-111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 639,\n                        \"name\": \"Dalai Lama\",\n                        \"color\": \"Red\",\n                        \"tagId\": 6,\n                        \"description\": \"The tag returns\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 638,\n                        \"name\": \"Dolly Llama\",\n                        \"color\": \"Green\",\n                        \"tagId\": 317,\n                        \"description\": \"The most wholly of holies\",\n                        \"css\": \"tag-green\"\n                    },\n                    {\n                        \"id\": 368,\n                        \"name\": \"Tag - by CN\",\n                        \"color\": \"Red\",\n                        \"tagId\": 520,\n                        \"description\": \"Knowing what I can grab for E2E Testing purposes\",\n                        \"css\": \"tag-red\"\n                    },\n                    {\n                        \"id\": 483,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2018-08-22T06:29:31Z\",\n                \"common_id\": 144762,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"1111111\",\n                \"common_assetClass\": \"APPLICATION\",\n                \"common_description\": \"\",\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"M1-Phy\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 653,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"\",\n                \"common_lastUpdated\": \"2019-03-19T19:00:51Z\",\n                \"common_id\": 145977,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 719,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2019-03-19T15:57:26Z\",\n                \"common_id\": 113835,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 640,\n                        \"name\": \"QAE2E odI Tag\",\n                        \"color\": \"Pink\",\n                        \"tagId\": 545,\n                        \"description\": \"Custom QAE2E odI Tag description\",\n                        \"css\": \"tag-pink\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T19:43:15Z\",\n                \"common_id\": 144764,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 650,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:37:26Z\",\n                \"common_id\": 144778,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:33Z\",\n                \"common_id\": 144779,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 646,\n                        \"name\": \"Got the cool\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 592,\n                        \"description\": \"Description of a new tag.\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 666,\n                        \"name\": \"createTag769\",\n                        \"color\": \"Grey\",\n                        \"tagId\": 662,\n                        \"description\": \"Description\",\n                        \"css\": \"tag-grey\"\n                    },\n                    {\n                        \"id\": 667,\n                        \"name\": \"anotherTestingTag170\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 721,\n                        \"description\": \"Description766\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-13T17:51:12Z\",\n                \"common_id\": 144780,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 652,\n                        \"name\": \"anotherTestingTag152\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 913,\n                        \"description\": \"Description169\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-08T20:38:00Z\",\n                \"common_id\": 144781,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-14T13:53:55Z\",\n                \"common_id\": 145058,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 582,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 145059,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 643,\n                        \"name\": \"Let's update this\",\n                        \"color\": \"Blue\",\n                        \"tagId\": 537,\n                        \"description\": \"Different Description\",\n                        \"css\": \"tag-blue\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113835\",\n                \"common_lastUpdated\": \"2018-08-16T13:04:32Z\",\n                \"common_id\": 145808,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A1 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": \"\",\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"M1 - Physical\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 403,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113836\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113836,\n                \"taskAndCommentFlags\": {\n                    \"issue\": true,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 400,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"ddd\",\n                \"common_externalRefId\": \"113833\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113833,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": true\n                }\n            },\n            {\n                \"common_assetName\": \"A2 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 401,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113834\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113834,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 398,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113831\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113831,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A3 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 399,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113832\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113832,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 396,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113829\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113829,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 397,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113830\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113830,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 381,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113777\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113777,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A4 PDU2 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 383,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113784\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113784,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 394,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113827\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113827,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A5 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 395,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113828\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113828,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 A\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"Production\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 392,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": null,\n                \"common_externalRefId\": \"113825\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113825,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            },\n            {\n                \"common_assetName\": \"A6 PDU1 B\",\n                \"common_assetClass\": \"DEVICE\",\n                \"common_description\": null,\n                \"common_environment\": \"\",\n                \"common_moveBundle\": \"Master Bundle\",\n                \"common_tagAssets\": [\n                    {\n                        \"id\": 393,\n                        \"name\": \"QA1\",\n                        \"color\": \"Purple\",\n                        \"tagId\": 600,\n                        \"description\": \"updating tag 00\",\n                        \"css\": \"tag-purple\"\n                    }\n                ],\n                \"common_validation\": \"Unknown\",\n                \"common_planStatus\": \"Unassigned\",\n                \"common_supportType\": \"\",\n                \"common_externalRefId\": \"113826\",\n                \"common_lastUpdated\": \"2018-08-07T18:53:33Z\",\n                \"common_id\": 113826,\n                \"taskAndCommentFlags\": {\n                    \"issue\": false,\n                    \"comment\": false\n                }\n            }\n        ]\n    }\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "ec7e4747-41f8-43cc-96d9-511d4679e36d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "eecb5294-852c-484a-8eba-a93da476753e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
