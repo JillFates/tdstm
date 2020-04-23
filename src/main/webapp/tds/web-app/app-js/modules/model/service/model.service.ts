@@ -41,6 +41,7 @@ export class ModelService {
 
 	saveModel(model: ModelModel): Observable<ModelModel> {
 		const postRequest = {
+			id: model.id,
 			modelName: model.modelName,
 			manufacturer: (model.manufacturer['id']) ? {id: model.manufacturer['id']} : {id: model.manufacturer},
 			assetType: model.assetType,
@@ -70,12 +71,12 @@ export class ModelService {
 			removedConnectors: model.removedConnectors,
 			connectorCount: model.connectorCount,
 			aka: {
-				deleted: model.akaChanges.deleted.join(','),
+				deleted: model.akaChanges.deleted,
 				edited: model.akaChanges.edited,
 				added: model.akaChanges.added
 			},
 			useImage: model.useImage,
-			connectors: {added: model.modelConnectors, edited: [], deleted: model.removedConnectors.join(',')}
+			connectors: {added: model.modelConnectors, edited: [], deleted: model.removedConnectors}
 		};
 		if (!model.id) {
 			return this.http.post(`${this.wsModelUrl}`, JSON.stringify(postRequest))

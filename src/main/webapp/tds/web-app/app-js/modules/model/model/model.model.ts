@@ -107,7 +107,7 @@ export class ModelModel {
 	updatedBy?: string;
 	createdBy?: string;
 	modelConnectors: Connector[] = [];
-	removedConnectors: Connector[] = [];
+	removedConnectors: number[] = [];
 	connectorCount?: number;
 	akaChanges?: AkaChanges;
 	useImage = 0;

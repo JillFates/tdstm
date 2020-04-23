@@ -513,9 +513,6 @@ class ModelService implements ServiceMethods {
 	Model createOrUpdateModel(Project project, ModelCommand modelCommand) {
 		Model model = (Model) GormUtil.populateDomainFromCommand(project, Model, modelCommand.id, modelCommand, null, true)
 
-		// Firts validate name with Manufacturer
-		validateModelName(model.modelName, model.id, model.manufacturer.id)
-
 		if (modelCommand.powerType && modelCommand.powerType.equalsIgnoreCase('Amps')) {
 			model.powerNameplate = NumberUtil.toInteger(model.powerNameplate, 0) * 120
 			model.powerDesign = NumberUtil.toInteger(model.powerDesign, 0) * 120
