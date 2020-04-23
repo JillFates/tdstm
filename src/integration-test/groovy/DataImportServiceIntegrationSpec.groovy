@@ -19,6 +19,7 @@ import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.DataTransformService
 import net.transitionmanager.imports.ImportBatchRecord
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
@@ -49,7 +50,10 @@ class DataImportServiceIntegrationSpec extends Specification {
     DataImportService dataImportService
 
 	@Shared
-    SecurityService securityService
+	SecurityService securityService
+
+	@Shared
+	DataTransformService dataTransformService
 
 	@Shared
 	DataScriptTestHelper dataScriptTestHelper
@@ -740,7 +744,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			os.close()
 
 		when: 'calling to transform the data with the ETL script'
-			Map transformResults = dataImportService.transformEtlData(project.id, Mock(UserLogin), dataScript.id, fileUploadName, false)
+			Map transformResults = dataTransformService.transformEtlData(Mock(UserLogin), project.id, dataScript.id, fileUploadName, false, 'progress-key')
 			String transformedFileName = transformResults['filename']
 		then: 'the results should have a filename'
 			transformResults.containsKey('filename')

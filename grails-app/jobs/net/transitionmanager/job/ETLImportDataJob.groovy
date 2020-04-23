@@ -1,5 +1,6 @@
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.etl.ETLProcessor
+package net.transitionmanager.job
+
+
 import groovy.util.logging.Slf4j
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.imports.DataImportService
@@ -32,24 +33,14 @@ class ETLImportDataJob {
         JobDataMap dataMap = context.mergedJobDataMap
         Project project = (Project) dataMap.get('project')
         String filename = dataMap.getString('filename')
-        Boolean isAutoProcess = dataMap.getBooleanValue('isAutoProcess')
+        Long dataScriptId = dataMap.getLong('dataScriptId')
         Boolean sendResultsByEmail = dataMap.getBooleanValue('sendResultsByEmail')
         String progressKey = dataMap.getString('progressKey')
         UserLogin userLogin = (UserLogin) dataMap.get('userLogin')
 
-        try {
-            log.info('ETLImportDataJob started for filename: {}', filename)
-            Map importResults = dataImportService.loadETLJsonIntoImportBatch(project, userLogin, filename, isAutoProcess, sendResultsByEmail, progressKey)
-            log.info('ETL import data execution result: {}', importResults)
-        } catch (Throwable e) {
-            log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-            progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))
-
-        }
-
-
+        log.info('ETLImportDataJob started for filename: {}', filename)
+        Map importResults = dataImportService.loadETLJsonIntoImportBatch(project, userLogin, filename, dataScriptId, sendResultsByEmail, progressKey)
+        log.info('ETL import data execution result: {}', importResults)
     }
-
-
 }
 
