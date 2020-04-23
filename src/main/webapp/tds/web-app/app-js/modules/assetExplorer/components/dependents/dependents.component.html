@@ -112,8 +112,15 @@
 									 class="cell-template bundle"
 									 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
 									<div class="dependent-show">
-										<span>{{dataItem.moveBundle.name}} </span>
-										<img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+										<!--  bundle conflict and the status is valid -->
+										<div class="lbl-information text left">
+											<strong><span>{{dataItem.moveBundle.name}} </span></strong>
+										</div>
+										<div class="lbl-information icon right">
+											<span class="status status-Warning" title="The linked assets have conflicting bundles.">
+												<clr-icon shape="exclamation-triangle" class="is-solid"></clr-icon>
+											</span>
+										</div>
 									</div>
 								</div>
 								<ng-template #normalBundleNameSupport>
@@ -133,6 +140,39 @@
 
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
 								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)">
+									<span class="status-icon status-Ready" *ngIf="dataItem.status === 'Validated' || dataItem.status === 'Ready'">
+										<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
+									</span>
+									<span class="status-icon status-Started" *ngIf="dataItem.status === 'Started'">
+										<fa-icon [icon]="['fas', 'circle-notch']"></fa-icon>
+									</span>
+									<span class="status-icon status-Hold" *ngIf="dataItem.status === 'Hold'">
+										<fa-icon [icon]="['fas', 'pause']"></fa-icon>
+									</span>
+									<span class="status-icon status-Completed" *ngIf="dataItem.status === 'Completed'">
+										<fa-icon [icon]="['fas', 'check']"></fa-icon>
+									</span>
+									<span class="status-icon status-Pending" *ngIf="dataItem.status === 'Pending'">
+										<fa-icon [icon]="['fas', 'hourglass-start']"></fa-icon>
+									</span>
+									<span class="status-icon status-Unknown" *ngIf="dataItem.status === 'Unknown'">
+										<fa-icon [icon]="['fas', 'question-circle']"></fa-icon>
+									</span>
+									<span class="status-icon status-Archived" *ngIf="dataItem.status === 'Archived'">
+										<fa-icon [icon]="['fas', 'archive']"></fa-icon>
+									</span>
+									<span class="status-icon status-Future" *ngIf="dataItem.status === 'Future'">
+										<fa-icon [icon]="['far', 'share-square']"></fa-icon>
+									</span>
+									<span class="status-icon status-Validated-NA" *ngIf="dataItem.status === 'Validated_NA'">
+										<fa-icon [icon]="['fas', 'square']"></fa-icon>
+									</span>
+									<span class="status-icon status-Not-Applicable" *ngIf="dataItem.status === 'Not Applicable'">
+										<fa-icon [icon]="['fas', 'ban']"></fa-icon>
+									</span>
+									<span class="status-icon status-Questioned" *ngIf="dataItem.status === 'Questioned'">
+										<fa-icon [icon]="['fas', 'exclamation-triangle']"></fa-icon>
+									</span>
 									{{dataItem.status}}
 								</div>
 							</ng-template>
@@ -269,8 +309,15 @@
 									 class="cell-template bundle"
 									 (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)">
 									<div class="dependent-show">
-										<span>{{dataItem.moveBundle.name}}</span>
-										<img src="/tdstm/assets/icons/error.png" border="0" title="The linked assets have conflicting bundles.">
+										<!--  bundle conflict and the status is valid -->
+										<div class="lbl-information text left">
+											<strong><span>{{dataItem.moveBundle.name}} </span></strong>
+										</div>
+										<div class="lbl-information icon right">
+											<span class="status status-Warning" title="The linked assets have conflicting bundles.">
+												<clr-icon shape="exclamation-triangle" class="is-solid"></clr-icon>
+											</span>
+										</div>
 									</div>
 								</div>
 								<ng-template #normalBundleNameDependent>
@@ -289,6 +336,39 @@
 
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
 								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)">
+									<span class="status-icon status-Ready" *ngIf="dataItem.status === 'Validated' || dataItem.status === 'Ready'">
+										<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
+									</span>
+									<span class="status-icon status-Started" *ngIf="dataItem.status === 'Started'">
+										<fa-icon [icon]="['fas', 'circle-notch']"></fa-icon>
+									</span>
+									<span class="status-icon status-Hold" *ngIf="dataItem.status === 'Hold'">
+										<fa-icon [icon]="['fas', 'pause']"></fa-icon>
+									</span>
+									<span class="status-icon status-Completed" *ngIf="dataItem.status === 'Completed'">
+										<fa-icon [icon]="['fas', 'check']"></fa-icon>
+									</span>
+									<span class="status-icon status-Pending" *ngIf="dataItem.status === 'Pending'">
+										<fa-icon [icon]="['fas', 'hourglass-start']"></fa-icon>
+									</span>
+									<span class="status-icon status-Unknown" *ngIf="dataItem.status === 'Unknown'">
+										<fa-icon [icon]="['fas', 'question-circle']"></fa-icon>
+									</span>
+									<span class="status-icon status-Archived" *ngIf="dataItem.status === 'Archived'">
+										<fa-icon [icon]="['fas', 'archive']"></fa-icon>
+									</span>
+									<span class="status-icon status-Future" *ngIf="dataItem.status === 'Future'">
+										<fa-icon [icon]="['far', 'share-square']"></fa-icon>
+									</span>
+									<span class="status-icon status-Validated-NA" *ngIf="dataItem.status === 'Validated_NA'">
+										<fa-icon [icon]="['fas', 'square']"></fa-icon>
+									</span>
+									<span class="status-icon status-Not-Applicable" *ngIf="dataItem.status === 'Not Applicable'">
+										<fa-icon [icon]="['fas', 'ban']"></fa-icon>
+									</span>
+									<span class="status-icon status-Questioned" *ngIf="dataItem.status === 'Questioned'">
+										<fa-icon [icon]="['fas', 'exclamation-triangle']"></fa-icon>
+									</span>
 									{{dataItem.status}}
 								</div>
 							</ng-template>

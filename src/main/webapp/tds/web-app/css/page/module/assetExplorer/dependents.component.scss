@@ -29,6 +29,27 @@
     table thead th.text-center {
       padding-left: 0px;
     }
+
+    .lbl-information {
+      &.text {
+        padding-top: 4px;
+      }
+      &.icon {
+        padding-right: 10px;
+      }
+      &.left {
+        float: left;
+      }
+      &.right {
+        float: right;
+      }
+    }
+
+    .cell-template {
+      img {
+        padding-left: 10px;
+      }
+    }
   }
 
 }
