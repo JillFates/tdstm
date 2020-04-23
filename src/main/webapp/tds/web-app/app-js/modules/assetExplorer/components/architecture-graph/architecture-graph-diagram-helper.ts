@@ -29,6 +29,25 @@ export class ArchitectureGraphDiagramHelper {
 		// Architecture Graph Diagram Helper Constructor
 	}
 
+	static isDeviceVirtualServer(type: string): boolean {
+		return ['vm', 'virtual'].indexOf(type) !== -1;
+	}
+
+	static isDeviceServer(type: string): boolean {
+		return ['server', 'appliance', 'blade'].indexOf(type) !== -1;
+	}
+
+	static isDeviceStorage(type: string): boolean {
+		return ['array', 'disk', 'nas', 'san', 'san switch', 'storage', 'tape', 'tape library',
+			'virtual tape library'].indexOf(type) !== -1;
+	}
+
+	static isDeviceNetwork(type: string): boolean {
+		return ['encoder', 'load balancer', 'modem', 'module', 'multiplexer',
+			'network', 'probe', 'receiver', 'router', 'switch', 'telecom',
+			'terminal server', 'vpn'].indexOf(type) !== -1;
+	}
+
 	/**
 	 * Diagram data object
 	 */
@@ -112,8 +131,11 @@ export class ArchitectureGraphDiagramHelper {
 		// Picture Icon
 		const iconPicture = new Picture();
 		iconPicture.desiredSize = new Size(50, 50);
-		iconPicture.bind(new Binding('source', 'assetClass',
-			(val: string) => this.getIconPath(val)));
+		iconPicture.bind(new Binding('source', '',
+			(val: string) => {
+				return this.getIconPath(val);
+				}
+		));
 		iconPicture.imageAlignment = Spot.Center;
 
 		// TextBlock
@@ -121,6 +143,9 @@ export class ArchitectureGraphDiagramHelper {
 		textBlock.stroke = '#000';
 		textBlock.overflow = TextBlock.OverflowEllipsis;
 		textBlock.bind(new Binding('text', 'name'));
+
+		// hide if the node if the name is empty
+		textBlock.bind(new Binding('visible', 'name', (val: string) => !!val));
 
 		textBlock.mouseOver = (e: InputEvent, obj: TextBlock) => {
 			if (obj.text && obj.text.length > 10) {
@@ -260,8 +285,25 @@ export class ArchitectureGraphDiagramHelper {
 		return node;
 	}
 
-	private getIconPath(name: string): string {
-		const icon = ASSET_ICONS[name && name.toLowerCase()];
+	private getIconPath(node: any): string {
+		const name = (node.assetClass || '').toLowerCase();
+		const type = (node.type || '').toLowerCase();
+		let icon;
+		if (name === 'device') {
+			if (ArchitectureGraphDiagramHelper.isDeviceVirtualServer(type)) {
+				icon = ASSET_ICONS['virtualServer'];
+			} else if (ArchitectureGraphDiagramHelper.isDeviceServer(type)) {
+				icon = ASSET_ICONS['server'];
+			} else if (ArchitectureGraphDiagramHelper.isDeviceStorage(type)) {
+				icon = ASSET_ICONS['physicalStorage'];
+			} else if (ArchitectureGraphDiagramHelper.isDeviceNetwork(type)) {
+				icon = ASSET_ICONS['network'];
+			} else {
+				icon = ASSET_ICONS['device'];
+			}
+		} else {
+			icon = ASSET_ICONS[name && name.toLowerCase()];
+		}
 		return !!icon ? icon.icon : ASSET_ICONS.application.icon;
 	}
 
