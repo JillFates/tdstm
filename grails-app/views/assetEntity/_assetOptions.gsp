@@ -67,6 +67,11 @@
 			$("#addAssetTypeButtonId").val("SAVE");
 			$(".deleteAssetType").show();
 			$("#addAssetTypeButtonId").attr("onClick","submitForm('"+option+"')");
+		} else if (value == 'taskCategory') {
+			$("#newTaskCategory").show(500);
+			$("#addTaskCategoryButtonId").val("SAVE");
+			$(".deleteTaskCategory").show();
+			$("#addTaskCategoryButtonId").attr("onClick", "submitForm('" + option + "')");
 		}
 	}
 	
@@ -78,6 +83,7 @@
 			var dependencyStatus = $("#dependencyStatus").val();
 			var environment = $("#environment").val();
 			var assetType = $("#assetType").val();
+			var taskCategory = $("#taskCategory").val();
 
 			if (option=='planStatus' && planStatus) {
 				${remoteFunction(action:'saveAssetoptions', params:'\'planStatus=\'+ encodeURIComponent(planStatus)+\'&assetOptionType=\'+"planStatus" ', onSuccess:'addAssetOption(data,planStatus,option)')};
@@ -89,7 +95,9 @@
 				${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ encodeURIComponent(dependencyStatus) +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(data,dependencyStatus,option)')};
 			} else if(option=='assetType' && assetType) {
 				${remoteFunction(action:'saveAssetoptions', params:'\'assetType=\'+ encodeURIComponent(assetType) +\'&assetOptionType=\'+"assetType"', onSuccess:'addAssetOption(data,assetType,option)')};
-			} else if(option=='environment' && environment) {
+			}  else if(option=='taskCategory' && taskCategory) {
+				${remoteFunction(action:'saveAssetoptions', params:'\'taskCategory=\'+ encodeURIComponent(taskCategory) +\'&assetOptionType=\'+"taskCategory"', onSuccess:'addAssetOption(data,taskCategory,option)')};
+			}else if(option=='environment' && environment) {
 				if (environment.length <= 20) {
 					${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ encodeURIComponent(environment) +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(data,environment,option)')};
 				} else {
@@ -154,6 +162,12 @@
             $("#assetTypeTbodyId").append("<tr id='assetType_"+id+"' style='cursor: pointer;'><td>"+assetTypeValue+"</td><td><span class=\'deleteAssetType clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
             $("#assetType").val("");
             sortTable($("#assetTypeTableId")[0]);
+		} else if (option == 'taskCategory') {
+			var id = data.id;
+			var taskCategoryValue = value;
+			$("#taskCategoryTbodyId").append("<tr id='taskCategory_" + id + "' style='cursor: pointer;'><td>" + taskCategoryValue + "</td><td><span class=\'deleteTaskCategory clear_filter'\ onClick=\"deleteAssetStatus(\'" + id + "','" + option + "')\" ><b>X</b></span></td></tr>")
+			$("#taskCategory").val("");
+			sortTable($("#taskCategoryTableId")[0]);
 		}
 
 	}
@@ -187,6 +201,9 @@
 		 } else if (option == 'assetType') {
 			 var id = id
 			 ${remoteFunction(action:'deleteAssetOptions', params:'\'assetTypeId=\'+ id +\'&assetOptionType=\'+"assetType"', onSuccess:'fillAssetOptions(id,option)')};
+		 } else if (option == 'taskCategory') {
+			 var id = id
+			 ${remoteFunction(action:'deleteAssetOptions', params:'\'taskCategoryId=\'+ id +\'&assetOptionType=\'+"taskCategory"', onSuccess:'fillAssetOptions(id,option)')};
 		 }
 	}
 	
@@ -204,6 +221,8 @@
 			$('#environment_'+id).remove();
 		} else if (option == 'assetType') {
 			$('#assetType_' + id).remove();
+		} else if (option == 'taskCategory') {
+			$('#taskCategory_' + id).remove();
 		}
 	}
 	</script>
