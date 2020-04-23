@@ -72,7 +72,7 @@
 		<tr style="margin-top: 10px">
 			<td valign="top" class="name"  colspan="2"><a href="${createLink(controller:'task',  action:'listUserTasks',  absolute:"true")}">See my tasks</a></td>
 	   </tr>
-	</>
-	</div>
-	</body>
-	</html>
+	</table>
+</div>
+</body>
+</html>
