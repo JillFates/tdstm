@@ -140,7 +140,10 @@ export class ArchitectureGraphDiagramHelper {
 
 		// TextBlock
 		const textBlock = new TextBlock();
+		textBlock.desiredSize = new Size(60, 10);
 		textBlock.stroke = '#000';
+		textBlock.maxLines = 1;
+		textBlock.wrap = TextBlock.None;
 		textBlock.overflow = TextBlock.OverflowEllipsis;
 		textBlock.bind(new Binding('text', 'name'));
 
@@ -197,8 +200,8 @@ export class ArchitectureGraphDiagramHelper {
 			$(TextBlock,
 				{
 					text: tooltipText,
-					background: '#ddd',
-					stroke: 'black',
+					background: '#fff',
+					stroke: '#0077b8',
 					font: '14px sans-serif'
 				}
 			)
