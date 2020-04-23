@@ -17,6 +17,11 @@
   }
 
   .tds-table {
+    &.hide-paginator {
+      kendo-pager {
+        display: none;
+      }
+    }
     .grid-label {
       line-height: 33px;
     }
