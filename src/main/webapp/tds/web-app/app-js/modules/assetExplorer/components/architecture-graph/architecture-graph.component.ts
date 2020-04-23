@@ -259,7 +259,8 @@ export class ArchitectureGraphComponent implements OnInit {
 				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
-					this.updateNodeData(this.currentNodesData, false);
+					const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
+					this.updateNodeData(this.currentNodesData, noLabelChecked);
 					if (setInitialAsset && res && res.nodes) {
 						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
 						if (selectedAsset) {
@@ -387,11 +388,13 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	/**
 	 * shows or hides the labels of the asset on the graph based on what's selected on the labels checkboxes
+	 * @param checked value
 	 * @param index of the selected checkbox
 	 */
-	updateGraphLabels(index) {
+	updateGraphLabels(checked: boolean, index: any) {
+		const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
 		if (this.assetId) {
-			this.updateNodeData(this.currentNodesData, false);
+			this.updateNodeData(this.currentNodesData, noLabelChecked);
 		}
 	}
 
