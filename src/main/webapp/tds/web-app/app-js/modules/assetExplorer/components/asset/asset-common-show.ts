@@ -84,6 +84,14 @@ export class AssetCommonShow implements OnInit {
 		assetShowComponent.onDismiss();
 	}
 
+	/**
+	 * Open an Asset from the inner Dependency View Tables
+	 * @param event
+	 */
+	protected onAssetShowFromDependency(event: any) {
+		this.showAssetDetailView(event.assetClass, event.id);
+	}
+
 	protected showAssetDetailView(assetClass: string, id: number) {
 		// Close current dialog before open new one
 		this.cancelCloseDialog();

@@ -1,3 +1,7 @@
-<%@page defaultCodec="html" %>
-<dependents-component [dependencies]="dependencies"></dependents-component>
+<%@ page defaultCodec="html" %>
+<dependents-component
+        [dependencies]="dependencies"
+        (onAssetShow)="onAssetShowFromDependency($event)"
+>
+</dependents-component>
 
