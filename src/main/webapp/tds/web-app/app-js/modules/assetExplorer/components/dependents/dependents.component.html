@@ -39,7 +39,7 @@
 							<!-- Clear all Filters button -->
 							<ng-template kendoGridFilterCellTemplate let-filter>
 								<tds-grid-clear-all-filters-button
-										[show]="gridSupportsData.getFilterCounter()" (clearFilters)="onClearSupportFilters()">
+										[show]="gridSupportsData.getFilterCounter()" (clearFilters)="gridSupportsData.clearAllFilters(supportOnColumnModel.columns)">
 								</tds-grid-clear-all-filters-button>
 							</ng-template>
 							<ng-template
@@ -241,7 +241,7 @@
 							<!-- Clear all Filters button -->
 							<ng-template kendoGridFilterCellTemplate let-filter>
 								<tds-grid-clear-all-filters-button
-										[show]="gridDependenciesData.getFilterCounter()" (clearFilters)="onClearDependentFilters()">
+										[show]="gridDependenciesData.getFilterCounter()" (clearFilters)="gridDependenciesData.clearAllFilters(dependentOnColumnModel.columns)">
 								</tds-grid-clear-all-filters-button>
 							</ng-template>
 							<ng-template

@@ -4,7 +4,6 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DependentType, SupportDependentsColumnsModel} from './model/support-dependents-columns.model';
 // Service
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {ViewColumn} from '../../model/view-spec.model';
 import {COLUMN_MIN_WIDTH} from 'tds-component-library';
 
 @Component({
@@ -93,32 +92,5 @@ export class DependentsComponent implements OnInit {
 		} else {
 			return 'cell-template dep-' + dataItem.status;
 		}
-	}
-
-	// Support Filtering
-
-	/**
-	 * Set the filter value to the new search string and start off the filtering process
-	 * @param {string} search - Current search value
-	 * @param {ViewColumn} column - Column of the datagrid which threw the event
-	 */
-	public setFilter(search: string, column: ViewColumn): void {
-		column.filter = search;
-	}
-
-	public hasSupportFilterApplied(): boolean {
-		return this.supportOnColumnModel.columns.filter((c: any) => c.filter).length > 0;
-	}
-
-	public onClearSupportFilters(): void {
-		this.supportOnColumnModel.columns.forEach((c: any) => {
-			c.filter = '';
-		});
-	}
-
-	public onClearDependentFilters(): void {
-		this.dependentOnColumnModel.columns.forEach((c: any) => {
-			c.filter = '';
-		});
 	}
 }
