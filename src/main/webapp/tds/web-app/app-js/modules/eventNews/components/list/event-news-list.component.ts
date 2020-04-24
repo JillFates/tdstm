@@ -136,7 +136,7 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 					openFromList: false
 				},
 				modalConfiguration: {
-					title: 'Event News',
+					title: 'Event News Create',
 					draggable: true,
 					modalSize: ModalSize.MD
 				}
@@ -226,7 +226,7 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 					openFromList: openFromList
 				},
 				modalConfiguration: {
-					title: 'Event News',
+					title: 'Event News Edit',
 					draggable: true,
 					modalSize: ModalSize.MD
 				}
