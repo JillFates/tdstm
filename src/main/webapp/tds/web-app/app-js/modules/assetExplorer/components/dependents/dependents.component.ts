@@ -79,8 +79,8 @@ export class DependentsComponent implements OnInit {
 	/**
 	 * Emit the event to Show the Dependency Tree Parent Component
 	 */
-	public showDependencyView(type: string, assetId: number, dependencyAsset: number, rowId = ''): void {
-		this.onDependencyShow.emit({type, assetId, dependencyAsset, rowId})
+	public showDependencyView(type: string, dataItem: any, assetId: number, dependencyAsset: number, rowId = ''): void {
+		this.onDependencyShow.emit({dataItem, type, assetId, dependencyAsset, rowId})
 	}
 
 	/**

@@ -57,7 +57,7 @@
 											   (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)"
 											>Show Asset</a>
 											<a clrDropdownItem
-											   (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)"
+											   (click)="showDependencyView(dependentType.SUPPORT, dataItem, dataItem.assetId, dependencies.asset.id)"
 											>Show Dependency</a>
 										</clr-dropdown-menu>
 									</clr-dropdown>
@@ -136,14 +136,14 @@
 							</ng-template>
 
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem, dataItem.assetId, dependencies.asset.id)">
 									{{dataItem.type}}
 									<img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
 								</div>
 							</ng-template>
 
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem.assetId, dependencies.asset.id)">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.SUPPORT, dataItem, dataItem.assetId, dependencies.asset.id)">
 									<span class="status-icon status-Ready" *ngIf="dataItem.status === 'Validated' || dataItem.status === 'Ready'">
 										<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
 									</span>
@@ -259,7 +259,7 @@
 											   (click)="showAssetDetailView(dataItem.assetClass.toUpperCase(), dataItem.assetId)"
 											>Show Asset</a>
 											<a clrDropdownItem
-											   (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)"
+											   (click)="showDependencyView(dependentType.DEPENDENT, dataItem, dependencies.asset.id, dataItem.assetId)"
 											>Show Dependency</a>
 										</clr-dropdown-menu>
 									</clr-dropdown>
@@ -336,14 +336,14 @@
 							</ng-template>
 
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dataItem, dependencies.asset.id, dataItem.assetId)">
 									{{dataItem.type}}
 									<img *ngIf="dataItem.comment.length > 0" src="/tdstm/assets/icons/comment.png" border="0" title="{{dataItem.comment}}">
 								</div>
 							</ng-template>
 
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dependencies.asset.id, dataItem.assetId)">
+								<div class="cell-template dep-{{dataItem.status}}" (click)="showDependencyView(dependentType.DEPENDENT, dataItem, dependencies.asset.id, dataItem.assetId)">
 									<span class="status-icon status-Ready" *ngIf="dataItem.status === 'Validated' || dataItem.status === 'Ready'">
 										<fa-icon [icon]="['fas', 'thumbs-up']"></fa-icon>
 									</span>
