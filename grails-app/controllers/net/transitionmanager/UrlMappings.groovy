@@ -94,6 +94,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/dependenciesForShow/$assetId" {
+			controller = "wsAsset"
+			action = [
+			        GET: "dependenciesForAsset"
+			]
+		}
+
 		"/ws/asset/dependencies" {
 			controller = "wsAsset"
 			action = [

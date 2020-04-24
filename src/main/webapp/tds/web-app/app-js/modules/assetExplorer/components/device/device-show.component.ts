@@ -56,7 +56,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any, pa
 				userContextService,
 				windowService,
 				architectureGraphService,
-				parentDialog
+				parentDialog,
+				metadata
 			);
 			this.mainAsset = modelId;
 			this.assetTags = metadata.assetTags;

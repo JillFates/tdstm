@@ -94,10 +94,12 @@ class DeviceService implements ServiceMethods {
 	/**
 	 * Used to provide a map/model of the properties used by the DEVICE show view
 	 * @param project
+	 * @param assetEntity - selected asset
+	 * @param includeDependencies - whether or not dependencies should be included in the model.
 	 * @return a Map that includes the list of common properties
 	 */
 	@Transactional(readOnly = true)
-	Map getModelForShow(Project project, assetEntity, Map params) {
+	Map getModelForShow(Project project, assetEntity, Map params, boolean includeDependencies = true) {
 
 		boolean deleteChassisWarning = false
 
@@ -108,9 +110,8 @@ class DeviceService implements ServiceMethods {
 			deleteChassisWarning = count > 0
 		}
 
-		Map commonModel = this.getCommonModel(false, project, assetEntity, params)
+		Map commonModel = this.getCommonModel(false, project, assetEntity, params, includeDependencies)
 		List fields =  dataviewService.fetch(DataViewMap.DEVICES.id).toMap(project, securityService.userLoginPerson).schema.columns.collect{it.label}
-
 		Map model = [
 			assetEntity         : assetEntity,
 			/*label: frontEndLabel,*/
@@ -371,10 +372,11 @@ class DeviceService implements ServiceMethods {
 	 * @param project - the project of the user
 	 * @param assetEntity - current assetEntity
 	 * @param params - request parameters
+	 * @param includeDependencies - whether or not dependencies should be included in the model.
 	 * @return a map of the properties containing the list values to populate the list controls
 	 */
-	private Map getCommonModel(Boolean forCreate, Project project, AssetEntity assetEntity , Map params) {
-		Map commonModel = assetEntityService.getCommonModel(forCreate, project, assetEntity, 'AssetEntity', params)
+	private Map getCommonModel(Boolean forCreate, Project project, AssetEntity assetEntity , Map params, boolean includeDependencies = true) {
+		Map commonModel = assetEntityService.getCommonModel(forCreate, project, assetEntity, 'AssetEntity', params, includeDependencies)
 		commonModel.standardFieldSpecs.priority.constraints.put('values', assetEntityService.getAssetPriorityOptions())
 
 		return commonModel;
