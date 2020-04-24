@@ -293,6 +293,7 @@ class AssetComment {
 		status == HOLD
 	}
 
+	//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 	boolean isRunbookTask() {
 		moveDayCategories.contains(category)
 	}

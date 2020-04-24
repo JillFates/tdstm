@@ -530,8 +530,10 @@ class PlanningDashboardData {
 								AND a.status =:status AND a.category IN (:category) AND a.isPublished = true"""
 
 			Map issueArgs = [project: project, status: AssetCommentStatus.COMPLETED, type: AssetCommentType.TASK.toString()]
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			Map publishedIssueArgs = [project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category: AssetComment.planningCategories]
 
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			openIssue = AssetComment.executeQuery(issueQuery,issueArgs + [category : AssetComment.discoveryCategories])[0]
 			dueOpenIssue = AssetComment.executeQuery( dueIssueQuery, issueArgs + [category : AssetComment.discoveryCategories, dueDate:today])[0]
 			generalOverDue = AssetComment.executeQuery(dueIssueQuery, issueArgs + [category: AssetComment.planningCategories, dueDate:today])[0]

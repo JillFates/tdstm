@@ -48,6 +48,7 @@ class CommentService implements ServiceMethods {
 		'estFinish', 'estStart', 'moveEvent', 'priority', 'role',
 		'sendNotification', 'status']
 
+	//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 	// These are the default values that are remembered during user session for preferences
 	// when creating new tasks (see TM-5696)
 	Map<PREF, Object> TASK_CREATE_DEFAULTS = [

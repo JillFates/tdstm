@@ -238,6 +238,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')"))
 			}
 
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetCommentCategory.moveDayCategories)) {
 
@@ -294,6 +295,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')") << "</span>"
 			}
 
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 
@@ -379,6 +381,7 @@ class TaskController implements ControllerMethods {
 				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
 			}
 
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 

@@ -911,6 +911,7 @@ class TaskService implements ServiceMethods {
 	 * @return statusWarn as can
 	 */
 	boolean canChangeStatus (AssetComment task) {
+		//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 		// TODO : runbook - add logic to allow PM to change status anytime.
 		![ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].contains(task.category) ||
 		 [ACS.READY, ACS.STARTED].contains(task.status)
