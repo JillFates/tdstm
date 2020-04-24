@@ -111,7 +111,7 @@
 							class="control-label label-detail text-capitalize"
 							>Date created:
 							{{
-								assetCommentModel?.dateCreated | tdsDateTime: userTimeZone:userDateTimeFormat
+							(assetCommentModel?.dateCreated | tdsDateTime: userTimeZone:userDateTimeFormat).toUpperCase()
 							}}</label
 						>
 					</div>
@@ -120,7 +120,7 @@
 							class="control-label label-detail text-capitalize pull-right"
 							>Last updated:
 							{{
-								assetCommentModel?.lastUpdated | tdsDateTime: userTimeZone:userDateTimeFormat
+							(assetCommentModel?.lastUpdated | tdsDateTime: userTimeZone:userDateTimeFormat).toUpperCase()
 							}}</label
 						>
 					</div>
