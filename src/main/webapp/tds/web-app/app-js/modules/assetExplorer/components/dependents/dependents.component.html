@@ -1,4 +1,4 @@
-<div class="dependents-component">
+<div class="dependents-component dialog-inner-tables">
 	<div tdsScrollSection class="clr-row">
 		<div class="clr-col-12 table-data-section">
 			<div class="tds-table">
@@ -74,9 +74,13 @@
 										   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 							<!-- Header Template -->
 							<ng-template kendoGridHeaderTemplate>
-								<a class="k-link ng-star-inserted" href="#" tabindex="-1">
-									<span>{{column.label}}</span>
-								</a>
+								<div class="sortable-column component-action-sort">
+									<div>
+										<label>
+											{{column.label}}
+										</label>
+									</div>
+								</div>
 							</ng-template>
 
 							<!-- Filter Template -->
@@ -272,9 +276,13 @@
 										   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 							<!-- Header Template -->
 							<ng-template kendoGridHeaderTemplate>
-								<a class="k-link ng-star-inserted" href="#" tabindex="-1">
-									<span>{{column.label}}</span>
-								</a>
+								<div class="sortable-column component-action-sort">
+									<div>
+										<label>
+											{{column.label}}
+										</label>
+									</div>
+								</div>
 							</ng-template>
 
 							<!-- Filter Template -->
