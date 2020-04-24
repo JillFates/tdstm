@@ -1,0 +1,230 @@
+{
+	"info": {
+		"_postman_id": "d9d0fd91-471f-4b9f-a819-a3265bc003a6",
+		"name": "Task Highlighting",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login - Task Highlighting",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"{{username}}\",\n\t\"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Events",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "049e3830-bb5f-416f-a034-e408875b1317",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Events have been listed.\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.globals.set(\"event1\", jsonData.data[0].id);",
+							"});",
+							"",
+							"pm.test(\"Success Status\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/moveEvent/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"moveEvent",
+						"list"
+					]
+				},
+				"description": "This EP will bring a list of events. Some event ids will be saved in order to add the created tags to them."
+			},
+			"response": []
+		},
+		{
+			"name": "Task Highlight Options",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fb03e662-e1cc-4cbc-8db4-7c3df60cd980",
+						"exec": [
+							"pm.test(\"Response contains the persons\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"persons\");",
+							"});",
+							"",
+							"pm.test(\"Response contains the teams\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"teams\");",
+							"});",
+							"",
+							"pm.test(\"Response contains the ownersAndSmes\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"ownersAndSmes\");",
+							"});",
+							"",
+							"pm.test(\"Response contains the environments\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"environments\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success Status\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"});",
+							"",
+							"",
+							"pm.environment.unset(\"event1\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/taskGraph/taskHighlightOptions?eventId={{event1}}&viewUnpublished=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"taskGraph",
+						"taskHighlightOptions"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "{{event1}}"
+						},
+						{
+							"key": "viewUnpublished",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Task Highlight Options negative scenario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "57f7a242-fbcf-4937-9fe5-23d72dbd909e",
+						"exec": [
+							"pm.test(\"Error\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"error\");",
+							"});",
+							"",
+							"pm.test(\"Nothing found page\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Oops! Nothing Found\");",
+							"});",
+							"",
+							"",
+							"",
+							"pm.environment.unset(\"event1\");",
+							"pm.environment.unset(\"jwt_token\");",
+							"pm.environment.unset(\"tokenHeaderName\");",
+							"pm.environment.unset(\"token\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/taskGraph/taskHighlightOptions?eventId=9999999&viewUnpublished=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"taskGraph",
+						"taskHighlightOptions"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "9999999"
+						},
+						{
+							"key": "viewUnpublished",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

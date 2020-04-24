@@ -88,13 +88,13 @@
 							<clr-dropdown-menu *clrIfOpen clr-dropdown-menu>
 								<a
 									clrDropdownItem
-									(click)="openTaskEdit(dataItem)"
+									(click)="isTaskEditAvailable() && openTaskEdit(dataItem)"
 									[disabled]="!isTaskEditAvailable() || !hasTaskManagerViewPermission"
 									>Edit Task</a
 								>
 								<a
 									clrDropdownItem
-									(click)="onDelete(dataItem)"
+									(click)="isTaskDeleteAvailable() && onDelete(dataItem)"
 									[disabled]="!isTaskDeleteAvailable()"
 									>Delete Task</a
 								>
@@ -209,7 +209,7 @@
 								<a
 									clrDropdownItem
 									(click)="
-										openTaskComment(
+										isCommentEditAvailable() && openTaskComment(
 											dataItem,
 											modalType.EDIT
 										)
@@ -219,7 +219,7 @@
 								>
 								<a
 									clrDropdownItem
-									(click)="onDelete(dataItem)"
+									(click)="isCommentDeleteAvailable() && onDelete(dataItem)"
 									[disabled]="!isCommentDeleteAvailable()"
 									>Delete Comment</a
 								>
