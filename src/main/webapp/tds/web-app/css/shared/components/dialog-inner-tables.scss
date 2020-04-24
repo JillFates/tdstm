@@ -1,3 +1,7 @@
+/**
+ * Following code is used on the inner tables on the Asset Views, not necessary on other dialogs
+ * but helps to put together before send it to the Library
+ */
 .dialog-inner-tables {
   .k-grid-content {
     overflow-y: auto;
@@ -23,6 +27,9 @@
         height: 10px;
         margin-top: -2px;
       }
+    }
+    a.k-link:hover {
+      color: #656565;
     }
   }
   .k-grid-header {
