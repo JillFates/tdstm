@@ -49,9 +49,10 @@
 	</div>
 	<kendo-grid
         #grid
-		[data]="gridData">
+		[data]="gridData"
+		[scrollable]="'scrollable'">
 		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]"
-						   [width]="i < 4 ? '70' : '30'">
+						   [width]="i < 4 ? '100' : '70'">
 			<ng-template kendoGridHeaderTemplate>
 				<div *ngIf="col === 'Groups'" class="group-column" (click)="openGroupInfoModal($event)">
 					{{col}}

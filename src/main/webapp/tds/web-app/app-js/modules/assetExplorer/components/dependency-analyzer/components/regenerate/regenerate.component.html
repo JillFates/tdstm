@@ -1,3 +1,33 @@
 <div class="regenerate-component-wrapper">
-	<h2>hello moto</h2>
+<!--	<h2><strong>{{'DEPENDENCY_ANALYZER.DEPENDENCY_GROUPING_CONTROL'| translate}}</strong></h2>-->
+	<form clrForm>
+		<div class="clr-row">
+			<div class="clr-col-6">
+				<h4><strong>{{'DEPENDENCY_ANALYZER.CONNECTION_TYPE'| translate}}</strong></h4>
+				<clr-checkbox-wrapper *ngFor="let type of dependencyType">
+					<input type="checkbox" clrCheckbox [(ngModel)]="type.checked" [ngModelOptions]="{standalone: true}" />
+					<label>{{type.label}}</label>
+				</clr-checkbox-wrapper>
+			</div>
+			<div class="clr-col-6">
+				<h4><strong>{{'DEPENDENCY_ANALYZER.CONNECTION_STATUS' | translate}}</strong></h4>
+				<clr-checkbox-wrapper *ngFor="let type of dependencyStatus">
+					<input type="checkbox" clrCheckbox [(ngModel)]="type.checked" [ngModelOptions]="{standalone: true}"/>
+					<label>{{type.label}}</label>
+				</clr-checkbox-wrapper>
+			</div>
+		</div>
+		<hr>
+		<div class="clr-row">
+			<div class="clr-col-6">
+				<clr-checkbox-wrapper class="mt-4">
+					<input type="checkbox" clrCheckbox [(ngModel)]="saveDefault"  [ngModelOptions]="{standalone: true}" />
+					<label><strong>{{'DEPENDENCY_ANALYZER.SAVE_DEFAULT' | translate}}</strong></label>
+				</clr-checkbox-wrapper>
+			</div>
+			<div class="clr-col-6 text-right">
+				<button class="btn btn-primary" (click)="regenerate()"><i class="fas fa-chart-bar"></i> Regenerate</button>
+			</div>
+		</div>
+	</form>
 </div>

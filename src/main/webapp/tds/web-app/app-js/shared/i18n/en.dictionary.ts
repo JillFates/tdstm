@@ -306,7 +306,11 @@ export const en_DICTIONARY: Object = {
 		'REGENERATE': 'Regenerate',
 		'BUNDLE': 'Bundle',
 		'TAGS': 'Tags',
-		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress'
+		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress',
+		'DEPENDENCY_GROUPING_CONTROL': 'Dependency Grouping Control',
+		'CONNECTION_TYPE': 'Connection Type',
+		'SAVE_DEFAULT': 'Save as Default',
+		'CONNECTION_STATUS': 'Connection Status'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',

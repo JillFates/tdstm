@@ -46,6 +46,10 @@ import {AssetExplorerRouteModule} from './asset-explorer.route';
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 import {DependencyAnalyzerComponent} from './components/dependency-analyzer/dependency-analyzer.component';
 import {RegenerateComponent} from './components/dependency-analyzer/components/regenerate/regenerate.component';
+import {DependencyGroupStatusComponent} from './components/dependency-analyzer/components/dependency-group-status-modal/dependency-group-status.component';
+import {ProvidersResolveService} from '../provider/resolve/providers-resolve.service';
+import {ProviderService} from '../provider/service/provider.service';
+import {RegenerateProgressDialogComponent} from './components/dependency-analyzer/components/regenerate-progress-dialog/regenerate-progress-dialog.component';
 
 @NgModule({
 	imports: [
@@ -87,7 +91,9 @@ import {RegenerateComponent} from './components/dependency-analyzer/components/r
 		TaskActionSummaryComponent,
 		ArchitectureGraphComponent,
 		DependencyAnalyzerComponent,
-		RegenerateComponent
+		RegenerateComponent,
+		DependencyGroupStatusComponent,
+		RegenerateProgressDialogComponent
 	],
 	providers: [
 		// Services
@@ -99,7 +105,8 @@ import {RegenerateComponent} from './components/dependency-analyzer/components/r
 		ManufacturerService,
 		ModelService,
 		ArchitectureGraphService,
-		DependencyAnalyzerService
+		DependencyAnalyzerService,
+		ProviderService
 	],
 	exports: [
 		AssetShowComponent,
@@ -112,7 +119,9 @@ import {RegenerateComponent} from './components/dependency-analyzer/components/r
 		TaskCommentComponent,
 		TaskActionsComponent,
 		TaskActionSummaryComponent,
-		RegenerateComponent
+		RegenerateComponent,
+		DependencyGroupStatusComponent,
+		RegenerateProgressDialogComponent
 	],
 	entryComponents: [
 		AssetShowComponent,
@@ -132,7 +141,9 @@ import {RegenerateComponent} from './components/dependency-analyzer/components/r
 		ModelDeviceShowComponent,
 		AssetCloneComponent,
 		TaskActionSummaryComponent,
-		RegenerateComponent
+		RegenerateComponent,
+		DependencyGroupStatusComponent,
+		RegenerateProgressDialogComponent
 	]
 })
 

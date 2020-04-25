@@ -6,6 +6,8 @@ import {DependencyAnalyzerService} from './service/dependency-analyzer.service';
 import {DependencyAnalyzerDataModel, DependencyBundleModel} from './model/dependency-analyzer-data.model';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {RegenerateComponent} from './components/regenerate/regenerate.component';
+import {DependencyGroupStatusComponent} from './components/dependency-group-status-modal/dependency-group-status.component';
+import {RegenerateProgressDialogComponent} from './components/regenerate-progress-dialog/regenerate-progress-dialog.component';
 
 @Component({
 	selector: 'tds-dependency-analyzer',
@@ -16,25 +18,25 @@ export class DependencyAnalyzerComponent implements OnInit {
 	private userContext: any;
 	public gridModel: GridModel;
 	public showOnlyWIP = false;
-	icons = FA_ICONS;
-	selectedBundle;
-	teamHighlights$;
-	selectedTags: number[];
-	allMoveBundles;
-	dependencyStatus;
-	dependencyType;
-	allTags;
-	columns = [];
-	classes = [];
-	dependencyConsoleList: DependencyBundleModel[];
-	gridData = [];
-	showBottomGrid = false;
-	keepTabContent = true;
-	selectedColumn = '';
-	selectedData;
-	planningBundles;
-	tagMatch = 'ANY';
-	isAssigned = false;
+	public icons = FA_ICONS;
+	public selectedBundle;
+	public teamHighlights$;
+	public selectedTags: number[];
+	public allMoveBundles;
+	public dependencyStatus;
+	public dependencyType;
+	public allTags;
+	public columns = [];
+	public classes = [];
+	public gridData = [];
+	public showBottomGrid = false;
+	public keepTabContent = true;
+	public selectedColumn = '';
+	public selectedData;
+	public planningBundles;
+	public tagMatch = 'ANY';
+	public isAssigned = false;
+	public depGrpCrt;
 	public defaultBundleItem = {name: 'All Planning', id: null};
 
 	constructor(
@@ -59,8 +61,6 @@ export class DependencyAnalyzerComponent implements OnInit {
 		this.dependencyAnalyzerService.getDependencyAnalyzerData().subscribe(( res: DependencyAnalyzerDataModel) => {
 			this.allMoveBundles = res.allMoveBundles;
 			this.planningBundles = res.planningBundles;
-			this.dependencyType = res.dependencyType;
-			this.dependencyStatus = res.dependencyStatus;
 			this.setData(res);
 		});
 		this.tagService.getTags().subscribe((res: any) => {
@@ -75,9 +75,10 @@ export class DependencyAnalyzerComponent implements OnInit {
 	 * */
 	setData(res) {
 		this.isAssigned = res.isAssigned;
-		this.gridData = [];
-		this.columns = [];
-		this.classes = [];
+		this.cleanObjects();
+		this.dependencyType = res.dependencyType;
+		this.dependencyStatus = res.dependencyStatus;
+		this.depGrpCrt = res.depGrpCrt;
 		this.columns.push('Groups');
 		this.classes.push('');
 		this.columns = this.columns.concat(res.dependencyConsole.group);
@@ -90,10 +91,37 @@ export class DependencyAnalyzerComponent implements OnInit {
 	}
 
 	/**
-	 * TODO: Show information modal for groups click
+	 * Sets the content of the lists to empty
+	 * */
+	cleanObjects() {
+		delete this.gridData;
+		delete this.columns;
+		delete this.classes;
+		delete this.dependencyType;
+		delete this.dependencyStatus;
+		delete this.depGrpCrt;
+	}
+
+	/**
+	 * Shows information modal for groups
+	 * ie: what the color of the column means
 	 * */
 	openGroupInfoModal(event) {
 		// Open informative modal here
+		try {
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: DependencyGroupStatusComponent,
+				data: {},
+				modalConfiguration: {
+					title: '',
+					draggable: true,
+					modalSize: ModalSize.MD
+				}
+			});
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
@@ -228,27 +256,64 @@ export class DependencyAnalyzerComponent implements OnInit {
 		// console.log(event);
 	}
 
+	/**
+	 * Open the regenerate Dialog to select the different dependency type and status
+	 * and save selected list as default too
+	 * When the regenerate buttons is clicked inside the modal, the getInitialData is called
+	 * to retrieve the changes of the regenerate.
+	 * */
 	regenerate() {
 		// open modal
 		try {
-			console.log('regenerate');
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
 				component: RegenerateComponent,
 				data: {
 					dependencyType: this.dependencyType,
 					dependencyStatus: this.dependencyStatus,
+					depGrpCrt: this.depGrpCrt
 				},
 				modalConfiguration: {
-					title: 'Provider',
+					title: 'Dependency Grouping Control',
 					draggable: true,
 					modalSize: ModalSize.MD
 				}
 			}).subscribe((data: any) => {
-				console.log('Basic Dialog was closed successfully: ', data);
+				if (data.dependencyType) {
+					let regenString = '';
+					data.dependencyType.forEach( el => {
+						regenString += 'connection=' + el + '&';
+					});
+					data.dependencyStatus.forEach( el => {
+						regenString += 'status=' + el + '&';
+					});
+					regenString += 'saveDefault=' + (data.saveDefault ? '1&' : '0&');
+					regenString += 'bundle=' + (this.selectedBundle ? this.selectedBundle : '');
+					this.dependencyAnalyzerService.regenerateData(regenString).subscribe( (res: any) => {
+						const regenKey = res.data.key;
+						try {
+							this.dialogService.open({
+								componentFactoryResolver: this.componentFactoryResolver,
+								component: RegenerateProgressDialogComponent,
+								data: {
+									regenKey
+								},
+								modalConfiguration: {
+									title: 'Generating Dependency Groups',
+									draggable: true,
+									modalSize: ModalSize.MD,
+								}
+							}).subscribe((data: any) => {
+								this.getFilteredData();
+							});
+						} catch (error) {
+							console.error(error);
+						}
+					});
+				}
 			});
 		} catch (error) {
-		console.error(error);
-	}
+			console.error(error);
+		}
 	}
 }
