@@ -7,17 +7,9 @@
       }
     }
   }
-
-  .k-grid-content {
-    overflow-y: auto;
-  }
-  clr-dropdown-menu.dropdown-menu {
-    transform: translateY(-95px) translateX(-10px) !important;
-  }
-  .k-grid-header {
-    background: #d9e4ea !important;
-  }
-  .k-grid-table {
-    margin-left: -1px;
+  .tds-table {
+    .grid-label {
+      line-height: 55px;
+    }
   }
 }

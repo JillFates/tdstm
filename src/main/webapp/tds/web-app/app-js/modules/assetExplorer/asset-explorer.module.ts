@@ -50,6 +50,7 @@ import {DependencyGroupStatusComponent} from './components/dependency-analyzer/c
 import {ProvidersResolveService} from '../provider/resolve/providers-resolve.service';
 import {ProviderService} from '../provider/service/provider.service';
 import {RegenerateProgressDialogComponent} from './components/dependency-analyzer/components/regenerate-progress-dialog/regenerate-progress-dialog.component';
+import {DependentsComponent} from './components/dependents/dependents.component';
 
 @NgModule({
 	imports: [
@@ -93,7 +94,9 @@ import {RegenerateProgressDialogComponent} from './components/dependency-analyze
 		DependencyAnalyzerComponent,
 		RegenerateComponent,
 		DependencyGroupStatusComponent,
-		RegenerateProgressDialogComponent
+		RegenerateProgressDialogComponent,
+		DependencyAnalyzerComponent,
+		DependentsComponent
 	],
 	providers: [
 		// Services
@@ -121,7 +124,9 @@ import {RegenerateProgressDialogComponent} from './components/dependency-analyze
 		TaskActionSummaryComponent,
 		RegenerateComponent,
 		DependencyGroupStatusComponent,
-		RegenerateProgressDialogComponent
+		RegenerateProgressDialogComponent,
+		TaskActionSummaryComponent,
+		DependentsComponent
 	],
 	entryComponents: [
 		AssetShowComponent,

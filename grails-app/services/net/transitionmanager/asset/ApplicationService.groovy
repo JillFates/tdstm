@@ -73,9 +73,10 @@ class ApplicationService implements ServiceMethods {
 	 * @param project - the project of the user
 	 * @param app - the instance of the application to pull attributes from
 	 * @param params - request parameters
+	 * @param includeDependencies - whether or not dependencies should be included in the model.
 	 * @return a map of the properties
 	 */
-	Map getModelForShow(Project ignored, Application app, Map params) {
+	Map getModelForShow(Project ignored, Application app, Map params, boolean includeDependencies = true) {
 		Project project = GrailsHibernateUtil.unwrapIfProxy(app.project)
 
 		def appMoveEvent = AppMoveEvent.findAllByApplication(app)
@@ -93,7 +94,7 @@ class ApplicationService implements ServiceMethods {
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
 		def availableRoles = partyRelationshipService.getStaffingRoles()
 		def partyGroupList = partyRelationshipService.getCompaniesList()
-		Map commonModel = this.getCommonModel(false, project, app, params)
+		Map commonModel = this.getCommonModel(false, project, app, params, includeDependencies)
 
 		return [
 				   applicationInstance: app,
@@ -241,10 +242,11 @@ class ApplicationService implements ServiceMethods {
 	 * @param project - the project of the user
 	 * @param application - current application
 	 * @param params - request parameters
+	 * @param includeDependencies - whether or not dependencies should be included in the model.
 	 * @return a map of the properties containing the list values to populate the list controls
 	 */
-	private Map getCommonModel(Boolean forCreate, Project project, Application application, Map params) {
-		Map commonModel = assetEntityService.getCommonModel(forCreate, project, application, 'Application', params)
+	private Map getCommonModel(Boolean forCreate, Project project, Application application, Map params, boolean includeDependencies = true) {
+		Map commonModel = assetEntityService.getCommonModel(forCreate, project, application, 'Application', params, includeDependencies)
 		commonModel.standardFieldSpecs.criticality.constraints.put('values', Application.CRITICALITY)
 		return commonModel
 	}

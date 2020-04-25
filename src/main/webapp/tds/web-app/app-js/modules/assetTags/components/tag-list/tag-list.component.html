@@ -74,7 +74,7 @@
 							let-dataItem
 							let-rowIndex="rowIndex"
 						>
-							<div class="action-button btn-link">
+							<div class="action-button btn-link align-ellipses-center">
 								<clr-dropdown #dropdown>
 									<tds-button icon="ellipsis-vertical"
 															clrDropdownTrigger
@@ -87,6 +87,7 @@
 											clrDropdownItem
 											kendoGridEditCommand
 											*ngIf="canEdit()"
+											title="Edit"
 										>
 											Edit
 										</a>
@@ -94,6 +95,7 @@
 											clrDropdownItem
 											kendoGridRemoveCommand
 											*ngIf="canDelete()"
+											title="Delete"
 										>
 											Delete
 										</a>
@@ -107,6 +109,7 @@
 												canMerge()
 											"
 											(click)="onMerge(dataItem)"
+											title="Merge"
 										>
 											Merge
 										</a>
@@ -117,6 +120,7 @@
 											[disabled]="
 												myForm.invalid || duplicateName
 											"
+											title="Save"
 										>
 											Save
 										</a>
@@ -124,6 +128,7 @@
 										<a
 											clrDropdownItem
 											kendoGridCancelCommand
+											title="Cancel"
 										>Cancel</a
 										>
 									</clr-dropdown-menu>

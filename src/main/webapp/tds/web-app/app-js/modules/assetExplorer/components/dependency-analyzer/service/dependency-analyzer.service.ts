@@ -66,7 +66,7 @@ export class DependencyAnalyzerService {
 			})
 		};
 		return this.http.post(`${this.DEPENDENCY_ANALYZER_GENERATE_URL}`, data, httpOptions)
-			.map((response: any) => {
+			.map((response: any) => {asset-explorer.module
 				return response;
 			})
 			.catch( (error: any) => error);

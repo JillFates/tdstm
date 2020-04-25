@@ -43,7 +43,8 @@ export class ArchitectureGraphComponent implements OnInit {
 	public urlParams: IArchitectureGraphParams;
 	private currentNodesData;
 	public categories;
-	public assetClass: any = {id: 'ALL', value: 'All Classes'};
+	private readonly initialAssetClass = {id: 'ALL', value: 'All Classes'};
+	public assetClass: any;
 	public asset: any = {id: '', text: ''};
 	protected getAssetList: Function;
 
@@ -80,56 +81,56 @@ export class ArchitectureGraphComponent implements OnInit {
 		{
 			icon: 'application',
 			label: 'Application',
-			value: 'APPLICATION',
+			value: 'application',
 			tagLabel: this.TAG_APPLICATION,
 			checked: false
 		},
 		{
 			icon: 'database',
 			label: 'Database',
-			value: 'DATABASE',
+			value: 'database',
 			tagLabel: this.TAG_DATABASE,
 			checked: false
 		},
 		{
 			icon: 'serverPhysical',
 			label: 'Physical Server',
-			value: 'physical server',
+			value: 'serverPhysical',
 			tagLabel: this.TAG_PHYSICAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'serverVirtual',
 			label: 'Virtual Server',
-			value: 'Device',
+			value: 'serverVirtual',
 			tagLabel: this.TAG_VIRTUAL_SERVER,
 			checked: false
 		},
 		{
 			icon: 'storageLogical',
 			label: 'Logical Storage',
-			value: 'Logical Storage',
+			value: 'storage',
 			tagLabel: this.TAG_STORAGE_LOGICAL,
 			checked: false
 		},
 		{
 			icon: 'storagePhysical',
 			label: 'Storage Device',
-			value: 'Storage Device',
+			value: 'storagePhysical',
 			tagLabel: this.TAG_STORAGE_DEVICE,
 			checked: false
 		},
 		{
 			icon: 'networkLogical',
 			label: 'Network Device',
-			value: 'Network Device',
+			value: 'networkLogical',
 			tagLabel: this.TAG_NETWORK_LOGICAl,
 			checked: false
 		},
 		{
 			icon: 'other',
 			label: 'Other Device',
-			value: 'DEVICE',
+			value: 'other',
 			tagLabel: this.TAG_OTHER_DEVICES,
 			checked: false
 		}
@@ -149,12 +150,20 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.assetClass = this.initialAssetClass;
+		let assetId = null;
+		let levelsUp = null;
+		let levelsDown = null;
+
 		// If it comes from asset explorer
 		if (this.urlParams && this.urlParams.assetId) {
 			this.assetId = this.urlParams.assetId;
+			assetId = this.assetId;
+			levelsUp = this.urlParams.levelsUp;
+			levelsDown = this.urlParams.levelsDown;
 			this.loadData(true);
 		}
-		this.getArchitectureGraphPreferences();
+		this.getArchitectureGraphPreferences(assetId, levelsUp, levelsDown);
 		this.initSearchModel();
 		this.loadAssetsForDropDown();
 	}
@@ -173,22 +182,26 @@ export class ArchitectureGraphComponent implements OnInit {
 		/**
 	 * A call to the Architecture graph service for getting the default graph data for the current user
 	 */
-	getArchitectureGraphPreferences() {
+	getArchitectureGraphPreferences(assetId = null, levelsUp = null, levelsDown = null) {
 		this.architectureGraphService
 			.getArchitectureGraphPreferences()
 			.subscribe((res: any) => {
 				this.dataForSelect = res.assetClassesForSelect;
-				this.levelsUp = +res.graphPrefs.levelsUp;
-				this.levelsDown = +res.graphPrefs.levelsDown;
+
+				this.levelsUp = levelsUp === null ? this.levelsUp = +res.graphPrefs.levelsUp  : levelsUp;
+				this.levelsDown = levelsDown === null ? this.levelsDown = +res.graphPrefs.levelsDown  : levelsDown;
+
 				this.showCycles = res.graphPrefs.showCycles;
 				this.appLbl = res.graphPrefs.appLbl;
 				this.labelOffset = res.graphPrefs.labelOffset;
 				this.assetClasses = res.graphPrefs.assetClasses;
-				// this.assetId = res.graphPrefs.assetClass;
-				// this.asset = res.graphPrefs.selectedAsset;
-				this.selectedAsset = res.graphPrefs.selectedAsset;
-				this.assetClass = res.graphPrefs.assetClass;
-				this.assetId = this.selectedAsset && this.selectedAsset.id || '';
+				if (assetId === null) {
+					this.assetClass = res.graphPrefs.assetClass || this.initialAssetClass;
+					this.selectedAsset = res.graphPrefs.selectedAsset;
+					this.assetId = this.selectedAsset && this.selectedAsset.id || '';
+				} else {
+					this.assetClass = this.initialAssetClass;
+				}
 				this.loadData();
 
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
@@ -259,7 +272,8 @@ export class ArchitectureGraphComponent implements OnInit {
 				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
-					this.updateNodeData(this.currentNodesData, false);
+					const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
+					this.updateNodeData(this.currentNodesData, noLabelChecked);
 					if (setInitialAsset && res && res.nodes) {
 						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
 						if (selectedAsset) {
@@ -387,11 +401,13 @@ export class ArchitectureGraphComponent implements OnInit {
 
 	/**
 	 * shows or hides the labels of the asset on the graph based on what's selected on the labels checkboxes
+	 * @param checked value
 	 * @param index of the selected checkbox
 	 */
-	updateGraphLabels(index) {
+	updateGraphLabels(checked: boolean, index: any) {
+		const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
 		if (this.assetId) {
-			this.updateNodeData(this.currentNodesData, false);
+			this.updateNodeData(this.currentNodesData, noLabelChecked);
 		}
 	}
 
@@ -409,8 +425,29 @@ export class ArchitectureGraphComponent implements OnInit {
 
 		clonedNodes.nodes.forEach(node => {
 			// Clear the node name if the assetClass is not included on the categories selected
-			if (!categories.includes(node.assetClass)) {
-				node.name = '';
+			if (node.assetClass === 'DEVICE' /*|| node.assetClass === 'STORAGE'*/) {
+				const type = node.type.toLowerCase();
+				if (!categories.includes('SERVERVIRTUAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceVirtualServer(type)) {
+					node.name = '';
+				} else if (!categories.includes('STORAGEPHYSICAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceStorage(type)) {
+					node.name = '';
+				} else if (!categories.includes('NETWORKLOGICAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceNetwork(type)) {
+					node.name = '';
+				} else if (!categories.includes('SERVERPHYSICAL') &&
+					ArchitectureGraphDiagramHelper.isDeviceServer(type)) {
+					node.name = '';
+				} else if (!categories.includes('OTHER') && type === 'other') {
+					node.name = '';
+				} else {
+					console.log('Not found');
+				}
+			} else {
+				if (!categories.includes(node.assetClass)) {
+					node.name = '';
+				}
 			}
 		});
 		// }
@@ -464,8 +501,11 @@ export class ArchitectureGraphComponent implements OnInit {
 			levelsUp: this.levelsUp,
 			levelsDown: this.levelsDown,
 			showCycles: this.showCycles,
-			selectedAsset: this.selectedAsset,
 		};
+
+		if (this.selectedAsset && this.selectedAsset.id) {
+			valueData['selectedAsset'] = this.selectedAsset;
+		}
 
 		const selectedLabels = this.getSelectedCategories()
 			.map((item: any) => {

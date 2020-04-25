@@ -96,7 +96,9 @@ import {Collision} from '@progress/kendo-angular-popup';
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="filterQueryObj.cyclicalPath"/>
+				                      [(ngModel)]="cyclicalP"
+                              (change)="updateCyclicalPathProp($event)"
+                      />
                       <span class="highlight-checkmark"></span>
                       Cyclical Paths
                   </label>
@@ -104,7 +106,9 @@ import {Collision} from '@progress/kendo-angular-popup';
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="filterQueryObj.withActions"/>
+                              [(ngModel)]="withActions"
+                              (change)="updateWithActionProp($event)"
+                      />
                       <span class="highlight-checkmark"></span>
                       With Actions
                   </label>
@@ -112,7 +116,9 @@ import {Collision} from '@progress/kendo-angular-popup';
                   <label class="task-chk-container">
                       <input
 				                      type="checkbox"
-				                      [(ngModel)]="filterQueryObj.withTmdActions"/>
+                              [(ngModel)]="withTmd"
+				                      (change)="updateWithTmdActionProp($event)"
+                      />
                       <span class="highlight-checkmark"></span>
                       With Actions requiring TMD
                   </label>
@@ -146,6 +152,7 @@ export class TaskHighlightFilter {
 	@Input('eventId') eventId: number;
 	@Input('viewUnpublished') viewUnpublished: boolean;
 	@Output() filteredTasks: EventEmitter<IGraphTask[]> = new EventEmitter();
+	@Output() clearFilters: EventEmitter<void> = new EventEmitter();
 	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
 	@ViewChild('highlightFilterContainer', {static: false}) highlightFilterContainer: ElementRef<HTMLElement>;
 	collision: Collision = { horizontal: 'flip', vertical: 'flip'};
@@ -157,6 +164,9 @@ export class TaskHighlightFilter {
 	tags: any;
 	filterQueryObj: ITaskHighlightQuery = new TaskHighlightQueryModel();
 	show: boolean;
+	cyclicalP: boolean;
+	withActions: boolean;
+	withTmd: boolean;
 
 	constructor(private taskService: TaskService, private renderer: Renderer2) {
 		this.subscribeToHighlightFilter();
@@ -193,10 +203,8 @@ export class TaskHighlightFilter {
 
 		this.taskService.findTasksByQuery(query)
 			.subscribe(res => {
-				const data = res.body && res.body.data.taskIds;
-				if (data) {
-					this.filteredTasks.emit(data);
-				}
+				const data = (res.body && res.body.data) && res.body.data.taskIds;
+				this.filteredTasks.emit(data);
 			});
 	}
 
@@ -254,6 +262,41 @@ export class TaskHighlightFilter {
 	 */
 	clearForm(): void {
 		this.filterQueryObj = new TaskHighlightQueryModel();
+		this.filterText = '';
+		this.cyclicalP = false;
+		this.withActions = false;
+		this.withTmd = false;
+		this.clearFilters.emit();
+	}
+
+	/**
+	 * set cyclical property value on query obj
+	 * @param value
+	 */
+	updateCyclicalPathProp(value: any): void {
+		if (this.filterQueryObj) {
+			this.filterQueryObj.cyclicalPath = value.target.checked ? 1 : 0;
+		}
+	}
+
+	/**
+	 * set Action property value on query obj
+	 * @param value
+	 */
+	updateWithActionProp(value: any): void {
+		if (this.filterQueryObj) {
+			this.filterQueryObj.withActions = value.target.checked ? 1 : 0;
+		}
+	}
+
+	/**
+	 * set TMD Action property value on query obj
+	 * @param value
+	 */
+	updateWithTmdActionProp(value: any): void {
+		if (this.filterQueryObj) {
+			this.filterQueryObj.withTmdActions = value.target.checked ? 1 : 0;
+		}
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

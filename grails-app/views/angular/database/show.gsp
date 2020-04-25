@@ -14,31 +14,19 @@
 						</button>
 					</tds-scroller-item>
 					<tds-scroller-item>
-						<g:set var="supportsCounter" value="${supportAssets.size() as Integer}"/>
-						<g:if test="${supportsCounter > 0}">
+						<ng-template [ngIf]="metadata?.supports?.length > 0">
 							<span class="badge" id="asset-detail-support-counter">
-								<g:if test="${supportsCounter > 99}">
-									99+
-								</g:if>
-								<g:else>
-									${supportsCounter}
-								</g:else>
+								{{ (metadata.supports.length > 99)? '99+': metadata.supports.length }}
 							</span>
-						</g:if>
+						</ng-template>
 					</tds-scroller-item>
 					<tds-scroller-item>
 						<button tdsScrollerLink>Depends On
-							<g:set var="dependentCounter" value="${dependentAssets.size() as Integer}"/>
-							<g:if test="${dependentCounter > 0}">
+							<ng-template [ngIf]="metadata?.dependents?.length > 0">
 								<span class="badge" id="asset-detail-dependent-counter">
-									<g:if test="${dependentCounter > 99}">
-										99+
-									</g:if>
-									<g:else>
-										${dependentCounter}
-									</g:else>
+									{{ (metadata.dependents.length > 99)? '99+': metadata.dependents.length }}
 								</span>
-							</g:if>
+							</ng-template>
 						</button>
 					</tds-scroller-item>
 					<tds-scroller-item>
@@ -137,23 +125,7 @@
 			</div>
 		</div>
 
-		<div tdsScrollSection class="clr-row">
-			<div class="clr-col-12 table-data-section">
-				<g:render 
-					template="/angular/common/supportShow" 
-					model="[supportAssets:supportAssets]" >
-				</g:render>
-			</div>
-		</div>
-				
-		<div tdsScrollSection class="clr-row">
-			<div class="clr-col-12 table-data-section">
-				<g:render 
-					template="/angular/common/dependentShow" 
-					model="[assetEntity:asset]" >
-				</g:render>
-			</div>
-		</div>
+		<g:render template="/angular/common/dependenciesShow"></g:render>
 	
 		<div tdsScrollSection class="clr-row">
 			<g:render 

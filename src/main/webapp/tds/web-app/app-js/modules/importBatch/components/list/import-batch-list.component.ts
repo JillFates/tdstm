@@ -1,12 +1,10 @@
-import {Component, OnDestroy} from '@angular/core';
-import {ImportBatchService} from '../../service/import-batch.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
+// Angular
+import {Component, ComponentFactoryResolver, OnDestroy} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+// Model
 import {BatchStatus, ImportBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
-import {CellClickEvent, PageChangeEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {Permission} from '../../../../shared/model/permission.model';
-import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	DIALOG_SIZE, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
 	PROMPT_DELETE_ITEMS_CONFIRMATION
@@ -17,16 +15,27 @@ import {
 	GridColumnModel,
 	SELECT_ALL_COLUMN_WIDTH
 } from '../../../../shared/model/data-list-grid.model';
-import {IMPORT_BATCH_PREFERENCES, PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import {EnumModel} from '../../../../shared/model/enum.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+// Component
+import {ImportBatchDetailDialogComponent} from '../detail/import-batch-detail-dialog.component';
+// Service
+import {ImportBatchService} from '../../service/import-batch.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {
+	IMPORT_BATCH_PREFERENCES,
+	PREFERENCES_LIST,
+	PreferenceService
+} from '../../../../shared/services/preference.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {EnumModel} from '../../../../shared/model/enum.model';
-import {ImportBatchDetailDialogComponent} from '../detail/import-batch-detail-dialog.component';
-import {ActivatedRoute} from '@angular/router';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {UserContextService} from '../../../auth/service/user-context.service';
+// Other
+import {CellClickEvent, PageChangeEvent, SelectableSettings} from '@progress/kendo-angular-grid';
+import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
 
 @Component({
 	selector: 'import-batch-list',
@@ -36,12 +45,12 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 export class ImportBatchListComponent implements OnDestroy {
 
 	public userTimeZone: string;
-	SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
-	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
+	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	protected BatchStatus = BatchStatus;
 	protected columnsModel: ImportBatchColumnsModel;
 	protected importBatchPreferences = {};
-	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
+	private selectableSettings: SelectableSettings = {mode: 'single', checkboxOnly: false};
 	public dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
 		dir: 'desc',
@@ -62,11 +71,12 @@ export class ImportBatchListComponent implements OnDestroy {
 	private readonly UNARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEMS_CONFIRMATION';
 	private runningBatches: Array<ImportBatchModel> = [];
 	private queuedBatches: Array<ImportBatchModel> = [];
-	showFilters: boolean;
-	disableClearFilters: () => {};
+	public showFilters: boolean;
+	public disableClearFilters: () => {};
 
 	constructor(
-		private dialogService: UIDialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private dialogService: DialogService,
 		private importBatchService: ImportBatchService,
 		private permissionService: PermissionService,
 		private promptService: UIPromptService,
@@ -88,11 +98,11 @@ export class ImportBatchListComponent implements OnDestroy {
 	private onLoad(): void {
 
 		this.columnsModel = new ImportBatchColumnsModel();
-		if ( !this.canRunActions() ) {
+		if (!this.canRunActions()) {
 			this.columnsModel.columns.splice(0, 1);
 		}
-		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES).subscribe( res => {
-			this.getUnarchivedBatches().then( batchList => {
+		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES).subscribe(res => {
+			this.getUnarchivedBatches().then(batchList => {
 				let pageSize;
 				if (res) {
 					this.importBatchPreferences = JSON.parse(res);
@@ -122,9 +132,9 @@ export class ImportBatchListComponent implements OnDestroy {
 	private preSelectBatch(): void {
 		this.route.params.subscribe(params => {
 			const batchId = params['id'] ? parseInt(params['id'], 0) : null;
-			const match = !batchId ? null : this.dataGridOperationsHelper.resultSet.find( item => item.id === batchId);
+			const match = !batchId ? null : this.dataGridOperationsHelper.resultSet.find(item => item.id === batchId);
 			if (batchId && match) {
-				let cellClickEvent = { dataItem: match };
+				let cellClickEvent = {dataItem: match};
 				this.openBatchDetail(cellClickEvent);
 			}
 		});
@@ -144,7 +154,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Load all Import Batch Unarchived list
 	 */
 	private reloadBatchList(): void {
-		this.getUnarchivedBatches().then( batchList => {
+		this.getUnarchivedBatches().then(batchList => {
 			this.dataGridOperationsHelper.reloadData(batchList);
 			this.clearLoopsLists();
 		});
@@ -156,10 +166,10 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * @param {ImportBatchModel} batchRecord
 	 */
 	private reloadImportBatch(batch: ImportBatchModel) {
-		this.importBatchService.getImportBatch(batch.id).subscribe( (response: ApiResponseModel) => {
-				if (response.status === ApiResponseModel.API_SUCCESS) {
-					Object.assign(batch, response.data);
-				}
+		this.importBatchService.getImportBatch(batch.id).subscribe((response: ApiResponseModel) => {
+			if (response.status === ApiResponseModel.API_SUCCESS) {
+				Object.assign(batch, response.data);
+			}
 		});
 	}
 
@@ -170,9 +180,9 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private getUnarchivedBatches(): Promise<any> {
 		let promise = new Promise((resolve, reject) => {
-			this.importBatchService.getImportBatches().subscribe( (result) => {
+			this.importBatchService.getImportBatches().subscribe((result) => {
 				if (result.status === 'success') {
-					let batches: Array<ImportBatchModel> = result.data.filter( item => {
+					let batches: Array<ImportBatchModel> = result.data.filter(item => {
 						return !item.archived;
 					});
 					resolve(batches);
@@ -192,9 +202,9 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Load Archived Batches.
 	 */
 	private loadArchivedBatchList(): void {
-		this.importBatchService.getImportBatches().subscribe( result => {
+		this.importBatchService.getImportBatches().subscribe(result => {
 			if (result.status === 'success') {
-				let batches = result.data.filter( (item: ImportBatchModel) => {
+				let batches = result.data.filter((item: ImportBatchModel) => {
 					return item.archived;
 				});
 				this.dataGridOperationsHelper.reloadData(batches);
@@ -209,29 +219,37 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Open Dialog Popups to display Batch Import detail.
 	 * @param {CellClickEvent} cellClick
 	 */
-	private openBatchDetail(cellClick: any): void {
+	private async openBatchDetail(cellClick: any): Promise<void> {
 		// prevent open detail on column 0
 		let selectedBatch: ImportBatchModel = cellClick.dataItem;
-		if (cellClick.columnIndex === 0 ) {
+		if (cellClick.columnIndex === 0) {
 			return;
 		}
-		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
-		this.dialogService.open(ImportBatchDetailDialogComponent, [
-			{ provide: ImportBatchModel, useValue: selectedBatch}
-		], DIALOG_SIZE.XXL).then(result => {
-			if (result) {
-				this.reloadImportBatch(selectedBatch);
+		this.dataGridOperationsHelper.selectCell(cellClick);
+
+		const result = await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ImportBatchDetailDialogComponent,
+			data: {
+				importBatchModel: selectedBatch,
+			},
+			modalConfiguration: {
+				title: `Batch Detail - ${selectedBatch.id} - ${selectedBatch.domainClassName}`,
+				draggable: true,
+				modalSize: ModalSize.XL
 			}
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+		}).toPromise();
+
+		if (result.status === DialogExit.ACCEPT && result.batchRecordsUpdatedFlag) {
+			this.reloadImportBatch(selectedBatch);
+		}
 	}
 
 	/**
 	 * Confirmation to proceed with the archive of the batches.
 	 */
 	private confirmArchive(): void {
-		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map(item => parseInt(item, 10));
 		this.promptService.open(
 			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(ids.length === 1 ? this.ARCHIVE_ITEM_CONFIRMATION : this.ARCHIVE_ITEMS_CONFIRMATION),
@@ -247,7 +265,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onArchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
-		this.importBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.archiveImportBatches(ids).subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
 					this.dataGridOperationsHelper.unSelectAllCheckboxes();
@@ -263,7 +281,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Confirmation to proceed with the archive of the batches.
 	 */
 	private confirmUnarchive(): void {
-		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map(item => parseInt(item, 10));
 		this.promptService.open(
 			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(ids.length === 1 ? this.UNARCHIVE_ITEM_CONFIRMATION : this.UNARCHIVE_ITEMS_CONFIRMATION),
@@ -279,7 +297,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onUnarchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
-		this.importBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.unArchiveImportBatches(ids).subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
 					this.dataGridOperationsHelper.unSelectAllCheckboxes();
@@ -295,7 +313,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Confirmation to proceed with the delete of the batches.
 	 */
 	private confirmDelete(): void {
-		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map(item => parseInt(item, 10));
 		this.promptService.open(
 			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
 			this.translatePipe.transform(ids.length === 1 ? PROMPT_DELETE_ITEM_CONFIRMATION : PROMPT_DELETE_ITEMS_CONFIRMATION),
@@ -310,8 +328,8 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * On Delete batch button click.
 	 */
 	private onDeleteBatch(): void {
-		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.importBatchService.deleteImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map(item => parseInt(item, 10));
+		this.importBatchService.deleteImportBatches(ids).subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					if (this.viewArchived) {
 						this.loadArchivedBatchList();
@@ -357,7 +375,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onPlayButton(batch: ImportBatchModel): void {
 		const ids = [batch.id];
-		this.importBatchService.queueImportBatches(ids).subscribe( (response: ApiResponseModel) => {
+		this.importBatchService.queueImportBatches(ids).subscribe((response: ApiResponseModel) => {
 				if (response.status === ApiResponseModel.API_SUCCESS && response.data.QUEUE === 1) {
 					batch.status.code = BatchStatus.QUEUED.toString();
 					batch.status.label = 'Queued';
@@ -377,7 +395,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private onEjectButton(batch: ImportBatchModel): void {
 		const ids = [batch.id];
-		this.importBatchService.ejectImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.ejectImportBatches(ids).subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					batch.status.code = BatchStatus.PENDING.toString();
 					batch.status.label = 'Pending';
@@ -417,7 +435,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	private stopBatch(batch: ImportBatchModel): void {
 		const ids = [batch.id];
-		this.importBatchService.stopImportBatch(ids).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.stopImportBatch(ids).subscribe((result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.removeBatchFromRunningLoop(batch);
 				this.reloadImportBatch(batch);
@@ -469,7 +487,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Initializes the loop for batches on RUNNING state.
 	 */
 	private setRunningLoop(): void {
-		this.runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+		this.runningBatches = this.dataGridOperationsHelper.resultSet.filter((item: ImportBatchModel) => {
 			return item.status.code === BatchStatus.RUNNING.toString();
 		});
 		this.runningLoop();
@@ -490,9 +508,9 @@ export class ImportBatchListComponent implements OnDestroy {
 			for (let batch of this.runningBatches) {
 				this.importBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
 					if (response.status === ApiResponseModel.API_SUCCESS) {
-						batch.currentProgress =  response.data.progress ? response.data.progress : 0;
+						batch.currentProgress = response.data.progress ? response.data.progress : 0;
 						const lastUpdated = (response.data.lastUpdated as Date);
-						batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0 ;
+						batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0;
 						// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
 						if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
 							batch.status.code = BatchStatus.STALLED.toString();
@@ -504,7 +522,7 @@ export class ImportBatchListComponent implements OnDestroy {
 							this.removeBatchFromRunningLoop(batch);
 							this.reloadImportBatch(batch);
 						} else {
-							batch.lastUpdated =  response.data.lastUpdated as Date;
+							batch.lastUpdated = response.data.lastUpdated as Date;
 						}
 					} else {
 						this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
@@ -525,7 +543,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Initializes the loop for batches on QUEUED state.
 	 */
 	private setQueuedLoop(): void {
-		this.queuedBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+		this.queuedBatches = this.dataGridOperationsHelper.resultSet.filter((item: ImportBatchModel) => {
 			return item.status.code === BatchStatus.QUEUED.toString();
 		});
 		this.queuedLoop([...this.queuedBatches]);
@@ -627,7 +645,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	 */
 	protected onPageChange($event: PageChangeEvent): void {
 		this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.LIST_SIZE] = $event.take.toString();
-		this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe( result => {
+		this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe(result => {
 			// nothing to do here ..
 		});
 		this.dataGridOperationsHelper.pageChange($event)

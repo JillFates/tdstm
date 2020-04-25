@@ -1,6 +1,6 @@
 <div class="architecture-graph-gojs-component">
 	<div class="graph-container-gojs" [ngClass]="!toggleFullScreen ? 'fullscreen-gojs' : ''">
-		<div id="toolsContainerId">
+	<div id="toolsContainerId">
 			<div id="graphToolbarId">
 				<tds-button (click)="toggleControlPanel()">{{'ARCHITECTURE.CONTROL_PANEL' | translate}}</tds-button>
 				<tds-button (click)="toggleLegend()">{{'ARCHITECTURE.LEGEND' | translate}}</tds-button>
@@ -30,7 +30,7 @@
 						<tds-combobox
 								name="asset"
 								[(model)]="selectedAsset"
-								[(metaParam)]="assetClass.id"
+								[(metaParam)]="assetClass && assetClass.id"
 								[required]="false"
 								(valueChange)="onAssetSelected($event)"
 								[serviceRequest]="getAssetList">
@@ -74,7 +74,7 @@
 											[id]="label.value"
 											[name]="label.value"
 											[(ngModel)]="label.checked"
-											(change)="updateGraphLabels(i)"
+											(ngModelChange)="updateGraphLabels($event, i)"
 									>
 									<label class="k-checkbox-label" [for]="label.value">
 										<img height="16px" src="/tdstm/assets/icons/svg/{{label.icon}}_menu.svg" width="16px">
