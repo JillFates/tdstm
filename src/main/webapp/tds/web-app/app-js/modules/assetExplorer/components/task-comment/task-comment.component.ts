@@ -100,14 +100,20 @@ export class TaskCommentComponent implements OnInit {
 				this.taskCommentsList = res;
 				this.dataGridTaskHelper = new DataGridOperationsHelper(
 					this.getTaskWithFilter(),
-					null,
+					[{
+						dir: 'asc',
+						field: 'commentInstance.comment'
+					}],
 					null,
 					null,
 					2000,
 				);
 				this.dataGridCommentHelper = new DataGridOperationsHelper(
 					this.getCommentsWithFilter(),
-					null,
+					[{
+						dir: 'asc',
+						field: 'commentInstance.comment'
+					}],
 					null,
 					null,
 					2000,

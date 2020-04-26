@@ -103,10 +103,16 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
 				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}),
-				this.http.get(`../ws/asset/assetForDependencyGroup?assetId=${this.modelId}`))
+				this.http.get(`../ws/asset/assetForDependencyGroup?assetId=${this.modelId}`),
+				this.http.get(`../ws/asset/dependenciesForShow/${this.modelId}`))
 				.subscribe((response: any) => {
 					let template = response[0];
 					const templateTitleData = response[1];
+
+					let dependencies = response[2].data;
+					metadata.asset = dependencies.asset;
+					metadata.supports = dependencies.supports;
+					metadata.dependents = dependencies.dependents;
 
 					this.setTitle(this.getModalTitle(templateTitleData.data));
 

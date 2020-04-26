@@ -1,9 +1,9 @@
-<div class="task-comment-component dialog-container" >
+<div class="task-comment-component dialog-container dialog-inner-tables" >
 	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content"
 		 [ngClass]="{'has-not-task-manager-permission': !hasTaskManagerViewPermission}">
 		<kendo-grid
 			*ngIf="dataGridTaskHelper"
-			class="tds-table tds-task-grid"
+			class="tds-table narrow-rows clickable-rows"
 			[data]="dataGridTaskHelper.gridData"
 			[sort]="dataGridTaskHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -63,7 +63,13 @@
 			>
 				<!-- Header Template -->
 				<ng-template kendoGridHeaderTemplate>
-					{{ column.label }}
+					<div class="sortable-column component-action-sort">
+						<div>
+							<label>
+								{{column.label}}
+							</label>
+						</div>
+					</div>
 				</ng-template>
 
 				<!-- Action -->
@@ -82,13 +88,13 @@
 							<clr-dropdown-menu *clrIfOpen clr-dropdown-menu>
 								<a
 									clrDropdownItem
-									(click)="openTaskEdit(dataItem)"
+									(click)="isTaskEditAvailable() && openTaskEdit(dataItem)"
 									[disabled]="!isTaskEditAvailable() || !hasTaskManagerViewPermission"
 									>Edit Task</a
 								>
 								<a
 									clrDropdownItem
-									(click)="onDelete(dataItem)"
+									(click)="isTaskDeleteAvailable() && onDelete(dataItem)"
 									[disabled]="!isTaskDeleteAvailable()"
 									>Delete Task</a
 								>
@@ -129,7 +135,7 @@
 	>
 		<kendo-grid
 			*ngIf="dataGridCommentHelper"
-			class="tds-table"
+			class="tds-table narrow-rows clickable-rows"
 			[data]="dataGridCommentHelper.gridData"
 			[sort]="dataGridCommentHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -179,7 +185,13 @@
 			>
 				<!-- Header Template -->
 				<ng-template kendoGridHeaderTemplate>
-					{{ column.label }}
+					<div class="sortable-column component-action-sort">
+						<div>
+							<label>
+								{{column.label}}
+							</label>
+						</div>
+					</div>
 				</ng-template>
 
 				<!-- Action -->
@@ -197,7 +209,7 @@
 								<a
 									clrDropdownItem
 									(click)="
-										openTaskComment(
+										isCommentEditAvailable() && openTaskComment(
 											dataItem,
 											modalType.EDIT
 										)
@@ -207,7 +219,7 @@
 								>
 								<a
 									clrDropdownItem
-									(click)="onDelete(dataItem)"
+									(click)="isCommentDeleteAvailable() && onDelete(dataItem)"
 									[disabled]="!isCommentDeleteAvailable()"
 									>Delete Comment</a
 								>
@@ -238,8 +250,7 @@
 					</div>
 				</ng-template>
 			</kendo-grid-column>
-			<kendo-grid-messages noRecords="There are no records to display.">
-		</kendo-grid-messages>
+			<kendo-grid-messages noRecords="There are no records to display."></kendo-grid-messages>
 		</kendo-grid>
 	</div>
 </div>
