@@ -146,6 +146,7 @@ export class ArchitectureGraphDiagramHelper {
 
 		// TextBlock
 		const textBlock = new TextBlock();
+		textBlock.textAlign = 'center';
 		textBlock.desiredSize = new Size(60, 10);
 		textBlock.stroke = '#000';
 		textBlock.maxLines = 1;
