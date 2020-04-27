@@ -1,0 +1,16 @@
+<div class="regenerate-progress-dialog-wrapper static-dialog tds-modal-content">
+	<div class="clr-container">
+		<div class="clr-row" style="margin-top: 25px;">
+			<div class="clr-col-12">
+				<div class="progress">
+					<progress max="100" value="{{value}}" ></progress>
+				</div>
+			</div>
+		</div>
+		<div class="clr-row" style="margin-top: 25px;">
+			<div class="clr-col-12 text-right">
+				<button  class="btn btn-primary" *ngIf="value === 100" (click)="onDismiss()">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
