@@ -355,25 +355,28 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * load highlight options
 	 */
 	loadHighlightOptions(): void {
-		this.taskService.highlightOptions(this.selectedEvent.id, this.viewUnpublished)
-			.subscribe(res => {
-				const data = res.body && res.body.data;
-				if (data) {
-					this.highlightOptions$.next(data);
-				}
-			});
-		Observable.forkJoin([
-			this.taskService.highlightOptions(this.selectedEvent.id, this.viewUnpublished),
-			this.tagsService.getTagList()
-		]).subscribe(res => {
-			const [options, tags] = res;
-			if ((options.body && options.body.data) && tags) {
-				this.highlightOptions$.next({
-					...options.body.data,
-					tags: tags
+		const eventId = this.selectedEvent && this.selectedEvent.id
+		if (eventId) {
+			this.taskService.highlightOptions(eventId, this.viewUnpublished)
+				.subscribe(res => {
+					const data = res.body && res.body.data;
+					if (data) {
+						this.highlightOptions$.next(data);
+					}
 				});
-			}
-		})
+			Observable.forkJoin([
+				this.taskService.highlightOptions(eventId, this.viewUnpublished),
+				this.tagsService.getTagList()
+			]).subscribe(res => {
+				const [options, tags] = res;
+				if ((options.body && options.body.data) && tags) {
+					this.highlightOptions$.next({
+						...options.body.data,
+						tags: tags
+					});
+				}
+			})
+		}
 	}
 
 	/**
