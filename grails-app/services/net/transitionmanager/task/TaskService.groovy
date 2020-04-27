@@ -122,6 +122,7 @@ class TaskService implements ServiceMethods {
 	TimelineService            timelineService
 	AssetOptionsService        assetOptionsService
 
+	private static final List<String> statusList = ACS.list
 	private static Integer MINUTES_CONSIDERED_TARDY = 300
 	private static Integer MINUTES_CONSIDERED_LATE = 600
 
@@ -926,7 +927,6 @@ class TaskService implements ServiceMethods {
 		if (!from && to) return 1
 		if (from && !to) return -1
 
-		List<String> statusList= assetOptionsService.taskCategories()
 		int fidx = statusList.findIndexOf { it == from }
 		int tidx = statusList.findIndexOf { it == to }
 
