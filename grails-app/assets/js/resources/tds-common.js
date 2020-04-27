@@ -684,10 +684,9 @@ var UserPreference = function () {
 		var data = $('#' + formId).serialize();
 		$.post(tdsCommon.createAppURL('/person/saveDateAndTimePreferences'), data, function () {
 			window.location.reload();
-		})
-			.fail(function () {
-				alert("Can't update user's preferences");
-			});
+		}).fail(function () {
+			alert("Can't update user's preferences");
+		});
 	}
 
 	// resets the user's preferences to their default values

@@ -11,7 +11,7 @@ import {
 	Spot,
 	TextBlock,
 	TreeLayout,
-	LayeredDigraphLayout
+	LayeredDigraphLayout, default as go, Adornment, Placeholder, InputEvent
 } from 'gojs';
 import {
 	ITdsContextMenuOption
@@ -22,6 +22,8 @@ import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/archi
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 
 export class ArchitectureGraphDiagramHelper {
+
+	params: any;
 
 	constructor() {
 		// Architecture Graph Diagram Helper Constructor
@@ -51,6 +53,7 @@ export class ArchitectureGraphDiagramHelper {
 	 */
 	diagramData(params?: any): IDiagramData {
 		const d = this.data(params.data);
+		this.params = params;
 		return {
 			nodeDataArray: d.nodeDataArray,
 			linkDataArray: d.linkDataArray,
@@ -137,51 +140,150 @@ export class ArchitectureGraphDiagramHelper {
 
 		// TextBlock
 		const textBlock = new TextBlock();
+		textBlock.desiredSize = new Size(60, 10);
 		textBlock.stroke = '#000';
+		textBlock.maxLines = 1;
+		textBlock.wrap = TextBlock.None;
+		textBlock.overflow = TextBlock.OverflowEllipsis;
 		textBlock.bind(new Binding('text', 'name'));
 
 		// hide if the node if the name is empty
 		textBlock.bind(new Binding('visible', 'name', (val: string) => !!val));
 
+		textBlock.mouseOver = (e: InputEvent, obj: TextBlock) => {
+			if (obj.text && obj.text.length > 10) {
+				obj.toolTip = this.textBlockTooltip(obj.text);
+			}
+		};
+
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
+		const shape = new Shape();
+		shape.figure = 'RoundedRectangle';
+		shape.fill = 'transparent';
+		shape.strokeWidth = 4;
+		shape.desiredSize = new Size(65, 65);
+		shape.bind(new Binding('stroke', 'id', (val: any) => {
+			if (val === this.params.rootAsset || val === this.params.rootAsset) {
+				return 'red';
+			} else {
+				return 'transparent';
+			}
+		}));
+		panel.add(shape);
 		panel.add(panelBody);
 		node.add(panel);
+
+		node.bind(new Binding('selectionAdorned', 'id', (val: any) => {
+			return val !== this.params.rootAsset;
+		}));
 
 		if (opts.isExpandable) {
 			node.isTreeExpanded = false;
 			const expandButton = GraphObject.make('TreeExpanderButton');
 			node.add(expandButton);
 		}
-		node.click = (i, o) => console.log('click');
+
+		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 
 		return node;
 	}
 
+	/**
+	 * textblock tooltip
+	 * @param tooltipText
+	 */
+	textBlockTooltip(tooltipText: string) {
+		const $ = go.GraphObject.make;
+		return $(Adornment,
+			$(TextBlock,
+				{
+					text: tooltipText,
+					background: '#fff',
+					stroke: '#0077b8',
+					font: '14px sans-serif'
+				}
+			)
+		); // end Adornment
+	}
+
+	/**
+	 * Node Adornment template configuration
+	 * @param {go.Node} node > optional node to add the adornment to
+	 **/
+	selectionAdornmentTemplate(node?: go.Node): Adornment {
+		const selAdornmentTemplate = new Adornment(Panel.Auto);
+		selAdornmentTemplate.selectionAdorned = true;
+		if (node) { selAdornmentTemplate.adornedObject = node; }
+
+		const selAdornmentShape = new Shape();
+		selAdornmentShape.figure = 'RoundedRectangle';
+		selAdornmentShape.fill = null;
+		selAdornmentShape.stroke = 'red';
+		selAdornmentShape.strokeWidth = 4;
+		if (this.params.iconsOnly) {
+			selAdornmentShape.desiredSize = new Size(60, 60);
+		} else {
+			selAdornmentShape.desiredSize =  new Size(65, 65);
+		}
+
+		const placeholder = new Placeholder();
+
+		selAdornmentTemplate.add(selAdornmentShape);
+		selAdornmentTemplate.add(placeholder);
+
+		return selAdornmentTemplate;
+	}
+
 	iconOnlyNodeTemplate(opts?: any): Node {
-		const node = new Node(Panel.Viewbox);
-		node.position = new Point(0, 0);
-		node.maxSize = new Size(35, 60);
+		const node = new Node(Panel.Horizontal);
+		node.margin = new Margin(1, 1, 1, 1);
 
 		const panel = new Panel(Panel.Auto);
+		panel.background = '#fff';
+		panel.padding = new Margin(0, 0, 0, 0);
+
 		const panelBody = new Panel(Panel.Vertical);
+		panel.padding = new Margin(0, 0, 0, 0);
+		panel.margin = new Margin(0, 0, 0, 0);
+
 		// Picture Icon
 		const iconPicture = new Picture();
-		// iconPicture.desiredSize = new Size(80, 80);
+		iconPicture.desiredSize = new Size(50, 50);
 		iconPicture.bind(new Binding('source', 'assetClass',
 			(val: string) => this.getIconPath(val)));
+		iconPicture.imageAlignment = Spot.Center;
 
 		panelBody.add(iconPicture);
+
+		const shape = new Shape();
+		shape.figure = 'RoundedRectangle';
+		shape.fill = 'transparent';
+		shape.strokeWidth = 4;
+		shape.desiredSize = new Size(55, 55);
+		shape.bind(new Binding('stroke', 'id', (val: any) => {
+			if (val === this.params.rootAsset || val === this.params.rootAsset) {
+				return 'red';
+			} else {
+				return 'transparent';
+			}
+		}));
+		panel.add(shape);
 		panel.add(panelBody);
 		node.add(panel);
+
+		node.bind(new Binding('selectionAdorned', 'id', (val: any) => {
+			return val !== this.params.rootAsset;
+		}));
 
 		if (opts.isExpandable) {
 			node.isTreeExpanded = false;
 			const expandButton = GraphObject.make('TreeExpanderButton');
 			node.add(expandButton);
 		}
-		node.click = (i, o) => console.log('click');
+
+		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 
 		return node;
 	}
@@ -222,8 +324,32 @@ export class ArchitectureGraphDiagramHelper {
 
 		linkTemplate.add(linkShape);
 		linkTemplate.add(arrowHead);
+		linkTemplate.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
 
 		return linkTemplate;
+	}
+
+	/**
+	 * Node Adornment template configuration
+	 * @param {go.Node} node > optional node to add the adornment to
+	 **/
+	linkSelectionAdornmentTemplate(node?: go.Node): Adornment {
+		const selAdornmentTemplate = new Adornment(Panel.Link);
+		selAdornmentTemplate.selectionAdorned = true;
+		if (node) { selAdornmentTemplate.adornedObject = node; }
+
+		const linkShape = new go.Shape();
+		linkShape.isPanelMain = true;
+		linkShape.strokeWidth = 5;
+		linkShape.stroke = 'red';
+		const arrowHead = new Shape();
+		arrowHead.strokeWidth = 4;
+		arrowHead.stroke = '#af1102';
+		arrowHead.toArrow = 'Standard';
+
+		selAdornmentTemplate.add(linkShape);
+		selAdornmentTemplate.add(arrowHead);
+		return selAdornmentTemplate;
 	}
 
 	layout(): Layout {
