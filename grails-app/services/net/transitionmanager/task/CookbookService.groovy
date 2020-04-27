@@ -810,9 +810,10 @@ class CookbookService implements ServiceMethods {
 					}
 				}
 
-				if (n=="category" && !(v in assetOptionsService.taskCategories())) {
+				List<String> categories = assetOptionsService.taskCategories()
+				if (n=="category" && !(v in categories)) {
 					errorList << [error: 1, reason: 'Invalid Category',
-						detail: "$label in element $i contains unknown category '$v'"]
+						detail: "$label in element $i contains unknown category '$v' The vaid categories are: ${categories.join(', ')}"]
 				}
 
 				if ( n == "invoke" && type == "task") {
