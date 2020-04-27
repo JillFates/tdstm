@@ -355,15 +355,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * load highlight options
 	 */
 	loadHighlightOptions(): void {
-		const eventId = this.selectedEvent && this.selectedEvent.id
+		const eventId = this.selectedEvent && this.selectedEvent.id;
 		if (eventId) {
-			this.taskService.highlightOptions(eventId, this.viewUnpublished)
-				.subscribe(res => {
-					const data = res.body && res.body.data;
-					if (data) {
-						this.highlightOptions$.next(data);
-					}
-				});
 			Observable.forkJoin([
 				this.taskService.highlightOptions(eventId, this.viewUnpublished),
 				this.tagsService.getTagList()
@@ -386,7 +379,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	onEventSelect(moveEvent?: IMoveEvent): void {
 		if (moveEvent) { this.selectedEvent = moveEvent; }
 
-		this.loadFromSelectedEvent();
+		this.loadData();
 
 		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
 	}
