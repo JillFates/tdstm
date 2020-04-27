@@ -1,9 +1,11 @@
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.common.SequenceService
 import net.transitionmanager.party.PartyGroup
@@ -19,15 +21,27 @@ import net.transitionmanager.task.TaskService
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import spock.lang.Specification
+import spock.util.mop.ConfineMetaClassChanges
 
+import static net.transitionmanager.asset.AssetOptions.AssetOptionsType.TASK_CATEGORY
+
+@ConfineMetaClassChanges([GormUtil])
 class TaskServiceTests extends Specification implements ServiceUnitTest<TaskService>, DataTest{
 
 	void setupSpec(){
-		mockDomains AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, Person, Project
+		mockDomains AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, Person, Project, AssetOptions
+
+		defineBeans {
+			assetOptionsService(AssetOptionsService)
+		}
 	}
 
 	void setup(){
-		service.partyRelationshipService = [staffHasFunction:{Project project, staffId, functionCodes-> false}] as PartyRelationshipService
+		//Overriding this so that in the CustomValidators.inList the calls to getConstraintValue don't blow up.
+		GormUtil.metaClass.static.getConstraintValue = { Class clazz, String propertyName, String constraintName -> [] as Object }
+		new AssetOptions(type: TASK_CATEGORY, value: 'general').save(flush: true, failOnError: true)
+
+		service.partyRelationshipService = [staffHasFunction: { Project project, staffId, functionCodes -> false }] as PartyRelationshipService
 
 		service.assetOptionsService = [
 			taskCategories: { ->
