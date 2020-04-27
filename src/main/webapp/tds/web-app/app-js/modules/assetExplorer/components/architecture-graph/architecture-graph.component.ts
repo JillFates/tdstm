@@ -2,8 +2,9 @@ import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/
 import {ITdsContextMenuOption} from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {Observable, ReplaySubject} from 'rxjs';
+import {tap} from 'rxjs/operators';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link, Spot} from 'gojs';
+import {Diagram, Layout, Node, Link, Spot} from 'gojs';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
@@ -66,6 +67,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	public assetIconsPath = ASSET_ICONS;
 	public toggleFullScreen = true;
 	public selectedAsset = null;
+	public taskCycles: number[][];
 
 	public assetItem;
 	private TAG_APPLICATION = 'appLbl';
@@ -161,7 +163,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			assetId = this.assetId;
 			levelsUp = this.urlParams.levelsUp;
 			levelsDown = this.urlParams.levelsDown;
-			this.loadData(true);
+			this.refreshData(true);
 		}
 		this.getArchitectureGraphPreferences(assetId, levelsUp, levelsDown);
 		this.initSearchModel();
@@ -202,7 +204,7 @@ export class ArchitectureGraphComponent implements OnInit {
 				} else {
 					this.assetClass = this.initialAssetClass;
 				}
-				this.loadData();
+				this.refreshData(false);
 
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_DATABASE);
@@ -251,7 +253,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			this.assetId = event.id;
 			this.selectedAsset = event;
 			// this.asset = event;
-			this.loadData();
+			this.refreshData(false);
 		} else {
 			// reset assets selected
 			this.assetId = null;
@@ -266,29 +268,50 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Optionally accepts a flag to set the current selected asset
 	 * @param setInitialAsset When true set the initial value for the selected asset
 	 * */
-	loadData(setInitialAsset = false): void {
+	loadData(setInitialAsset = false): Observable<any> {
 		if (this.assetId) {
-			this.architectureGraphService
-				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
-				.subscribe( (res: any) => {
-					this.currentNodesData = res;
-					const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
-					this.updateNodeData(this.currentNodesData, noLabelChecked);
-					if (setInitialAsset && res && res.nodes) {
-						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
-						if (selectedAsset) {
-							this.selectedAsset = {
-								id: selectedAsset.id,
-								text: selectedAsset.name,
-							};
-							// this.asset = {
-							// 	id: selectedAsset.id,
-							// 	text: selectedAsset.name,
-							// };
+			return this.architectureGraphService
+				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode, this.showCycles)
+				.pipe(
+					tap((res: any) => {
+						this.currentNodesData = res;
+						this.taskCycles = res.cycles || [];
+						const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
+						this.updateNodeData(this.currentNodesData, noLabelChecked);
+						if (setInitialAsset && res && res.nodes) {
+							const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
+							if (selectedAsset) {
+								this.selectedAsset = {
+									id: selectedAsset.id,
+									text: selectedAsset.name,
+								};
+							}
 						}
-					}
-				});
+					})
+				)
+		} else {
+			return Observable.of(null);
 		}
+	}
+
+	/**
+	 * highlight nodes by cycles
+	 **/
+	highlightCycles(): void {
+		if ((this.taskCycles && this.taskCycles.length > 0) && this.showCycles) {
+			const cycles = [];
+			this.taskCycles.forEach(arr => cycles.push(...arr));
+			this.graph.highlightNodes((n: Node) => cycles && cycles.includes(n.data.id), false);
+		} else {
+			this.graph.clearHighlights();
+		}
+	}
+
+	/**
+	 * Update the info changing the state for the show cycles checkbox
+	 */
+	onToggleShowCycles() {
+		this.refreshData();
 	}
 
 	/**
@@ -308,8 +331,17 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (this.levelsUp > 0) {
 			this.levelsUp--;
 			this.form.controls.levelsUp.markAsDirty();
-			this.loadData();
+			this.refreshData(false);
 		}
+	}
+
+	/**
+	 * Refresh the data getting the information from the endpoint
+	 * * @param setInitialAsset Allow set passing the initial asset to standout
+	 */
+	refreshData(setInitialAsset = false): void {
+		this.loadData(setInitialAsset)
+			.subscribe(() => {/**/})
 	}
 
 	/**
@@ -318,7 +350,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	addLevelsUp() {
 		this.levelsUp++;
 		this.form.controls.levelsUp.markAsDirty();
-		this.loadData();
+		this.refreshData();
 	}
 
 	/**
@@ -327,7 +359,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	addLevelsDown() {
 		this.levelsDown++;
 		this.form.controls.levelsDown.markAsDirty();
-		this.loadData();
+		this.refreshData();
 	}
 
 	/**
@@ -337,7 +369,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (this.levelsDown > 0) {
 			this.levelsDown--;
 			this.form.controls.levelsDown.markAsDirty();
-			this.loadData();
+			this.refreshData();
 		}
 	}
 
@@ -469,7 +501,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	updateNodeData(data, iconsOnly) {
 		const clonedData = this.removeNodeNamesForNotSelectedCategories(data);
-		const diagramHelper = new ArchitectureGraphDiagramHelper();
+		const diagramHelper = new ArchitectureGraphDiagramHelper(this.taskCycles || []);
 
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
@@ -487,7 +519,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
-		this.loadData();
+		this.refreshData();
 		this.graph.showFullGraphBtn = false;
 		this.graph.nodeMove = false;
 	}
