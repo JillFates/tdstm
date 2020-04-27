@@ -12,7 +12,6 @@ import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.action.ApiAction
-import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.exception.DomainUpdateException
@@ -39,7 +38,6 @@ import java.sql.SQLException
 
 import static com.tdsops.tm.enums.domain.ProjectStatus.ACTIVE
 import static com.tdsops.tm.enums.domain.ProjectStatus.COMPLETED
-
 /**
  * Handles the logic for creating recipes and running the cookbook
  *
@@ -812,7 +810,7 @@ class CookbookService implements ServiceMethods {
 					}
 				}
 
-				if (n=="category" && !(v in assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.TASK_CATEGORY))) {
+				if (n=="category" && !(v in assetOptionsService.taskCategories())) {
 					errorList << [error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'"]
 				}
