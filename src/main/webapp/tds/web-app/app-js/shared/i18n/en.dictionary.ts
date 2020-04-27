@@ -272,8 +272,8 @@ export const en_DICTIONARY: Object = {
 		'NEWS': 'Event News List'
 	},
 	'EVENT_NEWS_LIST': {
-		'EDIT': 'Edit News Event',
-		'CREATE': 'Create News Event'
+		'EDIT': 'Event News Edit',
+		'CREATE': 'Event News Create'
 	},
 	'INSIGHT': {
 		'INSIGHT': 'Insight',
