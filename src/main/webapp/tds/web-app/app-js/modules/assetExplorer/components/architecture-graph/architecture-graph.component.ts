@@ -152,6 +152,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.showCycles = false;
 		this.assetClass = this.initialAssetClass;
 		let assetId = null;
 		let levelsUp = null;
@@ -159,7 +160,7 @@ export class ArchitectureGraphComponent implements OnInit {
 
 		// If it comes from asset explorer
 		if (this.urlParams && this.urlParams.assetId) {
-			this.assetId = this.urlParams.assetId;
+			this.assetId = parseInt(this.urlParams.assetId.toString(), 10);
 			assetId = this.assetId;
 			levelsUp = this.urlParams.levelsUp;
 			levelsDown = this.urlParams.levelsDown;
@@ -455,7 +456,8 @@ export class ArchitectureGraphComponent implements OnInit {
 		const categories = this.getSelectedCategories() // this.categories || [];
 					.map( label => label.value.toUpperCase());
 
-		clonedNodes.nodes.forEach(node => {
+		const nodes = clonedNodes.nodes || [];
+		nodes.forEach(node => {
 			// Clear the node name if the assetClass is not included on the categories selected
 			if (node.assetClass === 'DEVICE' /*|| node.assetClass === 'STORAGE'*/) {
 				const type = node.type.toLowerCase();

@@ -122,6 +122,14 @@ export class ArchitectureGraphDiagramHelper {
 		return null;
 	}
 
+	/**
+	 * Determines if the asset provided is the root asset
+	 * @param assetId
+	 */
+	isRootAsset(assetId: number): boolean {
+		return assetId === this.params.rootAsset;
+	}
+
 	nodeTemplate(opts?: any): Node {
 		const node = new Node(Panel.Horizontal);
 		node.margin = new Margin(1, 1, 1, 1);
@@ -147,7 +155,7 @@ export class ArchitectureGraphDiagramHelper {
 		// TextBlock
 		const textBlock = new TextBlock();
 		textBlock.textAlign = 'center';
-		textBlock.desiredSize = new Size(60, 10);
+		textBlock.desiredSize = new Size(60, 14);
 		textBlock.stroke = '#000';
 		textBlock.maxLines = 1;
 		textBlock.wrap = TextBlock.None;
@@ -166,19 +174,18 @@ export class ArchitectureGraphDiagramHelper {
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
-		const shape = new Shape();
-		shape.figure = 'RoundedRectangle';
-		shape.fill = 'transparent';
-		shape.strokeWidth = 4;
-		shape.desiredSize = new Size(65, 65);
-		shape.bind(new Binding('stroke', 'id', (val: any) => {
-			if (val === this.params.rootAsset || val === this.params.rootAsset) {
-				return 'red';
-			} else {
-				return 'transparent';
-			}
+		const selectedShape = new Shape();
+		selectedShape.figure = 'RoundedRectangle';
+		selectedShape.fill = 'transparent';
+		selectedShape.strokeWidth = 4;
+		selectedShape.desiredSize = new Size(65, 65);
+		selectedShape.bind(new Binding('stroke', 'id', (val: any) => {
+			return this.isRootAsset(val) ? 'red' : 'transparent';
 		}));
-		panel.add(shape);
+		selectedShape
+			.bind(new Binding('visible', 'id', (val: any) => this.isRootAsset(val)));
+
+		panel.add(selectedShape);
 		panel.add(panelBody);
 		node.add(panel);
 
