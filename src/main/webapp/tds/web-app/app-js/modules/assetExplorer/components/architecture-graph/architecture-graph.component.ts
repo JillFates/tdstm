@@ -349,18 +349,22 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Adds the levels up of the graph and reload the data
 	 */
 	addLevelsUp() {
-		this.levelsUp++;
-		this.form.controls.levelsUp.markAsDirty();
-		this.refreshData();
+		if (this.levelsUp < 10) {
+			this.levelsUp++;
+			this.form.controls.levelsUp.markAsDirty();
+			this.refreshData();
+		}
 	}
 
 	/**
 	 * Reduces the levels down of the graph and reload the data
 	 */
 	addLevelsDown() {
-		this.levelsDown++;
-		this.form.controls.levelsDown.markAsDirty();
-		this.refreshData();
+		if (this.levelsDown < 10) {
+			this.levelsDown++;
+			this.form.controls.levelsDown.markAsDirty();
+			this.refreshData();
+		}
 	}
 
 	/**
