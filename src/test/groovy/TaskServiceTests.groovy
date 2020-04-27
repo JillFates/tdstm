@@ -4,6 +4,7 @@ import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.common.SequenceService
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
@@ -27,6 +28,11 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 
 	void setup(){
 		service.partyRelationshipService = [staffHasFunction:{Project project, staffId, functionCodes-> false}] as PartyRelationshipService
+
+		service.assetOptionsService = [
+			taskCategories: { ->
+				['general', 'discovery', 'analysis', 'design', 'planning', 'buildout', 'walkthru', 'premove', 'moveday', 'shutdown', 'physical', 'transport', 'startup', 'verify', 'postmove', 'closeout', 'learning'] }
+		] as AssetOptionsService
 	}
 
 	void testCompareStatus() {
