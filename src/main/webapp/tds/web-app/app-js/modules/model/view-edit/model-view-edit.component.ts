@@ -373,11 +373,11 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modelService.saveModel(this.modelModel)
 			.subscribe(
 			(result: any) => {
-				console.log(result);
-				super.onAcceptSuccess(result);
+				this.onAcceptSuccess(result);
 			},
 			err => console.log(err)
 		);
+		this.modelConnectorsControls.length = 0;
 	}
 
 	/**
