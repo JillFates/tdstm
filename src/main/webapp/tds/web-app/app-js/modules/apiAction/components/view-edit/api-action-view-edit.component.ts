@@ -273,7 +273,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
-			super.onSetUpFocus();
+			// super.onSetUpFocus();
 		});
 	}
 

@@ -37,6 +37,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
 
 	@ViewChild('providerForm', {read: NgForm, static: true}) providerForm: NgForm;
+	@ViewChild('providerNameElement', {static: false}) providerNameElement: ElementRef;
 
 	public providerModel: ProviderModel;
 	public modalTitle: string;
@@ -141,6 +142,8 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			console.log('element:', this.providerNameElement);
+			super.onSetUpFocus(this.providerNameElement);
 		});
 	}
 
