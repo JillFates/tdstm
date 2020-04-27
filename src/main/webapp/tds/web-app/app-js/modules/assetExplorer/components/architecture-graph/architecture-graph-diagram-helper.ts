@@ -22,11 +22,17 @@ import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/archi
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 
 export class ArchitectureGraphDiagramHelper {
-
 	params: any;
+	refCycles: string[];
+	private readonly cyclicalColor = '#1945dd';
+	private readonly arrowColor = '#c3c3c3';
 
-	constructor() {
-		// Architecture Graph Diagram Helper Constructor
+	constructor(private cycles: number[][]) {
+		this.refCycles = [];
+			// Architecture Graph Diagram Helper Constructor
+		cycles.forEach((cycle: number[]) => {
+			this.refCycles.push(cycle.join('#'));
+		});
 	}
 
 	static isDeviceVirtualServer(type: string): boolean {
@@ -310,17 +316,40 @@ export class ArchitectureGraphDiagramHelper {
 		return !!icon ? icon.icon : ASSET_ICONS.application.icon;
 	}
 
+	/**
+	 * Determines is the current node belongs to the cyclical references
+	 * @param from
+	 * @param to
+	 */
+	isCyclicalReference(from: number, to: number): boolean {
+		const found = this.refCycles.find((cycle: string) => {
+			const currentNode = `${from}#${to}`;
+			return cycle.indexOf(currentNode) !== -1;
+		});
+		return Boolean(found);
+	}
+
 	linkTemplate(): Link {
 		const linkTemplate = new Link();
 		linkTemplate.layerName = 'Background';
 
 		const linkShape = new Shape();
 		linkShape.strokeWidth = 2;
-		linkShape.stroke = '#ddd';
+
+		linkShape.bind(new Binding('stroke', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  '#ddd'));
+
+		linkShape.bind(new Binding('strokeDashArray', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? [5, 10 ] :  null));
+
 		const arrowHead = new Shape();
 		arrowHead.toArrow = 'Standard';
-		arrowHead.stroke = '#c3c3c3';
-		arrowHead.fill = '#c3c3c3';
+
+		arrowHead.bind(new Binding('stroke', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
+
+		arrowHead.bind(new Binding('fill', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
 
 		linkTemplate.add(linkShape);
 		linkTemplate.add(arrowHead);
