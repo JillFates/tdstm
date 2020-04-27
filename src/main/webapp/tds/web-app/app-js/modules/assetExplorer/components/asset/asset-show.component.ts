@@ -307,8 +307,10 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 	private changeToEditViewOnDoubleClick(event: MouseEvent): void {
 		const bannedClasses = ['btn', 'clickable-text', 'show-hide-link', 'diagram-layout', 'task-comment-component'];
 		if (!ValidationUtils.isBannedClass(bannedClasses, event)) {
-			// move to edit mode
-			this.showAssetEditView(this.data.assetId, this.asset);
+			// move to edit mode just if the user has the permissions
+			if (this.isEditAvailable()) {
+				this.showAssetEditView(this.data.assetId, this.asset);
+			}
 		}
 	}
 }
