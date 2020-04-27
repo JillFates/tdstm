@@ -413,7 +413,7 @@
                         <tr *ngFor="let connector of modelConnectorsControls">
                             <td *ngIf="modalType === actionTypes.EDIT">
                                 <clr-icon shape="times" style="cursor:pointer; color: red;"
-                                          (click)="removeConnector(connector)"></clr-icon>
+                                          (click)="onRemoveConnector(connector)"></clr-icon>
                             </td>
                             <td>{{connector.type}}</td>
                             <td>{{connector.label}}</td>

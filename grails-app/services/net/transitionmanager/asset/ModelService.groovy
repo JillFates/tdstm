@@ -576,6 +576,7 @@ class ModelService implements ServiceMethods {
 	 * @param model
 	 * @param modelCommand
 	 */
+	@Transactional
 	private void deleteConnectors(Model model, ModelCommand modelCommand) {
 		if (modelCommand.connectors?.deleted) {
 			List<Long> connectorIds = modelCommand.connectors.deleted.collect { Map connectorInfo -> connectorInfo.id}
@@ -617,6 +618,7 @@ class ModelService implements ServiceMethods {
 	 * @param model
 	 * @param modelCommand
 	 */
+	@Transactional
 	private void deleteAkas(Model model, ModelCommand modelCommand) {
 		if (modelCommand.aka?.deleted) {
 			List<Long> akaIds = modelCommand.aka.deleted.collect { Map akaInfo -> akaInfo.id}

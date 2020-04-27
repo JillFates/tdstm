@@ -300,9 +300,10 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		if (modelInstance) {
 			def connector = params.connector
 			def modelConnector = ModelConnector.findByConnectorAndModel(connector, modelInstance)
-			assetCableMap = AssetCableMap.findAll("from AssetCableMap where cableStatus in ('$AssetCableStatus.EMPTY','$AssetCableStatus.CABLED','$AssetCableStatus.ASSIGNED') and (assetFromPort = ?0 or assetToPort = ?1)",[modelConnector,modelConnector])
+			assetCableMap = AssetCableMap.findAll("from AssetCableMap where cableStatus in ('Empty','Cabled','Assigned') and (assetFromPort = ?0 or assetToPort = ?1)",[modelConnector,modelConnector])
 		}
-		render assetCableMap as JSON
+		def numberOfAssets = assetCableMap.size()
+		renderSuccessJson(numberOfAssets)
 	}
 
 	/*

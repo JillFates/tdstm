@@ -100,4 +100,12 @@ export class ModelService {
 			})
 			.catch((error: any) => error);
 	}
+
+	retrieveAssetCablesForConnector(connector: string, modelId: number): Observable<any> {
+		return this.http.post(`${this.modelUrl}/retrieveAssetCablesForConnector?connector=${connector}&modelId=${modelId}`, null)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
 }

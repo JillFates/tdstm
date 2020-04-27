@@ -282,7 +282,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 
 		this.renderer.appendChild(this.d1.nativeElement, tr);
 		this.modelForm.form.markAsDirty();
-		// this.modelConnectorCount++;
+		this.modelConnectorCount++;
 	}
 
 	/**
@@ -428,7 +428,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	private getModelConnectors(): void {
 		const ele = this.d1.nativeElement;
 		let connectorNumber = this.modelModel.modelConnectors.length;
-		const skip = (this.modalType === ActionType.EDIT) ? this.modelConnectorCount : 0;
+		const skip = (this.modalType === ActionType.EDIT) ? this.modelConnectorsControls.length : 0;
 		let i = 0;
 		let loops = 0;
 		for (let child of ele.children) {
@@ -458,7 +458,25 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modelModel.manufacturer = event.target.value;
 	}
 
-	public removeConnector(connector: Connector): void {
+	public onRemoveConnector = async (connector: Connector): Promise<void> => {
+		this.modelService.retrieveAssetCablesForConnector(connector.connector.toString(), this.modelModel.id)
+			.subscribe((response: number) => {
+				if (response > 0) {
+					this.dialogService.confirm(
+						'Confirmation Required',
+						'WARNING: Some assets use this connector. Be sure you want to remove it before proceeding'
+					).subscribe(confirmation => {
+						if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+							this.removeConnector(connector);
+						}
+					});
+				} else {
+					this.removeConnector(connector);
+				}
+			});
+	}
+
+	private removeConnector(connector: Connector) {
 		const index = this.modelConnectorsControls.findIndex(c => c.id === connector.id);
 		this.removedConnectors.push({id: parseInt(connector.id, 10)});
 		this.modelConnectorsControls.splice(index, 1);
