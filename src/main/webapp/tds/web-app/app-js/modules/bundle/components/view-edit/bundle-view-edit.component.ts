@@ -113,6 +113,15 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		});
 	}
 
+	private populateTimepickers(startTime, completionTime): void {
+		if (startTime) {
+			this.startTimePicker.dateValue = this.formatForDateTimePicker(startTime);
+		}
+		if (completionTime) {
+			this.completionTimePicker.dateValue = this.formatForDateTimePicker(completionTime);
+		}
+	}
+
 	/**
 	 * Set up the initial default values for the model
 	 * @returns {any}
@@ -188,12 +197,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		this.setTitle(this.getModalTitle());
 		// Small delay when switch so the elements are visible
 		setTimeout(() => {
-			if (this.bundleModel.startTime) {
-				this.startTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.startTime);
-			}
-			if (this.bundleModel.completionTime) {
-				this.completionTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.completionTime);
-			}
+			this.populateTimepickers(this.bundleModel.startTime, this.bundleModel.completionTime);
 		});
 	}
 
@@ -235,6 +239,12 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 						}
 						this.updateSavedFields();
 					});
+
+				if (this.editing) {
+					setTimeout(() => {
+						this.populateTimepickers(this.bundleModel.startTime, this.bundleModel.completionTime);
+					});
+				}
 			});
 	}
 

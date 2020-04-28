@@ -11,9 +11,11 @@ class ArchitectureGraphCommand implements CommandObject {
 	Integer levelsUp   = 0
 	Integer levelsDown = 3
 	String  mode
+	boolean includeCycles
 
 	static constraints = {
 		assetId nullable: true
 		mode nullable: true
+		includeCycles nullable: true
 	}
 }
