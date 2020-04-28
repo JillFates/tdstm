@@ -368,7 +368,7 @@ export class ArchitectureGraphDiagramHelper {
 			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  '#ddd'));
 
 		linkShape.bind(new Binding('strokeDashArray', '',
-			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? [5, 10 ] :  null));
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? [2, 6] :  null));
 
 		const arrowHead = new Shape();
 		arrowHead.toArrow = 'Standard';
