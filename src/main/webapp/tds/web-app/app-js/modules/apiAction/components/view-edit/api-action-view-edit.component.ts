@@ -464,7 +464,6 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.commonFieldSpecs = result;
 		if (this.modalType !== ActionType.CREATE) {
 			this.getParameters();
-			this.parameterList.push(null);
 		}
 	}
 
