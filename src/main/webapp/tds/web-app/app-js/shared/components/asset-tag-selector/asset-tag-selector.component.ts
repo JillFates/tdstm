@@ -99,7 +99,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	public classComponent = '';
 
 	ngOnInit(): void {
-		this.tagList = this.sourceTagList.slice();
+		this.tagList = this.sourceTagList && this.sourceTagList.slice();
 		this.classComponent = `asset-tag-selector-component ${this.classList || ''}`;
 		if (this.model) {
 			this.assetSelectorModel.tags = this.model.tags;
