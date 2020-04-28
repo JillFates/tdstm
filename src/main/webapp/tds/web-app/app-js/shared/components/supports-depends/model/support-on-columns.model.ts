@@ -1,4 +1,5 @@
 import {GridColumnModel} from '../../../model/data-list-grid.model';
+import {RecordState} from '../../../utils/data-grid-operations.helper';
 
 /**
  * Defines the columns.
@@ -17,21 +18,21 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Class',
-				property: 'assetClass.text',
+				property: 'assetClassName',
 				type: 'text',
 				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Name',
-				property: 'assetDepend.text',
+				property: 'assetName',
 				type: 'text',
 				filterable: true,
 				width: 235
 			},
 			{
 				label: 'Bundle',
-				property: 'assetDepend.moveBundle.name',
+				property: 'moveBundleName',
 				type: 'text',
 				filterable: true,
 				width: 195
@@ -60,7 +61,11 @@ export class DependencySupportModel {
 	public type: string;
 	public status: string;
 	public assetClass: any;
+	public assetName?: string;
+	public assetClassName?: string;
+	public moveBundleName?: string;
 	public assetDepend: any;
 	public dependencyType: string;
 	public comment: string;
+	public recordState: RecordState;
 }

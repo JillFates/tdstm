@@ -4,7 +4,7 @@ import {DialogConfirmAction, DialogService} from 'tds-component-library';
  * So this is not in the Asset Explorer Module and belongs here instead.
  */
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
+import {DataGridOperationsHelper, RecordState} from '../../utils/data-grid-operations.helper';
 import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
 import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
@@ -27,16 +27,17 @@ export class SupportsDependsComponent implements OnInit {
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 	@Output('initDone') initDone: EventEmitter<any> = new EventEmitter();
 	private supportOnColumnModel: SupportOnColumnsModel;
+	private dependentOnColumnModel: SupportOnColumnsModel;
 	private dataFlowFreqList = [];
 	private dependencyClassList = [];
 	private typeList = [];
 	private statusList = [];
 	private moveBundleList = [];
+	private supportsToDelete = [];
+	private dependentsToDelete = [];
 	public dependencyType = DEPENDENCY_TYPE;
 	public dataGridDependsOnHelper: DataGridOperationsHelper;
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
-	private supportsToDelete = [];
-	private dependentsToDelete = [];
 
 	public showFilterDep = false;
 	public showFilterSup = false;
@@ -71,19 +72,20 @@ export class SupportsDependsComponent implements OnInit {
 		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT)
 			.subscribe((dataGridDependsOnHelper) => {
 				this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
-				this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+				this.model.dependencyMap.supportAssets = [];
 				if (this.dataGridDependsOnHelper) {
 					this.initDone.emit(this.model);
 				}
 			});
 
-		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
-			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
-			if (this.dataGridSupportsOnHelper) {
-				this.initDone.emit(this.model);
-			}
-		});
+		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT)
+			.subscribe((dataGridDependsOnHelper) => {
+				this.dataGridDependsOnHelper = dataGridDependsOnHelper;
+				this.model.dependencyMap.dependentAssets = [];
+				if (this.dataGridSupportsOnHelper) {
+					this.initDone.emit(this.model);
+				}
+			});
 
 	}
 
@@ -93,6 +95,7 @@ export class SupportsDependsComponent implements OnInit {
 	private getDependencyList(dependencyMap: string, dependencyType): Observable<DataGridOperationsHelper> {
 		return new Observable(observer => {
 			this.supportOnColumnModel = new SupportOnColumnsModel();
+			this.dependentOnColumnModel = new SupportOnColumnsModel();
 			let dependencies = [];
 			if (this.model.dependencyMap && this.model.dependencyMap[dependencyMap]) {
 				let assets = R.clone(this.model.dependencyMap[dependencyMap]);
@@ -100,6 +103,7 @@ export class SupportsDependsComponent implements OnInit {
 					let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
 					let dependencySupportModel: DependencySupportModel = {
 						id: dependency.id,
+						recordState: RecordState.pristine,
 						dataFlowFreq: dependency.dataFlowFreq,
 						assetClass: assetClass,
 						assetDepend: {
@@ -107,6 +111,9 @@ export class SupportsDependsComponent implements OnInit {
 							text: dependency.asset.name,
 							moveBundle: R.clone(dependency.asset.moveBundle)
 						},
+						assetName: dependency.asset.name,
+						assetClassName: assetClass.text,
+						moveBundleName: dependency.asset.moveBundle.name,
 						type: dependency.type,
 						status: dependency.status,
 						dependencyType: dependencyType,
@@ -115,29 +122,41 @@ export class SupportsDependsComponent implements OnInit {
 					dependencies.push(dependencySupportModel);
 				});
 			}
-			observer.next(new DataGridOperationsHelper(dependencies, [{
-				dir: 'asc',
-				field: 'assetName'
-			}], null, null, 2000));
+			observer.next(new DataGridOperationsHelper(dependencies,
+				[{ dir: 'asc', field: 'assetName'}],
+				{ mode: 'single', checkboxOnly: false},
+				{ useColumn: 'id' },
+				25));
 		});
+	}
+
+	/**
+	 * Set the flag indicating the record state (updated, created)
+	 * after that updates the internal model
+	 * @param dataItem
+	 */
+
+	public updateRecordState(dataItem: DependencySupportModel): void {
+		if (dataItem.recordState === RecordState.created) {
+			this.onChangeInternalModel();
+			return;
+		} else {
+			dataItem.recordState = RecordState.updated;
+			this.onChangeInternalModel();
+		}
 	}
 
 	/**
 	 * Add a new Dependency
 	 */
 	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
-		/*if (dependencyType === DEPENDENCY_TYPE.SUPPORT) {
-			this.baseSupportsGridTabIndex++;
-		}
-		if (dependencyType === DEPENDENCY_TYPE.DEPENDENT) {
-			this.baseDependentGridTabIndex++;
-		}*/
 		let unknownIndex = this.statusList.indexOf('Unknown');
 		if (unknownIndex === -1) {
 			unknownIndex = 0
 		}
 		let dependencySupportModel: DependencySupportModel = {
 			id: 0,
+			recordState: RecordState.created,
 			dataFlowFreq: this.dataFlowFreqList[0],
 			assetClass: this.dependencyClassList[0],
 			assetDepend: {
@@ -154,8 +173,9 @@ export class SupportsDependsComponent implements OnInit {
 			comment: ''
 		};
 
-		dataGrid.addDataItem(dependencySupportModel);
+		dataGrid.addResultSetItem(dependencySupportModel);
 		this.onChangeInternalModel();
+		this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
 	}
 
 	/**
@@ -168,7 +188,7 @@ export class SupportsDependsComponent implements OnInit {
 			text: '',
 			moveBundle: dataItem.assetDepend.moveBundle
 		};
-		this.onChangeInternalModel();
+		this.updateRecordState(dataItem);
 	}
 
 	/**
@@ -176,6 +196,8 @@ export class SupportsDependsComponent implements OnInit {
 	 * @param {DependencySupportModel} dataItem
 	 */
 	public onDependencyChange(dependency: any, dataItem: DependencySupportModel): void {
+		this.updateRecordState(dataItem);
+
 		if (dependency) {
 			let changeParams = {
 				assetId: dependency.id,
@@ -260,7 +282,7 @@ export class SupportsDependsComponent implements OnInit {
 					} else {
 						this.dependentsToDelete.push(dataItem.id);
 					}
-					this.onDeleteDependencySupport(dataItem, dataGrid);
+					this.onDeleteDependencySupport(dataItem, dataGrid, dependencyType);
 				}
 			}
 		);
@@ -269,8 +291,16 @@ export class SupportsDependsComponent implements OnInit {
 	/**
 	 * Delete the selected element
 	 */
-	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper): void {
-		dataGrid.removeDataItem(dataItem);
+	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper, type: string): void {
+		if (dataItem.id) {
+			if (type === DEPENDENCY_TYPE.SUPPORT)  {
+				this.supportsToDelete.push(dataItem.id);
+			} else {
+				this.dependentsToDelete.push(dataItem.id);
+			}
+		}
+
+		dataGrid.removeResultSetItem(dataItem);
 		this.onChangeInternalModel();
 	}
 
@@ -292,6 +322,7 @@ export class SupportsDependsComponent implements OnInit {
 			], false, false)
 			.then((result) => {
 				dataItem.comment = result.comment;
+				this.updateRecordState(dataItem);
 			}).catch((error) => console.log(error));
 	}
 
@@ -339,8 +370,8 @@ export class SupportsDependsComponent implements OnInit {
 		});
 
 		if (validForm) {
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.getCreatedUpdatedRecords();
+			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
 			this.model.dependencyMap.dependentsToDelete = this.dependentsToDelete;
 			this.model.dependencyMap.supportsToDelete = this.supportsToDelete;
 		}

@@ -6,7 +6,7 @@
                     <kendo-grid
                         *ngIf="dataGridSupportsOnHelper"
                         class="tds-table narrow-rows clickable-rows"
-                        [ngClass]="{ 'hide-filter': !showFilterSup, 'hide-paginator': model?.dependencyMap?.supportAssets.length <= 25}"
+                        [ngClass]="{ 'hide-filter': !showFilterSup, 'hide-paginator': dataGridSupportsOnHelper.gridData.total <= 25}"
                         [data]="dataGridSupportsOnHelper.gridData"
                         [filterable]="true"
                         [sort]="dataGridSupportsOnHelper.state.sort"
@@ -69,7 +69,7 @@
                                     <clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
                                         <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
                                         <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-                                        <a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper)">Dependency Delete</a>
+                                        <a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper, dependencyType.SUPPORT)">Dependency Delete</a>
                                     </clr-dropdown-menu>
                                 </clr-dropdown>
                             </div>
@@ -121,7 +121,7 @@
                             </kendo-dropdownlist>
                         </ng-template>
 
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass.text'" let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClassName'" let-dataItem let-rowIndex="rowIndex">
                             <kendo-dropdownlist
                                     name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                                     [data]="dependencyClassList"
@@ -134,7 +134,7 @@
                             </kendo-dropdownlist>
                         </ng-template>
 
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetDepend.text'" let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
                             <tds-combobox
                                     [required]="true"
                                     [allowEmptyValue]="true"
@@ -146,7 +146,7 @@
                             </tds-combobox>
                         </ng-template>
 
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetDepend.moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundleName'" let-dataItem let-rowIndex="rowIndex">
                             <kendo-dropdownlist #dropdownFooter
                                                 name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                                                 [data]="moveBundleList"
@@ -210,7 +210,7 @@
                     <kendo-grid
                         *ngIf="dataGridDependsOnHelper"
                         class="tds-table narrow-rows clickable-rows"
-                        [ngClass]="{ 'hide-filter': !showFilterDep, 'hide-paginator': model?.dependencyMap?.dependentAssets.length <= 25}"
+                        [ngClass]="{ 'hide-filter': !showFilterDep, 'hide-paginator': dataGridDependsOnHelper.gridData.total <= 25}"
                         [data]="dataGridDependsOnHelper.gridData"
                         [filterable]="true"
                         [sort]="dataGridDependsOnHelper.state.sort"
@@ -274,14 +274,14 @@
                                     <clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
                                         <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
                                         <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-                                        <a clrDropdownItem (click)="onClickDelete(dataItem, dataGridDependsOnHelper)">Dependency Delete</a>
+                                        <a clrDropdownItem (click)="onClickDelete(dataItem, dataGridDependsOnHelper, dependencyType.DEPENDENT)">Dependency Delete</a>
                                     </clr-dropdown-menu>
                                 </clr-dropdown>
                             </div>
                         </ng-template>
                     </kendo-grid-column>
                     <!-- Columns -->
-                    <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns; let columnIndex = index"
+                    <kendo-grid-column *ngFor="let column of dependentOnColumnModel.columns; let columnIndex = index"
                                        field="{{column.property}}"
                                        [headerClass]="column.headerClass ? column.headerClass : ''"
                                        [headerStyle]="column.headerStyle ? column.headerStyle : ''"
@@ -325,7 +325,7 @@
                             </kendo-dropdownlist>
                         </ng-template>
 
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass.text'" let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClassName'" let-dataItem let-rowIndex="rowIndex">
                             <kendo-dropdownlist
                                     name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                                     [data]="dependencyClassList"
@@ -338,7 +338,7 @@
                             </kendo-dropdownlist>
                         </ng-template>
 
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetDepend.text'" let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
                             <tds-combobox
                                     [required]="true"
                                     [allowEmptyValue]="true"
@@ -350,7 +350,7 @@
                             </tds-combobox>
                         </ng-template>
 
-                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetDepend.moveBundle.name'" let-dataItem let-rowIndex="rowIndex">
+                        <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundleName'" let-dataItem let-rowIndex="rowIndex">
                             <kendo-dropdownlist #dropdownFooter
                                                 name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
                                                 [data]="moveBundleList"
