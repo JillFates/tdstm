@@ -332,7 +332,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (this.levelsUp > 0) {
 			this.levelsUp--;
 			this.form.controls.levelsUp.markAsDirty();
-			this.refreshData(false);
+			this.refreshData();
 		}
 	}
 
