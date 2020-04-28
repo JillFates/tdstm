@@ -22,11 +22,17 @@ import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/archi
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 
 export class ArchitectureGraphDiagramHelper {
-
 	params: any;
+	refCycles: string[];
+	private readonly cyclicalColor = '#1945dd';
+	private readonly arrowColor = '#c3c3c3';
 
-	constructor() {
-		// Architecture Graph Diagram Helper Constructor
+	constructor(private cycles: number[][]) {
+		this.refCycles = [];
+			// Architecture Graph Diagram Helper Constructor
+		cycles.forEach((cycle: number[]) => {
+			this.refCycles.push(cycle.join('#'));
+		});
 	}
 
 	static isDeviceVirtualServer(type: string): boolean {
@@ -116,6 +122,14 @@ export class ArchitectureGraphDiagramHelper {
 		return null;
 	}
 
+	/**
+	 * Determines if the asset provided is the root asset
+	 * @param assetId
+	 */
+	isRootAsset(assetId: number): boolean {
+		return assetId === this.params.rootAsset;
+	}
+
 	nodeTemplate(opts?: any): Node {
 		const node = new Node(Panel.Horizontal);
 		node.margin = new Margin(1, 1, 1, 1);
@@ -140,7 +154,8 @@ export class ArchitectureGraphDiagramHelper {
 
 		// TextBlock
 		const textBlock = new TextBlock();
-		textBlock.desiredSize = new Size(60, 10);
+		textBlock.textAlign = 'center';
+		textBlock.desiredSize = new Size(60, 14);
 		textBlock.stroke = '#000';
 		textBlock.maxLines = 1;
 		textBlock.wrap = TextBlock.None;
@@ -159,19 +174,18 @@ export class ArchitectureGraphDiagramHelper {
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
-		const shape = new Shape();
-		shape.figure = 'RoundedRectangle';
-		shape.fill = 'transparent';
-		shape.strokeWidth = 4;
-		shape.desiredSize = new Size(65, 65);
-		shape.bind(new Binding('stroke', 'id', (val: any) => {
-			if (val === this.params.rootAsset || val === this.params.rootAsset) {
-				return 'red';
-			} else {
-				return 'transparent';
-			}
+		const selectedShape = new Shape();
+		selectedShape.figure = 'RoundedRectangle';
+		selectedShape.fill = 'transparent';
+		selectedShape.strokeWidth = 4;
+		selectedShape.desiredSize = new Size(65, 65);
+		selectedShape.bind(new Binding('stroke', 'id', (val: any) => {
+			return this.isRootAsset(val) ? 'red' : 'transparent';
 		}));
-		panel.add(shape);
+		selectedShape
+			.bind(new Binding('visible', 'id', (val: any) => this.isRootAsset(val)));
+
+		panel.add(selectedShape);
 		panel.add(panelBody);
 		node.add(panel);
 
@@ -310,17 +324,60 @@ export class ArchitectureGraphDiagramHelper {
 		return !!icon ? icon.icon : ASSET_ICONS.application.icon;
 	}
 
+	/**
+	 * Determines is the current node belongs to the cyclical references
+	 * @param from
+	 * @param to
+	 */
+	isCyclicalReference(from: number, to: number): boolean {
+		const found = this.refCycles.find((cycle: string) => {
+			const currentNode = `${from}#${to}`;
+			return cycle.indexOf(currentNode) !== -1;
+		});
+
+		return Boolean(found) || this.isCyclicalBackReference(from, to);
+	}
+
+	/**
+	 * Determines is the current node belongs to the cyclical back references
+	 * @param from
+	 * @param to
+	 */
+	isCyclicalBackReference(from: number, to: number): boolean {
+		const found = this.cycles.find((cycle: number[]) => {
+			const first = cycle && cycle[0] || null;
+			const last = cycle && cycle[cycle.length - 1] || null;
+			if (first === null || last === null) {
+				return false;
+			} else {
+				return (from === last && to === first);
+			}
+		});
+
+		return Boolean(found);
+	}
+
 	linkTemplate(): Link {
 		const linkTemplate = new Link();
 		linkTemplate.layerName = 'Background';
 
 		const linkShape = new Shape();
 		linkShape.strokeWidth = 2;
-		linkShape.stroke = '#ddd';
+
+		linkShape.bind(new Binding('stroke', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  '#ddd'));
+
+		linkShape.bind(new Binding('strokeDashArray', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? [2, 6] :  null));
+
 		const arrowHead = new Shape();
 		arrowHead.toArrow = 'Standard';
-		arrowHead.stroke = '#c3c3c3';
-		arrowHead.fill = '#c3c3c3';
+
+		arrowHead.bind(new Binding('stroke', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
+
+		arrowHead.bind(new Binding('fill', '',
+			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
 
 		linkTemplate.add(linkShape);
 		linkTemplate.add(arrowHead);

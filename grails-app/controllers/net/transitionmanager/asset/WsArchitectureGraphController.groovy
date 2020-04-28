@@ -59,7 +59,9 @@ class WsArchitectureGraphController implements ControllerMethods, PaginationMeth
 			return
 		}
 
-		render view: '/common/mapAsJson', model: [data: architectureGraphService.architectureGraphModel(rootAsset, context.levelsUp, context.levelsDown, context.mode)]
+		Map model = architectureGraphService.architectureGraphModel(rootAsset, context.levelsUp, context.levelsDown, context.mode, context.includeCycles)
+
+		render view: '/common/architectureGraphAsJson', model: [architectureGraphModel: model]
 
 	}
 
