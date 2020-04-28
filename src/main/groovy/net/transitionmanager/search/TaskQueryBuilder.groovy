@@ -513,7 +513,8 @@ class TaskQueryBuilder {
 		'percentageComplete': [property: 'ac.percentageComplete', builder: eqBuilder, type: Integer],
 		'taskSpec'          : [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber'        : [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
-		'viewUnpublished'   : [builder: viewUnpublishedBuilder].asImmutable()
+		'viewUnpublished'   : [builder: viewUnpublishedBuilder].asImmutable(),
+		'sortColumn'        : [joinTable: 'ac.assetEntity'].asImmutable()
 	]
 
 }
