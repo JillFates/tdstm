@@ -7,7 +7,8 @@ import {
 	OnInit,
 	QueryList,
 	ViewChild,
-	ViewChildren
+	ViewChildren,
+	ElementRef
 } from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
@@ -56,7 +57,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 	@ViewChild('dueDate', {static: false}) dueDate;
-
+	@ViewChild('taskCreateCommentInput', {static: false}) taskCreateCommentInput: ElementRef;
 	protected modalType = ModalType;
 	protected dateFormat: string;
 	protected dateFormatTime: string;
@@ -135,6 +136,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle());
+			this.onSetUpFocus(this.taskCreateCommentInput);
 		});
 	}
 

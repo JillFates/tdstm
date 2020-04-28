@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
 // Model
 import {BundleModel} from '../../model/bundle.model';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
@@ -14,7 +14,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 })
 export class BundleCreateComponent extends Dialog implements OnInit {
 	@Input() data: any;
-
+	@ViewChild('bundleCreateNameInput', {static: false}) bundleCreateNameInput: ElementRef;
 	public rooms;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel: BundleModel = null;
@@ -60,6 +60,9 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 			useForPlanning: true,
 		};
 		this.bundleModel = Object.assign({}, this.defaultModel, this.bundleModel);
+		setTimeout(() => {
+			this.onSetUpFocus(this.bundleCreateNameInput);
+		});
 	}
 
 	private getModel() {

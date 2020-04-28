@@ -1,5 +1,5 @@
 // Angular
-import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild, ElementRef} from '@angular/core';
 // Modal
 import {ProjectModel} from '../../model/project.model';
 import {
@@ -39,7 +39,7 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 	public fetchResult: any;
 	public transformResult: ApiResponseModel;
 	public transformInProcess = false;
-
+	@ViewChild('projectCodeInput', {static: false}) projectCodeInput: ElementRef;
 	@ViewChild('startDatePicker', {static: false}) startDatePicker;
 	@ViewChild('completionDatePicker', {static: false}) completionDatePicker;
 
@@ -96,6 +96,9 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 			maxFileSize: 50000
 		};
 		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
+		setTimeout(() => {
+			this.onSetUpFocus(this.projectCodeInput);
+		});
 	}
 
 	private getModel(): void {

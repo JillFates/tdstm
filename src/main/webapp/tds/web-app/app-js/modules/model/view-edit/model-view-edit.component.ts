@@ -32,7 +32,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
 	@ViewChild('modelForm', {read: NgForm, static: true}) modelForm: NgForm;
 	@ViewChild('modelConnectorTableBody', { static: false }) d1: ElementRef;
-
+	@ViewChild('modelNameElement', {static: false}) modelNameElement: ElementRef;
 	public modelModel: ModelModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -138,6 +138,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			this.onSetUpFocus(this.modelNameElement);
 		});
 	}
 

@@ -34,7 +34,7 @@ import {ManufacturerService} from '../../service/manufacturer.service';
 })
 export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
-
+	@ViewChild('nameElement', {static: false}) nameElement: ElementRef;
 	@ViewChild('manufacturerForm', {read: NgForm, static: true}) manufacturerForm: NgForm;
 
 	public manufacturerModel: ManufacturerModel;
@@ -177,6 +177,7 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			this.onSetUpFocus(this.nameElement);
 		});
 	}
 
