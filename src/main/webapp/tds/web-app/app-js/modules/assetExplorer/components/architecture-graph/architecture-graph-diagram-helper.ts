@@ -335,6 +335,25 @@ export class ArchitectureGraphDiagramHelper {
 			return cycle.indexOf(currentNode) !== -1;
 		});
 
+		return Boolean(found) || this.isCyclicalBackReference(from, to);
+	}
+
+	/**
+	 * Determines is the current node belongs to the cyclical back references
+	 * @param from
+	 * @param to
+	 */
+	isCyclicalBackReference(from: number, to: number): boolean {
+		const found = this.cycles.find((cycle: number[]) => {
+			const first = cycle && cycle[0] || null;
+			const last = cycle && cycle[cycle.length - 1] || null;
+			if (first === null || last === null) {
+				return false;
+			} else {
+				return (from === last && to === first);
+			}
+		});
+
 		return Boolean(found);
 	}
 
@@ -354,12 +373,6 @@ export class ArchitectureGraphDiagramHelper {
 		const arrowHead = new Shape();
 		arrowHead.toArrow = 'Standard';
 
-		const arrowInit = new Shape();
-		// arrowInit.fromArrow = 'Backward';
-
-		arrowInit.bind(new Binding('fromArrow', '',
-			(val: any) => 'Backward'));
-
 		arrowHead.bind(new Binding('stroke', '',
 			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
 
@@ -367,7 +380,6 @@ export class ArchitectureGraphDiagramHelper {
 			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
 
 		linkTemplate.add(linkShape);
-		linkTemplate.add(arrowInit);
 		linkTemplate.add(arrowHead);
 		linkTemplate.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
 
