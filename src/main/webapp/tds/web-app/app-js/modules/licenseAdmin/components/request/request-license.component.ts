@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
 // Model
 import {RequestLicenseModel} from '../../model/license.model';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
@@ -21,9 +21,8 @@ import {NgForm} from '@angular/forms';
 })
 export class RequestLicenseComponent extends Dialog implements OnInit {
 	@Input() data: any;
-
 	@ViewChild('licenseRequestForm', {read: NgForm, static: true}) licenseRequestForm: NgForm;
-
+	@ViewChild('contactEmailInput', {static: false}) contactEmailInput: ElementRef;
 	public requestLicense = new RequestLicenseModel();
 	public environmentList: any = [];
 	public projectList: any = [];
@@ -62,6 +61,9 @@ export class RequestLicenseComponent extends Dialog implements OnInit {
 			this.projectList = res[1];
 			this.requestLicense.project = this.projectList[0];
 			this.dataSignature = JSON.stringify(this.requestLicense);
+		});
+		setTimeout(() => {
+			this.onSetUpFocus(this.contactEmailInput);
 		});
 	}
 

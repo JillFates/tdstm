@@ -3,7 +3,8 @@ import {
 	Component, ComponentFactoryResolver,
 	Input,
 	OnInit,
-	ViewChild
+	ViewChild,
+	ElementRef
 } from '@angular/core';
 import {Router} from '@angular/router';
 // Component
@@ -67,7 +68,7 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 	public transformInProcess = false;
 	private logoOriginalFilename;
 	public retrieveImageTimestamp = (new Date()).getTime(); // Update this to refresh the project logo
-
+	@ViewChild('projectCodeInputEdit', {static: false}) projectCodeInputEdit: ElementRef;
 	@ViewChild('startDatePicker', {static: false}) startDatePicker;
 	@ViewChild('completionDatePicker', {static: false}) completionDatePicker;
 
@@ -175,6 +176,7 @@ export class ProjectViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle());
+			this.onSetUpFocus(this.projectCodeInputEdit);
 		});
 
 	}

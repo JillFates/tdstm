@@ -35,9 +35,8 @@ import {Subject} from 'rxjs/Subject';
 })
 export class ProviderViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
-
 	@ViewChild('providerForm', {read: NgForm, static: true}) providerForm: NgForm;
-
+	@ViewChild('providerNameElement', {static: false}) providerNameElement: ElementRef;
 	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -141,6 +140,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			this.onSetUpFocus(this.providerNameElement);
 		});
 	}
 
