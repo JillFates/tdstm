@@ -38,6 +38,9 @@ export class SupportsDependsComponent implements OnInit {
 	private supportsToDelete = [];
 	private dependentsToDelete = [];
 
+	public showFilterDep = false;
+	public showFilterSup = false;
+
 	public baseSupportsGridTabIndex = 449;
 	public baseDependentGridTabIndex = 650;
 
@@ -195,6 +198,30 @@ export class SupportsDependsComponent implements OnInit {
 			};
 		}
 		this.onChangeInternalModel();
+	}
+
+	/**
+	 * Clears the filter on supports
+	 */
+	public showFilterSupports(): void {
+		if (this.showFilterSup) {
+			this.showFilterSup = false;
+			this.dataGridSupportsOnHelper.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterSup = true;
+		}
+	}
+
+	/**
+	 * Clears the Dependent filter
+	 */
+	showFilterDependents(): void {
+		if (this.showFilterDep) {
+			this.showFilterDep = false;
+			this.dataGridDependsOnHelper.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterDep = true;
+		}
 	}
 
 	/**

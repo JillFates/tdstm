@@ -95,6 +95,14 @@
             }
           }
         }
+        // With Tool Bar Tables
+        kendo-grid {
+          .tool-bar-wrapper {
+            .grid-label {
+              padding-left: 5px;
+            }
+          }
+        }
       }
     }
 

@@ -9,46 +9,45 @@ export class SupportOnColumnsModel {
 	constructor() {
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 80,
-				locked: true
-			},
-			{
 				label: 'Frequency',
 				property: 'dataFlowFreq',
 				type: 'text',
+				filterable: true,
 				width: 90
 			},
 			{
 				label: 'Class',
 				property: 'assetClass',
 				type: 'text',
+				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Name',
 				property: 'assetName',
 				type: 'text',
+				filterable: true,
 				width: 235
 			},
 			{
 				label: 'Bundle',
 				property: 'moveBundle',
 				type: 'text',
+				filterable: true,
 				width: 195
 			},
 			{
 				label: 'Type',
 				property: 'type',
 				type: 'text',
+				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
+				filterable: true,
 				width: 120
 			}
 		];
