@@ -1,5 +1,6 @@
 // Angular
 import {Component, ViewChild, OnInit, OnDestroy, ComponentFactoryResolver} from '@angular/core';
+import {Location} from '@angular/common';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
 // Model
 import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
@@ -36,6 +37,7 @@ import {
 	ASSET_OVERRIDE_CHILD_STATE,
 	ASSET_OVERRIDE_PARENT_STATE, OverrideState
 } from '../../models/asset-view-override-state.model';
+import {RouterUtils}  from '../../../../shared/utils/router.utils';
 
 declare var jQuery: any;
 
@@ -77,6 +79,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private queryParams: any = {};
 
 	constructor(
+		private location: Location,
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private route: ActivatedRoute,
 		private router: Router,
@@ -137,6 +140,39 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			const _override = !params._override || params._override === 'true' || params._override === true;
 			this.queryParams = { _override };
 		});
+	}
+
+	/**
+	 * Deletes a params from the global query param object
+	 * Passing the * character removes all global filters and resets the just planning
+	 * @param params contains the domain and the property of the param to be deleted
+	 */
+	public onRemoveGlobalQueryParam(params: {domain?: string, property: string}): void {
+		if (params.property === '*') {
+			for (let [key, value] of Object.entries(this.globalQueryParams)) {
+				this.removeGlobalQueryParam(key);
+			}
+			this.justPlanning = false;
+		} else {
+			// find and remove it by domain and property
+			this.removeGlobalQueryParam(`${params.domain}_${params.property}`);
+			// find and remove it just by property
+			this.removeGlobalQueryParam(`_${params.property}`);
+		}
+	}
+
+	/**
+	 * Deletes a params from the global query param object
+	 * @param name
+	 */
+	public removeGlobalQueryParam(name: string = null): void {
+		if (this.globalQueryParams.hasOwnProperty(name)) {
+			const newParams = Object.assign({}, this.globalQueryParams);
+			delete newParams[name];
+			this.globalQueryParams = newParams;
+			const newUrl = RouterUtils.getUrlExcludingParamName(this.location.path(), name) ;
+			this.location.replaceState(newUrl);
+		}
 	}
 
 	/**
