@@ -5,27 +5,34 @@ import {
 	Margin,
 	Node,
 	Panel,
-	Picture, Point,
+	Picture,
 	Shape,
 	Size,
 	Spot,
 	TextBlock,
-	TreeLayout,
 	LayeredDigraphLayout, default as go, Adornment, Placeholder, InputEvent
 } from 'gojs';
 import {
 	ITdsContextMenuOption
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {IconModel, IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-// import {ILinkPath} from '../../../taskManager/components/neighborhood/neighborhood.component';
-import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/architecture-graph-asset.model';
+import {
+	ASSET_CTX_MENU_ICONS_PATH,
+	ASSET_OPTION_LABEL,
+	IArchitectureGraphAsset,
+	IAssetLink,
+	IAssetNode
+} from '../../model/architecture-graph-asset.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetActionEvent} from '../../model/asset-action-event.constant';
 
 export class ArchitectureGraphDiagramHelper {
 
 	params: any;
 
-	constructor() {
+	constructor(private permissionService: PermissionService, private props?: any) {
 		// Architecture Graph Diagram Helper Constructor
 	}
 
@@ -60,8 +67,8 @@ export class ArchitectureGraphDiagramHelper {
 			currentUserId: params.currentUserId,
 			ctxMenuOptions: this.contextMenuOptions(),
 			nodeTemplate: params.iconsOnly ?
-				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras && params.extras.isExpandable })
+				: this.nodeTemplate({ isExpandable: params.extras && params.extras.isExpandable }),
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: params.iconsOnly ?
 				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
@@ -386,7 +393,32 @@ export class ArchitectureGraphDiagramHelper {
 	}
 
 	contextMenuOptions(): ITdsContextMenuOption {
-		return null;
+		return {
+			containerComp: 'ArchitectureGraph',
+			fields: [
+				{
+					label: ASSET_OPTION_LABEL.EDIT,
+					event: AssetActionEvent.EDIT,
+					icon: ASSET_CTX_MENU_ICONS_PATH.edit,
+					isAvailable: () => true,
+					hasPermission: () => this.permissionService.hasPermission(Permission.AssetEdit)
+				},
+				{
+					label: ASSET_OPTION_LABEL.VIEW,
+					event: AssetActionEvent.VIEW,
+					icon: ASSET_CTX_MENU_ICONS_PATH.view,
+					isAvailable: () => true,
+					hasPermission: () => this.permissionService.hasPermission(Permission.AssetView)
+				},
+				{
+					label: ASSET_OPTION_LABEL.GRAPH,
+					event: AssetActionEvent.GRAPH,
+					isAvailable: () => true,
+					icon: ASSET_CTX_MENU_ICONS_PATH.architectureGraph,
+					hasPermission: () => this.permissionService.hasPermission(Permission.ArchitectureView)
+				}
+			]
+		};
 	}
 
 	icons(): IconModel {

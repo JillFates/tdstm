@@ -33,7 +33,9 @@
 								[(metaParam)]="assetClass && assetClass.id"
 								[required]="false"
 								(valueChange)="onAssetSelected($event)"
-								[serviceRequest]="getAssetList">
+								[serviceRequest]="getAssetList"
+								#assetComboBox
+						>
 						</tds-combobox>
 					</div>
 					<div>
@@ -121,6 +123,7 @@
 							(diagramAnimationFinished)="onDiagramAnimationFinished()"
 							(backToFullGraph)="viewFullGraphFromCache()"
                             [onZoomApplyTemplates]="false"
+							(ctxMenuActionDispatched)="onActionDispatched($event)"
 							#graph
 					></tds-lib-diagram-layout>
 				</div>

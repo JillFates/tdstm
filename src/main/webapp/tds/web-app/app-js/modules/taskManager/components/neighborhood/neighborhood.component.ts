@@ -1,14 +1,13 @@
 import {
 	Component,
 	ComponentFactoryResolver,
-	ElementRef,
 	HostListener,
 	OnDestroy,
 	OnInit,
 	ViewChild
 } from '@angular/core';
 import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
-import {distinctUntilChanged, map, skip, takeUntil, timeout} from 'rxjs/operators';
+import {map, takeUntil, timeout} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
@@ -24,14 +23,13 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {ReportsService} from '../../../reports/service/reports.service';
 import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskDetailComponent} from '../detail/task-detail.component';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TaskActionEvents} from '../common/constants/task-action-events.constant';
 import {TaskStatus} from '../../model/task-edit-create.model';
 import {ITaskEvent} from '../../model/task-event.model';
 import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../common/constants/task-icon-path';
-import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
+import {ModalType} from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
@@ -1028,8 +1026,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		const taskGraphHelper = new TaskGraphDiagramHelper(
 			this.permissionService,
 			{
-				currentUser: this.userContext.person,
-				taskCount: this.tasks.length
+				currentUser: this.userContext && this.userContext.person,
+				taskCount: this.tasks && this.tasks.length
 			}
 		);
 		if (this.refreshTriggered) {

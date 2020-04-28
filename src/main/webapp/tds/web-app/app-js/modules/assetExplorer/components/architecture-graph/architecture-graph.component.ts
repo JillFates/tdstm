@@ -1,24 +1,37 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {
+	Component,
+	ComponentFactoryResolver,
+	HostListener,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import {ITdsContextMenuOption} from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {Observable, ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link, Spot} from 'gojs';
+import {Diagram, Layout, Link} from 'gojs';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {IArchitectureGraphParams} from '../../model/url-params.model';
 import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 import {
-	ComboBoxSearchResultModel,
-	RESULT_PER_PAGE
+	ComboBoxSearchResultModel
 } from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NgForm} from '@angular/forms';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetShowComponent} from '../asset/asset-show.component';
+import {AssetExplorerModule} from '../../asset-explorer.module';
+import {DialogService, ModalSize} from 'tds-component-library';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AssetActionEvent} from '../../model/asset-action-event.constant';
+import {TDSComboBoxComponent} from '../../../../shared/components/combo-box/combobox.component';
+import {AssetEditComponent} from '../asset/asset-edit.component';
 
 declare var jQuery: any;
 
@@ -30,6 +43,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	// References
 	@ViewChild('graph', {static: false}) graph: any;
 	@ViewChild('archGraphForm', { static: false }) protected form: NgForm;
+	@ViewChild('assetComboBox', { static: false }) assetComboBox: TDSComboBoxComponent;
 
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
@@ -135,6 +149,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			checked: false
 		}
 	];
+	unsubscribe$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private userContextService: UserContextService,
@@ -142,7 +157,11 @@ export class ArchitectureGraphComponent implements OnInit {
 		private architectureGraphService: ArchitectureGraphService,
 		private assetExplorerService: AssetExplorerService,
 		private sanitized: DomSanitizer,
-		private preferenceService: PreferenceService
+		private preferenceService: PreferenceService,
+		private dialogService: DialogService,
+		private notifierService: NotifierService,
+		private permissionService: PermissionService,
+		private componentFactoryResolver: ComponentFactoryResolver
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
 		this.getAssetList = this.listAssets.bind(this);
@@ -281,10 +300,6 @@ export class ArchitectureGraphComponent implements OnInit {
 								id: selectedAsset.id,
 								text: selectedAsset.name,
 							};
-							// this.asset = {
-							// 	id: selectedAsset.id,
-							// 	text: selectedAsset.name,
-							// };
 						}
 					}
 				});
@@ -469,11 +484,16 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	updateNodeData(data, iconsOnly) {
 		const clonedData = this.removeNodeNamesForNotSelectedCategories(data);
-		const diagramHelper = new ArchitectureGraphDiagramHelper();
+		const diagramHelper = new ArchitectureGraphDiagramHelper(
+			this.permissionService,
+			{
+				currentUser: this.userContext && this.userContext.person,
+				taskCount: this.currentNodesData && this.currentNodesData.length
+			});
 
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
-			currentUserId: 1,
+			currentUserId: (this.userContext && this.userContext.person) && this.userContext.person.id,
 			data: clonedData,
 			iconsOnly: iconsOnly,
 			extras: {
@@ -554,6 +574,94 @@ export class ArchitectureGraphComponent implements OnInit {
 			el.checked = false;
 		});
 		this.updateNodeData(this.currentNodesData, true);
+	}
+
+	/**
+	 * Subscribe to events with the notifierService
+	 */
+	onActionDispatched(data: any): void {
+		switch (data.name) {
+			case AssetActionEvent.EDIT:
+				this.onAssetEdit({name: data.name, task: data.node});
+				break;
+			case AssetActionEvent.VIEW:
+				this.onAssetView({name: data.name, task: data.node});
+				break;
+			case AssetActionEvent.GRAPH:
+				this.onGraph(data.node);
+				break;
+		}
+	}
+
+	/**
+	 * Show the asset popup detail.
+	 * @param data: ITaskEvent
+	 */
+	onAssetEdit(data: any): void {
+		const asset = data.asset;
+		if (asset  && asset.id) {
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetEditComponent,
+				data: {
+					assetId: asset.id,
+					assetClass: asset.assetClass,
+					assetExplorerModule: AssetExplorerModule
+				},
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe();
+		}
+	}
+
+	/**
+	 * Show the asset popup detail.
+	 * @param data: ITaskEvent
+	 */
+	onAssetView(data: any): void {
+		const asset = data.asset;
+		if (asset  && asset.id) {
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetShowComponent,
+				data: {
+					assetId: asset.id,
+					assetClass: asset.assetClass,
+					assetExplorerModule: AssetExplorerModule
+				},
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe();
+		}
+	}
+
+	/**
+	 * Show the asset popup detail.
+	 * @param data: ITaskEvent
+	 */
+	onGraph(data: any): void {
+		const asset = data.asset;
+		const assetDataSource = this.assetComboBox && this.assetComboBox.datasource;
+		if (assetDataSource.length > 1 && assetDataSource.includes(a => a.id === asset.id)) {
+			this.assetId = asset.id;
+			this.selectedAsset = asset;
+			this.loadData();
+			this.form.controls['assetClass'].markAsDirty();
+		}
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribe$.next();
+		this.unsubscribe$.complete();
 	}
 
 }
