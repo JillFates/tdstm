@@ -65,10 +65,10 @@ export class ArchitectureGraphDiagramHelper {
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: params.iconsOnly ?
 				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.lowScaleNodeTemplate(),
+				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
 			mediumScaleTemplate: params.iconsOnly ?
 				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.mediumScaleNodeTemplate(),
+				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
 			layout: this.layout(),
 			rootNode: params.rootAsset,
 			extras: params.extras
@@ -251,7 +251,7 @@ export class ArchitectureGraphDiagramHelper {
 		// Picture Icon
 		const iconPicture = new Picture();
 		iconPicture.desiredSize = new Size(50, 50);
-		iconPicture.bind(new Binding('source', 'assetClass',
+		iconPicture.bind(new Binding('source', '',
 			(val: string) => this.getIconPath(val)));
 		iconPicture.imageAlignment = Spot.Center;
 
