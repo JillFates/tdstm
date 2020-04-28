@@ -30,7 +30,7 @@
 						<tds-combobox
 								name="asset"
 								[(model)]="selectedAsset"
-								[(metaParam)]="assetClass && assetClass.id"
+								[(metaParam)]="assetClass.id"
 								[required]="false"
 								(valueChange)="onAssetSelected($event)"
 								[serviceRequest]="getAssetList">

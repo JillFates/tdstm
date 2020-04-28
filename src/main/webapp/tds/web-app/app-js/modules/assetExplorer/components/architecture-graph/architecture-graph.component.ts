@@ -148,12 +148,12 @@ export class ArchitectureGraphComponent implements OnInit {
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
 		this.getAssetList = this.listAssets.bind(this);
-		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
+		this.userContextService.getUserContext().subscribe(res => this.userContext = res);
+		this.assetClass = this.initialAssetClass;
 	}
 
 	ngOnInit(): void {
 		this.showCycles = false;
-		this.assetClass = this.initialAssetClass;
 		let assetId = null;
 		let levelsUp = null;
 		let levelsDown = null;

@@ -334,6 +334,7 @@ export class ArchitectureGraphDiagramHelper {
 			const currentNode = `${from}#${to}`;
 			return cycle.indexOf(currentNode) !== -1;
 		});
+
 		return Boolean(found);
 	}
 
