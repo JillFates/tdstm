@@ -17,21 +17,21 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Class',
-				property: 'assetClass',
+				property: 'assetClass.text',
 				type: 'text',
 				filterable: true,
 				width: 120
 			},
 			{
 				label: 'Name',
-				property: 'assetName',
+				property: 'assetDepend.text',
 				type: 'text',
 				filterable: true,
 				width: 235
 			},
 			{
 				label: 'Bundle',
-				property: 'moveBundle',
+				property: 'assetDepend.moveBundle.name',
 				type: 'text',
 				filterable: true,
 				width: 195

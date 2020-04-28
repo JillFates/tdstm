@@ -115,7 +115,10 @@ export class SupportsDependsComponent implements OnInit {
 					dependencies.push(dependencySupportModel);
 				});
 			}
-			observer.next(new DataGridOperationsHelper(dependencies, null, null, null, 2000));
+			observer.next(new DataGridOperationsHelper(dependencies, [{
+				dir: 'asc',
+				field: 'assetName'
+			}], null, null, 2000));
 		});
 	}
 
