@@ -354,6 +354,12 @@ export class ArchitectureGraphDiagramHelper {
 		const arrowHead = new Shape();
 		arrowHead.toArrow = 'Standard';
 
+		const arrowInit = new Shape();
+		// arrowInit.fromArrow = 'Backward';
+
+		arrowInit.bind(new Binding('fromArrow', '',
+			(val: any) => 'Backward'));
+
 		arrowHead.bind(new Binding('stroke', '',
 			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
 
@@ -361,6 +367,7 @@ export class ArchitectureGraphDiagramHelper {
 			(val: any) => (this.isCyclicalReference(val.from, val.to)) ? this.cyclicalColor :  this.arrowColor));
 
 		linkTemplate.add(linkShape);
+		linkTemplate.add(arrowInit);
 		linkTemplate.add(arrowHead);
 		linkTemplate.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
 
