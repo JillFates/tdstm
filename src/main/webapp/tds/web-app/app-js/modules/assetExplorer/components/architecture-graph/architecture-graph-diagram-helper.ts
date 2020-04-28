@@ -54,21 +54,22 @@ export class ArchitectureGraphDiagramHelper {
 	diagramData(params?: any): IDiagramData {
 		const d = this.data(params.data);
 		this.params = params;
+		const isExpandable = params.extras && params.extras.isExpandable;
 		return {
 			nodeDataArray: d.nodeDataArray,
 			linkDataArray: d.linkDataArray,
 			currentUserId: params.currentUserId,
 			ctxMenuOptions: this.contextMenuOptions(),
 			nodeTemplate: params.iconsOnly ?
-				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
+				this.iconOnlyNodeTemplate({ isExpandable: isExpandable})
+				: this.nodeTemplate({ isExpandable: isExpandable }),
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: params.iconsOnly ?
-				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
+				this.iconOnlyNodeTemplate({ isExpandable: isExpandable })
+				: this.nodeTemplate({ isExpandable: isExpandable }),
 			mediumScaleTemplate: params.iconsOnly ?
-				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
+				this.iconOnlyNodeTemplate({ isExpandable: isExpandable })
+				: this.nodeTemplate({ isExpandable: isExpandable }),
 			layout: this.layout(),
 			rootNode: params.rootAsset,
 			extras: params.extras
