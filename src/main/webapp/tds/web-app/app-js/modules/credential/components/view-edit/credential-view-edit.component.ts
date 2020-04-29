@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
 import {AUTH_METHODS, CredentialModel, REQUEST_MODE} from '../../model/credential.model';
@@ -58,10 +58,9 @@ import {Observable} from 'rxjs';
 })
 export class CredentialViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
-
 	// Forms
 	@ViewChild('credentialForm', {static: false}) credentialForm: NgForm;
-
+	@ViewChild('credentialName', {static: false}) credentialName: ElementRef;
 	@ViewChild('apiActionProvider', {
 		read: DropDownListComponent,
 		static: true
@@ -173,6 +172,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			this.onSetUpFocus(this.credentialName);
 		});
 	}
 

@@ -91,6 +91,7 @@
 				[viewId]="model.id"
 				[metadata]="metadata"
 				[justPlanning]="justPlanning"
+				(removeGlobalQueryParam)="onRemoveGlobalQueryParam($event)"
                 [gridMessage]="gridMessage">
 			</asset-explorer-view-grid>
 		</div>

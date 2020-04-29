@@ -17,7 +17,7 @@
 									</td>
 									<td class="valueNW description-container" colspan="4">
 										<div class="validated-field">
-											<input type="text" name="comment" class="comment" [(ngModel)]="model.comment" required>
+											<input type="text" name="comment" class="comment" [(ngModel)]="model.comment" required #taskCreateCommentInput>
 											<div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
 										</div>
 									</td>

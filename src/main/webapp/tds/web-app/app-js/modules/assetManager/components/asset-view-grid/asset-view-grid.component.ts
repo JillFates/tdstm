@@ -91,6 +91,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() justPlanning: boolean;
 	@Input() gridState: State;
 	@Output() modelChange = new EventEmitter<void>();
+	@Output() removeGlobalQueryParam = new EventEmitter<{domain?: string, property: string}>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Output() hiddenFiltersChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
@@ -285,15 +286,23 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		return obj;
 	}
 
+	/**
+	 * Removes all the fiilters selected
+	 * First removes the global query parameters
+	 */
 	public onClearFilters(): void {
-		this.model.columns.forEach((c: ViewColumn) => {
-			c.filter = '';
-		});
-		this.onFilter();
-		if (this.tagSelector) {
-			this.tagSelector.reset();
-		}
-		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		this.removeGlobalQueryParam.emit({property: '*'});
+
+		setTimeout(() => {
+			this.model.columns.forEach((c: ViewColumn) => {
+				c.filter = '';
+			});
+			this.onFilter();
+			if (this.tagSelector) {
+				this.tagSelector.reset();
+			}
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		}, 500);
 	}
 
 	/**
@@ -318,12 +327,22 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	/**
 	 * Set the filter value to the new search string and start off the filtering process
+	 * if the search value is empty, notify to the host component ir order to remove the global query params
 	 * @param {string} search - Current search value
 	 * @param {ViewColumn} column - Column of the datagrid which threw the event
 	*/
 	public setFilter(search: string, column: ViewColumn): void {
 		column.filter = search;
-		this.onFilter();
+		if (search === null || search === '') {
+			// removes the filter from the globals in case
+			this.removeGlobalQueryParam.emit({domain: column.domain, property: column.property});
+			// update the filters
+			setTimeout(() => {
+				this.onFilter();
+			}, 500);
+		} else {
+			this.onFilter();
+		}
 	}
 
 	/**

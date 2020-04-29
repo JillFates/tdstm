@@ -83,6 +83,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 	@Input() data: any;
 
 	// Forms
+	@ViewChild('actionNameInput', {static: false}) actionNameInput: ElementRef;
 	@ViewChild('apiActionForm', {static: false}) apiActionForm: NgForm;
 	@ViewChild('scriptForm', {static: false}) scriptForm: NgForm;
 	@ViewChild('simpleInfoForm', {static: false}) simpleInfoForm: NgForm;
@@ -273,7 +274,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
-			super.onSetUpFocus();
+			this.onSetUpFocus(this.actionNameInput);
 		});
 	}
 
@@ -463,7 +464,6 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.commonFieldSpecs = result;
 		if (this.modalType !== ActionType.CREATE) {
 			this.getParameters();
-			this.parameterList.push(null);
 		}
 	}
 

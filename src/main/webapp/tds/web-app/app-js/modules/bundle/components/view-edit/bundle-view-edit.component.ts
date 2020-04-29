@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
 // Store
 import {SetBundle} from '../../action/bundle.actions';
 import {Store} from '@ngxs/store';
@@ -40,6 +40,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 	protected userTimeZone: string;
 	protected userDateTimeFormat: string;
 	private requiredFields = ['name'];
+	@ViewChild('bundleEditNameInput', {static: false}) bundleEditNameInput: ElementRef;
 	@ViewChild('startTimePicker', {static: false}) startTimePicker;
 	@ViewChild('completionTimePicker', {static: false}) completionTimePicker;
 
@@ -108,6 +109,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle());
+			this.onSetUpFocus(this.bundleEditNameInput);
 		});
 	}
 
