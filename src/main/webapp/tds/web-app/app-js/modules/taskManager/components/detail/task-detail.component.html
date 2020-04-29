@@ -240,8 +240,8 @@
 																					[model]="model.instructionLink"
 																					[tooltip]="'Instructions'"
 																					[target]="'_blank'">
-													</tds-url-viewer
-												></span>
+													</tds-url-viewer>
+												</span>
 									</td>
 
 									<td
@@ -273,195 +273,80 @@
 									</td>
 								</tr>
 
-								<tr
-									*ngIf="
-												!collapsedTaskDetail
-											"
-									class="prop"
-								>
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Estimated
-											Duration</label
-										>
+								<tr *ngIf="!collapsedTaskDetail"
+									class="prop">
+									<td class="N" nowrap="nowrap">
+										<label>Estimated Duration</label>
 									</td>
 									<td class="valueNW">
-												<span>{{
-													model.durationText
-													}}</span>
+										<span>{{model.durationText}}</span>
 									</td>
 
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Earliest Start</label
-										>
+									<td class="N" nowrap="nowrap">
+										<label>Earliest Start</label>
 									</td>
 									<td class="valueNW">
 										<span>{{ model.etStart }}</span>
 									</td>
 
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Earliest Finish</label
-										>
+									<td class="N" nowrap="nowrap">
+										<label>Earliest Finish</label>
 									</td>
 									<td class="valueNW">
 										<span>{{ model.etFinish }}</span>
 									</td>
 								</tr>
 
-								<tr
-									*ngIf="
-												!collapsedTaskDetail
-											"
-									class="prop"
-								>
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Actual
-											Start</label
-										>
+								<tr *ngIf="!collapsedTaskDetail" class="prop">
+									<td class="N" nowrap="nowrap">
+										<label>Status</label>
 									</td>
 									<td class="valueNW">
-												<span>{{
-													model.actualStart ||
-													''
-													}}</span>
+										<tds-task-status-indicator [propertyName]="'status'"
+																							 [value]="model.status">
+										</tds-task-status-indicator>
 									</td>
-
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Actual
-											Finish</label
-										>
+									<td class="N" nowrap="nowrap">
+										<label>Actual Start</label>
 									</td>
 									<td class="valueNW">
-												<span>{{
-													model.actualFinish ||
-													''
-													}}</span>
+										<span>{{model.actualStart || ''}}</span>
 									</td>
-
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Actual
-											Duration</label
-										>
+									<td class="N" nowrap="nowrap">
+										<label>Actual Finish</label>
 									</td>
 									<td class="valueNW">
-												<span>{{
-													model.actualDuration
-													}}</span>
+										<span>{{model.actualFinish || ''}}</span>
 									</td>
 								</tr>
 
-								<tr
-									*ngIf="
-												!collapsedTaskDetail
-											"
-									class="prop"
-								></tr>
-								<tr
-									*ngIf="
-												!collapsedTaskDetail
-											"
-									class="prop"
-								>
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Status</label
-										>
+								<tr *ngIf="!collapsedTaskDetail" class="prop">
+									<td class="N" nowrap="nowrap">
+										<label>Completion %:</label>
 									</td>
 									<td class="valueNW">
-										<tds-task-status-indicator
-											[propertyName]="
-														'status'
-													"
-											[value]="
-														model.status
-													"
-										></tds-task-status-indicator>
-									</td>
-
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Duration
-											Delta</label
-										>
-									</td>
-									<td class="valueNW">
-												<span>{{
-													model.durationDelta
-													}}</span>
-									</td>
-								</tr>
-
-								<tr
-									*ngIf="
-												!collapsedTaskDetail
-											"
-									class="prop"
-								>
-									<td
-										class="N"
-										nowrap="nowrap"
-									>
-										<label
-										>Completion
-											%:</label
-										>
-									</td>
-									<td class="valueNW">
-										<div
-											class="progress completion"
-										>
-											<div
-												class="progress-bar"
-												role="progressbar"
-												*ngIf="model.percentageComplete"
-												[style.width.%]="
-															model.percentageComplete <= 24 ? 24 : model.percentageComplete
-														"
-												[attr.aria-valuenow]="
-															model.percentageComplete
-														"
-												[attr.aria-valuemin]="
-															0
-														"
-												[attr.aria-valuemax]="
-															100
-														"
-											>
-												{{
-												model.percentageComplete
-												}}
-												%
+										<div class="progress completion">
+											<div class="progress-bar" role="progressbar"
+													 *ngIf="model.percentageComplete"
+													 [style.width.%]="model.percentageComplete <= 24 ? 24 : model.percentageComplete"
+													 [attr.aria-valuenow]="model.percentageComplete"
+													 [attr.aria-valuemin]="0"
+													 [attr.aria-valuemax]="100">
+												{{model.percentageComplete}}%
 											</div>
 										</div>
+									</td>
+									<td class="N" nowrap="nowrap">
+										<label>Actual Duration</label>
+									</td>
+									<td class="valueNW">
+										<span>{{model.actualDuration}}</span>
+									</td>
+									<td class="N" nowrap="nowrap">
+										<label>Duration Delta</label>
+									</td>
+									<td class="valueNW">
+										<span>{{model.durationDelta}}</span>
 									</td>
 								</tr>
 								</tbody>
