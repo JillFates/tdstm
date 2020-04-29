@@ -14,7 +14,7 @@
 				[defaultItem]="defaultBundleItem"
 				[data]="allMoveBundles"
 				(selectionChange)="onBundleSelect($event)"
-                #teamHighlightDropdown>
+                #bundleListDropDown>
 			</kendo-dropdownlist>
 
 			<label class="dependency-analyzer-control-label "
@@ -24,6 +24,7 @@
 				[model]="selectedTags"
 				[showSwitch]="true"
 				class="tag-selector-for-da"
+				#tagsDropDown
 				(valueChange)="onAssetTagChange($event)"
 			></tds-asset-tag-selector>
 
@@ -49,14 +50,13 @@
 	</div>
 	<kendo-grid
         #grid
-		[data]="gridData"
-		[scrollable]="'scrollable'">
+		[data]="gridData">
 		<kendo-grid-column *ngFor="let col of columns; let i = index" [title]="col" [headerClass]="classes[i]"
 						   [width]="i < 4 ? '100' : '70'">
 			<ng-template kendoGridHeaderTemplate>
 				<div *ngIf="col === 'Groups'" class="group-column" (click)="openGroupInfoModal($event)">
 					{{col}}
-					<fa-icon [icon]="icons.faQuestion" size="md"></fa-icon>
+					<clr-icon shape="help"></clr-icon>
 				</div>
 				<div *ngIf="col !== 'Groups'" class="data-columns" (click)="columnClicked($event, i)">
 					{{col}}
