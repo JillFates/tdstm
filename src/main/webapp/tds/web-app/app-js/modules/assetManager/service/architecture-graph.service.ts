@@ -74,13 +74,16 @@ export class ArchitectureGraphService {
 	 * @returns {Observable<any>}
 	 * TODO: @sam please use the previously already implemented getEvents() from task.service.ts.
 	 */
-	getArchitectureGraphData(assetId: number, levelsUp: number, levelsDown: number, mode: string): Observable<any> {
+	getArchitectureGraphData(
+		assetId: number, levelsUp: number, levelsDown: number,
+		mode: string, includeCycles: boolean): Observable<any> {
 		let params;
 		params = new HttpParams()
 			.set('assetId', String(assetId))
 			.set('levelsUp', String(levelsUp))
 			.set('levelsDown', String(levelsDown))
-			.set('mode', mode);
+			.set('mode', mode)
+			.set('includeCycles', String(includeCycles));
 		return this.http.get(`${this.ARCHITECTURE_GRAPH_DATA}`, {params})
 			.map((response: any) => {
 				return response;

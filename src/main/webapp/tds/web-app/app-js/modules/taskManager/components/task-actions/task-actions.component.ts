@@ -24,7 +24,7 @@ export interface TaskActionsOptions {
 	template: `
 		<!-- Main content -->
 		<section class="task-actions-component " [ngClass]="{'btn-link': !displayAsButtons, 'btn-group': !displayAsButtons, 'btn-sm': !displayAsButtons}">
-            <tds-button *ngIf="showStart()" (click)="onStart()" theme="success" [icon]="displayAsButtons ? 'play' : ''">
+		<tds-button *ngIf="showStart()" (click)="onStart()" theme="success" [icon]="displayAsButtons ? 'play' : ''">
 				Start
 			</tds-button>
             <tds-button *ngIf="showDone()" (click)="onDone()"  [icon]="displayAsButtons ? 'check' : ''">
@@ -33,35 +33,36 @@ export interface TaskActionsOptions {
             <tds-button *ngIf="showInvoke()" [disabled]="!hasInvokePermission || invokeButton?.disabled" (click)="onInvoke()"  [icon]="displayAsButtons ? 'cog' : ''">
 				{{invokeButton?.label || 'Invoke'}}
 			</tds-button>
-            <tds-button *ngIf="showReset()" (click)="onReset()"  [icon]="displayAsButtons ? 'power' : ''">
+    	<tds-button *ngIf="showReset()" (click)="onReset()"  [icon]="displayAsButtons ? 'power' : ''">
 				Reset Action
-            </tds-button>
-            <tds-button *ngIf="showDetails" (click)="onShowDetails()" [icon]="displayAsButtons ? 'zoom-in' : ''">
-                Details
-            </tds-button>
-            <tds-button *ngIf="showAssignToMe()" (click)="onAssignToMe()" [icon]="displayAsButtons ? 'user' : ''">
-                Assign To Me
-            </tds-button>
-            <tds-button *ngIf="showNeighborhood()" (click)="onNeighborhood()" [icon]="displayAsButtons ? 'align-left' : ''">
-                Neighborhood
-            </tds-button>
-			<button *ngIf="showInstructionsLink && taskActionInfoModel.instructionsLinkURL" (click)="onInstructionsLink()"
-							class="btn" [ngClass]="buttonClass" type="button" title="Instructions">
-				<i class="fa fa-file"></i> <span>{{taskActionInfoModel.instructionsLinkLabel ? taskActionInfoModel.instructionsLinkLabel : 'Instruction Link'}}</span>
-			</button>
-            <div *ngIf="showDelayActions && showDelay()"
-                 class="task-action-buttons">
-                <label class="delay">Delay for:</label>
-                <tds-button (click)="onDelay(1)">
-                    1 day
-                </tds-button>
-                <tds-button (click)="onDelay(2)">
-                    2 days
-                </tds-button>
-                <tds-button (click)="onDelay(7)">
-                    7 days
-                </tds-button>
-            </div>
+			</tds-button>
+      <tds-button *ngIf="showDetails" (click)="onShowDetails()" [icon]="displayAsButtons ? 'zoom-in' : ''">
+      	Details
+			</tds-button>
+      <tds-button *ngIf="showAssignToMe()" (click)="onAssignToMe()" [icon]="displayAsButtons ? 'user' : ''">
+      	Assign To Me
+			</tds-button>
+      <tds-button *ngIf="showNeighborhood()" (click)="onNeighborhood()" [icon]="displayAsButtons ? 'align-left' : ''">
+      	Neighborhood
+			</tds-button>
+			<a *ngIf="showInstructionsLink && taskActionInfoModel && taskActionInfoModel.instructionsLinkURL"
+				 (click)="onInstructionsLink()" [href]="taskActionInfoModel.instructionsLinkURL" target="_blank"
+				 class="btn" [ngClass]="buttonClass" type="button" title="Instructions">
+								<i class="fa fa-file"></i> <span>{{taskActionInfoModel.instructionsLinkLabel ? taskActionInfoModel.instructionsLinkLabel : 'Instruction Link'}}</span>
+			</a>
+     	<div *ngIf="showDelayActions && showDelay()"
+					 class="task-action-buttons">
+				<label class="delay">Delay for:</label>
+        <tds-button (click)="onDelay(1)">
+					1 day
+				</tds-button>
+        <tds-button (click)="onDelay(2)">
+					2 days
+				</tds-button>
+        <tds-button (click)="onDelay(7)">
+					7 days
+				</tds-button>
+			</div>
 		</section>
 	`,
 })
@@ -137,12 +138,12 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	showAssignToMe(): boolean {
 		return (this.taskActionInfoModel
 			&&
-			(	( !this.taskActionInfoModel.assignedTo
-				||
-				this.userContext.person.id !== this.taskActionInfoModel.assignedTo )
+			((!this.taskActionInfoModel.assignedTo
+					||
+					this.userContext.person.id !== this.taskActionInfoModel.assignedTo)
 				&&
 				[TaskStatus.READY, TaskStatus.PENDING, TaskStatus.STARTED].indexOf(this.taskActionInfoModel.status) >= 0
-		) );
+			));
 	}
 
 	/**

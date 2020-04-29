@@ -535,8 +535,10 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 	private changeToEditViewOnDoubleClick(event: MouseEvent): void {
 		const bannedClasses = ['btn', 'actionable-link', 'k-grid'];
 		if (!ValidationUtils.isBannedClass(bannedClasses, event)) {
-			// move to edit mode
-			this.editTaskDetail();
+			// move to edit mode just if the user has the right permissions
+			if (this.hasEditTaskPermission) {
+				this.editTaskDetail();
+			}
 		}
 	}
 
