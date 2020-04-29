@@ -149,7 +149,8 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.action));
-			super.onSetUpFocus();
+			// TODO on Merge from dev/5.0.0 this will be fixed
+			// super.onSetUpFocus();
 		});
 	}
 
