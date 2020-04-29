@@ -1,5 +1,5 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 // NGXS
 import {Select, Store} from '@ngxs/store';
@@ -8,7 +8,6 @@ import {UserContextState} from '../../state/user-context.state';
 // Service
 import {LoginService} from '../../service/login.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PostNoticesManagerService} from '../../service/post-notices-manager.service';
 import {RouterUtils} from '../../../../shared/utils/router.utils';
 import {WindowService} from '../../../../shared/services/window.service';
@@ -26,6 +25,9 @@ import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
 import {Observable} from 'rxjs';
 import {map, withLatestFrom} from 'rxjs/operators';
 import {fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
+import {DialogService} from 'tds-component-library';
+import {ModalSize} from 'tds-component-library';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tds-login',
@@ -86,10 +88,12 @@ export class LoginComponent implements OnInit {
 		private store: Store,
 		private router: Router,
 		private notifierService: NotifierService,
-		private dialogService: UIDialogService,
+		private dialogService: DialogService,
 		private pageService: PageService,
 		private postNoticesManager: PostNoticesManagerService,
-		private windowService: WindowService) {
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private windowService: WindowService,
+		private translate: TranslatePipe) {
 	}
 
 	/**
@@ -196,16 +200,14 @@ export class LoginComponent implements OnInit {
 
 		if (this.userContextModel.alternativeProjects && this.userContextModel.alternativeProjects.length > 0) {
 			setTimeout(() => {
-				this.dialogService.open(SelectProjectModalComponent, [{
-					provide: Array,
-					useValue: this.userContextModel.alternativeProjects
-				}]).then(result => {
+				this.openSelectProject().then(result => {
 					if (result.success) {
 						setTimeout(() => {
 							this.getCurrentUserSnapshot();
 						}, 1000);
 					}
 				});
+
 			});
 		} else if (this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
 			if (this.userContextModel.postNotices && this.userContextModel.postNotices.length > 0) {
@@ -221,6 +223,24 @@ export class LoginComponent implements OnInit {
 			});
 			this.errMessage = this.userContextModel.error;
 		}
+	}
+
+	/**
+	 * Open the select project modal
+	 */
+	private async openSelectProject(): Promise<any> {
+		return await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: SelectProjectModalComponent,
+			data: {
+				projects: this.userContextModel.alternativeProjects
+			},
+			modalConfiguration: {
+				title: this.translate.transform('PROJECT.SELECT_PROJECT'),
+				draggable: false,
+				modalSize: ModalSize.MD
+			}
+		}).toPromise();
 	}
 
 	/**
@@ -262,25 +282,45 @@ export class LoginComponent implements OnInit {
 	/**
 	 * Open the view to show standard notices
 	 */
-	private showStandardNotices() {
-		const notices = this.filterPostNotices(false);
+	private async showStandardNotices(): Promise<void> {
+		try {
+			const notices = this.filterPostNotices(false);
 
-		return notices.length ? this.dialogService.open(StandardNoticesComponent, [{
-			provide: Notices,
-			useValue: {notices: notices}
-		}]) : Promise.resolve(true);
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: StandardNoticesComponent,
+				data: {
+					notices: notices
+				},
+				modalConfiguration: {
+					title: 'Notices',
+					draggable: false,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
 	 * Open the view to show mandatory notices
 	 */
-	private showMandatoryNotices() {
+	private async showMandatoryNotices(): Promise<void> {
 		const notices = this.filterPostNotices(true);
 
-		return notices.length ? this.dialogService
-				.open(MandatoryNoticesComponent, [{provide: Notices, useValue: {notices: notices}}])
-			:
-			Promise.resolve(true);
+		if (notices.length) {
+			await this.dialogService.open({
+					componentFactoryResolver: this.componentFactoryResolver,
+					component: MandatoryNoticesComponent,
+					data: {notices: notices},
+					modalConfiguration: {
+						title: 'Notices',
+						draggable: false,
+						modalSize: ModalSize.MD
+					}
+				}).toPromise()
+		}
 	}
 
 	/**

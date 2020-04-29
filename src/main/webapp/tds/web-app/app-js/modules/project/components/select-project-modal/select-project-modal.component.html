@@ -1,7 +1,4 @@
-<div tds-autofocus tds-handle-escape class="modal-content select-project-modal-component">
-    <div class="modal-header">
-        <h4 class="modal-title">{{'PROJECT.SELECT_PROJECT' | translate }}</h4>
-    </div>
+<div class="select-project-modal-component">
     <div class="modal-body">
 		<div [ngSwitch]="projects.length">
 			<label class="title-missing-project" *ngSwitchCase="0">{{ 'PROJECT.NO_ACTIVE_PROJECTS' | translate}} </label>
