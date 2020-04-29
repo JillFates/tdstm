@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.asset.ModelService
 import net.transitionmanager.command.ModelCommand
+import net.transitionmanager.command.model.ExportMgrAndModelCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
@@ -35,6 +36,17 @@ class WsModelController implements ControllerMethods {
 		Model model = fetchDomain(Model, [id: id])
 		modelService.delete(model)
 		renderSuccessJson()
+	}
+
+	/**
+	 * Fetch the Models, Manufacturers and Connectors for the export process.
+	 * @return
+	 */
+	@HasPermission(Permission.ModelExport)
+	def export() {
+		ExportMgrAndModelCommand command = populateCommandObject(ExportMgrAndModelCommand)
+		Map exportData = modelService.getManufacturersAndModelsExportData(command)
+		render view: '/model/exportManufacturersAndModels', model: [data: exportData]
 	}
 
 }
