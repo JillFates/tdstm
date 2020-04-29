@@ -84,6 +84,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	public taskViewType: string;
 	private taskDetailModel: TaskDetailModel;
 	invalidInstructionLink = false;
+	MODAL_TYPE = ModalType;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
