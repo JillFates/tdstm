@@ -10,7 +10,7 @@ import {ArchitectureGraphService} from '../../../assetManager/service/architectu
 import {Observable, ReplaySubject} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link} from 'gojs';
+import {Diagram, Layout, Link, Node} from 'gojs';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
@@ -361,7 +361,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	refreshData(setInitialAsset = false): void {
 		this.loadData(setInitialAsset)
-			.subscribe(() => {/**/})
+			.subscribe()
 	}
 
 	/**
@@ -530,7 +530,8 @@ export class ArchitectureGraphComponent implements OnInit {
 			this.permissionService,
 			{
 				currentUser: this.userContext && this.userContext.person,
-				taskCount: this.currentNodesData && this.currentNodesData.length
+				taskCount: this.currentNodesData && this.currentNodesData.length,
+				cycles: this.taskCycles || []
 			});
 
 		this.data$.next(diagramHelper.diagramData({
@@ -657,9 +658,9 @@ export class ArchitectureGraphComponent implements OnInit {
 					modalSize: ModalSize.CUSTOM,
 					modalCustomClass: 'custom-asset-modal-dialog'
 				}
-			}).subscribe(res => {
-				if (res && res.id) {
-					this.graph.updateNode(res);
+			}).subscribe(update => {
+				if (update && update.data) {
+					this.refreshData();
 				}
 			});
 		}
@@ -687,8 +688,8 @@ export class ArchitectureGraphComponent implements OnInit {
 					modalCustomClass: 'custom-asset-modal-dialog'
 				}
 			}).subscribe(update => {
-				if (update) {
-					this.graph.updateNode(update);
+				if (update && update.data) {
+					this.refreshData()
 				}
 			});
 		}
@@ -704,11 +705,11 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (assetDataSource.length > 1 && assetDataSource.includes(a => a.id === asset.id)) {
 			this.assetId = asset.id;
 			this.selectedAsset = asset;
-			this.loadData();
+			this.refreshData();
 			this.form.controls['assetClass'].markAsDirty();
 		} else {
 			this.assetId = asset.id;
-			this.loadData(true);
+			this.refreshData(true);
 			this.form.controls['assetClass'].markAsDirty();
 		}
 	}

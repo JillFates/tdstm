@@ -33,9 +33,15 @@ export class ArchitectureGraphDiagramHelper {
 	refCycles: string[];
 	private readonly cyclicalColor = '#1945dd';
 	private readonly arrowColor = '#c3c3c3';
+	cycles: [];
 
 	constructor(private permissionService: PermissionService, private props?: any) {
-		// Architecture Graph Diagram Helper Constructor
+		this.refCycles = [];
+		this.cycles = props.cycles;
+		props.cycles.forEach((cycle: number[]) => {
+			this.refCycles.push(cycle.join('#'));
+		});
+
 	}
 
 	static isDeviceVirtualServer(type: string): boolean {
@@ -178,18 +184,18 @@ export class ArchitectureGraphDiagramHelper {
 		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
-		const selectedShape = new Shape();
-		selectedShape.figure = 'RoundedRectangle';
-		selectedShape.fill = 'transparent';
-		selectedShape.strokeWidth = 4;
-		selectedShape.desiredSize = new Size(65, 65);
-		selectedShape.bind(new Binding('stroke', 'id', (val: any) => {
+		const rootAssetShape = new Shape();
+		rootAssetShape.figure = 'RoundedRectangle';
+		rootAssetShape.fill = 'transparent';
+		rootAssetShape.strokeWidth = 4;
+		rootAssetShape.desiredSize = new Size(65, 65);
+		rootAssetShape.bind(new Binding('stroke', 'id', (val: any) => {
 			return this.isRootAsset(val) ? 'red' : 'transparent';
 		}));
-		selectedShape
+		rootAssetShape
 			.bind(new Binding('visible', 'id', (val: any) => this.isRootAsset(val)));
 
-		panel.add(selectedShape);
+		panel.add(rootAssetShape);
 		panel.add(panelBody);
 		node.add(panel);
 
@@ -416,7 +422,7 @@ export class ArchitectureGraphDiagramHelper {
 	layout(): Layout {
 		const diagraph = new LayeredDigraphLayout();
 		diagraph.direction = 90;
-		diagraph.layerSpacing = 100;
+		diagraph.layerSpacing = 30;
 		return diagraph;
 	}
 
