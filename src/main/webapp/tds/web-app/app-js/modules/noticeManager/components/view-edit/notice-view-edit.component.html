@@ -25,6 +25,7 @@
 						title="{{ 'NOTICE.TOOLTIP_TITLE' | translate }}"
 						[(ngModel)]="model.title"
 						required
+						#noticeCreateTitle
 					/>
 					<ng-template #noticeTitleView>
 						<label class=" label-detail">{{

@@ -47,7 +47,7 @@ const DEBOUNCE_MILLISECONDS = 800;
 })
 export class DataScriptViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
-
+	@ViewChild('etlScriptCreateName', {static: false}) etlScriptCreateName: ElementRef;
 	@ViewChild('dataScriptForm', {read: NgForm, static: true}) dataScriptForm: NgForm;
 
 	@ViewChild('dataScriptProvider', {
@@ -169,6 +169,7 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			this.onSetUpFocus(this.etlScriptCreateName);
 		});
 	}
 

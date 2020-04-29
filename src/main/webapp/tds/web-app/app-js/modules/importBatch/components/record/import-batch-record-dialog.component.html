@@ -1,46 +1,17 @@
-<div tds-handle-escape
-		 (escPressed)="onCancelCloseDialog()"
-		 class="modal fade in tds-ui-modal-decorator import-batch-record-dialog allow-modal-background"
-		 id="import-batch-record-dialog"
-		 data-backdrop="static"
-		 tabindex="-1"
-		 role="dialog">
-	<div class="modal-dialog" role="document">
-		<div class="tds-modal-content has-side-nav with-box-shadow"
-				 style="width: 80%"
-				 tds-ui-modal-decorator
-				 [options]="modalOptions">
-			<div class="modal-header">
-				<button aria-label="Close" class="close" type="button" (click)="onCancelCloseDialog()">
-					<clr-icon aria-hidden="true" shape="close"></clr-icon>
-				</button>
-				<h4 class="modal-title">Record Detail</h4>
-			</div>
-			<div class="modal-body">
-				<div class="modal-body-container">
-					<section>
-						<import-batch-record-summary
-							[importBatch]="importBatch"
-							[batchRecord]="batchRecord">
-						</import-batch-record-summary>
-						<import-batch-record-fields
-							#detailFieldsComponent
-							*ngIf="batchRecord"
-							[importBatch]="importBatch"
-							[batchRecord]="batchRecord"
-							(onClose)="onCancelCloseDialog()"
-							(onUpdateSuccess)="onUpdateSuccess()"
-							(onBatchRecordUpdated)="onBatchRecordUpdated($event)">
-						</import-batch-record-fields>
-					</section>
-				</div>
-			</div>
-			<div class="modal-sidenav form-group-center">
-				<nav class="modal-sidenav btn-link">
-					<tds-button-save *ngIf="showActionButtons()"(click)="onSaveClicked()" [disabled]="!detailFieldsComponent.areOverrideValuesDirty()"></tds-button-save>
-					<tds-button-close (click)="onCancelCloseDialog()"></tds-button-close>
-				</nav>
-			</div>
-		</div>
-	</div>
+<div class="import-batch-record-dialog ">
+	<section>
+		<import-batch-record-summary
+			[importBatch]="importBatch"
+			[batchRecord]="batchRecord">
+		</import-batch-record-summary>
+		<import-batch-record-fields
+			#detailFieldsComponent
+			*ngIf="batchRecord"
+			[importBatch]="importBatch"
+			[batchRecord]="batchRecord"
+			(onClose)="onCancelCloseDialog()"
+			(onUpdateSuccess)="onUpdateSuccess()"
+			(onBatchRecordUpdated)="onBatchRecordUpdated($event)">
+		</import-batch-record-fields>
+	</section>
 </div>

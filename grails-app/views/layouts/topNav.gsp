@@ -44,12 +44,17 @@
 
     <script type="text/javascript">
 	$(document).ready(function() {
-			// Format User Name in Icon
-			$(".user-menu .user-name").each(function() {
-				$(this).text($(this).text().split(" ").map(function(a){
-					return a.substr(0,1).toUpperCase();
-				}).join(""))
-			})
+            <%-- SETUP CSRF TOKEN FOR ALL LEGACY PAGES --%>
+            $.ajaxSetup({
+                headers: { '${_csrf?.headerName}': '${_csrf?.token}' }
+            });
+
+            // Format User Name in Icon
+            $(".user-menu .user-name").each(function() {
+            	$(this).text($(this).text().split(" ").map(function(a){
+            		return a.substr(0,1).toUpperCase();
+            	}).join(""))
+            })
             $("#personDialog").dialog({ autoOpen: false });
             $("#userPrefDivId").dialog({ autoOpen: false });
             $("#userTimezoneDivId").dialog({ autoOpen: false });
@@ -88,7 +93,7 @@
         }
 
         function clearStorage() {
-			stateManagement.destroyState();
+            stateManagement.destroyState();
         }
 
     </script>

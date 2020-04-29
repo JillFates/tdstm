@@ -37,6 +37,8 @@ class CustomDomainService implements ServiceMethods {
     static final List<String> CUSTOM_REQUIRED_BULK_ACTIONS = ["replace"]
     static final List<String> CUSTOM_NON_REQUIRED_BULK_ACTIONS = ["replace", "clear"]
 
+    static final List<String> COMPUTED_FIELD_NAMES = ['dependencyGroup', 'conflict', 'tbd']
+
     NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
     SettingService settingService

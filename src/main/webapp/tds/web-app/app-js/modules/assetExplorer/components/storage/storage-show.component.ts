@@ -37,7 +37,8 @@ export function StorageShowComponent(template, modelId: number, metadata: any, p
 				userContextService,
 				windowService,
 				architectureGraphService,
-				parentDialog
+				parentDialog,
+				metadata
 			);
 			this.mainAsset = modelId;
 			this.assetTags = metadata.assetTags;

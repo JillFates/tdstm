@@ -1,0 +1,39 @@
+<div id="statusColors" title="Dependency Group Status" class="static-dialog tds-modal-content">
+	<div class="modal-header">
+		<div class="modal-title-container">
+			<div class="modal-title">
+				Dependency Group Status
+			</div>
+		</div>
+	</div>
+
+	<div class="modal-body">
+		<div class="box-header" style="background-color: yellow;">
+			<h3 class="box-title">Conflicts</h3>
+		</div>
+		<div class="box-body">
+			Yellow indicates that there is some conflict(s) with assets in the group. The conflict may be that two or
+			more assets are assigned to different events or one or more assets' dependency status is set to Questioned
+			or Unknown.
+		</div>
+		<div class="box-header" style="background-color: #e0e0e0;">
+			<h3 class="box-title">Pending</h3>
+		</div>
+		<div class="box-body">
+			Grey indicates that there are no outstanding conflicts but the Asset Validation needs to be set to Plan
+			Ready indicating the group is ready to be assigned.
+		</div>
+		<div class="box-header" style="background-color: lightgreen;">
+			<h3 class="box-title">Ready to Assign</h3>
+		</div>
+		<div class="box-body">
+			Green indicates that the assets in the group are Ready to be assigned.
+		</div>
+		<div class="box-header" style="background-color: #5f9fcf;">
+			<h3 class="box-title">Assigned</h3>
+		</div>
+		<div class="box-body">
+			Blue indicates that there are no conflicts and all of the assets in the group have been assigned correctly.
+		</div>
+	</div>
+</div>

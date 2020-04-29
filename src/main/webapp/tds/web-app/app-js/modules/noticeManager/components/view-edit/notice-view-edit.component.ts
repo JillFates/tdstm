@@ -1,5 +1,5 @@
 // Angular
-import {AfterViewInit, Component, ComponentFactoryResolver, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
 // Component
 import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
@@ -28,11 +28,9 @@ declare var jQuery: any;
 })
 export class NoticeViewEditComponent extends Dialog implements OnInit, AfterViewInit {
 	@Input() data: any;
-
 	@ViewChild('form', {read: NgForm, static: true}) form: NgForm;
-
 	@ViewChild('typeIdField', {static: false}) typeId: DropDownListComponent;
-
+	@ViewChild('noticeCreateTitle', {static: false}) noticeCreateTitle: ElementRef;
 	public EnumActionType = ActionType;
 	private dataSignature: string;
 	protected model: NoticeModel;
@@ -149,8 +147,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.action));
-			// TODO on Merge from dev/5.0.0 this will be fixed
-			// super.onSetUpFocus();
+			super.onSetUpFocus(this.noticeCreateTitle);
 		});
 	}
 

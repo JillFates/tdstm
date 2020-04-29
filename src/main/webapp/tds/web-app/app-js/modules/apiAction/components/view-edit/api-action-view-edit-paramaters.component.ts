@@ -14,14 +14,13 @@ import { NgForm } from '@angular/forms';
 				<kendo-grid
 					[data]="parameterList"
 					[pageSize]="25"
-                    class="row-actions-1-children"
-                    [height]="430">
+					[height]="430">
 					<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
 						<tds-button-create class="float-right"
-						                   [displayLabel]="false"
-											[id]="'btnAddParameter'"
-											[title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
-											(click)="onAddParameter()">
+															 [displayLabel]="false"
+															 [id]="'btnAddParameter'"
+															 [title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
+															 (click)="onAddParameter()">
 						</tds-button-create>
 					</ng-template>
 					<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index"
@@ -39,16 +38,23 @@ import { NgForm } from '@angular/forms';
 							<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i
 								class="fa fa-fw fa-code api-boolean-icon"></i></span>
 						</ng-template>
-                        <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-                            <div class="action-button btn-link">
-                                <clr-dropdown *ngIf="dataItem?.required === 0  || dataItem?.required === false">
-									<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-									<clr-dropdown-menu [clrPosition]="determinePositionClrDropdown(rowIndex, parameterList)" *clrIfOpen>
-                                        <a clrDropdownItem (click)="onDeleteParameter($event, dataItem)">Delete</a>
-                                    </clr-dropdown-menu>
-                                </clr-dropdown>
-                            </div>
-                        </ng-template>
+						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW"
+												 let-dataItem let-rowIndex="rowIndex">
+							<div *ngIf="dataItem?.required === 0  || dataItem?.required === false"
+									 class="action-button btn-link">
+								<clr-dropdown #dropdown>
+									<tds-button icon="ellipsis-vertical"
+															clrDropdownTrigger
+															tdsGridContextMenuFixedPosition [clrDropdown]="dropdown">
+									</tds-button>
+									<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+										<a clrDropdownItem (click)="onDeleteParameter($event, dataItem)">
+											Delete
+										</a>
+									</clr-dropdown-menu>
+								</clr-dropdown>
+							</div>
+						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem
 												 let-rowIndex="rowIndex">
 							<div
@@ -63,12 +69,12 @@ import { NgForm } from '@angular/forms';
 										(change)="onValuesChange()"
 										[(ngModel)]="dataItem[column.property]"
 									/>
-                				</clr-checkbox-wrapper>
+								</clr-checkbox-wrapper>
 							</div>
 							<div *ngIf="dataItem !== null && (column.type === 'text' && column.property === 'paramName')">
 								<!-- Name -->
 								<input (keypress)="getOnInputKey($event)"
-								       clrInput type="text" required class="param-text-input"
+											 clrInput type="text" required class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-param"
 											 (change)="onValuesChange()"
 											 [(ngModel)]="dataItem.paramName"
@@ -131,7 +137,8 @@ import { NgForm } from '@angular/forms';
 									*ngIf="dataItem?.readonly === 1  || dataItem?.readonly === true"><i
 									class="fa fa-fw fa-check"></i></span></span>
 								<span *ngIf="column.property === 'encoded'"><span
-									*ngIf="dataItem?.encoded === 1  || dataItem?.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
+									*ngIf="dataItem?.encoded === 1  || dataItem?.encoded === true"><i
+									class="fa fa-fw fa-check"></i></span></span>
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'paramName'">
 								<span>{{dataItem?.paramName}}</span>
@@ -159,7 +166,7 @@ import { NgForm } from '@angular/forms';
 	styles: [`
       .has-error, .has-error:focus {
           border: 1px #f00 solid;
-	  }
+      }
 	`]
 })
 export class ApiActionViewEditParamatersComponent {
@@ -168,7 +175,7 @@ export class ApiActionViewEditParamatersComponent {
 	@Input('commonFieldSpecs') commonFieldSpecs: any;
 	@Output('onValuesChange') onValuesChangeEmitter: EventEmitter<{ parameterList: Array<any>, isFormValid: boolean }>
 		= new EventEmitter<{ parameterList: Array<any>, isFormValid: boolean }>();
-	@ViewChild('apiActionParametersForm', {static: false}) apiActionParametersForm: NgForm;
+	@ViewChild('apiActionParametersForm', { static: false }) apiActionParametersForm: NgForm;
 	actionTypes = ActionType;
 	apiActionParameterColumnModel = new APIActionParameterColumnModel();
 	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
@@ -199,23 +206,9 @@ export class ApiActionViewEditParamatersComponent {
 	isFormValid = true;
 
 	/**
-	 * determines the position of the clr dropdown
-	 * **/
-	determinePositionClrDropdown(rowIndex, parameterList): string {
-		return rowIndex + 1 === parameterList.length - 1 ? 'right-top' : 'bottom-left';
-	}
-
-	/**
 	 * Add a new argument to the list of parameters and refresh the list.
 	 */
 	onAddParameter(): void {
-		if (this.parameterList) {
-			if (this.parameterList.length > 0) {
-				if (this.parameterList[this.parameterList.length - 1] === null) {
-					this.parameterList.pop();
-				}
-			}
-		}
 		this.parameterList.push({
 			paramName: '',
 			desc: '',
@@ -228,7 +221,6 @@ export class ApiActionViewEditParamatersComponent {
 			required: false,
 			encoded: false
 		});
-		this.parameterList.push(null);
 		this.onValuesChange();
 	}
 
@@ -326,9 +318,11 @@ export class ApiActionViewEditParamatersComponent {
 		const invalidParams = this.parameterList.filter(item => {
 			if (item) {
 				return item.context !== 'USER_DEF' && !item.fieldName;
-			} else { return true; }
+			} else {
+				return true;
+			}
 		});
 		this.isFormValid = this.isFormValid && invalidParams.length === 0;
-		this.onValuesChangeEmitter.emit({parameterList: this.parameterList, isFormValid: this.isFormValid});
+		this.onValuesChangeEmitter.emit({ parameterList: this.parameterList, isFormValid: this.isFormValid });
 	}
 }

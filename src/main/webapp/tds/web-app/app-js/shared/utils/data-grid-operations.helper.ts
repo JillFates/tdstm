@@ -67,9 +67,10 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * On Filter column event.
-	 * @param column
-	 */
+     * On Filter column event.
+     * @param column
+     * @param operator
+     */
 	public onFilter(column: GridColumnModel, operator?: string): void {
 		let root = this.getFilter(column, operator);
 		this.filterChange(root);
@@ -173,11 +174,10 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * Get the filters state structure excluding the column filter name provided
-	 * @param {string} excludeFilterName:  Name of the filter column to exclude
-	 * @param {any} state: Current filters state
-	 * @returns void
-	 */
+     * Get the filters state structure excluding the column filter name provided
+     * @param {string} excludeFilterName:  Name of the filter column to exclude
+     * @returns void
+     */
 	private getFiltersExcluding(excludeFilterName: string): any {
 		const filters = (this.state.filter && this.state.filter.filters) || [];
 		return filters.filter((r) => r['field'] !== excludeFilterName);
@@ -197,9 +197,10 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * On Filter Change.
-	 * @param {CompositeFilterDescriptor} filter
-	 */
+     * On Filter Change.
+     * @param {CompositeFilterDescriptor} filter
+     * @param state
+     */
 	public filterChange(filter: CompositeFilterDescriptor, state: State = null): void {
 		const currentState = state || this.state;
 		currentState.filter = filter;
@@ -217,7 +218,7 @@ export class DataGridOperationsHelper {
 
 	/**
 	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * @param {CellClickEvent} event
 	 */
 	public selectCell(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {

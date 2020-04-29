@@ -17,6 +17,7 @@ module.exports = function (env) {
 		entry: {
 			app: './web-app/app-js/main.ts',
 			polyfills: './web-app/app-js/polyfills.ts',
+			'custom-elements.min': './web-app/assets/modules/webcomponents/js/custom-elements.min.js'
 		},
 		output: {
 			path: path.resolve(__dirname, './web-app/dist/'),
@@ -52,7 +53,7 @@ module.exports = function (env) {
 				NODE_ENV: '"development"'
 			}),
 			new webpack.SourceMapDevToolPlugin({
-				filename: '[name].js.map',
+				filename: '[file].map',
 				exclude: ['vendor.js', 'polyfills.js']
 			}),
 			new AngularCompilerPlugin({

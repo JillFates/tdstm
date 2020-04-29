@@ -1,9 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+// Angular
+import {Component, ComponentFactoryResolver, Input, OnInit} from '@angular/core';
+// Model
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
-import {ImportBatchService} from '../../service/import-batch.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {
 	COLUMN_MIN_WIDTH,
@@ -11,27 +9,32 @@ import {
 	SELECT_ALL_COLUMN_WIDTH
 } from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {KEYSTROKE} from '../../../../shared/model/constants';
-import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
-import {PREFERENCES_LIST, IMPORT_BATCH_PREFERENCES, PreferenceService} from '../../../../shared/services/preference.service';
+import {Dialog, DialogButtonType, DialogExit, DialogService, ModalSize} from 'tds-component-library';
+// Component
 import {ImportBatchRecordDialogComponent} from '../record/import-batch-record-dialog.component';
+// Service
+import {ImportBatchService} from '../../service/import-batch.service';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {NULL_OBJECT_PIPE} from '../../../../shared/pipes/utils.pipe';
+import {
+	PREFERENCES_LIST,
+	IMPORT_BATCH_PREFERENCES,
+	PreferenceService
+} from '../../../../shared/services/preference.service';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {DateUtils} from '../../../../shared/utils/date.utils';
-import {UserContextService} from '../../../auth/service/user-context.service';
+// Other
+import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'import-batch-detail-dialog',
-	templateUrl: 'import-batch-detail-dialog.component.html',
-	host: {
-		'(keydown)': 'keyDownHandler($event)'
-	}
+	templateUrl: 'import-batch-detail-dialog.component.html'
 })
-export class ImportBatchDetailDialogComponent implements OnInit {
+export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
+	@Input() data: any;
 
 	private BatchStatus = BatchStatus;
 	private columnsModel: ImportBatchRecordDetailColumnsModel;
-	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
+	private selectableSettings: SelectableSettings = {mode: 'single', checkboxOnly: false};
 	public dataGridOperationsHelper: DataGridOperationsHelper;
 	private checkboxSelectionConfig = {
 		useColumn: 'id'
@@ -39,65 +42,74 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	private batchRecords: Array<ImportBatchRecordModel>;
 	private batchRecordsFilter: any = {
 		options: [{id: 1, name: 'All'},
-			{id: 2, name: 'Pending', filters: [
-				{column: 'status.label', value: 'Pending'},
-			]},
-			{id: 3, name: 'Pending with Errors', filters: [
-				{column: 'status.label', value: 'Pending'},
-				{column: 'errorCount', value: 1, operator: 'gte'},
-			]},
-			{id: 4, name: 'Ignored', filters: [
-				{column: 'status.label', value: 'Ignored'},
-			]},
-			{id: 5, name: 'Completed', filters: [
-				{column: 'status.label', value: 'Completed'},
-			]}],
+			{
+				id: 2, name: 'Pending', filters: [
+					{column: 'status.label', value: 'Pending'},
+				]
+			},
+			{
+				id: 3, name: 'Pending with Errors', filters: [
+					{column: 'status.label', value: 'Pending'},
+					{column: 'errorCount', value: 1, operator: 'gte'},
+				]
+			},
+			{
+				id: 4, name: 'Ignored', filters: [
+					{column: 'status.label', value: 'Ignored'},
+				]
+			},
+			{
+				id: 5, name: 'Completed', filters: [
+					{column: 'status.label', value: 'Completed'},
+				]
+			}],
 		selected: {id: 1, name: 'All'}
 	};
 	private batchRecordsUpdatedFlag = false;
 	protected NULL_OBJECT_PIPE = NULL_OBJECT_PIPE;
 	public dateTimeFormat: string;
 	private importBatchPreferences = {};
-	SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
-	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
+	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public importBatchModel: ImportBatchModel;
 
 	constructor(
-		public importBatchModel: ImportBatchModel,
+		private componentFactoryResolver: ComponentFactoryResolver,
 		private importBatchService: ImportBatchService,
-		private activeDialog: UIActiveDialogService,
-		private dialogService: UIDialogService,
-		private userPreferenceService: PreferenceService,
-		private userContextService: UserContextService) {
-
-		this.userContextService.getUserContext()
-			.subscribe((userContext: UserContextModel) => {
-				this.dateTimeFormat = userContext.dateFormat + ' ' + DateUtils.DEFAULT_FORMAT_TIME;
-
-				this.batchRecords = [];
-				this.prepareColumnsModel();
-				this.onLoad();
-			});
-	}
-
-	/**
-	 * On Page Load
-	 */
-	private onLoad(): void {
-		this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES).subscribe( res => {
-			if (res) {
-				this.importBatchPreferences = JSON.parse(res);
-				const match = this.batchRecordsFilter.options.find( item => item.name === this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.RECORDS_FILTER]);
-				if (match) {
-					this.batchRecordsFilter.selected = match;
-				}
-			}
-		}, error => { console.error(error) });
+		private dialogService: DialogService,
+		private userPreferenceService: PreferenceService) {
+		super();
 	}
 
 	/**
 	 * On Component Init get Import Batch Records.
 	 */
-	ngOnInit(): void {
+	async ngOnInit(): Promise<void> {
+		// Get Modal Model
+		this.importBatchModel = Object.assign({}, this.data.importBatchModel);
+
+		this.buttons.push({
+			name: 'close',
+			icon: 'ban',
+			show: () => true,
+			type: DialogButtonType.ACTION,
+			action: this.cancelCloseDialog.bind(this)
+		});
+
+		this.dateTimeFormat = this.userPreferenceService.getUserDateTimeFormat();
+		this.batchRecords = [];
+
+		const result = await this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES).toPromise();
+		if (result) {
+			this.importBatchPreferences = JSON.parse(result);
+			const match = this.batchRecordsFilter.options.find(item => item.name === this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.RECORDS_FILTER]);
+			if (match) {
+				this.batchRecordsFilter.selected = match;
+			}
+		}
+
+		this.prepareColumnsModel();
+
 		this.loadImportBatchRecords();
 	}
 
@@ -105,7 +117,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 * Load Import Batch Records from API.
 	 */
 	private loadImportBatchRecords(): void {
-		this.importBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( (result: ApiResponseModel) => {
+		this.importBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe((result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.batchRecords = result.data;
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
@@ -137,7 +149,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		const {fieldNameList, fieldLabelMap} = this.importBatchModel;
 
 		// const mock: Array<string> = [ 'Name (P)', 'Type (P)', 'Dep Type (P)', 'Name (D)', 'Type (D)'];
-		let fieldColumns: Array<GridColumnModel> = fieldNameList.map( field => {
+		let fieldColumns: Array<GridColumnModel> = fieldNameList.map(field => {
 			const column: GridColumnModel = new GridColumnModel();
 			column.label = (fieldLabelMap && fieldLabelMap[field]) || field;
 			column.properties = ['currentValues', field];
@@ -154,9 +166,9 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 * On Row Click open the record detail extra popup.
 	 * @param $event
 	 */
-	private openBatchRecordDetail(cellClick: CellClickEvent): void {
+	private async openBatchRecordDetail(cellClick: CellClickEvent): Promise<void> {
 		// prevent open detail on column 0
-		if (cellClick.columnIndex === 0 ) {
+		if (cellClick.columnIndex === 0) {
 			return;
 		}
 		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
@@ -165,16 +177,24 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		if (!selectedBatchRecord || !selectedBatchRecord.id) {
 			return;
 		}
-		this.dialogService.extra(ImportBatchRecordDialogComponent, [
-				{provide: ImportBatchModel, useValue: this.importBatchModel},
-				{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
-			], false, false)
-			.then((result) => {
-				if (result === 'reload') {
-					this.reloadSingleBatchRecord(selectedBatchRecord);
-					this.batchRecordsUpdatedFlag = true;
-				}
-			}).catch( result => { console.log('dismissed'); });
+		const result = await this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ImportBatchRecordDialogComponent,
+			data: {
+				importBatchModel: this.importBatchModel,
+				importBatchRecordModel:  selectedBatchRecord
+			},
+			modalConfiguration: {
+				title: `Record Detail`,
+				draggable: true,
+				modalSize: ModalSize.XL
+			}
+		}).toPromise();
+
+		if (result.status === DialogExit.ACCEPT && result.reloadRecords) {
+			this.reloadSingleBatchRecord(selectedBatchRecord);
+			this.batchRecordsUpdatedFlag = true;
+		}
 	}
 
 	/**
@@ -189,7 +209,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
-		this.activeDialog.close(this.batchRecordsUpdatedFlag);
+		this.onAcceptSuccess({batchRecordsUpdatedFlag: this.batchRecordsUpdatedFlag});
 	}
 
 	/**
@@ -230,13 +250,13 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	 */
 	private onStatusFilter(event, avoidPreferenceSave = false) {
 		for (const columnProperty of ['status.label', 'errorCount']) {
-			let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === columnProperty );
+			let foundMatch: GridColumnModel = this.columnsModel.columns.find((column: GridColumnModel) => column.property === columnProperty);
 			foundMatch.filter = null;
 			this.dataGridOperationsHelper.clearValue(foundMatch);
 		}
 		if (event.id !== 1) {
 			for (const filter of event.filters) {
-				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === filter.column );
+				let foundMatch: GridColumnModel = this.columnsModel.columns.find((column: GridColumnModel) => column.property === filter.column);
 				if (foundMatch) {
 					foundMatch.filter = filter.value;
 					this.dataGridOperationsHelper.onFilter(foundMatch, event.id === 3 ? 'gte' : null);
@@ -245,7 +265,8 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		}
 		if (!avoidPreferenceSave) {
 			this.importBatchPreferences[IMPORT_BATCH_PREFERENCES.RECORDS_FILTER] = event.name;
-			this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe( r => { /**/});
+			this.userPreferenceService.setPreference(PREFERENCES_LIST.IMPORT_BATCH_PREFERENCES, JSON.stringify(this.importBatchPreferences)).subscribe(r => { /**/
+			});
 		}
 	}
 
@@ -291,16 +312,6 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 	}
 
 	/**
-	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
-	 * @param {KeyboardEvent} event
-	 */
-	private keyDownHandler($event: KeyboardEvent): void {
-		if ($event && $event.code === KEYSTROKE.ESCAPE) {
-			this.cancelCloseDialog();
-		}
-	}
-
-	/**
 	 * Determines which value to print on the batch record dynamic values, can be direct value, init or null.
 	 * @returns {string}
 	 */
@@ -308,7 +319,7 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		const isEmptyVal = !dataItem.currentValues[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.currentValues[column.properties[1]])
 		if (isEmptyVal && dataItem.init) {
 			const isEmptyInit = !dataItem.init[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.init[column.properties[1]]);
-			return  !isEmptyInit ? dataItem.init[column.properties[1]] : '(null)';
+			return !isEmptyInit ? dataItem.init[column.properties[1]] : '(null)';
 		}
 		return isEmptyVal ? '(null)' : dataItem.currentValues[column.properties[1]];
 	}
@@ -321,8 +332,15 @@ export class ImportBatchDetailDialogComponent implements OnInit {
 		const isEmptyVal = !dataItem.currentValues[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.currentValues[column.properties[1]])
 		if (isEmptyVal && dataItem.init) {
 			const isEmptyInit = !dataItem.init[column.properties[1]] || ValidationUtils.isEmptyObject(dataItem.init[column.properties[1]]);
-			return  !isEmptyInit;
+			return !isEmptyInit;
 		}
 		return false;
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.cancelCloseDialog();
 	}
 }

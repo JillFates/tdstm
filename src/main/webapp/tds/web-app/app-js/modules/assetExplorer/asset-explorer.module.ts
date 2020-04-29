@@ -45,6 +45,12 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 import {AssetExplorerRouteModule} from './asset-explorer.route';
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 import {DependencyAnalyzerComponent} from './components/dependency-analyzer/dependency-analyzer.component';
+import {RegenerateComponent} from './components/dependency-analyzer/components/regenerate/regenerate.component';
+import {DependencyGroupStatusComponent} from './components/dependency-analyzer/components/dependency-group-status-modal/dependency-group-status.component';
+import {ProvidersResolveService} from '../provider/resolve/providers-resolve.service';
+import {ProviderService} from '../provider/service/provider.service';
+import {RegenerateProgressDialogComponent} from './components/dependency-analyzer/components/regenerate-progress-dialog/regenerate-progress-dialog.component';
+import {DependentsComponent} from './components/dependents/dependents.component';
 
 @NgModule({
 	imports: [
@@ -85,7 +91,12 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		TaskNotesComponent,
 		TaskActionSummaryComponent,
 		ArchitectureGraphComponent,
-		DependencyAnalyzerComponent
+		DependencyAnalyzerComponent,
+		RegenerateComponent,
+		DependencyGroupStatusComponent,
+		RegenerateProgressDialogComponent,
+		DependencyAnalyzerComponent,
+		DependentsComponent
 	],
 	providers: [
 		// Services
@@ -97,7 +108,8 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		ManufacturerService,
 		ModelService,
 		ArchitectureGraphService,
-		DependencyAnalyzerService
+		DependencyAnalyzerService,
+		ProviderService
 	],
 	exports: [
 		AssetShowComponent,
@@ -109,7 +121,12 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		TaskCommentDialogComponent,
 		TaskCommentComponent,
 		TaskActionsComponent,
-		TaskActionSummaryComponent
+		TaskActionSummaryComponent,
+		RegenerateComponent,
+		DependencyGroupStatusComponent,
+		RegenerateProgressDialogComponent,
+		TaskActionSummaryComponent,
+		DependentsComponent
 	],
 	entryComponents: [
 		AssetShowComponent,
@@ -128,7 +145,10 @@ import {DependencyAnalyzerComponent} from './components/dependency-analyzer/depe
 		ModelDeviceEditComponent,
 		ModelDeviceShowComponent,
 		AssetCloneComponent,
-		TaskActionSummaryComponent
+		TaskActionSummaryComponent,
+		RegenerateComponent,
+		DependencyGroupStatusComponent,
+		RegenerateProgressDialogComponent
 	]
 })
 

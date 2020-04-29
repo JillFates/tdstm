@@ -9,7 +9,8 @@ const INDETERMINATE_ATTRIBUTE = 'indeterminate';
 	selector: 'tds-indeterminate-checkbox',
 	template: `
         <div class="tds-indeterminate-checkbox">
-			<clr-checkbox-wrapper class="inline">
+			<clr-checkbox-wrapper class="inline"
+			       [ngClass]="{'is-indeterminate-state': currentState === CheckBoxStatesEnum.indeterminate }">
                     <input
                         clrCheckbox
                         type="checkbox"
@@ -32,6 +33,7 @@ export class TDSIndeterminateCheckboxComponent implements OnInit {
 	@ViewChild('tdsCheckbox', {static: false}) tdsCheckbox: ElementRef;
 	private currentState: CheckboxStates;
 	private transitionHandler: Function;
+	public CheckBoxStatesEnum = CheckboxStates;
 
 	ngOnInit() {
 		this.setStateSubject
