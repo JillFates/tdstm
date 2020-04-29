@@ -17,7 +17,8 @@
 									</td>
 									<td class="valueNW description-container" colspan="4">
 										<div class="validated-field">
-											<input type="text" name="comment" class="comment" [(ngModel)]="model.comment" required #taskCreateCommentInput>
+											<input type="text" name="comment" class="comment" [(ngModel)]="model.comment" required
+														 #taskCreateCommentInput>
 											<div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
 										</div>
 									</td>
@@ -169,9 +170,10 @@
 										<div class="validated-field">
 											<input type="text" name="instructionLink"
 														 #instructionLink="ngModel"
-														 (change)="validateLabelURL($event.target.value)"
-														 placeholder="Enter URL or Label|URL"
-														 [(ngModel)]="model.instructionLink"/>
+														 (keyup)="validateLabelURL($event.target.value)"
+														 [placeholder]="'Enter URL or Label|URL'"
+														 [(ngModel)]="model.instructionLink"
+														 [ngClass]="{'ng-invalid': invalidInstructionLink}"/>
 											<div class="error-message">Invalid URL</div>
 										</div>
 
@@ -516,7 +518,8 @@
 						</tr>
 					</table>
 				</tr>
-				<tr class="deps grow-container" [ngClass]="{'just-task-create-view': taskDetailModel.modal.type === modalType.CREATE}">
+				<tr class="deps grow-container"
+						[ngClass]="{'just-task-create-view': taskDetailModel.modal.type === modalType.CREATE}">
 					<td colspan="5">
 						<tds-task-notes [dataGridTaskNotesHelper]="dataGridTaskNotesHelper"
 														(create)="createNote()"></tds-task-notes>

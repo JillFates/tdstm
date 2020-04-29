@@ -83,6 +83,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	private destroySubject: Subject<any> = new Subject<any>();
 	public taskViewType: string;
 	private taskDetailModel: TaskDetailModel;
+	invalidInstructionLink = false;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -545,7 +546,8 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	public isFormInvalid(): boolean {
 		const { form = null } = this.taskEditCreateForm || {};
 
-		return form && ((!form.valid || this.hasInvalidFields()) || !(form.dirty || this.hasModelChanges));
+		return form && ((!form.valid || this.hasInvalidFields() || this.invalidInstructionLink)
+			|| !(form.dirty || this.hasModelChanges));
 	}
 
 	/**
@@ -562,16 +564,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	 * @returns {boolean}
 	 */
 	protected validateLabelURL(labelURL: string): void {
-		let isEmpty = false;
-
-		if (!labelURL) {
-			isEmpty = true
-		}
-
-		const errors = (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect': true} : null;
-		if (this.taskEditCreateForm.form) {
-			this.taskEditCreateForm.form.controls['instructionLink'].setErrors(errors);
-		}
+		this.invalidInstructionLink = labelURL && !ValidationUtils.isValidLabelURL(labelURL);
 	}
 
 	/**
