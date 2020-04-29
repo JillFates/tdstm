@@ -291,7 +291,7 @@ export class ArchitectureGraphComponent implements OnInit {
 				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 				.subscribe( (res: any) => {
 					this.currentNodesData = res;
-					const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
+					const noLabelChecked = this.graphLabels && !this.graphLabels.filter(l => l.checked) || this.graphLabels &&  this.graphLabels.filter(l => l.checked).length < 1;
 					this.updateNodeData(this.currentNodesData, noLabelChecked);
 					if (setInitialAsset && res && res.nodes) {
 						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
@@ -582,10 +582,10 @@ export class ArchitectureGraphComponent implements OnInit {
 	onActionDispatched(data: any): void {
 		switch (data.name) {
 			case AssetActionEvent.EDIT:
-				this.onAssetEdit({name: data.name, task: data.node});
+				this.onAssetEdit({name: data.name, asset: data.node});
 				break;
 			case AssetActionEvent.VIEW:
-				this.onAssetView({name: data.name, task: data.node});
+				this.onAssetView({name: data.name, asset: data.node});
 				break;
 			case AssetActionEvent.GRAPH:
 				this.onGraph(data.node);
@@ -594,8 +594,8 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	/**
-	 * Show the asset popup detail.
-	 * @param data: ITaskEvent
+	 * Show the asset edit modal.
+	 * @param data: any
 	 */
 	onAssetEdit(data: any): void {
 		const asset = data.asset;
@@ -606,6 +606,7 @@ export class ArchitectureGraphComponent implements OnInit {
 				data: {
 					assetId: asset.id,
 					assetClass: asset.assetClass,
+					onCloseOpenDetailView: false,
 					assetExplorerModule: AssetExplorerModule
 				},
 				modalConfiguration: {
@@ -614,13 +615,17 @@ export class ArchitectureGraphComponent implements OnInit {
 					modalSize: ModalSize.CUSTOM,
 					modalCustomClass: 'custom-asset-modal-dialog'
 				}
-			}).subscribe();
+			}).subscribe(res => {
+				if (res && res.id) {
+					this.graph.updateNode(res);
+				}
+			});
 		}
 	}
 
 	/**
-	 * Show the asset popup detail.
-	 * @param data: ITaskEvent
+	 * Show the asset detail modal.
+	 * @param data: any
 	 */
 	onAssetView(data: any): void {
 		const asset = data.asset;
@@ -639,7 +644,11 @@ export class ArchitectureGraphComponent implements OnInit {
 					modalSize: ModalSize.CUSTOM,
 					modalCustomClass: 'custom-asset-modal-dialog'
 				}
-			}).subscribe();
+			}).subscribe(update => {
+				if (update) {
+					this.graph.updateNode(update);
+				}
+			});
 		}
 	}
 
@@ -648,14 +657,26 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param data: ITaskEvent
 	 */
 	onGraph(data: any): void {
-		const asset = data.asset;
+		const asset = data;
 		const assetDataSource = this.assetComboBox && this.assetComboBox.datasource;
 		if (assetDataSource.length > 1 && assetDataSource.includes(a => a.id === asset.id)) {
 			this.assetId = asset.id;
 			this.selectedAsset = asset;
 			this.loadData();
 			this.form.controls['assetClass'].markAsDirty();
+		} else {
+			this.assetId = asset.id;
+			this.loadData(true);
+			this.form.controls['assetClass'].markAsDirty();
 		}
+	}
+
+	/**
+	 * Asset node double click handler
+	 * @param asset
+	 */
+	onNodeDoubleClick(asset: any): void {
+		this.onGraph(asset);
 	}
 
 	@HostListener('window:beforeunload', ['$event'])
