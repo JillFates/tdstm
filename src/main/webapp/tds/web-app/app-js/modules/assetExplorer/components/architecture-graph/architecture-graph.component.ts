@@ -620,7 +620,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	}
 
 	/**
-	 * Subscribe to events with the notifierService
+	 * Handle context menu actions
 	 */
 	onActionDispatched(data: any): void {
 		switch (data.name) {
