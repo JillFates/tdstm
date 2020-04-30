@@ -45,11 +45,13 @@ export interface TaskActionsOptions {
       <tds-button *ngIf="showNeighborhood()" (click)="onNeighborhood()" [icon]="displayAsButtons ? 'align-left' : ''">
       	Neighborhood
 			</tds-button>
-			<a *ngIf="showInstructionsLink && taskActionInfoModel && taskActionInfoModel.instructionsLinkURL"
-				 (click)="onInstructionsLink()" [href]="taskActionInfoModel.instructionsLinkURL" target="_blank"
-				 class="btn" [ngClass]="buttonClass" type="button" title="Instructions">
-								<i class="fa fa-file"></i> <span>{{taskActionInfoModel.instructionsLinkLabel ? taskActionInfoModel.instructionsLinkLabel : 'Instruction Link'}}</span>
-			</a>
+			<div class="inline">
+				<a *ngIf="showInstructionsLink && taskActionInfoModel && taskActionInfoModel.instructionsLinkURL"
+					 (click)="onInstructionsLink()" [href]="taskActionInfoModel.instructionsLinkURL" target="_blank"
+					 class="btn" [ngClass]="buttonClass" type="button" title="Instructions">
+					<i class="fa fa-file"></i> <span>{{taskActionInfoModel.instructionsLinkLabel ? taskActionInfoModel.instructionsLinkLabel : 'Instruction Link'}}</span>
+				</a>
+			</div>
      	<div *ngIf="showDelayActions && showDelay()"
 					 class="task-action-buttons">
 				<label class="delay">Delay for:</label>
