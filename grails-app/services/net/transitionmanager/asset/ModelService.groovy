@@ -513,9 +513,6 @@ class ModelService implements ServiceMethods {
 	Model createOrUpdateModel(Project project, ModelCommand modelCommand) {
 		Model model = (Model) GormUtil.populateDomainFromCommand(project, Model, modelCommand.id, modelCommand, null, true)
 
-		// Firts validate name with Manufacturer
-		validateModelName(model.modelName, model.id, model.manufacturer.id)
-
 		if (modelCommand.powerType && modelCommand.powerType.equalsIgnoreCase('Amps')) {
 			model.powerNameplate = NumberUtil.toInteger(model.powerNameplate, 0) * 120
 			model.powerDesign = NumberUtil.toInteger(model.powerDesign, 0) * 120
@@ -561,8 +558,8 @@ class ModelService implements ServiceMethods {
 				label = connectorInfo.label
 				type = connectorInfo.type
 				labelPosition = connectorInfo.labelPosition
-				connectorPosX = connectorInfo.xPosition
-				connectorPosY = connectorInfo.yPosition
+				connectorPosX = connectorInfo.connectorPosX
+				connectorPosY = connectorInfo.connectorPosY
 				connector = connectorInfo.connector
 			}
 
@@ -579,6 +576,7 @@ class ModelService implements ServiceMethods {
 	 * @param model
 	 * @param modelCommand
 	 */
+	@Transactional
 	private void deleteConnectors(Model model, ModelCommand modelCommand) {
 		if (modelCommand.connectors?.deleted) {
 			List<Long> connectorIds = modelCommand.connectors.deleted.collect { Map connectorInfo -> connectorInfo.id}
@@ -608,7 +606,7 @@ class ModelService implements ServiceMethods {
 				modelAlias = new ModelAlias([model: model])
 			}
 			modelAlias.with {
-				manufacturer = model.manufacturer
+				manufacturer = modelCommand.manufacturer
 				name = akaInfo.name
 			}
 			modelAlias.save()
@@ -620,6 +618,7 @@ class ModelService implements ServiceMethods {
 	 * @param model
 	 * @param modelCommand
 	 */
+	@Transactional
 	private void deleteAkas(Model model, ModelCommand modelCommand) {
 		if (modelCommand.aka?.deleted) {
 			List<Long> akaIds = modelCommand.aka.deleted.collect { Map akaInfo -> akaInfo.id}
