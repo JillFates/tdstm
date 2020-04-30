@@ -17,7 +17,8 @@
 									</td>
 									<td class="valueNW description-container" colspan="4">
 										<div class="validated-field">
-											<input type="text" name="comment" class="comment" [(ngModel)]="model.comment" required>
+											<input type="text" name="comment" class="comment" [(ngModel)]="model.comment" required
+														 #taskCreateCommentInput>
 											<div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
 										</div>
 									</td>
@@ -169,9 +170,10 @@
 										<div class="validated-field">
 											<input type="text" name="instructionLink"
 														 #instructionLink="ngModel"
-														 (change)="validateLabelURL($event.target.value)"
-														 placeholder="Enter URL or Label|URL"
-														 [(ngModel)]="model.instructionLink"/>
+														 (keyup)="validateLabelURL($event.target.value)"
+														 [placeholder]="'Enter URL or Label|URL'"
+														 [(ngModel)]="model.instructionLink"
+														 [ngClass]="{'ng-invalid': invalidInstructionLink}"/>
 											<div class="error-message">Invalid URL</div>
 										</div>
 
@@ -274,33 +276,6 @@
 										</div>
 									</td>
 								</tr>
-
-								<tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop just-task-edit-view">
-									<td class="N edge-cell" nowrap="nowrap">
-										<label>Actual Start</label>
-									</td>
-
-									<td class="valueNW">
-										<span class="read-only-dates">{{model.actualStart}}</span>
-									</td>
-
-									<td class="N edge-cell" nowrap="nowrap">
-										<label>Actual Finish</label>
-									</td>
-
-									<td class="valueNW">
-										<span class="read-only-dates">{{model.actualFinish}}</span>
-									</td>
-
-									<td class="N edge-cell" nowrap="nowrap">
-										<label>TaskSpec ID</label>
-									</td>
-
-									<td class="valueNW">
-										<span class="read-only-dates">{{model.taskSpec}}</span>
-									</td>
-								</tr>
-
 								<tr *ngIf="!collapsedTaskDetail" class="prop">
 									<td class="N status-cell" nowrap="nowrap">
 										<label>Status</label>
@@ -318,13 +293,23 @@
 											[(ngModel)]="model.status">
 										</kendo-dropdownlist>
 									</td>
-									<td colspan="4"></td>
+									<td class="N edge-cell" nowrap="nowrap">
+										<label>Actual Start</label>
+									</td>
+									<td class="valueNW">
+										<span class="read-only-dates">{{model.actualStart}}</span>
+									</td>
+									<td class="N edge-cell" nowrap="nowrap">
+										<label>Actual Finish</label>
+									</td>
+									<td class="valueNW">
+										<span class="read-only-dates">{{model.actualFinish}}</span>
+									</td>
 								</tr>
 								<tr *ngIf="!collapsedTaskDetail" class="prop">
 									<td class="N edge-cell" nowrap="nowrap">
 										<label>Completion %</label>
 									</td>
-
 									<td class="valueNW completion">
 										<tds-number-control
 											name="percentageComplete"
@@ -335,9 +320,22 @@
 											[max]="100">
 										</tds-number-control>
 									</td>
-
-									<td></td>
-									<td></td>
+									<td class="N" nowrap="nowrap"
+											*ngIf="taskDetailModel.modal.type === MODAL_TYPE.EDIT">
+										<label>Actual Duration</label>
+									</td>
+									<td class="valueNW"
+											*ngIf="taskDetailModel.modal.type === MODAL_TYPE.EDIT">
+										<span>{{model.actualDuration}}</span>
+									</td>
+									<td class="N" nowrap="nowrap"
+											*ngIf="taskDetailModel.modal.type === MODAL_TYPE.EDIT">
+										<label>Duration Delta</label>
+									</td>
+									<td class="valueNW"
+											*ngIf="taskDetailModel.modal.type === MODAL_TYPE.EDIT">
+										<span>{{model.durationDelta}}</span>
+									</td>
 								</tr>
 								</tbody>
 							</table>
@@ -516,7 +514,8 @@
 						</tr>
 					</table>
 				</tr>
-				<tr class="deps grow-container" [ngClass]="{'just-task-create-view': taskDetailModel.modal.type === modalType.CREATE}">
+				<tr class="deps grow-container"
+						[ngClass]="{'just-task-create-view': taskDetailModel.modal.type === modalType.CREATE}">
 					<td colspan="5">
 						<tds-task-notes [dataGridTaskNotesHelper]="dataGridTaskNotesHelper"
 														(create)="createNote()"></tds-task-notes>

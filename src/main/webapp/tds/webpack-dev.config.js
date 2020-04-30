@@ -4,7 +4,6 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const CopyPlugin = require('copy-webpack-plugin');
 let AngularCompilerPlugin = require( "@ngtools/webpack" ).AngularCompilerPlugin;
 let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
@@ -18,6 +17,7 @@ module.exports = function (env) {
 		entry: {
 			app: './web-app/app-js/main.ts',
 			polyfills: './web-app/app-js/polyfills.ts',
+			'custom-elements.min': './web-app/assets/modules/webcomponents/js/custom-elements.min.js'
 		},
 		output: {
 			path: path.resolve(__dirname, './web-app/dist/'),
@@ -49,20 +49,12 @@ module.exports = function (env) {
 			}
 		},
 		plugins: [
-			new CopyPlugin([
-				{ from: 'web-app/assets/modules/clarity/js/clr-icons.min.js', to: 'clr-icons.min.js'},
-				{ from: 'web-app/assets/modules/webcomponents/js/custom-elements.min.js', to: 'custom-elements.min.js'}
-			]),
 			new webpack.DefinePlugin({
 				NODE_ENV: '"development"'
 			}),
 			new webpack.SourceMapDevToolPlugin({
 				filename: '[file].map',
 				exclude: ['vendor.js', 'polyfills.js']
-			}),
-			new webpack.SourceMapDevToolPlugin({
-				filename: '[file].map',
-				include: ['custom-elements.min.js']
 			}),
 			new AngularCompilerPlugin({
 				tsConfigPath: 'tsconfig.json',

@@ -158,6 +158,9 @@ class Project extends PartyGroup {
 			id                   : id,
 			name                 : name,
 			projectCode          : projectCode,
+			description			 : description,
+			comment				 : comment,
+			planMethodology		 : planMethodology,
 			defaultBundle        : [
 				id  : defaultBundle?.id,
 				name: defaultBundle?.name

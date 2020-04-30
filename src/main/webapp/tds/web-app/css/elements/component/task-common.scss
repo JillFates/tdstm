@@ -10,21 +10,12 @@
   .task-common {
     .just-task-create-view,
     .just-task-edit-view {
-      display: none;
+      display: none !important;
     }
 
     .task-create-view {
       .just-task-create-view {
         display: initial;
-      }
-    }
-
-    .task-edit-view {
-      .just-task-edit-view {
-        display: initial;
-      }
-      tr.just-task-edit-view {
-        display: table-row;
       }
     }
 

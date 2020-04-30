@@ -1,24 +1,38 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {
+	Component,
+	ComponentFactoryResolver,
+	HostListener,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import {ITdsContextMenuOption} from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {Observable, ReplaySubject} from 'rxjs';
+import {tap} from 'rxjs/operators';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Diagram, Layout, Link, Spot} from 'gojs';
+import {Diagram, Layout, Link, Node} from 'gojs';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {IArchitectureGraphParams} from '../../model/url-params.model';
 import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 import {
-	ComboBoxSearchResultModel,
-	RESULT_PER_PAGE
+	ComboBoxSearchResultModel
 } from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {NgForm} from '@angular/forms';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetShowComponent} from '../asset/asset-show.component';
+import {AssetExplorerModule} from '../../asset-explorer.module';
+import {DialogService, ModalSize} from 'tds-component-library';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AssetActionEvent} from '../../model/asset-action-event.constant';
+import {TDSComboBoxComponent} from '../../../../shared/components/combo-box/combobox.component';
+import {AssetEditComponent} from '../asset/asset-edit.component';
 
 declare var jQuery: any;
 
@@ -30,6 +44,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	// References
 	@ViewChild('graph', {static: false}) graph: any;
 	@ViewChild('archGraphForm', { static: false }) protected form: NgForm;
+	@ViewChild('assetComboBox', { static: false }) assetComboBox: TDSComboBoxComponent;
 
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
@@ -66,6 +81,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	public assetIconsPath = ASSET_ICONS;
 	public toggleFullScreen = true;
 	public selectedAsset = null;
+	public taskCycles: number[][];
 
 	public assetItem;
 	private TAG_APPLICATION = 'appLbl';
@@ -135,6 +151,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			checked: false
 		}
 	];
+	unsubscribe$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private userContextService: UserContextService,
@@ -142,26 +159,31 @@ export class ArchitectureGraphComponent implements OnInit {
 		private architectureGraphService: ArchitectureGraphService,
 		private assetExplorerService: AssetExplorerService,
 		private sanitized: DomSanitizer,
-		private preferenceService: PreferenceService
+		private preferenceService: PreferenceService,
+		private dialogService: DialogService,
+		private notifierService: NotifierService,
+		private permissionService: PermissionService,
+		private componentFactoryResolver: ComponentFactoryResolver
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
 		this.getAssetList = this.listAssets.bind(this);
-		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
+		this.userContextService.getUserContext().subscribe(res => this.userContext = res);
+		this.assetClass = this.initialAssetClass;
 	}
 
 	ngOnInit(): void {
-		this.assetClass = this.initialAssetClass;
+		this.showCycles = false;
 		let assetId = null;
 		let levelsUp = null;
 		let levelsDown = null;
 
 		// If it comes from asset explorer
 		if (this.urlParams && this.urlParams.assetId) {
-			this.assetId = this.urlParams.assetId;
+			this.assetId = parseInt(this.urlParams.assetId.toString(), 10);
 			assetId = this.assetId;
 			levelsUp = this.urlParams.levelsUp;
 			levelsDown = this.urlParams.levelsDown;
-			this.loadData(true);
+			this.refreshData(true);
 		}
 		this.getArchitectureGraphPreferences(assetId, levelsUp, levelsDown);
 		this.initSearchModel();
@@ -202,7 +224,7 @@ export class ArchitectureGraphComponent implements OnInit {
 				} else {
 					this.assetClass = this.initialAssetClass;
 				}
-				this.loadData();
+				this.refreshData(false);
 
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_APPLICATION);
 				this.markAsPreferenceChecked(res.graphPrefs, this.TAG_DATABASE);
@@ -251,7 +273,7 @@ export class ArchitectureGraphComponent implements OnInit {
 			this.assetId = event.id;
 			this.selectedAsset = event;
 			// this.asset = event;
-			this.loadData();
+			this.refreshData(false);
 		} else {
 			// reset assets selected
 			this.assetId = null;
@@ -266,29 +288,50 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Optionally accepts a flag to set the current selected asset
 	 * @param setInitialAsset When true set the initial value for the selected asset
 	 * */
-	loadData(setInitialAsset = false): void {
+	loadData(setInitialAsset = false): Observable<any> {
 		if (this.assetId) {
-			this.architectureGraphService
-				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
-				.subscribe( (res: any) => {
-					this.currentNodesData = res;
-					const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
-					this.updateNodeData(this.currentNodesData, noLabelChecked);
-					if (setInitialAsset && res && res.nodes) {
-						const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
-						if (selectedAsset) {
-							this.selectedAsset = {
-								id: selectedAsset.id,
-								text: selectedAsset.name,
-							};
-							// this.asset = {
-							// 	id: selectedAsset.id,
-							// 	text: selectedAsset.name,
-							// };
+			return this.architectureGraphService
+				.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode, this.showCycles)
+				.pipe(
+					tap((res: any) => {
+						this.currentNodesData = res;
+						this.taskCycles = res.cycles || [];
+						const noLabelChecked = !this.graphLabels.filter(l => l.checked) || this.graphLabels.filter(l => l.checked).length < 1;
+						this.updateNodeData(this.currentNodesData, noLabelChecked);
+						if (setInitialAsset && res && res.nodes) {
+							const selectedAsset = res.nodes.find((item: any) => item.id === res.assetId);
+							if (selectedAsset) {
+								this.selectedAsset = {
+									id: selectedAsset.id,
+									text: selectedAsset.name,
+								};
+							}
 						}
-					}
-				});
+					})
+				)
+		} else {
+			return Observable.of(null);
 		}
+	}
+
+	/**
+	 * highlight nodes by cycles
+	 **/
+	highlightCycles(): void {
+		if ((this.taskCycles && this.taskCycles.length > 0) && this.showCycles) {
+			const cycles = [];
+			this.taskCycles.forEach(arr => cycles.push(...arr));
+			this.graph.highlightNodes((n: Node) => cycles && cycles.includes(n.data.id), false);
+		} else {
+			this.graph.clearHighlights();
+		}
+	}
+
+	/**
+	 * Update the info changing the state for the show cycles checkbox
+	 */
+	onToggleShowCycles() {
+		this.refreshData();
 	}
 
 	/**
@@ -308,26 +351,39 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (this.levelsUp > 0) {
 			this.levelsUp--;
 			this.form.controls.levelsUp.markAsDirty();
-			this.loadData();
+			this.refreshData();
 		}
+	}
+
+	/**
+	 * Refresh the data getting the information from the endpoint
+	 * * @param setInitialAsset Allow set passing the initial asset to standout
+	 */
+	refreshData(setInitialAsset = false): void {
+		this.loadData(setInitialAsset)
+			.subscribe()
 	}
 
 	/**
 	 * Adds the levels up of the graph and reload the data
 	 */
 	addLevelsUp() {
-		this.levelsUp++;
-		this.form.controls.levelsUp.markAsDirty();
-		this.loadData();
+		if (this.levelsUp < 10) {
+			this.levelsUp++;
+			this.form.controls.levelsUp.markAsDirty();
+			this.refreshData();
+		}
 	}
 
 	/**
 	 * Reduces the levels down of the graph and reload the data
 	 */
 	addLevelsDown() {
-		this.levelsDown++;
-		this.form.controls.levelsDown.markAsDirty();
-		this.loadData();
+		if (this.levelsDown < 10) {
+			this.levelsDown++;
+			this.form.controls.levelsDown.markAsDirty();
+			this.refreshData();
+		}
 	}
 
 	/**
@@ -337,7 +393,7 @@ export class ArchitectureGraphComponent implements OnInit {
 		if (this.levelsDown > 0) {
 			this.levelsDown--;
 			this.form.controls.levelsDown.markAsDirty();
-			this.loadData();
+			this.refreshData();
 		}
 	}
 
@@ -423,7 +479,8 @@ export class ArchitectureGraphComponent implements OnInit {
 		const categories = this.getSelectedCategories() // this.categories || [];
 					.map( label => label.value.toUpperCase());
 
-		clonedNodes.nodes.forEach(node => {
+		const nodes = clonedNodes.nodes || [];
+		nodes.forEach(node => {
 			// Clear the node name if the assetClass is not included on the categories selected
 			if (node.assetClass === 'DEVICE' /*|| node.assetClass === 'STORAGE'*/) {
 				const type = node.type.toLowerCase();
@@ -469,11 +526,17 @@ export class ArchitectureGraphComponent implements OnInit {
 	 */
 	updateNodeData(data, iconsOnly) {
 		const clonedData = this.removeNodeNamesForNotSelectedCategories(data);
-		const diagramHelper = new ArchitectureGraphDiagramHelper();
+		const diagramHelper = new ArchitectureGraphDiagramHelper(
+			this.permissionService,
+			{
+				currentUser: this.userContext && this.userContext.person,
+				taskCount: this.currentNodesData && this.currentNodesData.length,
+				cycles: this.taskCycles || []
+			});
 
 		this.data$.next(diagramHelper.diagramData({
 			rootAsset: this.assetId,
-			currentUserId: 1,
+			currentUserId: (this.userContext && this.userContext.person) && this.userContext.person.id,
 			data: clonedData,
 			iconsOnly: iconsOnly,
 			extras: {
@@ -487,7 +550,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Generate the graph with the current data
 	 */
 	regenerateGraph() {
-		this.loadData();
+		this.refreshData();
 		this.graph.showFullGraphBtn = false;
 		this.graph.nodeMove = false;
 	}
@@ -554,6 +617,115 @@ export class ArchitectureGraphComponent implements OnInit {
 			el.checked = false;
 		});
 		this.updateNodeData(this.currentNodesData, true);
+	}
+
+	/**
+	 * Handle context menu actions
+	 */
+	onActionDispatched(data: any): void {
+		switch (data.name) {
+			case AssetActionEvent.EDIT:
+				this.onAssetEdit({name: data.name, asset: data.node});
+				break;
+			case AssetActionEvent.VIEW:
+				this.onAssetView({name: data.name, asset: data.node});
+				break;
+			case AssetActionEvent.GRAPH:
+				this.onGraph(data.node);
+				break;
+		}
+	}
+
+	/**
+	 * Show the asset edit modal.
+	 * @param data: any
+	 */
+	onAssetEdit(data: any): void {
+		const asset = data.asset;
+		if (asset  && asset.id) {
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetEditComponent,
+				data: {
+					assetId: asset.id,
+					assetClass: asset.assetClass,
+					onCloseOpenDetailView: false,
+					assetExplorerModule: AssetExplorerModule
+				},
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe(update => {
+				if (update && update.data) {
+					this.refreshData();
+				}
+			});
+		}
+	}
+
+	/**
+	 * Show the asset detail modal.
+	 * @param data: any
+	 */
+	onAssetView(data: any): void {
+		const asset = data.asset;
+		if (asset  && asset.id) {
+			this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: AssetShowComponent,
+				data: {
+					assetId: asset.id,
+					assetClass: asset.assetClass,
+					assetExplorerModule: AssetExplorerModule
+				},
+				modalConfiguration: {
+					title: 'Asset',
+					draggable: true,
+					modalSize: ModalSize.CUSTOM,
+					modalCustomClass: 'custom-asset-modal-dialog'
+				}
+			}).subscribe(update => {
+				if (update && update.data) {
+					this.refreshData()
+				}
+			});
+		}
+	}
+
+	/**
+	 * Show the asset popup detail.
+	 * @param data: ITaskEvent
+	 */
+	onGraph(data: any): void {
+		const asset = data;
+		const assetDataSource = this.assetComboBox && this.assetComboBox.datasource;
+		if (assetDataSource.length > 1 && assetDataSource.includes(a => a.id === asset.id)) {
+			this.assetId = asset.id;
+			this.selectedAsset = asset;
+			this.refreshData();
+			this.form.controls['assetClass'].markAsDirty();
+		} else {
+			this.assetId = asset.id;
+			this.refreshData(true);
+			this.form.controls['assetClass'].markAsDirty();
+		}
+	}
+
+	/**
+	 * Asset node double click handler
+	 * @param asset
+	 */
+	onNodeDoubleClick(asset: any): void {
+		this.onGraph(asset);
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribe$.next();
+		this.unsubscribe$.complete();
 	}
 
 }

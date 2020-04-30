@@ -33,7 +33,9 @@
 								[(metaParam)]="assetClass && assetClass.id"
 								[required]="false"
 								(valueChange)="onAssetSelected($event)"
-								[serviceRequest]="getAssetList">
+								[serviceRequest]="getAssetList"
+								#assetComboBox
+						>
 						</tds-combobox>
 					</div>
 					<div>
@@ -54,6 +56,7 @@
 									clrCheckbox
 									type="checkbox"
 									name="showCyclesOnGraph"
+									(change)="onToggleShowCycles()"
 									id="showCyclesOnGraph"
 									class="k-checkbox"
 									[(ngModel)]="showCycles">
@@ -121,6 +124,8 @@
 							(diagramAnimationFinished)="onDiagramAnimationFinished()"
 							(backToFullGraph)="viewFullGraphFromCache()"
                             [onZoomApplyTemplates]="false"
+							(ctxMenuActionDispatched)="onActionDispatched($event)"
+							(nodeDoubleClick)="onNodeDoubleClick($event)"
 							#graph
 					></tds-lib-diagram-layout>
 				</div>

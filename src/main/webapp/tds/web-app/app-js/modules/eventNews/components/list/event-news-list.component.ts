@@ -66,7 +66,8 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 		private eventNewsService: EventNewsService,
 		private eventService: EventsService,
 		private translateService: TranslatePipe,
-		private elementRef: ElementRef
+		private elementRef: ElementRef,
+		private translatePipe: TranslatePipe
 	) {
 	}
 
@@ -136,7 +137,7 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 					openFromList: false
 				},
 				modalConfiguration: {
-					title: 'Event News',
+					title: this.translatePipe.transform('EVENT_NEWS_LIST.CREATE'),
 					draggable: true,
 					modalSize: ModalSize.MD
 				}
@@ -226,7 +227,7 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 					openFromList: openFromList
 				},
 				modalConfiguration: {
-					title: 'Event News',
+					title: this.translatePipe.transform('EVENT_NEWS_LIST.EDIT'),
 					draggable: true,
 					modalSize: ModalSize.MD
 				}

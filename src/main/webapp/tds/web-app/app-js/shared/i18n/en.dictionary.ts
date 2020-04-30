@@ -271,6 +271,10 @@ export const en_DICTIONARY: Object = {
 		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks',
 		'NEWS': 'Event News List'
 	},
+	'EVENT_NEWS_LIST': {
+		'EDIT': 'Event News Edit',
+		'CREATE': 'Event News Create'
+	},
 	'INSIGHT': {
 		'INSIGHT': 'Insight',
 		'DASHBOARD': 'Dashboard',
@@ -306,7 +310,11 @@ export const en_DICTIONARY: Object = {
 		'REGENERATE': 'Regenerate',
 		'BUNDLE': 'Bundle',
 		'TAGS': 'Tags',
-		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress'
+		'SHOW_ONLY_WIP': 'Show ONLY Work In Progress',
+		'DEPENDENCY_GROUPING_CONTROL': 'Dependency Grouping Control',
+		'CONNECTION_TYPE': 'Connection Type',
+		'SAVE_DEFAULT': 'Save as Default',
+		'CONNECTION_STATUS': 'Connection Status'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',

@@ -32,7 +32,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
 	@ViewChild('modelForm', {read: NgForm, static: true}) modelForm: NgForm;
 	@ViewChild('modelConnectorTableBody', { static: false }) d1: ElementRef;
-
+	@ViewChild('modelNameElement', {static: false}) modelNameElement: ElementRef;
 	public modelModel: ModelModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -40,11 +40,11 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	public manufacturerList;
 	public assetTypeList;
 	public sourceTDS = false;
-	public modelConnectors: Connector[] = [];
+	public removedConnectors = [];
 	public modelConnectorsControls: Connector[] = [];
 	public modelAkas;
 	public powerType: string;
-	public powerTypes = ['Amp', 'Watts'];
+	public powerTypes = ['Amps', 'Watts'];
 	public modelAkasDisplay: string;
 	public manufacturerName: string;
 	public usizeList: number[] = [];
@@ -93,7 +93,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modelModel = Object.assign({}, this.data.modelModel);
 		this.manufacturerList = this.data.manufacturerList;
 		this.modalType = this.data.actionType;
-		this.modalTitle = this.getModalTitle(this.modalType);
+		this.modalTitle = ModelViewEditComponent.getModalTitle(this.modalType);
 
 		if (this.modalType !== ActionType.CREATE) {
 			this.getModelDetails();
@@ -137,7 +137,8 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		});
 
 		setTimeout(() => {
-			this.setTitle(this.getModalTitle(this.modalType));
+			this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
+			this.onSetUpFocus(this.modelNameElement);
 		});
 	}
 
@@ -152,7 +153,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 					this.modelModel = JSON.parse(this.dataSignature);
 					this.dataSignature = JSON.stringify(this.modelModel);
 					this.modalType = this.actionTypes.VIEW;
-					this.setTitle(this.getModalTitle(this.modalType));
+					this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
 				} else if (result.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
 					this.onCancelClose();
 				}
@@ -160,7 +161,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		} else {
 			if (!this.data.openFromList) {
 				this.modalType = this.actionTypes.VIEW;
-				this.setTitle(this.getModalTitle(this.modalType));
+				this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
 			} else {
 				this.onCancelClose();
 			}
@@ -182,7 +183,6 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			.subscribe((response: any) => {
 				this.modelModel = response.data.modelInstance;
 				this.modelConnectorsControls = response.data.modelConnectors;
-				// this.modelConnectorsControls = [...this.modelConnectors];
 				this.modelAkas = response.data.modelAkas;
 				this.modelAkasDisplay = response.data.modelAkas.map(i => i.name).join(', ');
 				this.sourceTDS = this.modelModel.sourceTDS === 1;
@@ -190,7 +190,6 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 				this.manufacturerName = (manufacturer) ? manufacturer.name : '';
 				this.usizeList = response.data.usizeList;
 				this.assetTypeList = response.data.assetTypes;
-				// this.aliasControls = (this.modalType === this.actionTypes.EDIT) ? (this.modelAkas) ? this.modelAkas : [] : [];
 				this.dataSignature = JSON.stringify(this.modelModel);
 				this.userList = response.data.userList;
 				this.modelCreatedBy = response.data.modelCreatedBy.replace(/null/g, '');
@@ -284,6 +283,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 
 		this.renderer.appendChild(this.d1.nativeElement, tr);
 		this.modelForm.form.markAsDirty();
+		this.modelConnectorCount++;
 	}
 
 	/**
@@ -298,7 +298,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	 */
 	public removeAlias(index: number, itemId: number): void {
 		this.modelForm.form.markAsDirty();
-		this.aliasDeleted.push(itemId);
+		this.aliasDeleted.push({id: itemId});
 		this.aliasControls.splice(index, 1);
 
 		this.aliasSpanElements.toArray().splice(index, 1);
@@ -317,7 +317,10 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			} else {
 				const arrayItem = this.aliasAdded.find(i => i === event.target.value);
 				if (!arrayItem) {
-					this.aliasAdded.push(event.target.value);
+					const inAliasControls = this.aliasControls.find(i => i.name === event.target.value);
+					if (!inAliasControls) {
+						this.aliasAdded.push({id: 0, name: event.target.value});
+					}
 				}
 			}
 		} else {
@@ -325,7 +328,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			if (alreadyAdded) {
 				this.aliasAdded[index].name = event.target.value;
 			} else {
-				this.aliasAdded.push({id: index, name: event.target.value});
+				this.aliasAdded.push({id: 0, name: event.target.value});
 			}
 		}
 	}
@@ -335,7 +338,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	 * @param {ActionType} modalType
 	 * @returns {string}
 	 */
-	private getModalTitle(modalType: ActionType): string {
+	private static getModalTitle(modalType: ActionType): string {
 		if (modalType === ActionType.CREATE) {
 			return 'Model Create';
 		}
@@ -351,7 +354,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modalType = this.actionTypes.EDIT;
 		this.aliasPristineList = (this.modalType === this.actionTypes.EDIT) ? (this.modelAkas) ? this.modelAkas : [] : [];
 		this.aliasControls = (this.modalType === this.actionTypes.EDIT) ? (this.modelAkas) ? this.modelAkas : [] : [];
-		this.setTitle(this.getModalTitle(this.modalType));
+		this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
 	}
 
 	/**
@@ -361,9 +364,13 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.getModelConnectors();
 		this.modelModel.connectorCount = this.modelConnectorCount;
 		this.modelModel.modelConnectors = this.modelConnectorsControls;
-		this.modelModel.removedConnectors = this.modelConnectors;
+		this.modelModel.removedConnectors = (this.modalType === this.actionTypes.EDIT) ? this.removedConnectors : [];
 		this.modelModel.sourceTDS = (this.sourceTDS) ? 1 : 0;
 		this.modelModel.akaChanges = { added: this.aliasAdded, deleted: this.aliasDeleted, edited: this.aliasUpdated };
+		this.modelModel.endOfLifeDate =
+			(this.modelModel.endOfLifeDate) ?
+				DateUtils.formatDate(this.modelModel.endOfLifeDate, DateUtils.SERVER_FORMAT_DATE) :
+				'';
 		this.modelService.saveModel(this.modelModel)
 			.subscribe(
 			(result: any) => {
@@ -371,6 +378,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			},
 			err => console.log(err)
 		);
+		this.modelConnectorsControls.length = 0;
 	}
 
 	/**
@@ -421,7 +429,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	private getModelConnectors(): void {
 		const ele = this.d1.nativeElement;
 		let connectorNumber = this.modelModel.modelConnectors.length;
-		const skip = (this.modalType === ActionType.EDIT) ? this.modelConnectorCount : 0;
+		const skip = (this.modalType === ActionType.EDIT) ? this.modelConnectorsControls.length : 0;
 		let i = 0;
 		let loops = 0;
 		for (let child of ele.children) {
@@ -440,10 +448,9 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 			connector.type = child.children[i].children[0].children[0].value;
 			connector.label = child.children[i + 1].children[0].value;
 			connector.labelPosition = child.children[i + 2].children[0].children[0].value;
-			connector.connectorPosX = child.children[i + 3].children[0].value;
-			connector.connectorPosY = child.children[i + 4].children[0].value;
+			connector.connectorPosX = parseInt(child.children[i + 3].children[0].value, 10);
+			connector.connectorPosY = parseInt(child.children[i + 4].children[0].value, 10);
 
-			// this.modelConnectors.push(connector);
 			this.modelConnectorsControls.push(connector);
 		}
 	}
@@ -452,11 +459,28 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modelModel.manufacturer = event.target.value;
 	}
 
-	public removeConnector(connector: Connector): void {
+	public onRemoveConnector = async (connector: Connector): Promise<void> => {
+		this.modelService.retrieveAssetCablesForConnector(connector.connector.toString(), this.modelModel.id)
+			.subscribe((response: number) => {
+				if (response > 0) {
+					this.dialogService.confirm(
+						'Confirmation Required',
+						'WARNING: Some assets use this connector. Be sure you want to remove it before proceeding'
+					).subscribe(confirmation => {
+						if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+							this.removeConnector(connector);
+						}
+					});
+				} else {
+					this.removeConnector(connector);
+				}
+			});
+	}
+
+	private removeConnector(connector: Connector) {
 		const index = this.modelConnectorsControls.findIndex(c => c.id === connector.id);
-		this.modelConnectors.push(this.modelConnectorsControls.find(c => c.id === connector.id));
+		this.removedConnectors.push({id: parseInt(connector.id, 10)});
 		this.modelConnectorsControls.splice(index, 1);
-		// this.modelConnectors[index] = null;
 		this.modelForm.form.markAsDirty();
 		this.modelConnectorCount--;
 	}

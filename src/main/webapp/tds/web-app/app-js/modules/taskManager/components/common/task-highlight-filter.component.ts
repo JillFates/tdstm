@@ -1,22 +1,26 @@
 import {
+	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	EventEmitter,
 	HostListener,
 	Input,
-	Output, Renderer2,
+	Output,
+	Renderer2,
 	ViewChild
 } from '@angular/core';
 import {ReplaySubject} from 'rxjs';
 import {distinctUntilChanged, filter, skip, takeUntil} from 'rxjs/operators';
 import {IGraphTask} from '../../model/graph-task.model';
 import {
-	ITaskHighlightOption, ITaskHighlightQuery,
+	ITaskHighlightOption,
+	ITaskHighlightQuery,
 	TaskHighlightQueryModel
 } from '../../model/task-highlight-filter.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {TaskService} from '../../service/task.service';
 import {Collision} from '@progress/kendo-angular-popup';
+import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 
 @Component({
 	selector: 'task-highlight-filter',
@@ -81,6 +85,7 @@ import {Collision} from '@progress/kendo-angular-popup';
 					                  [class]="'highlight-tag-list-container'"
 					                  [tagList]="highlightOptions?.tags"
 					                  (valueChange)="onTagValueChange($event)"
+					                  #assetTagSelector
 	                  ></tds-asset-tag-selector>
                   </div>
                   <div class="popup-option">
@@ -122,8 +127,8 @@ import {Collision} from '@progress/kendo-angular-popup';
                       <span class="highlight-checkmark"></span>
                       With Actions requiring TMD
                   </label>
-		              <div class="popup-option">
-                      <button class="btn" (click)="tasksByQuery()">Search</button>
+		              <div class="popup-controls">
+                      <button class="btn" (click)="tasksByQuery()" [disabled]="!isValid()">Search</button>
                       <button class="btn" (click)="clearForm()">Clear</button>
 		              </div>
               </kendo-popup>
@@ -145,7 +150,8 @@ import {Collision} from '@progress/kendo-angular-popup';
                       [ngClass]="['clear-icon-button']"
                       [hidden]="!filterText || filterText.length < 1"></fa-icon>
           </div>
-      </div>`
+      </div>`,
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskHighlightFilter {
 	@Input('highlightOptions') highlightOptions: ITaskHighlightOption;
@@ -155,6 +161,7 @@ export class TaskHighlightFilter {
 	@Output() clearFilters: EventEmitter<void> = new EventEmitter();
 	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
 	@ViewChild('highlightFilterContainer', {static: false}) highlightFilterContainer: ElementRef<HTMLElement>;
+	@ViewChild('assetTagSelector', {static: false}) assetTagSelector: AssetTagSelectorComponent;
 	collision: Collision = { horizontal: 'flip', vertical: 'flip'};
 	icons = FA_ICONS;
 	filterText: string;
@@ -198,7 +205,12 @@ export class TaskHighlightFilter {
 		};
 
 		if (text || this.filterText) {
-			query['taskText'] = text || this.filterText;
+			query.taskText = text || this.filterText;
+		}
+
+		if (this.tags && this.tags.tagIds) {
+			query.tagIds = this.tags.tagIds;
+			query.tagMatch = this.tags.operator || 'ANY';
 		}
 
 		this.taskService.findTasksByQuery(query)
@@ -266,6 +278,7 @@ export class TaskHighlightFilter {
 		this.cyclicalP = false;
 		this.withActions = false;
 		this.withTmd = false;
+		this.assetTagSelector.clearTags();
 		this.clearFilters.emit();
 	}
 
@@ -297,6 +310,22 @@ export class TaskHighlightFilter {
 		if (this.filterQueryObj) {
 			this.filterQueryObj.withTmdActions = value.target.checked ? 1 : 0;
 		}
+	}
+
+	private isValid(): boolean {
+		const values = [];
+		Object.keys(this.filterQueryObj)
+			.forEach(k => {
+				const v = this.filterQueryObj[k];
+				if (k === 'assignedPersonId' && typeof v === 'number') {
+					values.push(v);
+				} else if (v) {
+					values.push(v);
+				}
+			});
+		return this.filterText && this.filterText.length > 2
+			|| values.length > 0
+			|| (this.tags && this.tags.tagIds) && this.tags.tagIds.length > 0;
 	}
 
 	@HostListener('window:beforeunload', ['$event'])
