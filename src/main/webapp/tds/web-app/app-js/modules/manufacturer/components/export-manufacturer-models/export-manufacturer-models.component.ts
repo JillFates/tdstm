@@ -43,7 +43,7 @@ import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
         <kendo-excelexport *ngIf="data" [data]="dataToExport$ | async" fileName="{{exportFileName + '.xlsx'}}" #excelExport>
             <div *ngIf="columns">
                 <kendo-excelexport-column *ngFor="let column of columns" [field]="column.name" [title]="column.title"
-                                          [locked]="column.locked" [cellOptions]="column.cell">
+                                          [locked]="column.locked" [width]="column.width">
                 </kendo-excelexport-column>
             </div>
         </kendo-excelexport>
@@ -80,7 +80,7 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 			name: 'close',
 			icon: 'export',
 			text: 'Export',
-			show: () => true,
+			show: () => !!this.exportFileName,
 			type: DialogButtonType.CONTEXT,
 			action: this.export.bind(this)
 		});
@@ -92,19 +92,30 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 		}
 	}
 
-	loadAll(): void {
-		this.data.manufacturerExportModel.loadData().then(res => {
-			this.dataToExport$.next(res);
-		}).catch(err => console.error('Error loading manufacturers: ', err));
-		this.columns = this.data.manufacturerExportModel.columnModel;
-	}
-
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes) {
 			if (changes.data && !changes.firstChange) {
 				this.loadAll();
 			}
 		}
+	}
+
+	loadAll(): void {
+		this.createColumnsModel(this.data.manufacturerExportModel.columnModel);
+		this.data.manufacturerExportModel.loadData().then(res => {
+			this.dataToExport$.next(res);
+		}).catch(err => console.error('Error loading manufacturers: ', err));
+	}
+
+	createColumnsModel(data: any): void {
+		data.forEach(c => {
+			this.columns.push({
+				name: c.property,
+				title: c.label,
+				width: c.width,
+				locked: false
+			});
+		});
 	}
 
 	updateCheckboxValue(checked: any): void {
