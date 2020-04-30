@@ -1,19 +1,19 @@
-import {DialogConfirmAction, DialogService} from 'tds-component-library';
-/**
- * Structure does not allows to introduce other base Modules
- * So this is not in the Asset Explorer Module and belongs here instead.
- */
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DataGridOperationsHelper, RecordState} from '../../utils/data-grid-operations.helper';
-import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
-import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
-import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
-import {DEPENDENCY_TYPE} from './model/support-depends.model';
-import * as R from 'ramda';
-import {Observable} from 'rxjs';
-import {UIDialogService} from '../../services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver, EventEmitter, Input, OnInit, Output} from '@angular/core';
+// Component
 import {AssetComment} from '../dependent-comment/model/asset-coment.model';
 import {DependentCommentComponent} from '../dependent-comment/dependent-comment.component';
+// Model
+import {DialogConfirmAction, DialogExit, DialogService, ModalSize} from 'tds-component-library';
+import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
+import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
+import {DEPENDENCY_TYPE} from './model/support-depends.model';
+// Service
+import {DataGridOperationsHelper, RecordState} from '../../utils/data-grid-operations.helper';
+import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
+// Other
+import * as R from 'ramda';
+import {Observable} from 'rxjs';
 
 declare var jQuery: any;
 
@@ -45,7 +45,10 @@ export class SupportsDependsComponent implements OnInit {
 	public baseSupportsGridTabIndex = 449;
 	public baseDependentGridTabIndex = 650;
 
-	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService, private tdsDialogService: DialogService) {
+	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private assetExplorerService: AssetExplorerService,
+		private dialogService: DialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
 	}
 
@@ -271,7 +274,7 @@ export class SupportsDependsComponent implements OnInit {
 	 * Confirm before delete
 	 * **/
 	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper, dependencyType: DEPENDENCY_TYPE): void {
-		this.tdsDialogService.confirm(
+		this.dialogService.confirm(
 			'Confirm Delete',
 			'Please confirm delete of this record. This action cannot be undone.'
 		).subscribe(
@@ -308,22 +311,32 @@ export class SupportsDependsComponent implements OnInit {
 	 * Open the Dialog to Edit/Add a comment
 	 * @param dataItem
 	 */
-	public onAddEditComment(dataItem: any): void {
+	public async onAddEditComment(dataItem: any): Promise<void> {
 		let assetComment: AssetComment = {
 			comment: dataItem.comment,
-			dialogTitle: dataItem.assetDepend.text + ' (' + dataItem.dependencyType + ')'
+			dialogTitle: 'Comment for ' + dataItem.assetDepend.text + ' (' + dataItem.dependencyType + ')'
 		};
-		this.dialogService.extra(DependentCommentComponent,
-			[UIDialogService,
-				{
-					provide: AssetComment,
-					useValue: assetComment
+
+		try {
+			const result = await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: DependentCommentComponent,
+				data: {
+					assetComment: assetComment
+				},
+				modalConfiguration: {
+					title: assetComment.dialogTitle,
+					draggable: true,
+					modalSize: ModalSize.MD
 				}
-			], false, false)
-			.then((result) => {
+			}).toPromise();
+			if (result.status === DialogExit.ACCEPT) {
 				dataItem.comment = result.comment;
 				this.updateRecordState(dataItem);
-			}).catch((error) => console.log(error));
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
