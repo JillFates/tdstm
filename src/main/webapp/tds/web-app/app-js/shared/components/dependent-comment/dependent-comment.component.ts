@@ -1,5 +1,5 @@
 // Angular
-import {Component, ViewChild, OnInit} from '@angular/core';
+import {Component, ViewChild, OnInit, ElementRef} from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
 import {AssetComment} from './model/asset-coment.model';
@@ -16,6 +16,7 @@ import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-
                         <div class="col-md-12">
                             <div class="form-group">
 								<textarea
+                                        #dependentComment
                                         clrTextarea
                                         required
                                         rows="15"
@@ -34,6 +35,7 @@ import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-
 })
 export class DependentCommentComponent extends Dialog implements OnInit {
 	@ViewChild('dependentForm', {static: false}) dependentForm: NgForm;
+	@ViewChild('dependentComment', {static: false}) dependentComment: ElementRef;
 
 	public assetCommentModel: AssetComment = null;
 
@@ -62,6 +64,10 @@ export class DependentCommentComponent extends Dialog implements OnInit {
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
+		});
+
+		setTimeout(() => {
+			super.onSetUpFocus(this.dependentComment);
 		});
 	}
 
