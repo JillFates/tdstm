@@ -17,13 +17,13 @@ export class ModelColumnModel {
 				label: 'Manufacturer',
 				property: 'manufacturer',
 				filterType: FilterType.text,
-				width: 'auto',
+				width: 200,
 			},
 			{
 				label: 'Description',
 				property: 'description',
 				filterType: FilterType.text,
-				width: 'auto',
+				width: 200,
 			},
 			{
 				label: 'Asset Type',
@@ -42,7 +42,7 @@ export class ModelColumnModel {
 				label: 'No Of Connectors',
 				property: 'connectors',
 				filterType: FilterType.number,
-				width: 150,
+				width: 170,
 			},
 			{
 				label: 'Assets',
@@ -60,7 +60,7 @@ export class ModelColumnModel {
 				label: 'Source TDS',
 				property: 'sourceTDS',
 				filterType: FilterType.number,
-				width: 100,
+				width: 140,
 			},
 			{
 				label: 'Model Status',
@@ -97,7 +97,7 @@ export class ModelModel {
 	storageSize?: number;
 	sourceURL?: string;
 	productLine?: string;
-	endOfLifeDate?: Date;
+	endOfLifeDate?: string;
 	powerUse = 0;
 	powerNameplate = 0;
 	powerDesign = 0;
@@ -107,7 +107,8 @@ export class ModelModel {
 	updatedBy?: string;
 	createdBy?: string;
 	modelConnectors: Connector[] = [];
-	removedConnectors: Connector[] = [];
+	removedConnectors: number[] = [];
 	connectorCount?: number;
 	akaChanges?: AkaChanges;
+	useImage = 0;
 }
