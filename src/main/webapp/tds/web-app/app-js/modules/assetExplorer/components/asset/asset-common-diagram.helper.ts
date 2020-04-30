@@ -30,21 +30,22 @@ export class AssetCommonDiagramHelper {
 	 */
 	diagramData(params?: any): IDiagramData {
 		const d = this.data(params.data);
+		const isExpandable = params.extras && params.extras.isExpandable;
 		return {
 			nodeDataArray: d.nodeDataArray,
 			linkDataArray: d.linkDataArray,
 			currentUserId: params.currentUserId,
 			ctxMenuOptions: this.contextMenuOptions(),
 			nodeTemplate: params.iconsOnly ?
-				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
+				this.iconOnlyNodeTemplate({ isExpandable: isExpandable})
+				: this.nodeTemplate({ isExpandable: isExpandable }),
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: params.iconsOnly ?
-				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.lowScaleNodeTemplate(),
+				this.iconOnlyNodeTemplate({ isExpandable: isExpandable })
+				: this.nodeTemplate({ isExpandable: isExpandable }),
 			mediumScaleTemplate: params.iconsOnly ?
-				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
-				: this.mediumScaleNodeTemplate(),
+				this.iconOnlyNodeTemplate({ isExpandable: isExpandable })
+				: this.nodeTemplate({ isExpandable: isExpandable }),
 			layout: this.layout(),
 			rootNode: params.rootNode,
 			extras: params.extras
@@ -191,7 +192,7 @@ export class AssetCommonDiagramHelper {
 	layout(): Layout {
 		const diagraph = new LayeredDigraphLayout();
 		diagraph.direction = 90;
-		diagraph.layerSpacing = 100;
+		diagraph.layerSpacing = 30;
 		return diagraph;
 	}
 

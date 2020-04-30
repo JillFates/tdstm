@@ -55,3 +55,33 @@ export interface IAssetNode {
 	tooltipData?: any;
 	iconPath?: any
 }
+
+export const enum ASSET_OPTION_LABEL {
+	VIEW = 'View',
+	EDIT = 'Edit',
+	GRAPH = 'Show Graph'
+}
+
+export const ASSET_CTX_MENU_ICONS_PATH = {
+	edit: {
+		name: 'edit',
+		iconAlt: '\uf044',
+		// tslint:disable-next-line:max-line-length
+		icon: 'faEdit',
+		color: '#9e9e9e'
+	},
+	view: {
+		name: 'view',
+		iconAlt: '\uf06e',
+		// tslint:disable-next-line:max-line-length
+		icon: 'faEye',
+		color: '#9e9e9e'
+	},
+	architectureGraph: {
+		name: 'assetDetail',
+		iconAlt: '\uf1ad',
+		// tslint:disable-next-line:max-line-length
+		icon: 'faSitemap',
+		color: '#9e9e9e'
+	}
+};
