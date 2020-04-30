@@ -8,10 +8,12 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.ModelCommand
+import net.transitionmanager.command.model.ExportMgrAndModelCommand
 import net.transitionmanager.controller.PaginationObject
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.manufacturer.ManufacturerAlias
 import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelAlias
 import net.transitionmanager.model.ModelConnector
@@ -628,5 +630,28 @@ class ModelService implements ServiceMethods {
 				id in akaIds
 			}.deleteAll()
 		}
+	}
+
+	/**
+	 * Create and return a map with the models and manufacturers that should be included in the export
+	 * according to the parameters the user selected.
+	 *
+	 * @param command - command object with the options selected.
+	 * @return a map with three lists: manufacturers, models and connectors.
+	 */
+	Map getManufacturersAndModelsExportData(ExportMgrAndModelCommand command) {
+		List<Model> models = command.onlyTdsModels ? Model.findAllBySourceTDS(1) : Model.findAll()
+
+		Set<Manufacturer> manufacturers = models*.manufacturer
+
+		String connectorQuery = "FROM ModelConnector where model.sourceTDS = 1 order by model.id"
+		List<ModelConnector> connectors = command.onlyTdsModels ? ModelConnector.findAll(connectorQuery) : ModelConnector.findAll()
+
+
+		return [
+		        models: models,
+				manufacturers: manufacturers,
+				connectors: connectors
+		]
 	}
 }

@@ -1,0 +1,89 @@
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import net.transitionmanager.manufacturer.Manufacturer
+import net.transitionmanager.model.Model
+import net.transitionmanager.model.ModelConnector
+
+model {
+    Map data
+}
+
+/**
+ * Grails View plugin won't accept anything ever slightly similar to model {}.
+ * So, we tweak things around a little bit and end up doing 'model' modelToMap() instead.
+ * @param model
+ * @return
+ */
+Map modelToMap(Model model) {
+    return [
+            id: model.id,
+            name: model.modelName
+    ]
+}
+
+json {
+
+    connectors(data.connectors) { ModelConnector modelConnector ->
+        id modelConnector.id
+        connector modelConnector.connector
+        connectorPosX modelConnector.connectorPosX
+        connectorPosY modelConnector.connectorPosY
+        label modelConnector.label
+        labelPosition modelConnector.labelPosition
+        'model' modelToMap(modelConnector.model)
+        option modelConnector.option
+        status modelConnector.status
+        type modelConnector.type
+    }
+
+    manufacturers(data.manufacturers) { Manufacturer manufacturer ->
+        id manufacturer.id
+        name manufacturer.name
+        description manufacturer.description
+        aliases WebUtil.listAsMultiValueString(manufacturer.getAliases()*.name)
+    }
+
+    models(data.models) { Model model ->
+        id model.id
+        name model.modelName
+        aliases WebUtil.listAsMultiValueString(model.getAliases()*.name)
+        description model.description
+        manufacturer {
+                id model.manufacturer.id
+                name model.manufacturer.name
+        }
+        assetType model.assetType
+        bladeCount model.bladeCount
+        bladeLabelCount model.bladeLabelCount
+        bladeRows model.bladeRows
+        sourceTDS model.sourceTDS == 1 ? 'TDS' : ''
+        powerNameplate model.powerNameplate
+        powerDesign model.powerDesign
+        powerUse model.powerUse
+        roomObject model.roomObject ? 'Yes' : 'No'
+        sourceTDSVersion model.sourceTDSVersion ?: 1
+        useImage model.useImage ? 'Yes' : 'No'
+        usize model.usize
+        cpuType model.cpuType
+        cpuCount model.cpuCount
+        memorySize model.memorySize
+        storageSize model.storageSize
+        height model.height
+        weight model.weight
+        depth model.depth
+        width model.width
+        layoutStyle model.layoutStyle
+        productLine model.productLine
+        modelFamily model.modelFamily
+        endOfLifeDate model.endOfLifeDate
+        endOfLifeStatus model.endOfLifeStatus
+        createdBy model.createdBy?.toString()
+        updatedBy model.updatedBy?.toString()
+        validatedBy model.validatedBy?.toString()
+        sourceURL model.sourceURL
+        modelStatus model.modelStatus
+        modelScope model.modelScope
+        dateCreated TimeUtil.formatDate(model.dateCreated)
+        lastModified TimeUtil.formatDate(model.lastModified)
+    }
+}
