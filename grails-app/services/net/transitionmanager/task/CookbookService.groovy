@@ -780,7 +780,8 @@ class CookbookService implements ServiceMethods {
 		 * @param key - the primary reference code for the section as specified in the recipe (e.g task spec id or group name)
 		 * @return List of error messages
 		 */
-		def validateAgainstMap = { String type, spec, map, String key ->
+		def validateAgainstMap
+		validateAgainstMap = { String type, spec, map, String key ->
 			int i = 0
 			if (key == null) {
 				key = type == 'task' ? "${spec.id ?: 'UNDEF'}" : "${spec.name ?: 'UNDEF'}"
