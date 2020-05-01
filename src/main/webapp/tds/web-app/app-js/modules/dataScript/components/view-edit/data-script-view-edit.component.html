@@ -22,7 +22,7 @@
 						</label>
 						<div
 							class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-							<kendo-dropdownlist *ngIf="providerList && providerList.length > 0"
+							<kendo-dropdownlist *ngIf="providerList && providerList.length"
 												#dataScriptProvider
 												id="dataScriptProvider"
 												name="dataScriptProvider"
@@ -72,12 +72,7 @@
 								class="form-control"
 								[(ngModel)]="dataScriptModel.name"
 								required
-								[ngClass]="{
-									'has-error':
-										!dataScriptForm.form.valid &&
-										dataScriptForm.touched &&
-										dataScriptModel.name.length <= 0
-								}"
+								[ngClass]="{'has-error': isNameInvalid()}"
 								#etlScriptCreateName
 							/>
 							<span
