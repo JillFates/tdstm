@@ -756,6 +756,7 @@ class CookbookService implements ServiceMethods {
 	*/
 	List<Map> basicValidateSyntax(sourceCode, Project currentProject = null) {
 
+		List<String> categories = assetOptionsService.taskCategories()
 		def errorList = [] as HashSet
 		def recipe
 		def msg
@@ -779,8 +780,7 @@ class CookbookService implements ServiceMethods {
 		 * @param key - the primary reference code for the section as specified in the recipe (e.g task spec id or group name)
 		 * @return List of error messages
 		 */
-		def validateAgainstMap
-		validateAgainstMap = { String type, spec, map, String key ->
+		def validateAgainstMap = { String type, spec, map, String key ->
 			int i = 0
 			if (key == null) {
 				key = type == 'task' ? "${spec.id ?: 'UNDEF'}" : "${spec.name ?: 'UNDEF'}"
@@ -810,7 +810,6 @@ class CookbookService implements ServiceMethods {
 					}
 				}
 
-				List<String> categories = assetOptionsService.taskCategories()
 				if (n=="category" && !(v in categories)) {
 					errorList << [error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v' The vaid categories are: ${categories.join(', ')}"]

@@ -864,12 +864,7 @@ class TaskService implements ServiceMethods {
 		""")
 
 		if (category) {
-			if (assetOptionsService.taskCategories().contains(category)) {
-				query.append("AND ac.category='$category' ")
-			} else {
-				log.warn "unexpected category filter '$category'"
-				category=''
-			}
+			query.append("AND ac.category='$category' ")
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent

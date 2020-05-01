@@ -2508,6 +2508,8 @@ class ImportService implements ServiceMethods {
 				int r
 				int rowNum
 				try {
+					List<String> taskCategories = assetOptionsService.taskCategories()
+
 					for (r = 1; r <= commentCount; r++) {
 						rowNum = r + 1
 
@@ -2565,7 +2567,7 @@ class ImportService implements ServiceMethods {
 						// Grab the category
 						//def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r)?.replace("'","\\'")?.toLowerCase()?.trim()
 						def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r, "", true)?.toLowerCase()?.trim()
-						if (assetOptionsService.taskCategories().contains(categoryInput)) {
+						if (taskCategories.contains(categoryInput)) {
 							//assetComment.category = categoryInput ?: AssetCommentCategory.GENERAL
 							assetComment.category = categoryInput
 						} else {
