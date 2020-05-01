@@ -1,5 +1,5 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ElementRef, ViewChild} from '@angular/core';
 // Model
 import {EventModel} from '../../model/event.model';
 import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
@@ -13,6 +13,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	templateUrl: 'event-create.component.html',
 })
 export class EventCreateComponent extends Dialog implements OnInit {
+	@ViewChild('eventCreateName', {static: false}) eventCreateName: ElementRef;
 	public bundles: any[] = [];
 	public runbookStatuses: string[] = [];
 	public assetTags: any[] = [];
@@ -63,6 +64,9 @@ export class EventCreateComponent extends Dialog implements OnInit {
 			apiActionBypass: false
 		};
 		this.eventModel = Object.assign({}, this.defaultModel, this.eventModel);
+		setTimeout(() => {
+			this.onSetUpFocus(this.eventCreateName);
+		});
 	}
 
 	private getModel() {

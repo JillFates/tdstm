@@ -47,7 +47,7 @@ const DEBOUNCE_MILLISECONDS = 800;
 })
 export class DataScriptViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
-
+	@ViewChild('etlScriptCreateName', {static: false}) etlScriptCreateName: ElementRef;
 	@ViewChild('dataScriptForm', {read: NgForm, static: true}) dataScriptForm: NgForm;
 
 	@ViewChild('dataScriptProvider', {
@@ -169,6 +169,7 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
+			this.onSetUpFocus(this.etlScriptCreateName);
 		});
 	}
 
@@ -217,8 +218,19 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 		;
 	}
 
+	/**
+	 * Validates if action name is unique.
+	 */
 	protected onValidateUniqueness(): void {
 		this.datasourceName.next(this.dataScriptModel.name);
+	}
+
+	/**
+	 * Validates and returns true if action name input is valid, false otherwise.
+	 */
+	isNameInvalid(): boolean {
+		return !this.dataScriptForm.form.valid && this.dataScriptForm.touched
+			&& (!this.dataScriptModel.name || this.dataScriptModel.name.length <= 0);
 	}
 
 	/**

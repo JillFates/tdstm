@@ -12,8 +12,9 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.service.ServiceMethods
 
-class AssetService {
+class AssetService implements ServiceMethods{
 
     // DO NOT ADD AssetEntityService due to circular references of services
 	ApplicationService  applicationService
@@ -21,7 +22,6 @@ class AssetService {
 	CustomDomainService customDomainService
 	DatabaseService     DatabaseService
 	DeviceService       DeviceService
-	SecurityService     securityService
 	StorageService      storageService
 
     /**
@@ -300,5 +300,52 @@ class AssetService {
             facade = new AssetFacade(assetEntity, fieldSpecs, readonly)
         }
         return facade
-   }
+	}
+
+
+	/**
+	 * Create and return a map with the information regarding dependencies for the Asset Show views.
+	 *
+	 * @param project - user's current project.
+	 * @param assetId - the given asset used to search dependencies by.
+	 * @return a map with the info about the dependents and supporting assets.
+	 */
+	Map getDependenciesMapForAsset(Project project, Long assetId) {
+		AssetEntity asset = get(AssetEntity, assetId, project)
+
+		Closure transformDependency = { AssetDependency dependency, AssetEntity depAsset ->
+			return [
+					assetClass: AssetClass.getDomainForAssetType(depAsset.class.getSimpleName()),
+					assetType: depAsset.assetType,
+					assetId: depAsset.id,
+					comment: dependency.comment?: '', // send an empty string where there's no comment to make front-end validations easier.
+					id: dependency.id,
+					moveBundle: [
+					        id: depAsset.moveBundle.id,
+							name: depAsset.moveBundle.name
+					],
+					name: depAsset.assetName,
+			        status: dependency.status,
+					type: dependency.type
+			]
+		}
+
+		List<Map> supports = asset.supportedDependencies().collect { AssetDependency dependency ->
+			transformDependency(dependency, dependency.asset)
+		}
+
+		List<Map> dependents = asset.requiredDependencies().collect { AssetDependency dependency ->
+			transformDependency(dependency, dependency.dependent)
+		}
+
+		return [
+				asset: [
+				        id: asset.id,
+						moveBundleId: asset.moveBundle.id
+				],
+		        supports: supports,
+				dependents: dependents
+		]
+
+	}
 }

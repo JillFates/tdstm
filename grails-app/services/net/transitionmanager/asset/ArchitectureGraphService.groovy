@@ -3,11 +3,13 @@ package net.transitionmanager.asset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.NumberUtil
 import grails.converters.JSON
 import grails.util.Environment
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TailRecursive
+import net.transitionmanager.graph.Graph
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
@@ -105,10 +107,11 @@ class ArchitectureGraphService implements ServiceMethods {
 	 * @param levelsUp The numbers of levels up, for the graph.
 	 * @param levelsDown The number of levels down for the graph.
 	 * @param mode the mode of the graph if 'assetId' then buildArchitectureGraph is called
+	 * @param includeCycles - whether or not cyclical references should be included.
 	 *
 	 * @return A map representing the architecture graph to be rendered in the view.
 	 */
-	Map architectureGraphModel(AssetEntity rootAsset, Integer levelsUp, Integer levelsDown, String mode) {
+	Map architectureGraphModel(AssetEntity rootAsset, Integer levelsUp, Integer levelsDown, String mode, boolean includeCycles = false) {
 
 		Set assetsList = [] as Set
 		Set dependencyList = [] as Set
@@ -122,6 +125,12 @@ class ArchitectureGraphService implements ServiceMethods {
 
 		List<Map> graphNodes = createGraphNodes(assetsList, rootAsset)
 		List<Map> graphLinks = createGraphLinks(dependencyList, graphNodes)
+		List<List<Long>> cycles
+
+		// Calculate cycles if the user requests cyclical references.
+		if (includeCycles) {
+			cycles = findCycles(graphLinks)
+		}
 
 		addLinksToNodes(graphLinks, graphNodes)
 
@@ -131,6 +140,7 @@ class ArchitectureGraphService implements ServiceMethods {
 		return [
 			nodes         : graphNodes,
 			links         : graphLinks,
+			cycles		  : cycles,
 			assetId       : rootAsset?.id,
 			levelsUp      : levelsUp,
 			levelsDown    : levelsDown,
@@ -139,6 +149,38 @@ class ArchitectureGraphService implements ServiceMethods {
 			environment   : Environment.current.name
 		]
 	}
+
+	/**
+	 * Determine the cycles for the Architecture Graph.
+	 * @param links
+	 * @return
+	 */
+	List<List<Long>> findCycles(List<Map> links) {
+		Map<Long, List<Long>> graphInfo = [:]
+		links.each {Map link ->
+			Long parentId = NumberUtil.toLong(link['parentId'])
+			Long childId = NumberUtil.toLong(link['childId'])
+			if (!graphInfo.containsKey(parentId)) {
+				graphInfo[parentId] = []
+			}
+			if (!graphInfo.containsKey(childId)) {
+				graphInfo[childId] = []
+			}
+			graphInfo[parentId].add(childId)
+		}
+		return new Graph(graphInfo).findCycles()
+	}
+
+	/**
+	 *
+	 * @param links
+	 * @return
+	 */
+	private List<List<Long>> getArchitectureGraphCycles(List<Map> links) {
+		List<List<Long>> cycles = []
+		
+	}
+
 
 	/**
 	 * Build the architecture model map to be rendered to the view.

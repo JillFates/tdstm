@@ -7,7 +7,8 @@ import {
 	OnInit,
 	QueryList,
 	ViewChild,
-	ViewChildren
+	ViewChildren,
+	ElementRef
 } from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
@@ -56,7 +57,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 	@ViewChild('dueDate', {static: false}) dueDate;
-
+	@ViewChild('taskCreateCommentInput', {static: false}) taskCreateCommentInput: ElementRef;
 	protected modalType = ModalType;
 	protected dateFormat: string;
 	protected dateFormatTime: string;
@@ -82,6 +83,8 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	private destroySubject: Subject<any> = new Subject<any>();
 	public taskViewType: string;
 	private taskDetailModel: TaskDetailModel;
+	invalidInstructionLink = false;
+	MODAL_TYPE = ModalType;
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -135,6 +138,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle());
+			this.onSetUpFocus(this.taskCreateCommentInput);
 		});
 	}
 
@@ -543,7 +547,8 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	public isFormInvalid(): boolean {
 		const { form = null } = this.taskEditCreateForm || {};
 
-		return form && ((!form.valid || this.hasInvalidFields()) || !(form.dirty || this.hasModelChanges));
+		return form && ((!form.valid || this.hasInvalidFields() || this.invalidInstructionLink)
+			|| !(form.dirty || this.hasModelChanges));
 	}
 
 	/**
@@ -560,16 +565,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	 * @returns {boolean}
 	 */
 	protected validateLabelURL(labelURL: string): void {
-		let isEmpty = false;
-
-		if (!labelURL) {
-			isEmpty = true
-		}
-
-		const errors = (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect': true} : null;
-		if (this.taskEditCreateForm.form) {
-			this.taskEditCreateForm.form.controls['instructionLink'].setErrors(errors);
-		}
+		this.invalidInstructionLink = labelURL && !ValidationUtils.isValidLabelURL(labelURL);
 	}
 
 	/**

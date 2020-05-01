@@ -20,8 +20,10 @@ class WsModelController implements ControllerMethods {
 	def save() {
 		ModelCommand modelCommand = populateCommandObject(ModelCommand)
 		Project project = securityService.userCurrentProject
+		// First validate name with Manufacturer
+		modelService.validateModelName(modelCommand.modelName, modelCommand.id, modelCommand.manufacturer.id)
 		modelService.createOrUpdateModel(project, modelCommand)
-		renderSuccessJson()
+		renderSuccessJson([success: true])
 	}
 
 	@HasPermission(Permission.ModelEdit)
@@ -29,7 +31,7 @@ class WsModelController implements ControllerMethods {
 		ModelCommand modelCommand = populateCommandObject(ModelCommand)
 		Project project = securityService.userCurrentProject
 		modelService.createOrUpdateModel(project, modelCommand)
-		renderSuccessJson()
+		renderSuccessJson([sucess: true])
 	}
 
 	def delete(Long id) {

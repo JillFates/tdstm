@@ -2928,7 +2928,12 @@ class ImportService implements ServiceMethods {
 	 */
 	private List getMissingColumns(List entityMapColumnList, Map sheetColumnNames) {
 		entityMapColumnList.findAll { Map<String, ?> field ->
-			field["label"] != "DepGroup" && !sheetColumnNames.containsKey(field["label"])
+			String fieldName = field["field"]
+			String label = field["label"]
+
+			label != "DepGroup" &&
+					!sheetColumnNames.containsKey(label) &&
+					!CustomDomainService.COMPUTED_FIELD_NAMES.contains(fieldName)
 		}
 	}
 

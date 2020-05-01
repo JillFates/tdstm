@@ -103,10 +103,16 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		this.prepareMetadata().then( (metadata: any) => {
 			Observable.zip(
 				this.http.get(`../ws/asset/showTemplate/${this.modelId}`, {responseType: 'text'}),
-				this.http.get(`../ws/asset/assetForDependencyGroup?assetId=${this.modelId}`))
+				this.http.get(`../ws/asset/assetForDependencyGroup?assetId=${this.modelId}`),
+				this.http.get(`../ws/asset/dependenciesForShow/${this.modelId}`))
 				.subscribe((response: any) => {
 					let template = response[0];
 					const templateTitleData = response[1];
+
+					let dependencies = response[2].data;
+					metadata.asset = dependencies.asset;
+					metadata.supports = dependencies.supports;
+					metadata.dependents = dependencies.dependents;
 
 					this.setTitle(this.getModalTitle(templateTitleData.data));
 
@@ -301,8 +307,10 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 	private changeToEditViewOnDoubleClick(event: MouseEvent): void {
 		const bannedClasses = ['btn', 'clickable-text', 'show-hide-link', 'diagram-layout', 'task-comment-component'];
 		if (!ValidationUtils.isBannedClass(bannedClasses, event)) {
-			// move to edit mode
-			this.showAssetEditView(this.data.assetId, this.asset);
+			// move to edit mode just if the user has the permissions
+			if (this.isEditAvailable()) {
+				this.showAssetEditView(this.data.assetId, this.asset);
+			}
 		}
 	}
 }

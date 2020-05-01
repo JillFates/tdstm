@@ -1,0 +1,16 @@
+model {
+    Map architectureGraphModel
+}
+
+json {
+    nodes           architectureGraphModel.nodes
+    links           architectureGraphModel.links
+    cycles          architectureGraphModel.cycles
+    assetId         architectureGraphModel.assetId
+    levelsUp        architectureGraphModel.levelsUp
+    levelsDown      architectureGraphModel.levelsDown
+    assetTypes      architectureGraphModel.assetTypes
+    assetTypesJson  architectureGraphModel.assetTypesJson
+    environment     architectureGraphModel.environment
+}
+

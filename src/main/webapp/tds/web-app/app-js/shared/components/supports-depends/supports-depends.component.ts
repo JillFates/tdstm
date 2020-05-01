@@ -1,272 +1,25 @@
-import {DialogConfirmAction, DialogService} from 'tds-component-library';
-/**
- * Structure does not allows to introduce other base Modules
- * So this is not in the Asset Explorer Module and belongs here instead.
- */
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
-import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
-import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
-import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
-import {DEPENDENCY_TYPE} from './model/support-depends.model';
-import * as R from 'ramda';
-import {Observable} from 'rxjs';
-import {UIDialogService} from '../../services/ui-dialog.service';
+// Angular
+import {Component, ComponentFactoryResolver, EventEmitter, Input, OnInit, Output} from '@angular/core';
+// Component
 import {AssetComment} from '../dependent-comment/model/asset-coment.model';
 import {DependentCommentComponent} from '../dependent-comment/dependent-comment.component';
+// Model
+import {DialogConfirmAction, DialogExit, DialogService, ModalSize} from 'tds-component-library';
+import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
+import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
+import {DEPENDENCY_TYPE} from './model/support-depends.model';
+// Service
+import {DataGridOperationsHelper, RecordState} from '../../utils/data-grid-operations.helper';
+import {AssetExplorerService} from '../../../modules/assetManager/service/asset-explorer.service';
+// Other
+import * as R from 'ramda';
+import {Observable} from 'rxjs';
 
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-supports-depends',
-	template: `
-        	<kendo-grid
-                *ngIf="dataGridSupportsOnHelper"
-                class="tds-table"
-                [data]="dataGridSupportsOnHelper.gridData"
-                [sort]="dataGridSupportsOnHelper.state.sort"
-								[sortable]="false"
-                [resizable]="true"
-                (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
-
-            <!-- Toolbar Template -->
-			<ng-template kendoGridToolbarTemplate [position]="'top'">
-				<div class="clr-row">
-					<div class="grid-label clr-col-4">
-						<strong>Supports</strong>
-					</div>
-					<div class="grid-actions clr-col-8">
-						<div class="btn-sm">
-							<tds-button-add
-								[tooltip]="'Add link to Support Asset'"
-								id="add-support"
-								[tabIndex]="449"(click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
-							</tds-button-add>
-						</div>
-					</div>
-				</div>
-            </ng-template>
-
-            <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
-                               field="{{column.property}}"
-                               [headerClass]="column.headerClass ? column.headerClass : ''"
-                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-                               [class]="column.cellClass ? column.cellClass : ''"
-                               [style]="column.cellStyle ? column.cellStyle : ''"
-                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-
-                <!-- Header Template -->
-                <ng-template kendoGridHeaderTemplate>
-                    <label>{{column.label}}</label>
-                </ng-template>
-
-                <!-- Action -->
-                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-					<div class="action-button btn-link">
-						<clr-dropdown>
-							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridSupportsOnHelper, dependencyType.SUPPORT)">Dependency Delete</a>
-							</clr-dropdown-menu>
-						</clr-dropdown>
-					</div>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dataFlowFreqList"
-                            [(ngModel)]="dataItem.dataFlowFreq"
-                            (valueChange)="onChangeInternalModel()"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dependencyClassList"
-                            [textField]="'text'"
-                            [valueField]="'id'"
-                            [(ngModel)]="dataItem.assetClass"
-                            (valueChange)="onDependencyClassChange(dataItem)"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
-                    <tds-combobox
-		                    [required]="true"
-		                    [allowEmptyValue]="true"
-                            [(model)]="dataItem.assetDepend"
-                            [(metaParam)]="dataItem.assetClass.id"
-                            [serviceRequest]="getAssetListForComboBox"
-                            (valueChange)="onDependencyChange($event, dataItem)">
-                    </tds-combobox>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                                        [data]="moveBundleList"
-                                        [textField]="'text'"
-                                        [valueField]="'id'"
-                                        [(ngModel)]="dataItem.assetDepend.moveBundle"
-                                        [ngClass]="getMoveBundleColor(dataItem)"
-                                        (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
-                                        (valueChange)="onChangeInternalModel()"
-                                        required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="typeList"
-                            [(ngModel)]="dataItem.type"
-                            (valueChange)="onChangeInternalModel()"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="statusList"
-                            [(ngModel)]="dataItem.status"
-                            (valueChange)="onChangeInternalModel()"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-            </kendo-grid-column>
-            <kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
-        </kendo-grid>
-
-        	<kendo-grid
-                *ngIf="dataGridDependsOnHelper"
-                class="tds-table"
-                [data]="dataGridDependsOnHelper.gridData"
-                [sortable]="false"
-                [resizable]="true"
-                (sortChange)="dataGridDependsOnHelper.sortChange($event)">
-
-            <!-- Toolbar Template -->
-			<ng-template kendoGridToolbarTemplate [position]="'top'">
-				<div class="clr-row">
-					<div class="grid-label clr-col-4">
-						<strong>Dependent On</strong>
-					</div>
-					<div class="grid-actions clr-col-8">
-						<div class="btn-sm">
-							<tds-button-add
-								[tooltip]="'Add link to Dependent Asset'"
-								id="dependent-support"
-								[tabIndex]="450"(click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
-							</tds-button-add>
-						</div>
-					</div>
-				</div>
-			</ng-template>
-
-            <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
-				field="{{column.property}}"
-				[headerClass]="column.headerClass ? column.headerClass : ''"
-				[headerStyle]="column.headerStyle ? column.headerStyle : ''"
-				[class]="column.cellClass ? column.cellClass : ''"
-				[style]="column.cellStyle ? column.cellStyle : ''"
-				[width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-
-                <!-- Header Template -->
-                <ng-template kendoGridHeaderTemplate>
-                    <label>{{column.label}}</label>
-                </ng-template>
-
-                <!-- Action -->
-				<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem let-rowIndex="rowIndex">
-					<div class="action-button btn-link">
-						<clr-dropdown>
-							<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
-							<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="!dataItem.comment">Comment Create</a>
-                                <a clrDropdownItem (click)="onAddEditComment(dataItem)" *ngIf="dataItem.comment">Comment Edit</a>
-								<a clrDropdownItem (click)="onClickDelete(dataItem, dataGridDependsOnHelper, dependencyType.DEPENDENT)">Dependency Delete</a>
-							</clr-dropdown-menu>
-						</clr-dropdown>
-					</div>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dataFlowFreqList"
-                            [(ngModel)]="dataItem.dataFlowFreq"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetClass'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="dependencyClassList"
-                            [textField]="'text'"
-                            [valueField]="'id'"
-                            [(ngModel)]="dataItem.assetClass"
-                            (valueChange)="onDependencyClassChange(dataItem)"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
-                    <tds-combobox
-                            [required]="true"
-                            [allowEmptyValue]="true"
-                            [(model)]="dataItem.assetDepend"
-                            [(metaParam)]="dataItem.assetClass.id"
-                            [serviceRequest]="getAssetListForComboBox"
-                            (selectionChange)="onDependencyChange($event, dataItem)">
-                    </tds-combobox>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist #dropdownFooter
-                                        name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                                        [data]="moveBundleList"
-                                        [textField]="'text'"
-                                        [valueField]="'id'"
-                                        [(ngModel)]="dataItem.assetDepend.moveBundle"
-                                        [ngClass]="getMoveBundleColor(dataItem)"
-                                        (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
-                                        required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="typeList"
-                            [(ngModel)]="dataItem.type"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
-                    <kendo-dropdownlist
-                            name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                            [data]="statusList"
-                            [(ngModel)]="dataItem.status"
-                            required>
-                    </kendo-dropdownlist>
-                </ng-template>
-
-            </kendo-grid-column>
-            <kendo-grid-messages noRecords="There are no Dependent Assets to display."> </kendo-grid-messages>
-        </kendo-grid>
-	`,
-	styles: []
+	templateUrl: 'support-depends.component.html'
 })
 
 export class SupportsDependsComponent implements OnInit {
@@ -274,18 +27,28 @@ export class SupportsDependsComponent implements OnInit {
 	@Output('isValidForm') isValidForm: EventEmitter<any> = new EventEmitter();
 	@Output('initDone') initDone: EventEmitter<any> = new EventEmitter();
 	private supportOnColumnModel: SupportOnColumnsModel;
+	private dependentOnColumnModel: SupportOnColumnsModel;
 	private dataFlowFreqList = [];
 	private dependencyClassList = [];
 	private typeList = [];
 	private statusList = [];
 	private moveBundleList = [];
+	private supportsToDelete = [];
+	private dependentsToDelete = [];
 	public dependencyType = DEPENDENCY_TYPE;
 	public dataGridDependsOnHelper: DataGridOperationsHelper;
 	public dataGridSupportsOnHelper: DataGridOperationsHelper;
-	private supportsToDelete = [];
-	private dependentsToDelete = [];
 
-	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService, private tdsDialogService: DialogService) {
+	public showFilterDep = false;
+	public showFilterSup = false;
+
+	public baseSupportsGridTabIndex = 449;
+	public baseDependentGridTabIndex = 650;
+
+	constructor(
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private assetExplorerService: AssetExplorerService,
+		private dialogService: DialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
 	}
 
@@ -312,19 +75,20 @@ export class SupportsDependsComponent implements OnInit {
 		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT)
 			.subscribe((dataGridDependsOnHelper) => {
 				this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
-				this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
+				this.model.dependencyMap.supportAssets = [];
 				if (this.dataGridDependsOnHelper) {
 					this.initDone.emit(this.model);
 				}
 			});
 
-		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
-			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
-			if (this.dataGridSupportsOnHelper) {
-				this.initDone.emit(this.model);
-			}
-		});
+		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT)
+			.subscribe((dataGridDependsOnHelper) => {
+				this.dataGridDependsOnHelper = dataGridDependsOnHelper;
+				this.model.dependencyMap.dependentAssets = [];
+				if (this.dataGridSupportsOnHelper) {
+					this.initDone.emit(this.model);
+				}
+			});
 
 	}
 
@@ -334,6 +98,7 @@ export class SupportsDependsComponent implements OnInit {
 	private getDependencyList(dependencyMap: string, dependencyType): Observable<DataGridOperationsHelper> {
 		return new Observable(observer => {
 			this.supportOnColumnModel = new SupportOnColumnsModel();
+			this.dependentOnColumnModel = new SupportOnColumnsModel();
 			let dependencies = [];
 			if (this.model.dependencyMap && this.model.dependencyMap[dependencyMap]) {
 				let assets = R.clone(this.model.dependencyMap[dependencyMap]);
@@ -341,6 +106,7 @@ export class SupportsDependsComponent implements OnInit {
 					let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
 					let dependencySupportModel: DependencySupportModel = {
 						id: dependency.id,
+						recordState: RecordState.pristine,
 						dataFlowFreq: dependency.dataFlowFreq,
 						assetClass: assetClass,
 						assetDepend: {
@@ -348,6 +114,9 @@ export class SupportsDependsComponent implements OnInit {
 							text: dependency.asset.name,
 							moveBundle: R.clone(dependency.asset.moveBundle)
 						},
+						assetName: dependency.asset.name,
+						assetClassName: assetClass.text,
+						moveBundleName: dependency.asset.moveBundle.name,
 						type: dependency.type,
 						status: dependency.status,
 						dependencyType: dependencyType,
@@ -356,8 +125,28 @@ export class SupportsDependsComponent implements OnInit {
 					dependencies.push(dependencySupportModel);
 				});
 			}
-			observer.next(new DataGridOperationsHelper(dependencies, null, null, null, 2000));
+			observer.next(new DataGridOperationsHelper(dependencies,
+				[{ dir: 'asc', field: 'assetName'}],
+				{ mode: 'single', checkboxOnly: false},
+				{ useColumn: 'id' },
+				25));
 		});
+	}
+
+	/**
+	 * Set the flag indicating the record state (updated, created)
+	 * after that updates the internal model
+	 * @param dataItem
+	 */
+
+	public updateRecordState(dataItem: DependencySupportModel): void {
+		if (dataItem.recordState === RecordState.created) {
+			this.onChangeInternalModel();
+			return;
+		} else {
+			dataItem.recordState = RecordState.updated;
+			this.onChangeInternalModel();
+		}
 	}
 
 	/**
@@ -370,6 +159,7 @@ export class SupportsDependsComponent implements OnInit {
 		}
 		let dependencySupportModel: DependencySupportModel = {
 			id: 0,
+			recordState: RecordState.created,
 			dataFlowFreq: this.dataFlowFreqList[0],
 			assetClass: this.dependencyClassList[0],
 			assetDepend: {
@@ -386,8 +176,9 @@ export class SupportsDependsComponent implements OnInit {
 			comment: ''
 		};
 
-		dataGrid.addDataItem(dependencySupportModel);
+		dataGrid.addResultSetItem(dependencySupportModel);
 		this.onChangeInternalModel();
+		this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
 	}
 
 	/**
@@ -400,7 +191,7 @@ export class SupportsDependsComponent implements OnInit {
 			text: '',
 			moveBundle: dataItem.assetDepend.moveBundle
 		};
-		this.onChangeInternalModel();
+		this.updateRecordState(dataItem);
 	}
 
 	/**
@@ -408,6 +199,8 @@ export class SupportsDependsComponent implements OnInit {
 	 * @param {DependencySupportModel} dataItem
 	 */
 	public onDependencyChange(dependency: any, dataItem: DependencySupportModel): void {
+		this.updateRecordState(dataItem);
+
 		if (dependency) {
 			let changeParams = {
 				assetId: dependency.id,
@@ -436,6 +229,30 @@ export class SupportsDependsComponent implements OnInit {
 	}
 
 	/**
+	 * Clears the filter on supports
+	 */
+	public showFilterSupports(): void {
+		if (this.showFilterSup) {
+			this.showFilterSup = false;
+			this.dataGridSupportsOnHelper.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterSup = true;
+		}
+	}
+
+	/**
+	 * Clears the Dependent filter
+	 */
+	showFilterDependents(): void {
+		if (this.showFilterDep) {
+			this.showFilterDep = false;
+			this.dataGridDependsOnHelper.clearAllFilters(this.supportOnColumnModel.columns);
+		} else {
+			this.showFilterDep = true;
+		}
+	}
+
+	/**
 	 * Calculate the Color for the Move Bundle
 	 * @returns {string}
 	 */
@@ -455,10 +272,9 @@ export class SupportsDependsComponent implements OnInit {
 
 	/**
 	 * Confirm before delete
-	 *
 	 * **/
 	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper, dependencyType: DEPENDENCY_TYPE): void {
-		this.tdsDialogService.confirm(
+		this.dialogService.confirm(
 			'Confirm Delete',
 			'Please confirm delete of this record. This action cannot be undone.'
 		).subscribe(
@@ -469,7 +285,7 @@ export class SupportsDependsComponent implements OnInit {
 					} else {
 						this.dependentsToDelete.push(dataItem.id);
 					}
-					this.onDeleteDependencySupport(dataItem, dataGrid);
+					this.onDeleteDependencySupport(dataItem, dataGrid, dependencyType);
 				}
 			}
 		);
@@ -478,8 +294,16 @@ export class SupportsDependsComponent implements OnInit {
 	/**
 	 * Delete the selected element
 	 */
-	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper): void {
-		dataGrid.removeDataItem(dataItem);
+	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper, type: string): void {
+		if (dataItem.id) {
+			if (type === DEPENDENCY_TYPE.SUPPORT)  {
+				this.supportsToDelete.push(dataItem.id);
+			} else {
+				this.dependentsToDelete.push(dataItem.id);
+			}
+		}
+
+		dataGrid.removeResultSetItem(dataItem);
 		this.onChangeInternalModel();
 	}
 
@@ -487,21 +311,32 @@ export class SupportsDependsComponent implements OnInit {
 	 * Open the Dialog to Edit/Add a comment
 	 * @param dataItem
 	 */
-	public onAddEditComment(dataItem: any): void {
+	public async onAddEditComment(dataItem: any): Promise<void> {
 		let assetComment: AssetComment = {
 			comment: dataItem.comment,
-			dialogTitle: dataItem.assetDepend.text + ' (' + dataItem.dependencyType + ')'
+			dialogTitle: 'Comment for ' + dataItem.assetDepend.text + ' (' + dataItem.dependencyType + ')'
 		};
-		this.dialogService.extra(DependentCommentComponent,
-			[UIDialogService,
-				{
-					provide: AssetComment,
-					useValue: assetComment
+
+		try {
+			const result = await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: DependentCommentComponent,
+				data: {
+					assetComment: assetComment
+				},
+				modalConfiguration: {
+					title: assetComment.dialogTitle,
+					draggable: true,
+					modalSize: ModalSize.MD
 				}
-			], false, false)
-			.then((result) => {
+			}).toPromise();
+			if (result.status === DialogExit.ACCEPT) {
 				dataItem.comment = result.comment;
-			}).catch((error) => console.log(error));
+				this.updateRecordState(dataItem);
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
@@ -548,8 +383,8 @@ export class SupportsDependsComponent implements OnInit {
 		});
 
 		if (validForm) {
-			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
-			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
+			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.getCreatedUpdatedRecords();
+			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
 			this.model.dependencyMap.dependentsToDelete = this.dependentsToDelete;
 			this.model.dependencyMap.supportsToDelete = this.supportsToDelete;
 		}

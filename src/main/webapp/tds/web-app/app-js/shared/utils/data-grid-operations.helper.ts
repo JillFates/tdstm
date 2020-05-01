@@ -15,8 +15,16 @@ import {
 } from '../model/constants';
 import { DateUtils } from './date.utils';
 import { NotifierService } from '../services/notifier.service';
+import {DependencySupportModel} from '../components/supports-depends/model/support-on-columns.model';
 
 declare var jQuery: any;
+
+// Define the row state
+export enum RecordState {
+	pristine,
+	updated,
+	created
+}
 
 /**
  * TODO: (dontiveros) migrate usage of Grid Helper to Helper class from component-library.
@@ -67,9 +75,10 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * On Filter column event.
-	 * @param column
-	 */
+     * On Filter column event.
+     * @param column
+     * @param operator
+     */
 	public onFilter(column: GridColumnModel, operator?: string): void {
 		let root = this.getFilter(column, operator);
 		this.filterChange(root);
@@ -173,11 +182,10 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * Get the filters state structure excluding the column filter name provided
-	 * @param {string} excludeFilterName:  Name of the filter column to exclude
-	 * @param {any} state: Current filters state
-	 * @returns void
-	 */
+     * Get the filters state structure excluding the column filter name provided
+     * @param {string} excludeFilterName:  Name of the filter column to exclude
+     * @returns void
+     */
 	private getFiltersExcluding(excludeFilterName: string): any {
 		const filters = (this.state.filter && this.state.filter.filters) || [];
 		return filters.filter((r) => r['field'] !== excludeFilterName);
@@ -197,9 +205,10 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * On Filter Change.
-	 * @param {CompositeFilterDescriptor} filter
-	 */
+     * On Filter Change.
+     * @param {CompositeFilterDescriptor} filter
+     * @param state
+     */
 	public filterChange(filter: CompositeFilterDescriptor, state: State = null): void {
 		const currentState = state || this.state;
 		currentState.filter = filter;
@@ -217,7 +226,7 @@ export class DataGridOperationsHelper {
 
 	/**
 	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * @param {CellClickEvent} event
 	 */
 	public selectCell(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
@@ -436,6 +445,52 @@ export class DataGridOperationsHelper {
 	public getFilterCounter(state: State = null): number {
 		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
 		return uniq(filters.map((filter: any) => filter.field)).length;
+	}
+
+	/**
+	 * Add one element to the whole list
+	 * @param item
+	 */
+	public addResultSetItem(item: any): void {
+		this.addDataItem(item);
+
+		if (this.state.skip > this.resultSet.length) {
+			this.resultSet.push(item);
+		} else {
+			this.resultSet.splice(this.state.skip, 0, item);
+		}
+		this.reloadData(this.resultSet);
+	}
+
+	/**
+	 * Remove one element from to the whole result set item
+	 * @param item
+	 */
+	public removeResultSetItem(item: any): void {
+		let index = this.resultSet.indexOf(item);
+
+		if (index >= 0) {
+			this.resultSet.splice(index, 1);
+			this.reloadData(this.resultSet);
+		}
+	}
+
+	/**
+	 * Get just the created or updated records
+	 */
+	public getCreatedUpdatedRecords(): DependencySupportModel[] {
+		const result = this.resultSet
+			.filter((dependency: DependencySupportModel) => {
+				return dependency.recordState === RecordState.updated ||
+					dependency.recordState === RecordState.created;
+			})
+			.map((dependency: DependencySupportModel) => {
+				const item = {...dependency} ;
+				delete item['recordState'];
+				return item;
+			});
+
+		return result;
 	}
 }
 
