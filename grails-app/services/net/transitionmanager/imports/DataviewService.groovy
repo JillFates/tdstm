@@ -282,10 +282,12 @@ class DataviewService implements ServiceMethods {
 		boolean hasGlobalOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
 		boolean hasProjectOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)
 		boolean isDefaultProject = project.isDefaultProject()
-
 		boolean canModify = false
+
 		if (hasEditPerm && dataview) {
-			if (dataview.personId == whom.id) {
+			if(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.project.id != project.id){
+				canModify = false
+			} else if (dataview.personId == whom.id) {
 				canModify = (dataview.projectId == project.id)
 			} else {
 				boolean hasPerm = (isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm)
@@ -295,6 +297,7 @@ class DataviewService implements ServiceMethods {
 						dataview.projectId == project.id)
 			}
 		}
+
 		return canModify
 	}
 
@@ -635,7 +638,7 @@ class DataviewService implements ServiceMethods {
 		validateDataviewViewAccessOrException(project, whom, dataview)
 
 		if(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.project.id != project.id){
-			throw new InvalidParamException("You can not edit $dataview.name outside of the default project.")
+			throw new InvalidParamException(i18nMessage('dataview.validate.editGlobalViewOutsideDefProject'))
 		}
 
 		if (dataview.isSystem) {
