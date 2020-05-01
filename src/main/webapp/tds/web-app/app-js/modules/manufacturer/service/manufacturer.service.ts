@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 
@@ -9,6 +9,7 @@ import {ManufacturerModel} from '../model/manufacturer.model';
 @Injectable()
 export class ManufacturerService {
 	private manufacturerUrl = '/tdstm/manufacturer';
+	private manufacturerExportUrl = '/tdstm/ws/model/export';
 	constructor(private http: HttpClient) {}
 
 	getManufacturerList(): Observable<ManufacturerModel[]> {
@@ -86,5 +87,10 @@ export class ManufacturerService {
 				return response && response.status === 'success' && response.data;
 			})
 			.catch((error: any) => error);
+	}
+
+	getManufactrurerModelExportData(tdsModelsOnly: boolean): Observable<any> {
+		const params = new HttpParams().set('tdsModelsOnly', `${tdsModelsOnly}`);
+		return this.http.get<any>(this.manufacturerExportUrl, {params, observe: 'response'});
 	}
 }

@@ -2,6 +2,7 @@ import {AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewC
 import {Dialog, DialogButtonType} from 'tds-component-library';
 import {ReplaySubject} from 'rxjs';
 import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
+import {ManufacturerService} from '../../service/manufacturer.service';
 
 @Component({
 	selector: 'tds-export-manufacturer-models',
@@ -9,7 +10,21 @@ import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
 		<div class="export-mfg-models-container">
 				<form (ngSubmit)="export()" class="clr-form">
 						<div class="clr-row">
-								<div class="clr-col-12 clr-align-self-center">
+						</div>
+						<div class="row">
+								<div class="clr-col-6 clr-align-self-center">
+                    <label
+                            class="clr-control-label clr-control-label-sm inline"
+                            for="export-file-name">File Name: </label>
+                    <input
+                            id="export-file-name"
+                            type="text"
+                            name="export-file-name"
+                            [(ngModel)]="exportFileName"
+                            (ngModelChange)="updateCheckboxValue($event)"
+                    />
+								</div>
+                <div class="clr-col-6 clr-align-self-center">
                     <clr-checkbox-wrapper class="inline">
                         <label
                                 class="clr-control-label clr-control-label-sm inline"
@@ -23,21 +38,7 @@ import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
                                 (ngModelChange)="updateCheckboxValue($event)"
                         />
                     </clr-checkbox-wrapper>
-								</div>
-						</div>
-						<div class="row">
-								<div class="clr-col-12 clr-align-self-center">
-                    <label
-                            class="clr-control-label clr-control-label-sm inline"
-                            for="export-file-name">File Name: </label>
-                    <input
-                            id="export-file-name"
-                            type="text"
-                            name="export-file-name"
-                            [(ngModel)]="exportFileName"
-                            (ngModelChange)="updateCheckboxValue($event)"
-                    />
-								</div>
+                </div>
 						</div>
 				</form>
         <kendo-excelexport *ngIf="data" [data]="dataToExport$ | async" fileName="{{exportFileName + '.xlsx'}}" #excelExport>
@@ -61,7 +62,7 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 	dataToExport$: ReplaySubject<any> = new ReplaySubject<any>(1);
 	columns: any[] = [];
 
-	constructor() {
+	constructor(private manufacturerService: ManufacturerService) {
 		// Import Export constructor
 		super();
 	}
@@ -125,6 +126,9 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 	export(): void {
 		console.log('Form Data: ');
 		console.table(this.formData);
+		this.manufacturerService.getManufactrurerModelExportData(this.tdsModelsOnly).subscribe(res => {
+			const data = res;
+		});
 		this.excelExport.save();
 	}
 
