@@ -81,7 +81,11 @@
       margin-left: 3px
       width: 112px !important
     .before-call
+      width: 165px !important
+      padding-left: 25px
+    .post-call
       width: 150px !important
+      padding-left: 0px
   api-action-view-edit-parameters
     form
       padding-top: 15px
@@ -134,11 +138,6 @@
       padding: unset
       .tab-pane
         overflow: hidden
-    .nav-tabs
-      li
-        a.tab-disabled
-          color: $color-font-disabled--gray
-          cursor: not-allowed
   .k-widget.ng-invalid
     .k-input
       color: gray
@@ -161,3 +160,9 @@
     display: block
     tds-button-custom
       margin-left: 5px
+  ul.nav
+    li
+      a.tab-disabled
+        color: $color-font-disabled--gray
+        background-color: transparent
+        cursor: not-allowed

@@ -67,7 +67,7 @@
 									  [title]="'Before Invocation'">
 						</tds-checkbox>
 					</div>
-					<div class="col-md-2">
+					<div class="col-md-2 post-call">
 						<tds-checkbox [name]="'apiActionAfterCall'"
 									  [(inputModel)]="eventReactions[EventReactions.PostInvocation].selected"
 									  [disabled]="eventReactions[EventReactions.PostInvocation].value.length > 0 || modalType === actionTypes.VIEW"
@@ -341,7 +341,7 @@
 							 *ngIf="showsCustomizeLabel()">Customize:
 				</label>
 				<!-- Before Invocation Reaction Event -->
-				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.BeforeInvocation].selected">
+					<div class="col-md-12 codemirror-wrapper" *ngIf="eventReactions[EventReactions.BeforeInvocation].selected">
 					<div class="form-group">
 						<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before Invocation
 							<span class="font-normal">
@@ -379,7 +379,7 @@
 					</div>
 				</div>
 				<!-- Post Invocation Reaction Event -->
-				<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="eventReactions[EventReactions.PostInvocation].selected">
+				<div class="col-md-12 codemirror-wrapper" *ngIf="eventReactions[EventReactions.PostInvocation].selected">
 					<div class="form-group">
 						<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Invocation
 							<span class="font-normal">
