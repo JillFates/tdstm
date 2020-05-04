@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {DialogService, GridModel, ModalSize} from 'tds-component-library';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
@@ -15,6 +15,8 @@ import {RegenerateProgressDialogComponent} from './components/regenerate-progres
 })
 export class DependencyAnalyzerComponent implements OnInit {
 
+	@ViewChild('tagsDropDown', {static: false}) tagsDropDown: any;
+	@ViewChild('bundleListDropDown', {static: false}) bundleListDropDown: any;
 	private userContext: any;
 	public gridModel: GridModel;
 	public showOnlyWIP = false;
@@ -94,12 +96,12 @@ export class DependencyAnalyzerComponent implements OnInit {
 	 * Sets the content of the lists to empty
 	 * */
 	cleanObjects() {
-		delete this.gridData;
-		delete this.columns;
-		delete this.classes;
-		delete this.dependencyType;
-		delete this.dependencyStatus;
-		delete this.depGrpCrt;
+		this.gridData = [];
+		this.columns = [];
+		this.classes = [];
+		this.dependencyType = [];
+		this.dependencyStatus = [];
+		this.depGrpCrt = [];
 	}
 
 	/**
@@ -114,10 +116,12 @@ export class DependencyAnalyzerComponent implements OnInit {
 				component: DependencyGroupStatusComponent,
 				data: {},
 				modalConfiguration: {
-					title: '',
+					title: 'Dependency Group Status',
 					draggable: true,
 					modalSize: ModalSize.MD
 				}
+			}).subscribe((data: any) => {
+				// just closing status
 			});
 		} catch (error) {
 			console.error(error);
@@ -246,7 +250,15 @@ export class DependencyAnalyzerComponent implements OnInit {
 	 * Refreshes the data of the table
 	 * */
 	onRefeshData() {
+		this.clearFilters();
 		this.getInitialData();
+	}
+
+	clearFilters() {
+		this.selectedTags = [];
+		this.tagsDropDown.reset();
+		this.bundleListDropDown.reset();
+		this.selectedBundle = '';
 	}
 
 	/**
