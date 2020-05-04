@@ -132,15 +132,15 @@
                             <div class="row">
                                 <div class="col-sm-3">
                                     <input clrInput type="number" id="modelPowerNameplate" name="modelPowerNameplate" class="form-control"
-                                           [(ngModel)]="modelModel.powerNameplate"/>
+                                           [(ngModel)]="modelModel.powerNameplate" required/>
                                 </div>
                                 <div class="col-sm-3">
                                     <input clrInput type="number" id="modelPowerDesign" name="modelPowerDesign" class="form-control"
-                                           [(ngModel)]="modelModel.powerDesign"/>
+                                           [(ngModel)]="modelModel.powerDesign" required/>
                                 </div>
                                 <div class="col-sm-3">
                                     <input clrInput type="number" id="modelPowerUse" name="modelPowerUse" class="form-control"
-                                           [(ngModel)]="modelModel.powerUse"/>
+                                           [(ngModel)]="modelModel.powerUse" required/>
                                 </div>
                                 <div class="col-sm-3">
                                     <clr-select-container style="display: inline-block">
@@ -280,9 +280,17 @@
                             </div>
                         </div>
                         <div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-                            <label class="control-label label-detail power-label">H:{{modelModel.height}}</label>
-                            <label class="control-label label-detail power-label">W:{{modelModel.width}}</label>
-                            <label class="control-label label-detail power-label">D:{{modelModel.depth}}</label>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label class="control-label label-detail power-label">H:{{modelModel.height}}</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="control-label label-detail power-label">W:{{modelModel.width}}</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="control-label label-detail power-label">D:{{modelModel.depth}}</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">

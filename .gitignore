@@ -28,3 +28,7 @@ test/e2e/build
 tdstm-config.groovy
 **/.gradle/**
 src/main/webapp/tds/karma_html/
+src/main/webapp/tds/web-app/assets/modules/clarity/css/*.map
+src/main/webapp/tds/web-app/assets/modules/webcomponents/js/*.map
+src/main/webapp/tds/*.css
+src/main/webapp/tds/*.js
