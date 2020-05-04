@@ -60,7 +60,9 @@ var PasswordValidation = (function ($) {
 		}
 
 		submitDisabled = (score < 3);
-		document.getElementById('resetPasswordSubmitButton').disabled = (submitDisabled || !passwordsMatch);
+		const resetPasswordSubmitButton = document.getElementById('resetPasswordSubmitButton');
+        if (resetPasswordSubmitButton)
+            resetPasswordSubmitButton.disabled = (submitDisabled || !passwordsMatch);
 		
 		return (score === 3);
 	}
@@ -73,7 +75,9 @@ var PasswordValidation = (function ($) {
         const element = parent.find('#retypedPasswordMatchRequirementId');
         result = public.confirmPasswordMatch(password.toLowerCase(), retypedPassword.toLowerCase(), element);
         passwordsMatch = (result === 1);
-        document.getElementById('resetPasswordSubmitButton').disabled = (submitDisabled || !passwordsMatch);
+        const resetPasswordSubmitButton = document.getElementById('resetPasswordSubmitButton');
+        if (resetPasswordSubmitButton)
+            document.getElementById('resetPasswordSubmitButton').disabled = (submitDisabled || !passwordsMatch);
         return result;
     };
 

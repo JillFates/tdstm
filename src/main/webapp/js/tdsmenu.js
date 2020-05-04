@@ -60,8 +60,8 @@ function changePersonDetails () {
 
 	var returnVal = true 
 	var firstName = $("#firstNameId").val()
-	var oldPassword = $("#personDialog #oldPasswordId").val()
-	var newPassword = $("#personDialog #passwordId").val()
+	var oldPassword = $("#personDialog #personOldPasswordId").val()
+	var newPassword = $("#personDialog #personPasswordId").val()
 	var email = $("#emailId").val()
 	var expiryDate = $("#expiryDateId").val()
 	var powerType = $("#powerTypeId").val()
@@ -86,7 +86,7 @@ function changePersonDetails () {
 		if (!oldPassword) {
 			alert("Old Password should not be blank ")
 			returnVal = false
-		} else if (!PasswordValidation.checkPassword($("#personDialog #passwordId")[0])) {
+		} else if (!PasswordValidation.checkPassword($("#personDialog #personPasswordId")[0])) {
 			alert("New Password does not meet all the requirements ")
 			returnVal = false
 		}
@@ -95,8 +95,8 @@ function changePersonDetails () {
 
 		var parameters = 'id=' + $('#personId').val()
         +'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
-        +'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #oldPasswordId').val()
-        +'&newPassword='+$('#personDialog #passwordId').val() +'&confirmPassword='+$('#personDialog #confirmPasswordId').val()
+        +'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #personOldPasswordId').val()
+        +'&newPassword='+$('#personDialog #personPasswordId').val() +'&confirmPassword='+$('#personDialog #personConfirmPasswordId').val()
         +'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
         +'&powerType='+powerType+'&startPage='+startPage
 
