@@ -177,6 +177,7 @@
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
 					<tds-combobox-group
+							[name]="'shutdownBy'"
 							[model]="model.asset.shutdownBy"
 							(modelChange)="model.asset.shutdownBy.id = $event"
 							(isFixedChange)="model.asset.shutdownFixed = $event"
@@ -195,6 +196,7 @@
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 					<tds-combobox-group
+						[name]="'startupBy'"
 						[model]="model.asset.startupBy"
 						(modelChange)="model.asset.startupBy.id = $event"
 						(isFixedChange)="model.asset.startupFixed = $event"
@@ -210,6 +212,7 @@
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 					<tds-combobox-group
+							[name]="'testingBy'"
 							[model]="model.asset.testingBy"
 							(modelChange)="model.asset.testingBy.id = $event"
 							(isFixedChange)="model.asset.testingFixed = $event"
