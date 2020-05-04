@@ -34,18 +34,18 @@ import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
 			<div class="clr-control-container">
 				<div class="clr-checkbox-wrapper" style="display: flex">
 					<span class="checkboxContainer">
-                                <div class="clr-form-control" style="margin-top: unset;">
+                                <div class="clr-form-control unset-margin-top">
                                     <div class="clr-control-container">
                                         <div class="clr-checkbox-wrapper">
 											<input
 												type="checkbox"
-												[name]="fixCheckboxName"
-												[id]="fixCheckboxName"
+												[name]="controlName"
+												[id]="controlName"
 												[checked]="!!isFixed"
 												[disabled]="!model || isTeamItemSelected()"
 												(change)="onChangeFixed($event)"
 												class="pointer" />
-                                            <label [for]="fixCheckboxName" class="clr-control-label clr-control-label-sm inline"><span class="left-label-pad">Fixed</span></label>
+                                            <label [for]="controlName" class="clr-control-label clr-control-label-sm inline"><span class="left-label-pad">Fixed</span></label>
                                         </div>
                                     </div>
                                 </div>
@@ -64,7 +64,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	@Input('namedStaff') namedStaff: any;
 	@Input('team') team: any;
 	@Input('isFixed') isFixed: number;
-	@Input('name') fixCheckboxName: string;
+	@Input('name') controlName: string;
 
 	readonly CATEGORY_BY_REFERENCE = 'By Reference';
 	readonly CATEGORY_BY_TEAM = 'Team';
