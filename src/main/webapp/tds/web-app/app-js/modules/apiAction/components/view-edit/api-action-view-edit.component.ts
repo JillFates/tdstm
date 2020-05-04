@@ -371,21 +371,44 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 			this.apiActionModel.httpMethod = this.httpMethodList[0];
 		}
 		if (result && result.data.actionTypes) {
-			this.actionTypesList = [];
-			const keys = Object.keys(result.data.actionTypes);
-			keys.forEach((key: string) => {
-				this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
-			});
-			if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
-				this.apiActionModel.actionType = {id: this.WEB_API};
-			}
+			this.prepareActionTypeList(result);
 		}
 		if (result && result.data.remoteCredentialMethods) {
-			this.remoteCredentials = [];
-			const keys = Object.keys(result.data.remoteCredentialMethods);
-			keys.forEach((key: string) => {
-				this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
-			});
+			this.prepareRemoteCredentialsList(result);
+		}
+	}
+
+	/**
+	 * Prepare remote credentials list to display in UI
+	 * @param result
+	 */
+	prepareRemoteCredentialsList(result: any): void {
+		this.remoteCredentials = [];
+		this.remoteCredentials.push({id: 0, value: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+		const keys = Object.keys(result.data.remoteCredentialMethods);
+		keys.forEach((key: string) => {
+			this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
+		});
+		if (!this.apiActionModel.remoteCredentialMethod) {
+			this.apiActionModel.remoteCredentialMethod = this.remoteCredentials[0];
+		}
+	}
+
+	/**
+	 * Prepare action type list to display in UI.
+	 * @param result
+	 */
+	prepareActionTypeList(result: any): void {
+		this.actionTypesList = [];
+		this.actionTypesList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+		const keys = Object.keys(result.data.actionTypes);
+		keys.forEach((key: string) => {
+			this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
+		});
+		if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
+			this.apiActionModel.actionType = {id: this.WEB_API};
+		} else if (!this.apiActionModel.actionType) {
+			this.apiActionModel.actionType = this.actionTypesList[0];
 		}
 	}
 
