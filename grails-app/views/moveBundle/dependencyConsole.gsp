@@ -124,7 +124,7 @@
 									<div class="f-column-2">
 										<label>Bundle:</label>
 										<div class="clr-select-wrapper">
-											<g:select class="clr-select" style="width:160px; margin-left:10px;" id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="onDependencyFiltersChange()"/>
+											<g:select class="clr-select" style="width:160px; margin-left:10px;" id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" optionValue="name" value="${moveBundleId}" onchange="onDependencyFiltersChange()"/>
 										</div>
 									</div>
 									<div class="f-column-3">
