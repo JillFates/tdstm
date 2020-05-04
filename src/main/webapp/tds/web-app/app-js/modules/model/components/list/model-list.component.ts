@@ -129,7 +129,8 @@ export class ModelListComponent implements OnInit {
 				assetType: 'Server',
 				powerDesign: 0,
 				powerNameplate: 0,
-				powerUse: 0
+				powerUse: 0,
+				useImage: 0
 			};
 			await this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,

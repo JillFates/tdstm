@@ -130,6 +130,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
 		this.reloadStrategy();
 		this.initialiseComponent();
+		this.gridMessage = this.translateService.transform('GLOBAL.LOADING_RECORDS') || 'Loading records...';
 	}
 
 	/**
@@ -255,7 +256,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public onQuery(): void {
-		this.gridMessage = this.translateService.transform('GLOBAL.LOADING_RECORDS');
 		// Timeout exists so assetExplorerViewGrid gets created first
 		setTimeout(() => {
 			let params = {

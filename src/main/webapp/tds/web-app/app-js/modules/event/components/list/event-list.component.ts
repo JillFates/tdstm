@@ -184,12 +184,13 @@ export class EventListComponent implements OnInit, AfterContentInit, OnDestroy {
 					'WARNING: Are you sure you want to delete this event?'
 				).toPromise();
 				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
-					this.eventsService.deleteEvent(dataItem.id).toPromise();
-					await this.gridComponent.reloadData();
+					this.eventsService.deleteEvent(dataItem.id).toPromise().then(() => {
+						this.gridComponent.reloadData();
+					});
 					setTimeout(() => {
 						// If the Delete Item is the one selected, remove it from the Storage
 						const event = this.store.selectSnapshot(UserContextState.getUserEvent);
-						if (event.id === dataItem.id) {
+						if (event && event.id === dataItem.id) {
 							this.store.dispatch(new SetEvent(null));
 						}
 					});

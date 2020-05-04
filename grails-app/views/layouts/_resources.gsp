@@ -27,7 +27,7 @@
 
 <!-- Clarity -->
 <script src="${resource(dir: 'dist/js/vendors/clarity', file: 'clr-icons.min.js')}"></script>
-<script src="${resource(dir: 'tds/web-app/dist', file: 'custom-elements.min.js')}"></script>
+<script src="${resource(dir: 'tds/web-app/assets/modules/webcomponents/js', file: 'custom-elements.min.js')}"></script>
 
 <!-- TDSTMLayout App -->
 <script src="${resource(dir: 'dist/js', file: 'TDSTMLayout.min.js')}"></script>

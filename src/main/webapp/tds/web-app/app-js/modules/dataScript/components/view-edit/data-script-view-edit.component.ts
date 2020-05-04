@@ -218,8 +218,19 @@ export class DataScriptViewEditComponent extends Dialog implements OnInit {
 		;
 	}
 
+	/**
+	 * Validates if action name is unique.
+	 */
 	protected onValidateUniqueness(): void {
 		this.datasourceName.next(this.dataScriptModel.name);
+	}
+
+	/**
+	 * Validates and returns true if action name input is valid, false otherwise.
+	 */
+	isNameInvalid(): boolean {
+		return !this.dataScriptForm.form.valid && this.dataScriptForm.touched
+			&& (!this.dataScriptModel.name || this.dataScriptModel.name.length <= 0);
 	}
 
 	/**

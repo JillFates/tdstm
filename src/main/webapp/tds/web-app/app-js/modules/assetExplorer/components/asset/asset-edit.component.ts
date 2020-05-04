@@ -39,6 +39,7 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 
 	public modelId;
 	public asset;
+	public onCloseOpenDetailView = true;
 
 	@ViewChild('view', {read: ViewContainerRef, static: true}) view: ViewContainerRef;
 
@@ -60,6 +61,9 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 	ngOnInit(): void {
 		this.modelId = this.data.assetId;
 		this.asset = this.data.assetClass;
+		if (this.data && this.data.onCloseOpenDetailView !== undefined) {
+			this.onCloseOpenDetailView = this.data.onCloseOpenDetailView;
+		}
 
 		this.buttons.push({
 			name: 'edit',
@@ -256,7 +260,11 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 	 * User Dismiss Changes
 	 */
 	public onDismiss(): void {
-		const cancelEdit = this.buttons.find((button: DialogButtonModel) => button.name === 'cancelEdit');
-		cancelEdit.action();
+		if (this.onCloseOpenDetailView) {
+			const cancelEdit = this.buttons.find((button: DialogButtonModel) => button.name === 'cancelEdit');
+			cancelEdit.action();
+		} else {
+			this.onCancelClose();
+		}
 	}
 }

@@ -6,6 +6,7 @@ import {ModelModel} from '../model/model.model';
 @Injectable()
 export class ModelService {
 	private modelUrl = '/tdstm/model';
+	private wsModelUrl = '../ws/model'
 	constructor(private http: HttpClient) {	}
 
 	getModels(): Observable<ModelModel[]> {
@@ -31,10 +32,7 @@ export class ModelService {
 	}
 
 	deleteModel(id: number): Observable<string> {
-		const body = {
-			id
-		}
-		return this.http.post(`${this.modelUrl}/delete/${id}`, body)
+		return this.http.delete(`${this.wsModelUrl}/${id}`)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
 			})
@@ -43,8 +41,9 @@ export class ModelService {
 
 	saveModel(model: ModelModel): Observable<ModelModel> {
 		const postRequest = {
+			id: model.id,
 			modelName: model.modelName,
-			manufacturer: { id: model.manufacturer },
+			manufacturer: (model.manufacturer['id']) ? {id: model.manufacturer['id']} : {id: model.manufacturer},
 			assetType: model.assetType,
 			usize: model.usize,
 			weight: model.weight,
@@ -71,20 +70,22 @@ export class ModelService {
 			modelConnectors: model.modelConnectors,
 			removedConnectors: model.removedConnectors,
 			connectorCount: model.connectorCount,
-			akaChanges: {
-				deleted: model.akaChanges.deleted.join(','),
+			aka: {
+				deleted: model.akaChanges.deleted,
 				edited: model.akaChanges.edited,
 				added: model.akaChanges.added
-			}
+			},
+			useImage: model.useImage,
+			connectors: {added: model.modelConnectors, edited: [], deleted: model.removedConnectors}
 		};
 		if (!model.id) {
-			return this.http.post(`${this.modelUrl}/save`, JSON.stringify(postRequest))
+			return this.http.post(`${this.wsModelUrl}`, JSON.stringify(postRequest))
 				.map((response: any) => {
 					return response && response.status === 'success' && response.data;
 				})
 				.catch((error: any) => error);
 		} else {
-			return this.http.post(`${this.modelUrl}/update/${model.id}`, JSON.stringify(postRequest))
+			return this.http.put(`${this.wsModelUrl}`, JSON.stringify(postRequest))
 				.map((response: any) => {
 					return response && response.status === 'success' && response.data;
 				})
@@ -94,6 +95,14 @@ export class ModelService {
 
 	getPreData(): Observable<any> {
 		return this.http.get(`${this.modelUrl}/create`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	retrieveAssetCablesForConnector(connector: string, modelId: number): Observable<any> {
+		return this.http.post(`${this.modelUrl}/retrieveAssetCablesForConnector?connector=${connector}&modelId=${modelId}`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
 			})

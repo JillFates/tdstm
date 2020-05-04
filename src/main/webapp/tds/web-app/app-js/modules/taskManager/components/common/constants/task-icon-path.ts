@@ -254,5 +254,12 @@ export const CTX_MENU_ICONS_PATH = {
 		// tslint:disable-next-line:max-line-length
 		icon: 'faBuilding',
 		color: '#9e9e9e'
+	},
+	architectureGraph: {
+		name: 'assetDetail',
+		iconAlt: '\uf1ad',
+		// tslint:disable-next-line:max-line-length
+		icon: 'faBuilding',
+		color: '#9e9e9e'
 	}
 };

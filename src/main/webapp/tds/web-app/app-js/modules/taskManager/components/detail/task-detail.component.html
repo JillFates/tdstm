@@ -3,146 +3,146 @@
 		<form>
 			<table class="full-height">
 				<tbody class="full-height task-layout">
-					<tr class="no-grow-container">
-						<td colspan="2">
-							<div class="btn-collapsed-fixed-right">
-								<tds-button-collapse
-									[displayLabel]="false"
-									*ngIf="!collapsedTaskDetail"
-									(click)="onCollapseTaskDetail()"
-								></tds-button-collapse>
-								<tds-button-expand
-									[displayLabel]="false"
-									*ngIf="collapsedTaskDetail"
-									(click)="onCollapseTaskDetail()"
-								></tds-button-expand>
-							</div>
-							<div class="dialog tds-table">
-								<table class="task-details">
-									<tbody>
-										<tr class="prop">
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													class="task-number"
-													>Task #
-													{{
-														model.taskNumber
-													}}</label
-												>
-											</td>
-											<td
-												class="valueNW"
-												class="task-comment"
-												colspan="5"
-											>
+				<tr class="no-grow-container">
+					<td colspan="2">
+						<div class="btn-collapsed-fixed-right">
+							<tds-button-collapse
+								[displayLabel]="false"
+								*ngIf="!collapsedTaskDetail"
+								(click)="onCollapseTaskDetail()"
+							></tds-button-collapse>
+							<tds-button-expand
+								[displayLabel]="false"
+								*ngIf="collapsedTaskDetail"
+								(click)="onCollapseTaskDetail()"
+							></tds-button-expand>
+						</div>
+						<div class="dialog tds-table">
+							<table class="task-details">
+								<tbody>
+								<tr class="prop">
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+											class="task-number"
+										>Task #
+											{{
+											model.taskNumber
+											}}</label
+										>
+									</td>
+									<td
+										class="valueNW"
+										class="task-comment"
+										colspan="5"
+									>
 												<span>{{
 													model.comment
-												}}</span>
-											</td>
-										</tr>
-										<tr
-											*ngIf="
+													}}</span>
+									</td>
+								</tr>
+								<tr
+									*ngIf="
 												!collapsedTaskDetail
 											"
-											class="prop"
+									class="prop"
+								>
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+										>Person</label
 										>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Person</label
-												>
-											</td>
-											<td class="valueNW">
+									</td>
+									<td class="valueNW">
 												<span>{{
 													(model.assignedTo &&
 														model
 															.assignedTo
 															.text) ||
-														''
-												}}</span>
-											</td>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label>Team</label>
-											</td>
-											<td class="valueNW">
+													''
+													}}</span>
+									</td>
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label>Team</label>
+									</td>
+									<td class="valueNW">
 												<span>{{
 													(model.assignedTeam &&
 														model
 															.assignedTeam
 															.text) ||
-														''
-												}}</span>
-											</td>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label>Event</label>
-											</td>
-											<td class="valueNW">
+													''
+													}}</span>
+									</td>
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label>Event</label>
+									</td>
+									<td class="valueNW">
 												<span>{{
 													(model.event &&
 														model.event
 															.text) ||
-														''
-												}}</span>
-											</td>
-										</tr>
-										<tr
-											*ngIf="
+													''
+													}}</span>
+									</td>
+								</tr>
+								<tr
+									*ngIf="
 												!collapsedTaskDetail
 											"
-											class="prop"
+									class="prop"
+								>
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+										>Fixed
+											Assignment</label
 										>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Fixed
-													Assignment</label
-												>
-											</td>
-											<td class="valueNW">
+									</td>
+									<td class="valueNW">
 												<span>{{
 													model.hardAssigned
-												}}</span>
-											</td>
+													}}</span>
+									</td>
 
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Send
-													Notification</label
-												>
-											</td>
-											<td class="valueNW">
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+										>Send
+											Notification</label
+										>
+									</td>
+									<td class="valueNW">
 												<span>{{
 													model.sendNotification
-												}}</span>
-											</td>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Action</label
-												>
-											</td>
-											<td class="valueNW">
+													}}</span>
+									</td>
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+										>Action</label
+										>
+									</td>
+									<td class="valueNW">
 												<span class="actionable-link">
 													<a
-													(click)="
+														(click)="
 														openTaskActionSummaryDetailHandler()
 													"
 													>{{
@@ -150,360 +150,242 @@
 															model
 																.apiAction
 																.text) ||
-															''
-													}}</a
-												>
+														''
+														}}</a
+													>
 												</span>
-											</td>
-										</tr>
+									</td>
+								</tr>
 
-										<tr
-											*ngIf="
+								<tr
+									*ngIf="
 												!collapsedTaskDetail
 											"
-											class="prop"
+									class="prop"
+								>
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+										>Category</label
 										>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Category</label
-												>
-											</td>
-											<td class="valueNW">
+									</td>
+									<td class="valueNW">
 												<span>{{
 													model.category
-												}}</span>
-											</td>
-											<td
-												class="url N"
-												nowrap="nowrap"
-											>
-												<label
-													><span
-														>Class</span
-													></label
-												>
-											</td>
-											<td class="valueNW">
+													}}</span>
+									</td>
+									<td
+										class="url N"
+										nowrap="nowrap"
+									>
+										<label
+										><span
+										>Class</span
+										></label
+										>
+									</td>
+									<td class="valueNW">
 												<span>{{
 													(model.assetClass &&
 														model
 															.assetClass
 															.text) ||
-														''
-												}}</span>
-											</td>
+													''
+													}}</span>
+									</td>
 
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label>Asset</label>
-											</td>
-											<td class="valueNW">
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label>Asset</label>
+									</td>
+									<td class="valueNW">
 												<span class="actionable-link">
 													<a
-													(click)="
+														(click)="
 														onOpenLinkAsset()
 													"
 													>{{
 														model.asset &&
-															model
-																.asset
-																.text
-													}}</a
-												>
+														model
+															.asset
+															.text
+														}}</a
+													>
 												</span>
-											</td>
-										</tr>
+									</td>
+								</tr>
 
-										<tr
-											*ngIf="
+								<tr
+									*ngIf="
 												!collapsedTaskDetail
 											"
-											class="prop"
+									class="prop"
+								>
+									<td
+										class="url N"
+										nowrap="nowrap"
+									>
+										<label
+										>Instruction
+											Link</label
 										>
-											<td
-												class="url N"
-												nowrap="nowrap"
-											>
-												<label
-													>Instruction
-													Link</label
-												>
-											</td>
-											<td class="valueNW">
-												<span class="actionable-link"
-													><tds-url-viewer
-														*ngIf="
-															model.instructionLink
-														"
-														[model]="
-															model.instructionLink
-														"
-													></tds-url-viewer
-												></span>
-											</td>
+									</td>
+									<td class="valueNW">
+												<span class="actionable-link">
+													<tds-url-viewer *ngIf="model.instructionLink"
+																					[model]="model.instructionLink"
+																					[tooltip]="'Instructions'"
+																					[target]="'_blank'">
+													</tds-url-viewer>
+												</span>
+									</td>
 
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Priority</label
-												>
-											</td>
-											<td class="valueNW">
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+										>Priority</label
+										>
+									</td>
+									<td class="valueNW">
 												<span>{{
 													model.priority
-												}}</span>
-											</td>
+													}}</span>
+									</td>
 
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Due Date</label
-												>
-											</td>
-											<td class="valueNW">
+									<td
+										class="N"
+										nowrap="nowrap"
+									>
+										<label
+										>Due Date</label
+										>
+									</td>
+									<td class="valueNW">
 												<span>{{
 													model.dueDate || ''
-												}}</span>
-											</td>
-										</tr>
+													}}</span>
+									</td>
+								</tr>
 
-										<tr
-											*ngIf="
-												!collapsedTaskDetail
-											"
-											class="prop"
-										>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Estimated
-													Duration</label
-												>
-											</td>
-											<td class="valueNW">
-												<span>{{
-													model.durationText
-												}}</span>
-											</td>
+								<tr *ngIf="!collapsedTaskDetail"
+									class="prop">
+									<td class="N" nowrap="nowrap">
+										<label>Estimated Duration</label>
+									</td>
+									<td class="valueNW">
+										<span>{{model.durationText}}</span>
+									</td>
 
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Earliest Start</label
-												>
-											</td>
-											<td class="valueNW">
-												<span>{{ model.etStart }}</span>
-											</td>
+									<td class="N" nowrap="nowrap">
+										<label>Earliest Start</label>
+									</td>
+									<td class="valueNW">
+										<span>{{ model.etStart }}</span>
+									</td>
 
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Earliest Finish</label
-												>
-											</td>
-											<td class="valueNW">
-												<span>{{ model.etFinish }}</span>
-											</td>
-										</tr>
+									<td class="N" nowrap="nowrap">
+										<label>Earliest Finish</label>
+									</td>
+									<td class="valueNW">
+										<span>{{ model.etFinish }}</span>
+									</td>
+								</tr>
 
-										<tr
-											*ngIf="
-												!collapsedTaskDetail
-											"
-											class="prop"
-										>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Actual
-													Start</label
-												>
-											</td>
-											<td class="valueNW">
-												<span>{{
-													model.actualStart ||
-														''
-												}}</span>
-											</td>
+								<tr *ngIf="!collapsedTaskDetail" class="prop">
+									<td class="N" nowrap="nowrap">
+										<label>Status</label>
+									</td>
+									<td class="valueNW">
+										<tds-task-status-indicator [propertyName]="'status'"
+																							 [value]="model.status">
+										</tds-task-status-indicator>
+									</td>
+									<td class="N" nowrap="nowrap">
+										<label>Actual Start</label>
+									</td>
+									<td class="valueNW">
+										<span>{{model.actualStart || ''}}</span>
+									</td>
+									<td class="N" nowrap="nowrap">
+										<label>Actual Finish</label>
+									</td>
+									<td class="valueNW">
+										<span>{{model.actualFinish || ''}}</span>
+									</td>
+								</tr>
 
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Actual
-													Finish</label
-												>
-											</td>
-											<td class="valueNW">
-												<span>{{
-													model.actualFinish ||
-														''
-												}}</span>
-											</td>
-
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Actual
-													Duration</label
-												>
-											</td>
-											<td class="valueNW">
-												<span>{{
-													model.actualDuration
-												}}</span>
-											</td>
-										</tr>
-
-										<tr
-											*ngIf="
-												!collapsedTaskDetail
-											"
-											class="prop"
-										></tr>
-										<tr
-											*ngIf="
-												!collapsedTaskDetail
-											"
-											class="prop"
-										>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Status</label
-												>
-											</td>
-											<td class="valueNW">
-												<tds-task-status-indicator
-													[propertyName]="
-														'status'
-													"
-													[value]="
-														model.status
-													"
-												></tds-task-status-indicator>
-											</td>
-
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Duration
-													Delta</label
-												>
-											</td>
-											<td class="valueNW">
-												<span>{{
-													model.durationDelta
-												}}</span>
-											</td>
-										</tr>
-
-										<tr
-											*ngIf="
-												!collapsedTaskDetail
-											"
-											class="prop"
-										>
-											<td
-												class="N"
-												nowrap="nowrap"
-											>
-												<label
-													>Completion
-													%:</label
-												>
-											</td>
-											<td class="valueNW">
-												<div
-													class="progress completion"
-												>
-													<div
-														class="progress-bar"
-														role="progressbar"
-														*ngIf="model.percentageComplete"
-														[style.width.%]="
-															model.percentageComplete <= 24 ? 24 : model.percentageComplete
-														"
-														[attr.aria-valuenow]="
-															model.percentageComplete
-														"
-														[attr.aria-valuemin]="
-															0
-														"
-														[attr.aria-valuemax]="
-															100
-														"
-													>
-														{{
-															model.percentageComplete
-														}}
-														%
-													</div>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</td>
-					</tr>
-					<tr
-						class="no-grow-container"
-						*ngIf="!collapsedTaskDetail"
+								<tr *ngIf="!collapsedTaskDetail" class="prop">
+									<td class="N" nowrap="nowrap">
+										<label>Completion %:</label>
+									</td>
+									<td class="valueNW">
+										<div class="progress completion">
+											<div class="progress-bar" role="progressbar"
+													 *ngIf="model.percentageComplete"
+													 [style.width.%]="model.percentageComplete <= 24 ? 24 : model.percentageComplete"
+													 [attr.aria-valuenow]="model.percentageComplete"
+													 [attr.aria-valuemin]="0"
+													 [attr.aria-valuemax]="100">
+												{{model.percentageComplete}}%
+											</div>
+										</div>
+									</td>
+									<td class="N" nowrap="nowrap">
+										<label>Actual Duration</label>
+									</td>
+									<td class="valueNW">
+										<span>{{model.actualDuration}}</span>
+									</td>
+									<td class="N" nowrap="nowrap">
+										<label>Duration Delta</label>
+									</td>
+									<td class="valueNW">
+										<span>{{model.durationDelta}}</span>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</td>
+				</tr>
+				<tr
+					class="no-grow-container"
+					*ngIf="!collapsedTaskDetail"
+				>
+					<td
+						class="dates-info-container"
+						colspan="2"
 					>
-						<td
-							class="dates-info-container"
-							colspan="2"
-						>
-							<table class="dates-info">
-								<tbody>
-									<tr>
-										<td class="date-created">
-											Created By:
-											{{
-												model.personCreateObj
-											}}
-											at
-											{{
-												model.dtCreated
-											}}
-											{{
-												model.taskSpecId
-													? ' with spec id ' +
-													  model.taskSpecId
-													: ''
-											}}
-											<span
-												*ngIf="
+						<table class="dates-info">
+							<tbody>
+							<tr>
+								<td class="date-created">
+									Created By:
+									{{
+									model.personCreateObj
+									}}
+									at
+									{{
+									model.dtCreated
+									}}
+									{{
+									model.taskSpecId
+										? ' with spec id ' +
+										model.taskSpecId
+										: ''
+									}}
+									<span
+										*ngIf="
 													model.recipe &&
 													hasCookbookPermission
 												"
-											>
+									>
 												in recipe
 												<a
 													href="./../recipes/index#/recipes/{{
@@ -512,350 +394,350 @@
 													}}/gentasks/start"
 												>
 													{{
-														model.recipe
-															?.name
+													model.recipe
+														?.name
 													}}</a
 												>
 											</span>
-										</td>
-										<td class="last-updated">
-											Last Updated:
-											{{
-												model.lastUpdated
-											}}
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</td>
-					</tr>
-					<tr class="deps no-grow-container">
-						<table>
-							<tr>
-								<td valign="top">
-									<kendo-grid
-										*ngIf="
+								</td>
+								<td class="last-updated">
+									Last Updated:
+									{{
+									model.lastUpdated
+									}}
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				<tr class="deps no-grow-container">
+					<table>
+						<tr>
+							<td valign="top">
+								<kendo-grid
+									*ngIf="
 											dataGridTaskPredecessorsHelper &&
 											modelHelper
 										"
-										class="successor-predecessor-table"
-										[data]="
+									class="successor-predecessor-table"
+									[data]="
 											dataGridTaskPredecessorsHelper.gridData
 										"
-										[sort]="
+									[sort]="
 											dataGridTaskPredecessorsHelper
 												.state.sort
 										"
-										[sortable]="{
+									[sortable]="{
 											mode: 'single'
 										}"
-										[resizable]="false"
-										(sortChange)="
+									[resizable]="false"
+									(sortChange)="
 											dataGridTaskPredecessorsHelper.sortChange(
 												$event
 											)
 										">
-										<!-- Toolbar Template -->
-										<ng-template kendoGridToolbarTemplate [position]="'top'">
-											<div class="table-container">
-												<label class="table-title">Predecessors
-													({{ dataGridTaskPredecessorsHelper
-															.gridData
-															.data
-															.length
-													}})</label >
-												<tds-button-add title="Create" [displayLabel]="false"
-													[small]="true"
-													iconClass="is-solid"
-													[tooltip]="modelHelper.CREATE_PREDECESSOR"
-													[id]="'btnAddPredecessor'"
-													[disabled]="!hasCreateTaskPermission"
-													(click)="onAddTaskDependency(model.predecessorList,dataGridTaskPredecessorsHelper)">
-												</tds-button-add>
-											</div>
-										</ng-template>
+									<!-- Toolbar Template -->
+									<ng-template kendoGridToolbarTemplate [position]="'top'">
+										<div class="table-container">
+											<label class="table-title">Predecessors
+												({{ dataGridTaskPredecessorsHelper
+													.gridData
+													.data
+													.length
+												}})</label>
+											<tds-button-add title="Create" [displayLabel]="false"
+																			[small]="true"
+																			iconClass="is-solid"
+																			[tooltip]="modelHelper.CREATE_PREDECESSOR"
+																			[id]="'btnAddPredecessor'"
+																			[disabled]="!hasCreateTaskPermission"
+																			(click)="onAddTaskDependency(model.predecessorList,dataGridTaskPredecessorsHelper)">
+											</tds-button-add>
+										</div>
+									</ng-template>
 
-										<!-- Columns -->
-										<kendo-grid-column
-											*ngFor="
+									<!-- Columns -->
+									<kendo-grid-column
+										*ngFor="
 												let column of taskSuccessorPredecessorColumnsModel.columns
 											"
-											field="{{
+										field="{{
 												column.property
 											}}"
-											[width]="
+										[width]="
 												!column.width
 													? COLUMN_MIN_WIDTH
 													: column.width
 											"
+									>
+										<!-- Header Template -->
+										<ng-template
+											kendoGridHeaderTemplate
 										>
-											<!-- Header Template -->
-											<ng-template
-												kendoGridHeaderTemplate
-											>
-												<label>{{
-													column.label
+											<label>{{
+												column.label
 												}}</label>
-											</ng-template>
+										</ng-template>
 
-											<ng-template
-												kendoGridCellTemplate
-												*ngIf="
+										<ng-template
+											kendoGridCellTemplate
+											*ngIf="
 													column.property ===
 													'taskNumber'
 												"
-												let-dataItem
-												let-rowIndex="rowIndex"
-											>
-												<label
-													class="pointer pad-left-7"
-													(click)="
+											let-dataItem
+											let-rowIndex="rowIndex"
+										>
+											<label
+												class="pointer pad-left-7"
+												(click)="
 														openTaskDetail(
 															dataItem,
 															modalType.VIEW
 														)
 													"
-													>{{
-														dataItem.taskNumber
-													}}</label
-												>
-											</ng-template>
+											>{{
+												dataItem.taskNumber
+												}}</label
+											>
+										</ng-template>
 
-											<ng-template
-												kendoGridCellTemplate
-												*ngIf="
+										<ng-template
+											kendoGridCellTemplate
+											*ngIf="
 													column.property ===
 													'desc'
 												"
-												let-dataItem
-												let-rowIndex="rowIndex"
-											>
-												<label
-													class="pointer pad-left-7"
-													(click)="
+											let-dataItem
+											let-rowIndex="rowIndex"
+										>
+											<label
+												class="pointer pad-left-7"
+												(click)="
 														openTaskDetail(
 															dataItem,
 															modalType.VIEW
 														)
 													"
-													>{{
-														dataItem.desc
-													}}</label
-												>
-											</ng-template>
-
-											<ng-template kendoGridCellTemplate
-														 let-dataItem
-														 let-rowIndex="rowIndex"
-														 *ngIf="column.property === 'status'">
-												<tds-task-status-indicator
-														class=""
-														[propertyName]="column.property"
-														[value]="dataItem[column.property]">
-												</tds-task-status-indicator>
-											</ng-template>
-
-											<ng-template
-												kendoGridCellTemplate
-												let-dataItem
-												let-rowIndex="rowIndex"
+											>{{
+												dataItem.desc
+												}}</label
 											>
-												<label
-													class="pad-left-7"
-													>{{
-														dataItem[
-															column
-																.property
-														]
-													}}</label
-												>
-											</ng-template>
-										</kendo-grid-column>
-										<kendo-grid-messages
-											noRecords="There are no records to display."
+										</ng-template>
+
+										<ng-template kendoGridCellTemplate
+																 let-dataItem
+																 let-rowIndex="rowIndex"
+																 *ngIf="column.property === 'status'">
+											<tds-task-status-indicator
+												class=""
+												[propertyName]="column.property"
+												[value]="dataItem[column.property]">
+											</tds-task-status-indicator>
+										</ng-template>
+
+										<ng-template
+											kendoGridCellTemplate
+											let-dataItem
+											let-rowIndex="rowIndex"
 										>
-										</kendo-grid-messages>
-									</kendo-grid>
-								</td>
-								<td valign="top">
-									<kendo-grid
-										*ngIf="
+											<label
+												class="pad-left-7"
+											>{{
+												dataItem[
+													column
+														.property
+													]
+												}}</label
+											>
+										</ng-template>
+									</kendo-grid-column>
+									<kendo-grid-messages
+										noRecords="There are no records to display."
+									>
+									</kendo-grid-messages>
+								</kendo-grid>
+							</td>
+							<td valign="top">
+								<kendo-grid
+									*ngIf="
 											dataGridTaskSuccessorsHelper &&
 											modelHelper
 										"
-										class="successor-predecessor-table"
-										[data]="
+									class="successor-predecessor-table"
+									[data]="
 											dataGridTaskSuccessorsHelper.gridData
 										"
-										[sort]="
+									[sort]="
 											dataGridTaskSuccessorsHelper
 												.state.sort
 										"
-										[sortable]="{
+									[sortable]="{
 											mode: 'single'
 										}"
-										[resizable]="false"
-										(sortChange)="
+									[resizable]="false"
+									(sortChange)="
 											dataGridTaskSuccessorsHelper.sortChange(
 												$event
 											)
 										">
-										<!-- Toolbar Template -->
-										<ng-template
-											kendoGridToolbarTemplate
-											[position]="'top'"
+									<!-- Toolbar Template -->
+									<ng-template
+										kendoGridToolbarTemplate
+										[position]="'top'"
+									>
+										<div
+											class="table-container"
 										>
-											<div
-												class="table-container"
+											<label
+												class="table-title"
+											>Successors ({{
+												dataGridTaskSuccessorsHelper
+													.gridData
+													.data
+													.length
+												}})</label
 											>
-												<label
-													class="table-title"
-													>Successors ({{
-														dataGridTaskSuccessorsHelper
-															.gridData
-															.data
-															.length
-													}})</label
-												>
-												<tds-button-add
-													title="Create"
-													[displayLabel]="
+											<tds-button-add
+												title="Create"
+												[displayLabel]="
 														false
 													"
-													iconClass="is-solid"
-													[small]="true"
-													[tooltip]="
+												iconClass="is-solid"
+												[small]="true"
+												[tooltip]="
 														modelHelper.CREATE_SUCCESSOR
 													"
-													[id]="
+												[id]="
 														'btnAddSuccessor'
 													"
-													[disabled]="!hasCreateTaskPermission"
-													(click)="
+												[disabled]="!hasCreateTaskPermission"
+												(click)="
 														onAddTaskDependency(
 															model.successorList,
 															dataGridTaskSuccessorsHelper
 														)
 													"
-												>
-												</tds-button-add>
-											</div>
-										</ng-template>
-										<!-- Columns -->
-										<kendo-grid-column
-											*ngFor="
+											>
+											</tds-button-add>
+										</div>
+									</ng-template>
+									<!-- Columns -->
+									<kendo-grid-column
+										*ngFor="
 												let column of taskSuccessorPredecessorColumnsModel.columns
 											"
-											field="{{
+										field="{{
 												column.property
 											}}"
-											[width]="
+										[width]="
 												!column.width
 													? COLUMN_MIN_WIDTH
 													: column.width
 											"
+									>
+										<!-- Header Template -->
+										<ng-template
+											kendoGridHeaderTemplate
 										>
-											<!-- Header Template -->
-											<ng-template
-												kendoGridHeaderTemplate
-											>
-												<label>{{
-													column.label
+											<label>{{
+												column.label
 												}}</label>
-											</ng-template>
+										</ng-template>
 
-											<ng-template
-												kendoGridCellTemplate
-												*ngIf="
+										<ng-template
+											kendoGridCellTemplate
+											*ngIf="
 													column.property ===
 													'taskNumber'
 												"
-												let-dataItem
-												let-rowIndex="rowIndex"
-											>
-												<label
-													class="pointer pad-left-7"
-													(click)="
+											let-dataItem
+											let-rowIndex="rowIndex"
+										>
+											<label
+												class="pointer pad-left-7"
+												(click)="
 														openTaskDetail(
 															dataItem,
 															modalType.VIEW
 														)
 													"
-													>{{
-														dataItem.taskNumber
-													}}</label
-												>
-											</ng-template>
+											>{{
+												dataItem.taskNumber
+												}}</label
+											>
+										</ng-template>
 
-											<ng-template
-												kendoGridCellTemplate
-												*ngIf="
+										<ng-template
+											kendoGridCellTemplate
+											*ngIf="
 													column.property ===
 													'desc'
 												"
-												let-dataItem
-												let-rowIndex="rowIndex"
-											>
-												<label
-													class="pointer pad-left-7"
-													(click)="
+											let-dataItem
+											let-rowIndex="rowIndex"
+										>
+											<label
+												class="pointer pad-left-7"
+												(click)="
 														openTaskDetail(
 															dataItem,
 															modalType.VIEW
 														)
 													"
-													>{{
-														dataItem.desc
-													}}</label
-												>
-											</ng-template>
-
-											<ng-template kendoGridCellTemplate
-														 let-dataItem
-														 let-rowIndex="rowIndex"
-														 *ngIf="column.property === 'status'">
-												<tds-task-status-indicator
-														class=""
-														[propertyName]="column.property"
-														[value]="dataItem[column.property]">
-												</tds-task-status-indicator>
-											</ng-template>
-
-											<ng-template
-												kendoGridCellTemplate
-												let-dataItem
-												let-rowIndex="rowIndex"
+											>{{
+												dataItem.desc
+												}}</label
 											>
-												<label
-													class="pad-left-7"
-													>{{
-														dataItem[
-															column
-																.property
-														]
-													}}</label
-												>
-											</ng-template>
-										</kendo-grid-column>
-										<kendo-grid-messages
-											noRecords="There are no records to display."
+										</ng-template>
+
+										<ng-template kendoGridCellTemplate
+																 let-dataItem
+																 let-rowIndex="rowIndex"
+																 *ngIf="column.property === 'status'">
+											<tds-task-status-indicator
+												class=""
+												[propertyName]="column.property"
+												[value]="dataItem[column.property]">
+											</tds-task-status-indicator>
+										</ng-template>
+
+										<ng-template
+											kendoGridCellTemplate
+											let-dataItem
+											let-rowIndex="rowIndex"
 										>
-										</kendo-grid-messages>
-									</kendo-grid>
-								</td>
-							</tr>
-						</table>
-					</tr>
-					<tr class="deps grow-container">
-						<td colspan="5">
-							<tds-task-notes
-								[dataGridTaskNotesHelper]="
+											<label
+												class="pad-left-7"
+											>{{
+												dataItem[
+													column
+														.property
+													]
+												}}</label
+											>
+										</ng-template>
+									</kendo-grid-column>
+									<kendo-grid-messages
+										noRecords="There are no records to display."
+									>
+									</kendo-grid-messages>
+								</kendo-grid>
+							</td>
+						</tr>
+					</table>
+				</tr>
+				<tr class="deps grow-container">
+					<td colspan="5">
+						<tds-task-notes
+							[dataGridTaskNotesHelper]="
 									dataGridTaskNotesHelper
 								"
-								(create)="createNote()"
-							></tds-task-notes>
-						</td>
-					</tr>
+							(create)="createNote()"
+						></tds-task-notes>
+					</td>
+				</tr>
 				</tbody>
 			</table>
 		</form>

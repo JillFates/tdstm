@@ -7,6 +7,7 @@ let autoPreFixer = require('gulp-autoprefixer');
 let gulp = require('gulp');
 let sass = require('gulp-sass');
 let shell = require('gulp-shell');
+let sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('sass-main-style', function () {
 	return gulp.src('../../../../grails-app/assets/stylesheets/css/tds-style.sass')
@@ -34,6 +35,19 @@ gulp.task('sass-angular-manager-compiler', function () {
 		.pipe(sass({errLogToConsole: true}))
 		.pipe(autoPreFixer({browsers: ['last 2 version'], cascade: false}))
 		.pipe(gulp.dest('./web-app/css'));
+});
+
+const custom_sources = ['./web-app/assets/modules/clarity/css/*.css', './web-app/assets/modules/webcomponents/js/*.js'];
+
+gulp.task('custom-sourcemaps', function(done) {
+    Object.keys(custom_sources).forEach(function(i){
+        const wildcardIndex = custom_sources[i].indexOf('*');
+        gulp.src(custom_sources[i])
+            .pipe(sourcemaps.init())
+            .pipe(sourcemaps.write(custom_sources[i].slice(0, wildcardIndex - 1)))
+            .pipe(gulp.dest('.'));
+    });
+    done();
 });
 
 gulp.task('build-test', shell.task(['karma start karma.conf.js']));

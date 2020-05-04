@@ -5,7 +5,7 @@
 	"description": "TDS has upgraded its base code to use Angular 5 Latest,",
 	"author": "TransitionManager",
 	"scripts": {
-		"compile-css": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-main-style --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-manager-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-manager-compiler --PROD",
+		"compile-css": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js custom-sourcemaps & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-main-style --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-manager-compiler --PROD & node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js sass-angular-manager-compiler --PROD",
 		"build-prod": "npm run compile-css & node ./node_modules/webpack/bin/webpack --profile --config ../../webapp/tds/webpack-prod.config.js --env=prod",
 		"build-dev": "npm run compile-css & node ./node_modules/webpack/bin/webpack --profile --config ../../webapp/tds/webpack-dev.config.js",
 		"karma-unit-test": "node ./node_modules/gulp/bin/gulp.js --gulpfile ../../webapp/tds/gulpfile.js build-test-report"
@@ -75,7 +75,7 @@
 		"ramda": "0.25.0",
 		"rxjs": "6.4.0",
 		"rxjs-compat": "6.4.0",
-		"tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.1.49.tgz",
+		"tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.1.52.tgz",
 		"zone.js": "0.10.0"
 	},
 	"devDependencies": {

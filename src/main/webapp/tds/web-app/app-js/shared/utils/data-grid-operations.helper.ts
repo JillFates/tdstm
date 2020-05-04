@@ -15,8 +15,16 @@ import {
 } from '../model/constants';
 import { DateUtils } from './date.utils';
 import { NotifierService } from '../services/notifier.service';
+import {DependencySupportModel} from '../components/supports-depends/model/support-on-columns.model';
 
 declare var jQuery: any;
+
+// Define the row state
+export enum RecordState {
+	pristine,
+	updated,
+	created
+}
 
 /**
  * TODO: (dontiveros) migrate usage of Grid Helper to Helper class from component-library.
@@ -437,6 +445,52 @@ export class DataGridOperationsHelper {
 	public getFilterCounter(state: State = null): number {
 		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
 		return uniq(filters.map((filter: any) => filter.field)).length;
+	}
+
+	/**
+	 * Add one element to the whole list
+	 * @param item
+	 */
+	public addResultSetItem(item: any): void {
+		this.addDataItem(item);
+
+		if (this.state.skip > this.resultSet.length) {
+			this.resultSet.push(item);
+		} else {
+			this.resultSet.splice(this.state.skip, 0, item);
+		}
+		this.reloadData(this.resultSet);
+	}
+
+	/**
+	 * Remove one element from to the whole result set item
+	 * @param item
+	 */
+	public removeResultSetItem(item: any): void {
+		let index = this.resultSet.indexOf(item);
+
+		if (index >= 0) {
+			this.resultSet.splice(index, 1);
+			this.reloadData(this.resultSet);
+		}
+	}
+
+	/**
+	 * Get just the created or updated records
+	 */
+	public getCreatedUpdatedRecords(): DependencySupportModel[] {
+		const result = this.resultSet
+			.filter((dependency: DependencySupportModel) => {
+				return dependency.recordState === RecordState.updated ||
+					dependency.recordState === RecordState.created;
+			})
+			.map((dependency: DependencySupportModel) => {
+				const item = {...dependency} ;
+				delete item['recordState'];
+				return item;
+			});
+
+		return result;
 	}
 }
 

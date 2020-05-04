@@ -1,4 +1,4 @@
-<g:if test="${fromDialog}">
+<g:if test="${fromDialog && !fromPersonEdit}">
 
 	<tr class='passwordsEditFields'>
 		<td>Hide password:</td>
@@ -71,7 +71,7 @@
 	</tr>
 </g:if>
 
-<g:if test="${!fromDialog}">
+<g:if test="${!fromDialog && !fromPersonEdit}">
 	<div class="checkbox">
 		<label>
 			<input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="showPasswordEditId" checked/> Hide password
@@ -117,4 +117,77 @@
 		</g:hasErrors>
 	</div>
 		<em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
+</g:if>
+
+<g:if test="${fromPersonEdit}">
+
+    <tr class='passwordsEditFields'>
+        <td>Hide password:</td>
+        <td>
+            <input type="checkbox" onchange="PasswordValidation.togglePasswordVisibility(this)" id="personShowPasswordEditId" checked/>
+        </td>
+    </tr>
+    <g:if test="${changingPassword}">
+        <tr class="prop passwordsEditFields">
+            <td valign="top" class="name">
+                <label for="oldPasswordId">Old Password:</label>
+            </td>
+            <td valign="top" class="value">
+                <input type="hidden" id="personId" name="personId" value=""/>
+                <input type="password" id="personOldPasswordId" class="passwordField" maxlength="25" name="oldPassword" value=""/>
+            </td>
+        </tr>
+    </g:if>
+    <tr class="prop passwordsEditFields">
+        <td valign="top" class="name">
+            <label for="passwordId">
+                <g:if test="${changingPassword}">New </g:if>Password:&nbsp;
+            </label>
+        </td>
+        <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
+            <input type="password" id="personPasswordId" class="passwordField" onkeyup="PasswordValidation.checkPassword(this)" name="password" value="" autocomplete="off" />
+
+            <g:hasErrors bean="${userLoginInstance}" field="password">
+                <div class="errors">
+                    <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
+                </div>
+            </g:hasErrors>
+        </td>
+    </tr>
+    <tr class="passwordsEditFields">
+        <td>Requirements:</td>
+        <td>
+            <em id="usernameRequirementId">Password must not contain the username<b class="ok"></b></em><br/>
+            <em id="lengthRequirementId" size="${minPasswordLength}">Password must be at least ${minPasswordLength} characters long<b class="ok"></b></em><br/>
+            <b id="passwordRequirementsId">Password must contain at least 3 of these requirements:<b class="ok"></b></b><br/>
+            <ul>
+                <li><em id="uppercaseRequirementId">Uppercase characters<b class="ok"></b></em></li>
+                <li><em id="lowercaseRequirementId">Lowercase characters<b class="ok"></b></em></li>
+                <li><em id="numericRequirementId">Numeric characters<b class="ok"></b></em></li>
+                <li><em id="symbolRequirementId">Nonalphanumeric characters<b class="ok"></b></em></li>
+            </ul>
+        </td>
+    </tr>
+    <tr class="passwordsEditFields">
+        <td valign="top" class="name">
+            <label for="passwordId">
+                Confirm <g:if test="${changingPassword}">new </g:if>password:&nbsp;
+            </label>
+        </td>
+        <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
+            <input type="password" id="personConfirmPasswordId" class="passwordField" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)" name="confirmPassword" value="" autocomplete="off" />
+
+            <g:hasErrors bean="${userLoginInstance}" field="password">
+                <div class="errors">
+                    <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
+                </div>
+            </g:hasErrors>
+        </td>
+    </tr>
+    <tr class="passwordConfirmField passwordsEditFields">
+        <td></td>
+        <td>
+            <em id="retypedPasswordMatchRequirementId">Password should match<b class="ok"></b></em><br/>
+        </td>
+    </tr>
 </g:if>
