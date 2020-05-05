@@ -16,8 +16,7 @@ module.exports = function (env) {
 		devtool: false,
 		entry: {
 			app: './web-app/app-js/main.ts',
-			polyfills: './web-app/app-js/polyfills.ts',
-			'custom-elements.min': './web-app/assets/modules/webcomponents/js/custom-elements.min.js'
+			polyfills: './web-app/app-js/polyfills.ts'
 		},
 		output: {
 			path: path.resolve(__dirname, './web-app/dist/'),

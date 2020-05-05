@@ -29,7 +29,9 @@
                                     <tds-button-add
                                             [tooltip]="'Add link to Support Asset'"
                                             id="add-support"
-                                            [tabIndex]="449" (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
+                                            [tabIndex]="449"
+                                            (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)"
+                                            (keyup)="onKeyup($event, dependencyType.SUPPORT, dataGridSupportsOnHelper)">
                                     </tds-button-add>
                                 </div>
                             </div>
@@ -234,7 +236,9 @@
                                     <tds-button-add
                                             [tooltip]="'Add link to Dependent Asset'"
                                             id="dependent-support"
-                                            [tabIndex]="650"(click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
+                                            [tabIndex]="650"
+                                            (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)"
+                                            (keyup)="onKeyup($event, dependencyType.DEPENDENT, dataGridDependsOnHelper)">
                                     </tds-button-add>
                                 </div>
                             </div>

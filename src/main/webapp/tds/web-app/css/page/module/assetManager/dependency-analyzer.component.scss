@@ -57,4 +57,11 @@
   .asset-tag-selector-component.tag-selector-for-da {
     width: 100%;
   }
+
+  kendo-grid div.k-grid-content {
+    overflow-y: visible !important;
+  }
+  kendo-grid div.k-grid-header {
+    padding-right: 0 !important;
+  }
 }

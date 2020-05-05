@@ -84,7 +84,7 @@ export class APIActionParameterColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 64
+				width: 74
 			},
 			{
 				label: 'custom',

@@ -391,4 +391,10 @@ export class SupportsDependsComponent implements OnInit {
 
 		this.isValidForm.emit(validForm);
 	}
+
+	onKeyup(event: any, DEPENDENT: DEPENDENCY_TYPE, dataGridDependsOn: any) {
+		if (event.keyCode === 13) {
+			this.onAdd(DEPENDENT, dataGridDependsOn);
+		}
+	}
 }
