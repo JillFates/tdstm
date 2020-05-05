@@ -10,7 +10,6 @@ import {
 	ChangeDetectionStrategy,
 	OnDestroy, HostListener, ComponentFactoryResolver
 } from '@angular/core';
-import {NavigationEnd, Router} from '@angular/router';
 // Model
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
