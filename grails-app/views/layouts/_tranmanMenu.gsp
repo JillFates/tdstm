@@ -62,9 +62,6 @@
                             </li>
                             <li class="menu-child-item menu-list-models">
                                 <g:link controller="model" >List Models</g:link>
-                            </li>
-                            <li class="menu-child-item menu-sync-libraries">
-                                <g:link controller="model" action="importExport">Export Mfg & Models</g:link>
                             </li></g:if>
                         </ul>
                     </li>

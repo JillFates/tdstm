@@ -1,10 +1,11 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {ManufacturerModel} from '../model/manufacturer.model';
+import {IManufacturerModelsExportData} from '../model/manufacturer-models-export-data.model';
 
 @Injectable()
 export class ManufacturerService {
@@ -89,8 +90,8 @@ export class ManufacturerService {
 			.catch((error: any) => error);
 	}
 
-	getManufactrurerModelExportData(tdsModelsOnly: boolean): Observable<any> {
-		const params = new HttpParams().set('tdsModelsOnly', `${tdsModelsOnly}`);
-		return this.http.get<any>(this.manufacturerExportUrl, {params, observe: 'response'});
+	getManufacturerModelExportData(tdsModelsOnly: boolean): Observable<HttpResponse<IManufacturerModelsExportData>> {
+		const params = new HttpParams().set('onlyTdsModels', `${tdsModelsOnly}`);
+		return this.http.get<IManufacturerModelsExportData>(this.manufacturerExportUrl, {params, observe: 'response'});
 	}
 }

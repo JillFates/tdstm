@@ -25,7 +25,7 @@ import {
 import {CellClickEvent} from '@progress/kendo-angular-grid';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ManufacturerColumnModel, ManufacturerModel} from '../../model/manufacturer.model';
-import {ExportManufacturerModelsComponent} from '../export-manufacturer-models/export-manufacturer-models.component';
+import {ExportManufacturerModelsComponent} from '../../../../shared/components/export-manufacturer-models/export-manufacturer-models.component';
 
 @Component({
 	selector: 'manufacturer-list',
@@ -167,11 +167,9 @@ export class ManufacturerListComponent implements OnInit {
 		this.dialogService.open({
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: ExportManufacturerModelsComponent,
-			data: {
-				manufacturerExportModel: this.gridModel
-			},
+			data: null,
 			modalConfiguration: {
-				title: 'Export to Excel',
+				title: 'Export Manufacturers & Models to Excel',
 				draggable: true,
 				modalSize: ModalSize.MD
 			}

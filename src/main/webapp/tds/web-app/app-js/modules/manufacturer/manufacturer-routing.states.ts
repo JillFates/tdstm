@@ -7,8 +7,6 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {ManufacturerListComponent} from './components/list/manufacturer-list.component';
-import {ExportManufacturerModelsComponent} from './components/export-manufacturer-models/export-manufacturer-models.component';
-import {ModelStates} from '../model/model-routing.states';
 
 /**
  * Top menu parent section class.
