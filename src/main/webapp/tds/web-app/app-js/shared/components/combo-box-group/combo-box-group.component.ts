@@ -4,7 +4,7 @@ import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
 @Component({
 	selector: 'tds-combobox-group',
 	template: `
-        <div class="combo-group">
+        <div class="tds-combo-group">
             <kendo-combobox #innerComboBoxGroup
                             [data]="data"
                             [(ngModel)]="model"
