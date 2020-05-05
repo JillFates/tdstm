@@ -10,7 +10,6 @@ import {
 	ChangeDetectionStrategy,
 	OnDestroy, HostListener, ComponentFactoryResolver
 } from '@angular/core';
-import {NavigationEnd, Router} from '@angular/router';
 // Model
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
@@ -76,6 +75,9 @@ import {
 	GridDataResult, PageChangeEvent,
 	RowClassArgs
 } from '@progress/kendo-angular-grid';
+import { ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
+import {AssetGlobalFiltersService} from '../../service/asset-global-filters.service';
 
 declare var jQuery: any;
 
@@ -111,6 +113,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.gridStateChange.emit({...this.gridState, skip: 0});
 		this.modelChange.emit();
 	}
+
+	protected globalQueryParams = {};
 	public currentFields = [];
 	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
@@ -160,8 +164,10 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private userService: UserService,
 		private userContextService: UserContextService,
 		private assetTagUIWrapperService: AssetTagUIWrapperService,
-		private router: Router,
-		private translateService: TranslatePipe) {
+		private translateService: TranslatePipe,
+		private assetGlobalFiltersService: AssetGlobalFiltersService,
+		private route: ActivatedRoute,
+		private router: Router) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -195,6 +201,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				this.showFullTags = this.toggleTagsColumn;
 				this.onReload();
 		});
+
+		this.globalQueryParams = this.route.snapshot.queryParams;
+		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
 
 		// Iterate Fields to get reference for this context
 		this.currentFields = this.fields.reduce((p, c) => {
@@ -871,6 +880,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
+		if (this.hiddenFilters) {
+			this.assetGlobalFiltersService.prepareFilters(payload, this.globalQueryParams);
+		}
 		if (justPlanning) {
 			payload['justPlanning'] = true;
 		}
