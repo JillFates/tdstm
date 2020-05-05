@@ -210,7 +210,7 @@
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${assetInstance.testingBy}"/>
 					<tds-combobox-group
-							[name]="'startupBy'"
+							[name]="'testingBy'"
 							[model]="model.asset.testingBy"
 							(modelChange)="model.asset.testingBy.id = $event"
 							(isFixedChange)="model.asset.testingFixed = $event"
