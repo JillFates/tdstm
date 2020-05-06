@@ -1,26 +1,17 @@
-<div *ngIf="getCurrentNotice(); let notice" tds-autofocus tds-handle-escape (escPressed)="onCancel()"
-     class="tds-modal-content notice-eula-html-content">
-    <div class="modal-header">
-		<button (click)="onCancel()" type="button" class="close" aria-label="Close">
-			<clr-icon aria-hidden="true" shape="close"></clr-icon>
-		</button>
-        <h4 class="modal-title">{{notice.title}}</h4>
-    </div>
-    <div class="modal-body">
-        <form name="form"
-              role="form"
-              data-toggle="validator"
-              class="form-horizontal"
-              #form='ngForm'>
-		        <div class="form-group agreement">
-			        <div class="col-sm-12 mandatory-container">
-				        <div [innerHTML]="sanitizeHTML(notice.htmlText)"></div>
-			        </div>
-				</div>
-        </form>
-    </div>
-
-    <div class="modal-footer form-group-center">
+<div *ngIf="getCurrentNotice(); let notice" tds-handle-escape (escPressed)="onCancel()">
+    <form name="form"
+          role="form"
+          data-toggle="validator"
+          class="form-horizontal"
+          #form='ngForm'>
+	        <div class="form-group agreement">
+		        <div class="col-sm-12 mandatory-container">
+			        <div [innerHTML]="sanitizeHTML(notice.htmlText)"></div>
+		        </div>
+			</div>
+    </form>
+	<hr/>
+    <div class="form-group-center" style="display: flex">
 		<div class="col-sm-12">
 			<label class="pull-left agreement-checkbox"> 
 				{{ (notice.acknowledgeLabel  || 'NOTICE.AGREEMENT') | translate }}

@@ -1,25 +1,24 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs';
 // Service
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
-import {NoticeModel, Notices} from '../../model/notice.model';
+import {NoticeModel} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
 import {PostNoticesManagerService} from '../../../auth/service/post-notices-manager.service';
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-standard-notices',
 	templateUrl: 'standard-notices.component.html'
 })
 export class StandardNoticesComponent extends NoticeCommonComponent implements OnInit {
+	@Input() data: any;
 	private notices: NoticeModel[];
 
 	constructor(
-		protected model: Notices,
-		protected activeDialog: UIActiveDialogService,
 		protected userContextService: UserContextService,
 		private postNoticesManager: PostNoticesManagerService,
 		protected sanitizer: DomSanitizer) {
@@ -27,7 +26,8 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 	}
 
 	ngOnInit() {
-		this.notices = this.model.notices;
+		this.notices = this.data.notices;
+		jQuery('.close').hide();
 	}
 
 	/**
@@ -40,17 +40,17 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 
 		if (updates.length) {
 			Observable.forkJoin(updates)
-				.subscribe((results) => this.activeDialog.close());
+				.subscribe((results) => this.onCancelClose());
 		} else {
-			this.activeDialog.close();
+			this.onCancelClose();
 		}
 	}
 
-	/**
-	 * Close the current active dialog
-	*/
 	onCancel() {
-		this.activeDialog.close();
+		// Disabled for this component
 	}
 
+	onDismiss() {
+		// Disabled for this component
+	}
 }

@@ -1,11 +1,10 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 // Service
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
-import {NoticeModel, Notices} from '../../model/notice.model';
+import {NoticeModel} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
 import {PostNoticesManagerService} from '../../../auth/service/post-notices-manager.service';
 
@@ -14,12 +13,11 @@ import {PostNoticesManagerService} from '../../../auth/service/post-notices-mana
 	templateUrl: 'mandatory-notices.component.html'
 })
 export class MandatoryNoticesComponent extends NoticeCommonComponent implements OnInit {
+	@Input() data: any;
 	private notices: NoticeModel[];
 	private currentNoticeIndex: number;
 
 	constructor(
-		protected model: Notices,
-		protected activeDialog: UIActiveDialogService,
 		protected userContextService: UserContextService,
 		private postNoticesManager: PostNoticesManagerService,
 		protected sanitizer: DomSanitizer) {
@@ -30,7 +28,7 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 		this.currentNoticeIndex = 0;
 		this.userContextService.getUserContext()
 		.subscribe((context) => {
-			this.notices = this.model.notices.filter((notice) => notice.needAcknowledgement);
+			this.notices = this.data.notices.filter((notice) => notice.needAcknowledgement);
 		});
 	}
 
@@ -45,7 +43,7 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 	 * On cancel dismiss the active dialog
 	*/
 	onCancel() {
-		this.activeDialog.dismiss();
+		this.onCancelClose();
 	}
 
 	/**
@@ -56,7 +54,7 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 			.setAcknowledge(this.notices[this.currentNoticeIndex].id)
 				.subscribe(() => {
 					if ((this.currentNoticeIndex + 1) >= this.notices.length) {
-						this.activeDialog.close();
+						this.onCancelClose();
 					} else {
 						this.currentNoticeIndex += 1;
 					}

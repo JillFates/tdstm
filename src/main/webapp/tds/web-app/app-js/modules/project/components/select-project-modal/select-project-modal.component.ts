@@ -1,5 +1,5 @@
 // Angular
-import {Component} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 // NGXS
 import {SetProject} from '../../actions/project.actions';
 import {Store} from '@ngxs/store';
@@ -8,6 +8,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {PostNotices} from '../../../auth/action/notice.actions';
+import {Dialog} from 'tds-component-library';
 
 // Model
 enum ProjectType {
@@ -19,17 +20,22 @@ enum ProjectType {
 	selector: 'tds-select-project-modal',
 	templateUrl: 'select-project-modal.component.html'
 })
-export class SelectProjectModalComponent {
+export class SelectProjectModalComponent extends Dialog implements OnInit {
+	@Input() data: any;
 	public selectedProjectId: any = null;
 	public projectType = ProjectType;
 	public selectedProjectStatus = this.projectType.ACTIVE;
+	private projects: any[];
 
 	constructor(
-		private projects: any[],
 		private store: Store,
-		protected activeDialog: UIActiveDialogService,
 		protected preferenceService: PreferenceService,
 		protected userContextService: UserContextService) {
+		super();
+	}
+
+	ngOnInit() {
+		this.projects = this.data.projects;
 	}
 
 	/**
@@ -51,7 +57,7 @@ export class SelectProjectModalComponent {
 					logoUrl: project.logoUrl
 				})).subscribe(() => {
 				this.store.dispatch(new PostNotices()).subscribe(() => {
-					this.activeDialog.close({success: true});
+					this.onCancel();
 				});
 			});
 		});
@@ -61,7 +67,14 @@ export class SelectProjectModalComponent {
 	 * if user doesn't want to continue with the current login info
 	 */
 	public onCancel(): void {
-		this.activeDialog.close({success: false});
+		this.onCancelClose();
+	}
+
+	/**
+	 * User Dismiss Changes
+	 */
+	public onDismiss(): void {
+		this.onCancelClose();
 	}
 
 	/**
