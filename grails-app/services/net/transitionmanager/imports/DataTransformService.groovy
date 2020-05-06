@@ -1,5 +1,6 @@
 package net.transitionmanager.imports
 
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.ProgressCallback
 import com.tdssrc.grails.FileSystemUtil
@@ -49,7 +50,11 @@ class DataTransformService implements ServiceMethods {
             return executeTransformationAndScheduleImport(userLogin, project, dataScript, filename, sendResultsByEmail, updateProgressCallback)
 
         } catch (Throwable e) {
-            String errorMessage = e.getMessage()
+            /**
+             * ETL transformation exceptions can be calculated with line number
+             * using teh following support:
+             */
+            String errorMessage = ETLProcessor.getErrorMessage(e).message
             reportFailureProgress(updateProgressCallback, errorMessage)
 
             if (dataScript?.isAutoProcess) {

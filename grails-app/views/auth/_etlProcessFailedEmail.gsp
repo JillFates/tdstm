@@ -5,8 +5,7 @@
 
 Hi ${person},<br>
 
-<p>The ETL process you initiated encountered an error that prevented the process from completing.</p>
-<p>The information below may provide the necessary information to correct the error. If not, please forward this email to support.</p>
+<p>The ETL process you initiated encountered an error that prevented the process from completing.</p><p>The information below may provide the necessary information to correct the error. If not, please forward this email to support.</p>
 <table style="border-collapse: collapse;margin: 5px 0 5px 2px;width: auto;">
     <tbody>
     </tr>
