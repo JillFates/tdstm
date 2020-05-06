@@ -25,7 +25,7 @@ declare var jQuery: any;
                 <ng-container *ngIf="pageMetaData">
                     <div class="breadcrumb-navigation-container">
                         <div class="header-section" [ngClass]="{'wide': !settings.hasBanner}">
-							<h2 [style.color]="pageMetaData?.titleColor" [style.fontWeight]="pageMetaData?.titleFontWeight">
+							<h2 class="title-styling">
 								{{ pageMetaData.title | translate }}
 								<small *ngIf="pageMetaData.instruction">{{pageMetaData.instruction | translate}}</small>
 							</h2>
@@ -61,6 +61,22 @@ declare var jQuery: any;
 		`
 			.font-weight-bold {
 				font-weight: bold;
+			}
+
+			.title-styling {
+				font-weight: 300;
+				line-height: 2rem;
+				font-size: 32px;
+				color: #000;
+				letter-spacing: normal;
+			}
+
+			.breadcrumb-container {
+				font-size: 14px;
+			}
+
+			.breadcrumb-container > li {
+				color: #666666;
 			}
 		`,
 	],
