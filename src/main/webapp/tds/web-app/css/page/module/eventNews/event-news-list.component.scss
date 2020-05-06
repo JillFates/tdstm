@@ -1,0 +1,14 @@
+event-news-list {
+  .event-news-list-dropdown-container {
+    position: absolute;
+    z-index: 5;
+    top: 87px;
+    margin-left: 10px;
+    .clr-select-wrapper {
+      width: 100%;
+      select {
+        width: inherit;
+      }
+    }
+  }
+}
