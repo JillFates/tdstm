@@ -66,7 +66,7 @@ declare var jQuery: any;
 			.title-styling {
 				font-weight: 300;
 				line-height: 2rem;
-				font-size: 32px;
+				font-size: 24px;
 				color: #000;
 				letter-spacing: normal;
 			}
