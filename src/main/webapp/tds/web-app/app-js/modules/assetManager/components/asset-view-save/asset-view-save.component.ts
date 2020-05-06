@@ -62,26 +62,12 @@ import { AssetViewSaveOptions } from '../../models/asset-view-save-options.model
 						</div>
 						<div class="col-sm-8 col-sm-offset-4">
 							<div class="checkbox favorite inline"
-									 (click)="onFavorite()">
+									 (click)="isSaveInMyViewMode() && onFavorite()">
 								<i class="fa fa-star-o text-yellow"
 									 [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
-								<label (click)="onFavorite()">
-									<clr-checkbox-wrapper class="inline">
-										<input
-											clrCheckbox
-											type="checkbox"
-											[disabled]="!isSaveInMyViewMode()"
-											name="favorite"
-											style="visibility:hidden"
-											(click)="onFavorite()"
-										/>
-										<label
-											class="clr-control-label clr-control-label-sm inline"
-										>
-										{{ 'GLOBAL.ADD_FAVORITES' | translate }}
-										</label>
-                					</clr-checkbox-wrapper>
-								</label>
+                                <label class="clr-control-label clr-control-label-sm inline">
+                                    {{ 'GLOBAL.ADD_FAVORITES' | translate }}
+                                </label>
 							</div>
 						</div>
 					</div>
