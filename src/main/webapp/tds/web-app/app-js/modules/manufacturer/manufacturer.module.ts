@@ -18,6 +18,8 @@ import {ManufacturerListComponent} from './components/list/manufacturer-list.com
 import { ModuleResolveService } from '../../shared/resolves/module.resolve.service';
 // Services
 import {ManufacturerService} from './service/manufacturer.service';
+import {ExportManufacturerModelsComponent} from '../../shared/components/export-manufacturer-models/export-manufacturer-models.component';
+import {ExcelExportModule} from '@progress/kendo-angular-excel-export';
 
 @NgModule({
 	imports: [
@@ -30,6 +32,7 @@ import {ManufacturerService} from './service/manufacturer.service';
 		GridModule,
 		InputsModule,
 		DateInputsModule,
+		ExcelExportModule,
 		// Route
 		ManufacturerRouteModule,
 	],

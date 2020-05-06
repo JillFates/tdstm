@@ -17,6 +17,7 @@ import {ModelColumnModel, ModelModel} from '../../model/model.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {ModelService} from '../../service/model.service';
 import {ModelViewEditComponent} from '../../view-edit/model-view-edit.component';
+import {ExportManufacturerModelsComponent} from '../../../../shared/components/export-manufacturer-models/export-manufacturer-models.component';
 
 @Component({
 	selector: 'model-list',
@@ -81,6 +82,13 @@ export class ModelListComponent implements OnInit {
 				show: true,
 				onClick: this.onCreateModel,
 			},
+			{
+				icon: 'download-cloud',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.EXPORT'),
+				show: true,
+				onClick: this.onExport.bind(this),
+			}
 		];
 
 		this.gridModel = {
@@ -237,5 +245,23 @@ export class ModelListComponent implements OnInit {
 
 	private isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	}
+
+	/**
+	 * Export Models
+	 */
+	private onExport (): void {
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ExportManufacturerModelsComponent,
+			data: {
+				modelsOnly: true
+			},
+			modalConfiguration: {
+				title: 'Export Models to Excel',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe();
 	}
 }

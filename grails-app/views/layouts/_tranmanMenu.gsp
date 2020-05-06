@@ -61,10 +61,7 @@
                                 <a href="/tdstm/module/manufacturer/list">List Manufacturers</a>
                             </li>
                             <li class="menu-child-item menu-list-models">
-                                <a href="/tdstm/module/model/list">List Models</a>
-                            </li>
-                            <li class="menu-child-item menu-sync-libraries">
-                                <g:link controller="model" action="importExport">Export Mfg & Models</g:link>
+                                <g:link controller="model" >List Models</g:link>
                             </li></g:if>
                         </ul>
                     </li>

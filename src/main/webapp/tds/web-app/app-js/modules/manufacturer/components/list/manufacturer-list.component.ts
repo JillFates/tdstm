@@ -25,6 +25,7 @@ import {
 import {CellClickEvent} from '@progress/kendo-angular-grid';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ManufacturerColumnModel, ManufacturerModel} from '../../model/manufacturer.model';
+import {ExportManufacturerModelsComponent} from '../../../../shared/components/export-manufacturer-models/export-manufacturer-models.component';
 
 @Component({
 	selector: 'manufacturer-list',
@@ -85,6 +86,13 @@ export class ManufacturerListComponent implements OnInit {
 				show: true,
 				onClick: this.onCreateManufacturer,
 			},
+			{
+				icon: 'download-cloud',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.EXPORT'),
+				show: true,
+				onClick: this.onExport.bind(this),
+			}
 		];
 
 		this.gridModel = {
@@ -151,6 +159,22 @@ export class ManufacturerListComponent implements OnInit {
 			console.error(error);
 		}
 	};
+
+	/**
+	 * Export manufacturer list
+	 */
+	private onExport (): void {
+		this.dialogService.open({
+			componentFactoryResolver: this.componentFactoryResolver,
+			component: ExportManufacturerModelsComponent,
+			data: null,
+			modalConfiguration: {
+				title: 'Export Manufacturers & Models to Excel',
+				draggable: true,
+				modalSize: ModalSize.MD
+			}
+		}).subscribe();
+	}
 
 	/**
 	 * Delete the selected Provider

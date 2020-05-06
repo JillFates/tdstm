@@ -525,6 +525,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/model/export" {
+			controller = 'wsModel'
+			action = [
+			        GET: 'export'
+			]
+		}
+
 		"/ws/model/$id" {
 			controller = "wsModel"
 			action = [DELETE: "delete"]

@@ -127,6 +127,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CircleCountdownComponent } from './components/circle-countdown/circle-countdown.component';
 import { MenusModule } from '@progress/kendo-angular-menu';
 import { TooltipModule } from '@progress/kendo-angular-tooltip';
+import {ExportManufacturerModelsComponent} from './components/export-manufacturer-models/export-manufacturer-models.component';
+import {ExcelExportModule} from '@progress/kendo-angular-excel-export';
 
 @NgModule({
 	imports: [
@@ -148,7 +150,8 @@ import { TooltipModule } from '@progress/kendo-angular-tooltip';
 		FontAwesomeModule,
 		MenusModule,
 		TooltipModule,
-		TdsComponentLibraryModule
+		TdsComponentLibraryModule,
+		ExcelExportModule
 	],
 	declarations: [
 		UIAutofocusDirective,
@@ -216,7 +219,8 @@ import { TooltipModule } from '@progress/kendo-angular-tooltip';
 		PowerComponent,
 		CircleCountdownComponent,
 		TDSCheckboxComponent,
-		TaskStatusIndicatorComponent
+		TaskStatusIndicatorComponent,
+		ExportManufacturerModelsComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -287,6 +291,7 @@ import { TooltipModule } from '@progress/kendo-angular-tooltip';
 		TdsComponentLibraryModule,
 		TaskStatusIndicatorComponent,
 		TDSCheckboxComponent,
+		ExportManufacturerModelsComponent,
 		// Clarity
 		ClarityModule
 	],
@@ -304,6 +309,7 @@ import { TooltipModule } from '@progress/kendo-angular-tooltip';
 		UserManageStaffComponent,
 		PasswordChangeComponent,
 		TDSModalPageWrapperComponent,
+		ExportManufacturerModelsComponent
 	],
 })
 export class SharedModule {
