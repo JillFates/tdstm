@@ -4,7 +4,7 @@ import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
 @Component({
 	selector: 'tds-combobox-group',
 	template: `
-        <div class="combo-group">
+        <div class="tds-combo-group">
             <kendo-combobox #innerComboBoxGroup
                             [data]="data"
                             [(ngModel)]="model"
@@ -33,23 +33,23 @@ import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
 			</kendo-combobox>
 			<div class="clr-control-container">
 				<div class="clr-checkbox-wrapper" style="display: flex">
-					<clr-checkbox-wrapper class="inline">
-                    <input
-                        clrCheckbox
-                        type="checkbox"
-						clrcheckbox=""
-						[checked]="!!isFixed"
-						[disabled]="!model || isTeamItemSelected()"
-						(change)="onChangeFixed($event)"
-                    />
-                    <label
-                        class="clr-control-label clr-control-label-sm inline"
-                        for="justPlanning"
-                    >
-					Fixed
-                    </label>
-                	</clr-checkbox-wrapper>
-
+					<span class="checkboxContainer">
+                                <div class="clr-form-control unset-margin-top">
+                                    <div class="clr-control-container">
+                                        <div class="clr-checkbox-wrapper">
+											<input
+												type="checkbox"
+												[name]="controlName"
+												[id]="controlName"
+												[checked]="!!isFixed"
+												[disabled]="!model || isTeamItemSelected()"
+												(change)="onChangeFixed($event)"
+												class="pointer" />
+                                            <label [for]="controlName" class="clr-control-label clr-control-label-sm inline"><span class="left-label-pad">Fixed</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                    </span>
 				</div>
 			</div>
         </div>
@@ -64,6 +64,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	@Input('namedStaff') namedStaff: any;
 	@Input('team') team: any;
 	@Input('isFixed') isFixed: number;
+	@Input('name') controlName: string;
 
 	readonly CATEGORY_BY_REFERENCE = 'By Reference';
 	readonly CATEGORY_BY_TEAM = 'Team';
