@@ -59,7 +59,7 @@ export class ImportBatchColumnsModel {
 				label: 'Id',
 				property: 'id',
 				type: 'number',
-				width: 60,
+				width: 70,
 				locked: false
 			},
 			{
@@ -140,7 +140,7 @@ export class ImportBatchColumnsModel {
 				label: 'Imported By',
 				property: 'createdBy',
 				type: 'text',
-				width: 120,
+				width: 130,
 				locked: false,
 				filterable: true
 			},
