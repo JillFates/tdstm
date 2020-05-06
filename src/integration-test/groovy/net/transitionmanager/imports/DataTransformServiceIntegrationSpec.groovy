@@ -115,6 +115,6 @@ class DataTransformServiceIntegrationSpec extends Specification implements DataT
             Map<String, String> results = dataTransformService.transformEtlData(null, project.id, dataScript.id, datasetFilename, false, null)
 
         then: 'results contains etl JSON results'
-            results.errorMessage == "Extracting a missing column name 'Unknown Column'"
+            results.errorMessage == "Extracting a missing column name 'Unknown Column' at line 4"
     }
 }
