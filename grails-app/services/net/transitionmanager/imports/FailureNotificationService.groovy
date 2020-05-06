@@ -10,7 +10,7 @@ import net.transitionmanager.service.ServiceMethods
  *
  * @see ETLTransformImportFailureEvent
  */
-class ETLImportFailureService implements ServiceMethods {
+class FailureNotificationService implements ServiceMethods {
 
     /**
      * Dispatch an email for ETL transfomration failure cases. It uses Grails events for notifying it.
@@ -22,6 +22,7 @@ class ETLImportFailureService implements ServiceMethods {
      */
     @Publisher(ETLTransformImportFailureEvent.EVENT_NAME)
     ETLTransformImportFailureEvent notifyDataTransformFailure(Person whom, DataScript dataScript, String errorMessage) {
+        log.info "Notify ${ETLTransformImportFailureEvent.EVENT_NAME} for personId:${whom.id} and dataScriptId:${dataScript.id} with error:$errorMessage"
         return new ETLTransformImportFailureEvent.Builder('Transformation')
                 .withPerson(whom)
                 .withDataScript(dataScript)
@@ -40,6 +41,7 @@ class ETLImportFailureService implements ServiceMethods {
      */
     @Publisher(ETLTransformImportFailureEvent.EVENT_NAME)
     ETLTransformImportFailureEvent notifyDataImportFailure(Person whom, DataScript dataScript, String groupGuid, String errorMessage) {
+        log.info "Notify ${ETLTransformImportFailureEvent.EVENT_NAME} for personId:${whom.id}, dataScriptId:${dataScript.id} and groupGuid:$groupGuid with error:$errorMessage"
         return new ETLTransformImportFailureEvent.Builder('Batch Creation process')
                 .withPerson(whom)
                 .withDataScript(dataScript)

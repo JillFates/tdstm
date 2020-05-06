@@ -83,7 +83,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	ScriptProcessorService   scriptProcessorService
 	TagAssetService			 tagAssetService
 	TagService 				 tagService
-	ETLImportFailureService ETLImportFailureService
+	FailureNotificationService failureNotificationService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -150,7 +150,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))
 
 			if (dataScript.isAutoProcess){
-				ETLImportFailureService.notifyDataImportFailure(userLogin.person, dataScript, groupGuid, errorMessage)
+				failureNotificationService.notifyDataImportFailure(userLogin.person, dataScript, groupGuid, errorMessage)
 			}
 			return [errorMessage: errorMessage]
 		}

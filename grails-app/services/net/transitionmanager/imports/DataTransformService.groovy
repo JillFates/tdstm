@@ -27,7 +27,7 @@ class DataTransformService implements ServiceMethods {
     ProgressService progressService
     FileSystemService fileSystemService
     ScriptProcessorService scriptProcessorService
-    ETLImportFailureService ETLImportFailureService
+    FailureNotificationService failureNotificationService
     Scheduler quartzScheduler
     /**
      * Transform the Data from ETL as part of the Asset Import process' first step.
@@ -53,7 +53,7 @@ class DataTransformService implements ServiceMethods {
             reportFailureProgress(updateProgressCallback, errorMessage)
 
             if (dataScript?.isAutoProcess) {
-                ETLImportFailureService.notifyDataTransformFailure(userLogin.person, dataScript, errorMessage)
+                failureNotificationService.notifyDataTransformFailure(userLogin.person, dataScript, errorMessage)
             }
             return [errorMessage: errorMessage]
         }
