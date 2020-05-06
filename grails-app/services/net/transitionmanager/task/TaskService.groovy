@@ -5880,7 +5880,7 @@ class TaskService implements ServiceMethods {
 		}
 
 		// Deal with task assignment.
-		if (taskCommand.assignedTo != null) {
+		if (taskCommand.assignedTo != null && taskCommand.assignedTo != '') {
 			// If the parameter is '0', then the task is unassigned.
 			if (taskCommand.assignedTo == '0') {
 				task.assignedTo = null
