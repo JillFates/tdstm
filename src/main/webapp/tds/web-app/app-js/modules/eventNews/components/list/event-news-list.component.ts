@@ -77,12 +77,10 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 	async ngOnInit() {
 		this.headerEventData = this.loadHeaderData();
 		this.headerEventData.then(eventList => {
-			this.eventId = eventList[0].id;
-			this.gridComponent.reloadData();
-			// Insert the dropdown controls on the grid toolbar
-			this.elementRef.nativeElement
-				.querySelector('kendo-grid-toolbar div div')
-				.insertAdjacentElement('afterbegin', this.headerDropdowns.nativeElement);
+			if (eventList && eventList.length > 0) {
+				this.eventId = eventList[0].id;
+				this.gridComponent.reloadData();
+			}
 		}).finally();
 
 		this.gridRowActions = [{
