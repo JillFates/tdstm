@@ -142,7 +142,6 @@ export class SupportsDependsComponent implements OnInit {
 	public updateRecordState(dataItem: DependencySupportModel): void {
 		if (dataItem.recordState === RecordState.created) {
 			this.onChangeInternalModel();
-			return;
 		} else {
 			dataItem.recordState = RecordState.updated;
 			this.onChangeInternalModel();
@@ -179,6 +178,14 @@ export class SupportsDependsComponent implements OnInit {
 		dataGrid.addResultSetItem(dependencySupportModel);
 		this.onChangeInternalModel();
 		this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
+	}
+
+	/**
+	 * Got the new change, update the record and continue the normal validation format
+	 */
+	public onDropdownChange(dataItem: DependencySupportModel): void {
+		this.updateRecordState(dataItem);
+		this.onChangeInternalModel();
 	}
 
 	/**
@@ -280,11 +287,6 @@ export class SupportsDependsComponent implements OnInit {
 		).subscribe(
 			(data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
-					if (dependencyType === DEPENDENCY_TYPE.SUPPORT)  {
-						this.supportsToDelete.push(dataItem.id);
-					} else {
-						this.dependentsToDelete.push(dataItem.id);
-					}
 					this.onDeleteDependencySupport(dataItem, dataGrid, dependencyType);
 				}
 			}

@@ -22,8 +22,9 @@ class TaskQueryBuilder {
 	/**
 	 * Some fields will require additional joins. This list keep track of all
 	 * additional tables that need to be joined.
+	 * Using a Set Collection to avoid duplicates
 	 */
-	private List<String> joinTables
+	private Set<String> joinTables
 
 	/**
 	 * List of all the expressions that need to be used for building the WHERE clause.
@@ -93,7 +94,7 @@ class TaskQueryBuilder {
 		requestParams = params
 		whereClauses = ["ac.project = :project"]
 		whereParams = ['project': project]
-		joinTables = ["AssetComment ac"]
+		joinTables = ['AssetComment ac', 'LEFT JOIN ac.assetEntity'] // TM-17521: Preloaded Left Join of AssetEntity to avoid Task with NO Asset Associated
 		// Make sure we query for Tasks only.
 		whereClauses << "ac.commentType = :commentType"
 		whereParams['commentType'] = AssetCommentType.TASK
@@ -143,7 +144,8 @@ class TaskQueryBuilder {
 	 */
 	private void addJoinTable(Map fieldMap) {
 		String join = fieldMap.join ?: 'LEFT JOIN'
-		joinTables << "${join} ${fieldMap.joinTable}"
+		// Changing to String to avoid GString Objects and avoid duplicates
+		joinTables << "${join} ${fieldMap.joinTable}".toString()
 	}
 
 
@@ -471,7 +473,8 @@ class TaskQueryBuilder {
 	 * NOTE: Please, don't use .withDefault. This object will receive
 	 * the request's param map, which contains keys other than valid fields.
 	 */
-	final Map fieldsInfoMap = [
+	final
+	private Map fieldsInfoMap = [
 		'actStart'          : [property: 'ac.actStart', builder: dateBuilder, type: Date],
 		'actFinish'         : [property: 'ac.dateResolved', builder: dateBuilder, type: Date],
 		'apiAction'         : [property: 'ac.apiAction.name', builder: likeBuilder],
