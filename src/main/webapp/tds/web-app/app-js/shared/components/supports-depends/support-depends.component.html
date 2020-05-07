@@ -325,6 +325,7 @@
                                     [data]="dataFlowFreqList"
                                     [(ngModel)]="dataItem.dataFlowFreq"
                                     [tabindex]="baseDependentGridTabIndex"
+                                    (valueChange)="onDropdownChange(dataItem)"
                                     required>
                             </kendo-dropdownlist>
                         </ng-template>
@@ -363,6 +364,7 @@
                                                 [(ngModel)]="dataItem.assetDepend.moveBundle"
                                                 [ngClass]="getMoveBundleColor(dataItem)"
                                                 (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
+                                                (valueChange)="onDropdownChange(dataItem)"
                                                 [tabindex]="baseDependentGridTabIndex"
                                                 required>
                             </kendo-dropdownlist>
@@ -374,6 +376,7 @@
                                     [data]="typeList"
                                     [(ngModel)]="dataItem.type"
                                     [tabindex]="baseDependentGridTabIndex"
+                                    (valueChange)="onDropdownChange(dataItem)"
                                     required>
                             </kendo-dropdownlist>
                         </ng-template>
@@ -384,6 +387,7 @@
                                     [data]="statusList"
                                     [(ngModel)]="dataItem.status"
                                     [tabindex]="baseDependentGridTabIndex"
+                                    (valueChange)="onDropdownChange(dataItem)"
                                     required>
                             </kendo-dropdownlist>
                         </ng-template>
