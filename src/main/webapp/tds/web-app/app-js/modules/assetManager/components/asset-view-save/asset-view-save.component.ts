@@ -43,7 +43,7 @@ import { AssetViewSaveOptions } from '../../models/asset-view-save-options.model
 						<div class="col-sm-8">
 							<input #inputText type="text" (keyup)="onNameChanged()" name="name" id="name" class="form-control"
 										 [disabled]="!isSaveInMyViewMode()"
-										 placeholder="View Name" [(ngModel)]="model.name" required>
+										 placeholder="{{'ASSET_EXPLORER.PLACEHOLDER_VIEW_NAME' | translate}}" [(ngModel)]="model.name" required>
 							<span *ngIf="!isUnique" class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }}
 								name must be unique</span>
 						</div>
