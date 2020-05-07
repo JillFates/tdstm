@@ -143,6 +143,7 @@ export const en_DICTIONARY: Object = {
 			'SYSTEM': 'System',
 			'OVERRIDE': 'Override',
 		},
+		'PLACEHOLDER_VIEW_NAME': 'Enter a name for the view',
 		'SYSTEM_VIEW': 'System View',
 		'SAVE_LIST_VIEW': 'Save List View',
 		'SAVE_IN_MY_VIEWS': 'Save as My Own View',
