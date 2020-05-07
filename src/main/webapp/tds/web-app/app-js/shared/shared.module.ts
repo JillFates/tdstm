@@ -1,3 +1,4 @@
+import { TDSFixedCheckboxComponent } from './components/fixed-checkbox/fixed-checkbox.component';
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
@@ -186,6 +187,7 @@ import {ExcelExportModule} from '@progress/kendo-angular-excel-export';
 		CheckActionComponent,
 		URLViewerComponent,
 		TDSComboBoxComponent,
+		TDSFixedCheckboxComponent,
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent,
@@ -255,6 +257,7 @@ import {ExcelExportModule} from '@progress/kendo-angular-excel-export';
 		CheckActionComponent,
 		URLViewerComponent,
 		TDSComboBoxComponent,
+		TDSFixedCheckboxComponent,
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent,

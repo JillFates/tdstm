@@ -183,6 +183,13 @@
 							tabindex="31"
 							[team]="${availableRoles as JSON}">
 					</tds-combobox-group>
+					
+					<tds-fixed-checkbox
+						[model]="model.asset.shutdownBy"
+						[isFixed]="${assetInstance.shutdownFixed}"
+						[name]="'shutdownBy'">
+					</tds-fixed-checkbox>
+					
 				</div>
 
 				<tdsAngular:inputLabelAndField
