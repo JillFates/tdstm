@@ -625,10 +625,10 @@ export class ArchitectureGraphComponent implements OnInit {
 	onActionDispatched(data: any): void {
 		switch (data.name) {
 			case AssetActionEvent.EDIT:
-				this.onAssetEdit({name: data.name, asset: data.node});
+				this.onAssetEdit(data.node);
 				break;
 			case AssetActionEvent.VIEW:
-				this.onAssetView({name: data.name, asset: data.node});
+				this.onAssetView(data.node);
 				break;
 			case AssetActionEvent.GRAPH:
 				this.onGraph(data.node);
@@ -640,8 +640,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Show the asset edit modal.
 	 * @param data: any
 	 */
-	onAssetEdit(data: any): void {
-		const asset = data.asset;
+	onAssetEdit(asset: any): void {
 		if (asset  && asset.id) {
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
@@ -670,8 +669,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Show the asset detail modal.
 	 * @param data: any
 	 */
-	onAssetView(data: any): void {
-		const asset = data.asset;
+	onAssetView(asset: any): void {
 		if (asset  && asset.id) {
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,
@@ -699,8 +697,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * Show the asset popup detail.
 	 * @param data: ITaskEvent
 	 */
-	onGraph(data: any): void {
-		const asset = data;
+	onGraph(asset: any): void {
 		const assetDataSource = this.assetComboBox && this.assetComboBox.datasource;
 		if (assetDataSource.length > 1 && assetDataSource.includes(a => a.id === asset.id)) {
 			this.assetId = asset.id;
@@ -719,7 +716,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	 * @param asset
 	 */
 	onNodeDoubleClick(asset: any): void {
-		this.onGraph(asset);
+		this.onAssetView(asset);
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

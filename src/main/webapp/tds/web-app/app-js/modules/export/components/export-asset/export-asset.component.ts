@@ -1,5 +1,5 @@
 // Angular
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 // Services
 import { ExportAssetService } from '../../service/export-asset.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
@@ -12,6 +12,8 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { Store } from '@ngxs/store';
 import { saveAs } from 'file-saver';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 enum EXPORT_STATUS {
 	FAILED = 'Failed',
@@ -28,6 +30,7 @@ enum EXPORT_STATUS {
 	styles: []
 })
 export class ExportAssetComponent implements OnInit {
+	unsubscribe$: ReplaySubject<void> = new ReplaySubject(1);
 	public selectedAll = false;
 	public exportAssetsData: ExportAssetModel = new ExportAssetModel();
 	exportStatus: EXPORT_STATUS;
@@ -40,6 +43,7 @@ export class ExportAssetComponent implements OnInit {
 	private title = '';
 	private progress_value = 0;
 	private userContext: UserContextModel;
+	showSpinner$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
 	constructor(
 		private exportService: ExportAssetService,
@@ -54,13 +58,22 @@ export class ExportAssetComponent implements OnInit {
 	 * the users preference to item to export
 	 */
 	ngOnInit() {
-		this.exportService.getExportAssetsData().subscribe((res: any) => {
-			this.exportAssetsData = res;
-			this.updateUserPreferencesModel();
-		});
-		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-			this.userContext = userContext;
-		});
+		this.loadAll();
+	}
+
+	loadAll(): void {
+		this.exportService.getExportAssetsData()
+			.pipe(takeUntil(this.unsubscribe$))
+			.subscribe((res: any) => {
+				this.exportAssetsData = res;
+				this.updateUserPreferencesModel();
+				this.showSpinner$.next(false);
+			});
+		this.store.select(state => state.TDSApp.userContext)
+			.pipe(takeUntil(this.unsubscribe$))
+			.subscribe((userContext: UserContextModel) => {
+				this.userContext = userContext;
+			});
 	}
 
 	/**
@@ -152,7 +165,9 @@ export class ExportAssetComponent implements OnInit {
 				data['bundle'] = this.selectedBundles;
 			}
 			this.disableGlobalAnimation(true);
-			this.exportService.downloadBundleFile(data).subscribe(res => {
+			this.exportService.downloadBundleFile(data)
+				.pipe(takeUntil(this.unsubscribe$))
+				.subscribe(res => {
 				this.opened = true;
 				if (res['key']) {
 					this.pollUntilTaskFinished(res['key']);
@@ -167,7 +182,9 @@ export class ExportAssetComponent implements OnInit {
 	 * to 100 % ready
 	 */
 	async pollUntilTaskFinished(taskId) {
-		this.exportService.getProgress(taskId).subscribe((progress) => {
+		this.exportService.getProgress(taskId)
+			.pipe(takeUntil(this.unsubscribe$))
+			.subscribe((progress) => {
 			this.progress_value = progress['percentComp'];
 			// const progressStatus = progress['status'];
 			this.exportStatus = progress['status'];
@@ -226,5 +243,17 @@ export class ExportAssetComponent implements OnInit {
 			name: 'notificationDisableProgress',
 			disabled: disabled
 		});
+	}
+
+	onReload(): void {
+		this.showSpinner$.next(true);
+		this.loadAll();
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribe$.next();
+		this.unsubscribe$.complete();
+		this.showSpinner$.complete();
 	}
 }

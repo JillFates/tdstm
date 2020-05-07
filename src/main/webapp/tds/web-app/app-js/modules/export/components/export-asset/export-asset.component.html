@@ -1,305 +1,320 @@
 <!-- Main content -->
 <div class="content body tds-kendo-grid export-asset-component">
 	<!-- Main content -->
-	<section>
-		<div>
-			<form id="exportForm" name="exportForm" role="form">
-				<div class="export-assets">
-					<div class="clr-row">
-						<div class="clr-col-6">
-							<label for="bundleId" class="label-for-export-asset"
-								>{{
-									translatePipe.transform(
-										'ASSET_EXPORT.SELECT_BUNDLE'
-									)
-								}}
-							</label>
-							<select
-								clrSelect
-								[(ngModel)]="selectedBundles"
-								id="bundleId"
-								(change)="updateError()"
-								name="bundle"
-								multiple="multiple"
-							>
-								<option value="All">All Bundles</option>
-								<option value="useForPlanning"
-									>Planning Bundles</option
-								>
-								<option value="" disabled>──────────</option>
-								<option
-									*ngFor="
+	<div class="clr-row">
+		<div class="clr-col-sm-12">
+			<div class="buttons-container pull-right">
+				<tds-grid-header-action-buttons
+						(refresh)="onReload()"
+						[actionButtons]="[]">
+				</tds-grid-header-action-buttons>
+			</div>
+		</div>
+		<div class="clr-col-12">
+			<div class="box box-primary text-center">
+				<div class="spinner spinner-extra" *ngIf="showSpinner$ | async"></div>
+				<div class="box-header">
+				</div>
+				<section class="box-body text-justify" [ngClass]="{'add-opacity' : (showSpinner$ | async)}">
+					<div>
+						<form id="exportForm" name="exportForm" role="form">
+							<div class="export-assets">
+								<div class="clr-row">
+									<div class="clr-col-6">
+										<label for="bundleId" class="label-for-export-asset"
+										>{{
+											translatePipe.transform(
+													'ASSET_EXPORT.SELECT_BUNDLE'
+											)
+											}}
+										</label>
+										<select
+												clrSelect
+												[(ngModel)]="selectedBundles"
+												id="bundleId"
+												(change)="updateError()"
+												name="bundle"
+												multiple="multiple"
+										>
+											<option value="All">All Bundles</option>
+											<option value="useForPlanning"
+											>Planning Bundles</option
+											>
+											<option value="" disabled>──────────</option>
+											<option
+													*ngFor="
 										let bundle of exportAssetsData.bundles
 									"
-									[ngValue]="bundle['id']"
-									>{{ bundle['name'] }}</option
-								>
-							</select>
-						</div>
-						<div class="clr-col-4" *ngIf="userPreferences.length > 0">
-							<label
-								for="checkboxGroup"
-								class="label-for-export-asset"
-								>{{
-									translatePipe.transform(
-										'ASSET_EXPORT.CHOOSE_ITEM'
-									)
-								}}</label
-							>
-
-							<!-- Change value to ngValue? -->
-							<clr-checkbox-container>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="allItems"
-										name="All"
-										value="all"
-										(change)="selectAll()"
-										[checked]="selectedAll"
-									/>
-									<label>
-										{{
+													[ngValue]="bundle['id']"
+											>{{ bundle['name'] }}</option
+											>
+										</select>
+									</div>
+									<div class="clr-col-4" *ngIf="userPreferences.length > 0">
+										<label
+												for="checkboxGroup"
+												class="label-for-export-asset"
+										>{{
 											translatePipe.transform(
-												'ASSET_EXPORT.ALL_ITEMS'
+													'ASSET_EXPORT.CHOOSE_ITEM'
 											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="applicationId"
-										name="application"
-										value="{{
+											}}</label
+										>
+
+										<!-- Change value to ngValue? -->
+										<clr-checkbox-container>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="allItems"
+														name="All"
+														value="all"
+														(change)="selectAll()"
+														[checked]="selectedAll"
+												/>
+												<label>
+													{{
+													translatePipe.transform(
+															'ASSET_EXPORT.ALL_ITEMS'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="applicationId"
+														name="application"
+														value="{{
 											userPreferences[0]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[0].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label>
-										{{
-											translatePipe.transform(
-												'ASSET_EXPORT.APPLICATION'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="assetId"
-										name="asset"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label>
+													{{
+													translatePipe.transform(
+															'ASSET_EXPORT.APPLICATION'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="assetId"
+														name="asset"
+														value="{{
 											userPreferences[1]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[1].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label>
-										{{
-											translatePipe.transform(
-												'ASSET_EXPORT.DEVICE'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="databaseId"
-										name="database"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label>
+													{{
+													translatePipe.transform(
+															'ASSET_EXPORT.DEVICE'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="databaseId"
+														name="database"
+														value="{{
 											userPreferences[2]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[2].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label>
-										{{
-											translatePipe.transform(
-												'ASSET_EXPORT.DATABASE'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="filesId"
-										name="files"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label>
+													{{
+													translatePipe.transform(
+															'ASSET_EXPORT.DATABASE'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="filesId"
+														name="files"
+														value="{{
 											userPreferences[3]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[3].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label>
-										{{
-											translatePipe.transform(
-												'ASSET_EXPORT.STORAGE'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="roomId"
-										name="room"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label>
+													{{
+													translatePipe.transform(
+															'ASSET_EXPORT.STORAGE'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="roomId"
+														name="room"
+														value="{{
 											userPreferences[4]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[4].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label
-										>{{
-											translatePipe.transform(
-												'ASSET_EXPORT.ROOM'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="rackId"
-										name="rack"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label
+												>{{
+													translatePipe.transform(
+															'ASSET_EXPORT.ROOM'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="rackId"
+														name="rack"
+														value="{{
 											userPreferences[5]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[5].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label
-										>{{
-											translatePipe.transform(
-												'ASSET_EXPORT.RACK'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="dependencyId"
-										name="dependency"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label
+												>{{
+													translatePipe.transform(
+															'ASSET_EXPORT.RACK'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="dependencyId"
+														name="dependency"
+														value="{{
 											userPreferences[6]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[6].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label>
-										{{
-											translatePipe.transform(
-												'ASSET_EXPORT.DEPENDENCY'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="cablingId"
-										name="cabling"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label>
+													{{
+													translatePipe.transform(
+															'ASSET_EXPORT.DEPENDENCY'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="cablingId"
+														name="cabling"
+														value="{{
 											userPreferences[7]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[7].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label>
-										{{
-											translatePipe.transform(
-												'ASSET_EXPORT.CABLING'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-								<clr-checkbox-wrapper>
-									<input
-										clrCheckbox
-										type="checkbox"
-										id="commentId"
-										name="comment"
-										value="{{
+														(change)="checkIfAllSelected()"
+												/>
+												<label>
+													{{
+													translatePipe.transform(
+															'ASSET_EXPORT.CABLING'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+											<clr-checkbox-wrapper>
+												<input
+														clrCheckbox
+														type="checkbox"
+														id="commentId"
+														name="comment"
+														value="{{
 											userPreferences[8]['preference']
 										}}"
-										[(ngModel)]="
+														[(ngModel)]="
 											userPreferences[8].selected
 										"
-										(change)="checkIfAllSelected()"
-									/>
-									<label
-										>{{
-											translatePipe.transform(
-												'ASSET_EXPORT.COMMENT'
-											)
-										}}
-									</label>
-								</clr-checkbox-wrapper>
-							</clr-checkbox-container>
-						</div>
-						<div class="clr-col-2 action-column">
-							<tds-button-custom
-                                    [disabled]="!getSelectedCounter()"
-									[icon]="'download-cloud'"
-									[theme]="'primary'"
-									[title]="
+														(change)="checkIfAllSelected()"
+												/>
+												<label
+												>{{
+													translatePipe.transform(
+															'ASSET_EXPORT.COMMENT'
+													)
+													}}
+												</label>
+											</clr-checkbox-wrapper>
+										</clr-checkbox-container>
+									</div>
+									<div class="clr-col-2 action-column">
+										<tds-button-custom
+												[icon]="'download-cloud'"
+												[title]="
 								translatePipe.transform(
 									'ASSET_EXPORT.EXPORT_BUTTON'
 								)
 							"
-									(click)="exportData()"
-									[type]="'submit'"
-									id="exportButton"
-									aria-hidden="true"
-							>
-							</tds-button-custom>
-							<div
-									class="form-group error-bundle"
-									*ngIf="this.errorMessage"
-							>
-								{{ this.errorMessage }}
+												(click)="exportData()"
+												[type]="'submit'"
+												id="exportButton"
+												aria-hidden="true"
+										>
+										</tds-button-custom>
+										<div
+												class="form-group error-bundle"
+												*ngIf="this.errorMessage"
+										>
+											{{ this.errorMessage }}
+										</div>
+									</div>
+								</div>
 							</div>
-						</div>
+						</form>
 					</div>
-				</div>
-			</form>
+				</section>
+				<tds-progress-bar [opened]="opened"
+								  [title]="title"
+								  [value]="progress_value"
+								  [message]="exportMessage"
+								  [enableClose]="enableClose()"
+								  (close)="onExportClose()">
+				</tds-progress-bar>
+			</div>
 		</div>
-	</section>
-	<tds-progress-bar [opened]="opened"
-										[title]="title"
-										[value]="progress_value"
-										[message]="exportMessage"
-										[enableClose]="enableClose()"
-										(close)="onExportClose()">
-	</tds-progress-bar>
+	</div>
 </div>
