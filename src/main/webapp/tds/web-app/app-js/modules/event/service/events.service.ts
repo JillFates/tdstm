@@ -164,7 +164,6 @@ export class EventsService {
 	 * @returns {Observable<NewsDetailModel>} Delete operation results
 	*/
 	deleteNews(news: any): Observable<NewsDetailModel> {
-		news.mode = 'ajax';
 		return this.http.get(`${this.APP_EVENT_DELETE_NEWS}/?id=${news.id}`)
 			.map((response: any) => {
 				return response || null;

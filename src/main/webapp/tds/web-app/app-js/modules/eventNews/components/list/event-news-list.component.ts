@@ -15,7 +15,7 @@ import {EventNewsColumnModel, EventNewsModel} from '../../model/event-news.model
 import {ActionType} from '../../../dataScript/model/data-script.model';
 import {EventModel} from '../../../event/model/event.model';
 import {
-	ColumnHeaderData,
+	ColumnHeaderData, DialogConfirmAction,
 	DialogService,
 	GridComponent,
 	GridModel,
@@ -83,12 +83,20 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 			}
 		}).finally();
 
-		this.gridRowActions = [{
-			name: 'Edit',
-			show: true,
-			disabled: !this.isEditAvailable(),
-			onClick: this.onEdit,
-		}];
+		this.gridRowActions = [
+			{
+				name: 'Edit',
+				show: true,
+				disabled: !this.isEditAvailable(),
+				onClick: this.onEdit,
+			},
+			{
+				name: 'Delete',
+				show: true,
+				disabled: !this.isDeleteAvailable(),
+				onClick: this.onDelete,
+			}
+		];
 
 		this.headerActions = [
 			{
@@ -98,7 +106,7 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateEventNews,
-			},
+			}
 		];
 
 		this.gridModel = {
@@ -237,10 +245,42 @@ export class EventNewsListComponent implements AfterViewInit, OnInit {
 	}
 
 	/**
+	 * Delete the selected Event News
+	 * @param dataItem
+	 */
+	private onDelete = async (dataItem: EventNewsModel): Promise<void> => {
+		try {
+			if (this.isDeleteAvailable()) {
+
+				const confirmation = await this.dialogService
+					.confirm(
+						this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+						this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION')
+					).toPromise();
+				if (confirmation) {
+					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+						await this.eventService.deleteNews({id: dataItem.newsId}).toPromise();
+						await this.gridComponent.reloadData();
+					}
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	/**
+	 * Determine if the user has the permission to edit events
+	 */
+	protected isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.NewsDelete);
+	}
+
+	/**
 	 * Determine if the user has the permission to edit events
 	 */
 	protected isEditAvailable(): boolean {
-		return this.permissionService.hasPermission(Permission.EventEdit);
+		return this.permissionService.hasPermission(Permission.NewsEdit);
 	}
 
 	public onEventListChange(event: any): void {
