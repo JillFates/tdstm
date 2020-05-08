@@ -20,7 +20,7 @@ export class AssetCommentModel {
 	};
 	public lastUpdated?: string;
 	public dateCreated?: string;
-	public createdBy?; string;
+	public createdBy?: string;
 }
 
 export class AssetCommentColumnModel {
