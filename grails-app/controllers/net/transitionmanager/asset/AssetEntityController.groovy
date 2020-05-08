@@ -445,7 +445,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
 									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
 									 canEditComments: canEditComments,
-									 canEditTasks: canEditTasks]
+									 canEditTasks: canEditTasks,
+									 createdBy: it.createdBy?.toString()]
 		}
 
 		renderAsJson assetCommentsList
