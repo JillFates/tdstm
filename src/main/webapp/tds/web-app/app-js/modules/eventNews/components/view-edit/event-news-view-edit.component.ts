@@ -73,6 +73,15 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 		});
 
 		this.buttons.push({
+			name: 'delete',
+			icon: 'trash',
+			show: () => this.modalType !== this.actionTypes.CREATE,
+			disabled: () => !this.isDeleteAvailable(),
+			type: DialogButtonType.ACTION,
+			action: this.onDelete.bind(this)
+		});
+
+		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
 			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
@@ -171,6 +180,31 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 		return modalType === ActionType.EDIT
 			? 'Event News Edit'
 			: 'Event News Detail';
+	}
+
+	/**
+	 * Delete the selected Event News
+	 * @param dataItem
+	 */
+	private onDelete = async (): Promise<void> => {
+		try {
+			if (this.isDeleteAvailable()) {
+
+				const confirmation = await this.dialogService
+					.confirm(
+						this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+						this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION')
+					).toPromise();
+				if (confirmation) {
+					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
+						await this.eventsService.deleteNews({id: this.eventNewsModel.newsId}).toPromise();
+						this.onCancelClose();
+					}
+				}
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	/**
