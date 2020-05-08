@@ -695,7 +695,7 @@ class SearchQueryHelper {
 					}
 				}
 
-				int numFound = entities.size()
+				int numFound = entities ? entities.size() : 0
 
 				log.debug 'fetchEntityByAlternateKey() RESULTS: domainClass={}, searchValue={}, extraCriteria={}, found={}',
 					domainClass.getName(), searchValue, extraCriteria, numFound

@@ -1,6 +1,8 @@
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.GormUtil
@@ -20,6 +22,7 @@ import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.imports.DataTransformService
+import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.imports.ImportBatchRecord
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
@@ -31,8 +34,11 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
+import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
+import org.mortbay.util.ajax.JSON
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
@@ -976,6 +982,59 @@ class DataImportServiceIntegrationSpec extends Specification {
 			retVal.error == ''
 			retVal.entities.size() > 0
 			((Model)retVal.entities[0]).modelName == modelName
+	}
+
+	@IgnoreRest
+	void '22 Test the SearchQueryHelper.fetchEntityByAlternateKey for AssetComment and moveEvent reference field retrieving an empty results'() {
+		setup:
+			Class domainClass = AssetComment
+			String searchValue = '0'
+			String referenceFieldName = 'moveEvent'
+			Map fieldsInfo = JSON.parse('{"durationScale":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=M, errors=[], fieldOrder=6, originalValue=M}","hardAssigned":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=0, errors=[], fieldOrder=7, originalValue=0}","mustVerify":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=0, errors=[], fieldOrder=9, originalValue=0}","moveEvent":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=0, errors=[], fieldOrder=8, originalValue=0}","sendNotification":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=1, errors=[], fieldOrder=11, originalValue=1}","priority":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=3, errors=[], fieldOrder=10, originalValue=3}","assignedTo":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=0, errors=[], fieldOrder=1, originalValue=0}","duration":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=0, errors=[], fieldOrder=4, originalValue=0}","durationLocked":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=0, errors=[], fieldOrder=5, originalValue=0}","commentType":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=issue, errors=[], fieldOrder=3, originalValue=issue}","comment":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=test 1, errors=[], fieldOrder=2, originalValue=test 1}","category":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=general, errors=[], fieldOrder=0, originalValue=general}","status":"{find={size=0, query=[], matchOn=null, results=[]}, init=null, warn=false, value=Ready, errors=[], fieldOrder=12, originalValue=Ready}"}')
+			Map<String,?> context = [
+					domainClass: AssetComment,
+					domainClassName: 'Task',
+					domainShortName: 'AssetComment',
+					record: new ImportBatchRecord(
+							importBatch: new ImportBatch(
+									project: project,
+									status: ImportBatchStatusEnum.RUNNING,
+									provider: null,
+									dataScript: null,
+									domainClassName: ETLDomain.Task,
+									createdBy: whom,
+									dateFormat: '',
+									fieldNameList: '["category", "assignedTo", "comment", "commentType", "duration", "durationLocked", "durationScale", "hardAssigned", "moveEvent", "mustVerify", "priority", "sendNotification", "status"]',
+									fieldLabelMap: '{"status": "status", "comment": "comment", "category": "category", "duration": "duration", "priority": "priority", "moveEvent": "moveEvent", "assignedTo": "assignedTo", "mustVerify": "mustVerify", "commentType": "commentType", "hardAssigned": "hardAssigned", "durationScale": "durationScale", "durationLocked": "durationLocked", "sendNotification": "sendNotification"}',
+									importResults: """<h3>Import Batch Loading Results</h3>
+														<p>Results: <ul>
+														<li>Task: 4 Row(s) read, 4 Loaded, 0 Erred</li>
+														</ul></p><br>
+									""",
+									timezone: 'GMT',
+									groupGuid: '52f38a6e-c3fe-43f6-8ca4-519f74fb178a'
+							),
+							operation: ImportOperationEnum.INSERT,
+							status: ImportBatchStatusEnum.PENDING,
+							fieldsInfo: '{"status": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "Ready", "errors": [], "fieldOrder": 12, "originalValue": "Ready"}, "comment": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "test 1", "errors": [], "fieldOrder": 2, "originalValue": "test 1"}, "category": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "general", "errors": [], "fieldOrder": 0, "originalValue": "general"}, "duration": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "0", "errors": [], "fieldOrder": 4, "originalValue": "0"}, "priority": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "3", "errors": [], "fieldOrder": 10, "originalValue": "3"}, "moveEvent": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "0", "errors": [], "fieldOrder": 8, "originalValue": "0"}, "assignedTo": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "0", "errors": [], "fieldOrder": 1, "originalValue": "0"}, "mustVerify": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "0", "errors": [], "fieldOrder": 9, "originalValue": "0"}, "commentType": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "issue", "errors": [], "fieldOrder": 3, "originalValue": "issue"}, "hardAssigned": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "0", "errors": [], "fieldOrder": 7, "originalValue": "0"}, "durationScale": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "M", "errors": [], "fieldOrder": 6, "originalValue": "M"}, "durationLocked": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "0", "errors": [], "fieldOrder": 5, "originalValue": "0"}, "sendNotification": {"find": {"size": 0, "query": [], "matchOn": null, "results": []}, "init": null, "warn": false, "value": "1", "errors": [], "fieldOrder": 11, "originalValue": "1"}}',
+							comments: '',
+							errorCount: 0,
+							errorList: []
+					),
+					project: project,
+					whom: whom,
+					staffList: [],
+					fieldSpecProject: null,
+					projectTags: [GDPR: 5, HIPPA: 8, PCI: 7],
+					searchQueryHelperErrors: []
+			]
+
+		when: 'An AssetComment is seek by moveEvent'
+			Map retVal = SearchQueryHelper.fetchEntityByAlternateKey(domainClass, searchValue, referenceFieldName, fieldsInfo, context)
+
+		then: 'entities is empty'
+			retVal.entities.isEmpty()
+			retVal.error == ''
 	}
 
 	// void '20 Test the _fetchEntityByFindResults method'() {
