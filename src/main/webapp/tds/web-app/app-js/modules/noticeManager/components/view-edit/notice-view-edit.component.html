@@ -259,7 +259,7 @@
 				</div>
 			</div>
 			<!-- Message -->
-			<div class="clr-row">
+			<div class="clr-row editor-container">
 				<label class="clr-col-12 required-field vertical-label"
 					>Message:</label
 				>
@@ -298,8 +298,7 @@
 				</div>
 			</div>
 			<!-- Post Message Text -->
-			<div
-				class="clr-row"
+			<div class="clr-row post-message"
 				*ngIf="noticeType && noticeType.typeId === MANDATORY"
 			>
 				<label
@@ -310,10 +309,7 @@
 				<div class="clr-col-12">
 					<input
 						type="text"
-						*ngIf="
-							action !== EnumActionType.View;
-							else noticeAcknowledgeView
-						"
+						*ngIf="action !== EnumActionType.View; else noticeAcknowledgeView"
 						[readonly]="noticeIsLocked"
 						class="form-control"
 						name="acknowledgeLabel"
