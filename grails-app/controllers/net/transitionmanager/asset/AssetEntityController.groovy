@@ -1,5 +1,4 @@
 package net.transitionmanager.asset
-
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.ui.Pagination
