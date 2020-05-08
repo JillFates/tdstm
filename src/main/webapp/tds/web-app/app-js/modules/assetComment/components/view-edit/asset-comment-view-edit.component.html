@@ -99,32 +99,38 @@
 						</clr-checkbox-wrapper>
 					</clr-checkbox-container>
 				</div>
-				<div
-					class="col-md-12 asset-comment-date-container"
-					*ngIf="
-						assetCommentModel.modal.type ===
-						modalType.VIEW
-					"
-				>
-					<div class="col-md-6 pad-left-0">
-						<label
-							class="control-label label-detail text-capitalize"
+
+				<div *ngIf="assetCommentModel.modal.type === modalType.VIEW">
+					<div class="col-md-12 asset-comment-date-container">
+						<div class="col-md-6 pad-left-0">
+							<label
+									class="control-label label-detail text-capitalize"
 							>Date created:
-							{{
-							(assetCommentModel?.dateCreated | tdsDateTime: userTimeZone:userDateTimeFormat).toUpperCase()
-							}}</label
-						>
-					</div>
-					<div class="col-md-6">
-						<label
-							class="control-label label-detail text-capitalize pull-right"
+								{{
+								(assetCommentModel?.dateCreated | tdsDateTime: userTimeZone:userDateTimeFormat).toUpperCase()
+								}}</label
+							>
+						</div>
+						<div class="col-md-6">
+							<label
+									class="control-label label-detail text-capitalize pull-right"
 							>Last updated:
-							{{
-							(assetCommentModel?.lastUpdated | tdsDateTime: userTimeZone:userDateTimeFormat).toUpperCase()
-							}}</label
-						>
+								{{
+								(assetCommentModel?.lastUpdated | tdsDateTime: userTimeZone:userDateTimeFormat).toUpperCase()
+								}}</label
+							>
+						</div>
+					</div>
+					<div class="col-md-12 asset-comment-date-container">
+						<div class="col-md-6 pad-left-0">
+							<label class="control-label label-detail text-capitalize">Created by: {{assetCommentModel.createdBy}}</label>
+						</div>
+						<div class="col-md-6">
+							<label class="control-label label-detail text-capitalize pull-right"></label>
+						</div>
 					</div>
 				</div>
+
 			</div>
 		</div>
 	</form>
