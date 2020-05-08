@@ -1,0 +1,85 @@
+.clr-checkbox-wrapper {
+    position: relative; }
+  
+  .clr-checkbox-wrapper .clr-control-label {
+    font-weight: 400;
+    display: block; }
+  
+  .clr-checkbox-wrapper ~ .clr-validate-icon {
+    margin-left: 0; }
+  
+  .clr-checkbox-wrapper ~ .clr-subtext {
+    display: inline-block; }
+  
+  .clr-checkbox-wrapper input[type=checkbox], .clr-radio-wrapper input[type=radio] {
+    position: absolute;
+    opacity: 0;
+    top: 5px;
+    left: 0;
+    height: .76667rem;
+    width: .76667rem; }
+  
+  .clr-checkbox-wrapper label, .clr-radio-wrapper label {
+    position: relative;
+    display: inline-block;
+    color: #000;
+    min-height: 1rem;
+    padding-left: .916667rem;
+    margin-top: 0;
+    cursor: pointer;
+    line-height: 1rem; }
+  
+.clr-checkbox-wrapper input[type=checkbox] + label::before {
+    position: absolute;
+    top: .1666665rem;
+    left: 0;
+    content: "";
+    display: inline-block;
+    height: .666667rem;
+    width: .666667rem;
+    border: 1px solid #999;
+    border-radius: .125rem; }
+
+.clr-checkbox-wrapper input[type=checkbox] + label::after {
+    position: absolute;
+    content: "";
+    display: none;
+    height: .3083334167rem;
+    width: .4333335rem;
+    border-left: .073333375rem solid #fff;
+    border-bottom: .073333375rem solid #fff;
+    top: .1666665rem;
+    left: .16666675rem;
+    -webkit-transform: translate(0, 0.16667rem) rotate(-45deg);
+    transform: translate(0, 0.16667rem) rotate(-45deg); }
+
+    .clr-checkbox-wrapper input[type=checkbox]:checked + label::before {
+        background: #0077b8;
+        border: 0; }
+      
+      .clr-checkbox-wrapper input[type=checkbox]:checked + label::after {
+        display: inline-block; }
+      
+      .clr-checkbox-wrapper input[type=checkbox].clr-indeterminate + label::before, .clr-checkbox-wrapper input[type=checkbox]:indeterminate + label::before {
+        border: 1px solid #0077b8; }
+      
+      .clr-checkbox-wrapper input[type=checkbox].clr-indeterminate + label::after, .clr-checkbox-wrapper input[type=checkbox]:indeterminate + label::after {
+        border-left: none;
+        border-bottom-color: #0077b8;
+        display: inline-block;
+        -webkit-transform: translate(0, 0.16667rem);
+        transform: translate(0, 0.16667rem); }
+      
+      .clr-checkbox-wrapper.clr-checkbox-inline {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -ms-flex-line-pack: start;
+        align-content: flex-start; }
+      
+      .clr-checkbox-wrapper.clr-checkbox-inline .clr-control-label {
+        display: inline-block;
+        margin-right: .5rem;
+        width: auto; }

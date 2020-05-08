@@ -38,26 +38,21 @@
 				</tds-indeterminate-checkbox>
 			</ng-template>
 			<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-				<label class="selectall-checkbox-column text-center">					
-					<clr-checkbox-wrapper class="inline">
-						<input
+				<clr-checkbox-wrapper>
+					
+						<input 
 							clrCheckbox
 							type="checkbox"
 							id="checkbox_{{ dataItem.common_id }}"
-							[ngStyle]="{
-							cursor: isBulkSelectAvailable() ? 'pointer' : 'text'
-						}"
+							class="component-action-just-planning"
+							[ngStyle]="{cursor: isBulkSelectAvailable() ? 'pointer' : 'text'}"
 							[disabled]="!isBulkSelectAvailable()"
-							[checked]="
-							bulkCheckboxService.getValueBulkItem(dataItem.common_id)
-						"
-							(change)="
-							checkItem(dataItem.common_id, $event.target.checked)
-						"
+							[checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)"
+							(change)="checkItem(dataItem.common_id, $event.target.checked)"
 							name="checkbox_{{ dataItem.common_id }}"
-						/>
-					</clr-checkbox-wrapper>
-				</label>
+						 />
+					
+				</clr-checkbox-wrapper>
 			</ng-template>
 		</kendo-grid-column>
 
