@@ -27,7 +27,6 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -2566,7 +2565,7 @@ class ImportService implements ServiceMethods {
 						// Grab the category
 						//def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r)?.replace("'","\\'")?.toLowerCase()?.trim()
 						def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r, "", true)?.toLowerCase()?.trim()
-						if (AssetCommentCategory.list.contains(categoryInput)) {
+						if (assetOptionsService.taskCategories().contains(categoryInput)) {
 							//assetComment.category = categoryInput ?: AssetCommentCategory.GENERAL
 							assetComment.category = categoryInput
 						} else {

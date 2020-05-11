@@ -78,7 +78,7 @@
 								id="category" name="category"
 								required="true"
 								ng-model="ac.category" datasource="ds.categories"
-								from="${com.tdsops.tm.enums.domain.AssetCommentCategory.list}"
+								from="${categories}"
 								noSelection="['':'Please select']"
 							/>
 						</td>

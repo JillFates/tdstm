@@ -2,7 +2,6 @@ package net.transitionmanager.task
 
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.domain.RecipeHelper
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -13,6 +12,8 @@ import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.command.cookbook.ContextCommand
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -38,6 +39,7 @@ import java.sql.SQLException
 
 import static com.tdsops.tm.enums.domain.ProjectStatus.ACTIVE
 import static com.tdsops.tm.enums.domain.ProjectStatus.COMPLETED
+
 /**
  * Handles the logic for creating recipes and running the cookbook
  *
@@ -55,6 +57,7 @@ class CookbookService implements ServiceMethods {
 	PersonService              personService
 	ProjectService             projectService
 	TaskService                taskService
+	AssetOptionsService        assetOptionsService
 
 	/**
 	 * Checks if current user can access project. If it can't then it throws an {@link net.transitionmanager.exception.UnauthorizedException}
@@ -809,7 +812,7 @@ class CookbookService implements ServiceMethods {
 					}
 				}
 
-				if (n=="category" && !(v in AssetCommentCategory.list)) {
+				if (n=="category" && !(v in assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.TASK_CATEGORY))) {
 					errorList << [error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'"]
 				}
