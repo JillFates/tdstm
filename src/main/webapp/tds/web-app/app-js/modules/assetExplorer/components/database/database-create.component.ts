@@ -38,10 +38,10 @@ export function DatabaseCreateComponent(template, model: any, metadata: any, par
 		}
 
 		ngOnInit() {
+			this.setDefaultBundleAndCompany();
 			this.model.asset.retireDate = null;
 			this.model.asset.maintExpDate = null;
 
-			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
 			this.model.asset.environment = '';
 			this.model.asset.scale = null;

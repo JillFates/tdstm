@@ -67,6 +67,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
+			this.setDefaultCompany();
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.sme = this.model.asset.sme || { id: null };
 			this.model.asset.sme2 = this.model.asset.sme2 || { id: null };
@@ -231,6 +232,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
+			personModel.company = this.model.asset.client;
 
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,

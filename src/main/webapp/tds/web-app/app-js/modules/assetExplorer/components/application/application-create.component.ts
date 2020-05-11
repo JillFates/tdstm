@@ -71,10 +71,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
+			this.setDefaultBundleAndCompany();
 			this.model.asset.retireDate =   '';
 			this.model.asset.maintExpDate =  '';
 
-			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.moveBundleList = this.model.dependencyMap.moveBundleList;
 			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
 			this.model.asset.assetClass = {
@@ -255,6 +255,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
+			personModel.company = this.model.asset.client;
 
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,

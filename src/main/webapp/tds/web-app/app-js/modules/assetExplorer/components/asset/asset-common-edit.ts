@@ -27,7 +27,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
 import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
@@ -378,5 +378,63 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		lastFocusable.addEventListener('focusout', () => {
 			firstFocusable.focus();
 		});
+	}
+
+	/**
+	 * Based on the project set the default bundle and company into the model
+	 */
+	setDefaultBundleAndCompany(): void {
+		// set empty as defaults
+		this.model.asset.moveBundle = {id: null, name: ''};
+		this.model.asset.client = {id: null, name: ''};
+
+		// get the default bundle and company based on the project
+		this.getProjectInfo(this.getProjectIdFromModel())
+			.subscribe((response: any) => {
+				if (response) {
+					this.model.asset.moveBundle = response.moveBundle;
+					this.model.asset.client = response.client;
+				}
+			});
+	}
+
+	/**
+	 * Get the project info
+	 * @param projectId
+	 */
+	protected getProjectInfo(projectId: string): Observable<{moveBundle, client}> {
+		return this.assetExplorerService.getProjectInfo(projectId)
+			.map((response: any) => {
+				const data = response && response.data;
+				if (data) {
+					return {
+						moveBundle: data.defaultBundle,
+						client: data.client,
+					}
+				}
+				return null;
+			});
+	}
+
+	/**
+	 * Based on the project set the default company
+	 */
+	setDefaultCompany(): void {
+		// set empty as defaults
+		this.model.asset.client = {id: null, name: ''};
+
+		this.getProjectInfo(this.getProjectIdFromModel())
+			.subscribe((response: any) => {
+				if (response) {
+					this.model.asset.client = response.client;
+				}
+			});
+	}
+
+	/**
+	 * Return the project id from the current asset model
+	 */
+	private getProjectIdFromModel(): string {
+		return this.model.asset && this.model.asset.project && this.model.asset.project.id || null;
 	}
 }
