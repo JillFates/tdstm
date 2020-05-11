@@ -376,7 +376,7 @@ class TaskQueryBuilder {
 		Date today = new Date().clearTime()
 		switch (requestParams[field]) {
 			case "dueOpenIssue":
-				whereClauses << "ac.dueDate < :filterToday"
+				whereClauses << "ac.dueDate <= :filterToday"
 				whereParams['filterToday'] = today
 				// 'break' intentionally omitted.
 
@@ -395,7 +395,7 @@ class TaskQueryBuilder {
 				break
 
 			case "generalOverDue" :
-				whereClauses << "ac.dueDate < :filterToday"
+				whereClauses << "ac.dueDate <= :filterToday"
 				whereParams['filterToday'] = today
 				whereClauses << "ac.category in (:planningCategories)"
 				//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.

@@ -519,12 +519,12 @@ class PlanningDashboardData {
 		long issues
 
 		void calculate() {
-			Date today = new Date()
+			Date today = new Date().clearTime()
 			String issueQuery = """ SELECT COUNT(a.id)
 								FROM AssetComment a 
 								WHERE a.project =:project AND a.category IN (:category) AND a.status != :status 
 								AND a.commentType =:type AND a.isPublished = true"""
-			String dueIssueQuery = issueQuery + ' AND a.dueDate < :dueDate '
+			String dueIssueQuery = issueQuery + ' AND a.dueDate <= :dueDate '
 			String publishedIssueQuery = """SELECT COUNT(a.id)
 								FROM AssetComment a WHERE a.project = :project AND a.commentType = :type 
 								AND a.status =:status AND a.category IN (:category) AND a.isPublished = true"""
