@@ -14,7 +14,6 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import org.grails.web.json.JSONObject
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.dataview.DataviewApiFilterParam
 import net.transitionmanager.command.dataview.DataviewApiParamsCommand
@@ -634,6 +633,10 @@ class DataviewService implements ServiceMethods {
 	 */
 	void validateDataviewUpdateAccessOrException(Project project, Person whom, DataviewCrudCommand dataviewCommand, Dataview dataview) {
 		validateDataviewViewAccessOrException(project, whom, dataview)
+
+		if(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.project.id != project.id){
+			throw new InvalidParamException("You can not edit $dataview.name outside of the default project.")
+		}
 
 		if (dataview.isSystem) {
 			throwException(InvalidParamException.class, 'dataview.validate.modifySystemView', 'System views can not be modified. Please perform Save As and choose an Override options as an alternative.')
