@@ -1,3 +1,4 @@
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
@@ -33,6 +34,10 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 
 		defineBeans {
 			assetOptionsService(AssetOptionsService)
+
+			applicationContextHolder(ApplicationContextHolder) { bean ->
+				bean.factoryMethod = 'getInstance'
+			}
 		}
 	}
 
