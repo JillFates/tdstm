@@ -5,8 +5,19 @@
 		</button>
 	</div>
 	<div class="col-md-4 col-xs-4 form-group pull-right archiveCheckWrapper">
-			<label class="pull-right">
-				<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editor.editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
+			<label class="container-checkbox pull-right" for="viewArchived">View Archived Recipes
+				<input
+					type="checkbox"
+					name="viewArchived"
+					id="viewArchived"
+					value="n"
+					ng-model="archived"
+					ng-true-value="y"
+					ng-false-value="n"
+					ng-disabled="editor.editingRecipe"
+					ng-change="changeRecipeList()"
+				/>			
+				<span class="checkmark"></span>
 			</label>
 	</div>
 </form>
