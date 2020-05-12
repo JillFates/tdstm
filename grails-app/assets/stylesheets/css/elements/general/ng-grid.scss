@@ -8,23 +8,39 @@
     background: none;
     .ngTopPanel {
       background-color: #d9e4ea;
-      .ngHeaderCell {
-        .ngVerticalBar  {
-          margin-top: 10px;
-          height: 13px !important;
-          background-color: #656565;
+      height: 34px !important;
+      border-bottom: 1px solid #c8d2d8 !important;
+      .ngHeaderContainer {
+        height: 34px !important;
+        .ngHeaderScroller {
+          height: 34px !important;
+          .ngHeaderCell {
+          height: 34px !important;
+          .ngVerticalBar  {
+            margin-top: 10px;
+            height: 13px !important;
+            background-color: #656565;
+          }
+          .ngHeaderText {
+            text-align: center;
+            font-weight: 400;
+            font-size: 14px;
+            color: #656565
+          }
         }
-        .ngHeaderText {
-          text-align: center;
-          font-weight: 500;
-          font-size: 11px;
-          color: #3c8dbc;
         }
       }
     }
     .ngRow {
-      border: 1px solid #d9e4ea;
+      border-left: 1px solid #d9e4ea;
+      border-right: 1px solid #d9e4ea;
       background: none;
+      .gridIcon {
+        width: 88%;
+        i {
+          color: #0077b8;
+        }
+      }
       &.selected {
         background-color: #c9dde1;
       }

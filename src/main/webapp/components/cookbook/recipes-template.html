@@ -1,19 +1,20 @@
-<form id="gridControls" class="row-fluid clearfix form-inline groups">
-	<div class="col-md-1 col-xs-1 form-group text-center recipe-add">
-		<button class="btn" id="generateRecipe"  ng-click="createRecipe()" title="Create Recipe">
-			<img ng-src="{{applyRootPath('/assets/icons/svg/plus-circle-line.svg')}}" height="18px" />
-		</button>
-	</div>
-	<div class="col-md-4 col-xs-4 form-group pull-right archiveCheckWrapper">
-			<label class="pull-right">
-				<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editor.editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
-			</label>
-	</div>
+<form id="gridControls" class="recipe-grid-controls">
+    <div class="view-archive-recipes">
+        <label class="container-checkbox">
+            <input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editor.editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
+            <span class="checkmark"></span>
+        </label>
+    </div>
+    <div class="recipe-add">
+        <button class="btn" id="generateRecipe" ng-click="createRecipe()" title="Create Recipe">
+            <img ng-src="{{applyRootPath('/assets/icons/svg/plus-line.svg')}}" height="18px"/>
+        </button>
+    </div>
 </form>
 <div class="row-fluid clearfix">
-	<div class="col-md-12">
-		<div class="gridStyle" ng-grid="recipesGridOptions"></div>
-	</div>
+    <div class="col-md-12">
+        <div class="gridStyle" ng-grid="recipesGridOptions"></div>
+    </div>
 </div>
 
 <div ui-view="recipeDetail"></div>

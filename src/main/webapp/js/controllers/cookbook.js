@@ -145,29 +145,32 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	columnSel = {index: 0},
 	actionsTemplate = '<div class="gridIcon">'+
 			'<a href="" class="actions edit" title="Edit Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 0)">'+
-				'<img src="'+ utils.url.applyRootPath('/assets/icons/script_edit.png') + '" alt="Edit">' +
+				'<i class="far fa-edit"></i>' +
 			'</a>'+
 			'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }"'+
 				'title="Revert to other version" ng-click="gridActions(row, 1)">'+
-				'<img src="'+ utils.url.applyRootPath('/assets/icons/arrow_undo.png') + '" alt="Revert">' +
+				'<i class="fas fa-history"></i>' +
 			'</a>'+
 			'<a href="" class="actions archive" title="Archive Recipe" ng-click="gridActions(row, 2)"'+
 				'ng-hide="archived == \'y\'">'+
-				'<img src="'+ utils.url.applyRootPath('/assets/icons/folder.png') + '" alt="Archive">' +
+				'<i class="far fa-folder"></i>' +
 			'</a>'+
 			'<a href="" class="actions unarchive" title="Unarchive Recipe" ng-click="gridActions(row, 4)"'+
 				'ng-hide="archived == \'n\'">'+
-				'<img src="'+ utils.url.applyRootPath('/assets/icons/folder_go.png') + '" alt="Archive">' +
+				'<i class="far fa-folder-open"></i>' +
 			'</a>'+
 			'<a href="" class="actions remove" title="Delete Recipe" recipe-id="{{row.entity.recipeId}}" ng-click="gridActions(row, 3)">'+
-			'<img src="'+ utils.url.applyRootPath('/assets/icons/delete.png') + '" alt="Delete">' +
+			'<i class="far fa-trash-alt"></i>' +
 			'</a>'+
 		'</div>';
 	scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index +
 		'" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" />';
 	scope.colDef = [
-	{field:'', displayName:'Actions', cellClass: 'text-center', enableCellEdit: false, width: '**',
-        sortable: false, cellTemplate: actionsTemplate},
+		{
+			field: '', displayName: 'Actions', cellClass: 'text-center', enableCellEdit: false, width: '120px',
+			sortable: false, cellTemplate: actionsTemplate,
+			enableColumnResizing:false
+		},
 	{field:'name', displayName:'Recipe', enableCellEdit: true, enableCellEditOnFocus: false, width: '***',
 		editableCellTemplate: scope.edittableField},
 	{field:'description', displayName:'Description', enableCellEdit: true, enableCellEditOnFocus: false,

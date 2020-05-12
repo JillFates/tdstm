@@ -37,17 +37,6 @@
   }
 }
 
-.cookbook_recipes_editor {
-  .recipe-add {
-    width: 40px;
-    button {
-      max-height: 30px;
-      line-height: 30px;
-      min-width: 44px;
-    }
-  }
-}
-
 .taskGeneration {
   .container-fluid {
     padding-left: 0px;
@@ -80,3 +69,406 @@
     padding-top: 23px;
   }
 }
+
+// ----------------------------------
+
+/* Cookbook Styles */
+
+div.cookbook_recipes_editor div.container {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.paginationWrapper{
+  text-align: center;
+}
+
+.ngGridTable{
+  border:1px solid #ddd;
+  margin-bottom: 0;
+}
+
+.ngGridTable tr th, .ngGridTable tr td{
+  border-rigth:1px solid #ddd;
+  border-left:1px solid #ddd;
+}
+
+.ngGridTable tr th:nth-child(6), .ngGridTable tr td:nth-child(6){
+  text-align: right;
+}
+
+.ngGridTable tr th:nth-child(7), .ngGridTable tr td:nth-child(7), .ngGridTable tr th:nth-child(8), .ngGridTable tr td:nth-child(8), .ngGridTable tr th:nth-child(9), .ngGridTable tr td:nth-child(9){
+  text-align: center;
+}
+
+.ngGridCellEdit {
+  width: 98%;
+  margin-top: 2px;
+  margin-left: 2px;
+}
+
+ul{
+  padding-left: 25px;
+}
+
+.modal-dialog{
+  width:800px;
+}
+
+.modal-dialog h3{
+  margin:0;
+}
+
+.modal-dialog .selectLabel{
+  padding-top:2px;
+}
+
+.fullWidth{width: 100%}
+
+.create-recipe-tabs .tab-content {
+  padding: 15px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-container {
+  padding: 15px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.ngCell > div{
+  height: 100%;
+}
+
+.innerTabWrapper{
+  margin: 15px 0 0 0;
+}
+
+.historyMainTable table tr > th:nth-child(2), .historyMainTable table tr > td:nth-child(2), .historyMainTable table tr > th:nth-child(5), .historyMainTable table tr > td:nth-child(5){
+  text-align: right;
+}
+
+.historyMainTable table tr > th:nth-child(6), .historyMainTable table tr > td:nth-child(6), .historyMainTable table tr > th:nth-child(7), .historyMainTable table tr > td:nth-child(7){
+  text-align: center;
+}
+
+.actionsText{
+  margin: 15px 0;
+}
+
+#logsArea, #recipeCode{
+  display: block;
+  width: 100%;
+}
+
+#recipeCode{
+  height: 200px;
+}
+
+.btns{
+  margin:15px 0 0 0;
+}
+
+textarea#logs, .syntaxErrors{
+  height:167px;
+  width:100%;
+}
+
+form.groups{
+  margin-bottom: 1em;
+}
+
+.groupsTable, .groupsTable2{
+  height:150px;
+  overflow-y: auto;
+}
+
+.groupsTable2{
+  margin:15px 0 0 0;
+}
+
+.groupsTable table tr > th:nth-child(3), .groupsTable table tr > td:nth-child(3){
+  text-align: right;
+}
+
+.gridStyle {
+  border: 1px solid rgb(212,212,212);
+  box-sizing: content-box;
+  width: 100%;
+  height: 300px;
+  margin: 0 0 10px 0;
+}
+
+.gridStyle .ui-resizable-s {
+  bottom: 0;
+  height: 2px;
+  border-bottom: 3px silver double;
+  cursor: ns-resize;
+}
+
+.gridStyle span.ng-binding {
+  cursor: pointer !important;
+}
+
+.gridStyleTasks, .gridStyleGroups{
+  border: 1px solid rgb(212,212,212);
+  height: 154px;
+  margin: 0 0 10px 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.gridStyleTasksHistory, .gridStyleGroups{
+  border: 1px solid rgb(212,212,212);
+  height: 254px;
+  margin: 0 0 10px 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.gridStyleGroups .ngCellText  span {
+  cursor: pointer !important;
+}
+
+.gridIcon{
+  display: table;
+  height: 100%;
+  width: 100%;
+  padding: 0 10px;
+}
+
+.createRecipe{
+  margin: 10px 0;
+}
+
+.actions{
+  display: table-cell;
+  vertical-align: middle;
+  margin-right:5px;
+}
+
+.actions:last-child{
+  margin-right:0;
+}
+
+.actions.disabled{
+  opacity: 0.3;
+  color: #333;
+  cursor: default;
+}
+
+form .error-msg{
+  margin:0.5em 0 0 0;
+}
+
+.versionLinks{
+  margin: 7px 0;
+}
+
+.versionLinks label{
+  font-weight: normal;
+}
+
+/****/
+
+/* Code Mirror Stuff */
+.CodeMirror{
+  height: 430px;
+  border: 1px solid #ddd;
+}
+
+.CodeMirror-lines pre{
+  display: block;
+  padding: 0;
+  margin: 0;
+  font-size: 1em;
+  line-height: 1em;
+  color: #333333;
+  word-break: normal;
+  word-wrap: normal;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.code-editor-modal {
+  padding: 0px;
+}
+.code-editor-modal .modal-dialog {
+  width: 1060px;
+}
+
+/******/
+
+/* Code Diff Stuff */
+
+.codeDiff {
+  height: 480px;
+}
+
+.codeDiffHeaderLeft {
+  margin-left: 5px;
+}
+
+.codeDiffHeaderRight {
+  float: right;
+  margin-right: 15px;
+}
+
+/******/
+
+/* Validate Syntax Stuff */
+.syntaxErrors{
+  overflow: auto;
+  border: 1px solid #ddd;
+  margin: 0;
+}
+
+.syntaxErrors > li p:first-child{
+  margin: 0;
+}
+/*****/
+
+/* Tasks */
+form.taskGeneration{
+  padding: 10px 0 0 0;
+}
+
+form.taskGeneration label.inline, .groups label.inline{
+  margin: 0 5% 0 0;
+  display: inline;
+}
+
+form.taskGeneration label.inline select{
+  max-width: 20%;
+}
+
+form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generateWrapper, .progressWrapper, .completionButtons{
+  margin-top: 20px;
+}
+
+.completionWrapper .tab-content {
+  padding: 15px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.progressWrapper .progress{
+  margin-bottom: 0px;
+  max-height: 20px;
+  margin-top: 26px;
+}
+
+.selectorsHideShow{
+  margin: 8px 0 0 0;
+  display: inline-block;
+}
+
+.content-wrapper a:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+/* Customize checkbox */
+/* Customize the label (the container) */
+.container-checkbox {
+  display: inline-block;
+  position: relative;
+  padding-left: 29px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: 17px;
+  width: 17px;
+  background-color: #fff;
+  border: 1px solid #999;
+  outline-color: lightskyblue;
+  border-radius: .125rem;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container-checkbox input:checked ~ .checkmark {
+  background: #0077b8;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Show the checkmark when checked */
+.container-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container-checkbox .checkmark:after {
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 1.5px 1.5px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+/**
+ REFACTOR 2020/12/05
+**/
+
+.recipe-grid-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  .view-archive-recipes {
+    margin-left: 15px;
+    label {
+      padding-top: 15px;
+    }
+    .checkmark {
+      top: 19px;
+    }
+  }
+
+  .recipe-add {
+    width: 40px;
+    margin-right: 20px;
+    button {
+      max-height: 26px;
+      line-height: 27px;
+      min-width: 44px;
+    }
+  }
+}
+
+
