@@ -46,6 +46,19 @@ export class TaskCategoryComponent implements OnInit, AfterViewInit {
 
 	ngOnInit() {
 		this.setInitialConfiguration();
+		this.removeGeneralCategory();
+	}
+
+	/**
+	* Removes the "General" Category from the taskCategories structure
+	* so it doesn't show up in the Categories table.
+	* See TM-17688
+	*/
+	removeGeneralCategory() {
+		// find the index in the taskCategories structure that corresponds to the "general" category
+		let index = this.taskCategories.tasks[0].findIndex( elem => elem.text === 'general');
+		// remove all rows of the "general" category
+		this.taskCategories.tasks.map( elem => elem.splice(index, 1));
 	}
 
 	ngAfterViewInit() {

@@ -1,6 +1,22 @@
 package net.transitionmanager.project
 
-import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.TimeScale
+import com.tdssrc.grails.NumberUtil
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
+import net.transitionmanager.asset.Application
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.reporting.ReportsService
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagEvent
+import net.transitionmanager.tag.TagEventService
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
+import net.transitionmanager.exception.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
@@ -588,7 +604,7 @@ class MoveEventService implements ServiceMethods {
 				"remainingTasks":		categoryStats[REMAINING_TASKS],
 				"completedTasks": 		categoryStats[COMPLETED_TASKS],
 				"totalTasks": 			categoryStats[TOTAL_TASKS],
-				"percComp": 			Math.round(categoryStats[COMPLETED_TASKS] / categoryStats[TOTAL_TASKS] * 100),
+				"percComp": 			NumberUtil.percentage(categoryStats[COMPLETED_TASKS], categoryStats[TOTAL_TASKS]),
 				"color":				calculateColumnColor(categoryStats, now)
 			]
 		}
