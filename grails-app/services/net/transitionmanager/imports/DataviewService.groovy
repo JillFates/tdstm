@@ -944,10 +944,18 @@ class DataviewService implements ServiceMethods {
 
 	    Map queryResults = previewQueryResults(assets, totalAssets[0], dataviewSpec)
 
-	    postProcessAssetQuery(queryResults, whereInfo.mixedFields)
+		if (!dataviewSpec.forExport){
+			/**
+			 * TM-17666:
+			 * After previewQuery, some extra calculations (for icons definitions)
+			 * are necessary to build response data.
+			 * If this request is used for export purpose,
+			 * those extra calculations are not necessary.
+			 */
+			postProcessAssetQuery(queryResults, whereInfo.mixedFields)
+		}
 
 	    return queryResults
-
     }
 
 	/**
