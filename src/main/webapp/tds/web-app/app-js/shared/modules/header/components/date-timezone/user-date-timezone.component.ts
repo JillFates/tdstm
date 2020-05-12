@@ -46,7 +46,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 		DateUtils.PREFERENCE_MIDDLE_ENDIAN,
 		DateUtils.PREFERENCE_LITTLE_ENDIAN,
 	];
-	public selectedTimezone = {id: 411, code: 'GMT', label: 'GMT'};
+	public selectedTimezone: any;
 	public selectedTimeFormat;
 	// The timezone Pin is controlled by the Timezone picker, this helps to control it outside the jquery lib
 	public timezonePinShow = false;
@@ -55,6 +55,9 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 
 	public defaultTimeZone: string;
 	public shouldReturnData: boolean;
+	virtualizationSettings = {
+		itemHeight: 15
+	};
 
 	constructor(
 		private dialogService: DialogService,
@@ -127,7 +130,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 			.find('area')
 			.each((m, areaElement) => {
 				// Find the timezone attribute from the map itself
-				if (areaElement.getAttribute('data-timezone') === timezone.code) {
+				if (areaElement.getAttribute('data-timezone') === (timezone && timezone.code)) {
 					// Emulate the click to get the PIN in place
 					this.timezonePinShow = true;
 					setTimeout(() => {
@@ -142,7 +145,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 */
 	public onSave(): void {
 		const params = {
-			timezone: this.selectedTimezone.code,
+			timezone: this.selectedTimezone && this.selectedTimezone.code,
 			datetimeFormat: this.selectedTimeFormat,
 		};
 		if (this.shouldReturnData) {
@@ -152,8 +155,8 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 				(result: any) => {
 					// Update the storage before reload the window
 					this.store.dispatch(new SetTimeZoneAndDateFormat({
-						timezone: params.timezone,
-						dateFormat: params.datetimeFormat
+						timezone: params && params.timezone,
+						dateFormat: params && params.datetimeFormat
 					})).subscribe(() => {
 						this.onAcceptSuccess();
 						location.reload();
@@ -180,10 +183,10 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 				result[2][PREFERENCES_LIST.CURR_DT_FORMAT];
 			this.selectedTimezone = this.timezonesList.find(
 				timezone =>
-					timezone.code === result[2][PREFERENCES_LIST.CURR_TZ]
+					(timezone && timezone.code) === result[2][PREFERENCES_LIST.CURR_TZ]
 			);
 			let defaultTimeZone = this.timezonesList.find(
-				timezone => timezone.code === this.defaultTimeZone
+				timezone => (timezone && timezone.code) === this.defaultTimeZone
 			);
 			if (defaultTimeZone) {
 				this.selectedTimezone = defaultTimeZone;
