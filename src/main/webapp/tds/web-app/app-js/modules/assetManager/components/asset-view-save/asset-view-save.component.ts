@@ -228,10 +228,10 @@ export class AssetViewSaveComponent extends Dialog implements OnInit, AfterViewI
 		const tmpModel = this.extractModel(this.model);
 		this.assetExpService.saveReport(tmpModel)
 			.subscribe(result => {
-				if (result) {
-					this.cancelCloseDialog();
+				if (result && result.id) {
+					this.onAcceptSuccess(result);
 				}
-			}, error => this.activeDialog.dismiss(error));
+			}, error => super.onCancelClose());
 	}
 
 	/**
