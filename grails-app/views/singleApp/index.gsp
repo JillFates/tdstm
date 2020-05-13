@@ -10,7 +10,7 @@
         <meta http-equiv="pragma" content="no-cache" />
         <meta name="layout" content="header"/>
         <title>TransitionManager</title>
-
+        <g:javascript src="walkme.js" />
     </head>
 
     <body>

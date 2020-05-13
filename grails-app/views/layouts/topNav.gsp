@@ -40,6 +40,7 @@
     <asset:stylesheet href="css/daterangepicker-bs3.css" />
 
     <g:javascript src="tdsmenu.js" />
+    <g:javascript src="walkme.js" />
     <g:javascript src="PasswordValidation.js" />
 
     <script type="text/javascript">
