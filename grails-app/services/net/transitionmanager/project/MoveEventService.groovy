@@ -594,18 +594,19 @@ class MoveEventService implements ServiceMethods {
 		Date now = new Date()
 
 		taskCategoriesStatsList.each { categoryStats ->
+
 			stats << [
 				"category": 			categoryStats[0],
 				"minActStart": 			categoryStats[1],
-				"minEstStart": 			categoryStats[2],
+				"minEstStart": 			categoryStats[2] ?: moveEvent.estStartTime,
 				"maxActFinish": 		categoryStats[MAX_ACTUAL_FINISH],
 				"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH],
-				"maxEstFinish": 		categoryStats[MAX_EST_FINISH],
+				"maxEstFinish": 		categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime,
 				"remainingTasks":		categoryStats[REMAINING_TASKS],
 				"completedTasks": 		categoryStats[COMPLETED_TASKS],
 				"totalTasks": 			categoryStats[TOTAL_TASKS],
-				"percComp": 			NumberUtil.percentage(categoryStats[COMPLETED_TASKS], categoryStats[TOTAL_TASKS]),
-				"color":				calculateColumnColor(categoryStats, now)
+				"percComp": 			NumberUtil.percentage(categoryStats[TOTAL_TASKS], categoryStats[COMPLETED_TASKS]),
+				"color":				calculateColumnColor(categoryStats, moveEvent, now)
 			]
 		}
 		return stats
@@ -670,11 +671,11 @@ class MoveEventService implements ServiceMethods {
 	 * @param categoryStats - The properties for the category
 	 * @return - The calculated color for the category column.
 	 */
-	private String calculateColumnColor(Object[] categoryStats, Date now) {
+	private String calculateColumnColor(Object[] categoryStats, MoveEvent moveEvent, Date now) {
 		Long remainingTasks = categoryStats[REMAINING_TASKS]
 		Date maxPlannedFinish = categoryStats[MAX_PLANNED_FINISH]
 		Date maxActualFinish = categoryStats[MAX_ACTUAL_FINISH]
-		Date maxEstFinish = categoryStats[MAX_EST_FINISH]
+		Date maxEstFinish = categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime
 
 		String color = ""
 		if (remainingTasks == 0 && maxActualFinish <= maxPlannedFinish) {
