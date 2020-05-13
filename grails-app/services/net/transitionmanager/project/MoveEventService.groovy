@@ -587,6 +587,7 @@ class MoveEventService implements ServiceMethods {
 				from Task t
 				where t.moveEvent =:moveEvent 
 					and t.category is not null
+					and t.category <> 'general'
 					${ (! viewUnpublished ? 'and t.isPublished = true' : '') }
 				group by t.category
 				order by minEstStart, category
