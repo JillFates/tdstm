@@ -200,17 +200,26 @@ form.groups{
   width: 100%;
   height: 300px;
   margin: 0 0 10px 0;
-}
+  .ui-resizable-s {
+    bottom: 0;
+    height: 2px;
+    border-bottom: 3px silver double;
+    cursor: ns-resize;
+  }
+  
+  .ngCell:nth-child(-n+3) {
+    .ngCellText,
+    span.ng-binding {
+      cursor: pointer !important;
+    }
+  }
 
-.gridStyle .ui-resizable-s {
-  bottom: 0;
-  height: 2px;
-  border-bottom: 3px silver double;
-  cursor: ns-resize;
-}
-
-.gridStyle span.ng-binding {
-  cursor: pointer !important;
+  .ngCell:not(:nth-child(-n+3)) {
+    .ngCellText,
+    span.ng-binding {
+      cursor: default !important;
+    }
+  }
 }
 
 .gridStyleTasks, .gridStyleGroups{

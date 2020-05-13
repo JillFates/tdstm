@@ -21,6 +21,8 @@ tds.cookbook.directive = tds.cookbook.directive || {};
  */
 tds.cookbook.controller.MainController = function(scope, rootScope, log, recipeManager) {
 
+	$(".menu-parent-tasks-cookbook").addClass('active');
+
 	scope.cookbook = {
 		loadingIndicatorEnabled: true,
 		progressPromise: null
