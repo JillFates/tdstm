@@ -3,143 +3,78 @@ import { ViewModel } from '../../../assetExplorer/model/view.model';
 import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
+/**
+ * TODO: this is almost the same code for the asset-view-show-save-button.component.ts so probably we just
+ * need to unified both and just use a single component.
+ */
 @Component({
 	selector: 'tds-asset-view-config-save-button',
 	template: `
-		<div *ngIf="shouldDisplayDropdownButton(); else saveButton"
-				 class="btn-group">
-			<tds-button *ngIf="model.isOwner || (isSystemView() && isSystemSaveAvailable(true))"
-									[id]="'btnSave'"
-									[disabled]="(!assetExplorerService.isSaveAvailable(this.model) || !isValid) || !isDirty()"
-									[title]="'GLOBAL.SAVE' | translate"
-									(click)="onSave()"
-									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
-				{{'GLOBAL.SAVE' | translate}}
+		<div *ngIf="config.canShowSaveButton" class="btn-group">
+			<tds-button
+				[ngClass]="{'btn-secondary':!config.isDirty, 'btn-success': (config.isDirty && !config.disableSaveButton)}"
+				[id]="config.saveButtonId"
+				[disabled]="config.disableSaveButton"
+				[title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')"
+				(click)="saveClick(config.saveButtonId)">
+				{{config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')}}
 			</tds-button>
-			<tds-button *ngIf="!model.isOwner && !isSystemView()"
-									[id]="'btnSaveAs'"
-									[disabled]="!isSaveAsAvailable() || !isValid"
-									[title]="'GLOBAL.SAVE_AS' | translate"
-									(click)="onSaveAs()"
-									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
-				{{'GLOBAL.SAVE_AS' | translate}}
-			</tds-button>
-			<clr-dropdown>
-				<tds-button [title]="''" icon="angle down" clrDropdownTrigger
-										[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"></tds-button>
+			<clr-dropdown [clrCloseMenuOnItemClick]="true">
+				<tds-button [icon]="'angle down'"
+										[ngClass]="{'btn-secondary':!config.isDirty,'btn-success':config.isDirty}"
+										clrDropdownTrigger>
+				</tds-button>
 				<clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
-					<button clrDropdownItem class="btn"
-									[disabled]="!isDirty()"
+					<button *ngIf="config.canSave" clrDropdownItem class="btn"
+									[disabled]="config.canSave && !config.isDirty"
 									(click)="onSave()">
 						{{ 'GLOBAL.SAVE' | translate }}
 					</button>
-					<button clrDropdownItem class="btn"
+					<button *ngIf="config.canSaveAs" clrDropdownItem class="btn"
 									(click)="onSaveAs()">
 						{{ 'GLOBAL.SAVE_AS' | translate }}
 					</button>
 				</clr-dropdown-menu>
 			</clr-dropdown>
 		</div>
-		<ng-template #saveButton>
-			<tds-button [id]="'btnSave'"
-									*ngIf="( (model.id && !isSystemView()) || (model.id && isSystemView() && model.isOwner && isSystemSaveAvailable(true)))"
-									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
-									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success': (isValid && isDirty() && this.assetExplorerService.isSaveAvailable(this.model))}"
-									(click)="onSave()">
-				{{ 'GLOBAL.SAVE' | translate }}
-			</tds-button>
-			<tds-button [id]="'btnSaveAs'"
-									*ngIf="((model.id && isSystemView() && isSaveAsAvailable()) || isSaveAsAvailable())"
-									[disabled]="!isSaveAsAvailable() || !isValid"
-									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
-									(click)="onSaveAs()">
-				{{ 'GLOBAL.SAVE_AS' | translate }}
-			</tds-button>
-		</ng-template>
 	`,
 })
 export class AssetViewConfigSaveButtonComponent {
-	@Input() model: ViewModel;
-	@Input() isValid: boolean;
-	@Input() dataSignature: string;
+	@Input() config: {
+		isDirty: boolean,
+		saveButtonId: string,
+		canSave: boolean,
+		canSaveAs: boolean,
+		isEditAvailable: boolean,
+		canShowSaveButton: boolean,
+		disableSaveButton: boolean
+	};
 	@Output() save = new EventEmitter<any>();
 	@Output() saveAs = new EventEmitter<any>();
+	protected readonly SAVE_BUTTON_ID = 'btnSave';
 
-	constructor(
-		private assetExplorerService: AssetExplorerService,
-		private permissionService: PermissionService) {}
-
-	isDirty(): boolean {
-		let result = this.dataSignature !== JSON.stringify(this.model);
-		// TODO: hasPendingChanges
-		// if (this.state && this.state.$current && this.state.$current.data) {
-		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
-		// }
-		return result;
-	}
+	constructor(protected translateService: TranslatePipe) {}
 
 	/**
-	 * Check is user has permissions to Save As (create) a view.
+	 * Determines which save operation to call based on the button id.
 	 */
-	isSaveAsAvailable(): boolean {
-		return this.model.id ?
-			(	this.model.isSystem ?
-					this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) && this.canCreateViews() :
-					this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) && this.canCreateViews()
-			)
-			: this.assetExplorerService.isSaveAvailable(this.model);
-	}
-
-	/**
-	 * Check if user has AssetExplorerCreate permission.
-	 */
-	canCreateViews(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
-	}
-
-	/**
-	 * Check if user has permissions to Save a view.
-	 * @param edit
-	 */
-	isSystemSaveAvailable(edit): boolean {
-		return edit ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
+	saveClick(saveButtonId: string) {
+		saveButtonId === this.SAVE_BUTTON_ID ? this.onSave() : this.onSaveAs()
 	}
 
 	/**
 	 * On Save As button clicked, emit.
 	 */
 	onSaveAs(): void {
-		if (this.isSaveAsAvailable()) {
-			this.saveAs.emit();
-		}
+		this.saveAs.emit();
 	}
 
 	/**
 	 * On Save button clicked, emit.
 	 */
 	onSave() {
-		if (this.assetExplorerService.isSaveAvailable(this.model)) {
-			this.save.emit();
-		}
-	}
-
-	/**
-	 * Returns true if dropdown button should be displayed, otherwise false.
-	 */
-	shouldDisplayDropdownButton(): boolean {
-		return this.model.id && !this.isSystemView() && (this.model.isOwner || (
-				this.isSystemView() && (this.isSystemSaveAvailable(true) && this.isSystemSaveAvailable(false))
-			)
-		);
-	}
-
-	/**
-	 * Checks if current model is a system view
-	 */
-	isSystemView(): boolean {
-		return this.model.isSystem
+		this.save.emit();
 	}
 }
