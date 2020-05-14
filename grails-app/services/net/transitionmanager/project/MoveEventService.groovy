@@ -594,27 +594,26 @@ class MoveEventService implements ServiceMethods {
 		Date now = new Date()
 
 		taskCategoriesStatsList.each { categoryStats ->
+			// NOTE if minEstStart or maxEstFinish is empty, just use the event times
 
-			// if any of this two are empty, just use the event times
-			categoryStats[2] = categoryStats[2] ?: moveEvent.estStartTime
-			categoryStats[MAX_EST_FINISH] = categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime
-
-			stats << [
-				"category": 			categoryStats[0],
-				"minActStart": 			categoryStats[1],
-				"minEstStart": 			categoryStats[2],
-				"maxActFinish": 		categoryStats[MAX_ACTUAL_FINISH],
-				 // maxPlannedFinish is the latest completion time for the Task where it can finish on time
-				"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH],
-				 // maxEstFinish is when we expect the Task to complete, based on the current time
-				"maxEstFinish": 		categoryStats[MAX_EST_FINISH],
-				"remainingTasks":		categoryStats[REMAINING_TASKS],
-				"completedTasks": 		categoryStats[COMPLETED_TASKS],
-				"totalTasks": 			categoryStats[TOTAL_TASKS],
-				"percComp": 			NumberUtil.percentage(categoryStats[TOTAL_TASKS], categoryStats[COMPLETED_TASKS]),
-				"color":				calculateColumnColor(categoryStats, now)
+			Map catStats = [
+					"category": 			categoryStats[0],
+					"minActStart": 			categoryStats[1],
+					"minEstStart": 			categoryStats[2] ?: moveEvent.estStartTime,
+					"maxActFinish": 		categoryStats[MAX_ACTUAL_FINISH],
+					// maxPlannedFinish is the latest completion time for the Task where it can finish on time
+					"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH],
+					// maxEstFinish is when we expect the Task to complete, based on the current time
+					"maxEstFinish": 		categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime,
+					"remainingTasks":		categoryStats[REMAINING_TASKS],
+					"completedTasks": 		categoryStats[COMPLETED_TASKS],
+					"totalTasks": 			categoryStats[TOTAL_TASKS],
+					"percComp": 			NumberUtil.percentage(categoryStats[TOTAL_TASKS], categoryStats[COMPLETED_TASKS]),
 			]
+			catStats.color = calculateColumnColor(catStats, now)
+			stats << catStats
 		}
+
 		return stats
 	}
 
@@ -677,12 +676,12 @@ class MoveEventService implements ServiceMethods {
 	 * @param categoryStats - The properties for the category
 	 * @return - The calculated color for the category column.
 	 */
-	private String calculateColumnColor(Object[] categoryStats, Date now) {
+	private String calculateColumnColor(Map categoryStats, Date now) {
 
-		Long remainingTasks = categoryStats[REMAINING_TASKS]
-		Date maxPlannedFinish = categoryStats[MAX_PLANNED_FINISH]
-		Date maxActualFinish = categoryStats[MAX_ACTUAL_FINISH]
-		Date maxEstFinish = categoryStats[MAX_EST_FINISH]
+		Long remainingTasks = categoryStats.remainingTasks
+		Date maxPlannedFinish = categoryStats.maxPlannedFinish
+		Date maxActualFinish = categoryStats.maxActFinish
+		Date maxEstFinish = categoryStats.maxEstFinish
 
 		String color = ""
 		if (remainingTasks == 0) {

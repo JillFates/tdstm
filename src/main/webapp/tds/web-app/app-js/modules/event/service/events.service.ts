@@ -442,14 +442,14 @@ export class EventsService {
 
 			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxActFinish);
 
-			if (item.maxEstFinish && (DateUtils.stringDateToDate(item.maxActFinish) > DateUtils.stringDateToDate(item.maxEstFinish))) {
+			if (item.maxPlannedFinish && (DateUtils.stringDateToDate(item.maxActFinish) > DateUtils.stringDateToDate(item.maxPlannedFinish))) {
 				results[CatagoryRowType.ActualStart][index].classes += ' task-overdue ';
 				results[CatagoryRowType.ActualCompletion][index].classes += ' task-overdue ';
 			}
 		});
 
 		const hasInfo = data.find((item: CategoryTask) => {
-			return Boolean(item.minEstStart || item.maxEstFinish || item.minActStart || item.maxActFinish);
+			return Boolean(item.minEstStart || item.maxPlannedFinish || item.minActStart || item.maxActFinish);
 		});
 
 		return {tasks: results, columns: columnsLength, hasInfo};
