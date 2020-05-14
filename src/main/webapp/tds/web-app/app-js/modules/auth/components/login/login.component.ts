@@ -251,7 +251,10 @@ export class LoginComponent implements OnInit {
 		const hasStandardNotices = this.filterPostNotices(false).length > 0;
 
 		this.showMandatoryNotices()
-			.then(() => {
+			.then((result) => {
+				if (!result || !result.accepted) {
+					return;
+				}
 				if (hasStandardNotices) {
 					setTimeout(() => {
 						this.showStandardNotices()
@@ -306,11 +309,11 @@ export class LoginComponent implements OnInit {
 	/**
 	 * Open the view to show mandatory notices
 	 */
-	private async showMandatoryNotices(): Promise<void> {
+	private async showMandatoryNotices(): Promise<any> {
 		const notices = this.filterPostNotices(true);
 
 		if (notices.length) {
-			await this.dialogService.open({
+			return await this.dialogService.open({
 					componentFactoryResolver: this.componentFactoryResolver,
 					component: MandatoryNoticesComponent,
 					data: {notices: notices},
