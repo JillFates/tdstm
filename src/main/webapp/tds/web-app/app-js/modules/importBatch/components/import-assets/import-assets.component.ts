@@ -57,7 +57,7 @@ export class ImportAssetsComponent implements OnInit {
 	public file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	readonly UI_CONFIG = {
 		labelColSize: 3,
-		inputColSize: 3,
+		inputColSize: 2,
 		buttonColSize: 1,
 		urlColSize: 2,
 		showTransformButton: false,

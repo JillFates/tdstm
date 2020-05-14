@@ -39,4 +39,23 @@ import-assets {
 			color: #3c8dbc !important;
 		}
 	}
+	.aligned-row {
+		display: flex;
+		align-items: baseline;
+	}
+	.k-upload-button {
+		width: 100%;
+		display: flex;
+		justify-content: start;
+		align-items: center;
+	}
+
+	.k-upload-files,
+	.k-dropzone-hint {
+		padding: 8px;
+	}
+
+	.k-upload-status {
+		margin-left: 5px;
+	}
 }
