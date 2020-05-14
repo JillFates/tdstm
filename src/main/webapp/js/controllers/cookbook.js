@@ -2853,7 +2853,13 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 		// STATE DESC: Show create recipe popup
 		.state('recipes.create', {
 			url: '/create',
-			onEnter: function($state, $modal) {
+			views: {
+				"recipeDetail": {
+					templateUrl: servRootPathProvider.$get() + '/components/cookbook/recipe-detail-template.html',
+					controller: tds.cookbook.controller.RecipeDetailController
+				}
+			},
+			onEnter: function($rootScope, $state, $modal) {
 				$modal.open({
 					templateUrl: servRootPathProvider.$get() + '/components/cookbook/create/create-recipe-template.html',
 					controller: tds.cookbook.controller.CreateRecipeController,
@@ -2861,7 +2867,11 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 				}).result.then(function (recipeId) {
 					return $state.go("recipes.detail.code", {'recipeId': recipeId});
 				}, function () {
-					return $state.go("recipes");
+					try {
+						return $state.go("recipes.detail", {'recipeId': $rootScope.commentsScope.currentSelectedRow.entity.recipeId});
+					} catch (e) {
+						return $state.go("recipes");
+					}
 				});
 			},
 			onExit: function($rootScope) {

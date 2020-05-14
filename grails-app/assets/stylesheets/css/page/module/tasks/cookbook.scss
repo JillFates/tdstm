@@ -480,4 +480,31 @@ form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generate
   }
 }
 
+.recipeDetailContent {
+  .edition {
+    .btn {
+      padding: 0.4rem;
+    }
+  }
+}
+
+.code-editor-modal {
+  .modal-footer {
+    margin-right: 26px;
+    button:first-child {
+      margin-right: 15px;
+    }
+  }
+}
+
+#errorModal {
+  .modal-footer {
+    padding-top: 16px;
+    button {
+      margin-right: 25px;
+      margin-bottom: 18px;
+    }
+  }
+}
+
 
