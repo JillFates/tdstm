@@ -425,20 +425,28 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 	}
 
 	/**
-	 * Verify the Object has not changed
+	 * Verify if model has changed, also checks the param list, if one of the two are dirty returns true.
 	 * @returns {boolean}
 	 */
-	public isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.apiActionModel);
+	isDirty(): boolean {
+		return (this.dataSignature !== JSON.stringify(this.apiActionModel)) || this.isParameterListDirty();
 	}
 
 	/**
-	 * Verify the Object has not changed
+	 * Verify if parameter list has changed:
+	 * If we have pre-existing parameters then compare vs the current parameter list.
+	 * If we don't have any pre-existing parameter then just validate current parameter this is not empty.
 	 * @returns {boolean}
 	 */
-	public isParameterListDirty(): boolean {
-		if (this.dataParameterListSignature !== '' && this.parameterList.length > 0) {
-			return this.dataParameterListSignature !== JSON.stringify(this.parameterList);
+	isParameterListDirty(): boolean {
+		if (this.dataParameterListSignature !== '') {
+			let newParamList = '';
+			if (this.parameterList.length) {
+				newParamList = JSON.stringify(this.parameterList);
+			}
+			return this.dataParameterListSignature !== newParamList;
+		} else {
+			return this.parameterList.length > 0;
 		}
 	}
 
@@ -450,7 +458,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		if (this.loadingLists) {
 			return;
 		}
-		if ((this.isDirty() || this.isParameterListDirty()) && this.modalType !== this.actionTypes.VIEW) {
+		if (this.isDirty() && this.modalType !== this.actionTypes.VIEW) {
 			this.dialogService.confirm(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')
