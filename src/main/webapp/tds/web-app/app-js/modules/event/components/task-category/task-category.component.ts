@@ -36,7 +36,7 @@ export class TaskCategoryComponent implements OnInit, AfterViewInit {
 		'Percent completed',
 		'Task completed',
 		'Earliest Estimated Start',
-		'Latest Estimated Completion',
+		'Latest Planned Completion',
 		'Actual Start',
 		'Actual Completion',
 	];

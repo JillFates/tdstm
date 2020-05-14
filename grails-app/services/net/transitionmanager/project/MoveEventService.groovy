@@ -97,10 +97,10 @@ class MoveEventService implements ServiceMethods {
 	private static final Integer COMPLETED_TASKS = 7
 	private static final Integer TOTAL_TASKS = 8
 
-    public static final String CLOCK_MODE_NONE 			= 'none'
-    public static final String CLOCK_MODE_COUNTDOWN 	= 'countdown'
-    public static final String CLOCK_MODE_ELAPSED 		= 'elapsed'
-    public static final String CLOCK_MODE_FINISHED 		= 'finished'
+	public static final String CLOCK_MODE_NONE 			= 'none'
+	public static final String CLOCK_MODE_COUNTDOWN 	= 'countdown'
+	public static final String CLOCK_MODE_ELAPSED 		= 'elapsed'
+	public static final String CLOCK_MODE_FINISHED 		= 'finished'
 
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService
@@ -167,7 +167,7 @@ class MoveEventService implements ServiceMethods {
 			nonProjEventIds = reqEventIds - projEventsId
 			if(nonProjEventIds){
 				log.error "Event ids $nonProjEventIds is not associated with current project.\
-						    Kindly request for project associated  Event ids ."
+							Kindly request for project associated  Event ids ."
 			}
 		}
 		return nonProjEventIds
@@ -413,10 +413,10 @@ class MoveEventService implements ServiceMethods {
 				unresolvedIssues = AssetComment.executeQuery("""
 					from AssetComment
 					where assetEntity.id in (:assetIds)
-				  	and dateResolved = null
-				  	and commentType=:commentType
-				  	and category in ('general', 'discovery', 'planning', 'walkthru')
-				  	and isPublished IN (:publishedValues)
+					and dateResolved = null
+					and commentType=:commentType
+					and category in ('general', 'discovery', 'planning', 'walkthru')
+					and isPublished IN (:publishedValues)
 			""", [assetIds: allAssetIds, commentType: AssetCommentType.ISSUE,
 				  publishedValues: publishedValues])
 			}
@@ -595,18 +595,24 @@ class MoveEventService implements ServiceMethods {
 
 		taskCategoriesStatsList.each { categoryStats ->
 
+			// if any of this two are empty, just use the event times
+			categoryStats[2] = categoryStats[2] ?: moveEvent.estStartTime
+			categoryStats[MAX_EST_FINISH] = categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime
+
 			stats << [
 				"category": 			categoryStats[0],
 				"minActStart": 			categoryStats[1],
-				"minEstStart": 			categoryStats[2] ?: moveEvent.estStartTime,
+				"minEstStart": 			categoryStats[2],
 				"maxActFinish": 		categoryStats[MAX_ACTUAL_FINISH],
+				 // maxPlannedFinish is the latest completion time for the Task where it can finish on time
 				"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH],
-				"maxEstFinish": 		categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime,
+				 // maxEstFinish is when we expect the Task to complete, based on the current time
+				"maxEstFinish": 		categoryStats[MAX_EST_FINISH],
 				"remainingTasks":		categoryStats[REMAINING_TASKS],
 				"completedTasks": 		categoryStats[COMPLETED_TASKS],
 				"totalTasks": 			categoryStats[TOTAL_TASKS],
 				"percComp": 			NumberUtil.percentage(categoryStats[TOTAL_TASKS], categoryStats[COMPLETED_TASKS]),
-				"color":				calculateColumnColor(categoryStats, moveEvent, now)
+				"color":				calculateColumnColor(categoryStats, now)
 			]
 		}
 		return stats
@@ -622,30 +628,30 @@ class MoveEventService implements ServiceMethods {
 		MoveEventSnapshot moveEventPlannedSnapshot
 		TimeDuration dayTime
 		String eventString = ""
-        Date eventStartTime = moveEvent.estStartTime
-        Date eventCompletionTime = moveEvent.estCompletionTime
-        String clockMode = CLOCK_MODE_NONE
+		Date eventStartTime = moveEvent.estStartTime
+		Date eventCompletionTime = moveEvent.estCompletionTime
+		String clockMode = CLOCK_MODE_NONE
 
-        if (eventStartTime) {
-            if ( eventStartTime > sysTime ) {
-                dayTime = TimeCategory.minus(eventStartTime, sysTime)
-                eventString = "Countdown Until Event"
-                clockMode = CLOCK_MODE_COUNTDOWN
-            } else if (eventStartTime < sysTime && ( !eventCompletionTime || eventCompletionTime > sysTime )) {
-                dayTime = TimeCategory.minus(sysTime, eventStartTime)
-                eventString = "Elapsed Event Time"
-                clockMode = CLOCK_MODE_ELAPSED
-            } else {
-                dayTime = TimeCategory.minus(sysTime, eventCompletionTime)
-                eventString = "Time since the event finished"
-                clockMode = CLOCK_MODE_FINISHED
-            }
-        }
-        // select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
-        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent =: moveEvent AND mes.type =:type ORDER BY mes.dateCreated DESC"
-        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED] )[0]
+		if (eventStartTime) {
+			if ( eventStartTime > sysTime ) {
+				dayTime = TimeCategory.minus(eventStartTime, sysTime)
+				eventString = "Countdown Until Event"
+				clockMode = CLOCK_MODE_COUNTDOWN
+			} else if (eventStartTime < sysTime && ( !eventCompletionTime || eventCompletionTime > sysTime )) {
+				dayTime = TimeCategory.minus(sysTime, eventStartTime)
+				eventString = "Elapsed Event Time"
+				clockMode = CLOCK_MODE_ELAPSED
+			} else {
+				dayTime = TimeCategory.minus(sysTime, eventCompletionTime)
+				eventString = "Time since the event finished"
+				clockMode = CLOCK_MODE_FINISHED
+			}
+		}
+		// select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
+		String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
+		moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
 
-        String eventClock = TimeUtil.formatTimeDuration(dayTime)
+		String eventClock = TimeUtil.formatTimeDuration(dayTime)
 
 		return [snapshot: [
 				revisedComp: moveEvent?.revisedCompletionTime,
@@ -657,7 +663,7 @@ class MoveEventService implements ServiceMethods {
 						dialInd: moveEventPlannedSnapshot?.dialIndicator,
 						compTime: moveEvent.estCompletionTime,
 						dayTime: eventClock,
-                        clockMode: clockMode,
+						clockMode: clockMode,
 						eventDescription: moveEvent?.description,
 						eventString: eventString,
 						eventRunbook: moveEvent?.runbookStatus
@@ -671,22 +677,24 @@ class MoveEventService implements ServiceMethods {
 	 * @param categoryStats - The properties for the category
 	 * @return - The calculated color for the category column.
 	 */
-	private String calculateColumnColor(Object[] categoryStats, MoveEvent moveEvent, Date now) {
+	private String calculateColumnColor(Object[] categoryStats, Date now) {
+
 		Long remainingTasks = categoryStats[REMAINING_TASKS]
 		Date maxPlannedFinish = categoryStats[MAX_PLANNED_FINISH]
 		Date maxActualFinish = categoryStats[MAX_ACTUAL_FINISH]
-		Date maxEstFinish = categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime
+		Date maxEstFinish = categoryStats[MAX_EST_FINISH]
 
 		String color = ""
-		if (remainingTasks == 0 && maxActualFinish <= maxPlannedFinish) {
-			color = '#24488A'
-		} else if (remainingTasks > 0 && maxEstFinish <= maxPlannedFinish) {
-			color = "green"
-		} else if ( (remainingTasks == 0 && maxActualFinish > maxPlannedFinish) || ( remainingTasks > 0 && maxPlannedFinish < now ) ) {
-			color = "red"
-		} else {
-			color = "yellow"
+		if (remainingTasks == 0) {
+			color = maxActualFinish <= maxPlannedFinish ? '#24488A' : "red"
+		} else if (remainingTasks > 0) {
+			if (maxEstFinish <= maxPlannedFinish) {
+				color = "green"
+			} else if (maxPlannedFinish < now) {
+				color = "red"
+			} else {
+				color = "yellow"
+			}
 		}
-		return color
 	}
 }

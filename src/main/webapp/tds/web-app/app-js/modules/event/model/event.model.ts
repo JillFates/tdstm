@@ -84,6 +84,7 @@ export interface CategoryTask {
 	category: string;
 	minActStart: string;
 	maxActFinish: string;
+	maxPlannedFinish: string;
 	minEstStart: string;
 	maxEstFinish: string;
 }

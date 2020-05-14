@@ -436,7 +436,7 @@ export class EventsService {
 
 			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minEstStart);
 
-			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxEstFinish);
+			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxPlannedFinish);
 
 			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minActStart);
 
