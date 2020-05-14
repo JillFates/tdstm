@@ -1286,10 +1286,13 @@ tds.cookbook.controller.TaskGenerationCompletedController.$inject = ['$scope', '
  */
 tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stateParams, log, timeout, utils, cookbookService, alerts) {
 
-	$(".menu-parent-tasks-cookbook").removeClass('active');
-	$(".menu-parent-tasks-generation-history").addClass('active');
-	$(".content-header h1").html("Generation History");
-	$(".content-header ol.breadcrumb li:last-child").html("Generation History")
+	// Same control is being used in two sections
+	if (window.location.href.indexOf('generationHistory') !== -1) {
+		$(".menu-parent-tasks-cookbook").removeClass('active');
+		$(".menu-parent-tasks-generation-history").addClass('active');
+		$(".content-header h1").html("Generation History");
+		$(".content-header ol.breadcrumb li:last-child").html("Generation History")
+	}
 	scope.tasks = {};
 
 	scope.tasks.gridData = [{'message': 'No results found', 'context': 'none'}];
@@ -1305,11 +1308,11 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	var	tasksActionsTemplate = '<div class="gridIcon">'+
 		'<a href="" class="actions edit" title="Reset Tasks"'+
 			'ng-click="tasks.tasksGridActions(row, \'reset\')">'+
-			'<img src="'+ utils.url.applyRootPath('/assets/icons/table_refresh.png') + '" alt="Reset">' +
+			'<i class="fas fa-retweet"></i>' +
 		'</a>'+
 		'<a href="" class="actions remove" title="Delete Task Batch"'+
 			'ng-click="tasks.tasksGridActions(row, \'remove\')">'+
-			'<img src="'+ utils.url.applyRootPath('/assets/icons/delete.png') + '" alt="Delete">' +
+			'<i class="far fa-trash-alt"></i>' +
 		'</a>'+
 		'</div>';
 	var checkboxTemplate = '<div class="gridIcon">'+
@@ -2131,11 +2134,11 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 		'<a href="" ng-hide="row.entity.isCurrentVersion || !row.entity.versionNumber"'+
 			'class="actions edit" title="Revert Recipe Version"'+
 			'ng-click="versions.versionsGridActions(row, \'revert\')">'+
-			'<img src="'+ utils.url.applyRootPath('/icons/arrow_undo.png') + '" alt="Revert">' +
+			'<i class="fas fa-history"></i>' +
 		'</a>'+
 		'<a href="" class="actions remove" title="Delete Version"'+
 			'ng-click="versions.versionsGridActions(row, \'remove\')">'+
-			'<img src="'+ utils.url.applyRootPath('/assets/icons/delete.png') + '" alt="Delete">' +
+			'<i class="far fa-trash-alt"></i>' +
 		'</a>'+
 		'</div>',
 		currentVersionTemplate = '<div class="gridIcon">'+

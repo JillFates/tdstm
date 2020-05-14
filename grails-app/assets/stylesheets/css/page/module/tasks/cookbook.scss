@@ -228,6 +228,9 @@ form.groups{
   margin: 0 0 10px 0;
   overflow-x: hidden;
   overflow-y: auto;
+  .ngCellText.col0.colt0 {
+    text-align: center;
+  }
 }
 
 .gridStyleTasksHistory, .gridStyleGroups{
@@ -236,6 +239,9 @@ form.groups{
   margin: 0 0 10px 0;
   overflow-x: hidden;
   overflow-y: auto;
+  .ngCellText.col0.colt0 {
+    text-align: center;
+  }
 }
 
 .gridStyleGroups .ngCellText  span {
