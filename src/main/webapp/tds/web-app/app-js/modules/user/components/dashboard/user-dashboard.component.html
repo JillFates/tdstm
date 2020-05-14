@@ -14,7 +14,7 @@
 
 	<div class="clr-row">
 		<div class="clr-col-6 event-list">
-			<kendo-grid [data]="eventList" [selectable]="true" class="tds-table">
+			<kendo-grid [data]="eventList" [selectable]="true" class="tds-table scrollable-auto">
 				<ng-template kendoGridToolbarTemplate>
 					<div class="clr-row">
 						<div class="clr-col-6 grid-header">
@@ -85,7 +85,7 @@
 
 		<div class="clr-col-6 table-containers">
 			<div class="event-news-table">
-				<kendo-grid [data]="eventNewsList" [selectable]="true"  class="tds-table">
+				<kendo-grid [data]="eventNewsList" [selectable]="true"  class="tds-table scrollable-auto">
 				<ng-template kendoGridToolbarTemplate>
 					<div class="clr-row">
 						<div class="clr-col-8 grid-header">
@@ -135,7 +135,7 @@
 				<kendo-grid
 						[data]="applicationList"
 						[selectable]="true"
-						(cellClick)="handleApplicationClicked($event)" class="tds-table">
+						(cellClick)="handleApplicationClicked($event)" class="tds-table scrollable-auto">
 					<ng-template kendoGridToolbarTemplate>
 						<div class="clr-row">
 							<div class="grid-label clr-col-8">
@@ -166,7 +166,7 @@
 						[data]="activePersonList"
 						[selectable]="true"
 						(cellClick)="handlePersonClicked($event)"
-						class="clickable-grid tds-table">
+						class="clickable-grid tds-table scrollable-auto">
 					<ng-template kendoGridToolbarTemplate>
 						<div class="clr-row">
 							<div class="clr-col-8 grid-header">
@@ -206,7 +206,7 @@
 			</kendo-contextmenu>
 
 			<div #taskGridContainer>
-				<kendo-grid #taskGrid [data]="taskList" [selectable]="true" class="tds-table">
+				<kendo-grid #taskGrid [data]="taskList" [selectable]="true" class="tds-table scrollable-auto">
 					<ng-template kendoGridToolbarTemplate>
 						<div class="clr-row">
 							<div class="clr-col-6 grid-header">

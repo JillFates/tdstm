@@ -68,7 +68,7 @@ import {DialogService} from 'tds-component-library';
 												/>
 												<label
 													class="clr-control-label clr-control-label-sm inline"
-													for="justPlanning"
+													for="two"
 												>
 												Unresolved Dependencies - Having dependencies with status Unknown or Questioned
 												</label>

@@ -38,9 +38,11 @@ export class TagListComponent implements OnInit, OnDestroy {
 	private editedRowIndex: number;
 	private editedTag: TagModel;
 	protected dateFormat: string;
+	private readonly DELETE_TITLE = 'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE';
+	private readonly CANCEL_TITLE = 'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED';
+	private readonly DELETE_CONFIRMATION_MSG = 'ASSET_TAGS.TAG_LIST.DELETE_CONFIRMATION';
+	private readonly CANCEL_CONFIRMATION_MSG = 'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE';
 
-	private readonly REMOVE_CONFIRMATION =
-		'ASSET_TAGS.TAG_LIST.REMOVE_CONFIRMATION';
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	protected showFilters = false;
 
@@ -138,7 +140,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 */
 	protected removeHandler = async (item: any): Promise<void> => {
 		try {
-			const confirmation = await this.dialogService.confirm(this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY), this.translatePipe.transform(this.REMOVE_CONFIRMATION)).toPromise();
+			const confirmation = await this.dialogService.confirm(this.translatePipe.transform(this.DELETE_TITLE), this.translatePipe.transform(this.DELETE_CONFIRMATION_MSG)).toPromise();
 			if (confirmation) {
 				if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 					this.tagService
@@ -220,9 +222,41 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * @param {any} sender
 	 * @param {any} rowIndex
 	 */
-	protected cancelHandler({sender, rowIndex}): void {
-		// call the helper method
-		this.closeEditor(sender, rowIndex);
+	protected cancelHandler({sender, rowIndex, dataItem, isNew}): void {
+
+		if (this.isDirty(dataItem, isNew)) {
+			this.dialogService.confirm(
+				this.translatePipe.transform(this.CANCEL_TITLE), 
+				this.translatePipe.transform(this.CANCEL_CONFIRMATION_MSG)
+			).subscribe((confirmation:any) => {
+				if (confirmation) {
+					if (confirmation.confirm == DialogConfirmAction.CONFIRM) {
+						// call the helper method
+						this.closeEditor(sender, rowIndex);
+					}
+				}
+			});
+		} else {
+			this.closeEditor(sender, rowIndex);
+		}
+	}
+
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	public isDirty(dataItem, isNew) {
+		if (isNew) {
+			return JSON.stringify(dataItem) !== JSON.stringify(new TagModel()) 
+		} else {
+			if (this.editedTag) {
+				let match = this.gridSettings.resultSet.find((item: TagModel) => {
+					return item.id === this.editedTag.id;
+				});
+				return JSON.stringify(this.editedTag) !== JSON.stringify(match);
+			}
+			return false;
+		}	
 	}
 
 	/**

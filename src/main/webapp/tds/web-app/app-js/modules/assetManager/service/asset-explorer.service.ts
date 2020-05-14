@@ -201,7 +201,7 @@ export class AssetExplorerService {
 		}
 
 		if (model.id) {
-			return  model.isOwner && hasPermission(AssetExplorerEdit);
+			return  hasPermission(AssetExplorerEdit);
 		}
 
 		if (model.isSystem) {

@@ -485,9 +485,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public isEditAvailable(): boolean {
-		return this.model.isSystem ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-			this.permissionService.hasPermission(Permission.AssetExplorerEdit);
+		return this.model.id && this.canSave();
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package net.transitionmanager.asset
-
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
@@ -445,7 +445,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 									 assetName: it.assetEntity.assetName, assetType: it.assetEntity.assetType,
 									 assignedTo: it.assignedTo?.toString() ?: '', role: it.role ?: '',
 									 canEditComments: canEditComments,
-									 canEditTasks: canEditTasks]
+									 canEditTasks: canEditTasks,
+									 createdBy: it.createdBy?.toString()]
 		}
 
 		renderAsJson assetCommentsList

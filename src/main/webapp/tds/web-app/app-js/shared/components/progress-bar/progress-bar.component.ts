@@ -5,7 +5,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 		tds-progress-bar,
 	`,
 	template: `
-		<kendo-dialog title="Downloading file" *ngIf="opened" class="bar" [width]="450">
+		<kendo-dialog *ngIf="opened" class="bar" [width]="450">
+			<kendo-dialog-titlebar
+							[ngClass]="'title-bar'"
+							[style.background-color]="titleBarBackground || ''"
+							[style.color]="titleBarColor || ''">
+					<div>Downloading file</div>
+			</kendo-dialog-titlebar>
 			<div>
 				<h4>{{title}}</h4>
 				<progress-bar [progress]="value.toString()" [color]="'#488aff'"></progress-bar>
@@ -15,7 +21,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 		</kendo-dialog>
 	`,
 	styles: [`.bar { background-color: rgba(0,0,0,0.3); height: 100%;}
-    >>> .k-window-actions.k-dialog-actions {display: none;}`]
+    >>> .k-window-actions.k-dialog-actions {display: none;}
+		.title-bar {
+				background-color: #3c8dbc;
+		}
+	`]
 })
 export class TDSProgressBar {
 	@Input() title = '';
@@ -23,6 +33,8 @@ export class TDSProgressBar {
 	@Input() opened = false;
 	@Input() message;
 	@Input() enableClose: boolean;
+	@Input() titleBarBackground = '';
+	@Input() titleBarColor = '';
 	@Output() close: EventEmitter<void> = new EventEmitter<void>();
 
 	constructor() {
