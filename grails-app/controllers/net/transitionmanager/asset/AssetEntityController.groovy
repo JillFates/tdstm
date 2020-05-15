@@ -4,7 +4,6 @@ import com.tdsops.common.security.spring.HasPermission
 
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
@@ -20,9 +19,9 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
-import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.command.AssetOptionsCommand
 import net.transitionmanager.command.architecturegraph.ArchitectureGraphCommand
 import net.transitionmanager.common.ControllerService
@@ -599,7 +598,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				assignedTo             : assetComment.assignedTo?.toString() ?: 'Unassigned',
 				atStart                : atStart,
 				canEdit                : canEdit,
-				categories             : AssetCommentCategory.list,
+				categories             : assetOptionsService.taskCategories(),
 				cssForCommentStatus    : cssForCommentStatus,
 				dtCreated              : dtCreated ?: "",
 				dtResolved             : dtResolved ?: "",
@@ -1348,13 +1347,21 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		List<AssetOptions> dependencyStatus = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		List<AssetOptions> environment = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		List<AssetOptions> assetTypes = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
+		List<AssetOptions> taskCategory = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.TASK_CATEGORY)
 
 		def assetType = assetTypes.collect{ AssetOptions option ->
 			[id: option.id, type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
 		}
 
-		[planStatusOptions: planStatusOptions, priorityOption: priorityOption, dependencyType: dependencyType,
-		 dependencyStatus: dependencyStatus, environment: environment, assetType: assetType]
+		[
+			planStatusOptions: planStatusOptions,
+			priorityOption   : priorityOption,
+			dependencyType   : dependencyType,
+			dependencyStatus : dependencyStatus,
+			environment      : environment,
+			assetType        : assetType,
+			taskCategory     : taskCategory
+		]
 	}
 
 	/**
@@ -1363,6 +1370,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def saveAssetoptions() {
 		AssetOptionsCommand command = new AssetOptionsCommand()
+
 		switch(params.assetOptionType) {
 			case 'planStatus':
 				command.type = AssetOptions.AssetOptionsType.STATUS_OPTION
@@ -1384,6 +1392,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				command.type = AssetOptions.AssetOptionsType.ASSET_TYPE
 				command.value = params.assetType
 				break
+			case 'taskCategory':
+				command.type = AssetOptions.AssetOptionsType.TASK_CATEGORY
+				command.value = params.taskCategory
+				break
 			default:
 				command.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
 				command.value = params.dependencyStatus
@@ -1402,12 +1414,13 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		String optionType = params.assetOptionType
 
 		switch(optionType) {
-			case 'planStatus':  idParamName = 'assetStatusId'; break
-			case 'Priority':    idParamName = 'priorityId'; break
-			case 'dependency':  idParamName = 'dependecyId'; break
+			case 'planStatus': idParamName = 'assetStatusId'; break
+			case 'Priority': idParamName = 'priorityId'; break
+			case 'dependency': idParamName = 'dependecyId'; break
 			case 'environment': idParamName = 'environmentId'; break
-			case 'assetType':   idParamName = 'assetTypeId'; break
-			default:            idParamName = 'dependecyId'; break
+			case 'assetType': idParamName = 'assetTypeId'; break
+			case 'taskCategory': idParamName = 'taskCategoryId'; break
+			default: idParamName = 'dependecyId'; break
 		}
 
 		AssetOptions assetOption = assetOptionsService.findById(params[idParamName] as Long)

@@ -44,6 +44,15 @@ class AssetOptionsService {
 	}
 
 	/**
+	 * Gets the list of task categories as a list of Strings.
+	 *
+	 * @return a list of the task categories from the asset options.
+	 */
+	List<String> taskCategories(){
+		findAllByType(AssetOptions.AssetOptionsType.TASK_CATEGORY)*.value
+	}
+
+	/**
 	 * Find all asset option values by type
 	 * @param assetOptionsType - asset option type
 	 * @return
