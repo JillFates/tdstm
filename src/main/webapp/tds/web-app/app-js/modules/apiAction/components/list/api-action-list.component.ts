@@ -136,7 +136,7 @@ export class APIActionListComponent implements OnInit {
 		try {
 			if (this.isDeleteAvailable()) {
 				const confirmation = await this.dialogService.confirm(
-					'Confirmation Required', 
+					'Confirmation Required',
 					'You are about to delete the selected Action. Do you want to continue?').toPromise();
 				if (confirmation) {
 					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
