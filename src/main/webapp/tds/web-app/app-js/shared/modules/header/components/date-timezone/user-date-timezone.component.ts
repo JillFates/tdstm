@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnDestroy, OnInit} from '@angular/core';
 // Services
 import {HeaderService} from '../../services/header.service';
 import {PreferenceService} from '../../../../services/preference.service';
@@ -14,8 +14,9 @@ import {TranslatePipe} from '../../../../pipes/translate.pipe';
 import {Store} from '@ngxs/store';
 // Other
 import {forkJoin} from 'rxjs/observable/forkJoin';
-import {Observable} from 'rxjs';
+import {Observable, ReplaySubject} from 'rxjs';
 import * as R from 'ramda';
+import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 // Work-around for deprecated jQuery functionality
@@ -33,7 +34,7 @@ jQuery.browser = {};
 	selector: 'date-timezone-modal',
 	templateUrl: 'user-date-timezone.component.html',
 })
-export class UserDateTimezoneComponent extends Dialog implements OnInit {
+export class UserDateTimezoneComponent extends Dialog implements OnInit, OnDestroy {
 	@Input() data: any;
 
 	public currentUserName;
@@ -58,6 +59,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	virtualizationSettings = {
 		itemHeight: 15
 	};
+	unsubscribeAll$: ReplaySubject<void> = new ReplaySubject<void>();
 
 	constructor(
 		private dialogService: DialogService,
@@ -79,7 +81,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 			name: 'save',
 			icon: 'floppy',
 			show: () => true,
-			disabled: () => !this.isDirty(),
+			disabled: () => !this.selectedTimezone  || !this.selectedTimeFormat,
 			type: DialogButtonType.ACTION,
 			action: this.onSave.bind(this)
 		});
@@ -108,6 +110,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
 				)
 			)
+				.pipe(takeUntil(this.unsubscribeAll$))
 				.subscribe((data: any) => {
 					if (data.confirm === DialogConfirmAction.CONFIRM) {
 						super.onCancelClose();
@@ -157,7 +160,9 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 					this.store.dispatch(new SetTimeZoneAndDateFormat({
 						timezone: params && params.timezone,
 						dateFormat: params && params.datetimeFormat
-					})).subscribe(() => {
+					}))
+						.pipe(takeUntil(this.unsubscribeAll$))
+						.subscribe(() => {
 						this.onAcceptSuccess();
 						location.reload();
 					});
@@ -235,7 +240,9 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 */
 	private retrieveMapAreas(): Observable<any> {
 		return new Observable((observer: any) => {
-			this.headerService.getMapAreas().subscribe(
+			this.headerService.getMapAreas()
+				.pipe(takeUntil(this.unsubscribeAll$))
+				.subscribe(
 				(result: any) => {
 					let mapAreas = [];
 					for (let key in result) {
@@ -260,10 +267,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 * Verify if the data has changed
 	 */
 	private isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify({
-			timezone: this.selectedTimezone,
-			datetimeFormat: this.selectedTimeFormat
-		});
+		return this.selectedTimezone || this.selectedTimeFormat;
 	}
 
 	/**
@@ -271,5 +275,11 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 */
 	public onDismiss(): void {
 		this.cancelCloseDialog();
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribeAll$.next();
+		this.unsubscribeAll$.complete();
 	}
 }
