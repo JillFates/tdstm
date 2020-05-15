@@ -105,4 +105,5 @@ databaseChangeLog = {
 	include file: 'version/v5_0_0/20200414-resize-dependency-group-column-on-manage-views.groovy'
 
 	include file: 'version/v4_7_3/20190423-add-category-codes-to-asset-options.groovy'
+	include file: 'version/v5_0_0/20200515-fixing-dataviews.groovy'
 }
