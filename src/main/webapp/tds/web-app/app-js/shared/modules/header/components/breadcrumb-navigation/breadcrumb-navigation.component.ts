@@ -76,7 +76,7 @@ declare var jQuery: any;
 			}
 
 			.breadcrumb-container > li {
-				color: #666666;
+				color: #444;
 			}
 		`,
 	],
