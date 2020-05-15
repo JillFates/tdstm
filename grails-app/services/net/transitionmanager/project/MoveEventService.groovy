@@ -571,7 +571,11 @@ class MoveEventService implements ServiceMethods {
 									FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) + COALESCE(t.duration,0)*60 )
 								end
 							else
-								FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(t.actStart) + COALESCE(t.duration,0)*60 ) 
+								case when ( (UNIX_TIMESTAMP(t.actStart) + COALESCE(t.duration,0)*60) > UNIX_TIMESTAMP(NOW()) ) then
+									FROM_UNIXTIME( UNIX_TIMESTAMP(t.actStart) + COALESCE(t.duration,0)*60 )
+								else
+									NOW()
+								end
 							end
 						else
 						  null
