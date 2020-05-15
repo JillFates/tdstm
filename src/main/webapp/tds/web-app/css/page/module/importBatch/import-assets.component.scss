@@ -58,4 +58,13 @@ import-assets {
 	.k-upload-status {
 		margin-left: 5px;
 	}
+	.file-icon {
+		clr-icon {
+          height: 32px;
+          width: 32px;
+		}
+	}
+  	clr-icon {
+		cursor: pointer;
+	}
 }

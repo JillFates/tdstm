@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {ImportAssetsService} from '../../service/import-assets.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {RemoveEvent, SuccessEvent, UploadComponent, UploadEvent} from '@progress/kendo-angular-upload';
+import {FileState, RemoveEvent, SuccessEvent, UploadComponent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
@@ -75,6 +75,14 @@ export class ImportAssetsComponent implements OnInit {
 		private notifier: NotifierService,
 		private dataIngestionService: DataScriptService) {
 			this.file.fileUID = null;
+	}
+
+	public remove(upload, uid: string) {
+		upload.removeFilesByUid(uid);
+	}
+
+	public showButton(state: FileState): boolean {
+		return (state === FileState.Uploaded) ? true : false;
 	}
 
 	ngOnInit(): void {
