@@ -226,11 +226,11 @@ export class TagListComponent implements OnInit, OnDestroy {
 
 		if (this.isDirty(dataItem, isNew)) {
 			this.dialogService.confirm(
-				this.translatePipe.transform(this.CANCEL_TITLE), 
+				this.translatePipe.transform(this.CANCEL_TITLE),
 				this.translatePipe.transform(this.CANCEL_CONFIRMATION_MSG)
-			).subscribe((confirmation:any) => {
+			).subscribe((confirmation: any) => {
 				if (confirmation) {
-					if (confirmation.confirm == DialogConfirmAction.CONFIRM) {
+					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 						// call the helper method
 						this.closeEditor(sender, rowIndex);
 					}
@@ -247,7 +247,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 */
 	public isDirty(dataItem, isNew) {
 		if (isNew) {
-			return JSON.stringify(dataItem) !== JSON.stringify(new TagModel()) 
+			return JSON.stringify(dataItem) !== JSON.stringify(new TagModel())
 		} else {
 			if (this.editedTag) {
 				let match = this.gridSettings.resultSet.find((item: TagModel) => {
@@ -256,7 +256,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 				return JSON.stringify(this.editedTag) !== JSON.stringify(match);
 			}
 			return false;
-		}	
+		}
 	}
 
 	/**
