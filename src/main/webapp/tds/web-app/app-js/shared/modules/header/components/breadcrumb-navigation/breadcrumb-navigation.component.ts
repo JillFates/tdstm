@@ -64,11 +64,10 @@ declare var jQuery: any;
 			}
 
 			.title-styling {
-				font-weight: 300;
-				line-height: 2rem;
-				font-size: 24px;
-				color: #000;
-				letter-spacing: normal;
+				font-weight: 500 !important;
+				font-size: 24px !important;
+				color: #333333 !important;
+				margin: 0px !important;
 			}
 
 			.breadcrumb-container {
