@@ -602,7 +602,7 @@ class MoveEventService implements ServiceMethods {
 					"minEstStart": 			categoryStats[2] ?: moveEvent.estStartTime,
 					"maxActFinish": 		categoryStats[MAX_ACTUAL_FINISH],
 					// maxPlannedFinish is the latest completion time for the Task where it can finish on time
-					"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH],
+					"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH] ?: moveEvent.estCompletionTime,
 					// maxEstFinish is when we expect the Task to complete, based on the current time
 					"maxEstFinish": 		categoryStats[MAX_EST_FINISH] ?: moveEvent.estCompletionTime,
 					"remainingTasks":		categoryStats[REMAINING_TASKS],
@@ -671,7 +671,8 @@ class MoveEventService implements ServiceMethods {
 	}
 
 	/**
-	 * Returns the color that the column should have for the given category in the Event Dashboard.
+	 * Returns the color that the column should have for the given category in the Event Dashboard based on the time,
+	 * if the tasks are finished and when the finished in comparison to the category planned finish time.
 	 * @See TM-15896/ TM-16319
 	 * @param categoryStats - The properties for the category
 	 * @return - The calculated color for the category column.
@@ -688,8 +689,9 @@ class MoveEventService implements ServiceMethods {
 			color = maxActualFinish <= maxPlannedFinish ? '#24488A' : "red"
 		} else if (remainingTasks > 0) {
 			if (maxEstFinish <= maxPlannedFinish) {
+				// The expected finish of the latest uncompleted task is <= planned finish for the category
 				color = "green"
-			} else if (maxPlannedFinish < now) {
+			} else if (now > maxPlannedFinish) {
 				color = "red"
 			} else {
 				color = "yellow"
