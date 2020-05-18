@@ -86,6 +86,7 @@ export interface CategoryTask {
 	maxActFinish: string;
 	maxPlannedFinish: string;
 	minEstStart: string;
+	color: string;
 }
 
 export class EventPlanStatus {

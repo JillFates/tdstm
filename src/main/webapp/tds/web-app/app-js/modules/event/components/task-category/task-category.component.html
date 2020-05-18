@@ -12,7 +12,9 @@
                             <div *ngFor="let column of row;"
                                     class=" category-column {{column.classes}}"
                                     [ngClass]="{'heading': rowIndex === RowType.Header}"
-                                    [style.background-color]="rowIndex === RowType.Percents && column.compose ? column.compose.color : ''">
+                                    [style.background-color]="rowIndex === RowType.Percents && column.compose ? column.compose.color : ''"
+                                    [style.color]="rowIndex === RowType.Percents && column.compose ? column.compose.fontColor : ''"
+                            >
                                     <a *ngIf="rowIndex === RowType.Header; else categoryValue"
                                        [routerLink]="['/taskManager', 'list']"
                                        [queryParams]="{category: column.text, justRemaining: 0}">

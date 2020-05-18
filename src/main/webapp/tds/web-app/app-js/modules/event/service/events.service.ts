@@ -434,6 +434,8 @@ export class EventsService {
 			results[CatagoryRowType.Percent][index].compose =   item;
 			results[CatagoryRowType.TaskCompleted][index].compose =   item;
 
+			results[CatagoryRowType.Percent][index].compose.fontColor = item.color === 'yellow' ? 'black' : 'white';
+
 			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minEstStart);
 
 			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxPlannedFinish);
