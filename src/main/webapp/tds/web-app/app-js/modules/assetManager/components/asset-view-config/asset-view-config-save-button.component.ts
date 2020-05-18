@@ -5,10 +5,6 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
-/**
- * TODO: this is almost the same code for the asset-view-show-save-button.component.ts so probably we just
- * need to unified both and just use a single component.
- */
 @Component({
 	selector: 'tds-asset-view-config-save-button',
 	template: `
@@ -47,7 +43,6 @@ export class AssetViewConfigSaveButtonComponent {
 		saveButtonId: string,
 		canSave: boolean,
 		canSaveAs: boolean,
-		isEditAvailable: boolean,
 		canShowSaveButton: boolean,
 		disableSaveButton: boolean
 	};
