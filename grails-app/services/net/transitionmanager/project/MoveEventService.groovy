@@ -692,13 +692,13 @@ class MoveEventService implements ServiceMethods {
 		if (remainingTasks == 0) {
 			color = maxActualFinish <= maxPlannedFinish ? '#24488A' : "red"
 		} else if (remainingTasks > 0) {
-			if (maxEstFinish <= maxPlannedFinish) {
-				// The expected finish of the latest uncompleted task is <= planned finish for the category
-				color = "green"
-			} else if (now > maxPlannedFinish) {
+			if (now > maxPlannedFinish) {
 				color = "red"
-			} else {
+			} else if (maxEstFinish > maxPlannedFinish) {
+				// The projected finish is after the planned finish
 				color = "yellow"
+			} else {
+				color = "green"
 			}
 		}
 	}
