@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+import {Component, ComponentFactoryResolver, HostListener, OnInit, ViewChild} from '@angular/core';
 import {
 	ColumnHeaderData, DialogConfirmAction, DialogService,
 	GridComponent,
@@ -18,6 +18,9 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {ModelService} from '../../service/model.service';
 import {ModelViewEditComponent} from '../../view-edit/model-view-edit.component';
 import {ExportManufacturerModelsComponent} from '../../../../shared/components/export-manufacturer-models/export-manufacturer-models.component';
+import moment from 'moment';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
 	selector: 'model-list',
@@ -45,6 +48,7 @@ export class ModelListComponent implements OnInit {
 	private dateFormat = '';
 
 	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
+	unsubscribeAll$: ReplaySubject<void> = new ReplaySubject<void>();
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -111,6 +115,7 @@ export class ModelListComponent implements OnInit {
 
 	private getManufacturerList(): void {
 		this.manufacturerService.getManufacturerList()
+			.pipe(takeUntil(this.unsubscribeAll$))
 			.subscribe((list: any) => {
 				this.manufacturerList = list;
 			})
@@ -224,7 +229,9 @@ export class ModelListComponent implements OnInit {
 				this.dialogService.confirm(
 					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
 					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION')
-				).subscribe((result: any) => {
+				)
+					.pipe(takeUntil(this.unsubscribeAll$))
+					.subscribe((result: any) => {
 					if (result.confirm === DialogConfirmAction.CONFIRM) {
 						this.modelService.deleteModel(dataItem.id).toPromise().finally(() => this.gridComponent.reloadData());
 					}
@@ -255,13 +262,22 @@ export class ModelListComponent implements OnInit {
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: ExportManufacturerModelsComponent,
 			data: {
-				modelsOnly: true
+				modelsOnly: true,
+				exportFileName: `models-${moment().format('YYYY-MM-DD')}`
 			},
 			modalConfiguration: {
 				title: 'Export Models to Excel',
 				draggable: true,
 				modalSize: ModalSize.MD
 			}
-		}).subscribe();
+		})
+			.pipe(takeUntil(this.unsubscribeAll$))
+			.subscribe();
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribeAll$.next();
+		this.unsubscribeAll$.complete();
 	}
 }
