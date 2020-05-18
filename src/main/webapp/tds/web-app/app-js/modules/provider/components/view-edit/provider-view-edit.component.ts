@@ -1,11 +1,5 @@
 // Angular
-import {
-	ElementRef,
-	Component,
-	OnInit,
-	ViewChild,
-	Input, Output, EventEmitter, ComponentFactoryResolver,
-} from '@angular/core';
+import {Component, ComponentFactoryResolver, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
 import {ActionType} from '../../../dataScript/model/data-script.model';
@@ -77,6 +71,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
 			disabled: () => !this.permissionService.hasPermission(Permission.ProviderUpdate),
 			active: () => this.modalType === this.actionTypes.EDIT,
@@ -87,6 +82,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
 			disabled: () => !this.providerForm.form.valid || !this.isUnique || this.isEmptyValue() || !this.providerForm.form.dirty,
 			type: DialogButtonType.ACTION,
@@ -96,6 +92,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.modalType !== this.actionTypes.CREATE,
 			disabled: () => !this.permissionService.hasPermission(Permission.ProviderDelete),
 			type: DialogButtonType.ACTION,
@@ -105,6 +102,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -113,6 +111,7 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
@@ -140,7 +139,6 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
-			this.onSetUpFocus(this.providerNameElement);
 		});
 	}
 
@@ -260,12 +258,17 @@ export class ProviderViewEditComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.CREATE || modalType === ActionType.EDIT) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.providerNameElement);
+			});
+		}
+
 		if (modalType === ActionType.CREATE) {
 			return 'Provider Create';
 		}
-		return modalType === ActionType.EDIT
-			? 'Provider Edit'
-			: 'Provider Detail';
+
+		return modalType === ActionType.EDIT ? 'Provider Edit' : 'Provider Detail';
 	}
 
 	/**
