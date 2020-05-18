@@ -121,6 +121,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
 			active: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
@@ -130,6 +131,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
 			disabled: () => this.isFormInvalid(this.credentialForm) || !this.isDirty(),
 			type: DialogButtonType.ACTION,
@@ -139,6 +141,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.modalType !== this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.onDeleteCredential.bind(this)
@@ -147,6 +150,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: ((this.modalType === this.actionTypes.VIEW) ? 'Close' : 'Cancel'),
 			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -155,6 +159,7 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
@@ -172,7 +177,6 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
-			this.onSetUpFocus(this.credentialName);
 		});
 	}
 
@@ -500,6 +504,12 @@ export class CredentialViewEditComponent extends Dialog implements OnInit {
 			// This ensure the UI has loaded since Kendo can change the signature of an object
 			this.dataSignature = JSON.stringify(this.credentialModel);
 		}, 800);
+
+		if (modalType === ActionType.CREATE || modalType === ActionType.EDIT) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.credentialName);
+			});
+		}
 
 		if (modalType === ActionType.CREATE) {
 			return 'Credential Create';
