@@ -1,29 +1,26 @@
 package net.transitionmanager.asset
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.ui.Pagination
 
 /**
  * Created by David Ontiveros
  */
 
-
-import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.dataview.DataviewCrudCommand
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
-import net.transitionmanager.command.dataview.DataviewCrudCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.imports.Dataview
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
 import net.transitionmanager.imports.DataviewService
+import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.security.SecurityService
 import org.apache.commons.lang3.BooleanUtils
-import org.grails.web.json.JSONObject
 
 /**
  *
