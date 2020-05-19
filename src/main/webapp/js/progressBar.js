@@ -68,8 +68,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 		bar.css('width', value + '%');
 		bar.html(value + '%');
 		showProgressBar();
-		// TM-17692 Meassage of Initializing is redundant and don't needed
-		status.html("");
+		status.html("Initializing...");
 	}
 
 	var finishProgressBar = function(onFinishCallback) {
