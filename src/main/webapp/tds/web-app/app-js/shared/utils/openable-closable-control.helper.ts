@@ -13,6 +13,8 @@ export class OpenableClosableControlHelper {
 	static setUpListeners(controls: {controlType: string, list: any[]}[], takeUntilSubject: any): void {
 		const controlTypes = {
 			dropDownList: ['wrapper', 'nativeElement'],
+			comboList: ['wrapper'],
+			tdsComboList: ['innerComboBox', 'wrapper'],
 			dateControlList: ['datePicker', 'first', 'element', 'nativeElement'],
 			dateTimePartDateControlList: ['datePicker', 'first', 'element', 'nativeElement'],
 			dateTimePartTimeControlList: ['timePicker', 'first', 'element', 'nativeElement'],
