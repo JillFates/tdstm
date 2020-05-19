@@ -25,18 +25,22 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
-import {equals as ramdaEquals, clone as ramdaClone} from 'ramda';
+import {equals as ramdaEquals, clone as ramdaClone, pathOr} from 'ramda';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {DatePickerComponent} from '@progress/kendo-angular-dateinputs';
+
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {TDSDateControlComponent} from '../../../../shared/components/custom-control/date-time/date-control.component';
+import {OpenableClosableControlHelper} from '../../../../shared/utils/openable-closable-control.helper';
 
 declare var jQuery: any;
 
 export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('form', { static: false }) public form: NgForm;
-	@ViewChildren(DropDownListComponent) dropdowns: QueryList<
-		DropDownListComponent
-	>;
+	@ViewChildren(DropDownListComponent) dropdownList: QueryList<DropDownListComponent>;
+	@ViewChildren(TDSDateControlComponent) dates: QueryList<TDSDateControlComponent>;
+
 	private destroySubject: Subject<any> = new Subject<any>();
 
 	private assetTagsDirty = false;
@@ -89,29 +93,20 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	// set the handlers on open / on close to set the flags that indicate the state of the
 	// dropdown list items (opened/closed)
 	ngAfterViewInit() {
-		this.dropdowns.toArray().forEach(dropdown => {
-			dropdown.open
-				.pipe(takeUntil(this.destroySubject))
-				.subscribe(() =>
-					EscapeHandler.setIsDropdownListOpen(
-						dropdown.wrapper.nativeElement,
-						true
-					)
-				);
+		const dropdowns  = this.dropdownList.toArray();
+		const dates  = this.dates.toArray();
 
-			dropdown.close
-				.pipe(takeUntil(this.destroySubject))
-				.subscribe(() =>
-					setTimeout(
-						() =>
-							EscapeHandler.setIsDropdownListOpen(
-								dropdown.wrapper.nativeElement,
-								false
-							),
-						200
-					)
-				);
-		});
+		let controls = [];
+		// dropdown list controls
+		controls = controls.concat(dropdowns.
+			map((item: any) => ({...item, nativeTarget: ['wrapper', 'nativeElement']})));
+
+		// calendar controls
+		controls = controls
+			.concat(dates
+				.map((item: any) => ({...item, nativeTarget: ['datePicker', 'first', 'element', 'nativeElement']})));
+
+		OpenableClosableControlHelper.setUpListeners(controls, this.destroySubject);
 	}
 
 	ngOnDestroy() {
