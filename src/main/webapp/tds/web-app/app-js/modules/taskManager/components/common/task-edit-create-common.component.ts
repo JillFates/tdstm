@@ -58,14 +58,12 @@ declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends Dialog implements OnInit, AfterViewInit, OnDestroy {
 	@Input() data: any;
-
 	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdownList: QueryList<DropDownListComponent>;
 	@ViewChildren(ComboBoxComponent) comboList: QueryList<ComboBoxComponent>;
 	@ViewChildren(TDSDateControlComponent) dateControlList: QueryList<TDSDateControlComponent>;
 	@ViewChildren(TDSDateTimeControlComponent) dateTimeControlList: QueryList<TDSDateTimeControlComponent>;
 	@ViewChildren(TDSComboBoxComponent) tdsComboList: QueryList<TDSComboBoxComponent>;
-	@ViewChild('dueDate', {static: false}) dueDate;
 	@ViewChild('taskCreateCommentInput', {static: false}) taskCreateCommentInput: ElementRef;
 	protected modalType = ModalType;
 	protected dateFormat: string;
@@ -630,11 +628,6 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 							this.modelHelper.generateNotes(this.model.notesList), null, null);
 				}
 			});
-	}
-
-	onOpenDueDate(event) {
-		event.preventDefault();
-		this.dueDate.toggle();
 	}
 
 	/**
