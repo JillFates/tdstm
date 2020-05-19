@@ -1,17 +1,16 @@
 <div class="asset-explorer-view-show-component">
-	<section
-		*ngIf="getDynamicConfiguration(); let config"
-		class="page-asset-explorer-config">
+	<section class="page-asset-explorer-config">
 		<div class="button-bar">
 			<div class="inline">
 				<!-- Asset Views dropdown -->
 				<tds-asset-view-selector #select="tdsAssetViewSelector"></tds-asset-view-selector>
 
 				<!-- Save / Save As button -->
-				<tds-asset-show-save-button [config]="config"
+				<tds-asset-view-save-button *ngIf="config && model"
+																		[config]="config"
 																		(save)="onSave()"
 																		(saveAs)="onSaveAs()">
-				</tds-asset-show-save-button>
+				</tds-asset-view-save-button>
 
 				<!-- Favorite button -->
 				<tds-button-custom

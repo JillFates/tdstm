@@ -29,6 +29,7 @@ import {
 	ASSET_OVERRIDE_CHILD_STATE,
 	ASSET_OVERRIDE_PARENT_STATE, OverrideState
 } from '../../models/asset-view-override-state.model';
+import { AbstractAssetViewSave } from '../asset-view-save/abstract-asset-view-save';
 
 declare var jQuery: any;
 
@@ -36,7 +37,7 @@ declare var jQuery: any;
 	selector: 'tds-asset-view-config',
 	templateUrl: 'asset-view-config.component.html'
 })
-export class AssetViewConfigComponent implements OnInit, OnDestroy {
+export class AssetViewConfigComponent extends AbstractAssetViewSave implements OnInit, OnDestroy {
 	@ViewChild('select', { static: false }) select: AssetViewSelectorComponent;
 	public data: any = null;
 	public gridState: State = {
@@ -63,7 +64,6 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	columnIndex = 0;
 	rowIndex = 0;
 	draggableColumns: QueryColumn[];
-	model: ViewModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
@@ -71,17 +71,12 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 	position: any[] = [];
 	currentTab = 0;
 	public metadata: any = {};
-	saveOptions: any;
 	currentOverrideState: OverrideState;
-	config: any;
 	protected justPlanning: boolean;
-	private dataSignature: string;
 	private queryParams: any = {};
 	private navigationSubscription: any;
 	private lastSnapshot: any;
 	private lastViewId;
-	readonly SAVE_BUTTON_ID = 'btnSave';
-	readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -91,6 +86,7 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		private dialogService: DialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService) {
+		super();
 		this.initResolveData();
 	}
 
@@ -643,87 +639,6 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	getDynamicConfiguration(): any {
-		return {
-			isDirty: this.isDirty(),
-			saveButtonId: this.getSaveButtonId(),
-			canSave: this.canSave(),
-			canSaveAs: this.canSaveAs(),
-			saveButtonLabel: this.getSaveButtonLabel(),
-			isEditAvailable: this.isEditAvailable(),
-			canShowSaveButton: this.canShowSaveButton(),
-			disableSaveButton: this.isSaveButtonDisabled()
-		}
-	}
-
-	/**
-	 * Determines if current model has been changed from the original copy.
-	 */
-	isDirty(): boolean {
-		return this.dataSignature !== this.stringifyCopyOfModel(this.model);
-	}
-
-	/**
-	 * Removes isFavorite property from view model and returns stringified json.
-	 * @param {ViewModel} model
-	 * @returns {ViewModel}
-	 */
-	private stringifyCopyOfModel(model: ViewModel): string {
-		// ignore 'favorite' property.
-		let modelCopy = {...model};
-		delete modelCopy.isFavorite;
-		return JSON.stringify(modelCopy);
-	}
-
-	/**
-	 * Determines if primary button can be Save or Save all based on permissions.
-	 */
-	getSaveButtonId(): string {
-		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
-	}
-
-	/**
-	 * Is edit available
-	 */
-	isEditAvailable(): boolean {
-		return this.model.id && this.canSave();
-	}
-
-	/**
-	 * Determines if show we can show Save/Save All buttons at all.
-	 * @returns {boolean}
-	 */
-	canShowSaveButton(): boolean {
-		return this.model.id && (this.canSave() || this.canSaveAs());
-	}
-
-	/**
-	 * Determines if current user can Save view.
-	 * @returns {boolean}
-	 */
-	canSave(): boolean {
-		return this.saveOptions.save;
-	}
-
-	/**
-	 * Determine if current user can Save As (new) view.
-	 * @returns {boolean}
-	 */
-	canSaveAs(): boolean {
-		return (
-			this.saveOptions &&
-			Array.isArray(this.saveOptions.saveAsOptions) &&
-			this.saveOptions.saveAsOptions.length > 0
-		);
-	}
-
-	/**
-	 * Should save button be disabled.
-	 */
-	isSaveButtonDisabled(): boolean {
-		return !this.canSave() && !this.canSaveAs();
-	}
-
 	/**
 	 * Determines if current form is valid.
 	 */
@@ -731,16 +646,8 @@ export class AssetViewConfigComponent implements OnInit, OnDestroy {
 		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
-	/**
-	 * Determines determines the string of the save button label.
-	 * @returns {string}
-	 */
-	getSaveButtonLabel() {
-		if (!this.canSave() && this.canSaveAs()) {
-			return 'GLOBAL.SAVE_AS'
-		} else {
-			return 'GLOBAL.SAVE'
-		}
+	isSaveButtonDisabled(): boolean {
+		return !this.canSave() && !this.canSaveAs();
 	}
 
 	/**
