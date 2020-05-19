@@ -39,7 +39,7 @@ declare var jQuery: any;
 export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('form', { static: false }) public form: NgForm;
 	@ViewChildren(DropDownListComponent) dropdownList: QueryList<DropDownListComponent>;
-	@ViewChildren(TDSDateControlComponent) dates: QueryList<TDSDateControlComponent>;
+	@ViewChildren(TDSDateControlComponent) dateControlList: QueryList<TDSDateControlComponent>;
 
 	private destroySubject: Subject<any> = new Subject<any>();
 
@@ -93,19 +93,19 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	// set the handlers on open / on close to set the flags that indicate the state of the
 	// dropdown list items (opened/closed)
 	ngAfterViewInit() {
-		const dropdowns  = this.dropdownList.toArray();
-		const dates  = this.dates.toArray();
+		const dropDownList  = this.dropdownList.toArray();
+		const dateControlList  = this.dateControlList.toArray();
 
-		let controls = [];
-		// dropdown list controls
-		controls = controls.concat(dropdowns.
-			map((item: any) => ({...item, nativeTarget: ['wrapper', 'nativeElement']})));
-
-		// calendar controls
-		controls = controls
-			.concat(dates
-				.map((item: any) => ({...item, nativeTarget: ['datePicker', 'first', 'element', 'nativeElement']})));
-
+		let controls = [
+			{
+				controlType: 'dropDownList',
+				list: dropDownList
+			},
+			{
+				controlType: 'dateControlList',
+				list: dateControlList
+			}
+		];
 		OpenableClosableControlHelper.setUpListeners(controls, this.destroySubject);
 	}
 

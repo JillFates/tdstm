@@ -10,8 +10,21 @@ export class OpenableClosableControlHelper {
 	 * @param controls
 	 * @param takeUntilSubject
 	 */
-	public static setUpListeners(controls: any[], takeUntilSubject: any): void {
-		controls.forEach(control => {
+	public static setUpListeners(controls: {controlType: string, list: any[]}[], takeUntilSubject: any): void {
+		const controlTypes = {
+			dropDownList: ['wrapper', 'nativeElement'],
+			dateControlList: ['datePicker', 'first', 'element', 'nativeElement'],
+		};
+
+		const listControls = [];
+		controls.forEach((item: {controlType: string, list: any[]}) => {
+			item.list.forEach((listItem: any) => {
+				const nativeTarget = controlTypes[item.controlType];
+				listControls.push({...listItem, nativeTarget});
+			});
+		});
+
+		listControls.forEach(control => {
 			control.open
 				.pipe(takeUntil(takeUntilSubject))
 				.subscribe(() => {
