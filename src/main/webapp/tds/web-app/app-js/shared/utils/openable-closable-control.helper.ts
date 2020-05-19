@@ -10,7 +10,7 @@ export class OpenableClosableControlHelper {
 	 * @param controls
 	 * @param takeUntilSubject
 	 */
-	public static setUpListeners(controls: {controlType: string, list: any[]}[], takeUntilSubject: any): void {
+	static setUpListeners(controls: {controlType: string, list: any[]}[], takeUntilSubject: any): void {
 		const controlTypes = {
 			dropDownList: ['wrapper', 'nativeElement'],
 			dateControlList: ['datePicker', 'first', 'element', 'nativeElement'],
@@ -27,26 +27,23 @@ export class OpenableClosableControlHelper {
 		listControls.forEach(control => {
 			control.open
 				.pipe(takeUntil(takeUntilSubject))
-				.subscribe(() => {
-					const nativeElement = pathOr(null, control.nativeTarget, control);
-					if (nativeElement) {
-						nativeElement.setAttribute(TDS_ATTRIBUTE_IS_OPEN, 'true');
-					}
-				});
+				.subscribe(() => OpenableClosableControlHelper.setAttribute(control, 'true'));
 
 			control.close
 				.pipe(takeUntil(takeUntilSubject))
-				.subscribe(() =>
-					setTimeout(
-						() => {
-							const nativeElement = pathOr(null, control.nativeTarget, control);
-							if (nativeElement) {
-								nativeElement.setAttribute(TDS_ATTRIBUTE_IS_OPEN, 'false');
-							}
-						},
-						200
-					)
-				);
+				.subscribe(() => setTimeout(() => OpenableClosableControlHelper.setAttribute(control, 'false'), 200));
 		});
+	}
+
+	/**
+	 * Set the value for the control attribute that indicates if it is open/close
+	 * @param control
+	 * @param value
+	 */
+	static setAttribute(control: any, value: string): void {
+		const nativeElement = pathOr(null, control.nativeTarget, control);
+		if (nativeElement) {
+			nativeElement.setAttribute(TDS_ATTRIBUTE_IS_OPEN, value);
+		}
 	}
 }
