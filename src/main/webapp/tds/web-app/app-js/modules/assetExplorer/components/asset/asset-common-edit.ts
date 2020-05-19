@@ -33,6 +33,7 @@ import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {TDSDateControlComponent} from '../../../../shared/components/custom-control/date-time/date-control.component';
 import {OpenableClosableControlHelper} from '../../../../shared/utils/openable-closable-control.helper';
+import {TDSDateTimeControlComponent} from '../../../../shared/components/custom-control/date-time/datetime-control.component';
 
 declare var jQuery: any;
 
@@ -40,6 +41,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('form', { static: false }) public form: NgForm;
 	@ViewChildren(DropDownListComponent) dropdownList: QueryList<DropDownListComponent>;
 	@ViewChildren(TDSDateControlComponent) dateControlList: QueryList<TDSDateControlComponent>;
+	@ViewChildren(TDSDateTimeControlComponent) dateTimeControlList: QueryList<TDSDateTimeControlComponent>;
 
 	private destroySubject: Subject<any> = new Subject<any>();
 
@@ -95,7 +97,9 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	ngAfterViewInit() {
 		let controls = [
 			{ controlType: 'dropDownList', list: this.dropdownList.toArray() },
-			{ controlType: 'dateControlList', list: this.dateControlList.toArray() }
+			{ controlType: 'dateControlList', list: this.dateControlList.toArray() },
+			{ controlType: 'dateTimePartDateControlList', list: this.dateTimeControlList.toArray() },
+			{ controlType: 'dateTimePartTimeControlList', list: this.dateTimeControlList.toArray() }
 		];
 		OpenableClosableControlHelper.setUpListeners(controls, this.destroySubject);
 	}

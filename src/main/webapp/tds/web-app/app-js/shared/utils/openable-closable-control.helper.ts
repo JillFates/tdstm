@@ -14,22 +14,34 @@ export class OpenableClosableControlHelper {
 		const controlTypes = {
 			dropDownList: ['wrapper', 'nativeElement'],
 			dateControlList: ['datePicker', 'first', 'element', 'nativeElement'],
+			dateTimePartDateControlList: ['datePicker', 'first', 'element', 'nativeElement'],
+			dateTimePartTimeControlList: ['timePicker', 'first', 'element', 'nativeElement'],
 		};
 
 		const listControls = [];
 		controls.forEach((item: {controlType: string, list: any[]}) => {
 			item.list.forEach((listItem: any) => {
 				const nativeTarget = controlTypes[item.controlType];
-				listControls.push({...listItem, nativeTarget});
+				if (item.controlType === 'dateTimePartTimeControlList') {
+					const elements = {...listItem, nativeTarget};
+					elements.openEvent = elements.openTime;
+					elements.closeEvent = elements.closeTime;
+					listControls.push(elements);
+				} else {
+					const elements = {...listItem, nativeTarget};
+					elements.openEvent = elements.open;
+					elements.closeEvent = elements.close;
+					listControls.push(elements);
+				}
 			});
 		});
 
 		listControls.forEach(control => {
-			control.open
+			control.openEvent
 				.pipe(takeUntil(takeUntilSubject))
 				.subscribe(() => OpenableClosableControlHelper.setAttribute(control, 'true'));
 
-			control.close
+			control.closeEvent
 				.pipe(takeUntil(takeUntilSubject))
 				.subscribe(() => setTimeout(() => OpenableClosableControlHelper.setAttribute(control, 'false'), 200));
 		});
