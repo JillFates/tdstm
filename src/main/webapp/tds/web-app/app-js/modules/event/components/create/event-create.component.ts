@@ -34,6 +34,7 @@ export class EventCreateComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => true,
 			disabled: () => !this.validateRequiredFields(this.eventModel),
 			type: DialogButtonType.ACTION,
@@ -43,6 +44,7 @@ export class EventCreateComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
