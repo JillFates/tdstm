@@ -68,7 +68,8 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 		bar.css('width', value + '%');
 		bar.html(value + '%');
 		showProgressBar();
-		status.html("Initializing...");
+		// TM-17692 Meassage of Initializing is redundant and don't needed
+		status.html("");
 	}
 
 	var finishProgressBar = function(onFinishCallback) {
@@ -116,7 +117,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 						var showBar=true;
 						var percentComp=100;
 
-						data = response.data;
+						var data = response.data;
 
 						// Double-check to makes sure that the progress has been moving forward
 						if (data.lastUpdated == lastUpdated) {
@@ -142,7 +143,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 
 						switch (data.status) {
 							case STARTED:
-								status.html(data.status);
+								status.html("Processing...");
 								percentComp=data.percentComp;
 								setTimeout(function() {
 									updateProgress();
@@ -150,12 +151,12 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 								break;
 
 							case COMPLETED:
+								status.html("Completed.");
 								if (data.detail) {
 									showDetail=true;
 									showClose=true;
 									showBar=false;
 								} else {
-									status.html(data.status);
 									finishProgressBar(onSuccess);
 								}
 								break;
@@ -184,7 +185,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 							bar.attr('aria-valuenow', value);
 							bar.css('width', value + '%');
 							bar.html(value + '%');
-							showProgressBar();							
+							showProgressBar();
 						} else {
 							bar.hide();
 						}
@@ -203,7 +204,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 								} else {
 									finishProgressBar(onSuccess);
 								}
-							});							
+							});
 						} else if (failed) {
 							finishProgressBar(onFailure);
 						}
