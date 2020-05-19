@@ -26,7 +26,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
 import {equals as ramdaEquals, clone as ramdaClone, pathOr} from 'ramda';
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {ComboBoxComponent, DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DatePickerComponent} from '@progress/kendo-angular-dateinputs';
 
 import {Subject} from 'rxjs';
@@ -34,6 +34,7 @@ import {takeUntil} from 'rxjs/operators';
 import {TDSDateControlComponent} from '../../../../shared/components/custom-control/date-time/date-control.component';
 import {OpenableClosableControlHelper} from '../../../../shared/utils/openable-closable-control.helper';
 import {TDSDateTimeControlComponent} from '../../../../shared/components/custom-control/date-time/datetime-control.component';
+import {TDSComboBoxComponent} from '../../../../shared/components/combo-box/combobox.component';
 
 declare var jQuery: any;
 
@@ -42,9 +43,9 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChildren(DropDownListComponent) dropdownList: QueryList<DropDownListComponent>;
 	@ViewChildren(TDSDateControlComponent) dateControlList: QueryList<TDSDateControlComponent>;
 	@ViewChildren(TDSDateTimeControlComponent) dateTimeControlList: QueryList<TDSDateTimeControlComponent>;
-
+	@ViewChildren(TDSComboBoxComponent) tdsComboList: QueryList<TDSComboBoxComponent>;
+	@ViewChildren(ComboBoxComponent) comboList: QueryList<ComboBoxComponent>;
 	private destroySubject: Subject<any> = new Subject<any>();
-
 	private assetTagsDirty = false;
 	protected assetTagsModel: any = { tags: [] };
 	protected newAssetTagsSelection: any = { tags: [] };
@@ -99,7 +100,9 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			{ controlType: 'dropDownList', list: this.dropdownList.toArray() },
 			{ controlType: 'dateControlList', list: this.dateControlList.toArray() },
 			{ controlType: 'dateTimePartDateControlList', list: this.dateTimeControlList.toArray() },
-			{ controlType: 'dateTimePartTimeControlList', list: this.dateTimeControlList.toArray() }
+			{ controlType: 'dateTimePartTimeControlList', list: this.dateTimeControlList.toArray() },
+			{ controlType: 'comboList', list: this.comboList.toArray() },
+			{ controlType: 'tdsComboList', list: this.tdsComboList.toArray() }
 		];
 		OpenableClosableControlHelper.setUpListeners(controls, this.destroySubject);
 	}
