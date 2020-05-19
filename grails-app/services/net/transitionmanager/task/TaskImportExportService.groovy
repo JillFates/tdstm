@@ -851,6 +851,10 @@ class TaskImportExportService implements ServiceMethods {
 				}
 			}
 
+			if (!task.durationScale || task.durationScale == '') {
+				task.durationScale = TimeScale.default
+			}
+
 			AssetComment assetComment = AssetComment.findByTaskNumberAndProject(task.taskNumber, project)
 			applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true )
 			assetComment.discard()
