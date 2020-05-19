@@ -91,20 +91,11 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	// set the handlers on open / on close to set the flags that indicate the state of the
-	// dropdown list items (opened/closed)
+	// dropdown list, datecontrols items (opened/closed)
 	ngAfterViewInit() {
-		const dropDownList  = this.dropdownList.toArray();
-		const dateControlList  = this.dateControlList.toArray();
-
 		let controls = [
-			{
-				controlType: 'dropDownList',
-				list: dropDownList
-			},
-			{
-				controlType: 'dateControlList',
-				list: dateControlList
-			}
+			{ controlType: 'dropDownList', list: this.dropdownList.toArray() },
+			{ controlType: 'dateControlList', list: this.dateControlList.toArray() }
 		];
 		OpenableClosableControlHelper.setUpListeners(controls, this.destroySubject);
 	}
