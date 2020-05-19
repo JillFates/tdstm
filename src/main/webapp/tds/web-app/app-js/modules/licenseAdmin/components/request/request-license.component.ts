@@ -41,6 +41,7 @@ export class RequestLicenseComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => true,
 			disabled: () => !this.licenseRequestForm.form.valid,
 			type: DialogButtonType.ACTION,
@@ -50,6 +51,7 @@ export class RequestLicenseComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
