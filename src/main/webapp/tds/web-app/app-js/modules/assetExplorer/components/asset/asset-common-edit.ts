@@ -93,9 +93,16 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		jQuery('[data-toggle="popover"]').popover();
 	}
 
-	// set the handlers on open / on close to set the flags that indicate the state of the
-	// dropdown list, datecontrols items (opened/closed)
 	ngAfterViewInit() {
+		// set the handlers on open / on close to set the flags that indicate the state of the
+		// dropdown list, datecontrols items (opened/closed)
+		this.setupListListeners();
+	}
+
+	/**
+	 * Setup the listeners over the list components
+	 */
+	setupListListeners() {
 		let controls = [
 			{ controlType: 'dropDownList', list: this.dropdownList.toArray() },
 			{ controlType: 'dateControlList', list: this.dateControlList.toArray() },
