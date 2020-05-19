@@ -42,6 +42,7 @@ export class NewsCreateEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => true,
 			disabled: () => !this.newsForm.form.valid || this.newsForm.form.pristine,
 			type: DialogButtonType.ACTION,
@@ -51,6 +52,7 @@ export class NewsCreateEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => !this.isCreate(),
 			disabled: () => !this.isDeleteAvailable(),
 			type: DialogButtonType.ACTION,
@@ -60,6 +62,7 @@ export class NewsCreateEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
