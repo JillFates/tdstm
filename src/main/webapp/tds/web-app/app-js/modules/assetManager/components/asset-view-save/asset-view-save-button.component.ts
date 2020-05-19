@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
-	selector: 'tds-asset-show-save-button',
+	selector: 'tds-asset-view-save-button',
 	template: `
 		<div *ngIf="config.canShowSaveButton" class="btn-group">
 			<tds-button [ngClass]="{'btn-secondary':!config.isDirty, 'btn-success': (config.isDirty && !config.disableSaveButton)}"
@@ -32,13 +32,12 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 		</div>
 	`,
 })
-export class AssetViewShowSaveButtonComponent {
+export class AssetViewSaveButtonComponent {
 	@Input() config: {
 		isDirty: boolean,
 		saveButtonId: string,
 		canSave: boolean,
 		canSaveAs: boolean,
-		isEditAvailable: boolean,
 		canShowSaveButton: boolean,
 		disableSaveButton: boolean
 	};

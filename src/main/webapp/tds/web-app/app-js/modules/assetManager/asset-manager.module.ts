@@ -36,7 +36,7 @@ import {AssetViewShowComponent} from './components/asset-view-show/asset-view-sh
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
 // import {ExportComponent} from './components/asset-export/export.component';
 // import {ExportAssetService} from './service/export-asset.service';
-import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/asset-view-show-save-button.component';
+import { AssetViewSaveButtonComponent } from './components/asset-view-save/asset-view-save-button.component';
 import { AssetViewShowCreateButtonComponent } from './components/asset-view-show/asset-view-show-create-button.component';
 import { AssetViewConfigSaveButtonComponent } from './components/asset-view-config/asset-view-config-save-button.component';
 import { TabStripModule } from '@progress/kendo-angular-layout';
@@ -70,7 +70,7 @@ import {AssetCommentModule} from '../assetComment/asset-comment.module';
 		AssetViewExportComponent,
 		AssetViewGridComponent,
 		AssetViewShowComponent,
-		AssetViewShowSaveButtonComponent,
+		AssetViewSaveButtonComponent,
 		AssetViewShowCreateButtonComponent
 	],
 	providers: [

@@ -181,6 +181,7 @@ export class AssetExplorerService {
 
 	/**
 	 * Check if model is All Assets based on the ID also, since now we support Overwritting..
+	 * @deprecated Please remove if no longer used.
 	 * @param model: ViewModel
 	 */
 	isAllAssets(model: ViewModel): boolean {
@@ -188,10 +189,18 @@ export class AssetExplorerService {
 		return model.name === this.ALL_ASSETS && model.id === this.ALL_ASSETS_SYSTEM_VIEW_ID;
 	}
 
+	/**
+	 * @deprecated Please remove if no longer used
+	 * @param model
+	 */
 	isSaveAvailable(model: ViewModel): boolean {
 		return model && !this.isAllAssets(model) && this.hasSavePermission(model);
 	}
 
+	/**
+	 * @deprecated Please remove if no longer used.
+	 * @param model
+	 */
 	hasSavePermission(model): boolean {
 		const hasPermission = this.permissionService.hasPermission.bind(this.permissionService);
 		const {AssetExplorerSystemEdit, AssetExplorerEdit, AssetExplorerSystemCreate, AssetExplorerCreate } = Permission;
