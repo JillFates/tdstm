@@ -81,7 +81,7 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 			completionDate: new Date(today.setMonth(today.getMonth() + 12)),
 			partners: [],
 			projectLogo: '',
-			projectManagerId: 0,
+			projectManagerId: null,
 			projectCode: '',
 			projectType: 'Standard',
 			comment: '',
@@ -282,6 +282,8 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
+		console.log('this.projectModel: ', this.projectModel);
+		console.log('this.defaultModel: ', this.defaultModel);
 		if (JSON.stringify(this.projectModel) !== JSON.stringify(this.defaultModel)) {
 			this.dialogService.confirm(
 				'Confirmation Required',
