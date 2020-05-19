@@ -282,8 +282,6 @@ export class ProjectCreateComponent extends Dialog implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
-		console.log('this.projectModel: ', this.projectModel);
-		console.log('this.defaultModel: ', this.defaultModel);
 		if (JSON.stringify(this.projectModel) !== JSON.stringify(this.defaultModel)) {
 			this.dialogService.confirm(
 				'Confirmation Required',
