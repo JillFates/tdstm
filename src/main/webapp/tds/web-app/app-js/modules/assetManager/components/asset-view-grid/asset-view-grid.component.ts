@@ -299,19 +299,19 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 * Removes all the fiilters selected
 	 * First removes the global query parameters
 	 */
-	public onClearFilters(): void {
-		this.removeGlobalQueryParam.emit({property: '*'});
+	public onClearFilters(removeQueryParams = true): void {
+		if (removeQueryParams) {
+			this.removeGlobalQueryParam.emit({property: '*'});
+		}
 
-		setTimeout(() => {
-			this.model.columns.forEach((c: ViewColumn) => {
-				c.filter = '';
-			});
-			this.onFilter();
-			if (this.tagSelector) {
-				this.tagSelector.reset();
-			}
-			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
-		}, 500);
+		this.model.columns.forEach((c: ViewColumn) => {
+			c.filter = '';
+		});
+		this.onFilter();
+		if (this.tagSelector) {
+			this.tagSelector.reset();
+		}
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
@@ -320,7 +320,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	public onClearHiddenFilters(): void {
 		this.hiddenFilters = false;
 		this.hiddenFiltersChange.emit(this.hiddenFilters);
-		this.onClearFilters();
+		this.onClearFilters(false);
 	}
 
 	hasFilterApplied(): boolean {
