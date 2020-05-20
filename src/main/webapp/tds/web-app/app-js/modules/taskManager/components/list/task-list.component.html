@@ -125,7 +125,6 @@
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
 			>
-                <ng-template kendoGridNoRecordsTemplate>{{this.gridMessage}}</ng-template>
 				<!-- Column Menu -->
 				<ng-template
 					kendoGridColumnMenuTemplate
@@ -169,6 +168,7 @@
 				<ng-template kendoGridToolbarTemplate [position]="'top'">
 					<div class="button-toolbar"></div>
 				</ng-template>
+
 				<!-- Row Detail Template -->
 				<div
 					*kendoGridDetailTemplate="
@@ -362,6 +362,7 @@
 					</ng-template>
 				</kendo-grid-column>
 
+				<!-- Pagination template -->
 				<ng-template
 					kendoPagerTemplate
 					let-total="total"
@@ -381,6 +382,9 @@
 						</tds-grid-pager>
 					</div>
 				</ng-template>
+
+				<!-- No records template -->
+				<ng-template kendoGridNoRecordsTemplate>{{'GLOBAL.NO_RECORDS_AVAILABLE' | translate}}</ng-template>
 			</kendo-grid>
 		</div>
 	</section>
