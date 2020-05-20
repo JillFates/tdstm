@@ -45,18 +45,25 @@ import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 // Other
 import {Observable, Subject} from 'rxjs';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
 import * as R from 'ramda';
 import {StringUtils} from '../../../../shared/utils/string.utils';
+import {TDSDateControlComponent} from '../../../../shared/components/custom-control/date-time/date-control.component';
+import {TDSDateTimeControlComponent} from '../../../../shared/components/custom-control/date-time/datetime-control.component';
+import {OpenableClosableControlHelper} from '../../../../shared/utils/openable-closable-control.helper';
+import {TDSComboBoxComponent} from '../../../../shared/components/combo-box/combobox.component';
 
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends Dialog implements OnInit, AfterViewInit, OnDestroy {
 	@Input() data: any;
-
 	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
-	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
-	@ViewChild('dueDate', {static: false}) dueDate;
+	@ViewChildren(DropDownListComponent) dropdownList: QueryList<DropDownListComponent>;
+	@ViewChildren(ComboBoxComponent) comboList: QueryList<ComboBoxComponent>;
+	@ViewChildren(TDSDateControlComponent) dateControlList: QueryList<TDSDateControlComponent>;
+	@ViewChildren(TDSDateTimeControlComponent) dateTimeControlList: QueryList<TDSDateTimeControlComponent>;
+	@ViewChildren(TDSComboBoxComponent) tdsComboList: QueryList<TDSComboBoxComponent>;
 	@ViewChild('taskCreateCommentInput', {static: false}) taskCreateCommentInput: ElementRef;
 	protected modalType = ModalType;
 	protected dateFormat: string;
@@ -247,7 +254,18 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 					if (percentageComplete) {
 						percentageComplete.markAsPristine();
 					}
-				});
+
+					setTimeout(() => {
+						let controls = [
+							{ controlType: 'dropDownList', list: this.dropdownList.toArray() },
+							{ controlType: 'dateControlList', list: this.dateControlList.toArray() },
+							{ controlType: 'dateTimePartDateControlList', list: this.dateTimeControlList.toArray() },
+							{ controlType: 'dateTimePartTimeControlList', list: this.dateTimeControlList.toArray() },
+							{ controlType: 'comboList', list: this.comboList.toArray() },
+							{ controlType: 'tdsComboList', list: this.tdsComboList.toArray() },
+						];
+						OpenableClosableControlHelper.setUpListeners(controls, this.destroySubject);
+					}, 1000);				});
 
 			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null, null, 2000);
 			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null, null, 2000);
@@ -257,17 +275,6 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		});
-
-		this.dropdowns.toArray()
-			.forEach((dropdown) => {
-				dropdown.open
-					.pipe(takeUntil(this.destroySubject))
-					.subscribe(() => EscapeHandler.setIsDropdownListOpen(dropdown.wrapper.nativeElement, true));
-
-				dropdown.close
-					.pipe(takeUntil(this.destroySubject))
-					.subscribe(() => setTimeout(() => EscapeHandler.setIsDropdownListOpen(dropdown.wrapper.nativeElement, false), 200));
-			});
 	}
 
 	ngOnDestroy() {
@@ -624,11 +631,6 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 							this.modelHelper.generateNotes(this.model.notesList), null, null);
 				}
 			});
-	}
-
-	onOpenDueDate(event) {
-		event.preventDefault();
-		this.dueDate.toggle();
 	}
 
 	/**
