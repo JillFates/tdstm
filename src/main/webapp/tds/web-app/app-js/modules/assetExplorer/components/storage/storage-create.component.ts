@@ -1,5 +1,5 @@
 // Angular
-import {Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
 // Model
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 // Service
@@ -17,6 +17,8 @@ import {AssetCommonEdit} from '../asset/asset-common-edit';
 // Other
 import * as R from 'ramda';
 
+declare var jQuery: any;
+
 export function StorageCreateComponent(template: string, model: any, metadata: any, parentDialog: any): any {
 	@Component({
 		selector: 'tds-storage-create',
@@ -25,7 +27,7 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			{ provide: 'model', useValue: model }
 		]
 	})
-	class StorageCreateComponent extends AssetCommonEdit implements OnInit {
+	class StorageCreateComponent extends AssetCommonEdit implements OnInit, AfterViewInit {
 		constructor(
 			@Inject('model') model: any,
 			componentFactoryResolver: ComponentFactoryResolver,
@@ -44,6 +46,10 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			this.initModel();
 			this.focusControlByName('assetName');
 			this.onFocusOutOfCancel();
+		}
+
+		ngAfterViewInit() {
+			jQuery('[data-toggle="popover"]').popover();
 		}
 
 		/**

@@ -1,6 +1,5 @@
 // Angular
 import {
-	OnInit,
 	AfterViewInit,
 	OnDestroy,
 	ViewChildren,
@@ -32,7 +31,7 @@ import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 
-export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
+export class AssetCommonEdit implements AfterViewInit, OnDestroy {
 	@ViewChild('form', { static: false }) public form: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<
 		DropDownListComponent
@@ -79,16 +78,13 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 				}
 			});
 	}
-	/**
-	 * Initiates The Injected Component
-	 */
-	ngOnInit(): void {
-		jQuery('[data-toggle="popover"]').popover();
-	}
 
 	// set the handlers on open / on close to set the flags that indicate the state of the
 	// dropdown list items (opened/closed)
 	ngAfterViewInit() {
+
+		jQuery('[data-toggle="popover"]').popover();
+
 		this.dropdowns.toArray().forEach(dropdown => {
 			dropdown.open
 				.pipe(takeUntil(this.destroySubject))
