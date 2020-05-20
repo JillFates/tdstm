@@ -37,6 +37,7 @@ export class ManualRequestComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.onCancelClose.bind(this)

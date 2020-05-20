@@ -69,6 +69,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.isEditAvailable(),
 			type: DialogButtonType.ACTION,
 			action: this.showAssetEditView.bind(this, this.data.assetId, this.asset)
@@ -77,6 +78,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'cloneAsset',
 			icon: 'copy',
+			tooltipText: 'Clone',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.onCloneAsset.bind(this)
@@ -85,6 +87,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.isDeleteAvailable(),
 			type: DialogButtonType.ACTION,
 			action: this.onDeleteAsset.bind(this)
@@ -93,6 +96,7 @@ export class AssetShowComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.onDismiss.bind(this)

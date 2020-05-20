@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 // Store
 import {Store} from '@ngxs/store';
 // Model
@@ -20,6 +20,7 @@ import {ActionType} from '../../../dataScript/model/data-script.model';
 	templateUrl: 'event-view-edit.component.html',
 })
 export class EventViewEditComponent extends Dialog implements OnInit {
+	@ViewChild('eventName', {static: false}) eventName: ElementRef;
 	@Input() data: any;
 
 	public eventModel: EventModel = null;
@@ -56,6 +57,7 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => true,
 			active: () => this.editing,
 			type: DialogButtonType.ACTION,
@@ -65,6 +67,7 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.editing,
 			disabled: () => !this.validateRequiredFields(this.eventModel) || !this.isDirty(),
 			type: DialogButtonType.ACTION,
@@ -74,6 +77,7 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.canEditEvent,
 			type: DialogButtonType.ACTION,
 			action: this.confirmDeleteEvent.bind(this)
@@ -82,6 +86,7 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => !this.editing,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -90,6 +95,7 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.editing,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEdit.bind(this)
@@ -301,11 +307,9 @@ export class EventViewEditComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getModalTitle(): string {
-		// Every time we change the title, it means we switched to View, Edit or Create
 		setTimeout(() => {
-			// This ensure the UI has loaded since Kendo can change the signature of an object
-			// this.dataSignature = JSON.stringify(this.credentialModel);
-		}, 800);
+			this.onSetUpFocus(this.eventName);
+		});
 
 		if (this.editing) {
 			return 'Event Edit';

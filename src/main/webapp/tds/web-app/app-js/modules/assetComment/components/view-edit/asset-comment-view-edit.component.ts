@@ -50,6 +50,7 @@ export class AssetCommentViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => (this.assetCommentModel.modal.type === this.modalType.VIEW || this.assetCommentModel.modal.type === this.modalType.EDIT) && this.isCommentEditAvailable(),
 			active: () => this.assetCommentModel.modal.type === this.modalType.EDIT,
 			type: DialogButtonType.ACTION,
@@ -59,6 +60,7 @@ export class AssetCommentViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.assetCommentModel.modal.type !== this.modalType.VIEW,
 			disabled: () => !this.dependentForm.dirty || !this.dependentForm.valid,
 			type: DialogButtonType.ACTION,
@@ -68,6 +70,7 @@ export class AssetCommentViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.isCommentDeleteAvailable() && this.assetCommentModel.modal.type !== this.modalType.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.onDelete.bind(this)
@@ -76,6 +79,7 @@ export class AssetCommentViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: ((this.assetCommentModel.modal.type === this.modalType.VIEW) ? 'Close' : 'Cancel'),
 			show: () => this.assetCommentModel.modal.type === this.modalType.VIEW || this.assetCommentModel.modal.type === this.modalType.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.closeDialog.bind(this)
@@ -84,6 +88,7 @@ export class AssetCommentViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.assetCommentModel.modal.type === this.modalType.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.closeDialog.bind(this)

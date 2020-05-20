@@ -63,6 +63,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.canEditBundle,
 			active: () => this.editing,
 			type: DialogButtonType.ACTION,
@@ -72,6 +73,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.editing,
 			disabled: () => !this.validateRequiredFields(this.bundleModel) || !this.isDirty(),
 			type: DialogButtonType.ACTION,
@@ -81,6 +83,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.canEditBundle,
 			type: DialogButtonType.ACTION,
 			action: this.confirmDeleteBundleAndAssets.bind(this)
@@ -89,6 +92,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => !this.editing,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -97,6 +101,7 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.editing,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEdit.bind(this)
@@ -109,7 +114,6 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle());
-			this.onSetUpFocus(this.bundleEditNameInput);
 		});
 	}
 
@@ -374,13 +378,10 @@ export class BundleViewEditComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getModalTitle(): string {
-		// Every time we change the title, it means we switched to View, Edit or Create
-		setTimeout(() => {
-			// This ensure the UI has loaded since Kendo can change the signature of an object
-			// this.dataSignature = JSON.stringify(this.credentialModel);
-		}, 800);
-
 		if (this.editing) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.bundleEditNameInput);
+			});
 			return 'Bundle Edit';
 		}
 		return 'Bundle Detail';

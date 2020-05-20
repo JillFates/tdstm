@@ -2,13 +2,13 @@
 import {
 	AfterViewInit,
 	ComponentFactoryResolver,
+	ElementRef,
 	Input,
 	OnDestroy,
 	OnInit,
 	QueryList,
 	ViewChild,
-	ViewChildren,
-	ElementRef
+	ViewChildren
 } from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
@@ -102,6 +102,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.taskDetailModel.modal.type === ModalType.EDIT,
 			active: () => this.taskDetailModel.modal.type === ModalType.EDIT,
 			type: DialogButtonType.ACTION,
@@ -111,6 +112,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => (this.taskDetailModel.modal.type === ModalType.EDIT || this.taskDetailModel.modal.type === ModalType.CREATE) && this.hasEditTaskPermission,
 			disabled: () => this.isFormInvalid(),
 			type: DialogButtonType.ACTION,
@@ -120,6 +122,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.taskDetailModel.modal.type === ModalType.EDIT && this.hasEditTaskPermission,
 			type: DialogButtonType.ACTION,
 			action: this.deleteTask.bind(this)
@@ -128,6 +131,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -138,7 +142,6 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle());
-			this.onSetUpFocus(this.taskCreateCommentInput);
 		});
 	}
 
@@ -640,6 +643,12 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	 * @returns {string}
 	 */
 	private getModalTitle(): string {
+
+		if (this.taskDetailModel.modal.type === ModalType.CREATE || this.taskDetailModel.modal.type === ModalType.EDIT) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.taskCreateCommentInput);
+			});
+		}
 
 		if (this.taskDetailModel.modal.type === ModalType.EDIT) {
 			return this.translatePipe.transform(

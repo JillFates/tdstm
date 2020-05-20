@@ -16,7 +16,7 @@
                         </label>
                         <div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
                             <clr-select-container>
-                                <select clrSelect id="modelManufacturer" name="modelManufacturer" (change)="onChangeManufacturer($event)" required [(ngModel)]="manufacturerId">
+                                <select clrSelect #modelManufacturer id="modelManufacturer" name="modelManufacturer" (change)="onChangeManufacturer($event)" required [(ngModel)]="manufacturerId">
                                     <option *ngFor="let item of manufacturerList" value="{{item.id}}">{{item.name}}</option>
                                 </select>
                             </clr-select-container>
