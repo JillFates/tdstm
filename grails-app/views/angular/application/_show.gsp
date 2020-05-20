@@ -134,5 +134,7 @@
 	</tbody>
 </table>
 
+<g:render template="/angular/common/assetTags"></g:render>
+
 	
 
