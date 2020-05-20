@@ -296,8 +296,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	/**
-	 * Removes all the fiilters selected
-	 * First removes the global query parameters
+	 * Removes all the filters selected
+	 * @param removeQueryParams Flag to indicate if it removes the global query parameters
 	 */
 	public onClearFilters(removeQueryParams = true): void {
 		if (removeQueryParams) {
