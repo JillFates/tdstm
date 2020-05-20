@@ -52,8 +52,8 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 		this.defaultModel = {
 			name: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
+			fromId: null,
+			toId: null,
 			startTime: '',
 			completionTime: '',
 			operationalOrder: 1,
@@ -122,7 +122,7 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 					}
 				});
 		} else {
-			super.onCancelClose();
+			this.onCancelClose();
 		}
 	}
 
