@@ -38,7 +38,6 @@ export function DatabaseCreateComponent(template, model: any, metadata: any, par
 		}
 
 		ngOnInit() {
-			this.setDefaultBundleAndCompany();
 			this.model.asset.retireDate = null;
 			this.model.asset.maintExpDate = null;
 

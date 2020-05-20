@@ -48,7 +48,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any, paren
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.setDefaultBundleAndCompany();
 			this.model.sourceRoomSelect = [this.defaultRoom, ...this.model.sourceRoomSelect];
 			this.model.targetRoomSelect = [this.defaultRoom, ...this.model.targetRoomSelect];
 			this.model.rackSourceOptions = [this.defaultRoom, ...this.model.rackSourceOptions];

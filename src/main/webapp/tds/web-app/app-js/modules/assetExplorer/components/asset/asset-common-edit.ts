@@ -381,57 +381,6 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	/**
-	 * Based on the project set the default bundle and company into the model
-	 */
-	setDefaultBundleAndCompany(): void {
-		// set empty as defaults
-		this.model.asset.moveBundle = {id: null, name: ''};
-		this.model.asset.client = {id: null, name: ''};
-
-		// get the default bundle and company based on the project
-		this.getProjectInfo(this.getProjectIdFromModel())
-			.subscribe((response: any) => {
-				if (response) {
-					this.model.asset.moveBundle = response.moveBundle;
-					this.model.asset.client = response.client;
-				}
-			});
-	}
-
-	/**
-	 * Get the project info
-	 * @param projectId
-	 */
-	protected getProjectInfo(projectId: string): Observable<{moveBundle, client}> {
-		return this.assetExplorerService.getProjectInfo(projectId)
-			.map((response: any) => {
-				const data = response && response.data;
-				if (data) {
-					return {
-						moveBundle: data.defaultBundle,
-						client: data.client,
-					}
-				}
-				return null;
-			});
-	}
-
-	/**
-	 * Based on the project set the default company
-	 */
-	setDefaultCompany(): void {
-		// set empty as defaults
-		this.model.asset.client = {id: null, name: ''};
-
-		this.getProjectInfo(this.getProjectIdFromModel())
-			.subscribe((response: any) => {
-				if (response) {
-					this.model.asset.client = response.client;
-				}
-			});
-	}
-
-	/**
 	 * Return the project id from the current asset model
 	 */
 	private getProjectIdFromModel(): string {

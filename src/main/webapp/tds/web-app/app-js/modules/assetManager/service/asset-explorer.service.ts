@@ -10,7 +10,6 @@ import {PermissionService} from '../../../shared/services/permission.service';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {DateUtils} from '../../../shared/utils/date.utils';
-import {ProjectService} from '../../project/service/project.service';
 
 @Injectable()
 export class AssetExplorerService {
@@ -25,8 +24,7 @@ export class AssetExplorerService {
 
 	constructor(
 		private http: HttpClient,
-		private permissionService: PermissionService,
-		private projectService: ProjectService) {}
+		private permissionService: PermissionService) {}
 
 	getReports(): Observable<ViewGroupModel[]> {
 		return this.http.get(`${this.assetExplorerUrl}/views`)
@@ -453,17 +451,5 @@ export class AssetExplorerService {
 		return this.http.get(`${this.assetExplorerUrl}/saveOptions`)
 			.map((response: any) => response.saveOptions)
 			.catch((error: any) => error);
-	}
-
-	/**
-	 * Get the info for an specific project
-	 * @param projectId
-	 */
-	getProjectInfo(projectId: string): Observable<any> {
-		if (projectId) {
-			return this.projectService.getModelForProjectViewEdit(projectId);
-		} else {
-			return Observable.of(null);
-		}
 	}
 }
