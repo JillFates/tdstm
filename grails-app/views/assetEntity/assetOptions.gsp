@@ -29,6 +29,9 @@
             <div>
                 <g:render template="assetType"/>
             </div>
+            <div>
+                <g:render template="taskCategory"/>
+            </div>
         </div>
     </div>
 </body>

@@ -1,25 +1,32 @@
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
-import net.transitionmanager.task.CookbookService
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
+import net.transitionmanager.task.CookbookService
 import spock.lang.Specification
 import test.helper.mock.ProjectMock
 
 class CookbookServiceTests extends Specification implements ServiceUnitTest<CookbookService>, DataTest {
 
 	void setupSpec(){
-		mockDomains UserLogin, UserPreference, Person, ApiAction
+		mockDomains UserLogin, UserPreference, Person, ApiAction, AssetOptions
 	}
 
 	void setup() {
 		Project project = ProjectMock.create()
 		SecurityService securityService = GroovyMock(SecurityService)
+
 		service.securityService = securityService
+
+		service.assetOptionsService = [
+			taskCategories : {-> ['general', 'discovery', 'analysis', 'design', 'planning', 'buildout', 'walkthru', 'premove', 'moveday', 'shutdown', 'physical', 'transport', 'startup', 'verify', 'postmove', 'closeout', 'learning']}
+		] as AssetOptionsService
 
 		//Mocking up the Users Current Project
 		service.securityService.metaClass.getUserCurrentProject = {

@@ -21,12 +21,12 @@ import { COLUMN_MIN_WIDTH } from 'tds-component-library';
 					<div class="table-container">
                         <label class="table-title">Task Notes ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
                         <tds-button-add [title]="'Create'"
-										[displayLabel]="false"
-										[small]="true"
-										iconClass="is-solid"
+                                        [displayLabel]="false"
+                                        [small]="true"
+                                        iconClass="is-solid"
                                         [tooltip]="'Create a note'"
                                         [id]="'btnAddNote'"
-									[disabled]="!hasEditTaskPermission"
+                                        [disabled]="!hasEditTaskPermission"
                                         (click)="onCreateNote()">
                         </tds-button-add>
 					</div>

@@ -763,7 +763,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 
 			log.debug "addOrUpdateDependencies() Attempting to ${isNew ? 'CREATE' : 'UPDATE'} dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
-			if (!assetDependency.save(flush:true, failOnError: false)) {
+			if (!assetDependency.save(flush:true, failOnError: false, deepValidate: false)) {
 				throw new DomainUpdateException("Unable to save $depType dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
 			}
 		}

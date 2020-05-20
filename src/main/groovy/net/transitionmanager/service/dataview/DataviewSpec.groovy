@@ -66,6 +66,10 @@ class DataviewSpec {
 	private Map<String, Integer> args
 	private Map<String, String> order
 	private Boolean justPlanning
+	/**
+	 * Determines if a Dataview request is going to be used for exporting results.
+	 */
+	private Boolean forExport
 	/*
 		Extra Filters are used by All Assets for custom filtering on Planing dashboard
 		"extra": [ {
@@ -151,6 +155,7 @@ class DataviewSpec {
 			}
 		]
 
+		forExport = command.forExport
 		justPlanning = command.justPlanning
 		args = [offset: command.offset]
 		if (command.limit != 0) {

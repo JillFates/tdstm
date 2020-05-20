@@ -3,13 +3,19 @@ import {
 	forwardRef,
 	OnInit,
 	OnChanges,
-	SimpleChanges
+	SimpleChanges, AfterViewInit, EventEmitter, ViewChildren, QueryList
 } from '@angular/core';
 import {
 	NG_VALUE_ACCESSOR,
 	NG_VALIDATORS
 } from '@angular/forms';
+import {
+	DatePickerComponent,
+	TimePickerComponent,
+	PreventableEvent
+} from '@progress/kendo-angular-dateinputs';
 
+import {merge} from 'rxjs';
 import {CUSTOM_FIELD_TYPES} from '../../../model/constants';
 import {DateUtils} from '../../../utils/date.utils';
 import {PreferenceService} from '../../../services/preference.service';
@@ -30,7 +36,7 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
             </kendo-datepicker>
 			<kendo-timepicker
 				[value]="dateValue"
-				(valueChange)="onTimeChange($event)">
+                (valueChange)="onTimeChange($event)">
 			</kendo-timepicker>
 		</div>
 	`,
@@ -51,7 +57,7 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * input: yyyy-MM-dd hh:mm:ss
  * output: yyyy-MM-ddThh:mm:ssZ
  */
-export class TDSDateTimeControlComponent extends TDSCustomControl implements OnInit, OnChanges {
+export class TDSDateTimeControlComponent extends TDSCustomControl implements OnInit, AfterViewInit, OnChanges {
 	private readonly KENDO_DATETIME_DISPLAY_FORMAT_MMDD = 'yyyy-MM-dd HH:mm:ss';
 	private readonly KENDO_DATETIME_DISPLAY_FORMAT_DDMM = 'yyyy-dd-MM HH:mm:ss';
 	protected outputFormat: string;
@@ -59,12 +65,22 @@ export class TDSDateTimeControlComponent extends TDSCustomControl implements OnI
 	protected selectedTime: string;
 	public displayFormat: string;
 	public dateValue: any;
+	public open: EventEmitter<PreventableEvent>;
+	public close: EventEmitter<PreventableEvent>;
+	public openTime: EventEmitter<PreventableEvent>;
+	public closeTime: EventEmitter<PreventableEvent>;
+	@ViewChildren(DatePickerComponent) datePicker: QueryList<DatePickerComponent>;
+	@ViewChildren(TimePickerComponent) timePicker: QueryList<TimePickerComponent>;
 
 	constructor(
 		private userPreferenceService: PreferenceService,
 		protected validationRulesFactory: ValidationRulesFactoryService
 	) {
 		super(validationRulesFactory);
+		this.open = new EventEmitter<PreventableEvent>();
+		this.close = new EventEmitter<PreventableEvent>();
+		this.openTime = new EventEmitter<PreventableEvent>();
+		this.closeTime = new EventEmitter<PreventableEvent>();
 		this.displayFormat = this.userPreferenceService.getUserDateFormat() === 'DD/MM/YYYY' ? this.KENDO_DATETIME_DISPLAY_FORMAT_DDMM : this.KENDO_DATETIME_DISPLAY_FORMAT_MMDD;
 	}
 
@@ -73,6 +89,21 @@ export class TDSDateTimeControlComponent extends TDSCustomControl implements OnI
 	 */
 	ngOnInit(): void {
 		this.updateValue();
+	}
+
+	ngAfterViewInit(): void {
+		// setup the listeners to the open/close list events
+		this.datePicker.first.open
+			.subscribe((event) => this.open.emit(event));
+
+		this.timePicker.first.open
+			.subscribe((event) => this.openTime.emit(event));
+
+		this.datePicker.first.close
+			.subscribe((event) => this.close.emit(event));
+
+		this.timePicker.first.close
+			.subscribe((event) => this.closeTime.emit(event));
 	}
 
 	/**

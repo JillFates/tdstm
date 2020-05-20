@@ -6,6 +6,6 @@
 	</select>
 </p>
 <p>
-	<button type="submit" ng-disabled="!versions.toCompareVersion" ng-show="versions.toCompareVersions.length > 0" ng-click="versions.onCompareVersions()">Compare</button>
+	<button class="btn" type="submit" ng-disabled="!versions.toCompareVersion" ng-show="versions.toCompareVersions.length > 0" ng-click="versions.onCompareVersions()"><i class="fas fa-exchange-alt"></i> Compare</button>
 </p>
 <label ng-show="versions.toCompareVersions.length < 1">No versions available to compare</label>											     

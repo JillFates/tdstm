@@ -14,7 +14,6 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import org.grails.web.json.JSONObject
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.dataview.DataviewApiFilterParam
 import net.transitionmanager.command.dataview.DataviewApiParamsCommand
@@ -283,10 +282,12 @@ class DataviewService implements ServiceMethods {
 		boolean hasGlobalOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)
 		boolean hasProjectOverridePerm = securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)
 		boolean isDefaultProject = project.isDefaultProject()
-
 		boolean canModify = false
+
 		if (hasEditPerm && dataview) {
-			if (dataview.personId == whom.id) {
+			if(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.project.id != project.id){
+				canModify = false
+			} else if (dataview.personId == whom.id) {
 				canModify = (dataview.projectId == project.id)
 			} else {
 				boolean hasPerm = (isDefaultProject ? hasGlobalOverridePerm : hasProjectOverridePerm)
@@ -296,6 +297,7 @@ class DataviewService implements ServiceMethods {
 						dataview.projectId == project.id)
 			}
 		}
+
 		return canModify
 	}
 
@@ -635,6 +637,10 @@ class DataviewService implements ServiceMethods {
 	void validateDataviewUpdateAccessOrException(Project project, Person whom, DataviewCrudCommand dataviewCommand, Dataview dataview) {
 		validateDataviewViewAccessOrException(project, whom, dataview)
 
+		if(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.project.id != project.id){
+			throw new InvalidParamException(i18nMessage('dataview.validate.editGlobalViewOutsideDefProject'))
+		}
+
 		if (dataview.isSystem) {
 			throwException(InvalidParamException.class, 'dataview.validate.modifySystemView', 'System views can not be modified. Please perform Save As and choose an Override options as an alternative.')
 		}
@@ -944,10 +950,18 @@ class DataviewService implements ServiceMethods {
 
 	    Map queryResults = previewQueryResults(assets, totalAssets[0], dataviewSpec)
 
-	    postProcessAssetQuery(queryResults, whereInfo.mixedFields)
+		if (!dataviewSpec.forExport){
+			/**
+			 * TM-17666:
+			 * After previewQuery, some extra calculations (for icons definitions)
+			 * are necessary to build response data.
+			 * If this request is used for export purpose,
+			 * those extra calculations are not necessary.
+			 */
+			postProcessAssetQuery(queryResults, whereInfo.mixedFields)
+		}
 
 	    return queryResults
-
     }
 
 	/**

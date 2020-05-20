@@ -1,7 +1,6 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
@@ -18,6 +17,9 @@ import org.grails.web.json.JSONArray
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
+import net.transitionmanager.asset.AssetUtils
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.command.task.ListTaskCommand
 import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
@@ -33,8 +35,10 @@ import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.QzSignService
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
+import org.grails.web.json.JSONArray
 /**
  * Handles WS calls of the TaskService.
  *
@@ -44,14 +48,15 @@ import net.transitionmanager.task.TaskService
 @Slf4j
 class WsTaskController implements ControllerMethods, PaginationMethods {
 
-	CommentService commentService
-	QzSignService qzSignService
-	TaskService taskService
-	TaskActionService taskActionService
-	ApiActionService apiActionService
-	CredentialService credentialService
-    UserPreferenceService userPreferenceService
-    AssetEntityService assetEntityService
+	CommentService        commentService
+	QzSignService         qzSignService
+	TaskService           taskService
+	TaskActionService     taskActionService
+	ApiActionService      apiActionService
+	CredentialService     credentialService
+	UserPreferenceService userPreferenceService
+	AssetEntityService    assetEntityService
+	AssetOptionsService   assetOptionsService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -448,7 +453,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
      */
     @HasPermission(Permission.CommentView)
     def assetCommentCategories() {
-        renderSuccessJson(AssetCommentCategory.list)
+        renderSuccessJson(assetOptionsService.taskCategories())
     }
 
 	/**

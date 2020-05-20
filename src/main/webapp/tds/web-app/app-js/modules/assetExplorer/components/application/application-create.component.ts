@@ -65,6 +65,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 
 		ngAfterViewInit() {
 			this.onFocusOutOfCancel();
+			this.setupListListeners();
 		}
 
 		/**

@@ -58,6 +58,7 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 		this.buttons.push({
 			name: 'saveAsset',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.isEditAvailable(),
 			type: DialogButtonType.ACTION,
 		});
@@ -65,6 +66,7 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 		this.buttons.push({
 			name: 'cancelEdit',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.onDismiss.bind(this)

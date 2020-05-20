@@ -1,5 +1,7 @@
 // Angular
-import {Component, Inject, Input, OnInit} from '@angular/core';
+import {Component, Inject, Input, OnInit, ViewChild} from '@angular/core';
+// Component
+import {AssetDependencyEditComponent} from './edit/asset-dependency-edit.component';
 // Model
 import {DependencyChange, DependencyType} from './model/asset-dependency.model';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -12,7 +14,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 import {Observable} from 'rxjs';
 import * as R from 'ramda';
-import {ActionType} from '../../../../shared/model/data-list-grid.model';
+import set = Reflect.set;
 
 @Component({
 	selector: 'asset-dependency',
@@ -67,6 +69,12 @@ import {ActionType} from '../../../../shared/model/data-list-grid.model';
 export class AssetDependencyComponent extends Dialog implements OnInit {
 	@Input() data: any;
 
+	@ViewChild('assetDependencyEdit', {
+		read: AssetDependencyEditComponent,
+		static: false,
+	})
+	assetDependencyEdit: AssetDependencyEditComponent;
+
 	protected frequencyList: string[];
 	protected typeList: string[];
 	protected statusList: string[];
@@ -94,6 +102,7 @@ export class AssetDependencyComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.isEditAvailable(),
 			active: () => this.isEditing,
 			type: DialogButtonType.ACTION,
@@ -103,6 +112,7 @@ export class AssetDependencyComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.isEditing,
 			disabled: () => !this.editedDependencies.dependencies,
 			type: DialogButtonType.ACTION,
@@ -112,6 +122,7 @@ export class AssetDependencyComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.isDeleteAvailable() && this.dependencyA && !this.dependencyB,
 			type: DialogButtonType.ACTION,
 			action: this.onDeleteDependencyA.bind(this)
@@ -120,6 +131,7 @@ export class AssetDependencyComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => !this.isEditing,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -128,6 +140,7 @@ export class AssetDependencyComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.isEditing,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEdit.bind(this)
@@ -377,6 +390,11 @@ export class AssetDependencyComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getModalTitle(): string {
+		if (this.isEditing) {
+			setTimeout(() => {
+				this.assetDependencyEdit.frequencyListA.focus();
+			}, 1000);
+		}
 		return (!this.isEditing
 				? this.translatePipe.transform('ASSET_EXPLORER.DEPENDENCY_DETAIL')
 				: this.translatePipe.transform('ASSET_EXPLORER.DEPENDENCY_EDIT')

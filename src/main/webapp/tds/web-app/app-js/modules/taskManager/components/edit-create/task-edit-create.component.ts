@@ -15,9 +15,6 @@ import {DialogService} from 'tds-component-library';
 	styles: []
 })
 export class TaskEditCreateComponent extends TaskEditCreateCommonComponent implements OnInit {
-
-	@ViewChild('dueDatePicker', {static: false}) dueDatePicker;
-
 	constructor(
 		componentFactoryResolver: ComponentFactoryResolver,
 		taskManagerService: TaskService,
@@ -29,14 +26,4 @@ export class TaskEditCreateComponent extends TaskEditCreateCommonComponent imple
 		super(componentFactoryResolver, taskManagerService, dialogService, userPreferenceService, permissionService, translatePipe);
 
 	}
-
-	/**
-	 * Forces kendo datepicker to open it's calendar.
-	 * @param event: any
-	 */
-	public onOpenDueDatePicker(event): void {
-		event.preventDefault();
-		this.dueDatePicker.toggle();
-	}
-
 }

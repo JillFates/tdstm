@@ -170,6 +170,7 @@ export class AssetCommentListComponent implements OnInit {
 				},
 				lastUpdated: comment.lastUpdated,
 				dateCreated: comment.dateCreated,
+				createdBy: comment.createdBy && comment.createdBy.name
 			};
 
 			await this.dialogService.open({

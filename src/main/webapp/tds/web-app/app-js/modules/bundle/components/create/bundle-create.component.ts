@@ -33,6 +33,7 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => true,
 			disabled: () => !this.validateRequiredFields(this.bundleModel),
 			type: DialogButtonType.ACTION,
@@ -42,6 +43,7 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -52,8 +54,8 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 		this.defaultModel = {
 			name: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
+			fromId: null,
+			toId: null,
 			startTime: '',
 			completionTime: '',
 			operationalOrder: 1,
@@ -122,7 +124,7 @@ export class BundleCreateComponent extends Dialog implements OnInit {
 					}
 				});
 		} else {
-			super.onCancelClose();
+			this.onCancelClose();
 		}
 	}
 

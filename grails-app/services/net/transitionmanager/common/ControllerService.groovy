@@ -1,24 +1,26 @@
 package net.transitionmanager.common
 
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.validation.ValidationException
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.exception.UnauthorizedException
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
 import net.transitionmanager.security.AuditService
-import net.transitionmanager.person.PersonService
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.person.UserPreferenceService
 import org.springframework.web.context.request.RequestContextHolder
 
 /**
@@ -243,6 +245,8 @@ class ControllerService implements ServiceMethods {
 			controller.flash.message = null
 		} catch (InvalidRequestException | EmptyResultException | UnauthorizedException | DomainUpdateException e) {
 			errorMsg = e.message
+		} catch (ValidationException v) {
+			errorMsg = GormUtil.validateErrorsI18n(v)
 		} catch (e) {
 			log.error ExceptionUtil.stackTraceToString('saveUpdateAssetHandler() failed', e, 80)
 			errorMsg = "An error occurred during the update"

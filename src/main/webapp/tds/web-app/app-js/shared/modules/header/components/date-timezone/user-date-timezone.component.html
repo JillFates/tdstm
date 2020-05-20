@@ -1,28 +1,35 @@
 <div class="datetime-modal-component">
 	<form id="userTimezoneForm">
 		<div class="filters">
-			<label>Time Zone:</label>
-			<kendo-dropdownlist
-				id="dateTimezone"
-				name="timezone"
-				[(ngModel)]="selectedTimezone"
-				[data]="timezonesList"
-				[textField]="'label'"
-				[valueField]="'code'"
-				(valueChange)="onTimezoneSelected($event)"
-			>
-			</kendo-dropdownlist>
-			<label *ngIf="!shouldReturnData">
-				{{ 'GLOBAL.DATE_FORMAT' | translate }}:
-			</label>
-			<kendo-dropdownlist
-				*ngIf="!shouldReturnData"
-				id="dateTimeFormat"
-				name="dateTimeFormat"
-				[(ngModel)]="selectedTimeFormat"
-				[data]="timeFormatList"
-			>
-			</kendo-dropdownlist>
+			<div class="clr-row">
+				<div class="clr-col-6 clr-displ">
+					<label>Time Zone:</label>
+					<kendo-combobox
+							name="timezone"
+							[data]="timezonesList"
+							[(ngModel)]="selectedTimezone"
+							[valueField]="'code'"
+							[textField]="'label'"
+							(valueChange)="onTimezoneSelected($event)"
+							[virtual]="virtualizationSettings"
+							[style.display]="'inline-block'"
+							#timezoneCombobox>
+					</kendo-combobox>
+				</div>
+				<div class="clr-col-6">
+					<label *ngIf="!shouldReturnData">
+						{{ 'GLOBAL.DATE_FORMAT' | translate }}:
+					</label>
+					<kendo-dropdownlist
+							*ngIf="!shouldReturnData"
+							id="dateTimeFormat"
+							name="dateTimeFormat"
+							[(ngModel)]="selectedTimeFormat"
+							[data]="timeFormatList"
+					>
+					</kendo-dropdownlist>
+				</div>
+			</div>
 		</div>
 
 		<map name="timezoneMap" id="timezoneMap">
