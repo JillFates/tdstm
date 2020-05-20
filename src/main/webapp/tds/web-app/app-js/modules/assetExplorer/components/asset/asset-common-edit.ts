@@ -28,7 +28,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {equals as ramdaEquals, clone as ramdaClone, pathOr} from 'ramda';
 import {ComboBoxComponent, DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DatePickerComponent} from '@progress/kendo-angular-dateinputs';
-import {Observable, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {TDSDateControlComponent} from '../../../../shared/components/custom-control/date-time/date-control.component';
 import {OpenableClosableControlHelper} from '../../../../shared/utils/openable-closable-control.helper';
@@ -377,12 +377,5 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		lastFocusable.addEventListener('focusout', () => {
 			firstFocusable.focus();
 		});
-	}
-
-	/**
-	 * Return the project id from the current asset model
-	 */
-	private getProjectIdFromModel(): string {
-		return this.model.asset && this.model.asset.project && this.model.asset.project.id || null;
 	}
 }

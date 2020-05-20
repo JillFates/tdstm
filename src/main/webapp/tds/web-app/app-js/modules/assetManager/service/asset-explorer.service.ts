@@ -22,9 +22,7 @@ export class AssetExplorerService {
 	private assetEntitySearch = 'assetEntity';
 	private readonly ALL_ASSETS_SYSTEM_VIEW_ID = 1;
 
-	constructor(
-		private http: HttpClient,
-		private permissionService: PermissionService) {}
+	constructor(private http: HttpClient, private permissionService: PermissionService) {}
 
 	getReports(): Observable<ViewGroupModel[]> {
 		return this.http.get(`${this.assetExplorerUrl}/views`)
