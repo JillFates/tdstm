@@ -46,11 +46,11 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 				[outline]="outline"
 				[flat]="flat"
 				[icon]="icon || button.icon || ''"
+				[iconClass]="iconClass || button.iconClass"
 				[title]="tooltip || button.tooltip || ''"
 				[disabled]="disabled || !hasAllPermissions"
 				[tabindex]="tabindex"
-				class="action-button"
-				[iconClass]="iconClass">
+				class="action-button">
 			{{ displayLabel ? titleButton : '' }}
 		</tds-button>
 	`,

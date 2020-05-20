@@ -3,4 +3,5 @@ export interface TDSButton {
 	title: string;
 	tooltip?: string;
 	hasAllPermissions?: boolean;
+	iconClass?: string;
 }
