@@ -1,17 +1,17 @@
 package net.transitionmanager.task
 
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import net.transitionmanager.command.task.ViewUnpublishedCommand
+
 import net.transitionmanager.command.task.TaskSearchCommand
+import net.transitionmanager.command.task.ViewUnpublishedCommand
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.taskgraph.TaskHighlightOptions
 import net.transitionmanager.task.taskgraph.TaskSearch
 import net.transitionmanager.task.timeline.CPAResults
+import net.transitionmanager.task.timeline.TaskVertex
 import net.transitionmanager.task.timeline.TimelineService
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -68,18 +68,14 @@ class TaskGraphService implements ServiceMethods {
 
     List<Long> filterForTaskIds(Project project, TaskSearchCommand taskSearchCommand) {
 
-        TaskSearch taskSearch = new TaskSearch(project, taskSearchCommand)
-
-        // List of task ids from the CPA
-        List<Long> cpaTasks
-        // List of task ids fetched with the query.
-        List<Long> queryTasks
-        // This is the list of ids that will be returned.
-        List<Long> taskIds
-
         // boolean that tells whether or not unpublished tasks need to be included.
         boolean viewUnpublished = taskSearchCommand.viewUnpublishedTasks(securityService.hasPermission(Permission.TaskViewUnpublished))
+
         MoveEvent moveEvent
+        // List of task ids from the CPA
+        List<Long> cpaTasks
+        TaskSearch taskSearch = new TaskSearch(project, taskSearchCommand)
+
         // If a MoveEvent id is provided, fetch the domain object from the database (fail if the id is invalid or doesn't belong to the project).
         if (taskSearchCommand.eventId) {
             moveEvent = get(MoveEvent, taskSearchCommand.eventId, project)
@@ -98,19 +94,11 @@ class TaskGraphService implements ServiceMethods {
 
         Map queryInfo = taskSearch.buildSearchQuery(moveEvent, viewUnpublished)
 
-        queryTasks = namedParameterJdbcTemplate.queryForList(queryInfo.query, queryInfo.params)*.taskId
-
-        // If there were tasks retrieved by CPA, then, do the intersect with the queryTasks
+        List<Long> taskIds = namedParameterJdbcTemplate.queryForList(queryInfo.query, queryInfo.params)*.taskId
         if (cpaTasks) {
-            taskIds = cpaTasks.intersect(queryTasks)
+            return taskIds.intersect(cpaTasks)
         } else {
-            /* If needed there was no need for CPA (the cpaTasks list is empty, otherwise it short-circuited before),
-            the results are the tasks fetched from the database. */
-            taskIds = queryTasks
+            return taskIds
         }
-
-        return taskIds
     }
-
-
 }
