@@ -1377,6 +1377,7 @@ class AssetEntityService implements ServiceMethods {
 		Map model = [
 			assetId: 			asset.id,
 			project: 			project,
+			defaultClientId:	project.clientId,
 
 			// Used for change detection/optimistic locking
 			version: 			asset.version,
@@ -3088,6 +3089,8 @@ class AssetEntityService implements ServiceMethods {
 
 		if (forCreate) {
 			commonModel = getCommonModelForCreate(domain, project, assetEntity)
+			assetEntity.moveBundle = project.defaultBundle
+			assetEntity.owner = project.client
 		} else {
 			commonModel = getCommonModelForShows(domain, project, params, assetEntity, includeDependencies)
 		}

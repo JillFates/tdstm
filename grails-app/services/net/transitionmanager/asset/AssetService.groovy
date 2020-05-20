@@ -89,6 +89,7 @@ class AssetService implements ServiceMethods{
 	@Transactional(readOnly = true)
     Map commonModelOptions(Project project) {
         [
+			defaultClientId: project.clientId,
             environmentOptions : getAssetEnvironmentOptions(),
             planStatusOptions : getAssetPlanStatusOptions(),
             validationOptions : ValidationType.list,
