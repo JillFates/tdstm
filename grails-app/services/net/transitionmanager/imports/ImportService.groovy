@@ -70,6 +70,7 @@ import static com.tdsops.tm.enums.domain.AssetClass.STORAGE
 import static com.tdsops.tm.enums.domain.AssetClass.domainClassFor
 import static com.tdsops.tm.enums.domain.AssetClass.domainNameFor
 
+@Transactional
 class ImportService implements ServiceMethods {
 
 	// The spreadsheet columns that are Date format

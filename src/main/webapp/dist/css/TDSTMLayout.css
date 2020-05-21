@@ -2900,6 +2900,9 @@ table.text-center th {
 .modal-footer {
   border-top-color: #f4f4f4;
 }
+#progressBar .modal-footer {
+  padding: 15px !important;
+}
 .modal-primary .modal-header,
 .modal-primary .modal-footer {
   border-color: #307095;
