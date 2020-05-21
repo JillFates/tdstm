@@ -3088,6 +3088,8 @@ class AssetEntityService implements ServiceMethods {
 
 		if (forCreate) {
 			commonModel = getCommonModelForCreate(domain, project, assetEntity)
+			assetEntity.moveBundle = project.defaultBundle
+			assetEntity.owner = project.client
 		} else {
 			commonModel = getCommonModelForShows(domain, project, params, assetEntity, includeDependencies)
 		}

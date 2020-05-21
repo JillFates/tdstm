@@ -28,7 +28,6 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {equals as ramdaEquals, clone as ramdaClone, pathOr} from 'ramda';
 import {ComboBoxComponent, DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {DatePickerComponent} from '@progress/kendo-angular-dateinputs';
-
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {TDSDateControlComponent} from '../../../../shared/components/custom-control/date-time/date-control.component';
