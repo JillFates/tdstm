@@ -76,127 +76,182 @@ class TaskSearch {
      */
     Map buildSearchQuery(MoveEvent moveEvent, boolean viewUnpublished) {
 
-        String query = """
-            SELECT TASK.asset_comment_id as taskId
-            FROM asset_comment TASK
-                 LEFT OUTER JOIN api_action API_ACTION on TASK.api_action_id = API_ACTION.id
-                 LEFT OUTER JOIN asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id
-                 ${joinOwnerSmeId()}
-                 ${joinTags()}
-            WHERE TASK.comment_type = 'issue'
-              ${AND(moveEventOrProject(moveEvent, project))}
-              ${AND(taskText())}
-              ${AND(environment())}
-              ${AND(withAction())}
-              ${AND(withActionRequiringTMD())}
-              ${AND(taskAssignedToPerson())}
-              ${AND(ownerSmeId())}
-              ${AND(teamCode())}
-              ${AND(withBaseline())}
-              ${AND(withViewUnpublished(viewUnpublished))};
-        """.stripIndent().trim()
+        TaskSearchQueryBuilder queryBuilder = new TaskSearchQueryBuilder()
+
+        queryBuilder.with {
+            select 'TASK.asset_comment_id as taskId'
+            from 'asset_comment TASK'
+            leftOuterJoin 'api_action API_ACTION on TASK.api_action_id = API_ACTION.id'
+            leftOuterJoin 'asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id'
+            leftOuterJoin joinOwnerSmeId()
+            add 'INNER JOIN', joinTags(), 'TAG ON (TASK.asset_entity_id = TAG.asset_id)'
+            where "TASK.comment_type = 'issue'"
+            and moveEventOrProject(moveEvent, project)
+            and taskText()
+            and environment()
+            and withAction()
+            and withActionRequiringTMD()
+            and taskAssignedToPerson()
+            and ownerSmeId()
+            and teamCode()
+            and withBaseline()
+            and withViewUnpublished(viewUnpublished)
+        }
 
         return [
-                query : query,
+                query : queryBuilder.build(),
                 params: queryParams
         ]
     }
-
-
+    /**
+     * Determines if it is necessary to JOIN {@link net.transitionmanager.tag.Tag} domain
+     * for filtering results.
+     * @return
+     */
     String joinTags() {
-        String sentence = ''
         if (taskSearchCommand.tagIds) {
             queryParams['tagList'] = taskSearchCommand.tagIds
-            Closure<String> innerJoin = { String internalSentence ->
-                return "INNER JOIN ($internalSentence) TAG ON (TASK.asset_entity_id = TAG.asset_id)".toString()
-            }
-
             if (taskSearchCommand.tagMatch == 'ANY') {
-                sentence = innerJoin('SELECT DISTINCT(TAG_ASSET.asset_id) as asset_id FROM tag_asset TAG_ASSET WHERE TAG_ASSET.tag_id IN (:tagList)')
+                return '(SELECT DISTINCT(TAG_ASSET.asset_id) as asset_id FROM tag_asset TAG_ASSET WHERE TAG_ASSET.tag_id IN (:tagList))'
             } else {
                 queryParams['tagListSize'] = taskSearchCommand.tagIds.size()
-                sentence = innerJoin('SELECT TAG_ASSET.asset_id FROM tag_asset TAG_ASSET WHERE TAG_ASSET.tag_id IN (:tagList) GROUP BY TAG_ASSET.asset_id HAVING COUNT(*) = :tagListSize')
+                return '(SELECT TAG_ASSET.asset_id FROM tag_asset TAG_ASSET WHERE TAG_ASSET.tag_id IN (:tagList) GROUP BY TAG_ASSET.asset_id HAVING COUNT(*) = :tagListSize)'
             }
         }
-        return sentence
     }
 
+    /**
+     * Determines if it is necessary to JOIN {@link net.transitionmanager.Application} domain
+     * for filtering results.
+     * @return
+     */
     String joinOwnerSmeId() {
         String sentence = ''
         if (taskSearchCommand.ownerSmeId) {
-            sentence = 'LEFT OUTER JOIN application APPLICATION on ASSET_ENTITY.asset_entity_id = APPLICATION.app_id'
+            sentence = 'application APPLICATION on ASSET_ENTITY.asset_entity_id = APPLICATION.app_id'
         }
         return sentence
     }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#assignedTo} field.
+     * @return an HQL sentence or null
+     */
     String taskAssignedToPerson() {
-        if (taskSearchCommand.assignedPersonId) {
-            queryParams['assignedPersonId'] = taskSearchCommand.assignedPersonId
-            return 'AND TASK.assigned_to_id = :assignedPersonId'
+
+        switch (taskSearchCommand.assignedPersonId){
+            case null:
+                return null
+            case 0:
+                return 'TASK.assigned_to_id is null'
+            default:
+                queryParams['assignedPersonId'] = taskSearchCommand.assignedPersonId
+                return 'TASK.assigned_to_id = :assignedPersonId'
         }
     }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.asset.AssetEntity#environment} field.
+     * @return an HQL sentence or null
+     */
     String environment() {
         if (taskSearchCommand.environment) {
             queryParams['environment'] = taskSearchCommand.environment
-            return 'AND ASSET_ENTITY.environment = :environment'
+            return 'ASSET_ENTITY.environment = :environment'
         }
     }
 
-
+    /**
+     * Defines filtering by
+     * {@link net.transitionmanager.asset.AssetEntity#appOwner} field,
+     * or {@link net.transitionmanager.asset.Application#sme}
+     * or {@link net.transitionmanager.asset.Application#sme2}
+     * @return an HQL sentence or null
+     */
     String ownerSmeId() {
         if (taskSearchCommand.ownerSmeId) {
             queryParams['ownerSmeId'] = taskSearchCommand.ownerSmeId
-            return 'AND (ASSET_ENTITY.app_owner_id = :ownerSmeId OR APPLICATION.sme_id = :ownerSmeId OR APPLICATION.sme2_id = :ownerSmeId)'
+            return '(ASSET_ENTITY.app_owner_id = :ownerSmeId OR APPLICATION.sme_id = :ownerSmeId OR APPLICATION.sme2_id = :ownerSmeId)'
         }
     }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#role} field.
+     * @return an HQL sentence or null
+     */
     String teamCode() {
-        if (taskSearchCommand.teamCode) {
-            queryParams['teamCode'] = taskSearchCommand.teamCode
-            return 'AND TASK.role = :teamCode'
+
+        switch (taskSearchCommand.teamCode){
+            case null:
+                return null
+            case 'UNASSIGNED':
+                return 'TASK.role is NULL'
+            default:
+                queryParams['teamCode'] = taskSearchCommand.teamCode
+                return 'TASK.role = :teamCode'
         }
     }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#apiAction} field.
+     * @return an HQL sentence or null
+     */
     String withAction() {
         if (taskSearchCommand.withActions) {
-            return 'AND TASK.api_action_id IS NOT NULL'
+            return 'TASK.api_action_id IS NOT NULL'
         }
     }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.action.ApiAction#isRemote} field.
+     * @return an HQL sentence or null
+     */
     String withActionRequiringTMD() {
         if (taskSearchCommand.withTmdActions) {
-            return 'AND API_ACTION.is_remote = true'
+            return 'API_ACTION.is_remote = true'
         }
     }
 
+    /**
+     * Defines filtering by CPA Baseline using
+     * {@link net.transitionmanager.task.Task#isCriticalPath} field.
+     * @return an HQL sentence or null
+     */
     String withBaseline() {
         if (taskSearchCommand.criticalPathMode == 'Baseline') {
-            return 'AND TASK.is_critical_path = true'
+            return 'TASK.is_critical_path = true'
         }
     }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#isPublished} field.
+     * @return an HQL sentence or null
+     */
     String withViewUnpublished(boolean view) {
         if (view) {
-            return 'AND TASK.is_published = true'
+            return 'TASK.is_published = true'
         }
     }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#comment} field.
+     * @return an HQL sentence or null
+     */
     String taskText() {
         if (taskSearchCommand.taskText) {
             String comment = "%${taskSearchCommand.taskText}%"
             queryParams['taskText'] = comment
-            return 'AND TASK.comment LIKE :taskText'
+            return 'TASK.comment LIKE :taskText'
         }
     }
 
     String moveEventOrProject(MoveEvent moveEvent, Project project) {
         if (moveEvent) {
             queryParams['eventId'] = moveEvent.id
-            return 'AND TASK.move_event_id = :eventId'
+            return 'TASK.move_event_id = :eventId'
         } else {
             queryParams['projectId'] = project.id
-            return 'AND TASK.project_id = :projectId'
+            return 'TASK.project_id = :projectId'
         }
     }
 
