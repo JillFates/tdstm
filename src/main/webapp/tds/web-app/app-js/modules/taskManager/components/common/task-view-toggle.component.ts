@@ -1,7 +1,9 @@
-import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
-import {ActivatedRoute, Router} from '@angular/router';
-import {TaskManagerRoutingStates} from '../../task-manager-routing.states';
+import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { FA_ICONS } from '../../../../shared/constants/fontawesome-icons';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TaskManagerRoutingStates } from '../../task-manager-routing.states';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
 
 const routeNames = {
 	TASK_MANAGER: 'taskManager',
@@ -12,33 +14,36 @@ const routeNames = {
 @Component({
 	selector: 'tds-task-view-toggle',
 	template: `
-		<div kendoTooltip position="top" filter="span" tooltipClass="tvt-tooltip" class="text-center k-align-self-center">
-			<span
-			title="Task Manager"
-			id="task-manager"
-			class="task-view-toggle-btn btn"
-			(click)="taskManagerView()"
-			#taskManager>
+		<div kendoTooltip position="top"
+				 filter="span"
+				 tooltipClass="tvt-tooltip"
+				 class="text-center k-align-self-center">
+			<span *ngIf="canViewTaskList()"
+						title="Task Manager"
+						id="task-manager"
+						class="task-view-toggle-btn btn"
+						(click)="taskManagerView()"
+						#taskManager>
 				<div>
 					<fa-icon [icon]="icons.faListUl" size="lg"></fa-icon>
 				</div>
 			</span>
-			<span
-				title="Task Graph"
-				id="neighborhood"
-				class="task-view-toggle-btn btn"
-				(click)="neighborhoodView()"
-				#neighborhood>
+			<span *ngIf="canViewTaskGraph()"
+						title="Task Graph"
+						id="neighborhood"
+						class="task-view-toggle-btn btn"
+						(click)="neighborhoodView()"
+						#neighborhood>
 				<div>
 					<fa-icon [icon]="icons.faSitemap" size="lg" [rotate]="270"></fa-icon>
 				</div>
 			</span>
-			<span
-				title="Task Timeline"
-				id="task-timeline"
-				class="task-view-toggle-btn btn"
-				(click)="taskTimeLineView()"
-				#taskTimeline>
+			<span *ngIf="canViewTaskTimeline()"
+						title="Task Timeline"
+						id="task-timeline"
+						class="task-view-toggle-btn btn"
+						(click)="taskTimeLineView()"
+						#taskTimeline>
 				<div>
 					<fa-icon [icon]="icons.faStream" size="lg"></fa-icon>
 				</div>
@@ -47,9 +52,9 @@ const routeNames = {
 })
 export class TaskViewToggleComponent implements AfterViewInit {
 	icons = FA_ICONS;
-	@ViewChild('taskManager', {static: false}) taskManager: ElementRef;
-	@ViewChild('neighborhood', {static: false}) neighborhood: ElementRef;
-	@ViewChild('taskTimeline', {static: false}) taskTimeline: ElementRef;
+	@ViewChild('taskManager', { static: false }) taskManager: ElementRef;
+	@ViewChild('neighborhood', { static: false }) neighborhood: ElementRef;
+	@ViewChild('taskTimeline', { static: false }) taskTimeline: ElementRef;
 	disableNeighborhood: boolean;
 	disableTaskManager: boolean;
 	disableTaskTimeline: boolean;
@@ -57,8 +62,10 @@ export class TaskViewToggleComponent implements AfterViewInit {
 	constructor(
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
-		private renderer: Renderer2
-	) {	}
+		private renderer: Renderer2,
+		private permissionService: PermissionService
+	) {
+	}
 
 	ngAfterViewInit(): void {
 		this.subscribeToActivatedRoute();
@@ -100,31 +107,56 @@ export class TaskViewToggleComponent implements AfterViewInit {
 	 * open the task manager view on a new tab
 	 **/
 	taskManagerView(): void {
-		if (this.disableTaskManager) { return; }
+		if (this.disableTaskManager) {
+			return;
+		}
 		const url = 'taskManager/list';
 		window.open(url, '_blank');
-
 	}
 
 	/**
 	 * open the neighborhood view on a new tab
 	 **/
 	neighborhoodView(): void {
-		if (this.disableNeighborhood) { return; }
+		if (this.disableNeighborhood) {
+			return;
+		}
 		const url = 'taskManager/task-graph';
 		window.open(url, '_blank');
-
 	}
 
 	/**
 	 * open the task timeline view on a new tab
 	 **/
 	taskTimeLineView(): void {
-		if (this.disableTaskTimeline) { return; }
+		if (this.disableTaskTimeline) {
+			return;
+		}
 		// TODO remove currentUrl variable and 'task/' prefix after timeline is refactored to current angular version
 		let currentUrl = window.location.href;
 		currentUrl = currentUrl.substr(0, currentUrl.indexOf('module'));
-		let url = `${currentUrl}task/taskTimeline`;
+		let url = `${ currentUrl }task/taskTimeline`;
 		window.open(url, '_blank');
+	}
+
+	/**
+	 * Returns true if user can access Task Manager view, otherwise false.
+	 */
+	canViewTaskList(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskManagerView);
+	}
+
+	/**
+	 * Returns true if user can access Task Graph view, otherwise false.
+	 */
+	canViewTaskGraph(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskGraphView);
+	}
+
+	/**
+	 * Returns true if user can access Task Timeline view, otherwise false.
+	 */
+	canViewTaskTimeline(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskTimelineView);
 	}
 }
