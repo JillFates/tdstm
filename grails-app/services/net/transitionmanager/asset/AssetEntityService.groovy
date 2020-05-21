@@ -1377,7 +1377,6 @@ class AssetEntityService implements ServiceMethods {
 		Map model = [
 			assetId: 			asset.id,
 			project: 			project,
-			defaultClientId:	project.clientId,
 
 			// Used for change detection/optimistic locking
 			version: 			asset.version,
