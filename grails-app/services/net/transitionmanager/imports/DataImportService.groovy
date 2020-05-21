@@ -807,6 +807,27 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	}
 
 	/**
+	 * Used to update the ImportBatch status to COMPLETED if all rows are COMPLETED or IGNORED otherwise
+	 * set the status to PENDING.
+	 * @param batch - the batch that the ImportBatchRecord
+	 */
+	@Transactional
+	private void updateBatchStatus(Long batchId) {
+		Integer count = ImportBatchRecord.where {
+			importBatch.id == batchId
+			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
+		}.count()
+		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
+
+		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batchId, count, status.name()
+
+		ImportBatch.where {
+			id == batchId
+			status != status
+		}.updateAll([status: status])
+	}
+
+	/**
 	 * Used to review the batch to determine if it contains then necessary data for the type of operation
 	 * @param batch - the batch to be evaluated
 	 * @return A string containing an error if one was discovered

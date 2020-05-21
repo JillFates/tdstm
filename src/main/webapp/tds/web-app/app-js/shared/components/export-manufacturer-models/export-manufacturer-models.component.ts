@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, HostListener, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Dialog, DialogButtonType} from 'tds-component-library';
 import {ReplaySubject} from 'rxjs';
 import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
@@ -6,6 +6,9 @@ import {ManufacturerService} from '../../../modules/manufacturer/service/manufac
 import {ConnectorColumns, IConnector} from '../../../modules/manufacturer/model/connector.model';
 import {IManufacturerModel, ManufacturerModelColumns} from '../../../modules/manufacturer/model/manufacturer-model.model';
 import {ManufacturerColumns} from '../../../modules/manufacturer/model/manufacturer-export.model';
+import moment from 'moment';
+import {takeUntil} from 'rxjs/operators';
+import {IManufacturerModelsExportData} from '../../../modules/manufacturer/model/manufacturer-models-export-data.model';
 
 enum SHEET_NAMES {
 	MANUFACTURERS = 'Manufacturer',
@@ -74,9 +77,10 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 		tdsModelsOnly: 0
 	};
 	tdsModelsOnly = false;
-	exportFileName = 'export-data-file-name';
+	exportFileName: string;
 	dataToExport$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 	columns: any[] = [];
+	unsubscribeAll$: ReplaySubject<void> = new ReplaySubject<void>();
 
 	constructor(private manufacturerService: ManufacturerService) {
 		super();
@@ -100,6 +104,7 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 			type: DialogButtonType.CONTEXT,
 			action: this.export.bind(this)
 		});
+		this.exportFileName = this.data && this.data.exportFileName;
 		this.columns = this.data && this.data.modelsOnly ? [ManufacturerModelColumns] : [ManufacturerColumns, ManufacturerModelColumns, ConnectorColumns];
 	}
 
@@ -107,40 +112,65 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 		this.formData.tdsModelsOnly = checked ? 1 : 0;
 	}
 
+	/**
+	 * Export handler
+	 */
 	export(): void {
-		this.manufacturerService.getManufacturerModelExportData(this.tdsModelsOnly).subscribe(res => {
+		this.manufacturerService.getManufacturerModelExportData(this.tdsModelsOnly)
+			.pipe(takeUntil(this.unsubscribeAll$))
+			.subscribe(res => {
 			const data = res.body;
 			if (this.data && this.data.modelsOnly) {
-				const modelsToExport = this.mapModels(data && data.models);
-				this.dataToExport$.next([modelsToExport]);
-				setTimeout(() => {
-					const options = this.excelExportComponents.toArray().map(c => c.workbookOptions());
-					Promise.all(options).then(workBooks => {
-						workBooks[0].sheets[0].name = SHEET_NAMES.MODELS;
-						this.excelExportComponents.first.save(workBooks[0]);
-					})
-				}, 500);
+				this.exportModelsOnly(data);
 			} else {
-				const connectorsToExport = this.mapConnectors(data && data.connectors);
-				const modelsToExport = this.mapModels(data && data.models);
-				const manufacturersToExport = data.manufacturers;
-				this.dataToExport$.next([manufacturersToExport, modelsToExport, connectorsToExport]);
-				setTimeout(() => {
-					const options = this.excelExportComponents.toArray().map(c => c.workbookOptions());
-					Promise.all(options).then(workBooks => {
-						for (let i = 0; i < options.length - 1; i++) {
-							workBooks[0].sheets = workBooks[0].sheets.concat(workBooks[i + 1].sheets);
-						}
-						workBooks[0].sheets[0].name = SHEET_NAMES.MANUFACTURERS;
-						workBooks[0].sheets[1].name = SHEET_NAMES.MODELS;
-						workBooks[0].sheets[2].name = SHEET_NAMES.CONNECTORS;
-						this.excelExportComponents.first.save(workBooks[0]);
-					})
-				}, 500);
+				this.exportManufacturersAndModels(data);
 			}
 		});
 	}
 
+	/**
+	 * Export models only
+	 * @param data
+	 */
+	exportModelsOnly(data: IManufacturerModelsExportData): void {
+		const modelsToExport = this.mapModels(data && data.models);
+		this.dataToExport$.next([modelsToExport]);
+		setTimeout(() => {
+			const options = this.excelExportComponents.toArray().map(c => c.workbookOptions());
+			Promise.all(options).then(workBooks => {
+				workBooks[0].sheets[0].name = SHEET_NAMES.MODELS;
+				this.excelExportComponents.first.save(workBooks[0]);
+			}).finally(() => this.onDismiss())
+		}, 500);
+	}
+
+	/**
+	 * Export manufacturers and models
+	 * @param data
+	 */
+	exportManufacturersAndModels(data: IManufacturerModelsExportData): void {
+		const connectorsToExport = this.mapConnectors(data && data.connectors);
+		const modelsToExport = this.mapModels(data && data.models);
+		const manufacturersToExport = data.manufacturers;
+		this.dataToExport$.next([manufacturersToExport, modelsToExport, connectorsToExport]);
+		setTimeout(() => {
+			const options = this.excelExportComponents.toArray().map(c => c.workbookOptions());
+			Promise.all(options).then(workBooks => {
+				for (let i = 0; i < options.length - 1; i++) {
+					workBooks[0].sheets = workBooks[0].sheets.concat(workBooks[i + 1].sheets);
+				}
+				workBooks[0].sheets[0].name = SHEET_NAMES.MANUFACTURERS;
+				workBooks[0].sheets[1].name = SHEET_NAMES.MODELS;
+				workBooks[0].sheets[2].name = SHEET_NAMES.CONNECTORS;
+				this.excelExportComponents.first.save(workBooks[0]);
+			}).finally(() => this.onDismiss())
+		}, 500);
+	}
+
+	/**
+	 * map connectors array to match excel format
+	 * @param connectors
+	 */
 	mapConnectors(connectors: IConnector[]): any[] {
 		return connectors.map((c: IConnector) => {
 			const modelId = c.model && c.model.id;
@@ -154,6 +184,10 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 		});
 	}
 
+	/**
+	 * map models array to match excel format
+	 * @param models
+	 */
 	mapModels(models: IManufacturerModel[]): any[] {
 		return models.map((c: IManufacturerModel) => {
 			const manufacturerId = c.manufacturer && c.manufacturer.id;
@@ -172,5 +206,11 @@ export class ExportManufacturerModelsComponent  extends Dialog implements OnInit
 	 */
 	public onDismiss(): void {
 		super.onCancelClose();
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribeAll$.next();
+		this.unsubscribeAll$.complete();
 	}
 }

@@ -11,7 +11,8 @@ class AssetOptions {
 		DEPENDENCY_TYPE,
 		DEPENDENCY_STATUS,
 		ENVIRONMENT_OPTION,
-		ASSET_TYPE
+		ASSET_TYPE,
+		TASK_CATEGORY
 	}
 
 	AssetOptionsType type

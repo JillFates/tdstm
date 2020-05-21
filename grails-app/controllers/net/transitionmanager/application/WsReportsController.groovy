@@ -7,6 +7,8 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.command.reports.ApplicationConflictsCommand
@@ -30,13 +32,14 @@ import net.transitionmanager.task.AssetComment
 @Secured("isAuthenticated()")
 class WsReportsController implements ControllerMethods {
 
-    ReportsService reportsService
-    UserPreferenceService userPreferenceService
-    MoveBundleService moveBundleService
-    MoveEventService moveEventService
-    CustomDomainService customDomainService
-    ControllerService controllerService
-    PartyRelationshipService partyRelationshipService
+	ReportsService           reportsService
+	UserPreferenceService    userPreferenceService
+	MoveBundleService        moveBundleService
+	MoveEventService         moveEventService
+	CustomDomainService      customDomainService
+	ControllerService        controllerService
+	PartyRelationshipService partyRelationshipService
+	AssetOptionsService      assetOptionsService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the
@@ -141,7 +144,7 @@ class WsReportsController implements ControllerMethods {
         Project project = getProjectForWs()
         def smeList = reportsService.getSmeList(moveBundleId, true)
         List outageList = customDomainService.fieldSpecs(project, AssetClass.APPLICATION.toString(), CustomDomainService.ALL_FIELDS, ["field", "label"])
-        def categories = GormUtil.getConstrainedProperties(AssetComment).category.inList.collect { entry -> [
+        def categories = assetOptionsService.taskCategories().collect { entry -> [
                 id: entry,
                 text: entry
         ]}

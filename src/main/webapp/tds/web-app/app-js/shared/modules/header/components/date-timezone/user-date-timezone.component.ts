@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnDestroy, OnInit} from '@angular/core';
 // Services
 import {HeaderService} from '../../services/header.service';
 import {PreferenceService} from '../../../../services/preference.service';
@@ -14,8 +14,9 @@ import {TranslatePipe} from '../../../../pipes/translate.pipe';
 import {Store} from '@ngxs/store';
 // Other
 import {forkJoin} from 'rxjs/observable/forkJoin';
-import {Observable} from 'rxjs';
+import {Observable, ReplaySubject} from 'rxjs';
 import * as R from 'ramda';
+import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 // Work-around for deprecated jQuery functionality
@@ -33,7 +34,7 @@ jQuery.browser = {};
 	selector: 'date-timezone-modal',
 	templateUrl: 'user-date-timezone.component.html',
 })
-export class UserDateTimezoneComponent extends Dialog implements OnInit {
+export class UserDateTimezoneComponent extends Dialog implements OnInit, OnDestroy {
 	@Input() data: any;
 
 	public currentUserName;
@@ -46,7 +47,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 		DateUtils.PREFERENCE_MIDDLE_ENDIAN,
 		DateUtils.PREFERENCE_LITTLE_ENDIAN,
 	];
-	public selectedTimezone = {id: 411, code: 'GMT', label: 'GMT'};
+	public selectedTimezone: any;
 	public selectedTimeFormat;
 	// The timezone Pin is controlled by the Timezone picker, this helps to control it outside the jquery lib
 	public timezonePinShow = false;
@@ -55,6 +56,10 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 
 	public defaultTimeZone: string;
 	public shouldReturnData: boolean;
+	virtualizationSettings = {
+		itemHeight: 15
+	};
+	unsubscribeAll$: ReplaySubject<void> = new ReplaySubject<void>();
 
 	constructor(
 		private dialogService: DialogService,
@@ -76,7 +81,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 			name: 'save',
 			icon: 'floppy',
 			show: () => true,
-			disabled: () => !this.isDirty(),
+			disabled: () => !this.selectedTimezone  || !this.selectedTimeFormat,
 			type: DialogButtonType.ACTION,
 			action: this.onSave.bind(this)
 		});
@@ -105,6 +110,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 					'GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'
 				)
 			)
+				.pipe(takeUntil(this.unsubscribeAll$))
 				.subscribe((data: any) => {
 					if (data.confirm === DialogConfirmAction.CONFIRM) {
 						super.onCancelClose();
@@ -127,7 +133,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 			.find('area')
 			.each((m, areaElement) => {
 				// Find the timezone attribute from the map itself
-				if (areaElement.getAttribute('data-timezone') === timezone.code) {
+				if (areaElement.getAttribute('data-timezone') === (timezone && timezone.code)) {
 					// Emulate the click to get the PIN in place
 					this.timezonePinShow = true;
 					setTimeout(() => {
@@ -142,7 +148,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 */
 	public onSave(): void {
 		const params = {
-			timezone: this.selectedTimezone.code,
+			timezone: this.selectedTimezone && this.selectedTimezone.code,
 			datetimeFormat: this.selectedTimeFormat,
 		};
 		if (this.shouldReturnData) {
@@ -152,9 +158,11 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 				(result: any) => {
 					// Update the storage before reload the window
 					this.store.dispatch(new SetTimeZoneAndDateFormat({
-						timezone: params.timezone,
-						dateFormat: params.datetimeFormat
-					})).subscribe(() => {
+						timezone: params && params.timezone,
+						dateFormat: params && params.datetimeFormat
+					}))
+						.pipe(takeUntil(this.unsubscribeAll$))
+						.subscribe(() => {
 						this.onAcceptSuccess();
 						location.reload();
 					});
@@ -180,10 +188,10 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 				result[2][PREFERENCES_LIST.CURR_DT_FORMAT];
 			this.selectedTimezone = this.timezonesList.find(
 				timezone =>
-					timezone.code === result[2][PREFERENCES_LIST.CURR_TZ]
+					(timezone && timezone.code) === result[2][PREFERENCES_LIST.CURR_TZ]
 			);
 			let defaultTimeZone = this.timezonesList.find(
-				timezone => timezone.code === this.defaultTimeZone
+				timezone => (timezone && timezone.code) === this.defaultTimeZone
 			);
 			if (defaultTimeZone) {
 				this.selectedTimezone = defaultTimeZone;
@@ -232,7 +240,9 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 */
 	private retrieveMapAreas(): Observable<any> {
 		return new Observable((observer: any) => {
-			this.headerService.getMapAreas().subscribe(
+			this.headerService.getMapAreas()
+				.pipe(takeUntil(this.unsubscribeAll$))
+				.subscribe(
 				(result: any) => {
 					let mapAreas = [];
 					for (let key in result) {
@@ -257,10 +267,7 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 * Verify if the data has changed
 	 */
 	private isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify({
-			timezone: this.selectedTimezone,
-			datetimeFormat: this.selectedTimeFormat
-		});
+		return this.selectedTimezone || this.selectedTimeFormat;
 	}
 
 	/**
@@ -268,5 +275,11 @@ export class UserDateTimezoneComponent extends Dialog implements OnInit {
 	 */
 	public onDismiss(): void {
 		this.cancelCloseDialog();
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribeAll$.next();
+		this.unsubscribeAll$.complete();
 	}
 }

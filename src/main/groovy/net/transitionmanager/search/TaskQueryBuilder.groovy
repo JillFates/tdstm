@@ -382,6 +382,7 @@ class TaskQueryBuilder {
 
 			case "openIssue" :
 				whereClauses << "ac.category IN (:discoveryCategories)"
+				//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 				whereParams['discoveryCategories'] = AssetComment.discoveryCategories
 				break
 
@@ -389,6 +390,7 @@ class TaskQueryBuilder {
 				whereClauses << "ac.status = :filterStatusReady"
 				whereParams['filterStatusReady'] = AssetCommentStatus.READY
 				whereClauses << "ac.category in (:planningCategories)"
+				//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 				whereParams['planningCategories'] = AssetComment.planningCategories
 				break
 
@@ -396,6 +398,7 @@ class TaskQueryBuilder {
 				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
 				whereClauses << "ac.category in (:planningCategories)"
+				//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 				whereParams['planningCategories'] = AssetComment.planningCategories
 				break
 		}

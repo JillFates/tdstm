@@ -14,6 +14,7 @@ import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
@@ -69,20 +70,21 @@ class TaskController implements ControllerMethods {
 		'ERROR':      ['red',     'white']    // Use if the status doesn't match
 	]
 
-	AssetEntityService assetEntityService
-	AssetService assetService
-	ApiActionService apiActionService
-	CommentService commentService
-	ControllerService controllerService
-	CustomDomainService customDomainService
-	JdbcTemplate jdbcTemplate
+	AssetEntityService       assetEntityService
+	AssetService             assetService
+	ApiActionService         apiActionService
+	CommentService           commentService
+	ControllerService        controllerService
+	CustomDomainService      customDomainService
+	JdbcTemplate             jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	ReportsService reportsService
-	TaskService taskService
-	TaskActionService taskActionService
-	UserPreferenceService userPreferenceService
-	GraphvizService graphvizService
-	MessageSource messageSource
+	ReportsService           reportsService
+	TaskService              taskService
+	TaskActionService        taskActionService
+	UserPreferenceService    userPreferenceService
+	GraphvizService          graphvizService
+	MessageSource            messageSource
+	AssetOptionsService      assetOptionsService
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
@@ -236,6 +238,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')"))
 			}
 
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetCommentCategory.moveDayCategories)) {
 
@@ -292,6 +295,7 @@ class TaskController implements ControllerMethods {
 						"assignTask('$comment.id','$comment.assignedTo', '$comment.status', 'taskManager')") << "</span>"
 			}
 
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 
@@ -377,6 +381,7 @@ class TaskController implements ControllerMethods {
 				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
 			}
 
+			//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 			if (securityService.hasPermission(Permission.CommentView) && comment.status == READY &&
 			    !(comment.category in AssetComment.moveDayCategories)) {
 
@@ -1026,7 +1031,7 @@ digraph runbook {
 		if (! project) return
 		def apiActionList = apiActionService.list(project, true,[producesData:0] )
 
-		render(view: "_editTask", model: [apiActionList: apiActionList])
+		render(view: "_editTask", model: [apiActionList: apiActionList, categories: assetOptionsService.taskCategories()])
 	}
 
 	@HasPermission(Permission.TaskView)
@@ -1192,7 +1197,9 @@ digraph runbook {
 			moveBundleList: moveBundleList,
 			moveEventList: moveEventList,
 			moveEvent: moveEvent,
-			selectedTaskId: params.id]
+			selectedTaskId: params.id,
+			categories: assetOptionsService.taskCategories()
+		]
 
 		if (search && taskList) {
 			model.searchedAssetId = taskList*.id[0]
@@ -1321,7 +1328,9 @@ function goBack() { window.history.back() }
 		             statusWarn: taskService.canChangeStatus(assetComment) ? 0 : 1, assignmentPerm: assignmentPerm,
 		             categoryPerm: categoryPerm, successor: successor, projectStaff: projectStaff, canPrint: canPrint,
 		             dueDate: dueDate, assignToSelect: assignToSelect, assetEntity: assetComment.assetEntity,
-		             cartQty: cartQty, project: project, customs: customs]
+		             cartQty: cartQty, project: project, customs: customs,
+					 categories: assetOptionsService.taskCategories()
+		]
 		if (isCleaner) {
 			model.lblQty = userPreferenceService.getPreference(PREF.PRINT_LABEL_QUANTITY) ?: PREF.DEFAULT_VALUES[PREF.PRINT_LABEL_QUANTITY]
 			model.prefPrinter = userPreferenceService.getPreference(PREF.PRINTER_NAME)

@@ -13,6 +13,9 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 import { ActivatedRoute } from '@angular/router';
 import { AssetViewSaveOptions } from '../../models/asset-view-save-options.model';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { ProjectService } from '../../../project/service/project.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -127,14 +130,19 @@ export class AssetViewSaveComponent extends Dialog implements OnInit, AfterViewI
 		save: true,
 		saveAsOptions: [ E_SAVE_AS_OPTIONS.MY_VIEW ]
 	}
+	private isUserOnDefaultProject: boolean;
 
 	constructor(
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService,
 		private notifier: NotifierService,
-		private activatedRoute: ActivatedRoute) {
+		private activatedRoute: ActivatedRoute,
+		private promptService: UIPromptService,
+		private projectService: ProjectService,
+		private translatePipe: TranslatePipe) {
 		super();
+		this.projectService.isUserOnDefaultProject().subscribe(result => this.isUserOnDefaultProject = result);
 	}
 
 	ngOnInit(): void {
@@ -199,15 +207,54 @@ export class AssetViewSaveComponent extends Dialog implements OnInit, AfterViewI
 		super.onCancelClose();
 	}
 
-	public confirmCloseDialog() {
+	confirmCloseDialog() {
+		if (this.isOverrideAllUsersMode() && this.isUserOnDefaultProject) {
+			this.confirmSaveForGlobalSharedView().then(result => {
+				if (result) {
+					this.saveModel();
+				} else {
+					this.cancelCloseDialog();
+				}
+			})
+		} else {
+			this.saveModel();
+		}
+	}
+
+	/**
+	 * Saves the view.
+	 */
+	private saveModel(): void {
 		const tmpModel = this.extractModel(this.model);
 		this.assetExpService.saveReport(tmpModel)
-			.subscribe(result => result && super.onAcceptSuccess(result),
-				error => super.onCancelClose(error));
+			.subscribe(result => {
+				if (result && result.id) {
+					this.onAcceptSuccess(result);
+				}
+			}, error => super.onCancelClose());
+	}
+
+	/**
+	 * Prompts for a confirmation on changing a global shared view.
+	 */
+	private confirmSaveForGlobalSharedView(): Promise<boolean> {
+		const message = 'Adding or Changing this Global view will affect all existing and future projects. Click Confirm to update view, otherwise click Cancel';
+		return this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
+			message,
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'));
 	}
 
 	isSaveInMyViewMode(): boolean {
 		return this.model.saveAsOption === this.saveAsOptions.MY_VIEW.value;
+	}
+
+	isOverrideForMeMode(): boolean {
+		return this.model.saveAsOption === this.saveAsOptions.OVERRIDE_FOR_ME.value;
+	}
+
+	isOverrideAllUsersMode(): boolean {
+		return this.model.saveAsOption === this.saveAsOptions.OVERRIDE_FOR_ALL.value;
 	}
 
 	public isValid(): boolean {

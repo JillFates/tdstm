@@ -131,6 +131,7 @@ class WsUserController implements ControllerMethods {
 				projects: projects*.toMap(),
 				projectInstance: project.toMap(),
 				projectLogoId: projectLogo?.id,
+				//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 				movedayCategories: AssetComment.moveDayCategories
 		)
 	}

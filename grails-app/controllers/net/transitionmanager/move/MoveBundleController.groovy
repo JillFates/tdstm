@@ -399,6 +399,7 @@ class MoveBundleController implements ControllerMethods {
 		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status not in (:status) and a.commentType =:type AND a.isPublished = true"
 		def issueArgs = [project:project, status: [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED], type:AssetCommentType.TASK.toString()]
 
+		//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 		def openIssue =  AssetComment.findAll(issueQuery,issueArgs + [category : AssetComment.discoveryCategories]).size()
 		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category : AssetComment.discoveryCategories, dueDate: todayClearedTime]).size()
 		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \

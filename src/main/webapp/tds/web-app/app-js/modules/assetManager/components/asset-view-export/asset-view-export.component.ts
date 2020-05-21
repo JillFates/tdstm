@@ -20,6 +20,16 @@ import * as R from 'ramda';
 					<label for="fileName" class="control-label">File Name </label>
 					<input type="text" class="form-control" id="fileName" [(ngModel)]="fileName" name="fileName" required [ngClass]="{'has-error': !exportForm.form.valid}"/>
 				</div>
+                <div class="form-group">
+                    <label for="exportIdCheckbox" class="aligned-label pointer">
+                        <input type="checkbox"
+                               class="aligned-label pointer"
+                               id="exportIdCheckbox"
+                               name="exportIdCheckbox"
+                               [(ngModel)]="isIdFieldExported">
+                        Include ID column
+                    </label>
+                </div>
 			</div>
 		</form>
         <kendo-excelexport [data]="dataToExport" fileName="{{exportFileName + '.xlsx'}}" #excelexport>
@@ -43,6 +53,16 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 	public dataToExport: any[] = [];
 	private allProperties = false;
 	private fieldImportance = new FieldImportance();
+	public isIdFieldExported: boolean;
+	private readonly ID_FIELD_OBJECT = {
+		domain: 'common',
+		edit: false,
+		filter: '',
+		label: 'Id',
+		locked: false,
+		property: 'id',
+		width: 210
+	};
 	@ViewChild('excelexport', {static: false}) public excelexport: ExcelExportComponent;
 
 	public assetExportModel: AssetExportModel;
@@ -51,6 +71,7 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 		private assetExpService: AssetExplorerService
 	) {
 		super();
+		this.isIdFieldExported = true;  // by default mark the id as exportable
 	}
 
 	ngOnInit(): void {
@@ -73,8 +94,8 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 			action: this.getExportData.bind(this)
 		});
 
+		/*
 		let configuredColumns = {...this.assetExportModel.assetQueryParams.filters.columns};
-
 		this.columns = Object.keys(configuredColumns).map((key) => {
 			let definition = {
 				name: this.getPropertyColumnField(configuredColumns[key]['domain'], '_', configuredColumns[key]['property']),
@@ -88,8 +109,16 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 
 			return definition;
 		});
-
 		this.getFileName();
+		 */
+	}
+
+	/**
+	 * Determines if the column domain and property match the id column definition
+	 * @param column
+	 */
+	isIdColumn(column: any): boolean {
+		return column.domain ===  this.ID_FIELD_OBJECT.domain && column.property === this.ID_FIELD_OBJECT.property;
 	}
 
 	/**
@@ -107,6 +136,8 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 	 * Transform the Data information
 	 */
 	public getExportData(): void {
+		this.setColumns();
+
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
@@ -175,5 +206,49 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 	 */
 	public onDismiss(): void {
 		this.cancelCloseDialog();
+	}
+	/**
+	 * Get the configured columns
+	 * if user choose export the id, add that column if not present
+	 * otherwise remove it even is present in the columns view definition
+	 */
+	private getConfiguredColumns(): any {
+		let configuredColumns = [...this.assetExportModel.assetQueryParams.filters.columns];
+
+		// user wants to export the id
+		if (this.isIdFieldExported) {
+			const hasIdColumn = configuredColumns.find((column: any) => this.isIdColumn(column));
+			// if doesn't have the column, add it
+			if (!hasIdColumn) {
+				// check if the configuration is using locked columns
+				// if so, mark the id column as locked
+				const hasLockedColumns = configuredColumns.find((column: any) => column.locked);
+				this.ID_FIELD_OBJECT.locked = Boolean(hasLockedColumns);
+				configuredColumns.unshift(this.ID_FIELD_OBJECT);
+			}
+		} else {
+			// user doesn't want to export id column, so remove it from the results
+			configuredColumns = configuredColumns.filter((column: any) => !this.isIdColumn(column))
+		}
+
+		return configuredColumns;
+	}
+
+	/**
+	 * Set the columns to be exported based on the configured columns
+	 */
+	setColumns(): void {
+		this.columns = this.getConfiguredColumns()
+			.map((column: any) => {
+				return {
+					name: this.getPropertyColumnField(column['domain'], '_', column['property']),
+					title: column['label'],
+					width: column['width'],
+					locked: column['locked'],
+					cell: {
+						background: this.getImportanceColor(column)
+					}
+				};
+			});
 	}
 }

@@ -91,6 +91,7 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.hasEditTaskPermission,
 			type: DialogButtonType.ACTION,
 			action: this.editTaskDetail.bind(this)
@@ -99,6 +100,7 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.hasDeleteTaskPermission,
 			type: DialogButtonType.ACTION,
 			action: this.deleteTask.bind(this)
@@ -107,6 +109,7 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)

@@ -10,7 +10,6 @@ import {PermissionService} from '../../../shared/services/permission.service';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {DateUtils} from '../../../shared/utils/date.utils';
-import {ProjectService} from '../../project/service/project.service';
 
 @Injectable()
 export class AssetExplorerService {
@@ -23,10 +22,7 @@ export class AssetExplorerService {
 	private assetEntitySearch = 'assetEntity';
 	private readonly ALL_ASSETS_SYSTEM_VIEW_ID = 1;
 
-	constructor(
-		private http: HttpClient,
-		private permissionService: PermissionService,
-		private projectService: ProjectService) {}
+	constructor(private http: HttpClient, private permissionService: PermissionService) {}
 
 	getReports(): Observable<ViewGroupModel[]> {
 		return this.http.get(`${this.assetExplorerUrl}/views`)
@@ -185,6 +181,7 @@ export class AssetExplorerService {
 
 	/**
 	 * Check if model is All Assets based on the ID also, since now we support Overwritting..
+	 * @deprecated Please remove if no longer used.
 	 * @param model: ViewModel
 	 */
 	isAllAssets(model: ViewModel): boolean {
@@ -192,10 +189,18 @@ export class AssetExplorerService {
 		return model.name === this.ALL_ASSETS && model.id === this.ALL_ASSETS_SYSTEM_VIEW_ID;
 	}
 
+	/**
+	 * @deprecated Please remove if no longer used
+	 * @param model
+	 */
 	isSaveAvailable(model: ViewModel): boolean {
 		return model && !this.isAllAssets(model) && this.hasSavePermission(model);
 	}
 
+	/**
+	 * @deprecated Please remove if no longer used.
+	 * @param model
+	 */
 	hasSavePermission(model): boolean {
 		const hasPermission = this.permissionService.hasPermission.bind(this.permissionService);
 		const {AssetExplorerSystemEdit, AssetExplorerEdit, AssetExplorerSystemCreate, AssetExplorerCreate } = Permission;
@@ -205,7 +210,7 @@ export class AssetExplorerService {
 		}
 
 		if (model.id) {
-			return  model.isOwner && hasPermission(AssetExplorerEdit);
+			return  hasPermission(AssetExplorerEdit);
 		}
 
 		if (model.isSystem) {
@@ -453,17 +458,5 @@ export class AssetExplorerService {
 		return this.http.get(`${this.assetExplorerUrl}/saveOptions`)
 			.map((response: any) => response.saveOptions)
 			.catch((error: any) => error);
-	}
-
-	/**
-	 * Get the info for an specific project
-	 * @param projectId
-	 */
-	getProjectInfo(projectId: string): Observable<any> {
-		if (projectId) {
-			return this.projectService.getModelForProjectViewEdit(projectId);
-		} else {
-			return Observable.of(null);
-		}
 	}
 }

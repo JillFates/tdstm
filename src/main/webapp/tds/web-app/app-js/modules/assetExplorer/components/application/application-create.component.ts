@@ -65,13 +65,13 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 
 		ngAfterViewInit() {
 			this.onFocusOutOfCancel();
+			this.setupListListeners();
 		}
 
 		/**
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.setDefaultBundleAndCompany();
 			this.model.asset.retireDate =   '';
 			this.model.asset.maintExpDate =  '';
 
@@ -255,7 +255,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
-			personModel.company = this.model.asset.client;
+			personModel.company = this.model.asset.owner;
 
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,

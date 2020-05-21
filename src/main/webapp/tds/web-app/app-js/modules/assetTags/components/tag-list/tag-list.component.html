@@ -191,13 +191,12 @@
 							<input
 								clrInput
 								[(ngModel)]="dataItem.name"
-								autofocus
 								[ngClass]="{ 'ng-invalid': duplicateName }"
 								required
-								#input
+								#tagNameInput
 								(input)="
 									validateUniqueName(dataItem);
-									input.value = $event.target.value
+									tagNameInput.value = $event.target.value
 								"
 								type="text"
 								name="name"

@@ -271,6 +271,7 @@ export class TaskCommentComponent implements OnInit {
 			},
 			lastUpdated: comment.commentInstance.lastUpdated,
 			dateCreated: comment.commentInstance.dateCreated,
+			createdBy: comment.createdBy || ''
 		};
 
 		this.dialogService.open({
