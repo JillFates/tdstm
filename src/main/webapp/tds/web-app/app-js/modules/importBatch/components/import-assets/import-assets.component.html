@@ -10,7 +10,7 @@
                         <!-- Fetch(Dropdown action) Row -->
                         <div class="form-group row aligned-row" style="margin-bottom: 5px;">
                             <label class="col-sm-3 control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_DATA_ACTION' | translate}}</label>
-                            <div class="col-sm-{{uiConfig.inputColSize}}">
+                            <div class="col-sm-3">
                                 <select clrSelect [(ngModel)]="selectedActionOption"
                                         (ngModelChange)="onActionScriptChange($event)"
                                         name="fetch"
@@ -22,13 +22,15 @@
                                             [ngValue]="option">{{option.name}}</option>
                                 </select>
                             </div>
-                            <tds-button class="col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
-                                <i aria-hidden="true" class="fa"
-                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': fetchInProcess,
+                            <div class="col-sm-2">
+                                <tds-button class="pull-right" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
+                                    <i aria-hidden="true" class="fa"
+                                       [ngClass]="{'fa-fw fa-spinner fast-right-spinner': fetchInProcess,
                                                'fa-check green': fetchResult?.status === 'success' && fetchInputUsed === 'action',
                                                'fa-thumbs-down red': fetchResult?.status === 'error' && fetchInputUsed === 'action'}"></i>
-                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
-                            </tds-button>
+                                    <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
+                                </tds-button>
+                            </div>
 <!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"-->
 <!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
 <!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
@@ -101,7 +103,7 @@
                            <label class="col-sm-3 control-label" for="transform">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_WITH_DATA_SCRIPT' | translate}}
                            </label>
-                           <div class="col-sm-{{uiConfig.inputColSize}}">
+                           <div class="col-sm-3">
                                <select clrSelect [ngModel]="selectedScriptOption"
                                        (ngModelChange)="onChangeSelectedScript($event)"
                                        name="transform"
@@ -111,27 +113,30 @@
                                            [ngValue]="option">{{option.name | translate}}</option>
                                </select>
                             </div>
-                            <tds-button *ngIf="uiConfig.showManualProcessElements"
-                                    [disabled]="disableTransformButton() || transformInProcess"
-                                    (click)="onTransform()"
-                                    class="col-sm-{{uiConfig.buttonColSize}}">
-                                <i aria-hidden="true" class="fa"
-                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
+                            <div class="col-sm-2">
+                                <tds-button *ngIf="uiConfig.showManualProcessElements"
+                                            [disabled]="disableTransformButton() || transformInProcess"
+                                            class="pull-right"
+                                            (click)="onTransform()">
+                                    <i aria-hidden="true" class="fa"
+                                       [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
                                                'fa-check green': transformResult?.status === 'success',
                                                'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
-                                <span>{{uiConfig.transformBtnLabel | translate}}</span>
-                            </tds-button>
-
-                            <tds-button *ngIf="uiConfig.showAutoProcessElements"
-                                    [disabled]="disableTransformButton() || transformInProcess"
-                                    (click)="onImport()"
-                                    class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
-                                <i aria-hidden="true" class="fa"
-                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
+                                    <span>{{uiConfig.transformBtnLabel | translate}}</span>
+                                </tds-button>
+                            </div>
+                            <div class="col-sm-2">
+                                <tds-button *ngIf="uiConfig.showAutoProcessElements"
+                                            [disabled]="disableTransformButton() || transformInProcess"
+                                            (click)="onImport()"
+                                            class="btn btn-default pull-right">
+                                    <i aria-hidden="true" class="fa"
+                                       [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
                                                'fa-check green': transformResult?.status === 'success',
                                                'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
-                                <span>{{uiConfig.transformBtnLabel | translate}}</span>
-                            </tds-button>
+                                    <span>{{uiConfig.transformBtnLabel | translate}}</span>
+                                </tds-button>
+                            </div>
 <!--                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);"-->
 <!--                               (click)="onViewData('TRANSFORM')"-->
 <!--                               class="control-label col-sm-{{uiConfig.urlColSize}}">-->
@@ -201,11 +206,12 @@
                            </a>
                         </div>
                         <!-- Clear Button Row -->
-                        <div class="row clear-button">
-                           <tds-button (click)="onClear()"
-                                   class="col-md-offset-5 col-sm-{{uiConfig.buttonColSize}}">
-                               {{'GLOBAL.CLEAR' | translate}}
-                           </tds-button>
+                        <div class="row clear-row">
+                            <div class="col-sm-8">
+                                <tds-button (click)="onClear()" class="pull-right">
+                                    {{'GLOBAL.CLEAR' | translate}}
+                                </tds-button>
+                            </div>
                        </div>
 
                         <!-- View Content Tabbed Panel Row -->

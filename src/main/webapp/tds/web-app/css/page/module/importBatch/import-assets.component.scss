@@ -3,6 +3,24 @@ import-assets {
     margin-top: unset;
   }
 
+  .clear-row {
+    margin-top: 50px;
+  }
+
+  .k-file {
+	  div {
+		  white-space: nowrap;
+		  overflow: hidden;
+		  text-overflow: ellipsis;
+          width: 100%;
+          span[title="Clear"] {
+			  display: flex;
+			  justify-content: center;
+			  align-items: center;
+		  }
+	  }
+  }
+
   .btn {
     margin: unset;
   }
@@ -43,13 +61,6 @@ import-assets {
 		display: flex;
 		align-items: baseline;
 	}
-	.k-upload-button {
-		width: 100%;
-		display: flex;
-		justify-content: start;
-		align-items: center;
-	}
-
 	.k-upload-files,
 	.k-dropzone-hint {
 		padding: 8px;
