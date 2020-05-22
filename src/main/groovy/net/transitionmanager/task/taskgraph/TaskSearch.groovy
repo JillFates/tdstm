@@ -58,7 +58,7 @@ class TaskSearch {
         // If the cyclical path flag is set, add the tasks in the cycles.
         if (taskSearchCommand.cyclicalPath == 1) {
             for (List<TaskVertex> cycle in cpaResults.summary.cycles) {
-                tasksFound = tasksFound.intersect(cycle*.taskId)
+                tasksFound.addAll(cycle*.taskId)
             }
         }
         // Return a unique list of task ids.
