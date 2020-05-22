@@ -251,9 +251,98 @@ class TaskSearchSpec extends Specification {
             }
     }
 
+    void 'test can build a query for criticalPathMode equals Baseline'() {
+
+        setup: 'an instance of TaskSearchCommand correctly configured'
+            setupData()
+                    .withProject()
+                    .withEvent()
+                    .withTaskSearchCommand(criticalPathMode: 'Baseline')
+
+        when: 'TaskSearch builds SearchQuery'
+            Map results = new TaskSearch(project, command).buildSearchQuery(event, false)
+
+        then: 'results contains a correct query'
+
+            that results.query shouldBe """
+                SELECT TASK.asset_comment_id as taskId 
+                FROM asset_comment TASK 
+                LEFT OUTER JOIN api_action API_ACTION on TASK.api_action_id = API_ACTION.id 
+                LEFT OUTER JOIN asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id
+                WHERE TASK.comment_type = 'issue' 
+                AND TASK.move_event_id = :eventId
+                AND TASK.is_critical_path = true
+            """
+
+        and: 'results contains the correct amount of query params'
+            verifyAll(results.params) {
+                eventId == this.event.id
+            }
+    }
+
+    void 'test can build a query for withActions filter'() {
+
+        setup: 'an instance of TaskSearchCommand correctly configured'
+            setupData()
+                    .withProject()
+                    .withEvent()
+                    .withTaskSearchCommand(withActions: 1)
+
+        when: 'TaskSearch builds SearchQuery'
+            Map results = new TaskSearch(project, command).buildSearchQuery(event, false)
+
+        then: 'results contains a correct query'
+
+            that results.query shouldBe """
+                SELECT TASK.asset_comment_id as taskId 
+                FROM asset_comment TASK 
+                LEFT OUTER JOIN api_action API_ACTION on TASK.api_action_id = API_ACTION.id 
+                LEFT OUTER JOIN asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id
+                WHERE TASK.comment_type = 'issue' 
+                AND TASK.move_event_id = :eventId
+                AND TASK.api_action_id IS NOT NULL
+            """
+
+        and: 'results contains the correct amount of query params'
+            verifyAll(results.params) {
+                eventId == this.event.id
+            }
+    }
+
+    void 'test can build a query for withTmdActions filter'() {
+
+        setup: 'an instance of TaskSearchCommand correctly configured'
+            setupData()
+                    .withProject()
+                    .withEvent()
+                    .withTaskSearchCommand(withTmdActions: 1)
+
+        when: 'TaskSearch builds SearchQuery'
+            Map results = new TaskSearch(project, command).buildSearchQuery(event, false)
+
+        then: 'results contains a correct query'
+
+            that results.query shouldBe """
+                SELECT TASK.asset_comment_id as taskId 
+                FROM asset_comment TASK 
+                LEFT OUTER JOIN api_action API_ACTION on TASK.api_action_id = API_ACTION.id 
+                LEFT OUTER JOIN asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id
+                WHERE TASK.comment_type = 'issue' 
+                AND TASK.move_event_id = :eventId
+                AND API_ACTION.is_remote = true
+            """
+
+        and: 'results contains the correct amount of query params'
+            verifyAll(results.params) {
+                eventId == this.event.id
+            }
+    }
+
     ////////////////// DATA BUILDER METHODS
     /**
-     * Defines a {@}* @return
+     * Initialize an instance of {@link Project}
+     *
+     * @return current instance of {@link TaskSearchSpec}
      */
     TaskSearchSpec withProject() {
         this.project = Mock(Project) {
@@ -261,7 +350,11 @@ class TaskSearchSpec extends Specification {
         }
         return this
     }
-
+    /**
+     * Initialize an instance of {@link MoveEvent}
+     *
+     * @return current instance of {@link TaskSearchSpec}
+     */
     TaskSearchSpec withEvent() {
         this.event = Mock(MoveEvent) {
             getId() >> 21345l
@@ -269,12 +362,21 @@ class TaskSearchSpec extends Specification {
         }
         return this
     }
-
+    /**
+     * Initialize an instance of {@link TaskSearchCommand}
+     * with params Map
+     *
+     * @param params Map properties for {@link TaskSearchCommand} creation
+     * @return current instance of {@link TaskSearchSpec}
+     */
     TaskSearchSpec withTaskSearchCommand(Map<String, ?> params = [:]) {
         this.command = new TaskSearchCommand(params)
         return this
     }
-
+    /**
+     * Setup initial data for {@link TaskSearchSpec}
+     * @return current instance of {@link TaskSearchSpec}
+     */
     TaskSearchSpec setupData() {
         this.event == null
         this.project == null

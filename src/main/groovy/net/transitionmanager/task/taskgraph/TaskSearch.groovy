@@ -49,21 +49,20 @@ class TaskSearch {
      * @param cpaResults - the CPA results.
      * @return a list of unique task ids.
      */
-    List<Long> getCPATasks(CPAResults cpaResults) {
-        List<Long> tasksFound = []
+    Collection<Long> getCPATasks(CPAResults cpaResults) {
+        Set<Long> tasksFound = [] as Set
         // If the CPA mode is set to Realtime fetch the CPA tasks ids.
         if (taskSearchCommand.criticalPathMode == 'Realtime') {
-            tasksFound = cpaResults.tasks.findAll { it.isCriticalPath }*.id
+            tasksFound.addAll(cpaResults.tasks.findAll { it.isCriticalPath }*.id)
         }
         // If the cyclical path flag is set, add the tasks in the cycles.
         if (taskSearchCommand.cyclicalPath == 1) {
             for (List<TaskVertex> cycle in cpaResults.summary.cycles) {
-                tasksFound.addAll(cycle*.taskId)
+                tasksFound = tasksFound.intersect(cycle*.taskId)
             }
         }
         // Return a unique list of task ids.
-        return tasksFound.unique { Long a, Long b -> a <=> b }
-
+        return tasksFound
     }
 
     /**
@@ -83,8 +82,8 @@ class TaskSearch {
             from 'asset_comment TASK'
             leftOuterJoin 'api_action API_ACTION on TASK.api_action_id = API_ACTION.id'
             leftOuterJoin 'asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id'
-            leftOuterJoin joinOwnerSmeId()
-            add 'INNER JOIN', joinTags(), 'TAG ON (TASK.asset_entity_id = TAG.asset_id)'
+            leftOuterJoin Application()
+            innerJoin AssetTags(), 'TAG ON (TASK.asset_entity_id = TAG.asset_id)'
             where "TASK.comment_type = 'issue'"
             and moveEventOrProject(moveEvent, project)
             and taskText()
@@ -108,7 +107,7 @@ class TaskSearch {
      * for filtering results.
      * @return
      */
-    String joinTags() {
+    String AssetTags() {
         if (taskSearchCommand.tagIds) {
             queryParams['tagList'] = taskSearchCommand.tagIds
             if (taskSearchCommand.tagMatch == 'ANY') {
@@ -125,7 +124,7 @@ class TaskSearch {
      * for filtering results.
      * @return
      */
-    String joinOwnerSmeId() {
+    String Application() {
         String sentence = ''
         if (taskSearchCommand.ownerSmeId) {
             sentence = 'application APPLICATION on ASSET_ENTITY.asset_entity_id = APPLICATION.app_id'

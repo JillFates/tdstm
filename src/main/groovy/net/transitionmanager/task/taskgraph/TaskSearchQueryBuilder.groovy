@@ -28,6 +28,10 @@ class TaskSearchQueryBuilder {
         return addSentence('WHERE', sentence)
     }
 
+    TaskSearchQueryBuilder innerJoin(String sentence, String suffix) {
+        return addSentence('INNER JOIN', sentence, suffix)
+    }
+
     TaskSearchQueryBuilder leftOuterJoin(String sentence) {
         return addSentence('LEFT OUTER JOIN', sentence)
     }
@@ -38,7 +42,8 @@ class TaskSearchQueryBuilder {
 
     private TaskSearchQueryBuilder addSentence(String sentence, String term, String suffix = '') {
         if (term) {
-            query.append("$sentence $term $suffix")
+            query.append("$sentence $term")
+            if (suffix) query.append(" $suffix")
             query.append(System.lineSeparator())
         }
         return this

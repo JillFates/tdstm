@@ -72,8 +72,8 @@ class TaskGraphService implements ServiceMethods {
         boolean viewUnpublished = taskSearchCommand.viewUnpublishedTasks(securityService.hasPermission(Permission.TaskViewUnpublished))
 
         MoveEvent moveEvent
-        // List of task ids from the CPA
-        List<Long> cpaTasks
+        // A Set of task ids from the CPA. It can contain CPA tasks and Cycles tasks.
+        Collection<Long> cpaTasks
         TaskSearch taskSearch = new TaskSearch(project, taskSearchCommand)
 
         // If a MoveEvent id is provided, fetch the domain object from the database (fail if the id is invalid or doesn't belong to the project).
