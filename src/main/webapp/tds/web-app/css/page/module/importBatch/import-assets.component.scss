@@ -7,6 +7,27 @@ import-assets {
     margin-top: 50px;
   }
 
+  .import-batches {
+	  a {
+		  width: 100%;
+		  padding-right: 0;
+	  }
+  }
+
+  tds-button {
+	  .tds-button.btn {
+		  min-width: 115px!important;
+	  }
+  }
+
+  .control-upload {
+	  padding-right: 0;
+	  .uploaded-file {
+		  display: flex;
+		  justify-content: space-between;
+	  }
+  }
+
   .k-file {
 	  div {
 		  white-space: nowrap;
