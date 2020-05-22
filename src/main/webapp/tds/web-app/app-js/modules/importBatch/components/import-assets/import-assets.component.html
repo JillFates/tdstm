@@ -9,7 +9,6 @@
 
                         <!-- Fetch(Dropdown action) Row -->
                         <div class="form-group row aligned-row" style="margin-bottom: 5px;">
-                            <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_DATA_ACTION' | translate}}</label>
                             <div class="col-sm-3">
                                 <select clrSelect [(ngModel)]="selectedActionOption"
@@ -44,13 +43,11 @@
 
                         </div>
                         <div class="form-group row" style="margin-bottom: 5px;">
-                            <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label" style="padding-right: 5%">{{'IMPORT_ASSETS.MANUAL_IMPORT.OR' | translate}}</label>
                         </div>
 
                         <!-- Fetch(File Upload) Row -->
                         <div class="form-group row">
-                            <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label" for="fetchWithFile">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_FILE_UPLOAD' | translate}}</label>
                             <div class="col-sm-5 control-upload">
                                 <kendo-upload
@@ -103,7 +100,6 @@
 
                         <!-- Transform Datascript Row -->
                         <div class="form-group row aligned-row" style="margin-bottom: 0px;">
-                            <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label" for="transform">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_WITH_DATA_SCRIPT' | translate}}
                            </label>
@@ -149,7 +145,6 @@
                         </div>
 
                         <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showAutoProcessElements">
-                            <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label">
                             </label>
                             <div class="col-md-6">
@@ -167,8 +162,7 @@
 
                         <!-- Progress bar-->
                         <div class="form-group row progressBar-row" *ngIf="uiConfig.showManualProcessElements">
-                            <div class="col-sm-4"></div>
-                            <div class="col-md-5 progressBar-container">
+                            <div class="col-sm-offset-2 col-md-5 progressBar-container">
                                 <div *ngIf="transformInProcess" class="progress">
                                     <div class="progress-bar progress-bar-striped active"
                                          [style.width.%]="transformProgress.currentProgress"></div>
@@ -177,7 +171,7 @@
                         </div>
 
                         <div class="form-group row">
-                            <div class="col-sm-8"></div>
+                            <div class="col-sm-6"></div>
                             <div class="col-sm-1">
                                 <tds-button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                             (click)="onImport()"
@@ -193,7 +187,6 @@
 
                         <!-- Load Data Row -->
                         <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualProcessElements">
-                            <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
                            </label>
@@ -216,7 +209,6 @@
                         </div>
 
                         <div class="row import-batches">
-                            <div class="col-sm-2"></div>
                             <div class="col-sm-7">
                                 <div class="pull-right">
                                     <a [routerLink]="['/importbatch','list']" class="control-label col-sm-{{uiConfig.urlColSize}}">
@@ -228,7 +220,6 @@
 
                         <!-- Clear Button Row -->
                         <div class="row clear-row">
-                            <div class="col-sm-2"></div>
                             <div class="col-sm-7">
                                 <tds-button (click)="onClear()" class="pull-right">
                                     {{'GLOBAL.CLEAR' | translate}}
