@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {EventsService} from '../../service/events.service';
@@ -20,6 +20,7 @@ export class NewsCreateEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
 
 	@ViewChild('newsForm', {read: NgForm, static: true}) newsForm: NgForm;
+	@ViewChild('messageTextArea', {static: false}) messageTextArea: ElementRef;
 
 	public commentType: string;
 	public optionGeneric = DisplayOptionGeneric;
@@ -75,6 +76,10 @@ export class NewsCreateEditComponent extends Dialog implements OnInit {
 			}
 			this.dataSignature = JSON.stringify(this.model);
 			this.setTitle(title);
+
+			setTimeout(() => {
+				this.onSetUpFocus(this.messageTextArea);
+			});
 		});
 	}
 

@@ -649,7 +649,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 		if (this.taskDetailModel.modal.type === ModalType.CREATE || this.taskDetailModel.modal.type === ModalType.EDIT) {
 			setTimeout(() => {
 				this.onSetUpFocus(this.taskCreateCommentInput);
-			});
+			}, 500);
 		}
 
 		if (this.taskDetailModel.modal.type === ModalType.EDIT) {
