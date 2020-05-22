@@ -163,56 +163,103 @@
 			</div>
 			<div
 				class="col-md-12"
-				*ngIf="
-					!collapsed.sample &&
-					sampleDataModel &&
-					sampleDataModel.data
-				"
+				*ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data"
 			>
-				<kendo-grid
-					*ngIf="sampleDataGridHelper"
-					[data]="sampleDataGridHelper.gridData"
-					[height]="sampleDataModel.gridHeight"
-					[resizable]="true"
-					[pageSize]="sampleDataGridHelper.state.take"
-					[skip]="sampleDataGridHelper.state.skip"
-					[pageable]="true"
-					(pageChange)="
-						sampleDataGridHelper.pageChange($event)
-					"
-				>
-					<kendo-grid-column
-						*ngFor="
-							let column of sampleDataModel.columns
-						"
-						field="{{ column.property }}"
-						title="{{ column.label }}"
-						[width]="column.width"
-					>
-						<ng-template kendoGridHeaderTemplate>
-							<label>{{ column.label }}</label>
-						</ng-template>
-						<ng-template
-							kendoGridCellTemplate
-							let-dataItem
+				<div class="dialog-inner-tables">
+					<kendo-grid
+							*ngIf="sampleDataGridHelper"
+							class="tds-table narrow-rows"
+							[ngClass]="{ 'hide-filter': !showSampleData, 'hide-paginator': sampleDataGridHelper.gridData.total <= 25}"
+							[data]="sampleDataGridHelper.gridData"
+							[filterable]="true"
+							[sort]="sampleDataGridHelper.state.sort"
+							[sortable]="{mode:'single'}"
+							(sortChange)="sampleDataGridHelper.sortChange($event)"
+							[skip]="sampleDataGridHelper.state.skip"
+							[pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+							[pageSize]="sampleDataGridHelper.state.take"
+							[resizable]="true"
+							[height]="sampleDataModel.gridHeight"
+							(pageChange)="sampleDataGridHelper.pageChange($event)"
 						>
-							<div
-								class="sample-data-cell-max-line-height"
-								title="{{
-									dataItem[column.property]
-										| utils
-											: OBJECT_OR_LIST_PIPE
-								}}"
-							>
-								{{
-								dataItem[column.property]
-									| utils
-									: OBJECT_OR_LIST_PIPE
-								}}
+						<!-- Show Filters / Actions column -->
+						<kendo-grid-column
+								[field]="'_showFilters'"
+								[headerClass]="'text-center'"
+								[sortable]="false"
+								[class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+								[width]="80"
+								[minResizableWidth]="80">
+							<!-- Toggle Filters button -->
+							<ng-template kendoGridHeaderTemplate>
+								<tds-grid-show-hide-filters-button
+										[filterCount]="sampleDataGridHelper.getFilterCounter()" (toggleFilters)="showFilterSampleData()">
+								</tds-grid-show-hide-filters-button>
+							</ng-template>
+							<!-- Clear all Filters button -->
+							<ng-template kendoGridFilterCellTemplate let-filter>
+								<tds-grid-clear-all-filters-button
+										[show]="sampleDataGridHelper.getFilterCounter()" (clearFilters)="sampleDataGridHelper.clearAllFilters(sampleDataModel.columns)">
+								</tds-grid-clear-all-filters-button>
+							</ng-template>
+						</kendo-grid-column>
+						<kendo-grid-column
+							*ngFor="let column of sampleDataModel.columns"
+							field="{{ column.property }}"
+							title="{{ column.label }}"
+							[width]="column.width">
+
+							<!-- Header Template -->
+							<ng-template kendoGridHeaderTemplate>
+								<div class="sortable-column component-action-sort">
+									<div>
+										<label>
+											{{column.label}}
+										</label>
+									</div>
+								</div>
+							</ng-template>
+
+							<!-- Filter Template -->
+							<ng-template kendoGridFilterCellTemplate let-filter>
+								<div class="filter-input"
+									 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )">
+									<tds-grid-filter-input
+											[name]="column.property"
+											[value]="column.filter || ''"
+											[filterType]="column.type"
+											[dateFormat]="column.format"
+											[placeholder]="'GLOBAL.FILTER' | translate"
+											(filter)="sampleDataGridHelper.onFilterWithValue($event, column)">
+									</tds-grid-filter-input>
+								</div>
+							</ng-template>
+
+							<ng-template kendoGridCellTemplate let-dataItem>
+								<div
+									class="sample-data-cell-max-line-height"
+									title="{{dataItem[column.property]| utils: OBJECT_OR_LIST_PIPE}}">
+									{{dataItem[column.property]| utils: OBJECT_OR_LIST_PIPE}}
+								</div>
+							</ng-template>
+						</kendo-grid-column>
+						<!-- Pagination Footer -->
+						<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+							<div class="clr-col-4"></div>
+							<div class="clr-col-8">
+								<tds-grid-pager
+										[total]="total"
+										[totalPages]="totalPages"
+										[currentPage]="currentPage"
+										[pageSize]="sampleDataGridHelper.state.take"
+										[pageSizes]="sampleDataGridHelper.defaultPageOptions"
+										(pageChange)="sampleDataGridHelper.pageChange($event)">
+								</tds-grid-pager>
 							</div>
 						</ng-template>
-					</kendo-grid-column>
-				</kendo-grid>
+						<kendo-grid-messages noRecords="There are no records to display."></kendo-grid-messages>
+					</kendo-grid>
+				</div>
 			</div>
 		</div>
 		<hr/>
@@ -295,187 +342,130 @@
 									"
 								>
 								</field-reference-popup>
-								<kendo-grid
-									*ngIf="
-										transformedDataGrids[i]
-									"
-									[data]="
-										transformedDataGrids[i]
-											.gridData
-									"
-									[height]="'300'"
-									[resizable]="true"
-									[pageSize]="
-										transformedDataGrids[i]
-											.state.take
-									"
-									[skip]="
-										transformedDataGrids[i]
-											.state.skip
-									"
-									[pageable]="true"
-									(pageChange)="
-										transformedDataGrids[
-											i
-										].pageChange($event)
-									"
-								>
-									<!-- Field Columns -->
-									<kendo-grid-column
-										class="test-results-row"
-										*ngFor="
-											let column of domain.fieldNames
-										"
-										title="{{
-											(domain.fieldLabelMap &&
-												domain
-													.fieldLabelMap[
-													column
-												]) ||
-												column
-										}}"
+								<div class="dialog-inner-tables">
+									<kendo-grid
+										*ngIf="transformedDataGrids[i]"
+										class="tds-table narrow-rows"
+										[ngClass]="{ 'hide-filter': !showTransformedData[i], 'hide-paginator': transformedDataGrids[i].gridData.total <= 25}"
+										[data]="transformedDataGrids[i].gridData"
+										[filterable]="true"
+										[sort]="transformedDataGrids[i].state.sort"
+										[sortable]="{mode:'single'}"
+										(sortChange)="transformedDataGrids[i].sortChange($event)"
+										[skip]="transformedDataGrids[i].state.skip"
+										[pageable]="{buttonCount: 5, info: true, pageSizes: [25, 50, 100]}"
+										[pageSize]="transformedDataGrids[i].state.take"
+										[resizable]="true"
+										[height]="'300'"
+										(pageChange)="transformedDataGrids[i].pageChange($event)"
 									>
-										<ng-template
-											kendoGridCellTemplate
-											let-dataItem
+										<!-- Show Filters / Actions column -->
+										<kendo-grid-column
+												[field]="'_showFilters'"
+												[headerClass]="'text-center'"
+												[sortable]="false"
+												[class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+												[width]="80"
+												[minResizableWidth]="80">
+											<!-- Toggle Filters button -->
+											<ng-template kendoGridHeaderTemplate>
+												<tds-grid-show-hide-filters-button
+														[filterCount]="transformedDataGrids[i].getFilterCounter()" (toggleFilters)="showFiltersTransformedData(i, domain.fieldNames)">
+												</tds-grid-show-hide-filters-button>
+											</ng-template>
+											<!-- Clear all Filters button -->
+											<ng-template kendoGridFilterCellTemplate let-filter>
+												<tds-grid-clear-all-filters-button
+														[show]="transformedDataGrids[i].getFilterCounter()" (clearFilters)="transformedDataGrids[i].clearAllFilters(domain.fieldNames)">
+												</tds-grid-clear-all-filters-button>
+											</ng-template>
+										</kendo-grid-column>
+										<!-- Field Columns -->
+										<kendo-grid-column
+											class="test-results-row"
+											*ngFor="let column of domain.fieldNames"
+											title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}"
 										>
-											<div
-												*ngIf="
-													dataItem.fields &&
-													dataItem
-														.fields[
-														column
-													]
-												"
-												[ngClass]="{
-													'has-init':
-														!dataItem
-															.fields[
-															column
-														]
-															.value &&
-														dataItem
-															.fields[
-															column
-														].init
-												}"
-											>
-												<div
-													class=""
-													style="width: 100%;"
-												>
-													{{
-													getInitOrValue(
-														dataItem
-															.fields[
-															column
-															]
-													)
-													}}
-													<i
-														*ngIf="
-															!dataItem
-																.fields[
-																column
-															]
-																.value &&
-															dataItem
-																.fields[
-																column
-															]
-																.init
-														"
-														[title]="
-															MESSAGE_FIELD_WILL_BE_INITIALIZED
-														"
-														class="fa fa-w fa-info"
-													></i>
+											<!-- Header Template -->
+											<ng-template kendoGridHeaderTemplate>
+												<div class="sortable-column component-action-sort">
+													<div>
+														<label>
+															{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}
+														</label>
+													</div>
 												</div>
+											</ng-template>
 
-												<!-- Popup Reference Icons -->
-												<div
-													class=""
-													style="width: 100%;"
-												>
-													<i
-														*ngIf="
-															dataItem
-																.fields[
-																column
-															]
-																.create
-														"
-														(click)="
-															fieldReferencePopupHelper.onShowPopup(
-																$event,
-																FieldInfoType.CREATE,
-																dataItem
-																	.fields[
-																	column
-																],
-																domain.fieldLabelMap
-															)
-														"
-														title="View Create Reference Detail"
-														class="field-info-icon fa fa-plus-square"
-													></i>
-													<i
-														*ngIf="
-															dataItem
-																.fields[
-																column
-															]
-																.update
-														"
-														(click)="
-															fieldReferencePopupHelper.onShowPopup(
-																$event,
-																FieldInfoType.UPDATE,
-																dataItem
-																	.fields[
-																	column
-																],
-																domain.fieldLabelMap
-															)
-														"
-														title="View Update Reference Detail"
-														class="field-info-icon fa fa-pencil-square"
-													></i>
-													<i
-														*ngIf="
-															dataItem
-																.fields[
-																column
-															]
-																.find &&
-															dataItem
-																.fields[
-																column
-															]
-																.find
-																.query
-																.length >
-																0
-														"
-														(click)="
-															fieldReferencePopupHelper.onShowPopup(
-																$event,
-																FieldInfoType.FIND,
-																dataItem
-																	.fields[
-																	column
-																],
-																domain.fieldLabelMap
-															)
-														"
-														title="View Find Results"
-														class="field-info-icon fa fa-search"
-													></i>
+											<!-- Filter Template -->
+											<ng-template kendoGridFilterCellTemplate let-filter>
+												<div class="filter-input">
+													<tds-grid-filter-input
+															[name]="column.property"
+															[value]="column.filter || ''"
+															[filterType]="column.type"
+															[dateFormat]="column.format"
+															[placeholder]="'GLOBAL.FILTER' | translate"
+															(filter)="transformedDataGrids[i].onFilterWithValue($event, column)">
+													</tds-grid-filter-input>
 												</div>
+											</ng-template>
+
+											<ng-template
+												kendoGridCellTemplate
+												let-dataItem
+											>
+												<div *ngIf="dataItem.fields &&dataItem.fields[column]"
+													 [ngClass]="{'has-init':!dataItem.fields[column].value &&dataItem.fields[column].init}">
+													<div class="" style="width: 100%;" >
+														{{ getInitOrValue( dataItem .fields[column ] ) }}
+														<i
+															*ngIf="!dataItem.fields[column].value &&dataItem.fields[column].init"
+															[title]="MESSAGE_FIELD_WILL_BE_INITIALIZED"
+															class="fa fa-w fa-info"
+														></i>
+													</div>
+
+													<!-- Popup Reference Icons -->
+													<div class="" style="width: 100%;">
+														<i
+															*ngIf="dataItem.fields[column].create"
+															(click)="fieldReferencePopupHelper.onShowPopup($event,FieldInfoType.CREATE,dataItem.fields[column],domain.fieldLabelMap)"
+															title="View Create Reference Detail"
+															class="field-info-icon fa fa-plus-square"
+														></i>
+														<i
+															*ngIf="dataItem.fields[column].update"
+															(click)="fieldReferencePopupHelper.onShowPopup($event,FieldInfoType.UPDATE,dataItem.fields[column ], domain.fieldLabelMap)"
+															title="View Update Reference Detail"
+															class="field-info-icon fa fa-pencil-square"></i>
+														<i
+															*ngIf="dataItem.fields[column].find &&dataItem.fields[column].find.query.length >0"
+															(click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem.fields[column],domain.fieldLabelMap) "
+															title="View Find Results"
+															class="field-info-icon fa fa-search"
+														></i>
+													</div>
+												</div>
+											</ng-template>
+										</kendo-grid-column>
+										<!-- Pagination Footer -->
+										<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+											<div class="clr-col-4"></div>
+											<div class="clr-col-8">
+												<tds-grid-pager
+														[total]="total"
+														[totalPages]="totalPages"
+														[currentPage]="currentPage"
+														[pageSize]="transformedDataGrids[i].state.take"
+														[pageSizes]="transformedDataGrids[i].defaultPageOptions"
+														(pageChange)="transformedDataGrids[i].pageChange($event)">
+												</tds-grid-pager>
 											</div>
 										</ng-template>
-									</kendo-grid-column>
-								</kendo-grid>
+										<kendo-grid-messages noRecords="There are no records to display."></kendo-grid-messages>
+									</kendo-grid>
+								</div>
 							</div>
 						</ng-template>
 					</kendo-tabstrip-tab>

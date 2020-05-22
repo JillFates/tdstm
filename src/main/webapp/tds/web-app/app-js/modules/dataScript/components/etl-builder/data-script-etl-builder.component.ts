@@ -90,6 +90,9 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
 
+	public showSampleData = false;
+	public showTransformedData = [];
+
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private translatePipe: TranslatePipe,
@@ -490,10 +493,12 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			this.importAssetsService.getFileContent(domain.outputFilename)
 				.subscribe((result: any) => {
 					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
+					this.showTransformedData[tabIndex] = false;
 					domain.data = result.data;
 				});
 		} else {
 			this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(domain.data ? domain.data : []);
+			this.showTransformedData[tabIndex] = false;
 		}
 	}
 
@@ -620,5 +625,30 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			}
 		}, 1000);
 		return `ETL Script Edit - ${ this.dataScriptModel.provider.name } / ${ this.dataScriptModel.name } `;
+	}
+
+	/**
+	 * Clears the filter on supports
+	 */
+	public showFilterSampleData(): void {
+		if (this.showSampleData) {
+			this.showSampleData = false;
+			this.sampleDataGridHelper.clearAllFilters(this.sampleDataModel.columns);
+		} else {
+			this.showSampleData = true;
+		}
+	}
+
+	/**
+	 * Hide show filters per data result
+	 * @param index
+	 */
+	public showFiltersTransformedData(index: number, columns: any): void {
+		if (this.showTransformedData[index]) {
+			this.showTransformedData[index] = false;
+			this.sampleDataGridHelper.clearAllFilters(columns);
+		} else {
+			this.showTransformedData[index] = true;
+		}
 	}
 }
