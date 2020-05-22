@@ -14,12 +14,6 @@ import-assets {
 	  }
   }
 
-  tds-button {
-	  .tds-button.btn {
-		  min-width: 115px!important;
-	  }
-  }
-
   .control-upload {
 	  padding-right: 0;
 	  .uploaded-file {
@@ -85,6 +79,14 @@ import-assets {
 	.k-upload-files,
 	.k-dropzone-hint {
 		padding: 8px;
+	}
+
+	.k-upload {
+		.k-file-success {
+			.k-file-name {
+				color: #37b400
+			}
+		}
 	}
 
 	.k-upload-status {
