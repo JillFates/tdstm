@@ -65,30 +65,7 @@
                                         (remove)="onRemoveFile($event)"
                                         (success)="completeEventHandler($event)">
                                     <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
-                                    <ng-template kendoUploadFileTemplate let-files let-state="state">
-                                        <div class="uploaded-file">
-                                            <div>
-                                                <span class="file-icon">
-                                                    <clr-icon shape="file"></clr-icon>
-                                                </span>
-                                                <span>
-                                                    {{files[0].name}}
-                                                </span>
-                                            </div>
-
-                                            <span title="Clear" (click)="remove(kendoUploadInstance, files[0].uid)">
-                                                <clr-icon shape="times"></clr-icon>
-                                            </span>
-                                        </div>
-                                        <!--
-                                        <button *ngIf="showButton(state)"
-                                                (click)="remove(kendoUploadInstance, files[0].uid)"
-                                                class="k-button" style="position: absolute; right: .2em;">
-                                            Remove
-                                        </button>
-                                        -->
-                                    </ng-template>
-                                </kendo-upload><!---->
+                                </kendo-upload>
                             </div>
                             <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
                                   class="control-label col-md-{{uiConfig.urlColSize}}">

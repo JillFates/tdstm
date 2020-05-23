@@ -22,20 +22,6 @@ import-assets {
 	  }
   }
 
-  .k-file {
-	  div {
-		  white-space: nowrap;
-		  overflow: hidden;
-		  text-overflow: ellipsis;
-          width: 100%;
-          span[title="Clear"] {
-			  display: flex;
-			  justify-content: center;
-			  align-items: center;
-		  }
-	  }
-  }
-
   .btn {
     margin: unset;
   }
@@ -75,30 +61,5 @@ import-assets {
 	.aligned-row {
 		display: flex;
 		align-items: baseline;
-	}
-	.k-upload-files,
-	.k-dropzone-hint {
-		padding: 8px;
-	}
-
-	.k-upload {
-		.k-file-success {
-			.k-file-name {
-				color: #37b400
-			}
-		}
-	}
-
-	.k-upload-status {
-		margin-left: 5px;
-	}
-	.file-icon {
-		clr-icon {
-          height: 32px;
-          width: 32px;
-		}
-	}
-  	clr-icon {
-		cursor: pointer;
 	}
 }
