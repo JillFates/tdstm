@@ -56,9 +56,9 @@ export class ImportAssetsComponent implements OnInit {
 	public fetchInputUsed: 'action' | 'file' = 'action';
 	public file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	readonly UI_CONFIG = {
-		labelColSize: 3,
-		inputColSize: 2,
-		buttonColSize: 1,
+		labelColSize: 2,
+		inputColSize: 3,
+		buttonColSize: 2,
 		urlColSize: 2,
 		showTransformButton: false,
 		showAutoProcessElements: false,
