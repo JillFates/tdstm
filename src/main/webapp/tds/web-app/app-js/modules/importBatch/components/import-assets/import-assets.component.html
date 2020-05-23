@@ -147,8 +147,8 @@
                         </div>
 
                         <div class="form-group row import-row">
-                            <div class="col-sm-6"></div>
-                            <div class="col-sm-1">
+                            <div class="col-sm-{{uiConfig.labelColSize + uiConfig.inputColSize}}"></div>
+                            <div class="col-sm-{{uiConfig.buttonColSize}}">
                                 <tds-button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                             (click)="onImport()"
                                             class="pull-right">
@@ -185,7 +185,7 @@
                         </div>
 
                         <div class="row import-batches">
-                            <div class="col-sm-7">
+                            <div class="col-md-offset-{{(uiConfig.labelColSize + uiConfig.buttonColSize)}} col-sm-{{uiConfig.inputColSize}}">
                                 <div class="pull-right">
                                     <a [routerLink]="['/importbatch','list']" class="control-label col-sm-{{uiConfig.urlColSize}}">
                                         {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
