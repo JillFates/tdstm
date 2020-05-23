@@ -156,7 +156,7 @@ export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
 			column.width = 130;
 			column.cellStyle = {'max-height': '20px'};
 			column.type = 'dynamicValue';
-			column.property = 'dynamicValue';
+			column.property =  column.properties.join('.');
 			return column;
 		});
 		this.columnsModel.columns = this.columnsModel.columns.concat(fieldColumns);
