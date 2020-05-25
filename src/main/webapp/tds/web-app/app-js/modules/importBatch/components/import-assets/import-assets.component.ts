@@ -77,14 +77,6 @@ export class ImportAssetsComponent implements OnInit {
 			this.file.fileUID = null;
 	}
 
-	public remove(upload, uid: string) {
-		upload.removeFilesByUid(uid);
-	}
-
-	public showButton(state: FileState): boolean {
-		return (state === FileState.Uploaded) ? true : false;
-	}
-
 	ngOnInit(): void {
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
 			this.actionOptions = result.actions;
