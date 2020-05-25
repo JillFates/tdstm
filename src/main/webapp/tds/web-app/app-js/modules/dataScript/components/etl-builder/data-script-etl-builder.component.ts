@@ -92,6 +92,7 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 
 	public showSampleData = false;
 	public showTransformedData = [];
+	public transformedDataColumns = [];
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -485,6 +486,7 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 
 	/**
 	 * If current domain doesn't have [data], then it needs to be loaded from a file.
+	 * We also pre-format the code so it can be easily used on the Grid to Performs Filter and data sorting accordingly
 	 * @param tabIndex
 	 */
 	private loadDataForDomain(tabIndex: number): void {
@@ -492,8 +494,28 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		if (!domain.data && domain.outputFilename) {
 			this.importAssetsService.getFileContent(domain.outputFilename)
 				.subscribe((result: any) => {
-					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
+					// Hide Filters
 					this.showTransformedData[tabIndex] = false;
+					// Prepare Columns
+					this.transformedDataColumns[tabIndex] = [];
+					domain.fieldNames.forEach((fieldName: string) => {
+						this.transformedDataColumns[tabIndex].push({
+							label: ((domain.fieldLabelMap && domain.fieldLabelMap[fieldName]) || fieldName),
+							property: fieldName,
+							type: 'text',
+							filterable: true
+						});
+					});
+					// Prepare Data by cc the field into the root
+					result.data.forEach((data: any) => {
+						for (const field in data.fields) {
+							if (data.fields[field]) {
+								// Structure: FIELD:VALUE
+								data[field] = this.getInitOrValue(data.fields[field]);
+							}
+						}
+					});
+					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
 					domain.data = result.data;
 				});
 		} else {

@@ -383,15 +383,16 @@
 										<!-- Field Columns -->
 										<kendo-grid-column
 											class="test-results-row"
-											*ngFor="let column of domain.fieldNames"
-											title="{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}"
+											*ngFor="let column of transformedDataColumns[i]"
+											field="{{ column.property }}"
+											title="{{column.label}}"
 										>
 											<!-- Header Template -->
 											<ng-template kendoGridHeaderTemplate>
 												<div class="sortable-column component-action-sort">
 													<div>
 														<label>
-															{{(domain.fieldLabelMap && domain.fieldLabelMap[column]) || column}}
+															{{column.label}}
 														</label>
 													</div>
 												</div>
@@ -404,7 +405,6 @@
 															[name]="column.property"
 															[value]="column.filter || ''"
 															[filterType]="column.type"
-															[dateFormat]="column.format"
 															[placeholder]="'GLOBAL.FILTER' | translate"
 															(filter)="transformedDataGrids[i].onFilterWithValue($event, column)">
 													</tds-grid-filter-input>
@@ -415,35 +415,35 @@
 												kendoGridCellTemplate
 												let-dataItem
 											>
-												<div *ngIf="dataItem.fields &&dataItem.fields[column]"
-													 [ngClass]="{'has-init':!dataItem.fields[column].value &&dataItem.fields[column].init}">
-													<div class="" style="width: 100%;" >
-														{{ getInitOrValue( dataItem .fields[column ] ) }}
+												<div *ngIf="dataItem.fields && dataItem.fields[column.property]"
+													 [ngClass]="{'has-init':!dataItem.fields[column.property].value && dataItem.fields[column.property].init}">
+													<div class="" style="width: 100%;">
+														{{ dataItem[column.property] }}
 														<i
-															*ngIf="!dataItem.fields[column].value &&dataItem.fields[column].init"
-															[title]="MESSAGE_FIELD_WILL_BE_INITIALIZED"
-															class="fa fa-w fa-info"
+																*ngIf="!dataItem.fields[column.property].value && dataItem.fields[column.property].init"
+																[title]="MESSAGE_FIELD_WILL_BE_INITIALIZED"
+																class="fa fa-w fa-info"
 														></i>
 													</div>
 
 													<!-- Popup Reference Icons -->
 													<div class="" style="width: 100%;">
 														<i
-															*ngIf="dataItem.fields[column].create"
-															(click)="fieldReferencePopupHelper.onShowPopup($event,FieldInfoType.CREATE,dataItem.fields[column],domain.fieldLabelMap)"
-															title="View Create Reference Detail"
-															class="field-info-icon fa fa-plus-square"
+																*ngIf="dataItem.fields[column.property].create"
+																(click)="fieldReferencePopupHelper.onShowPopup($event,FieldInfoType.CREATE,dataItem.fields[column.property],domain.fieldLabelMap)"
+																title="View Create Reference Detail"
+																class="field-info-icon fa fa-plus-square"
 														></i>
 														<i
-															*ngIf="dataItem.fields[column].update"
-															(click)="fieldReferencePopupHelper.onShowPopup($event,FieldInfoType.UPDATE,dataItem.fields[column ], domain.fieldLabelMap)"
-															title="View Update Reference Detail"
-															class="field-info-icon fa fa-pencil-square"></i>
+																*ngIf="dataItem.fields[column.property].update"
+																(click)="fieldReferencePopupHelper.onShowPopup($event,FieldInfoType.UPDATE,dataItem.fields[column.property], domain.fieldLabelMap)"
+																title="View Update Reference Detail"
+																class="field-info-icon fa fa-pencil-square"></i>
 														<i
-															*ngIf="dataItem.fields[column].find &&dataItem.fields[column].find.query.length >0"
-															(click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem.fields[column],domain.fieldLabelMap) "
-															title="View Find Results"
-															class="field-info-icon fa fa-search"
+																*ngIf="dataItem.fields[column.property].find && dataItem.fields[column.property].find.query.length > 0"
+																(click)="fieldReferencePopupHelper.onShowPopup($event, FieldInfoType.FIND, dataItem.fields[column.property],domain.fieldLabelMap) "
+																title="View Find Results"
+																class="field-info-icon fa fa-search"
 														></i>
 													</div>
 												</div>
