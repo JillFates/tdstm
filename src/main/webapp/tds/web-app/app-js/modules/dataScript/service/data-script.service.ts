@@ -229,7 +229,8 @@ export class DataScriptService {
 								label,
 								property: label,
 								type: data.config[property].type,
-								width: 140
+								width: 140,
+								filterable: true
 							};
 							columns.push(column);
 						}

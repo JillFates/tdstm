@@ -206,8 +206,7 @@
 						<kendo-grid-column
 							*ngFor="let column of sampleDataModel.columns"
 							field="{{ column.property }}"
-							title="{{ column.label }}"
-							[width]="column.width">
+							title="{{ column.label }}">
 
 							<!-- Header Template -->
 							<ng-template kendoGridHeaderTemplate>
@@ -237,7 +236,7 @@
 
 							<ng-template kendoGridCellTemplate let-dataItem>
 								<div
-									class="sample-data-cell-max-line-height"
+									class="cell-template"
 									title="{{dataItem[column.property]| utils: OBJECT_OR_LIST_PIPE}}">
 									{{dataItem[column.property]| utils: OBJECT_OR_LIST_PIPE}}
 								</div>
@@ -376,7 +375,7 @@
 											<!-- Clear all Filters button -->
 											<ng-template kendoGridFilterCellTemplate let-filter>
 												<tds-grid-clear-all-filters-button
-														[show]="transformedDataGrids[i].getFilterCounter()" (clearFilters)="transformedDataGrids[i].clearAllFilters(domain.fieldNames)">
+														[show]="transformedDataGrids[i].getFilterCounter()" (clearFilters)="transformedDataGrids[i].clearAllFilters(transformedDataColumns[i])">
 												</tds-grid-clear-all-filters-button>
 											</ng-template>
 										</kendo-grid-column>
