@@ -90,7 +90,7 @@ export class ModelListComponent implements OnInit {
 				icon: 'download-cloud',
 				iconClass: 'is-solid',
 				title: this.translateService.transform('GLOBAL.EXPORT'),
-				show: true,
+				show: this.permissionService.hasPermission(Permission.ModelExport),
 				onClick: this.onExport.bind(this),
 			}
 		];
