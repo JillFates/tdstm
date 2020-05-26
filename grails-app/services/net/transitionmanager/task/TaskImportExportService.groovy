@@ -851,7 +851,7 @@ class TaskImportExportService implements ServiceMethods {
 				}
 			}
 
-			if (!task.durationScale || task.durationScale == '') {
+			if (!task.durationScale) {
 				task.durationScale = TimeScale.default
 			}
 
