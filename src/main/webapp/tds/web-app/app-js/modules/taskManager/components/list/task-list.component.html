@@ -244,9 +244,9 @@
 					<ng-template
 						kendoGridCellTemplate
 						let-dataItem
-						let-rowIndex="rowIndex"
-					>
-						<div class="action-button btn-link">
+						let-rowIndex="rowIndex">
+						<div class="action-button btn-link"
+								 *ngIf="canEditTask()">
 							<clr-dropdown #dropdown>
 								<tds-button icon="ellipsis-vertical"
 														clrDropdownTrigger
@@ -254,13 +254,10 @@
 														class="contextual-menu"
 								></tds-button>
 								<clr-dropdown-menu *clrIfOpen>
-									<a
-										clrDropdownItem
-										(click)="
-											onOpenTaskEditHandler(dataItem)
-										"
-									>Edit Task</a
-									>
+									<a clrDropdownItem
+										 (click)="onOpenTaskEditHandler(dataItem)">
+										Edit Task
+									</a>
 								</clr-dropdown-menu>
 							</clr-dropdown>
 						</div>

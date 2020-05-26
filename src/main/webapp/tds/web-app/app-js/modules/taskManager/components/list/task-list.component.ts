@@ -142,7 +142,7 @@ export class TaskListComponent implements OnInit {
 				icon: 'plus',
 				iconClass: 'is-solid',
 				title: this.translate.transform('GLOBAL.CREATE'),
-				show: true,
+				show: this.permissionService.hasPermission(Permission.TaskCreate),
 				onClick: this.onCreateTaskHandler.bind(this),
 			},
 			{
@@ -152,6 +152,13 @@ export class TaskListComponent implements OnInit {
 				onClick: this.onBulkActionHandler.bind(this),
 			},
 		];
+	}
+
+	/**
+	 * Check if user has permission to edit a task.
+	 */
+	canEditTask(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskEdit);
 	}
 
 	/**
@@ -689,6 +696,10 @@ export class TaskListComponent implements OnInit {
 	 */
 	private loadEventListAndSearch(currentEventId: any): void {
 		this.reportService.getEventList().subscribe(result => {
+			if (result.status === 'error') {
+				console.error(result.errors ? result.errors[0] : `Couldn't load event list`);
+				result.data = [];
+			}
 			this.eventList = [this.allEventsOption].concat(result.data);
 			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 10));
 			if (match) {
@@ -697,6 +708,9 @@ export class TaskListComponent implements OnInit {
 				this.selectedEvent = this.allEventsOption;
 			}
 			this.search();
+		}, error => {
+			this.eventList = [];
+			console.error(error);
 		});
 	}
 
