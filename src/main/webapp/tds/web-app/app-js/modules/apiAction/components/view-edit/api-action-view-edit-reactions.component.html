@@ -84,10 +84,10 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+											  [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
 											  [disabled]="isCheckSyntaxSectionDisabled(EventReactions.Status)"
 											  [(model)]="eventReactions[EventReactions.Status]"
-												(onClick)="verifyCode(eventReactions[EventReactions.Status])">
-							</tds-check-action>
+											  (onClick)="verifyCode(eventReactions[EventReactions.Status])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.Status].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Status])"
@@ -123,10 +123,10 @@
 							<span class="font-normal">- logic to be performed upon the API call being successful.</span>
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
-							<tds-check-action *ngIf="modalType !== actionTypes.VIEW" 
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Success)"
-																[(model)]="eventReactions[EventReactions.Success]" (onClick)="verifyCode(eventReactions[EventReactions.Success])">
-							</tds-check-action>
+							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
+											  [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+											  [disabled]="isCheckSyntaxSectionDisabled(EventReactions.Success)"
+											  [(model)]="eventReactions[EventReactions.Success]" (onClick)="verifyCode(eventReactions[EventReactions.Success])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.Success].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Success])"
@@ -159,10 +159,10 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Default)"
-																[(model)]="eventReactions[EventReactions.Default]"
-																(onClick)="verifyCode(eventReactions[EventReactions.Default])">
-							</tds-check-action>
+											 [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+											 [disabled]="isCheckSyntaxSectionDisabled(EventReactions.Default)"
+											 [(model)]="eventReactions[EventReactions.Default]"
+											 (onClick)="verifyCode(eventReactions[EventReactions.Default])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.Default].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Default])"
@@ -196,10 +196,10 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Error)"
-																[(model)]="eventReactions[EventReactions.Error]"
-																(onClick)="verifyCode(eventReactions[EventReactions.Error])">
-							</tds-check-action>
+										 [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+										 [disabled]="isCheckSyntaxSectionDisabled(EventReactions.Error)"
+										 [(model)]="eventReactions[EventReactions.Error]"
+										(onClick)="verifyCode(eventReactions[EventReactions.Error])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.Error].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Error])"
@@ -232,10 +232,10 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Failed)"
-																[(model)]="eventReactions[EventReactions.Failed]"
-																(onClick)="verifyCode(eventReactions[EventReactions.Failed])">
-							</tds-check-action>
+											[tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+										 	[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Failed)"
+											[(model)]="eventReactions[EventReactions.Failed]"
+											(onClick)="verifyCode(eventReactions[EventReactions.Failed])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.Failed].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Failed])"
@@ -269,9 +269,9 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Lapsed)"
-																[(model)]="eventReactions[EventReactions.Lapsed]" (onClick)="verifyCode(eventReactions[EventReactions.Lapsed])">
-							</tds-check-action>
+											 [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+											 [disabled]="isCheckSyntaxSectionDisabled(EventReactions.Lapsed)"
+											 [(model)]="eventReactions[EventReactions.Lapsed]" (onClick)="verifyCode(eventReactions[EventReactions.Lapsed])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.Lapsed].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Lapsed])"
@@ -308,10 +308,9 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.Stalled)"
-																[(model)]="eventReactions[EventReactions.Stalled]" (onClick)="verifyCode(eventReactions[EventReactions.Stalled])">
-
-							</tds-check-action>
+											 [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+									         [disabled]="isCheckSyntaxSectionDisabled(EventReactions.Stalled)"
+											[(model)]="eventReactions[EventReactions.Stalled]" (onClick)="verifyCode(eventReactions[EventReactions.Stalled])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.Stalled].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.Stalled])"
@@ -350,9 +349,9 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.BeforeInvocation)"
-																[(model)]="eventReactions[EventReactions.BeforeInvocation]" (onClick)="verifyCode(eventReactions[EventReactions.BeforeInvocation])">
-							</tds-check-action>
+											 [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+										     [disabled]="isCheckSyntaxSectionDisabled(EventReactions.BeforeInvocation)"
+											 [(model)]="eventReactions[EventReactions.BeforeInvocation]" (onClick)="verifyCode(eventReactions[EventReactions.BeforeInvocation])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.BeforeInvocation].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.BeforeInvocation])"
@@ -388,9 +387,10 @@
 						</label>
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
-																[disabled]="isCheckSyntaxSectionDisabled(EventReactions.PostInvocation)"
-																[(model)]="eventReactions[EventReactions.PostInvocation]"
-																(onClick)="verifyCode(eventReactions[EventReactions.PostInvocation])"></tds-check-action>
+											 [tooltip]="'API_ACTION.REACTION.ACKNOWLEDGE' | translate"
+											 [disabled]="isCheckSyntaxSectionDisabled(EventReactions.PostInvocation)"
+											 [(model)]="eventReactions[EventReactions.PostInvocation]"
+											 (onClick)="verifyCode(eventReactions[EventReactions.PostInvocation])"></tds-check-action>
 
 							<tds-button-collapse *ngIf="eventReactions[EventReactions.PostInvocation].open"
 												 (click)="openCloseCodeMirror(eventReactions[EventReactions.PostInvocation])"
