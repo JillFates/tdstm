@@ -80,7 +80,8 @@ tds-grid-header-action-buttons .btn clr-icon {
 }
 kendo-grid {
 	.k-grid-header {
-		.k-grid-header-wrap {
+		.k-grid-header-wrap,
+		.k-grid-header-locked {
 			tr {
 				th {
 					a.k-link {
