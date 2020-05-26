@@ -1,5 +1,5 @@
 <div class="task-common">
-	<div class="task-detail-container">
+	<div class="task-detail-container edit-create">
 		<form #taskEditCreateForm="ngForm">
 			<table *ngIf="model" style="border: 0;"
 						 [ngClass]="{'has-duplicated-predecessors': modelHelper?.hasDuplicatedPredecessors(),
@@ -367,12 +367,11 @@
 									<!-- Toolbar Template -->
 									<ng-template kendoGridToolbarTemplate [position]="'top'">
 										<div class="table-container">
-											<label class="table-title">Predecessor
+											<label class="table-title">Predecessors
 												({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
 											<tds-button-add class="float-right"
 																			[tooltip]="modelHelper.ADD_PREDECESSOR"
-																			[displayLabel]="true"
-																			[title]="Add"
+																			[displayLabel]="false"
 																			[iconClass]="'is-solid'"
 																			[id]="'btnAddPredecessor'"
 																			(click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
@@ -437,8 +436,7 @@
 											<tds-button-add class="float-right"
 																			[tooltip]="modelHelper.ADD_SUCCESSOR"
 																			[iconClass]="'is-solid'"
-																			[displayLabel]="true"
-																			[title]="Add"
+																			[displayLabel]="false"
 																			[id]="'btnAddSuccessor'"
 																			(click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
 											</tds-button-add>
