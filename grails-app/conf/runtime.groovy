@@ -432,6 +432,8 @@ List staticSecurityRules = [
 	[pattern: '/templates/**', access: 'permitAll'],
 	[pattern: '/jasper/**', access: 'permitAll'],
 	[pattern: '/oauth/access_token', access: 'permitAll'],
+	[pattern: '/actuator/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"],
+	[pattern: '/monitoring', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 ]
 
 grails {
@@ -506,8 +508,6 @@ if (System.getProperty("tdstm.gconsole")) {
 			console.enabled = true
 			springsecurity {
 				staticSecurityRules << [pattern: '/h2-console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
-				staticSecurityRules << [pattern: '/actuator/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
-				staticSecurityRules << [pattern: '/monitoring', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/static/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				controllerAnnotations.staticRules = staticSecurityRules

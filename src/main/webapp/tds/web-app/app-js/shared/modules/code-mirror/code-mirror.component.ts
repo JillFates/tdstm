@@ -23,7 +23,7 @@ export class CodeMirrorComponent implements OnInit {
 	@Input() model: string;
 	@Input() mode;
 	@Output() modelChange = new EventEmitter<string>();
-	instance;
+	public instance;
 
 	/**
 	 * This stores (cache) the line errores currently present in the component.

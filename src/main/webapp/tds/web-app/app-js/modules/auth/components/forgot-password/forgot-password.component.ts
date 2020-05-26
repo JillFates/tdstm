@@ -1,52 +1,60 @@
-import {Component} from '@angular/core';
-import {LoginService} from '../../service/login.service';
+import {Component, ComponentFactoryResolver, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+
 import {LoginInfoModel} from '../../model/login-info.model';
+import {ActionType} from '../../../dataScript/model/data-script.model';
+import {DialogService, ModalSize} from 'tds-component-library';
+import {ForgotPasswordModalComponent} from './forgot-password-modal.component';
 
 @Component({
 	selector: 'tds-forget-password',
 	templateUrl: 'forgot-password.component.html',
 })
 
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnInit {
 
-	public loginInfo: LoginInfoModel = new LoginInfoModel();
+	public loginInfoModel: LoginInfoModel = new LoginInfoModel();
 	public error: any;
 	public passwordSent = false;
 	public email: '';
 
-	constructor(private loginService: LoginService) {
+	constructor(
+		private dialogService: DialogService,
+		private componentFactoryResolver: ComponentFactoryResolver,
+		private router: Router) {
+	}
+
+	ngOnInit() {
+		this.openModal(this.loginInfoModel, ActionType.VIEW);
 	}
 
 	/**
-	 * Request Password Recovery by sending email
+	 * Open The Dialog to Create, View or Edit the Provider
+	 * @param {LoginInfoModel} loginInfoModel
+	 * @param {number} actionType
+	 * @param openFromList
 	 */
-	public onSendEmail(): void {
-		this.validateFields()
-			.then(() => {
-				this.loginService.forgotPassword(this.email).subscribe((data: any) => {
-					if (!data.success) {
-						this.error = 'An error occurred, please try again later.';
-						return;
-					}
-					this.passwordSent = true;
-				});
-			})
-			.catch(err => this.passwordSent = false);
-	}
-
-	/**
-	 *  Validates fields
-	 */
-	public validateFields(): Promise<boolean> {
-		const emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,63})+$/;
-
-		return new Promise((resolve, reject) => {
-			this.error = '';
-			if ((this.email && !emailExp.test(this.email)) || !this.email) {
-				this.error = 'Not a valid e-mail address';
-			}
-			return this.error && this.error.length > 0 ? reject(new Error('Error validating fields')) : resolve(true);
-		});
+	private async openModal(loginInfoModel: LoginInfoModel, actionType: ActionType, openFromList = false): Promise<void> {
+		try {
+			await this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: ForgotPasswordModalComponent,
+				data: {
+					loginInfoModel: loginInfoModel,
+					actionType: actionType,
+					openFromList: openFromList
+				},
+				modalConfiguration: {
+					title: '',
+					draggable: true,
+					modalSize: ModalSize.MD,
+					resizable: true,
+				}
+			}).toPromise();
+			await this.router.navigate(['/login']);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 }

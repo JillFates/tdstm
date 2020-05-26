@@ -68,6 +68,7 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.isEditAvailable(),
 			active: () => true,
 			type: DialogButtonType.ACTION
@@ -76,6 +77,7 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'saveAsset',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.isEditAvailable(),
 			type: DialogButtonType.ACTION
 		});
@@ -83,6 +85,7 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.isDeleteAvailable(),
 			type: DialogButtonType.ACTION,
 			action: this.onDeleteAsset.bind(this)
@@ -91,6 +94,7 @@ export class AssetEditComponent extends DynamicComponent implements OnInit, Afte
 		this.buttons.push({
 			name: 'cancelEdit',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.onDismiss.bind(this)

@@ -2,14 +2,15 @@
 import {
 	Component,
 	ElementRef,
-	HostListener, Input,
+	HostListener,
+	Input,
 	OnDestroy,
 	OnInit,
 	QueryList,
 	ViewChild,
 	ViewChildren
 } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import {NgForm} from '@angular/forms';
 // Model
 import {
 	APIActionModel,
@@ -18,29 +19,29 @@ import {
 	EventReaction,
 	Languages
 } from '../../model/api-action.model';
-import { ProviderModel } from '../../../provider/model/provider.model';
-import { Permission } from '../../../../shared/model/permission.model';
-import { ActionType, COLUMN_MIN_WIDTH } from '../../../../shared/model/data-list-grid.model';
-import { INTERVAL, INTERVALS } from '../../../../shared/model/constants';
-import { AgentMethodModel, CredentialModel, DictionaryModel } from '../../model/agent.model';
-import { DataScriptModel } from '../../../dataScript/model/data-script.model';
-import { CHECK_ACTION } from '../../../../shared/components/check-action/model/check-action.model';
-import { Dialog, DialogButtonType, DialogConfirmAction, DialogService } from 'tds-component-library';
+import {ProviderModel} from '../../../provider/model/provider.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
+import {INTERVAL, INTERVALS} from '../../../../shared/model/constants';
+import {AgentMethodModel, CredentialModel, DictionaryModel} from '../../model/agent.model';
+import {DataScriptModel} from '../../../dataScript/model/data-script.model';
+import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 // Component
-import { ApiActionViewEditReactionsComponent } from './api-action-view-edit-reactions.component';
-import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
+import {ApiActionViewEditReactionsComponent} from './api-action-view-edit-reactions.component';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 // Service
-import { APIActionService } from '../../service/api-action.service';
-import { CustomDomainService } from '../../../fieldSettings/service/custom-domain.service';
-import { ObjectUtils } from '../../../../shared/utils/object.utils';
-import { SortUtils } from '../../../../shared/utils/sort.utils';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {APIActionService} from '../../service/api-action.service';
+import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
 import * as R from 'ramda';
-import { forkJoin, ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {forkJoin, ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 
@@ -173,6 +174,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
 			active: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
@@ -181,6 +183,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
 			disabled: () => !this.canSave() || !this.isDirty() || this.loadingLists,
 			type: DialogButtonType.ACTION,
@@ -189,6 +192,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.modalType !== this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.onDeleteApiAction.bind(this)
@@ -196,6 +200,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: ((this.modalType === this.actionTypes.VIEW) ? 'Close' : 'Cancel'),
 			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -203,6 +208,7 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
@@ -725,7 +731,6 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 					this.verifyIsValidForm();
 				});
 		}
-		this.onSetUpFocus(this.actionNameInput);
 		// Every time we change the title, it means we switched to View, Edit or Create
 		this.setTitle(this.getModalTitle(this.modalType));
 		this.dataSignature = JSON.stringify(this.apiActionModel);
@@ -893,6 +898,11 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 			modalTitle = 'Action Create';
 		} else {
 			modalTitle = modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail';
+		}
+		if (modalType === ActionType.CREATE || modalType === ActionType.EDIT) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.actionNameInput);
+			});
 		}
 		return modalTitle + ((this.apiActionModel && this.apiActionModel.name) ? ' ' + this.apiActionModel.name : '');
 	}

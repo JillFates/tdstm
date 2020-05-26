@@ -41,6 +41,7 @@ export class ImportBatchRecordDialogComponent extends Dialog implements OnInit, 
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.showActionButtons(),
 			disabled: () => !this.detailFieldsComponent.areOverrideValuesDirty(),
 			type: DialogButtonType.ACTION,
@@ -50,6 +51,7 @@ export class ImportBatchRecordDialogComponent extends Dialog implements OnInit, 
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.onCancelCloseDialog.bind(this)

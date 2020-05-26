@@ -147,7 +147,7 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 				importBatchService.queueBatchesForProcessing(project, [id])
 
 				// Now schedule the background job to run
-				affected = importBatchService.dataImportService.processBatch(importBatch.project, importBatch.id, actionCmd.ids)
+				affected = dataImportService.processBatch(importBatch.project, importBatch.id, actionCmd.ids)
 				break
 
 			default:

@@ -17,8 +17,6 @@
 						<li class="notifications-menu">
 							<span class="tds-nav-item" id="nav-project-name">
 								<span *ngIf="userContext.project">{{userContext.project.name}}</span>
-								<span *ngIf="userContext.event"> : {{ userContext.event.name }}</span>
-								<span *ngIf="userContext.bundle"> : {{ userContext.bundle.name }}</span>
 							</span>
 						</li>
 						<li *ngIf="userContext.license && !userContext.license.isManager && userContext.license.message">

@@ -48,6 +48,7 @@ export class LicenseDetailComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.onDelete.bind(this)
@@ -56,6 +57,7 @@ export class LicenseDetailComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)

@@ -17,6 +17,8 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
 import * as R from 'ramda';
 
+declare var jQuery: any;
+
 const pleaseSelectMessage = 'Please Select';
 
 export function ApplicationCreateComponent(template: string, model: any, metadata: any, parentDialog: any): any {
@@ -64,7 +66,9 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		}
 
 		ngAfterViewInit() {
+			jQuery('[data-toggle="popover"]').popover();
 			this.onFocusOutOfCancel();
+			this.setupListListeners();
 		}
 
 		/**
@@ -74,7 +78,6 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.model.asset.retireDate =   '';
 			this.model.asset.maintExpDate =  '';
 
-			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.moveBundleList = this.model.dependencyMap.moveBundleList;
 			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
 			this.model.asset.assetClass = {
@@ -255,6 +258,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
+			personModel.company = this.model.asset.owner;
 
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,

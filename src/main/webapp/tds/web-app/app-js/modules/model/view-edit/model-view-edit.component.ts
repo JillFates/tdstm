@@ -33,6 +33,8 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	@ViewChild('modelForm', {read: NgForm, static: true}) modelForm: NgForm;
 	@ViewChild('modelConnectorTableBody', { static: false }) d1: ElementRef;
 	@ViewChild('modelNameElement', {static: false}) modelNameElement: ElementRef;
+	@ViewChild('modelManufacturer', {static: false}) modelManufacturer: ElementRef;
+
 	public modelModel: ModelModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -93,7 +95,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modelModel = Object.assign({}, this.data.modelModel);
 		this.manufacturerList = this.data.manufacturerList;
 		this.modalType = this.data.actionType;
-		this.modalTitle = ModelViewEditComponent.getModalTitle(this.modalType);
+		this.modalTitle = this.getModalTitle(this.modalType);
 
 		if (this.modalType !== ActionType.CREATE) {
 			this.getModelDetails();
@@ -104,6 +106,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
 			disabled: () => !this.permissionService.hasPermission(Permission.ModelEdit),
 			active: () => this.modalType === this.actionTypes.EDIT,
@@ -114,6 +117,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
 			disabled: () => !this.modelForm.form.valid || !this.isUnique || this.isEmptyValue() || !this.modelForm.form.dirty,
 			type: DialogButtonType.ACTION,
@@ -123,6 +127,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: ((this.modalType === this.actionTypes.VIEW) ? 'Close' : 'Cancel'),
 			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -131,14 +136,14 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
 		});
 
 		setTimeout(() => {
-			this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
-			this.onSetUpFocus(this.modelNameElement);
+			this.setTitle(this.getModalTitle(this.modalType));
 		});
 	}
 
@@ -153,7 +158,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 					this.modelModel = JSON.parse(this.dataSignature);
 					this.dataSignature = JSON.stringify(this.modelModel);
 					this.modalType = this.actionTypes.VIEW;
-					this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
+					this.setTitle(this.getModalTitle(this.modalType));
 				} else if (result.confirm === DialogConfirmAction.CONFIRM && this.data.openFromList) {
 					this.onCancelClose();
 				}
@@ -161,7 +166,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		} else {
 			if (!this.data.openFromList) {
 				this.modalType = this.actionTypes.VIEW;
-				this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
+				this.setTitle(this.getModalTitle(this.modalType));
 			} else {
 				this.onCancelClose();
 			}
@@ -338,7 +343,13 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 	 * @param {ActionType} modalType
 	 * @returns {string}
 	 */
-	private static getModalTitle(modalType: ActionType): string {
+	private  getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.CREATE || modalType === ActionType.EDIT) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.modelManufacturer);
+			});
+		}
+
 		if (modalType === ActionType.CREATE) {
 			return 'Model Create';
 		}
@@ -354,7 +365,7 @@ export class ModelViewEditComponent extends Dialog implements OnInit {
 		this.modalType = this.actionTypes.EDIT;
 		this.aliasPristineList = (this.modalType === this.actionTypes.EDIT) ? (this.modelAkas) ? this.modelAkas : [] : [];
 		this.aliasControls = (this.modalType === this.actionTypes.EDIT) ? (this.modelAkas) ? this.modelAkas : [] : [];
-		this.setTitle(ModelViewEditComponent.getModalTitle(this.modalType));
+		this.setTitle(this.getModalTitle(this.modalType));
 	}
 
 	/**

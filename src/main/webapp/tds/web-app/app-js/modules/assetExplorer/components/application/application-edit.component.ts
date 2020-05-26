@@ -231,6 +231,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			personModel.companies = companies || [];
 			personModel.teams = teams;
 			personModel.staffType = staffTypes || [];
+			personModel.company = this.model.asset.owner;
 
 			this.dialogService.open({
 				componentFactoryResolver: this.componentFactoryResolver,

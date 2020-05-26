@@ -1,5 +1,5 @@
 // Angular
-import {Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
 // Model
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 // Service
@@ -15,6 +15,8 @@ import {AssetCommonEdit} from '../asset/asset-common-edit';
 // Other
 import * as R from 'ramda';
 
+declare var jQuery: any;
+
 export function DatabaseCreateComponent(template, model: any, metadata: any, parentDialog: any) {
 
 	@Component({
@@ -23,7 +25,7 @@ export function DatabaseCreateComponent(template, model: any, metadata: any, par
 		providers: [
 			{ provide: 'model', useValue: model }
 		]
-	}) class DatabaseCreateComponent extends AssetCommonEdit implements OnInit {
+	}) class DatabaseCreateComponent extends AssetCommonEdit implements OnInit, AfterViewInit {
 		constructor(
 			@Inject('model') model: any,
 			componentFactoryResolver: ComponentFactoryResolver,
@@ -41,13 +43,16 @@ export function DatabaseCreateComponent(template, model: any, metadata: any, par
 			this.model.asset.retireDate = null;
 			this.model.asset.maintExpDate = null;
 
-			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
 			this.model.asset.environment = '';
 			this.model.asset.scale = null;
 			this.model.asset.validation = this.defaultValidation;
 			this.focusControlByName('assetName');
 			this.onFocusOutOfCancel();
+		}
+
+		ngAfterViewInit() {
+			jQuery('[data-toggle="popover"]').popover();
 		}
 
 		/**

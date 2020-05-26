@@ -1,11 +1,5 @@
 // Angular
-import {
-	Component,
-	ComponentFactoryResolver,
-	Input,
-	OnInit,
-	ViewChild
-} from '@angular/core';
+import {Component, ComponentFactoryResolver, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {EventsService} from '../../../event/service/events.service';
@@ -27,6 +21,7 @@ import {UserContextModel} from '../../../auth/model/user-context.model';
 export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	@Input() data: any;
 	@ViewChild('eventNewsForm', {read: NgForm, static: true}) eventNewsForm: NgForm;
+	@ViewChild('commentTextArea', {static: false}) commentTextArea: ElementRef;
 	public eventNewsModel: EventNewsModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -56,6 +51,7 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
 			disabled: () => !this.permissionService.hasPermission(Permission.ProviderUpdate),
 			active: () => this.modalType === this.actionTypes.EDIT,
@@ -66,6 +62,7 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
 			disabled: () => !this.eventNewsForm.form.valid || !this.eventNewsForm.form.dirty,
 			type: DialogButtonType.ACTION,
@@ -75,6 +72,7 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.modalType !== this.actionTypes.CREATE,
 			disabled: () => !this.isDeleteAvailable(),
 			type: DialogButtonType.ACTION,
@@ -84,6 +82,7 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: ((this.modalType === this.actionTypes.VIEW) ? 'Close' : 'Cancel'),
 			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -92,6 +91,7 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
@@ -177,6 +177,11 @@ export class EventNewsViewEditComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.EDIT) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.commentTextArea);
+			});
+		}
 		return modalType === ActionType.EDIT
 			? 'Event News Edit'
 			: 'Event News Detail';
