@@ -72,7 +72,7 @@
 				</div>
 
 				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.moveBundle?.value}"/>
+					<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.moveBundle?.id}"/>
 					<kendo-dropdownlist
 						[tabIndex]="9"
 						class="tm-input-control"

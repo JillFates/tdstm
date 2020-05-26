@@ -85,7 +85,8 @@ export const en_DICTIONARY: Object = {
 		'DATE_TIMEZONE': 'Date and Timezone',
 		'DATE_FORMAT': 'Date Format',
 		'LOADING_RECORDS': 'Loading records...',
-		'NO_RECORDS': 'No records found'
+		'NO_RECORDS': 'No records found',
+		'NO_RECORDS_AVAILABLE': 'No records available'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'

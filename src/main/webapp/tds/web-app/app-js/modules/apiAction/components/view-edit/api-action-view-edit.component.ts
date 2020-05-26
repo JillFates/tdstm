@@ -900,7 +900,9 @@ export class APIActionViewEditComponent extends Dialog implements OnInit, OnDest
 			modalTitle = modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail';
 		}
 		if (modalType === ActionType.CREATE || modalType === ActionType.EDIT) {
-			this.onSetUpFocus(this.actionNameInput);
+			setTimeout(() => {
+				this.onSetUpFocus(this.actionNameInput);
+			});
 		}
 		return modalTitle + ((this.apiActionModel && this.apiActionModel.name) ? ' ' + this.apiActionModel.name : '');
 	}

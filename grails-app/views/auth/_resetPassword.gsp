@@ -27,7 +27,7 @@
 	<asset:stylesheet href="css/tds-style.css" />
 	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
-	<script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
 	<asset:stylesheet href="css/spinner.css" />
 

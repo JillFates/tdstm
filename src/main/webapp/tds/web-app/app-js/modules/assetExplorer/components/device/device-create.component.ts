@@ -64,7 +64,6 @@ export function DeviceCreateComponent(template, model: any, metadata: any, paren
 			this.model.asset.assetTypeSelectValue = {id: null};
 			this.model.asset.manufacturerSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};
-			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.defaultPlanStatus;
 			this.model.asset.validation = this.defaultValidation;
 			this.model.asset.environment = '';

@@ -2,9 +2,9 @@ export interface ITaskHighlightQuery {
 	eventId?: number;
 	viewUnpublished?: number;
 	assignedPersonId?: number;
-	teams?: string;
+	teamCode?: string;
 	ownerSmeId?: string;
-	environments?: string;
+	environment?: string;
 	taskText?: string;
 	tagIds?: [];
 	tagMatch?: string;
@@ -19,9 +19,9 @@ export class TaskHighlightQueryModel implements ITaskHighlightQuery {
 		public eventId?: number,
 		public viewUnpublished?: number,
 		public assignedPersonId?: number,
-		public teams?: string,
+		public teamCode?: string,
 		public ownerSmeId?: string,
-		public environments?: string,
+		public environment?: string,
 		public taskText?: string,
 		public tagIds?: [],
 		public tagMatch?: string,
