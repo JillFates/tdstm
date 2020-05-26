@@ -23,7 +23,7 @@ import * as R from 'ramda';
 						<div class="form-group">
 							<label for="newAssetName" class="col-sm-4 control-label"> New asset name</label>
 							<div class="col-sm-6">
-								<input type="text" id="newAssetName" name="newAssetName" [(ngModel)]="assetName" class="form-control" (keyup)="isAssetUnique()"/>
+								<input type="text" #newAssetName id="newAssetName" name="newAssetName" [(ngModel)]="assetName" class="form-control" (keyup)="isAssetUnique()"/>
 								<label class="asset-name-validations">
 									<span class="asset-unique-name" *ngIf="!uniqueAssetName && !existAsset"> Change name appropriately </span>
 									<span *ngIf="assetName.length == 0"> Asset name is required </span>
@@ -70,6 +70,7 @@ export class AssetCloneComponent extends Dialog implements OnInit {
 	public uniqueAssetName: boolean;
 	public existAsset: any;
 	@ViewChild('includeDependencies', {static: false}) includeDependencies: ElementRef;
+	@ViewChild('newAssetName', {static: false}) newAssetNameElement: ElementRef;
 
 	public cloneModalModel: AssetModalModel;
 	private dataSignature: string;
@@ -91,6 +92,7 @@ export class AssetCloneComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.canCloneAssets(),
 			disabled: () => this.assetName.length === 0,
 			type: DialogButtonType.ACTION,
@@ -100,6 +102,7 @@ export class AssetCloneComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cloneAsset',
 			icon: 'copy',
+			tooltipText: 'Clonse',
 			show: () => this.canCloneAssets(),
 			disabled: () => this.assetName.length === 0,
 			type: DialogButtonType.ACTION,
@@ -110,6 +113,7 @@ export class AssetCloneComponent extends Dialog implements OnInit {
 			name: 'cancel',
 			icon: 'ban',
 			show: () => true,
+			tooltipText: 'Cancel',
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});
@@ -122,6 +126,9 @@ export class AssetCloneComponent extends Dialog implements OnInit {
 				this.dataSignature = JSON.stringify({asset: this.asset, assetName: this.assetName});
 			}, (err) => console.log(err));
 
+		setTimeout( () => {
+			this.onSetUpFocus(this.newAssetNameElement);
+		});
 	}
 
 	/**

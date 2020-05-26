@@ -61,7 +61,7 @@
                                 <a href="/tdstm/module/manufacturer/list">List Manufacturers</a>
                             </li>
                             <li class="menu-child-item menu-list-models">
-                                <g:link controller="model" >List Models</g:link>
+                                <a href="/tdstm/module/model/list">List Models</a>
                             </li></g:if>
                         </ul>
                     </li>
@@ -223,7 +223,7 @@
                                 <tds:hasPermission permission="${Permission.DataTransferBatchView}">
                                     <li class="menu-child-item menu-parent-assets-manage-dep-batches">
                                         <g:link class="mmlink" controller="module" action="importbatch" id="list">
-                                            Manage Import Batches(ETL)
+                                            Manage Import Batches (ETL)
                                         </g:link>
                                     </li>
                                 </tds:hasPermission>

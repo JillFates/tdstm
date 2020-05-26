@@ -40,6 +40,7 @@
     <asset:stylesheet href="css/daterangepicker-bs3.css" />
 
     <g:javascript src="tdsmenu.js" />
+    <g:javascript src="walkme.js" />
     <g:javascript src="PasswordValidation.js" />
 
     <script type="text/javascript">
@@ -141,8 +142,6 @@
 									<!-- Menu toggle button -->
 									<span class="tds-nav-item" id="nav-project-name">
 										<g:if test="${currProject}"> ${currProject.name} </g:if>
-										<g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>
-										<g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>
 									</span>
 								</li>
 								<li>

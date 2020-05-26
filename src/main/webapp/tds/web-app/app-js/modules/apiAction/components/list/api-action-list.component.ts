@@ -135,7 +135,9 @@ export class APIActionListComponent implements OnInit {
 	private onDelete = async (dataItem: APIActionModel): Promise<void> => {
 		try {
 			if (this.isDeleteAvailable()) {
-				const confirmation = await this.dialogService.confirm('Confirmation Required', 'Confirm deletion of ' + dataItem.name + ' Action?').toPromise();
+				const confirmation = await this.dialogService.confirm(
+					'Confirmation Required',
+					'You are about to delete the selected Action. Do you want to continue?').toPromise();
 				if (confirmation) {
 					if (confirmation.confirm === DialogConfirmAction.CONFIRM) {
 						await this.apiActionService.deleteAPIAction(dataItem.id).toPromise();

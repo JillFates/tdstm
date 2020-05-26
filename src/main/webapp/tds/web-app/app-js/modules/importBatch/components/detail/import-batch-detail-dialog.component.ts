@@ -91,6 +91,7 @@ export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)

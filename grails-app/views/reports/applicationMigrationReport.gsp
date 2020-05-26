@@ -29,11 +29,11 @@
 					</tbody>
 					<tr>
 						<td><label for="startCateory">start of with:</label></td>
-						<td><g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).category.inList}" id="startCateory" name="startCateory" value='shutdown'/></td>
+						<td><g:select from="${categories}" id="startCateory" name="startCateory" value='shutdown'/></td>
 					</tr>
 					<tr>
 						<td><label for="stopCateory">end with:</label></td>
-						<td><g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).category.inList}" id="stopCateory" name="stopCateory" value='startup'/></td>
+						<td><g:select from="${categories}" id="stopCateory" name="stopCateory" value='startup'/></td>
 					</tr>
 					<tr>
 						<td><label for="outageWindow">Outage window:</label></td>

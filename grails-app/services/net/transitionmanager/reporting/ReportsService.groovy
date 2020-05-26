@@ -50,7 +50,6 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
@@ -1242,6 +1241,7 @@ class ReportsService implements ServiceMethods {
 
             List<Boolean> publishedValues = viewUnpublished ? [true, false] : [true]
 
+            //TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
             personTasks = AssetComment.executeQuery('''
 				from AssetComment
 				where moveEvent=:moveEvent

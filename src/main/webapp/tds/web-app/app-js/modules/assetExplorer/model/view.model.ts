@@ -4,6 +4,7 @@ export class ViewModel {
 	id: number;
 	name: string;
 	isOwner: boolean;
+	isGlobal: boolean;
 	isSystem: boolean;
 	isShared: boolean;
 	hasOverride: boolean;

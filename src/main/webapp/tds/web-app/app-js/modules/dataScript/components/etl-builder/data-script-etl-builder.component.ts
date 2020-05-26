@@ -106,6 +106,7 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			disabled: () => !this.isUpdateAvailable() || !this.isScriptDirty() || (this.operationStatus.save && this.operationStatus.save !== 'success'),
 			type: DialogButtonType.ACTION,
 			action: this.onSave.bind(this)
@@ -113,6 +114,7 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});
@@ -611,6 +613,12 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 	 * Based on modalType action returns the corresponding title
 	 */
 	private getModalTitle(): string {
+		setTimeout(() => {
+			if (this.codeMirrorComponent) {
+				this.codeMirrorComponent.instance.focus();
+				this.codeMirrorComponent.instance.setCursor(this.codeMirrorComponent.instance.lineCount(), 0);
+			}
+		}, 1000);
 		return `ETL Script Edit - ${ this.dataScriptModel.provider.name } / ${ this.dataScriptModel.name } `;
 	}
 }

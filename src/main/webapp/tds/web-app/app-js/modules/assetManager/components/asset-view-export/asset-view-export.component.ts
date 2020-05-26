@@ -10,6 +10,9 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import * as R from 'ramda';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {EventsService} from '../../../event/service/events.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 
 @Component({
 	selector: 'asset-explorer-view-export',
@@ -68,7 +71,8 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 	public assetExportModel: AssetExportModel;
 
 	constructor(
-		private assetExpService: AssetExplorerService
+		private assetExpService: AssetExplorerService,
+		private userContextService: UserContextService
 	) {
 		super();
 		this.isIdFieldExported = true;  // by default mark the id as exportable
@@ -76,6 +80,9 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 
 	ngOnInit(): void {
 		this.assetExportModel = R.clone(this.data.assetExportModel);
+		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+			this.fileName = userContext.project.name + '-' + this.data.assetExportModel.viewName;
+		});
 
 		this.buttons.push({
 			name: 'close',
@@ -127,6 +134,9 @@ export class AssetViewExportComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getImportanceColor(model: any): string {
+		if (model.notFound) {
+			return this.fieldImportance['U'].color;
+		}
 		let domain = this.assetExportModel.domains.find(r => r.domain.toLocaleLowerCase() === model.domain.toLocaleLowerCase());
 		let field = domain.fields.find(r => r.label.toLocaleLowerCase() === model.label.toLocaleLowerCase());
 		return this.fieldImportance[field.imp].color;

@@ -9,12 +9,11 @@
 				<tds-asset-view-selector #select="tdsAssetViewSelector"></tds-asset-view-selector>
 
 				<!-- Save / Save As button-->
-				<tds-asset-view-config-save-button [model]="model"
-												   [dataSignature]="dataSignature"
-												   [isValid]="isValid()"
-												   (save)="onSave()"
-												   (saveAs)="onSaveAs()">
-				</tds-asset-view-config-save-button>
+				<tds-asset-view-save-button *ngIf="config && model"
+																		[config]="config"
+																		(save)="onSave()"
+																		(saveAs)="onSaveAs()">
+				</tds-asset-view-save-button>
 
 				<!-- Cancel button -->
 				<tds-button [id]="'btnCancel'"
@@ -47,7 +46,7 @@
 				<!-- Export button -->
 				<tds-button-custom [id]="'btnExport'"
 													 [icon]="'download-cloud'"
-													 [disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid()"
+													 [disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isFormValid()"
 													 (click)="onExport()"
 													 [tooltip]="'Export View'">
 				</tds-button-custom>
@@ -63,8 +62,8 @@
 		<div class="tabs-button-bar text-right" *ngIf="!collapsed">
 			<tds-button [title]="'Preview'"
 									class="preview"
-									[disabled]="!isValid()"
-									[ngClass]="{'btn-secondary':!isValid(),'btn-success':isValid()}"
+									[disabled]="!isFormValid()"
+									[ngClass]="{'btn-secondary':!isFormValid(),'btn-success':isFormValid()}"
 									(click)="onPreview()">
 				Preview
 			</tds-button>

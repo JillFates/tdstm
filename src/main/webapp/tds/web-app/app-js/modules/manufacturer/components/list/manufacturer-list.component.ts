@@ -1,7 +1,7 @@
 // Angular
 import {
 	Component,
-	ComponentFactoryResolver,
+	ComponentFactoryResolver, HostListener,
 	OnInit,
 	ViewChild,
 } from '@angular/core';
@@ -26,6 +26,9 @@ import {CellClickEvent} from '@progress/kendo-angular-grid';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {ManufacturerColumnModel, ManufacturerModel} from '../../model/manufacturer.model';
 import {ExportManufacturerModelsComponent} from '../../../../shared/components/export-manufacturer-models/export-manufacturer-models.component';
+import moment from 'moment';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
 	selector: 'manufacturer-list',
@@ -50,6 +53,7 @@ export class ManufacturerListComponent implements OnInit {
 	private dateFormat = '';
 
 	@ViewChild(GridComponent, {static: false}) gridComponent: GridComponent;
+	unsubscribeAll$: ReplaySubject<void> = new ReplaySubject<void>();
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -90,7 +94,7 @@ export class ManufacturerListComponent implements OnInit {
 				icon: 'download-cloud',
 				iconClass: 'is-solid',
 				title: this.translateService.transform('GLOBAL.EXPORT'),
-				show: true,
+				show: this.permissionService.hasPermission(Permission.ModelExport),
 				onClick: this.onExport.bind(this),
 			}
 		];
@@ -167,13 +171,17 @@ export class ManufacturerListComponent implements OnInit {
 		this.dialogService.open({
 			componentFactoryResolver: this.componentFactoryResolver,
 			component: ExportManufacturerModelsComponent,
-			data: null,
+			data: {
+				exportFileName: `manufacturers-${moment().format('YYYY-MM-DD')}`
+			},
 			modalConfiguration: {
 				title: 'Export Manufacturers & Models to Excel',
 				draggable: true,
 				modalSize: ModalSize.MD
 			}
-		}).subscribe();
+		})
+			.pipe(takeUntil(this.unsubscribeAll$))
+			.subscribe();
 	}
 
 	/**
@@ -186,7 +194,9 @@ export class ManufacturerListComponent implements OnInit {
 				this.dialogService.confirm(
 					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
 					this.translateService.transform('GLOBAL.CONFIRMATION_PROMPT.DELETE_ITEM_CONFIRMATION')
-				).subscribe((result: any) => {
+				)
+					.pipe(takeUntil(this.unsubscribeAll$))
+					.subscribe((result: any) => {
 						if (result.confirm === DialogConfirmAction.CONFIRM) {
 							this.manufacturerService.deleteManufacturer(dataItem.id).toPromise().finally(() => this.gridComponent.reloadData());
 						}
@@ -243,6 +253,12 @@ export class ManufacturerListComponent implements OnInit {
 
 	private isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribeAll$.next();
+		this.unsubscribeAll$.complete();
 	}
 
 }

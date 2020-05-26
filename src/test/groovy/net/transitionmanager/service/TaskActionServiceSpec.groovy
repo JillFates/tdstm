@@ -17,6 +17,8 @@ import net.transitionmanager.action.Provider
 import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.common.CoreService
@@ -43,6 +45,9 @@ import spock.util.mop.ConfineMetaClassChanges
 import test.helper.ApiCatalogTestHelper
 import test.helper.mock.ProjectMock
 
+import static net.transitionmanager.asset.AssetOptions.AssetOptionsType.TASK_CATEGORY
+
+@ConfineMetaClassChanges([GormUtil])
 class TaskActionServiceSpec extends Specification implements ServiceUnitTest<TaskActionService>, DataTest, GrailsWebUnitTest {
 
 	@Shared
@@ -84,7 +89,10 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 	"""
 
 	def setupSpec() {
-		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetComment
+		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetComment, AssetOptions
+
+		//Overriding this so that in the CustomValidators.inList the calls to getConstraintValue don't blow up.
+		GormUtil.metaClass.static.getConstraintValue = {Class clazz, String propertyName, String constraintName -> [] as Object}
 
 		service.taskService = [
 					addNote: { AssetComment task, Person person, String note, int isAudit = 1 ->
@@ -95,6 +103,7 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		TaskFacade taskFacade2 = new TaskFacade(new AssetComment(), new Person())
 		taskFacade2.taskService = service.taskService
 		Holders.grailsApplication.mainContext.beanFactory.registerSingleton("taskFacade", taskFacade2)
+
 		defineBeans {
 			coreService(CoreService) {
 				grailsApplication = ref('grailsApplication')
@@ -104,6 +113,8 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 				transactionManager = ref('transactionManager')
 			}
 			settingService(SettingService)
+
+			assetOptionsService(AssetOptionsService)
 
 			httpProducerService(HttpProducerService)
 			// A custom context holder to allow us to gain access to the application context and other components of the runtime environment
@@ -130,6 +141,7 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 
 	def setup() {
 		notes = []
+		new AssetOptions(type: TASK_CATEGORY, value: 'general').save(flush: true, failOnError: true)
 		project = new ProjectMock().create()
 		whom = new Person(firstName: 'Danger', lastName: 'Powers').save(flush: true)
 		new Person(firstName: Person.SYSTEM_USER_AT.firstName,  lastName: Person.SYSTEM_USER_AT.lastName).save(flush: true)

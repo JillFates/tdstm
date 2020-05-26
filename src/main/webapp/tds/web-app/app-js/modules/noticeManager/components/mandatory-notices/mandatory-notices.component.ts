@@ -54,7 +54,7 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 			.setAcknowledge(this.notices[this.currentNoticeIndex].id)
 				.subscribe(() => {
 					if ((this.currentNoticeIndex + 1) >= this.notices.length) {
-						this.onCancelClose();
+						this.onAcceptSuccess();
 					} else {
 						this.currentNoticeIndex += 1;
 					}

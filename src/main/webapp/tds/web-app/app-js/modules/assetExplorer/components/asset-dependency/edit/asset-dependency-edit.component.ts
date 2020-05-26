@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewChild} from '@angular/core';
 
 import {DependencyType, Dependency} from '../model/asset-dependency.model';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 
 @Component({
 	selector: 'asset-dependency-edit',
@@ -14,6 +15,11 @@ export class AssetDependencyEditComponent implements OnInit {
 	@Input() statusList: string[] = [];
 	@Input() typeList: string[] = [];
 	@Input() directionList: string[] = [];
+	@ViewChild('frequencyListA', {
+		read: DropDownListComponent,
+		static: false,
+	})
+	frequencyListA: DropDownListComponent;
 	public DependencyType = DependencyType;
 
 	public dependencies = {

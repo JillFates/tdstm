@@ -17,7 +17,7 @@ export class UserContextModel {
 	error?: string;
 	alternativeProjects?: [];
 	csrf?: CSRF;
-	defaultProject?: any;
+	defaultProject?: {id: number};
 }
 
 export class CSRF {

@@ -763,7 +763,7 @@ class AssetEntityService implements ServiceMethods {
 			}
 
 			log.debug "addOrUpdateDependencies() Attempting to ${isNew ? 'CREATE' : 'UPDATE'} dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
-			if (!assetDependency.save(flush:true, failOnError: false)) {
+			if (!assetDependency.save(flush:true, failOnError: false, deepValidate: false)) {
 				throw new DomainUpdateException("Unable to save $depType dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
 			}
 		}
@@ -3088,6 +3088,8 @@ class AssetEntityService implements ServiceMethods {
 
 		if (forCreate) {
 			commonModel = getCommonModelForCreate(domain, project, assetEntity)
+			assetEntity.moveBundle = project.defaultBundle
+			assetEntity.owner = project.client
 		} else {
 			commonModel = getCommonModelForShows(domain, project, params, assetEntity, includeDependencies)
 		}

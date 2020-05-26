@@ -19,6 +19,7 @@
 	<link rel="stylesheet" href="https://unpkg.com/@clr/ui/clr-ui.min.css" />
     <!--CLARITY ICONS STYLE-->
     <link rel="stylesheet" href="${resource(dir:'dist/css/clarity',file:'clr-icons.min.css')}">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <!--CLARITY ICONS API & ALL ICON SETS-->
     <script src="${resource(dir:'dist/js/vendors/clarity',file:'clr-icons.min.js')}"></script>
 
@@ -26,6 +27,7 @@
 	<asset:stylesheet href="css/tds-style.css" />
 	<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
 	<asset:stylesheet href="css/spinner.css" />
 
@@ -33,9 +35,10 @@
 
 	</head>
 	<body class="hold-transition login-page">
-		<div class="login-box">
-
-			<div class="login-box-body">
+		<div id="passwordModal" class="login-box modal" style="padding: 0; background: none; width: 800px;">
+			<div class="modal-content" style="width: 400px; margin: 0 auto 0 auto;">
+				<span class="close" style="padding: 5px 5px 0 0;">&times;</span>
+				<div class="login-box-body" style="width: 360px; margin: 0 auto 0 auto; border: none !important;">
 				<div class="login-logo">
 					<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
 						<asset:image src="images/TMLoginLogo_v4.7.png" border="0" alt="Learn more about TransitionManager" />
@@ -49,7 +52,7 @@
 						src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 				</div>
 
-				<g:form action="applyNewPassword" name="forgotPasswordForm" method="post">
+				<g:form action="applyNewPassword" name="forgotPasswordForm" method="post" id="forgotPasswordForm">
 					<input type="hidden" name="username" id="username" value="${username}" />
 					<input type="hidden" name="token" id="token" value="${token}" />
 					<p>The final step is to enter your email address associated with your account and a new password.
@@ -177,6 +180,7 @@
 
 				</g:form>
 				</div>
+				</div>
 			</div>
 		</div>
 		<div id="overlay">
@@ -198,10 +202,31 @@
 		<script language="javascript" type="text/javascript">
 			// Let's keep this until migrate the login into angularjs.
 
+			const modal = document.getElementById("passwordModal");
+			const span = document.getElementsByClassName("close")[0];
+
 			$(document).ready(function() {
+				modal.style.display = "block";
+				$(".modal-content").resizable({minWidth: 360, maxWidth: 800});
+				$("#passwordModal").draggable();
 				$("#submitButton").click(function(){
 					$("#overlay").css('display', 'inline');
 				});
+				$('#email').focus();
+
+				$('.close').click(function() {
+					if (confirm("Return to the login page?") === true) {
+						window.location.href = "/tdstm";
+					}
+				});
+			});
+
+			$(document).keyup(function(e) {
+				if (e.key === "Escape") { // escape key maps to keycode `27`
+					if (confirm("Return to the login page?") === true) {
+						window.location.href = "/tdstm";
+					}
+				}
 			});
 
 		</script>

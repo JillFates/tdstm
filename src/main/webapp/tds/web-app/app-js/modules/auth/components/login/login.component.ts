@@ -25,7 +25,7 @@ import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
 import {Observable} from 'rxjs';
 import {map, withLatestFrom} from 'rxjs/operators';
 import {fixContentWrapper} from '../../../../shared/utils/data-grid-operations.helper';
-import {DialogService} from 'tds-component-library';
+import {DialogExit, DialogService} from 'tds-component-library';
 import {ModalSize} from 'tds-component-library';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
@@ -250,8 +250,10 @@ export class LoginComponent implements OnInit {
 	private showNotices(): void {
 		const hasStandardNotices = this.filterPostNotices(false).length > 0;
 
-		this.showMandatoryNotices()
-			.then(() => {
+		this.showMandatoryNotices().then((result) => {
+				if (!result || result.status !== DialogExit.ACCEPT) {
+					return;
+				}
 				if (hasStandardNotices) {
 					setTimeout(() => {
 						this.showStandardNotices()
@@ -306,21 +308,25 @@ export class LoginComponent implements OnInit {
 	/**
 	 * Open the view to show mandatory notices
 	 */
-	private async showMandatoryNotices(): Promise<void> {
+	private showMandatoryNotices(): Promise<any> {
 		const notices = this.filterPostNotices(true);
 
-		if (notices.length) {
-			await this.dialogService.open({
-					componentFactoryResolver: this.componentFactoryResolver,
-					component: MandatoryNoticesComponent,
-					data: {notices: notices},
-					modalConfiguration: {
-						title: 'Notices',
-						draggable: false,
-						modalSize: ModalSize.MD
-					}
-				}).toPromise()
+		// If User has Mandatory Notices, open the dialog
+		if (notices.length > 0) {
+			return this.dialogService.open({
+				componentFactoryResolver: this.componentFactoryResolver,
+				component: MandatoryNoticesComponent,
+				data: {notices: notices},
+				modalConfiguration: {
+					title: 'Notices',
+					draggable: false,
+					modalSize: ModalSize.MD
+				}
+			}).toPromise();
 		}
+
+		// If not, send accept to go to the next flow
+		return new Promise((resolve) => resolve({status: DialogExit.ACCEPT}));
 	}
 
 	/**

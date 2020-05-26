@@ -19,6 +19,8 @@ import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
@@ -48,17 +50,18 @@ import java.text.DateFormat
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ReportsController implements ControllerMethods {
 
-	AssetEntityService assetEntityService
-	ControllerService controllerService
-	CustomDomainService customDomainService
-	JdbcTemplate jdbcTemplate
-	MoveBundleService moveBundleService
-	MoveEventService moveEventService
+	AssetEntityService       assetEntityService
+	ControllerService        controllerService
+	CustomDomainService      customDomainService
+	JdbcTemplate             jdbcTemplate
+	MoveBundleService        moveBundleService
+	MoveEventService         moveEventService
 	PartyRelationshipService partyRelationshipService
-	ProjectService projectService
-	ReportsService reportsService
-	UserPreferenceService userPreferenceService
-	MetricReportingService metricReportingService
+	ProjectService           projectService
+	ReportsService           reportsService
+	UserPreferenceService    userPreferenceService
+	MetricReportingService   metricReportingService
+	AssetOptionsService      assetOptionsService
 
 
 	// Generate Report Dialog
@@ -713,7 +716,8 @@ class ReportsController implements ControllerMethods {
 			moveBundles  : moveBundleList,
 			moveBundleId : moveBundleId,
 			smeList      : smeList.sort { it.lastName },
-			appAttributes: appAttributes
+			appAttributes: appAttributes,
+			categories   : assetOptionsService.taskCategories()
 		]
 	}
 

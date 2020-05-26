@@ -6,7 +6,10 @@ import {
 	Input,
 	Output,
 	EventEmitter,
-	SimpleChanges
+	SimpleChanges,
+	ViewChildren,
+	QueryList,
+	AfterViewInit
 } from '@angular/core';
 import {
 	NG_VALUE_ACCESSOR,
@@ -19,6 +22,7 @@ import { PreferenceService } from '../../../services/preference.service';
 import { TDSCustomControl } from '../common/custom-control.component';
 import { ValidationRulesFactoryService } from '../../../services/validation-rules-factory.service';
 import { DateValidationConstraints } from '../../../../shared/model/validation-contraintes.model';
+import {DatePickerComponent, PreventableEvent} from '@progress/kendo-angular-dateinputs';
 
 @Component({
 	selector: 'tds-date-control',
@@ -47,12 +51,15 @@ import { DateValidationConstraints } from '../../../../shared/model/validation-c
 		}
 	]
 })
-export class TDSDateControlComponent extends TDSCustomControl implements OnChanges, OnInit {
+export class TDSDateControlComponent extends TDSCustomControl implements OnChanges, OnInit, AfterViewInit {
 	@Input('minimum') minimum;
 	@Input('maximum') maximum;
 	@Output() blur: EventEmitter<any> = new EventEmitter();
 	protected displayFormat: string;
 	public dateValue: Date;
+	public open: EventEmitter<PreventableEvent>;
+	public close: EventEmitter<PreventableEvent>;
+	@ViewChildren(DatePickerComponent) datePicker: QueryList<DatePickerComponent>;
 
 	constructor(
 		private userPreferenceService: PreferenceService,
@@ -66,6 +73,12 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 	*/
 	ngOnInit(): void {
 		this.updateDateValue();
+	}
+
+	ngAfterViewInit(): void {
+		// setup the listeners to the open/close list events
+		this.open = this.datePicker.first.open;
+		this.close = this.datePicker.first.close;
 	}
 
 	/**

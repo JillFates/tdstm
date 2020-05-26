@@ -259,11 +259,15 @@ export class ApiActionViewEditParamatersComponent {
 				dataItem.currentFieldList = fieldSpecs.fields;
 				dataItem.sourceFieldList = fieldSpecs.fields;
 				let property = dataItem.currentFieldList.find((field) => {
+					// this little hacky-fix over here exists because we expect fieldName to be a direct string but sometimes it comes as an object with other props.
+					if (dataItem.fieldName && dataItem.fieldName.field) {
+						dataItem.fieldName = dataItem.fieldName.field;
+					}
 					const fieldName = dataItem.fieldName.toLowerCase();
 					return field.field.toLowerCase() === fieldName || field.label.toLowerCase() === fieldName;
 				});
 				if (property) {
-					dataItem.fieldName = property;
+					dataItem.fieldName = property.label ? property.label : property;
 				}
 			}
 			this.onValuesChange();

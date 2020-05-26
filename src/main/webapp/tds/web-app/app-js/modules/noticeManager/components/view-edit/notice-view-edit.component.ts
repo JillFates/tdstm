@@ -1,5 +1,5 @@
 // Angular
-import {AfterViewInit, Component, ComponentFactoryResolver, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 // Component
 import {ViewHtmlComponent} from '../view-html/view-html.component';
 // Service
@@ -70,6 +70,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.action === ActionType.Edit || this.action === ActionType.View,
 			active: () => this.action === ActionType.Edit,
 			type: DialogButtonType.ACTION,
@@ -79,6 +80,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.action === ActionType.Edit || this.action === ActionType.Create,
 			disabled: () => !this.formValid() || !this.isCreateEditAvailable() || !this.isDirty(),
 			type: DialogButtonType.ACTION,
@@ -88,6 +90,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 		this.buttons.push({
 			name: 'delete',
 			icon: 'trash',
+			tooltipText: 'Delete',
 			show: () => this.action !== ActionType.Create,
 			type: DialogButtonType.ACTION,
 			action: this.deleteNotice.bind(this)
@@ -96,6 +99,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: ((this.action === ActionType.View) ? 'Close' : 'Cancel'),
 			show: () => this.action === ActionType.View || this.action === ActionType.Create,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -104,6 +108,7 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.action === ActionType.Edit,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
@@ -147,7 +152,6 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.action));
-			super.onSetUpFocus(this.noticeCreateTitle);
 		});
 	}
 
@@ -404,6 +408,12 @@ export class NoticeViewEditComponent extends Dialog implements OnInit, AfterView
 	 * @returns {string}
 	 */
 	getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.Create || modalType === ActionType.Edit) {
+			setTimeout(() => {
+				super.onSetUpFocus(this.noticeCreateTitle);
+			});
+		}
+
 		if (modalType === ActionType.Edit) {
 			return this.translatePipe.transform('NOTICE.EDIT_NOTICE');
 		}

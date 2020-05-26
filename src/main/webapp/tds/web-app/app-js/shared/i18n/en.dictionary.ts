@@ -85,7 +85,8 @@ export const en_DICTIONARY: Object = {
 		'DATE_TIMEZONE': 'Date and Timezone',
 		'DATE_FORMAT': 'Date Format',
 		'LOADING_RECORDS': 'Loading records...',
-		'NO_RECORDS': 'No records found'
+		'NO_RECORDS': 'No records found',
+		'NO_RECORDS_AVAILABLE': 'No records available'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -202,6 +203,7 @@ export const en_DICTIONARY: Object = {
 		'TAG_LIST': {
 			'TAG_MERGE': 'Tag Merge',
 			'MERGE_INTO': 'Merge into',
+			'DELETE_CONFIRMATION': 'You are about to delete the selected Tag. Do you want to continue?',
 			'REMOVE_CONFIRMATION': 'This Tag is removed from all linked records and will be deleted. There is no undo for this action.',
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}

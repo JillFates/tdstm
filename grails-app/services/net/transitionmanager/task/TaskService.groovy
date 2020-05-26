@@ -32,6 +32,8 @@ import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.asset.Database
@@ -63,7 +65,9 @@ import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
 import net.transitionmanager.task.timeline.TimelineDependency
+import net.transitionmanager.task.timeline.TimelineService
 import net.transitionmanager.task.timeline.TimelineTask
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -75,11 +79,9 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
 import java.sql.Timestamp
 import java.text.DateFormat
-import net.transitionmanager.task.timeline.TimelineService
-import net.transitionmanager.task.timeline.TaskTimeLineGraph
-import net.transitionmanager.task.timeline.CPAResults
 
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
@@ -99,7 +101,7 @@ import static net.transitionmanager.security.SecurityService.AUTOMATIC_PERSON_CO
 @Transactional
 class TaskService implements ServiceMethods {
 
-	ApiActionService           apiActionService
+	ApiActionService    apiActionService
 	ControllerService          controllerService
 	CookbookService            cookbookService
 	JdbcTemplate               jdbcTemplate
@@ -118,12 +120,9 @@ class TaskService implements ServiceMethods {
 	CredentialService          credentialService
 	UserPreferenceService	   userPreferenceService
 	TimelineService            timelineService
+	AssetOptionsService        assetOptionsService
 
-	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
-	private static final List<String> categoryList = ACC.list
 	private static final List<String> statusList = ACS.list
-
-	private static final List<String> ACTIONABLE_STATUSES = [ACS.READY, ACS.STARTED, ACS.COMPLETED]
 	private static Integer MINUTES_CONSIDERED_TARDY = 300
 	private static Integer MINUTES_CONSIDERED_LATE = 600
 
@@ -865,12 +864,7 @@ class TaskService implements ServiceMethods {
 		""")
 
 		if (category) {
-			if (categoryList.contains(category)) {
-				query.append("AND ac.category='$category' ")
-			} else {
-				log.warn "unexpected category filter '$category'"
-				category=''
-			}
+			query.append("AND ac.category='$category' ")
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
@@ -913,6 +907,7 @@ class TaskService implements ServiceMethods {
 	 * @return statusWarn as can
 	 */
 	boolean canChangeStatus (AssetComment task) {
+		//TODO TM-16224 2020-24-04 AssetCommentCategory usage needs to be replaced.
 		// TODO : runbook - add logic to allow PM to change status anytime.
 		![ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].contains(task.category) ||
 		 [ACS.READY, ACS.STARTED].contains(task.status)
@@ -1207,7 +1202,7 @@ class TaskService implements ServiceMethods {
 	 */
 	def genTableHtmlForDependencies(depTasks, task, String dependency){
 		def html = new StringBuilder("""<table id="${dependency}EditTableId" cellspacing="0" style="border:0px;width:0px"><tbody>""")
-		def optionList = GormUtil.getConstrainedProperties(AssetComment).category.inList.toList()
+		def optionList = assetOptionsService.taskCategories()
 		def i=1
 		depTasks.each { depTask ->
 			def succecessor = dependency == 'predecessor' ? depTask.predecessor : depTask.assetComment
@@ -1730,9 +1725,6 @@ class TaskService implements ServiceMethods {
 		// Determine the start/completion times for the event
 		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
 		def eventTimes = event ? moveEventService.getEventTimes(event.id) : [start:null, completion:null]
-
-		// TODO : Need to change out the categories to support all ???
-		def categories = GormUtil.asQuoteCommaDelimitedString(ACC.moveDayCategories)
 
 		/**
 		 * A helper closure used by generateRunbook to link a task to its predecessors by asset or milestone

@@ -11,6 +11,7 @@ import {ProjectModel} from '../model/project.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 import {Store} from '@ngxs/store';
 import { SetDefaultProject, SetProject } from '../actions/project.actions';
+import { UserContextModel } from '../../auth/model/user-context.model';
 
 @Injectable()
 export class ProjectService {
@@ -33,6 +34,19 @@ export class ProjectService {
 			.catch((error: any) => {
 				this.store.dispatch(new SetDefaultProject(null));
 				return error
+			});
+	}
+
+	isUserOnDefaultProject(): Observable<boolean> {
+		return this.store.select(state => state.TDSApp.userContext)
+			.map((userContext: UserContextModel) => {
+				if (userContext.defaultProject) {
+					return userContext.defaultProject.id === userContext.project.id;
+				} else {
+					this.getDefaultProject().subscribe(result => {
+						return result.id === userContext.project.id;
+					});
+				}
 			});
 	}
 
