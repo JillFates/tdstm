@@ -60,8 +60,8 @@ td[data-for].O .select2-choice,
 /* NORMAL */
 td[data-for].N.label,
 td.N.label {
-    background-color: #ddd !important;
-    background-image: none !important;
+    background-color: #ddd;
+    background-image: none;
 }
 /* UNIMPORTANT */
 td[data-for].U.label,

@@ -76,6 +76,13 @@ class ControlTagLib {
 		if (fieldSpec.constraints.required) {
 			sb.append(' required')
 		}
+		if(fieldSpec.label == "Version") {
+			sb.append(' versionStyle')
+		}
+		else if(fieldSpec.label == "SME1") {
+			sb.append(' sme1Style')
+		}
+
 		sb.append('">')
 		sb.append("\n")
 
@@ -163,7 +170,11 @@ class ControlTagLib {
         def fieldValue = attrs.value ?: ""
         def suffixFieldValue = attrs.valueSuffix ?: ""
 		StringBuilder sb = new StringBuilder("\n")
-		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
+		sb.append("<td class='valueNW ${fieldSpec.imp} ")
+		if(fieldSpec.label == "Version") {
+			sb.append(' versionStyle')
+		}
+		sb.append("'>")
 		sb.append("<span ")
 		sb.append(tooltipAttrib(fieldSpec, attrs.tooltipDataPlacement))
 		sb.append(" >")

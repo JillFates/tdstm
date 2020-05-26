@@ -2,8 +2,43 @@
   &.ui-dialog
     .ui-dialog-titlebar-close
       top: 20%
+  table
+    border: 1px solid #63a242;
+    width: 100%;
+    .planning-application-table
+      border-spacing: 2px
+      border-collapse: initial
+  tr
+    border: 0
+  th
+    text-align: left
+    font: 12px helvetica, arial, sans-serif
+    background: #CCCCCC;
+    color: #000;    
+    font-weight: bold;
+    line-height: 16px;
+    padding: 2px 6px;
+  th.versionStyle, th.sme1Style
+    background-color: #FAFF9B;
+    color: red;
+  td.N
+    background: #FFFFFF;
+  td.N.versionStyle
+    background-color: #FAFF9B;
+  td
+    .N      
+      width: 250px;
+    .G
+      color: red;
+      width: 250px;
 
   div#personGeneralViewId
     .footer_buttons
       button:first-child
         display: inline-block !important
+
+.content-generate-application-profiles
+  .label
+    display: table-cell
+    text-align: initial
+    vertical-align: inherit
