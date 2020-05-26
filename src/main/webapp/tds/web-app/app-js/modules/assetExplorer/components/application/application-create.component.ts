@@ -17,6 +17,8 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Other
 import * as R from 'ramda';
 
+declare var jQuery: any;
+
 const pleaseSelectMessage = 'Please Select';
 
 export function ApplicationCreateComponent(template: string, model: any, metadata: any, parentDialog: any): any {
@@ -64,6 +66,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 		}
 
 		ngAfterViewInit() {
+			jQuery('[data-toggle="popover"]').popover();
 			this.onFocusOutOfCancel();
 			this.setupListListeners();
 		}

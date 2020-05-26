@@ -74,7 +74,8 @@ export class AssetCreateComponent extends DynamicComponent implements OnInit, Af
 	}
 
 	ngAfterViewInit() {
-		this.prepareMetadata().then( (metadata: any) => {
+
+		this.prepareMetadata().then((metadata: any) => {
 			Observable.zip(
 				this.http.get(`../ws/asset/createTemplate/${this.asset}`, {responseType: 'text'}),
 				this.http.get(`../ws/asset/defaultCreateModel/${this.asset}`))

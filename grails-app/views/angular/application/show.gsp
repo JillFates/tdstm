@@ -59,7 +59,6 @@
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>
 				<g:render template="/angular/application/show" model="[asset:applicationInstance]"></g:render>
-				<g:render template="/angular/common/assetTags"></g:render>
 				<a (click)="showDetails = !showDetails" class="show-hide-link">
 					<span *ngIf="!showDetails">View All Fields</span>
 					<span *ngIf="showDetails">Hide Additional Fields</span>
