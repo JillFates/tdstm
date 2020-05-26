@@ -28,9 +28,8 @@
 				class="btn btn-default">
 				{{'DATA_INGESTION.DATASCRIPT.DESIGNER.VIEW_CONSOLE'| translate}}
 			</button>
-			<button class="pull-right btn btn-default" (click)="toggleSection('code')">
-				<i class="fa " [ngClass]="{ 'fa-angle-double-down': !collapsed.code, 'fa-angle-double-right': collapsed.code }"
-					 style="padding-right:0px"></i>
+			<button class="pull-right btn btn-default btn-collapsable" (click)="toggleSection('code')">
+				<i class="fa " [ngClass]="{ 'fa-angle-double-down': !collapsed.code, 'fa-angle-double-right': collapsed.code }"></i>
 			</button>
 		</div>
 	</div>
@@ -148,16 +147,16 @@
 					(click)="reloadSampleData()"
 				></span>
 				<button
-					class="pull-right btn btn-default"
+					class="pull-right btn btn-default btn-collapsable"
 					(click)="toggleSection('sample')"
 				>
 					<i
-						class="fa"
 						[ngClass]="
 							collapsed.sample
 								? 'fa-angle-double-right'
 								: 'fa-angle-double-down'
 						"
+						class="fa"
 					></i>
 				</button>
 			</div>
@@ -275,7 +274,7 @@
 					data-toggle="collapse"
 					data-target=".collapsible"
 					(click)="toggleSection('transform')"
-					class="btn btn-default pull-right"
+					class="btn btn-default pull-right btn-collapsable"
 				>
 					<i
 						[ngClass]="
