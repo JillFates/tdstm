@@ -1,27 +1,43 @@
 .user-dashboard-component {
-	kendo-grid.k-grid {
-		.grid-label {
-			font-size: 14px;
-			line-height: 24px;
-			> span {
-				font-weight: normal;
-				font-size: 10px;
-				line-height: 16px;
-				margin-left: 5px;
-			}
-		}
-	}
+  kendo-grid.k-grid {
+    .grid-label {
+      font-size: 14px;
+      line-height: 24px;
+
+      > span {
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 16px;
+        margin-left: 5px;
+      }
+    }
+  }
 }
 
 // override of the grid page-height, calculation totally valid and free to replicate on any particular grid needed
-.task-list kendo-grid.page-height {
-  --subtraction-height: 325px;
+kendo-grid.page-height {
+  --subtraction-height: 244px;
+}
+task-list kendo-grid.page-height {
+  --subtraction-height: 280px;
+}
+field-settings-list kendo-grid.page-height {
+  --subtraction-height: 242px;
+}
+tds-asset-view-manager kendo-grid.page-height {
+  --subtraction-height: 221px;
+}
+tds-dependencies-view-grid kendo-grid.page-height {
+  --subtraction-height: 219px;
+}
+asset-explorer-view-grid kendo-grid.page-height {
+  --subtraction-height: 267px;
 }
 
 .align-ellipses-center {
-	text-align: center;
+  text-align: center;
 }
 
 .pad-ellipses-center {
-	padding-left: 4px;
+  padding-left: 4px;
 }
