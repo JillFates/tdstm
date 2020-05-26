@@ -1,8 +1,7 @@
 package net.transitionmanager.task.taskgraph
 
-import com.tdssrc.grails.StringUtil
+
 import net.transitionmanager.command.task.TaskSearchCommand
-import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.task.timeline.CPAResults
@@ -24,26 +23,6 @@ class TaskSearch {
      * The parameters for the main query.
      */
     Map queryParams = [:]
-
-    /**
-     * Reference to the query for tags that should be executed based on the filters.
-     */
-    String tagQuery
-
-    /**
-     * Reference to the ApiAction query if the "With TDM Actions" is set.
-     */
-    String apiActionQuery
-
-    /**
-     * The where clauses that should be considered when querying the task table.
-     */
-    List<String> taskWhereClauses = [ "comment_type = 'issue'" ]
-
-    /**
-     * If the asset table needs to be queried, include these clauses.
-     */
-    List<String> assetWhereClauses = []
 
     /**
      * Basic constructor that keeps a local copy of the command object that needs to be used
@@ -70,11 +49,11 @@ class TaskSearch {
      * @param cpaResults - the CPA results.
      * @return a list of unique task ids.
      */
-    List<Long> getCPATasks(CPAResults cpaResults) {
-        List<Long> tasksFound = []
+    Collection<Long> getCPATasks(CPAResults cpaResults) {
+        Set<Long> tasksFound = [] as Set
         // If the CPA mode is set to Realtime fetch the CPA tasks ids.
         if (taskSearchCommand.criticalPathMode == 'Realtime') {
-            tasksFound = cpaResults.tasks*.id
+            tasksFound.addAll(cpaResults.tasks.findAll { it.isCriticalPath }*.id)
         }
         // If the cyclical path flag is set, add the tasks in the cycles.
         if (taskSearchCommand.cyclicalPath == 1) {
@@ -83,8 +62,7 @@ class TaskSearch {
             }
         }
         // Return a unique list of task ids.
-        return tasksFound.unique{ Long a, Long b -> a <=> b}
-
+        return tasksFound
     }
 
     /**
@@ -97,157 +75,190 @@ class TaskSearch {
      */
     Map buildSearchQuery(MoveEvent moveEvent, boolean viewUnpublished) {
 
-        // Evaluate all the filter, except for most of the CPA related filters which are handled separately.
-        evaluateFilters(moveEvent, viewUnpublished)
+        TaskSearchQueryBuilder queryBuilder = new TaskSearchQueryBuilder()
 
-        String query
-
-        // Put together the query against the asset_comment table.
-        String taskQuery = buildQuery(TASK_QUERY, taskWhereClauses)
-
-        String assetQuery
-        // The Assets table needs to be joined if there are asset, tag or action related filters
-        if (assetWhereClauses || tagQuery || apiActionQuery) {
-            assetQuery = buildQuery(ASSET_QUERY.trim(), assetWhereClauses)
-            query = "SELECT DISTINCT(ac.taskId) AS taskId FROM ($taskQuery) ac INNER JOIN ($assetQuery) ae ON (ac.asset_entity_id = ae.asset_entity_id)"
-            if (tagQuery) {
-                query = "$query INNER JOIN ($tagQuery) ta ON(ae.asset_entity_id = ta.asset_id)"
-            }
-            if (apiActionQuery) {
-                query = "$query INNER JOIN ($apiActionQuery) ac ON(ae.api_action_id = ac.id)"
-            }
-        } else {
-            query = taskQuery
+        queryBuilder.with {
+            select 'TASK.asset_comment_id as taskId'
+            from 'asset_comment TASK'
+            leftOuterJoin 'api_action API_ACTION on TASK.api_action_id = API_ACTION.id'
+            leftOuterJoin 'asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id'
+            leftOuterJoin application()
+            innerJoin assetTags(), 'TAG ON (TASK.asset_entity_id = TAG.asset_id)'
+            where "TASK.comment_type = 'issue'"
+            and moveEventOrProject(moveEvent, project)
+            and taskText()
+            and environment()
+            and withAction()
+            and withActionRequiringTMD()
+            and taskAssignedToPerson()
+            and ownerSmeId()
+            and teamCode()
+            and withBaseline()
+            and withViewUnpublished(viewUnpublished)
         }
 
         return [
-                query: query,
+                query : queryBuilder.build(),
                 params: queryParams
         ]
-
     }
-
     /**
-     * Given a base query and a where clause, this auxiliary method simply constructs a SQL query.
-     * @param baseQuery
-     * @param whereClauses
+     * Determines if it is necessary to JOIN {@link net.transitionmanager.tag.Tag} domain
+     * for filtering results.
      * @return
      */
-    private String buildQuery(String baseQuery, List<String> whereClauses) {
-        String query = baseQuery
-        if (whereClauses) {
-            query = "$baseQuery WHERE ${whereClauses.join(' AND ')}"
+    String assetTags() {
+        if (taskSearchCommand.tagIds) {
+            queryParams['tagList'] = taskSearchCommand.tagIds
+            if (taskSearchCommand.tagMatch == 'ANY') {
+                return '(SELECT DISTINCT(TAG_ASSET.asset_id) as asset_id FROM tag_asset TAG_ASSET WHERE TAG_ASSET.tag_id IN (:tagList))'
+            } else {
+                queryParams['tagListSize'] = taskSearchCommand.tagIds.size()
+                return '(SELECT TAG_ASSET.asset_id FROM tag_asset TAG_ASSET WHERE TAG_ASSET.tag_id IN (:tagList) GROUP BY TAG_ASSET.asset_id HAVING COUNT(*) = :tagListSize)'
+            }
         }
-        return query
     }
 
+    /**
+     * Determines if it is necessary to JOIN {@link net.transitionmanager.Application} domain
+     * for filtering results.
+     * @return
+     */
+    String application() {
+        String sentence = ''
+        if (taskSearchCommand.ownerSmeId) {
+            sentence = 'application APPLICATION on ASSET_ENTITY.asset_entity_id = APPLICATION.app_id'
+        }
+        return sentence
+    }
 
     /**
-     * Iterate over all of the filters, processing each of one accordingly.
-     * @param moveEvent
-     * @param viewUnpublished
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#assignedTo} field.
+     * @return an HQL sentence or null
      */
-    private void evaluateFilters(MoveEvent moveEvent, boolean viewUnpublished) {
+    String taskAssignedToPerson() {
 
+        switch (taskSearchCommand.assignedPersonId){
+            case null:
+                return null
+            case 0:
+                return 'TASK.assigned_to_id is null'
+            default:
+                queryParams['assignedPersonId'] = taskSearchCommand.assignedPersonId
+                return 'TASK.assigned_to_id = :assignedPersonId'
+        }
+    }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.asset.AssetEntity#environment} field.
+     * @return an HQL sentence or null
+     */
+    String environment() {
+        if (taskSearchCommand.environment) {
+            queryParams['environment'] = taskSearchCommand.environment
+            return 'ASSET_ENTITY.environment = :environment'
+        }
+    }
+
+    /**
+     * Defines filtering by
+     * {@link net.transitionmanager.asset.AssetEntity#appOwner} field,
+     * or {@link net.transitionmanager.asset.Application#sme}
+     * or {@link net.transitionmanager.asset.Application#sme2}
+     * @return an HQL sentence or null
+     */
+    String ownerSmeId() {
+        if (taskSearchCommand.ownerSmeId) {
+            queryParams['ownerSmeId'] = taskSearchCommand.ownerSmeId
+            return '(ASSET_ENTITY.app_owner_id = :ownerSmeId OR APPLICATION.sme_id = :ownerSmeId OR APPLICATION.sme2_id = :ownerSmeId)'
+        }
+    }
+
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#role} field.
+     * @return an HQL sentence or null
+     */
+    String teamCode() {
+
+        switch (taskSearchCommand.teamCode){
+            case null:
+                return null
+            case 'UNASSIGNED':
+                return 'TASK.role is NULL'
+            default:
+                queryParams['teamCode'] = taskSearchCommand.teamCode
+                return 'TASK.role = :teamCode'
+        }
+    }
+
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#apiAction} field.
+     * @return an HQL sentence or null
+     */
+    String withAction() {
+        if (taskSearchCommand.withActions) {
+            return 'TASK.api_action_id IS NOT NULL'
+        }
+    }
+
+    /**
+     * Defines filtering by {@link net.transitionmanager.action.ApiAction#isRemote} field.
+     * @return an HQL sentence or null
+     */
+    String withActionRequiringTMD() {
+        if (taskSearchCommand.withTmdActions) {
+            return 'API_ACTION.is_remote = true'
+        }
+    }
+
+    /**
+     * Defines filtering by CPA Baseline using
+     * {@link net.transitionmanager.task.Task#isCriticalPath} field.
+     * @return an HQL sentence or null
+     */
+    String withBaseline() {
         if (taskSearchCommand.criticalPathMode == 'Baseline') {
-            taskWhereClauses.add('is_critical_path = true')
+            return 'TASK.is_critical_path = true'
         }
+    }
 
-        if (moveEvent) {
-            taskWhereClauses.add('move_event_id = :eventId')
-            queryParams['eventId'] = moveEvent.id
-        } else {
-            taskWhereClauses.add('project_id = :projectId')
-            queryParams['projectId'] = project.id
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#isPublished} field.
+     * @return an HQL sentence or null
+     */
+    String withViewUnpublished(boolean view) {
+        if (view) {
+            return 'TASK.is_published = true'
         }
+    }
 
+    /**
+     * Defines filtering by {@link net.transitionmanager.task.AssetComment#comment} field.
+     * @return an HQL sentence or null
+     */
+    String taskText() {
         if (taskSearchCommand.taskText) {
             String comment = "%${taskSearchCommand.taskText}%"
-            taskWhereClauses.add('comment LIKE :taskText')
             queryParams['taskText'] = comment
-        }
-
-        if (taskSearchCommand.withActions) {
-            taskWhereClauses.add('api_action_id IS NOT NULL')
-        }
-
-        if (!viewUnpublished) {
-            taskWhereClauses.add('is_published = true')
-        }
-
-        if (taskSearchCommand.environment) {
-            assetWhereClauses.add('environment = :environment')
-            queryParams['environment'] = taskSearchCommand.environment
-        }
-
-        evaluateOwnerAndSmes()
-        evaluateTags()
-        evaluateTmdActions()
-    }
-
-    /**
-     * Based on the owner and smes filter, add the appropriate parameter and 'where' clause.
-     */
-    private void evaluateOwnerAndSmes() {
-        if (taskSearchCommand.ownerSmeId != null) {
-            assetWhereClauses.add('(app_owner_id = :appOwnerId OR sme_id = :smeId OR sme2_id = :sme2Id)')
-            queryParams['appOwnerId'] = taskSearchCommand.ownerSmeId
-            queryParams['smeId'] = taskSearchCommand.ownerSmeId
-            queryParams['sme2Id'] = taskSearchCommand.ownerSmeId
+            return 'TASK.comment LIKE :taskText'
         }
     }
 
-    /**
-     * Check the tags related filters and determine which query should be executed -- if any.
-     */
-    private void evaluateTags() {
-        if (taskSearchCommand.tagIds) {
-            String tagMatch = taskSearchCommand.tagMatch ?: 'ANY'
-            if (tagMatch == 'ANY') {
-                tagQuery = TAG_ANY_QUERY
-            } else {
-                tagQuery = TAG_ALL_QUERY
-                queryParams['tagListSize'] = taskSearchCommand.tagIds.size()
-            }
-            queryParams['tagList'] = taskSearchCommand.tagIds
+    String moveEventOrProject(MoveEvent moveEvent, Project project) {
+        if (moveEvent) {
+            queryParams['eventId'] = moveEvent.id
+            return 'TASK.move_event_id = :eventId'
+        } else {
+            queryParams['projectId'] = project.id
+            return 'TASK.project_id = :projectId'
         }
     }
 
-
-    /**
-     * Set the query for remote actions if the withTmdActions flag is set.
-     */
-    private void evaluateTmdActions() {
-        if (taskSearchCommand.withTmdActions) {
-            apiActionQuery = REMOTE_ACTIONS_QUERY
-        }
+    String AND(Closure<String> callable) {
+        return AND(callable.call())
     }
 
-
-    /**
-     * This is the basic query for the AssetComment table.
-     */
-    private static final String TASK_QUERY = "SELECT asset_comment_id as taskId, asset_entity_id, api_action_id FROM asset_comment"
-
-    /**
-     * Query for retrieving the assets that have any of the tags in a given list.
-     */
-    private static final String TAG_ANY_QUERY = "SELECT DISTINCT(asset_id) as asset_id FROM tag_asset ta WHERE tag_id IN (:tagList)"
-
-    /**
-     * Query that retrieves the assets that have every tag included in the given list.
-     */
-    private static final String TAG_ALL_QUERY = "SELECT asset_id FROM tag_asset WHERE tag_id IN (:tagList) GROUP BY asset_id HAVING COUNT(*) = :tagListSize"
-
-    private static final String REMOTE_ACTIONS_QUERY = "SELECT id FROM api_action WHERE is_remote = 1"
-
-    /**
-     * The query for assets actually does a join with the application table and projects the id, environment, app owner and smes.
-     */
-    private static final String ASSET_QUERY = """
-            SELECT asset_entity_id, environment, app_owner_id, sme_id, sme2_id
-            FROM asset_entity aen INNER JOIN application a ON (aen.asset_entity_id = a.app_id)
-            """
-
+    String AND(String sentence) {
+        return sentence ?: ''
+    }
 }
