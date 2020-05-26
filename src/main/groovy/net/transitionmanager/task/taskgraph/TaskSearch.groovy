@@ -82,8 +82,8 @@ class TaskSearch {
             from 'asset_comment TASK'
             leftOuterJoin 'api_action API_ACTION on TASK.api_action_id = API_ACTION.id'
             leftOuterJoin 'asset_entity ASSET_ENTITY on TASK.asset_entity_id = ASSET_ENTITY.asset_entity_id'
-            leftOuterJoin Application()
-            innerJoin AssetTags(), 'TAG ON (TASK.asset_entity_id = TAG.asset_id)'
+            leftOuterJoin application()
+            innerJoin assetTags(), 'TAG ON (TASK.asset_entity_id = TAG.asset_id)'
             where "TASK.comment_type = 'issue'"
             and moveEventOrProject(moveEvent, project)
             and taskText()
@@ -107,7 +107,7 @@ class TaskSearch {
      * for filtering results.
      * @return
      */
-    String AssetTags() {
+    String assetTags() {
         if (taskSearchCommand.tagIds) {
             queryParams['tagList'] = taskSearchCommand.tagIds
             if (taskSearchCommand.tagMatch == 'ANY') {
@@ -124,7 +124,7 @@ class TaskSearch {
      * for filtering results.
      * @return
      */
-    String Application() {
+    String application() {
         String sentence = ''
         if (taskSearchCommand.ownerSmeId) {
             sentence = 'application APPLICATION on ASSET_ENTITY.asset_entity_id = APPLICATION.app_id'
