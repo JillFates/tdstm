@@ -281,10 +281,13 @@ export class SupportsDependsComponent implements OnInit {
 	 * Confirm before delete
 	 * **/
 	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper, dependencyType: DEPENDENCY_TYPE): void {
-		this.dialogService.confirm(
-			'Confirm Delete',
-			'Please confirm delete of this record. This action cannot be undone.'
-		).subscribe(
+		const observable = dataItem.id ?
+			this.dialogService.confirm(
+				'Confirm Delete',
+				'Please confirm delete of this record. This action cannot be undone.'
+			) : Observable.of({ confirm: DialogConfirmAction.CONFIRM } );
+
+		observable.subscribe(
 			(data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.onDeleteDependencySupport(dataItem, dataGrid, dependencyType);
