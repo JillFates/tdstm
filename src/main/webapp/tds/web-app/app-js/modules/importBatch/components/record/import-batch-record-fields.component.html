@@ -103,22 +103,21 @@
 		</kendo-grid-column>
 	</kendo-grid>
 
-	<div class="row footer">
-		<tds-check-action
-			*ngIf="showActionButtons()"
-			[disabled]="areOverrideValuesDirty()"
-			[name]="'Process'"
-			(onClick)="onProcess()"
-			[noneStateIcon]="'fa fa-exchange'"
-			[class]="'btn-sm col-sm-1 tds-check-process-footer'"
-			[(model)]="processStatus"
-			[tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_IMMEDIATE_PROCESS' | translate">
-		</tds-check-action>
+	<div class="row footer import-footer">
+
+		<tds-button-custom *ngIf="showActionButtons()"
+				title="Process"
+				class="tds-check-process-footer"
+				[disabled]="areOverrideValuesDirty()"
+				(click)="onProcess()"
+				[icon]="'two-way-arrows'"
+				[tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_IMMEDIATE_PROCESS' | translate">
+		</tds-button-custom>
 
 		<tds-button-custom *ngIf="showIncludeButton()"
 						   title="Include"
 						   (click)="onInclude()"
-						   [icon]="'two-way-arrows'"
+						   [icon]="'plus'"
 						   [tooltip]="'IMPORT_BATCH.DETAIL.CLICK_TO_TOGGLE_IGNORE' | translate">
 		</tds-button-custom>
 
