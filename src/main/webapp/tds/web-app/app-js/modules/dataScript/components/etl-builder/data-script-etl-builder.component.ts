@@ -90,6 +90,10 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
 
+	public showSampleData = false;
+	public showTransformedData = [];
+	public transformedDataColumns = [];
+
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
 		private translatePipe: TranslatePipe,
@@ -482,6 +486,7 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 
 	/**
 	 * If current domain doesn't have [data], then it needs to be loaded from a file.
+	 * We also pre-format the code so it can be easily used on the Grid to Performs Filter and data sorting accordingly
 	 * @param tabIndex
 	 */
 	private loadDataForDomain(tabIndex: number): void {
@@ -489,11 +494,33 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 		if (!domain.data && domain.outputFilename) {
 			this.importAssetsService.getFileContent(domain.outputFilename)
 				.subscribe((result: any) => {
+					// Hide Filters
+					this.showTransformedData[tabIndex] = false;
+					// Prepare Columns
+					this.transformedDataColumns[tabIndex] = [];
+					domain.fieldNames.forEach((fieldName: string) => {
+						this.transformedDataColumns[tabIndex].push({
+							label: ((domain.fieldLabelMap && domain.fieldLabelMap[fieldName]) || fieldName),
+							property: fieldName,
+							type: 'text',
+							filterable: true
+						});
+					});
+					// Prepare Data by cc the field into the root
+					result.data.forEach((data: any) => {
+						for (const field in data.fields) {
+							if (data.fields[field]) {
+								// Structure: FIELD:VALUE
+								data[field] = this.getInitOrValue(data.fields[field]);
+							}
+						}
+					});
 					this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(result.data ? result.data : []);
 					domain.data = result.data;
 				});
 		} else {
 			this.transformedDataGrids[tabIndex] = new DataGridOperationsHelper(domain.data ? domain.data : []);
+			this.showTransformedData[tabIndex] = false;
 		}
 	}
 
@@ -620,5 +647,30 @@ export class DataScriptEtlBuilderComponent extends Dialog implements OnInit, Aft
 			}
 		}, 1000);
 		return `ETL Script Edit - ${ this.dataScriptModel.provider.name } / ${ this.dataScriptModel.name } `;
+	}
+
+	/**
+	 * Clears the filter on supports
+	 */
+	public showFilterSampleData(): void {
+		if (this.showSampleData) {
+			this.showSampleData = false;
+			this.sampleDataGridHelper.clearAllFilters(this.sampleDataModel.columns);
+		} else {
+			this.showSampleData = true;
+		}
+	}
+
+	/**
+	 * Hide show filters per data result
+	 * @param index
+	 */
+	public showFiltersTransformedData(index: number, columns: any): void {
+		if (this.showTransformedData[index]) {
+			this.showTransformedData[index] = false;
+			this.sampleDataGridHelper.clearAllFilters(columns);
+		} else {
+			this.showTransformedData[index] = true;
+		}
 	}
 }

@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {ImportAssetsService} from '../../service/import-assets.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {RemoveEvent, SuccessEvent, UploadComponent, UploadEvent} from '@progress/kendo-angular-upload';
+import {FileState, RemoveEvent, SuccessEvent, UploadComponent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
@@ -56,9 +56,9 @@ export class ImportAssetsComponent implements OnInit {
 	public fetchInputUsed: 'action' | 'file' = 'action';
 	public file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	readonly UI_CONFIG = {
-		labelColSize: 3,
+		labelColSize: 2,
 		inputColSize: 3,
-		buttonColSize: 1,
+		buttonColSize: 2,
 		urlColSize: 2,
 		showTransformButton: false,
 		showAutoProcessElements: false,

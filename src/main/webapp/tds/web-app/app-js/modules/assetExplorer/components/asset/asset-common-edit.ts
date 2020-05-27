@@ -1,6 +1,5 @@
 // Angular
 import {
-	OnInit,
 	AfterViewInit,
 	OnDestroy,
 	ViewChildren,
@@ -37,7 +36,7 @@ import {TDSComboBoxComponent} from '../../../../shared/components/combo-box/comb
 
 declare var jQuery: any;
 
-export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
+export class AssetCommonEdit implements AfterViewInit, OnDestroy {
 	@ViewChild('form', { static: false }) public form: NgForm;
 	@ViewChildren(DropDownListComponent) dropdownList: QueryList<DropDownListComponent>;
 	@ViewChildren(TDSDateControlComponent) dateControlList: QueryList<TDSDateControlComponent>;
@@ -85,17 +84,13 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 				}
 			});
 	}
-	/**
-	 * Initiates The Injected Component
-	 */
-	ngOnInit(): void {
-		jQuery('[data-toggle="popover"]').popover();
-	}
 
 	ngAfterViewInit() {
 		// set the handlers on open / on close to set the flags that indicate the state of the
 		// dropdown list, datecontrols items (opened/closed)
 		this.setupListListeners();
+
+		jQuery('[data-toggle="popover"]').popover();
 	}
 
 	/**

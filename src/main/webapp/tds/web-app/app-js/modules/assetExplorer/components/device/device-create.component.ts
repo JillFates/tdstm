@@ -1,5 +1,5 @@
 // Angular
-import {Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
 // Model
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 // Service
@@ -15,6 +15,8 @@ import {DeviceCommonComponent} from './model-device/device-common.component';
 // Other
 import * as R from 'ramda';
 
+declare var jQuery: any;
+
 export function DeviceCreateComponent(template, model: any, metadata: any, parentDialog: any) {
 
 	@Component({
@@ -23,7 +25,7 @@ export function DeviceCreateComponent(template, model: any, metadata: any, paren
 		providers: [
 			{ provide: 'model', useValue: model }
 		]
-	}) class DeviceCreateComponent extends DeviceCommonComponent implements OnInit {
+	}) class DeviceCreateComponent extends DeviceCommonComponent implements OnInit, AfterViewInit {
 		constructor(
 			@Inject('model') model: any,
 			componentFactoryResolver: ComponentFactoryResolver,
@@ -42,6 +44,10 @@ export function DeviceCreateComponent(template, model: any, metadata: any, paren
 			this.toggleAssetTypeFields();
 			this.focusControlByName('assetName');
 			this.onFocusOutOfCancel();
+		}
+
+		ngAfterViewInit() {
+			jQuery('[data-toggle="popover"]').popover();
 		}
 
 		/**

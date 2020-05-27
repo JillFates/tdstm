@@ -1,8 +1,6 @@
 package net.transitionmanager.command.task
 
-import net.transitionmanager.command.CommandObject
-
-class TaskSearchCommand extends ViewUnpublishedCommand{
+class TaskSearchCommand extends ViewUnpublishedCommand {
 
     /** null = disabled; 0 = unassigned; >0 = specific person */
     Long assignedPersonId
@@ -37,35 +35,21 @@ class TaskSearchCommand extends ViewUnpublishedCommand{
     /** This is the top level input field. Search were task.comment like '%'text'%' */
     String taskText
 
-
     /** This will be set to zero ( 0 ). In the future we may use this to retrieve tasks for other purposes. */
     Integer fullRecord
 
-
     static constraints = {
-
         assignedPersonId nullable: true
-
         teamCode nullable: true
-
         ownerSmeId nullable: true
-
         environment nullable: true
-
         tagIds nullable: true
-
         tagMatch nullable: true
-
         criticalPathMode nullable: true
-
         cyclicalPath nullable: true, inList: [0, 1]
-
         withActions nullable: true, inList: [0, 1]
-
         withTmdActions nullable: true, inList: [0, 1]
-
         taskText nullable: true
-
         fullRecord nullable: true
     }
 
