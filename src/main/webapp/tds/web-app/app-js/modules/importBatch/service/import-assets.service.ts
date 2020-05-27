@@ -72,7 +72,7 @@ export class ImportAssetsService {
 	 * @returns {Observable<any>} It should return the results of the import.
 	 */
 	public postImport(filename: string, dataScriptId: number): Observable<any> {
-		let url = this.importEndpointURL + `loadData?filename=${filename}dataScriptId=${dataScriptId}`;
+		let url = this.importEndpointURL + `loadData?filename=${filename}&dataScriptId=${dataScriptId}`;
 		return this.http.post(url, null)
 			.map((response: any) => response)
 			.catch((error: any) => error);
