@@ -1,223 +1,239 @@
 <div class="content body">
-    <section>
-        <div>
-            <form class="formly form-horizontal" role="form" novalidate >
-                <div class="box box-primary">
-                    <div class="box-header">
-                    </div>
-                    <div class="box-body" style="margin-top: 30px;">
+	<section>
+		<div>
+			<form class="formly form-horizontal" role="form" novalidate>
+				<div class="box box-primary">
+					<div class="box-header">
+					</div>
+					<div class="box-body" style="margin-top: 30px;">
 
-                        <!-- Fetch(Dropdown action) Row -->
-                        <div class="form-group row" style="margin-bottom: 5px;">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_DATA_ACTION' | translate}}</label>
-                            <div class="col-sm-{{uiConfig.inputColSize}}">
-                                <select clrSelect [(ngModel)]="selectedActionOption"
-                                        (ngModelChange)="onActionScriptChange($event)"
-                                        name="fetch"
-                                        id="fetch"
-                                        class="form-control"
-                                        [disabled]="actionOptions.length == 0">
-                                    <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
-                                    <option *ngFor="let option of actionOptions"
-                                            [ngValue]="option">{{option.name}}</option>
-                                </select>
-                            </div>
-                            <tds-button class="col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
-                                <i aria-hidden="true" class="fa"
-                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': fetchInProcess,
+						<!-- Fetch(Dropdown action) Row -->
+						<div class="form-group row aligned-row" style="margin-bottom: 5px;">
+							<label class="col-sm-{{uiConfig.labelColSize}} control-label"
+										 for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_DATA_ACTION' | translate}}</label>
+							<div class="col-sm-{{uiConfig.inputColSize}}">
+								<select clrSelect [(ngModel)]="selectedActionOption"
+												(ngModelChange)="onActionScriptChange($event)"
+												name="fetch"
+												id="fetch"
+												class="form-control"
+												[disabled]="actionOptions.length == 0">
+									<option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
+									<option *ngFor="let option of actionOptions"
+													[ngValue]="option">{{option.name}}</option>
+								</select>
+							</div>
+							<div class="col-sm-{{uiConfig.buttonColSize}}">
+								<tds-button class="pull-right" (click)="onFetch()"
+														[disabled]="!selectedActionOption || selectedActionOption == -1">
+									<i aria-hidden="true" class="fa"
+										 [ngClass]="{'fa-fw fa-spinner fast-right-spinner': fetchInProcess,
                                                'fa-check green': fetchResult?.status === 'success' && fetchInputUsed === 'action',
                                                'fa-thumbs-down red': fetchResult?.status === 'error' && fetchInputUsed === 'action'}"></i>
-                                <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
-                            </tds-button>
-<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"-->
-<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
-<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
-<!--                                <br>-->
-<!--                                <a href="javascript:void(0);"-->
-<!--                                   (click)="onViewData('FETCH')" >-->
-<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
-<!--                                </a>-->
-<!--                            </span>-->
+									<span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
+								</tds-button>
+							</div>
+							<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"-->
+							<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
+							<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
+							<!--                                <br>-->
+							<!--                                <a href="javascript:void(0);"-->
+							<!--                                   (click)="onViewData('FETCH')" >-->
+							<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
+							<!--                                </a>-->
+							<!--                            </span>-->
 
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 5px;">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" style="padding-right: 5%">{{'IMPORT_ASSETS.MANUAL_IMPORT.OR' | translate}}</label>
-                        </div>
+						</div>
+						<div class="form-group row" style="margin-bottom: 5px;">
+							<label class="col-sm-{{uiConfig.labelColSize}} control-label"
+										 style="padding-right: 5%">{{'IMPORT_ASSETS.MANUAL_IMPORT.OR' | translate}}</label>
+						</div>
 
-                        <!-- Fetch(File Upload) Row -->
-                        <div class="form-group row">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetchWithFile">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_FILE_UPLOAD' | translate}}</label>
-                            <div class="col-sm-{{ (uiConfig.inputColSize + uiConfig.buttonColSize) }}" style="padding-right: 0;">
-                                <kendo-upload
-                                        #kendoUploadInstance="kendoUpload"
-                                        [restrictions]="file.uploadRestrictions"
-                                        [autoUpload]="file.autoUpload"
-                                        [saveUrl]="file.uploadSaveUrl"
-                                        [removeUrl]="file.uploadDeleteUrl"
-                                        [saveField]="file.saveField"
-                                        [removeField]="file.removeField"
-                                        [multiple]="file.multiple"
-                                        [disabled]="false"
-                                        (select)="onSelectFile($event)"
-                                        (upload)="onUploadFile($event)"
-                                        (remove)="onRemoveFile($event)"
-                                        (success)="completeEventHandler($event)">
-                                    <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
-                                </kendo-upload><!---->
-                            </div>
-                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
-                                  class="control-label col-md-{{uiConfig.urlColSize}}">
+						<!-- Fetch(File Upload) Row -->
+						<div class="form-group row">
+							<label class="col-sm-{{uiConfig.labelColSize}} control-label"
+										 for="fetchWithFile">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_FILE_UPLOAD' | translate}}</label>
+							<div class="col-sm-{{(uiConfig.inputColSize + uiConfig.buttonColSize)}} control-upload">
+								<kendo-upload
+									#kendoUploadInstance="kendoUpload"
+									[restrictions]="file.uploadRestrictions"
+									[autoUpload]="file.autoUpload"
+									[saveUrl]="file.uploadSaveUrl"
+									[removeUrl]="file.uploadDeleteUrl"
+									[saveField]="file.saveField"
+									[removeField]="file.removeField"
+									[multiple]="file.multiple"
+									[disabled]="false"
+									(select)="onSelectFile($event)"
+									(upload)="onUploadFile($event)"
+									(remove)="onRemoveFile($event)"
+									(success)="completeEventHandler($event)">
+									<kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
+								</kendo-upload>
+							</div>
+							<span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
+										class="control-label col-md-{{uiConfig.urlColSize}}">
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
-                                <br>
+								<br>
                             </span>
 
-                        </div>
+						</div>
 
-                        <!-- Transform Datascript Row -->
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                           <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="transform">
-                               {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_WITH_DATA_SCRIPT' | translate}}
-                           </label>
-                           <div class="col-sm-{{uiConfig.inputColSize}}">
-                               <select clrSelect [ngModel]="selectedScriptOption"
-                                       (ngModelChange)="onChangeSelectedScript($event)"
-                                       name="transform"
-                                       id="transform"
-                                       class="form-control">
-                                   <option *ngFor="let option of dataScriptOptions"
-                                           [ngValue]="option">{{option.name | translate}}</option>
-                               </select>
-                            </div>
-                            <tds-button *ngIf="uiConfig.showManualProcessElements"
-                                    [disabled]="disableTransformButton() || transformInProcess"
-                                    (click)="onTransform()"
-                                    class="col-sm-{{uiConfig.buttonColSize}}">
-                                <i aria-hidden="true" class="fa"
-                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
+						<!-- Transform Datascript Row -->
+						<div class="form-group row aligned-row" style="margin-bottom: 0px;">
+							<label class="col-sm-{{uiConfig.labelColSize}} control-label" for="transform">
+								{{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_WITH_DATA_SCRIPT' | translate}}
+							</label>
+							<div class="col-sm-{{uiConfig.inputColSize}}">
+								<select clrSelect [ngModel]="selectedScriptOption"
+												(ngModelChange)="onChangeSelectedScript($event)"
+												name="transform"
+												id="transform"
+												class="form-control">
+									<option *ngFor="let option of dataScriptOptions"
+													[ngValue]="option">{{option.name | translate}}</option>
+								</select>
+							</div>
+							<div class="col-sm-{{uiConfig.buttonColSize}}"
+									 *ngIf="uiConfig.showManualProcessElements">
+								<tds-button [disabled]="disableTransformButton() || transformInProcess"
+														class="pull-right"
+														(click)="onTransform()">
+									<i aria-hidden="true" class="fa"
+										 [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
                                                'fa-check green': transformResult?.status === 'success',
                                                'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
-                                <span>{{uiConfig.transformBtnLabel | translate}}</span>
-                            </tds-button>
-
-                            <tds-button *ngIf="uiConfig.showAutoProcessElements"
-                                    [disabled]="disableTransformButton() || transformInProcess"
-                                    (click)="onImport()"
-                                    class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
-                                <i aria-hidden="true" class="fa"
-                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
+									<span>{{uiConfig.transformBtnLabel | translate}}</span>
+								</tds-button>
+							</div>
+							<!-- Auto Process import -->
+							<div class="col-sm-{{uiConfig.buttonColSize}}" *ngIf="uiConfig.showAutoProcessElements">
+								<tds-button [disabled]="disableTransformButton() || transformInProcess"
+														(click)="onImport()"
+														class="pull-right">
+									<i aria-hidden="true" class="fa"
+										 [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
                                                'fa-check green': transformResult?.status === 'success',
                                                'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
-                                <span>{{uiConfig.transformBtnLabel | translate}}</span>
-                            </tds-button>
-<!--                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);"-->
-<!--                               (click)="onViewData('TRANSFORM')"-->
-<!--                               class="control-label col-sm-{{uiConfig.urlColSize}}">-->
-<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
-<!--                            </a>-->
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showAutoProcessElements">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label">
-                            </label>
-                            <div class="col-md-6">
+									<span>{{uiConfig.transformBtnLabel | translate}}</span>
+								</tds-button>
+							</div>
+						</div>
+						<!-- Transform Auto Process import -->
+						<div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showAutoProcessElements">
+							<label class="col-sm-{{uiConfig.labelColSize}} control-label">
+							</label>
+							<div class="col-md-{{uiConfig.labelColSize + uiConfig.inputColSize}}">
                                 <span>
                                     <h4>{{ 'IMPORT_ASSETS.AUTO_IMPORT.HEADLINE' | translate}}</h4>
                                 </span>
-                                <div class="checkbox">
-                                    <label for="emailMe">
-                                        <input type="checkbox" id="emailMe" name="emailMe" [(ngModel)]="uiConfig.sendNotification"/>
-                                        <span class="checkbox-label">{{'IMPORT_ASSETS.AUTO_IMPORT.CHECKBOX_LABEL' | translate}}</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Progress bar-->
-                        <div class="form-group row progressBar-row" *ngIf="uiConfig.showManualProcessElements">
-                            <div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
-                                        col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
-                                <div *ngIf="transformInProcess" class="progress">
-                                    <div class="progress-bar progress-bar-striped active"
-                                         [style.width.%]="transformProgress.currentProgress"></div>
-                                </div>
-                            </div>
-                        </div>
+								<div class="checkbox">
+									<label for="emailMe">
+										<input type="checkbox" id="emailMe" name="emailMe" [(ngModel)]="uiConfig.sendNotification"/>
+										<span class="checkbox-label">{{'IMPORT_ASSETS.AUTO_IMPORT.CHECKBOX_LABEL' | translate}}</span>
+									</label>
+								</div>
+							</div>
+						</div>
+						<!-- Transform Progress bar-->
+						<div class="form-group row progressBar-row" *ngIf="uiConfig.showManualProcessElements">
+							<div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}} col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
+								<div *ngIf="transformInProcess" class="progress">
+									<div class="progress-bar progress-bar-striped active"
+											 [style.width.%]="transformProgress.currentProgress"></div>
+								</div>
+							</div>
+						</div>
 
-                        <!-- Load Data Row -->
-                        <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualProcessElements">
-                           <label class="col-sm-{{uiConfig.labelColSize}} control-label">
-                               {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
-                           </label>
-                            <div class="col-sm-{{uiConfig.inputColSize}}">
-                                <kendo-grid *ngIf="!importProgress.inProgress && importResult?.status === 'success'"
-                                        [data]="importResult.data.domains"
-                                        [pageSize]="100">
-                                    <kendo-grid-column title="Batch Id" field="batchId">
-                                        <ng-template kendoGridCellTemplate let-dataItem>
-                                            <a *ngIf="dataItem.batchId; else no_batch_id" [routerLink]="['/importbatch','list', dataItem.batchId]">{{dataItem.batchId}}</a>
-                                            <ng-template #no_batch_id>
-                                                <span>N/A</span>
-                                            </ng-template>
-                                        </ng-template>
-                                    </kendo-grid-column>
-                                    <kendo-grid-column title="Domain" field="domainClass"></kendo-grid-column>
-                                    <kendo-grid-column title="Records" field="rowsCreated"></kendo-grid-column>
-                                </kendo-grid>
-                            </div>
-                           <tds-button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
-                                   (click)="onImport()"
-                                   class="col-sm-{{uiConfig.buttonColSize}}">
-                               <i aria-hidden="true" class="fa"
-                                  [ngClass]="{'fa-fw fa-spinner fast-right-spinner': importProgress.inProgress,
+						<!-- Import Data Row -->
+						<div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualProcessElements">
+							<label class="col-sm-{{uiConfig.labelColSize}} control-label">
+								{{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
+							</label>
+							<div class="col-sm-{{uiConfig.inputColSize}}">
+								<kendo-grid *ngIf="!importProgress.inProgress && importResult?.status === 'success'"
+														[data]="importResult.data.domains"
+														[pageSize]="100">
+									<kendo-grid-column title="Batch Id" field="batchId">
+										<ng-template kendoGridCellTemplate let-dataItem>
+											<a *ngIf="dataItem.batchId; else no_batch_id"
+												 [routerLink]="['/importbatch','list', dataItem.batchId]">{{dataItem.batchId}}</a>
+											<ng-template #no_batch_id>
+												<span>N/A</span>
+											</ng-template>
+										</ng-template>
+									</kendo-grid-column>
+									<kendo-grid-column title="Domain" field="domainClass"></kendo-grid-column>
+									<kendo-grid-column title="Records" field="rowsCreated"></kendo-grid-column>
+								</kendo-grid>
+							</div>
+							<!--<div class="col-sm-{{uiConfig.labelColSize + uiConfig.inputColSize}}"></div>-->
+							<div class="col-sm-{{uiConfig.buttonColSize}}">
+								<tds-button
+									[disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
+									(click)="onImport()"
+									class="pull-right">
+									<i aria-hidden="true" class="fa"
+										 [ngClass]="{'fa-fw fa-spinner fast-right-spinner': importProgress.inProgress,
                                                'fa-check green': importResult?.status === 'success',
                                                'fa-thumbs-down red': importResult?.status === 'error'}"></i>
-                               <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}</span>
-                           </tds-button>
-                           <a [routerLink]="['/importbatch','list']" class="control-label col-sm-{{uiConfig.urlColSize}}">
-                               {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
-                           </a>
-                        </div>
-											<!-- Progress bar-->
-											<div class="form-group row progressBar-row">
-												<div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
-                                        col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
-													<div *ngIf="importProgress.inProgress" class="progress">
-														<div class="progress-bar progress-bar-striped active"
-																 [style.width.%]="importProgress.currentProgress"></div>
-													</div>
-												</div>
-											</div>
-                        <!-- Clear Button Row -->
-                        <div class="row clear-button">
-                           <tds-button (click)="onClear()"
-                                   class="col-md-offset-{{(uiConfig.labelColSize + uiConfig.inputColSize)}} col-sm-{{uiConfig.buttonColSize}}">
-                               {{'GLOBAL.CLEAR' | translate}}
-                           </tds-button>
-                       </div>
+									<span>{{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}</span>
+								</tds-button>
+							</div>
+							<div class="control-label col-sm-{{uiConfig.urlColSize}}">
+								<a [routerLink]="['/importbatch','list']" >
+									{{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
+								</a>
+							</div>
+						</div>
+						<!-- Import Progress bar-->
+						<div class="form-group row progressBar-row">
+							<div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}} col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
+								<div *ngIf="importProgress.inProgress" class="progress">
+									<div class="progress-bar progress-bar-striped active"
+											 [style.width.%]="importProgress.currentProgress"></div>
+								</div>
+							</div>
+						</div>
 
-                        <!-- View Content Tabbed Panel Row -->
-                        <div class="form-group row">
-                          <div class="col-sm-offset-1 col-sm-{{(uiConfig.labelColSize + uiConfig.inputColSize + uiConfig.urlColSize)}}" >
-                              <a (click)="onCloseFileContents()" *ngIf="fetchFileContent || transformFileContent"
-                                 href="javascript: void(0);" class="control-label pull-right" style="margin-right: 9%">
-                                  {{'GLOBAL.CLOSE' | translate}}
-                              </a>
-                              <kendo-tabstrip>
-                                  <kendo-tabstrip-tab [title]="'Fetch Data'" [selected]="viewDataType === 'FETCH'" *ngIf="fetchFileContent">
-                                      <ng-template kendoTabContent>
-                                          <div>{{getFetchFileContentValue()}}</div>
-                                      </ng-template>
-                                  </kendo-tabstrip-tab>
-                                  <kendo-tabstrip-tab [title]="'Transform Data'" [selected]="viewDataType === 'TRANSFORM'" *ngIf="transformFileContent">
-                                      <ng-template kendoTabContent>
-                                          <div>{{getTransformFileContentValue()}}</div>
-                                      </ng-template>
-                                  </kendo-tabstrip-tab>
-                              </kendo-tabstrip>
-                          </div>
-                      </div>
+						<!-- Clear Button Row -->
+						<div class="row clear-row">
+							<div
+								class="col-md-offset-{{(uiConfig.labelColSize + uiConfig.inputColSize)}} col-sm-{{uiConfig.buttonColSize}}">
+								<tds-button (click)="onClear()" class="pull-right">
+									{{'GLOBAL.CLEAR' | translate}}
+								</tds-button>
+							</div>
+						</div>
 
-                    </div>
-                </div>
-            </form>
-        </div>
-    </section>
+						<!-- View Content Tabbed Panel Row -->
+						<div class="form-group row">
+							<div
+								class="col-sm-offset-1 col-sm-{{(uiConfig.labelColSize + uiConfig.inputColSize + uiConfig.urlColSize)}}">
+								<a (click)="onCloseFileContents()" *ngIf="fetchFileContent || transformFileContent"
+									 href="javascript: void(0);" class="control-label pull-right" style="margin-right: 9%">
+									{{'GLOBAL.CLOSE' | translate}}
+								</a>
+								<kendo-tabstrip>
+									<kendo-tabstrip-tab [title]="'Fetch Data'" [selected]="viewDataType === 'FETCH'"
+																			*ngIf="fetchFileContent">
+										<ng-template kendoTabContent>
+											<div>{{getFetchFileContentValue()}}</div>
+										</ng-template>
+									</kendo-tabstrip-tab>
+									<kendo-tabstrip-tab [title]="'Transform Data'" [selected]="viewDataType === 'TRANSFORM'"
+																			*ngIf="transformFileContent">
+										<ng-template kendoTabContent>
+											<div>{{getTransformFileContentValue()}}</div>
+										</ng-template>
+									</kendo-tabstrip-tab>
+								</kendo-tabstrip>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</form>
+		</div>
+	</section>
 </div>

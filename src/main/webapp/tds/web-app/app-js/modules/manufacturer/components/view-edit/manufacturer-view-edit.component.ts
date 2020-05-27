@@ -1,10 +1,13 @@
 // Angular
 import {
-	ElementRef,
 	Component,
+	ComponentFactoryResolver,
+	ElementRef,
+	Input,
 	OnInit,
+	QueryList,
 	ViewChild,
-	Input, Output, EventEmitter, ComponentFactoryResolver, QueryList, ViewChildren,
+	ViewChildren,
 } from '@angular/core';
 import {NgForm} from '@angular/forms';
 // Model
@@ -14,7 +17,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 // Service
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {Dialog, DialogButtonType, DialogConfirmAction, DialogService, ModalSize} from 'tds-component-library';
+import {Dialog, DialogButtonType, DialogConfirmAction, DialogService} from 'tds-component-library';
 // Other
 import {Subject} from 'rxjs/Subject';
 import {ManufacturerModel} from '../../model/manufacturer.model';
@@ -95,6 +98,7 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'edit',
 			icon: 'pencil',
+			tooltipText: 'Edit',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.VIEW,
 			disabled: () => !this.permissionService.hasPermission(Permission.ProviderUpdate),
 			active: () => this.modalType === this.actionTypes.EDIT,
@@ -105,6 +109,7 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			show: () => this.modalType === this.actionTypes.EDIT || this.modalType === this.actionTypes.CREATE,
 			disabled: () => !this.manufacturerForm.form.valid || !this.isUnique || this.isEmptyValue() || !this.manufacturerForm.form.dirty || !this.hasOnlyUniqueAlias,
 			type: DialogButtonType.ACTION,
@@ -114,6 +119,7 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: ((this.modalType === this.actionTypes.VIEW) ? 'Close' : 'Cancel'),
 			show: () => this.modalType === this.actionTypes.VIEW || this.modalType === this.actionTypes.CREATE,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -122,6 +128,7 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => this.modalType === this.actionTypes.EDIT,
 			type: DialogButtonType.ACTION,
 			action: this.cancelEditDialog.bind(this)
@@ -177,7 +184,6 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 
 		setTimeout(() => {
 			this.setTitle(this.getModalTitle(this.modalType));
-			this.onSetUpFocus(this.nameElement);
 		});
 	}
 
@@ -271,6 +277,12 @@ export class ManufacturerViewEditComponent extends Dialog implements OnInit {
 	 * @returns {string}
 	 */
 	private getModalTitle(modalType: ActionType): string {
+		if (modalType === ActionType.EDIT || modalType === ActionType.CREATE) {
+			setTimeout(() => {
+				this.onSetUpFocus(this.nameElement);
+			});
+		}
+
 		if (modalType === ActionType.CREATE) {
 			return 'Manufacturer Create';
 		}

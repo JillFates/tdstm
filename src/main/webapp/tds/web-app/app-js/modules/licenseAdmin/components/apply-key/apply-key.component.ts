@@ -41,6 +41,7 @@ export class ApplyKeyComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)

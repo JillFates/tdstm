@@ -1,5 +1,13 @@
 // Angular
-import {Component, ComponentFactoryResolver, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {
+	Component,
+	ComponentFactoryResolver,
+	ElementRef,
+	HostListener,
+	OnDestroy,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 // Services
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
@@ -29,6 +37,8 @@ import {ReplaySubject} from 'rxjs';
 	providers: [TranslatePipe],
 })
 export class TagListComponent implements OnInit, OnDestroy {
+	@ViewChild('tagNameInput', {static: false}) tagNameInput: ElementRef;
+
 	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
 	public gridSettings: DataGridOperationsHelper;
@@ -177,6 +187,9 @@ export class TagListComponent implements OnInit, OnDestroy {
 	protected addHandler({sender}): void {
 		this.closeEditor(sender);
 		sender.addRow(new TagModel());
+		setTimeout( () => {
+			this.tagNameInput.nativeElement.focus();
+		});
 	}
 
 	/**

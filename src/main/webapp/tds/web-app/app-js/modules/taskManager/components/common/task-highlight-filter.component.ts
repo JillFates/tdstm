@@ -50,7 +50,7 @@ import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag
 	                  <label class="popup-label">Designated Team:</label>
 	                  <kendo-combobox
 					                  [data]="highlightOptions?.teams"
-					                  [(ngModel)]="filterQueryObj.teams"
+					                  [(ngModel)]="filterQueryObj.teamCode"
 	                          [valueField]="'id'"
                             [valuePrimitive]="true"
 	                          [textField]="'name'"
@@ -72,7 +72,7 @@ import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag
 	                  <label class="popup-label">Environment of Assets:</label>
 	                  <kendo-combobox
 					                  [data]="highlightOptions?.environments"
-					                  [(ngModel)]="filterQueryObj.environments"
+					                  [(ngModel)]="filterQueryObj.environment"
 	                          [valueField]="'name'"
                             [valuePrimitive]="true"
 	                          [textField]="'name'"

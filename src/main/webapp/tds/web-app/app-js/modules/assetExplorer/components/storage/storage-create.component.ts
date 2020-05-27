@@ -1,5 +1,5 @@
 // Angular
-import {Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, Inject, OnInit} from '@angular/core';
 // Model
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 // Service
@@ -17,6 +17,8 @@ import {AssetCommonEdit} from '../asset/asset-common-edit';
 // Other
 import * as R from 'ramda';
 
+declare var jQuery: any;
+
 export function StorageCreateComponent(template: string, model: any, metadata: any, parentDialog: any): any {
 	@Component({
 		selector: 'tds-storage-create',
@@ -25,7 +27,7 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			{ provide: 'model', useValue: model }
 		]
 	})
-	class StorageCreateComponent extends AssetCommonEdit implements OnInit {
+	class StorageCreateComponent extends AssetCommonEdit implements OnInit, AfterViewInit {
 		constructor(
 			@Inject('model') model: any,
 			componentFactoryResolver: ComponentFactoryResolver,
@@ -46,11 +48,14 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 			this.onFocusOutOfCancel();
 		}
 
+		ngAfterViewInit() {
+			jQuery('[data-toggle="popover"]').popover();
+		}
+
 		/**
 		 * Init model with necessary changes to support UI components.
 		 */
 		private initModel(): void {
-			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
 			this.model.asset.validation =  this.defaultValidation;
 			this.model.asset.environment = '';

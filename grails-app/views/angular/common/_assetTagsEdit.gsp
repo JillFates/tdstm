@@ -5,7 +5,9 @@
 </style>
 <table class="tdr-detail-list tag-list-edit">
     <tr>
-        <th class="N">Tags</th>
+        <th class="N">
+            <span data-content="${standardFieldSpecs.tagAssets.tip}" data-toggle="popover" data-trigger="hover" data-original-title="" title="">Tags</span>
+        </th>
         <td>
             <tds-asset-tag-selector *ngIf="tagList"
                                     [model]="assetTagsModel"

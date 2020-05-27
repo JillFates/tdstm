@@ -13,6 +13,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.DataTransformService
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
@@ -30,6 +31,7 @@ class WsAssetImportController implements ControllerMethods {
 
 	ApiActionService apiActionService
 	DataImportService dataImportService
+	DataTransformService dataTransformService
 	FileSystemService fileSystemService
 
 	// mock data to use until methods are integrated with database
@@ -98,7 +100,7 @@ class WsAssetImportController implements ControllerMethods {
 	 * 		jobTriggerName: <String> Trigger name of the executed.
 	 */
 	@HasPermission(Permission.AssetImport)
-	def loadData(String filename) {
+	def loadData(String filename, Long dataScriptId) {
 		Project project = getProjectForWs()
 		Person person = currentPerson()
 
@@ -110,7 +112,7 @@ class WsAssetImportController implements ControllerMethods {
 			throw new InvalidParamException('File must be JSON format')
 		}
 
-		Map result = dataImportService.scheduleImportDataJob(project, person.userLogin, filename)
+		Map result = dataTransformService.scheduleImportDataJob(project, person.userLogin, filename, dataScriptId)
 		renderSuccessJson(result)
 	}
 

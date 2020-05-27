@@ -55,8 +55,8 @@ export class ButtonsFactoryService {
 			['tds-button-sync']: {icon: 'sync', title: translate('GLOBAL.REFRESH'), tooltip: translate('GLOBAL.REFRESH')},
 			['tds-button-undo']: {icon: 'undo', title: translate('GLOBAL.UNDO'), tooltip: translate('GLOBAL.UNDO')},
 			['tds-button-script']: {icon: 'file-code-o', title: translate('GLOBAL.SCRIPT'), tooltip: translate('GLOBAL.SCRIPT')},
-			['tds-button-collapse']: {icon: 'collapse-card', title: translate('GLOBAL.COLLAPSE'), tooltip: translate('GLOBAL.COLLAPSE')},
-			['tds-button-expand']: {icon: 'expand-card', title: translate('GLOBAL.EXPAND'), tooltip: translate('GLOBAL.EXPAND')}
+			['tds-button-collapse']: {icon: 'angle-double down', title: translate('GLOBAL.COLLAPSE'), tooltip: translate('GLOBAL.COLLAPSE')},
+			['tds-button-expand']: {icon: 'angle-double right', title: translate('GLOBAL.EXPAND'), tooltip: translate('GLOBAL.EXPAND')}
 		};
 	}
 

@@ -91,6 +91,7 @@ export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'close',
 			icon: 'ban',
+			tooltipText: 'Close',
 			show: () => true,
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
@@ -156,7 +157,7 @@ export class ImportBatchDetailDialogComponent extends Dialog implements OnInit {
 			column.width = 130;
 			column.cellStyle = {'max-height': '20px'};
 			column.type = 'dynamicValue';
-			column.property = 'dynamicValue';
+			column.property =  column.properties.join('.');
 			return column;
 		});
 		this.columnsModel.columns = this.columnsModel.columns.concat(fieldColumns);
