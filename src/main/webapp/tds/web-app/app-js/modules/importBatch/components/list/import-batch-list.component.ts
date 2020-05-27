@@ -1,5 +1,5 @@
 // Angular
-import {Component, ComponentFactoryResolver, OnDestroy} from '@angular/core';
+import { Component, ComponentFactoryResolver, HostListener, OnDestroy } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Model
 import {BatchStatus, ImportBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
@@ -36,6 +36,8 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 // Other
 import {CellClickEvent, PageChangeEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DialogExit, DialogService, ModalSize} from 'tds-component-library';
+import { takeUntil } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs';
 
 @Component({
 	selector: 'import-batch-list',
@@ -73,6 +75,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	private queuedBatches: Array<ImportBatchModel> = [];
 	public showFilters: boolean;
 	public disableClearFilters: () => {};
+	private unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private componentFactoryResolver: ComponentFactoryResolver,
@@ -130,14 +133,15 @@ export class ImportBatchListComponent implements OnDestroy {
 	 * Checks if batchId is given and should be open.
 	 */
 	private preSelectBatch(): void {
-		this.route.params.subscribe(params => {
-			const batchId = params['id'] ? parseInt(params['id'], 0) : null;
-			const match = !batchId ? null : this.dataGridOperationsHelper.resultSet.find(item => item.id === batchId);
-			if (batchId && match) {
-				let cellClickEvent = {dataItem: match};
-				this.openBatchDetail(cellClickEvent);
-			}
-		});
+		this.route.params.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(params => {
+				const batchId = params['id'] ? parseInt(params['id'], 0) : null;
+				const match = !batchId ? null : this.dataGridOperationsHelper.resultSet.find(item => item.id === batchId);
+				if (batchId && match) {
+					let cellClickEvent = {dataItem: match};
+					this.openBatchDetail(cellClickEvent);
+				}
+			});
 	}
 
 	/**
@@ -658,7 +662,15 @@ export class ImportBatchListComponent implements OnDestroy {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
 	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 		clearTimeout(this.batchRunningLoop);
 		clearTimeout(this.batchQueuedLoop);
 	}
