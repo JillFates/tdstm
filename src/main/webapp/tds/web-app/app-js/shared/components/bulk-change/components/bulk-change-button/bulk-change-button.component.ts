@@ -16,6 +16,7 @@ import {BulkChangeActionsComponent} from '../bulk-change-actions/bulk-change-act
 			[icon]="'pencil'"
 			[tooltip]="'Bulk Edit'"
 			[id]="'btnBulkChange'"
+			class="btnBulkChange"
 			(click)="onClick()"
 			[disabled]="!enabled">
 		</tds-button-custom>
