@@ -236,7 +236,7 @@ export class ImportAssetsComponent implements OnInit {
 			this.runAutoImport(this.fetchResult.filename);
 		} else {
 			filename = this.transformResult.data.filename;
-			this.importAssetsService.postImport(filename).subscribe(result => {
+			this.importAssetsService.postImport(filename, this.selectedScriptOption.id).subscribe(result => {
 				if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 					this.importProgress.progressKey = result.data.progressKey;
 					this.setImportProgressInterval();
