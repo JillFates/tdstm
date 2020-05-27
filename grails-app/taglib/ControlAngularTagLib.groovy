@@ -21,7 +21,10 @@ class ControlAngularTagLib {
 	static final String CONTROL_CSS_CLASS = 'tm-input-control'
 	static final String SELECT_REQUIRED_PROMPT = 'Select...'
 	static final String MISSING_OPTION_WARNING = 'INVALID'
-	static final int MAX_STRING_LENGTH = 255
+
+	static final int MAX_STRING_LENGTH = 1024
+	static final int DEFAULT_STRING_LENGTH = 255
+
 	static final String EMPTY_IMP_CRIT_FIELD_CSS_CLASS = " highField"
 	static final List TOOLTIP_DATA_PLACEMENT_VALUES = ["top", "bottom", "left", "right"]
 	static final String MAX_VALIDATION_MESSAGE = 'Value exceeds the maximum {max} characters.'

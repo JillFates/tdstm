@@ -1,11 +1,11 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.action.Provider
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.imports.DataScriptMode
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.action.Provider
 import org.apache.commons.lang3.RandomStringUtils
 
 /**
@@ -21,16 +21,17 @@ class DataScriptTestHelper {
      * @param createdBy
      * @return
      */
-    DataScript createDataScript(Project project, Provider provider, Person createdBy, String etlSourceCode = '') {
+    DataScript createDataScript(Project project, Provider provider, Person createdBy, String etlSourceCode = '', Boolean isAutoProcess = false) {
         DataScript dataScript = new DataScript(
                 name: 'Test DataScript-' + RandomStringUtils.randomAlphabetic(10),
                 description: 'Test description',
-                target: 'Test target', 
+                target: 'Test target',
                 etlSourceCode: etlSourceCode.trim(),
                 project: project,
                 provider: provider,
                 mode: DataScriptMode.IMPORT,
-                createdBy: createdBy
+                createdBy: createdBy,
+                isAutoProcess: isAutoProcess
         ).save(flush: true)
         return dataScript
     }
@@ -38,9 +39,7 @@ class DataScriptTestHelper {
     /**
      * Create a etl script if not exists from given Map for E2EProjectSpec to persist at server DB
      * @param: [REQUIRED] etlData = [name: String]
-     * @param: project
-     * @param: provider
-     * @param: createdBy = Person
+     * @param: project* @param: provider* @param: createdBy = Person
      * @returm the etl script
      */
     DataScript createDataScript(Project project, Provider provider, Person createdBy, Map etlData, String etlSourceCode = '') {
@@ -54,7 +53,7 @@ class DataScriptTestHelper {
         } else {
             DataScript dataScript = new DataScript(
                     name: etlData.name,
-                    description: etlData.description ? etlData.description :'Test description',
+                    description: etlData.description ? etlData.description : 'Test description',
                     target: 'Test target',
                     etlSourceCode: etlSourceCode.trim(),
                     project: project,

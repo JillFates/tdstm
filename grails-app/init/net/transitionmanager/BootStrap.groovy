@@ -53,9 +53,6 @@ class BootStrap {
 
 		taskService.init()
 
-		// Registers a marshaller for JSON for the Notice domain ( to support notice as JSON )
-		Notice.registerObjectMarshaller()
-
 		// Warm up AESCodec
 		AESCodec.getInstance()
 

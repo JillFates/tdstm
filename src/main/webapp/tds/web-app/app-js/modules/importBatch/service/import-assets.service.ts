@@ -71,8 +71,8 @@ export class ImportAssetsService {
 	 * The call should pass in the filename returned from the transformData step.
 	 * @returns {Observable<any>} It should return the results of the import.
 	 */
-	public postImport(filename: string): Observable<any> {
-		let url = this.importEndpointURL + 'loadData?filename=' + filename;
+	public postImport(filename: string, dataScriptId: number): Observable<any> {
+		let url = this.importEndpointURL + `loadData?filename=${filename}&dataScriptId=${dataScriptId}`;
 		return this.http.post(url, null)
 			.map((response: any) => response)
 			.catch((error: any) => error);

@@ -482,7 +482,7 @@ class TaskService implements ServiceMethods {
 			taskWithLock.save(flush: true, failOnError: true)
 
 			// Note to the task indicating that the action was being invoked
-			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${ invokingLocally ? 'Server' : 'Desktop' })")
+			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (on ${ invokingLocally ? 'Server' : 'Desktop' })")
 
 		// Catch the Exceptions that the error message can be used directly
 		} catch (EmptyResultException e) {

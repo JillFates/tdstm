@@ -1,23 +1,22 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import net.transitionmanager.action.ApiActionService
-import net.transitionmanager.common.MessageSourceService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.person.Person
+import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
 import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ReactionHttpStatus
 import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.person.Person
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import net.transitionmanager.task.TaskService
 import org.springframework.context.i18n.LocaleContextHolder
@@ -217,10 +216,13 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			actionResponse.data = 'anything'
 			actionResponse.status = ReactionHttpStatus.NOT_FOUND
 
+			TaskService taskService = Mock()
 			AssetFacade asset = new AssetFacade(null, [:], true)
-			AssetComment realTask = new AssetComment()
+			AssetComment task = new AssetComment()
 			Person whom = new Person()
-			TaskFacade task = new TaskFacade(realTask, whom)
+			TaskFacade taskFacade = new TaskFacade(task, whom)
+			taskFacade.messageSourceService = applicationContext.getBean(MessageSourceService)
+			taskFacade.taskService = taskService
 			ApiActionJob job = new ApiActionJob()
 
 
@@ -236,14 +238,16 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 					script,
 					actionRequest,
 					actionResponse.asImmutable(),
-					task,
+					taskFacade,
 					asset,
 					job
 			)
 
-		then: 'An Exception is thrown'
-			ApiActionException e = thrown(ApiActionException)
-			e.message == 'Script must return SUCCESS or ERROR'
+		then: 'An error message is added in notes'
+			with(taskService) {
+				1 * setTaskStatus(task, 'Hold', whom)
+				1 * addNote(task, whom, 'STATUS script failure: Script must return SUCCESS or ERROR')
+			}
 	}
 
 	void 'test can throw an Exception with i18n message if a reaction STATUS script does not return a ReactionScriptCode'() {
@@ -260,10 +264,13 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			actionResponse.data = 'anything'
 			actionResponse.status = ReactionHttpStatus.NOT_FOUND
 
+			TaskService taskService = Mock()
 			AssetFacade asset = new AssetFacade(null, [:], true)
-			AssetComment realTask = new AssetComment()
+			AssetComment task = new AssetComment()
 			Person whom = new Person()
-			TaskFacade task = new TaskFacade(realTask, whom)
+			TaskFacade taskFacade = new TaskFacade(task, whom)
+			taskFacade.messageSourceService = applicationContext.getBean(MessageSourceService)
+			taskFacade.taskService = taskService
 			ApiActionJob job = new ApiActionJob()
 
 
@@ -279,14 +286,16 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 					script,
 					actionRequest,
 					actionResponse.asImmutable(),
-					task,
+					taskFacade,
 					asset,
 					job
 			)
 
-		then: 'An Exception is thrown'
-			ApiActionException e = thrown(ApiActionException)
-			e.message == 'Le script doit renvoyer SUCCESS ou ERROR'
+		then: 'An error with i18n message is added in notes'
+			with (taskService){
+				1 * setTaskStatus(task, 'Hold', whom)
+				1 * addNote(task, whom, 'STATUS script failure: Le script doit renvoyer SUCCESS ou ERROR')
+			}
 
 		cleanup:
 			LocaleContextHolder.resetLocaleContext()

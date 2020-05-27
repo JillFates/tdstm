@@ -3,8 +3,7 @@ package net.transitionmanager.imports
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
-import com.tdsops.etl.ETLProcessorResult
-import com.tdsops.etl.ProgressCallback
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.RowResult
 import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -21,7 +20,6 @@ import grails.converters.JSON
 import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.common.CustomDomainService
@@ -35,6 +33,7 @@ import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.job.ETLTransformDataJob
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
@@ -67,7 +66,6 @@ import org.springframework.transaction.support.DefaultTransactionStatus
  * to use transactions more efficiently.
  *
  */
-@Slf4j(value='log', category='net.transitionmanager.service.DataImportService')
 @Transactional(propagation=Propagation.MANDATORY)
 class DataImportService implements ServiceMethods, EventPublisher {
 
@@ -85,6 +83,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	ScriptProcessorService   scriptProcessorService
 	TagAssetService			 tagAssetService
 	TagService 				 tagService
+	FailureNotificationService failureNotificationService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -113,46 +112,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	]
 
 	/**
-	 * Schedules an execution of {@link ETLImportDataJob} with correct parameters.
-	 *
-	 * @param project
-	 * @param userLogin
-	 * @param datasetFileName
-	 * @param sendResultsByEmail
-	 * @return JSON map containing the following:
-	 * 		progressKey: <String> progress key generated
-	 * 		jobTriggerName: <String> Trigger name of the executed.
-	 */
-	@NotTransactional
-	Map<String, String> scheduleImportDataJob(
-			Project project,
-			UserLogin userLogin,
-			String filename = null,
-			Boolean isAutoProcess = false,
-			Boolean sendResultsByEmail = false
-	) {
-		String key = 'ETL-Import-Data-' + project.id + '-' + StringUtil.generateGuid()
-		progressService.create(key, ProgressService.PENDING)
-
-		def jobTriggerName = 'TM-ImportData-' + project.id + '-' + StringUtil.generateGuid()
-
-		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
-		trigger.jobDataMap.project = project
-		trigger.jobDataMap.filename = filename
-		trigger.jobDataMap.progressKey = key
-		trigger.jobDataMap.isAutoProcess = isAutoProcess
-		trigger.jobDataMap.sendResultsByEmail = sendResultsByEmail
-		trigger.jobDataMap.userLogin = userLogin
-		trigger.setJobName('ETLImportDataJob')
-		trigger.setJobGroup('tdstm-etl-import-data')
-		quartzScheduler.scheduleJob(trigger)
-
-		log.info('scheduleJob() {} kicked of an ETL Import data process for filename ({})', userLogin.username, filename)
-
-		return ['progressKey': key, 'jobTriggerName': jobTriggerName]
-	}
-
-	/**
 	 * loadETLJsonIntoImportBatch - the entry point for the initial loading of data into the Import batches.
 	 *
 	 * This method will create a ImportBatch for each domain present in the importJsonData and then
@@ -176,6 +135,36 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			Project project,
 			UserLogin userLogin,
 			String datasetFileName,
+			Long dataScriptId,
+			Boolean sendResultsByEmail = false,
+			String progressKey = null)
+	{
+		DataScript dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
+		String groupGuid = StringUtil.generateGuid()
+
+		try {
+			return doLoadETLJsonIntoImportBatch(project, userLogin, datasetFileName, groupGuid, dataScript.isAutoProcess, sendResultsByEmail, progressKey)
+
+		} catch (Throwable e) {
+			String errorMessage = e.getMessage()
+			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))
+
+			if (dataScript.isAutoProcess){
+				failureNotificationService.notifyDataImportFailure(userLogin.person, dataScript, groupGuid, errorMessage)
+			}
+			return [errorMessage: errorMessage]
+		}
+	}
+
+	/**
+	 * Init loading of data into the Import batches.
+	 */
+	@NotTransactional()
+	Map doLoadETLJsonIntoImportBatch(
+			Project project,
+			UserLogin userLogin,
+			String datasetFileName,
+			String groupGuid,
 			Boolean isAutoProcess = false,
 			Boolean sendResultsByEmail = false,
 			String progressKey = null)
@@ -206,7 +195,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				userLogin         : userLogin,
 				etlInfo           : importJsonData.ETLInfo,
 				status            : isAutoProcess ? ImportBatchStatusEnum.QUEUED : ImportBatchStatusEnum.PENDING,
-				guid              : StringUtil.generateGuid(),
+				guid              : groupGuid,
 				sendResultsByEmail: sendResultsByEmail,
 				// The cache will be used to hold on to domain entity references when found or a String if there
 				// was an error when looking up the domain object. The key will be the md5hex of the query element
@@ -226,7 +215,8 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				new ImportProgressCalculator(
 						progressKey,
 						importJsonData.domains.sum { (it?.dataSize)?:0 },
-						progressService
+						progressService,
+						importContext.guid
 				)
 
 		progressCalculator.start()
@@ -1795,7 +1785,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 					// Create the domain and set any of the require properties that are required
 					entity = createEntity(domainClassToCreate, fieldsValueMap, context)
 					boolean isPerson = Person.isAssignableFrom(entity.class)
-                  
+
 					// Check if isPerson and fieldsValueMap contains 'fullName' which means that user is looking for a person by fullName
 					// so we need to replace that with the correct parsing of full name into [firstName, lastName and middleName]
 					if (isPerson && fieldsValueMap.containsKey(Person.FULLNAME_KEY)) {
@@ -1946,84 +1936,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	}
 
 	/**
-	 * Transform the Data from ETL as part of the Asset Import process' first step.
-	 *
-	 * @param project
-	 * @param dataScriptId
-	 * @param filename
-	 * @return
-	 */
-	@NotTransactional()
-	Map transformEtlData(Long projectId, UserLogin userLogin, Long dataScriptId, String filename, Boolean sendResultsByEmail, String progressKey = null) {
-		Map result = [filename: '']
-		Project project = Project.get(projectId)
-
-		// TODO : SL - 05/2018 : Find if we still need to keep this validation since it was already done
-		// when scheduled a transformation job
-		DataScript dataScript = null
-		String errorMsg = null
-
-		if (!dataScriptId) {
-			errorMsg = 'Missing required dataScriptId parameter'
-		} else if (!filename) {
-			errorMsg = 'Missing filename parameter'
-		} else if (!fileSystemService.temporaryFileExists(filename)) {
-			errorMsg = 'Specified input file not found'
-		} else {
-			List<String> allowedExtensions = fileSystemService.getAllowedExtensions()
-			if (!FileSystemUtil.validateExtension(filename, allowedExtensions)) {
-				errorMsg = i18nMessage(Message.FileSystemInvalidFileExtension)
-			} else {
-				// See if we can find a DataScript.
-				dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
-
-				if (!dataScript.etlSourceCode) {
-					errorMsg = 'ETL Script has no source specified'
-				}
-			}
-		}
-
-		// If there was an error in the previous validations, throw an exception.
-		if (errorMsg) {
-			throw new InvalidParamException(errorMsg)
-		}
-
-		// The progress closure that will be used by the ETL process to report back to this service the overall progress
-		ProgressCallback updateProgressCallback = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
-			// if progress key is not provided, then just skip updating progress service
-			// this is useful during integration test invocation
-			if (progressKey) {
-				// log.debug "updateProgressCallback() ${percentComp}%, forceReport=$forceReport, status=$status, detail=$detail"
-				progressService.update(progressKey, percentComp, status.name(), detail)
-			}
-		} as ProgressCallback
-
-		// get full path of the temporary file containing data
-		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
-		log.debug "transformEtlData() calling scriptProcessorService.executeAndRetrieveResults"
-		ETLProcessorResult processorResult = scriptProcessorService.executeAndRetrieveResults(
-				project,
-				dataScript?.id,
-				dataScript.etlSourceCode,
-				inputFilename,
-				updateProgressCallback)
-
-		result.filename = scriptProcessorService.saveResultsUsingStreaming(processorResult)
-
-		updateProgressCallback.reportProgress(
-				100,
-				true,
-				ProgressCallback.ProgressStatus.COMPLETED,
-				result.filename)
-
-		if (dataScript.isAutoProcess) {
-			scheduleImportDataJob(project, userLogin, result.filename, dataScript.isAutoProcess, sendResultsByEmail)
-		}
-
-		return result
-	}
-
-	/**
 	 * Schedule a quartz job for the ETL transform data process
 	 * @param project
 	 * @param dataScriptId
@@ -2075,7 +1987,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		trigger.jobDataMap.progressKey = key
 		trigger.jobDataMap.sendNotification = sendNotification
 		trigger.jobDataMap.userLogin = securityService.loadCurrentPerson().userLogin
-		trigger.setJobName('ETLTransformDataJob')
+		trigger.setJobName(ETLTransformDataJob.class.name)
 		trigger.setJobGroup('tdstm-etl-transform-data')
 		quartzScheduler.scheduleJob(trigger)
 

@@ -434,25 +434,24 @@ export class EventsService {
 			results[CatagoryRowType.Percent][index].compose =   item;
 			results[CatagoryRowType.TaskCompleted][index].compose =   item;
 
-			item.minEstStart = item.minEstStart ? item.minEstStart : plannedStart;
-			item.maxEstFinish = item.maxEstFinish ? item.maxEstFinish : plannedCompletion;
+			results[CatagoryRowType.Percent][index].compose.fontColor = item.color === 'yellow' ? 'black' : 'white';
 
 			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minEstStart);
 
-			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxEstFinish);
+			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxPlannedFinish);
 
 			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minActStart);
 
 			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxActFinish);
 
-			if (item.maxEstFinish && (DateUtils.stringDateToDate(item.maxActFinish) > DateUtils.stringDateToDate(item.maxEstFinish))) {
+			if (item.maxPlannedFinish && (DateUtils.stringDateToDate(item.maxActFinish) > DateUtils.stringDateToDate(item.maxPlannedFinish))) {
 				results[CatagoryRowType.ActualStart][index].classes += ' task-overdue ';
 				results[CatagoryRowType.ActualCompletion][index].classes += ' task-overdue ';
 			}
 		});
 
 		const hasInfo = data.find((item: CategoryTask) => {
-			return Boolean(item.minEstStart || item.maxEstFinish || item.minActStart || item.maxActFinish);
+			return Boolean(item.minEstStart || item.maxPlannedFinish || item.minActStart || item.maxActFinish);
 		});
 
 		return {tasks: results, columns: columnsLength, hasInfo};

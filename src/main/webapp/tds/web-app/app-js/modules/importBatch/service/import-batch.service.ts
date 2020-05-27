@@ -16,11 +16,15 @@ export class ImportBatchService {
 
 	/**
 	 * GET - List of all Import Batches
-	 * @returns {Observable<any>}
+	 * @param groupGuid
 	 */
-	getImportBatches(): Observable<any> {
-		return this.http.get(this.importBatchesUrl)
-			.map( (response: any) => response)
+	getImportBatches(groupGuid: string = null): Observable<any> {
+		let url = `${this.importBatchesUrl}`;
+		if (groupGuid) {
+			url = `${url}?groupGuid=${groupGuid}`;
+		}
+		return this.http.get(url)
+			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
 

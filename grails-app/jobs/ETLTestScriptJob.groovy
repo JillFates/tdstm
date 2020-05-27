@@ -30,7 +30,7 @@ class  ETLTestScriptJob {
 			// test script temporary filename
 			String scriptFilename = dataMap.getString('scriptFilename')
 
-			log.info('ETLTransformDataJob started for test script: {}', scriptFilename)
+			log.info('ETLTestScriptJob started for test script: {}', scriptFilename)
 			Map result = scriptProcessorService.testScript(projectId, scriptFilename, filename, progressKey)
 			log.info('ETL transform data execution result: {}', result)
 		} catch (Throwable e) {

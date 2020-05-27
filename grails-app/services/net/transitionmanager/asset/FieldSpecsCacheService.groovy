@@ -85,7 +85,7 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * @return a String value used as a key in {@code FieldSpecsCacheService#cache} cache
 	 */
 	private String cacheKeyForMapObject(Project project, String domain) {
-		return "project-${project.id}-${domain.toLowerCase()}-fieldspec-map"
+		return "${projectCacheKey(project)}-${domain.toLowerCase()}-fieldspec-map"
 	}
 
 	/**
@@ -98,7 +98,21 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * @return a String value used as a key in {@code FieldSpecsCacheService#cache} cache
 	 */
 	private String cacheKeyForJSON(Project project) {
-		return "project-${project.id}-fieldspec-json"
+		return "${projectCacheKey(project)}-fieldspec-json"
+	}
+	/**
+	 * Prepares part of the cache keys using {@link Project#id}.
+	 * It is use in preparing cache keys
+	 * {@link FieldSpecsCacheService#cacheKeyForMapObject(net.transitionmanager.project.Project, java.lang.String)}
+	 * {@link FieldSpecsCacheService#cacheKeyForJSON(net.transitionmanager.project.Project)}
+	 * and in deleting queries:
+	 * {@link FieldSpecsCacheService#clearCache(net.transitionmanager.project.Project)}
+	 *
+	 * @param project an instace of {@link Project}
+	 * @return String key value
+	 */
+	private String projectCacheKey(Project project){
+		return "project-${project.id}"
 	}
 
 	/**
@@ -162,9 +176,12 @@ class FieldSpecsCacheService implements InitializingBean {
 	 * @param project an instance of {@code Project}
 	 * @param domain a String value represents an Asset name
 	 */
-	void removeFieldSpecs(Project project, String domain) {
-		fieldSpecsCache.remove(cacheKeyForJSON(project))
-		fieldSpecsCache.remove(cacheKeyForMapObject(project, domain))
+	void clearCache(Project project) {
+		for (String key in fieldSpecsCache.keys){
+			if (key.startsWith(projectCacheKey(project))){
+				fieldSpecsCache.remove(key)
+			}
+		}
 	}
 
 	/**

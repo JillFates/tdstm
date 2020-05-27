@@ -1,8 +1,6 @@
 package net.transitionmanager.notice
 
 import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
-import grails.converters.JSON
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
@@ -94,57 +92,34 @@ class Notice {
 		}
 	}
 
-	private static final Map<String, Class> MARSHALLER_TYPES = [
-		acknowledgeLabel:	Object,
-		activationDate:  	Date,
-		active:          	Object,
-		createdBy:       	Person,
-		dateCreated:     	Object,
-		expirationDate:  	Date,
-		htmlText:        	Object,
-		id:              	Object,
-		lastModified:    	Object,
-		locked:			 	Object,
-		needAcknowledgement: Object,
-		project:         	Project,
-		rawText:         	Object,
-		sequence:		 	Object,
-		title:           	Object,
-		typeId:          	NoticeType
-	]
 
-	static void registerObjectMarshaller() {
-		JSON.registerObjectMarshaller(Notice) { Notice notice ->
-			Map jsonData = [:]
-			MARSHALLER_TYPES.each { String name, Class type ->
-				def value = notice[name]
 
-				if (value != null) {
-					switch (type) {
-						case NoticeType:
-							value = value.toString()
-							break
+	Map toMap(){
 
-						case Person:
-							Person createdBy = value
-							value = [id: createdBy.id, fullname: createdBy.toString()]
-							break
-
-						case Project:
-							Project project = value
-							value = [id  : project.id, code: project.projectCode, name: project.name]
-							break
-					}
-
-					if (name == 'htmlText') {
-						value = StringUtil.sanitizeJavaScript(value)
-					}
-
-					jsonData[name] = value
-				}
-			}
-
-			return jsonData
-		}
+		[
+			acknowledgeLabel: acknowledgeLabel,
+			activationDate: activationDate,
+			active: active,
+			createdBy: [
+				id: createdBy?.id,
+				fullname: createdBy?.toString()
+			],
+			dateCreated: dateCreated,
+			expirationDate: expirationDate,
+			htmlText: StringUtil.sanitizeJavaScript(htmlText),
+			id: id,
+			lastModified: lastModified,
+			locked: locked,
+			needAcknowledgement: needAcknowledgement,
+			project: [
+				id  : project?.id,
+				code: project?.projectCode,
+				name: project?.name
+			],
+			rawText: rawText,
+			sequence: sequence,
+			title: title,
+			typeId: typeId.toString()
+		]
 	}
 }

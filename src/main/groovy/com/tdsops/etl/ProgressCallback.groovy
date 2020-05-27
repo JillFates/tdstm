@@ -7,7 +7,7 @@ package com.tdsops.etl
 interface ProgressCallback {
 
 	enum ProgressStatus{
-		RUNNING, COMPLETED, ERROR
+		RUNNING, COMPLETED, ERROR, FAILED
 	}
 
 	/**

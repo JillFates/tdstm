@@ -15,12 +15,14 @@ class ImportBatchTestHelper {
 	 *
 	 * @param project
 	 * @param domainClass
+	 * @param groupGuid
 	 * @return the import batch once saved.
 	 */
-	ImportBatch createBatch(Project project, ETLDomain domainClass) {
+	ImportBatch createBatch(Project project, ETLDomain domainClass, String groupGuid = null) {
 		ImportBatch importBatch = new ImportBatch(
-			project: project,
-			domainClassName: domainClass
+				project: project,
+				domainClassName: domainClass,
+				groupGuid: groupGuid
 		)
 		importBatch.save(flush: true)
 		return importBatch

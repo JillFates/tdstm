@@ -15,8 +15,6 @@ import com.tdssrc.grails.TimeUtil
 import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.CompileStatic
-import groovy.transform.TimedInterrupt
-
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.ScriptExpressionChecker
 import org.apache.commons.lang3.RandomStringUtils
@@ -2080,12 +2078,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @param progressCallback callback to report ETL script evaluation progress
      * @return
      */
-    @TimedInterrupt(1200l)
     Object evaluate(String script, ProgressCallback progressCallback = null) {
         return evaluate(script, defaultCompilerConfiguration(), progressCallback)
     }
 
-    @TimedInterrupt(1200l)
     Object execute(String script) {
         Object result = new GroovyShell(
                 this.class.classLoader,
@@ -2165,9 +2161,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @param script an ETL script content
      * @params configuration* @return the result of evaluate ETL script param
      * @param progressCallback callback to report ETL script evaluation progress
-     * @see TimedInterrupt
      */
-    @TimedInterrupt(1200l)
     Object evaluate(String script, CompilerConfiguration configuration, ProgressCallback progressCallback = null) {
         setUpProgressIndicator(script, progressCallback)
 

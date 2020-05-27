@@ -120,6 +120,10 @@ class ApiActionService implements ServiceMethods {
 			throw new InvalidRequestException('invoke() required context was null')
 		}
 
+		if (!(context instanceof AssetComment)){
+			throw new InvalidRequestException('invoke() not implemented for class ' + context.getClass().getName() )
+		}
+
 		if (context instanceof AssetComment) {
 
 			// We only need to implement Task for the moment
@@ -155,52 +159,7 @@ class ApiActionService implements ServiceMethods {
 				// get api action connector instance
 				def connector = connectorInstanceForAction(action)
 
-				ActionRequest actionRequest
 				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context, whom)
-
-				// try to construct action request object and execute preScript if there is any
-				try {
-					actionRequest = createActionRequest(action, context)
-				} catch (ApiActionException preScriptException) {
-					addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
-					String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
-					String defaultScript = reactionScripts[ReactionScriptCode.DEFAULT.name()]
-					String finalizeScript = reactionScripts[ReactionScriptCode.FINAL.name()]
-
-					// execute ERROR or DEFAULT scripts if present
-					if (errorScript) {
-						assetFacade.setReadonly(false)
-						try {
-							invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
-						} catch (ApiActionException errorScriptException) {
-							addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
-						}
-						assetFacade.setReadonly(true)
-					} else if (defaultScript) {
-						assetFacade.setReadonly(false)
-						try {
-							invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
-						} catch (ApiActionException defaultScriptException) {
-							addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
-						}
-						assetFacade.setReadonly(true)
-					}
-
-					// finalize PRE branch when it failed
-					if (finalizeScript) {
-						try {
-							invokeReactionScript(ReactionScriptCode.FINAL, finalizeScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
-						} catch (ApiActionException finalizeScriptException) {
-							addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
-						}
-					}
-
-					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
-					return
-				}
-
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.TASK_FACADE, taskFacade)
 
 				// setup asset facade if task has an asset associated
 				AssetFacade assetFacade
@@ -211,32 +170,76 @@ class ApiActionService implements ServiceMethods {
 				} else {
 					assetFacade = new AssetFacade(null, null, true)
 				}
-				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ASSET_FACADE, assetFacade)
+
+				// check pre script : set required request configurations
+				ActionRequest actionRequest = createActionRequest(action, context)
+
+				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
+				ReactionScriptInvocationParams invocationParams = new ReactionScriptInvocationParams(
+						reactionScripts,
+						actionRequest,
+						taskFacade,
+						assetFacade
+				)
+
+				Map<String, ?> invocationResults = invokeReactionScript(ReactionScriptCode.PRE, invocationParams)
+				if (invocationResults.errorMessage) {
+
+					if (invokeReactionScript(ReactionScriptCode.ERROR, invocationParams).isEmpty()){
+						invokeReactionScript(ReactionScriptCode.DEFAULT, invocationParams)
+					}
+					invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
+					return
+				}
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest
-				try {
-					if (context?.moveEvent?.apiActionBypass) {
-						log.info('By passing API Action invocation with following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest)
-						taskFacade.byPassed()
-					} else {
-						connector.invoke(action, actionRequest)
-					}
-				} catch (Exception e) {
-					log.warn(e.message)
-					taskFacade.error(e.message)
-				} finally {
-					// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
-					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+
+				if (context?.moveEvent?.apiActionBypass) {
+					log.info('By passing API Action invocation with following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest)
+					taskFacade.byPassed()
+
+				} else {
+					connector.invoke(action, invocationParams)
 				}
+
+				invokeReactionScript(ReactionScriptCode.FINAL, invocationParams)
+
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
-		} else {
-			throw new InvalidRequestException('invoke() not implemented for class ' + context.getClass().getName() )
 		}
 	}
 
+	/**
+	 * Invoke a reaction script based on {@link ReactionScriptCode} logical definitions.
+	 *
+	 * @param code
+	 * @param invocationParams
+	 * @return Map with the following fields:
+	 * 			result: a Map that contains the result of the execution script using an instance of GroovyShell
+	 * 			errorMessage: error message from invocation exceptions	 */
+	Map<String, ?> invokeReactionScript(ReactionScriptCode code, ReactionScriptInvocationParams invocationParams) {
+
+		Map<String, ?> invocationResults = [:]
+		String reactionScript = invocationParams.getScript(code)
+
+		if (reactionScript) {
+			Boolean readOnly = code in [ReactionScriptCode.ERROR, ReactionScriptCode.DEFAULT, ReactionScriptCode.FAILED, ReactionScriptCode.FINAL]
+			invocationParams.assetFacade.setReadonly(readOnly)
+
+			invocationResults = invokeReactionScript(code,
+					reactionScript,
+					invocationParams.actionRequest,
+					invocationParams.apiActionResponse,
+					invocationParams.taskFacade,
+					invocationParams.assetFacade,
+					invocationParams.apiActionJob
+			)
+		}
+
+		return invocationResults
+	}
 	/**
 	 * Create action request object containing all necessary data for the api connector to invoke an api action.
 	 * It executes the action pre-scripts if there is any.
@@ -265,29 +268,6 @@ class ApiActionService implements ServiceMethods {
 				apiAction: apiActionToMap(action)
 		]
 		actionRequest.setOptions(new ActionRequestParameter(optionalRequestParams))
-
-		// check pre script : set required request configurations
-		JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
-		ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
-		String preScript = reactionScripts[ReactionScriptCode.PRE.name()]
-
-		// execute PRE script if present
-		if (preScript) {
-			try {
-				invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
-						new ApiActionResponse(),
-						new TaskFacade(),
-						new AssetFacade(null, null, true),
-						new ApiActionJob()
-				)
-			} catch (ApiActionException preScriptException) {
-				log.error('Error invoking PRE script from DataScript: {}', ExceptionUtil.stackTraceToString(preScriptException))
-				throw preScriptException
-			} finally {
-				// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
-				ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
-			}
-		}
 
 		return actionRequest
 	}
@@ -549,7 +529,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
 	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
 	 */
-	@Transactional(noRollbackFor = [Exception])
+	@Transactional(noRollbackFor = [Throwable])
 	Map<String, ?> invokeReactionScript(
 			ReactionScriptCode code,
 			String script,
@@ -570,13 +550,18 @@ class ApiActionService implements ServiceMethods {
 		}
 
 		ApiActionScriptBinding scriptBinding = scriptBuilder.build(code)
-		def result = new ApiActionScriptEvaluator(scriptBinding).evaluate(script)
 
-		checkEvaluationScriptResult(code, result)
+		Map<String,?> resultMap = [:]
+		try {
+			resultMap.result = new ApiActionScriptEvaluator(scriptBinding).evaluate(script)
+			checkEvaluationScriptResult(code, resultMap.result)
+		} catch (Throwable failedScriptException) {
+			log.error('Error when invoking {} script. {}',code,  ExceptionUtil.stackTraceToString(failedScriptException))
+			resultMap.errorMessage = failedScriptException.message
+			addTaskScriptInvocationError(task, code, resultMap.errorMessage)
+		}
 
-		return [
-				result: result
-		]
+		return resultMap
 	}
 
 	/**
@@ -699,10 +684,10 @@ class ApiActionService implements ServiceMethods {
 	 * Add task error message through the task facade
 	 * @param taskFacade - the task facade wrapper
 	 * @param reactionScriptCode - the reaction script code generating the message
-	 * @param apiActionException - the API Exception
+	 * @param String - the error message
 	 */
-	private void addTaskScriptInvocationError(TaskFacade taskFacade, ReactionScriptCode reactionScriptCode, ApiActionException apiActionException) {
-		taskFacade.error(String.format('%s script failure: %s', reactionScriptCode, apiActionException.message))
+	private void addTaskScriptInvocationError(TaskFacade taskFacade, ReactionScriptCode reactionScriptCode, String errorMessage) {
+		taskFacade.error(String.format('%s script failure: %s', reactionScriptCode, errorMessage))
 	}
 
 	/**

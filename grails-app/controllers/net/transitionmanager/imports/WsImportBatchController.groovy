@@ -8,6 +8,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.command.PatchActionCommand
+import net.transitionmanager.command.importBatch.ListImportBatchesCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
@@ -28,8 +29,9 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 	 */
 	@HasPermission(Permission.DataTransferBatchView)
 	def listImportBatches() {
+		ListImportBatchesCommand command = populateCommandObject(ListImportBatchesCommand)
 		Project project = getProjectForWs()
-		Collection batches = importBatchService.listBatches(project)
+		Collection batches = importBatchService.listBatches(project, command)
 		renderSuccessJson(batches)
 	}
 
@@ -207,4 +209,6 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 		Map infoMap = importBatchService.getImportBatchInfo(project, id, info)
 		renderSuccessJson(infoMap)
 	}
+
+
 }
