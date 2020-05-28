@@ -40,6 +40,7 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'save',
 			icon: 'floppy',
+			tooltipText: 'Save',
 			disabled: () => !this.mergeToTag || !this.mergeToTag.id,
 			type: DialogButtonType.ACTION,
 			action: this.onMerge.bind(this)
@@ -48,6 +49,7 @@ export class TagMergeDialogComponent extends Dialog implements OnInit {
 		this.buttons.push({
 			name: 'cancel',
 			icon: 'ban',
+			tooltipText: 'Cancel',
 			type: DialogButtonType.ACTION,
 			action: this.cancelCloseDialog.bind(this)
 		});

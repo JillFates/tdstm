@@ -498,7 +498,7 @@ export class TaskEditCreateCommonComponent extends Dialog implements OnInit, Aft
 	public deleteTask(): void {
 		this.dialogService.confirm(
 			this.translatePipe.transform(
-				'GLOBAL.CONFIRM'
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'
 			),
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK'),
 		)

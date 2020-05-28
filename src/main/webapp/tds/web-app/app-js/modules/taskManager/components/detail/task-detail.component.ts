@@ -271,7 +271,7 @@ export class TaskDetailComponent extends Dialog implements OnInit {
 	deleteTask(): void {
 		this.dialogService.confirm(
 			this.translatePipe.transform(
-				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'
+				'GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'
 			),
 			this.translatePipe.transform(
 				'TASK_MANAGER.DELETE_TASK'

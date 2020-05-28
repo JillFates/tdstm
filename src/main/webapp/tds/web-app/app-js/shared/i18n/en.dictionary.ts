@@ -111,6 +111,9 @@ export const en_DICTIONARY: Object = {
 		'DELETE_ACTION': 'Delete Action',
 		'API_ACTION': 'Action',
 		'API_ACTIONS': 'Actions',
+		'REACTION': {
+			'ACKNOWLEDGE': 'Acknowledge'
+		}
 	},
 	'ASSET_EXPLORER': {
 		'ASSET_EXPLORER': 'Manage Views',
