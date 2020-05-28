@@ -1,5 +1,6 @@
 package net.transitionmanager.asset
 
+import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetOptions
@@ -34,13 +35,22 @@ class AssetOptionsService {
 
 	/**
 	 * Find all asset options by type
+	 *
 	 * @param assetOptionsType - asset option type
-	 * @return
+	 * @param sort - if the list of asset options should be sorted by value. Defaults to true.
+	 *
+	 * @return A list of AssetOptions for a AssetOptionsType.
 	 */
-	List<AssetOptions> findAllByType(AssetOptionsType assetOptionsType) {
-		return AssetOptions.where {
+	List<AssetOptions> findAllByType(AssetOptionsType assetOptionsType, boolean sort = true) {
+		DetachedCriteria options = AssetOptions.where {
 			type == assetOptionsType
-		}.order("value").list()
+		}
+
+		if (sort) {
+			return options.order("value").list()
+		} else {
+			return options.list()
+		}
 	}
 
 	/**

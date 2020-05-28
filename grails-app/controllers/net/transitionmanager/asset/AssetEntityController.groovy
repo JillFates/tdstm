@@ -1,7 +1,7 @@
 package net.transitionmanager.asset
+
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
-
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -1347,7 +1347,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		List<AssetOptions> dependencyStatus = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		List<AssetOptions> environment = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		List<AssetOptions> assetTypes = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
-		List<AssetOptions> taskCategory = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.TASK_CATEGORY)
+		List<AssetOptions> taskCategory = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.TASK_CATEGORY, false)
 
 		def assetType = assetTypes.collect{ AssetOptions option ->
 			[id: option.id, type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]

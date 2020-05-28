@@ -167,7 +167,6 @@
 			var taskCategoryValue = value;
 			$("#taskCategoryTbodyId").append("<tr id='taskCategory_" + id + "' style='cursor: pointer;'><td>" + taskCategoryValue + "</td><td><span class=\'deleteTaskCategory clear_filter'\ onClick=\"deleteAssetStatus(\'" + id + "','" + option + "')\" ><b>X</b></span></td></tr>")
 			$("#taskCategory").val("");
-			sortTable($("#taskCategoryTableId")[0]);
 		}
 
 	}
