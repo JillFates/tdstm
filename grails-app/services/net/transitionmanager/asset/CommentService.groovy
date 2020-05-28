@@ -863,7 +863,7 @@ class CommentService implements ServiceMethods {
 	Map filterTasks(Project project, Map params, String sortIndex = null, String sortOrder = null, Integer maxRows = null, Integer rowOffset = null) {
 		List<AssetComment> tasksList = []
 		Map resultMap = [:]
-		params['commentType'] = AssetCommentType.ISSUE
+		params['commentType'] = AssetCommentType.TASK
 
 		if (!params.containsKey('viewUnpublished')) {
 			params['viewUnpublished'] = false
