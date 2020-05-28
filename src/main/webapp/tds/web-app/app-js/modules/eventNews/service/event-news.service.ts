@@ -52,7 +52,6 @@ export class EventNewsService {
 					item.createdAt = ((item.createdAt) ? new Date(item.createdAt) : '');
 					item.resolvedAt = ((item.resolvedAt) ? new Date(item.resolvedAt) : '');
 				});
-
 				return eventNewsModels;
 			})
 			.catch((error: any) => error);

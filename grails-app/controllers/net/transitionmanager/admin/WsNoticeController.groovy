@@ -35,7 +35,7 @@ class WsNoticeController implements ControllerMethods {
 		}
 
 		List<Notice> notices = noticeService.fetch(type)
-		renderAsJson(notices: notices)
+		renderAsJson(notices: notices*.toMap())
 	}
 
 	/**
@@ -47,7 +47,7 @@ class WsNoticeController implements ControllerMethods {
 		if (!notice) {
 			throw new EmptyResultException()
 		}
-		renderAsJson notice
+		renderAsJson notice.toMap()
 	}
 
 	/**
@@ -65,7 +65,7 @@ class WsNoticeController implements ControllerMethods {
 
 		Notice notice = noticeService.saveOrUpdate(command)
 
-		renderAsJson([model: notice])
+		renderAsJson([model: notice.toMap()])
 	}
 
 	@HasPermission(Permission.NoticeEdit)
@@ -75,7 +75,7 @@ class WsNoticeController implements ControllerMethods {
 
 		Notice notice = noticeService.saveOrUpdate(command, id)
 
-		renderAsJson([model: notice])
+		renderAsJson([model: notice.toMap()])
 	}
 
 	/**
@@ -116,7 +116,7 @@ class WsNoticeController implements ControllerMethods {
 		}
 		List<Notice> notices = noticeService.fetchPostLoginNotices(currentPerson(), project, session)
 		Map result = [
-			notices: notices,
+			notices: notices*.toMap(),
 			redirectUri: session[SecurityUtil.REDIRECT_URI]
 		]
 

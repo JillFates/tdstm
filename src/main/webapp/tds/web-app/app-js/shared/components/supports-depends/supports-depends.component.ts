@@ -149,14 +149,16 @@ export class SupportsDependsComponent implements OnInit {
 	}
 
 	/**
-	 * Add a new Dependency
+	 * Creates a new brand dependency support object
+	 * @param dependencyType
 	 */
-	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
+	getDefaultDependency(dependencyType: string): DependencySupportModel {
 		let unknownIndex = this.statusList.indexOf('Unknown');
 		if (unknownIndex === -1) {
 			unknownIndex = 0
 		}
-		let dependencySupportModel: DependencySupportModel = {
+
+		return {
 			id: 0,
 			recordState: RecordState.created,
 			dataFlowFreq: this.dataFlowFreqList[0],
@@ -175,6 +177,13 @@ export class SupportsDependsComponent implements OnInit {
 			comment: ''
 		};
 
+	}
+
+	/**
+	 * Add a new Dependency
+	 */
+	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
+		const dependencySupportModel = this.getDefaultDependency(dependencyType);
 		dataGrid.addResultSetItem(dependencySupportModel);
 		this.onChangeInternalModel();
 		this.dataGridDependsOnHelper.getCreatedUpdatedRecords();
@@ -281,10 +290,14 @@ export class SupportsDependsComponent implements OnInit {
 	 * Confirm before delete
 	 * **/
 	public onClickDelete(dataItem: any, dataGrid: DataGridOperationsHelper, dependencyType: DEPENDENCY_TYPE): void {
-		this.dialogService.confirm(
-			'Confirm Delete',
-			'Please confirm delete of this record. This action cannot be undone.'
-		).subscribe(
+		const hasChanged =  JSON.stringify(dataItem) !== JSON.stringify(this.getDefaultDependency(dependencyType));
+
+		const observable = dataItem.id !== 0 || (dataItem.id === 0 && hasChanged) ? this.dialogService.confirm(
+				'Confirm Delete',
+				'Please confirm delete of this record. This action cannot be undone.'
+			) : Observable.of({ confirm: DialogConfirmAction.CONFIRM } );
+
+		observable.subscribe(
 			(data: any) => {
 				if (data.confirm === DialogConfirmAction.CONFIRM) {
 					this.onDeleteDependencySupport(dataItem, dataGrid, dependencyType);

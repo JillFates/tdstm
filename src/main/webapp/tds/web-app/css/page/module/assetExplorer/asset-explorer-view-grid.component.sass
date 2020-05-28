@@ -4,7 +4,7 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
     margin: 0
 
   kendo-grid-list
-    height: 64vh
+    height: calc( 100vh - var(--subtraction-height) - var(--filter-height))
 
   // wrap overflow text in ellipsis mode.
   kendo-grid.k-grid td
@@ -170,6 +170,7 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
     label
       margin-bottom: 0
   .selected-assets-counter
+    padding-left: 0
     .icon
       position: relative
       bottom: 2px

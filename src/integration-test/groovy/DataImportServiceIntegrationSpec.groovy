@@ -1,6 +1,8 @@
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.GormUtil
@@ -19,6 +21,8 @@ import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.DataTransformService
+import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.imports.ImportBatchRecord
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.manufacturer.ManufacturerAlias
@@ -30,8 +34,11 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
+import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
+import org.mortbay.util.ajax.JSON
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 import test.helper.AssetEntityTestHelper
@@ -49,7 +56,10 @@ class DataImportServiceIntegrationSpec extends Specification {
     DataImportService dataImportService
 
 	@Shared
-    SecurityService securityService
+	SecurityService securityService
+
+	@Shared
+	DataTransformService dataTransformService
 
 	@Shared
 	DataScriptTestHelper dataScriptTestHelper
@@ -740,7 +750,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			os.close()
 
 		when: 'calling to transform the data with the ETL script'
-			Map transformResults = dataImportService.transformEtlData(project.id, Mock(UserLogin), dataScript.id, fileUploadName, false)
+			Map transformResults = dataTransformService.transformEtlData(Mock(UserLogin), project.id, dataScript.id, fileUploadName, false, 'progress-key')
 			String transformedFileName = transformResults['filename']
 		then: 'the results should have a filename'
 			transformResults.containsKey('filename')
@@ -972,6 +982,24 @@ class DataImportServiceIntegrationSpec extends Specification {
 			retVal.error == ''
 			retVal.entities.size() > 0
 			((Model)retVal.entities[0]).modelName == modelName
+	}
+
+	void '22 Test the SearchQueryHelper.fetchEntityByAlternateKey for AssetComment and moveEvent reference field retrieving an empty results'() {
+		setup:
+			Class domainClass = AssetComment
+			String searchValue = '0'
+			String referenceFieldName = 'moveEvent'
+			Map fieldsInfo = [:]
+			Map<String,?> context = [
+					project: project,
+			]
+
+		when: 'An AssetComment is seek by moveEvent'
+			Map retVal = SearchQueryHelper.fetchEntityByAlternateKey(domainClass, searchValue, referenceFieldName, fieldsInfo, context)
+
+		then: 'entities is empty'
+			retVal.entities.isEmpty()
+			retVal.error == ''
 	}
 
 	// void '20 Test the _fetchEntityByFindResults method'() {

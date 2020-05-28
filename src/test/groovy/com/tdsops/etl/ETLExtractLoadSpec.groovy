@@ -1708,38 +1708,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			}
 	}
 
-	void 'test can throw an exception if script tries evaluate an invalid method loaded into the SOURCE.property'() {
-
-		given:
-			ETLFieldsValidator validator = new ETLFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuilder()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				read labels
-				domain Application
-				iterate {
-					extract 'vendor name' load 'appVendor'
-					if (!SOURCE.technology.unknownMethod('NGM')){
-						set environment with 'Production'
-					} else {
-						set environment with 'Development'
-					}
-				}
-			""".stripIndent())
-
-		then: 'An ETLProcessorException is thrown'
-			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (String) values: [NGM]'
-	}
-
 	void 'test can ignore current row based on some condition'() {
 
 		given:
@@ -3694,6 +3662,173 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 					}
 				}
 			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-17516')
+	void 'test all fields in SOURCE objects are String type for a CSV dataset'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				name,version
+				'FUBAR',1
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					load 'Name' with SOURCE.name
+					load 'Version' with SOURCE.version
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'appVersion'] as Set
+					assertWith(data[0]) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							value == 'FUBAR'
+							originalValue == 'FUBAR'
+						}
+						assertWith(fields.appVersion) {
+							value == '1'
+							originalValue == '1'
+						}
+					}
+				}
+			}
+
+
+		cleanup:
+			if (fileName) {
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-17516')
+	void 'test all fields in SOURCE objects are String type for a Excel dataset'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetXLSXDataSet('Applications', """
+					name,version
+					FUBAR,1
+				""".stripIndent().trim()
+			)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				sheet 'Applications'
+				read labels
+				domain Application
+				iterate {
+					load 'Name' with SOURCE.name
+					load 'Version' with SOURCE.version
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'appVersion'] as Set
+					assertWith(data[0]) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							value == 'FUBAR'
+							originalValue == 'FUBAR'
+						}
+						assertWith(fields.appVersion) {
+							value == '1'
+							originalValue == '1'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-17516')
+	void 'test all fields in SOURCE objects are String type for a JSON dataset'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildJSONDataSet('''
+				[
+					{
+						"name": "FUBAR",
+						"version": 1
+					}
+				]
+			'''.stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					load 'Name' with SOURCE.name
+					load 'Version' with SOURCE.version
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'appVersion'] as Set
+					assertWith(data[0]) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							value == 'FUBAR'
+							originalValue == 'FUBAR'
+						}
+						assertWith(fields.appVersion) {
+							value == 1
+							originalValue == 1
+						}
+					}
+				}
+			}
+
 
 		cleanup:
 			if (fileName) {

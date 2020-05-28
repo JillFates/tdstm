@@ -3,6 +3,7 @@ package net.transitionmanager.connector
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import net.transitionmanager.action.ReactionScriptInvocationParams
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.action.HttpProducerService
@@ -27,11 +28,11 @@ class GenericHttpConnector extends AbstractConnector {
 	 * Call the service supporting this connector execute method. This method name <code>invokeHttpRequest</code> is referenced
 	 * by HttpConnector and VMwarevCenterConnector dictionary in the "method" property of every dictionary item.
 	 *
-	 * @param actionRequest - the api action request
+	 * @param invocationParams - an instance of {@link ReactionScriptInvocationParams} with the api action request
 	 * @return an api action response
 	 */
-	ApiActionResponse callEndpoint(ActionRequest actionRequest) {
-		return httpProducerService.executeCall(actionRequest)
+	ApiActionResponse callEndpoint(ReactionScriptInvocationParams invocationParams) {
+		return httpProducerService.executeCall(invocationParams)
 	}
 
 }

@@ -22,7 +22,7 @@ class DataSetRowFacade {
         if (!row.containsKey(name)) {
             throw ETLProcessorException.unknownDataSetProperty(name)
         }
-        return new SourceField(row[name])
+        return row[name]
     }
     /**
      * Checks if Dataset contains a particular column name.

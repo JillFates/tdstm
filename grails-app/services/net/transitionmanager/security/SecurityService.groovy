@@ -33,7 +33,6 @@ import net.transitionmanager.common.EmailDispatch
 import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ProjectRequiredException
 import net.transitionmanager.exception.ServiceException
@@ -61,7 +60,6 @@ import java.security.PublicKey
 
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
-
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */

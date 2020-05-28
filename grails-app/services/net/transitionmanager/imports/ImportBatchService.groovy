@@ -10,6 +10,7 @@ import com.tdssrc.grails.NumberUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.command.ImportBatchRecordFieldUpdateCommand
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
+import net.transitionmanager.command.importBatch.ListImportBatchesCommand
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
@@ -203,13 +204,12 @@ class ImportBatchService implements ServiceMethods {
 	 * Return a list with the existing batches for the given project and with
 	 * the given status (optional).
 	 * @param project - if null, the user's current project will be used.
-	 * @param batchStatus - param for filtering by that status.
+	 * @param command - {@link ListImportBatchesCommand} for filtering by groupGuid.
 	 * @return all the batches for the project.
 	 */
-	Collection listBatches(Project project, ImportBatchStatusEnum batchStatus = null) {
-		Map results = findBatchesWithSummary(project)
+	Collection listBatches(Project project, ListImportBatchesCommand command) {
+		Map results = findBatchesWithSummary(project, null, null, command.groupGuid)
 		return results.values()
-
 	}
 
 	/**
@@ -614,10 +614,9 @@ class ImportBatchService implements ServiceMethods {
 
 		try {
 			quartzScheduler.scheduleJob(trigger)
+			log.info('scheduleJob() {} kicked of an batch import process for batch ({})', securityService.currentUsername, batchId)
 		} catch (Exception e) {
-			log.info('Could not schedule import batch. {}\\n{}', e.message, ExceptionUtil.stackTraceToString(e))
+			log.info('Import batch {} could not be started because another batch is currently being processed. It will be queue to be processed afterward.', batchId)
 		}
-
-		log.info('scheduleJob() {} kicked of an batch import process for batch ({})', securityService.currentUsername, batchId)
 	}
 }
