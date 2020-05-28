@@ -106,4 +106,5 @@ databaseChangeLog = {
 
 	include file: 'version/v4_7_3/20190423-add-category-codes-to-asset-options.groovy'
 	include file: 'version/v5_0_0/20200515-fixing-dataviews.groovy'
+	include file: 'version/v5_0_0/20200528-fixing-storage-dataview.groovy'
 }
