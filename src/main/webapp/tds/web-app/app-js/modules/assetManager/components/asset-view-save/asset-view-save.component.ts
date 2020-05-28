@@ -99,6 +99,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 									<input clrRadio type="radio"
 												 [value]="saveAsOptions.OVERRIDE_FOR_ALL.value"
 												 [name]="'radio-mode'"
+									       		 [attr.disabled]="saveAsOptions.OVERRIDE_FOR_ALL.disabled ? true : null"
 												 [(ngModel)]="model.saveAsOption">
 									<label class="clr-control-label inline">
 										{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}
