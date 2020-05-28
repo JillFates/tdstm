@@ -75,6 +75,10 @@ td[data-for].H .select2-choice,
     background-color:#fff !important;
     background-image: none !important;
 }
+div.modal-dialog div.modal-content div.modal-header {
+	background: #ffffff 50% 50% repeat-x !important;
+}
+  
 </style>
 <style type="text/css" media="print">
 <%--Had given these css property in css file but was not reflecting. so defined in page itself--%>
@@ -97,6 +101,11 @@ table.tablePerPage {
 div.onepage {
     page-break-after: always;
 }
+
+div.modal-dialog div.modal-content div.modal-header {
+	background: #ffffff 50% 50% repeat-x !important;
+}
+
 </style>
 	<div class="body old-legacy-content content-generate-application-profiles" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:100%">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
