@@ -652,8 +652,8 @@ class MoveEventService implements ServiceMethods {
 			}
 		}
 		// select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
-		String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
-		moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
+		String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent =: moveEvent AND mes.type =: type ORDER BY mes.dateCreated DESC"
+		moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED] )[0]
 
 		String eventClock = TimeUtil.formatTimeDuration(dayTime)
 
