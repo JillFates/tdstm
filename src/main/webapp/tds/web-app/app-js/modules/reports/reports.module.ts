@@ -35,7 +35,7 @@ import {ApplicationEventResultsReportComponent} from './components/application-e
 import {ReportToggleFiltersComponent} from './components/report-toggle-filters.component';
 import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
 import {ActivityMetricsReportComponent} from './components/activity-metrics/activity-metrics-report.component';
-
+import { AssetCommentViewEditComponent } from './../assetComment/components/view-edit/asset-comment-view-edit.component';
 @NgModule({
 	imports: [
 		// Angular
@@ -64,7 +64,8 @@ import {ActivityMetricsReportComponent} from './components/activity-metrics/acti
 		ApplicationEventResultsReportComponent,
 		ApplicationProfilesReportComponent,
 		ReportToggleFiltersComponent,
-		ActivityMetricsReportComponent
+		ActivityMetricsReportComponent,
+		AssetCommentViewEditComponent
 	],
 	providers: [
 		// Resolve
@@ -78,9 +79,12 @@ import {ActivityMetricsReportComponent} from './components/activity-metrics/acti
 	exports: [
 		ApplicationConflictsComponent,
 		DatabaseConflictsComponent,
-		PreEventCheckListSelectorComponent
+		PreEventCheckListSelectorComponent,
+		AssetCommentViewEditComponent
 	],
-	entryComponents: []
+	entryComponents: [
+		AssetCommentViewEditComponent
+	]
 })
 
 export class ReportsModule {
