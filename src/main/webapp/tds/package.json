@@ -60,7 +60,7 @@
 		"@webcomponents/custom-elements": "1.0.0",
 		"angular-in-memory-web-api": "0.8.0",
 		"angular-progress-bar": "1.0.9",
-		"codemirror": "5.43.0",
+		"codemirror": "5.58.2",
 		"compressorjs": "1.0.5",
 		"core-js": "2.6.4",
 		"file-saver": "2.0.2",
